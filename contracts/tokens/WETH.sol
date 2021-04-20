@@ -31,6 +31,7 @@ contract WETH is AccessControl, VerifySignature {
     }
 
     constructor() {
+        _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
          _setupRole(ADMIN_ROLE, msg.sender);
 
         _setRoleAdmin(BURNER_ROLE, ADMIN_ROLE);

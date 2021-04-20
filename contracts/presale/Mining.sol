@@ -4,55 +4,44 @@ pragma abicoder v2;
 
 import "../interfaces/IERC20.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol";
-import "../libraries/LibTokenSale.sol";
-import './CrowdsaleStorageSetting.sol';
+import "../interfaces/IFLDVault.sol";
+
+import "../libraries/LibTokenMining.sol";
+import './MiningStorageSetting.sol';
 import './StepFixedRatio.sol';
 
 /**
- * @title Crowdsale
- * @dev Crowdsale is a base contract for managing a token crowdsale.
- * Crowdsales have a start and end timestamps, where investors can make
- * token purchases and the crowdsale will assign them tokens based
- * on a token per ETH rate. Funds collected are forwarded to a wallet
- * as they arrive.
+ * @title Mining
+ * @dev
  */
-contract Crowdsale
+contract Mining
     is
-    CrowdsaleStorageSetting, StepFixedRatio, Initializable  {
-    /**
-    * event for token purchase logging
-    * @param purchaser who paid for the tokens
-    * @param value weis paid for purchase
-    * @param duration staking period
-    * @param amount amount of tokens purchased
-    */
+    MiningStorageSetting, StepFixedRatio, Initializable  {
+
+    address internal zeroAddr = address(0);
+
     event TokenPurchase(address indexed paytoken, address indexed purchaser, uint256 value, uint256 duration, uint256 amount);
     event TokenRePurchase(address indexed paytoken, address indexed purchaser, uint256 value, uint256 duration, uint256 amount);
     event Withdraw(address indexed paytoken, address indexed from, address token, uint256 value);
 
-  // event Withdraw(address indexed from, address indexed beneficiary,);
-
     function initialize(
         uint256 _startTime,
-        uint256 _endTime,
         address _token,
-        uint256 _cap,
+        address _vault,
         address _paytoken
     )
         external
         initializer
     {
         require(_startTime >= 0);
-        require(_endTime >= _startTime && _endTime >= block.timestamp);
         require(_token != address(0));
-        require(_cap > 0);
+        require(_vault != address(0));
 
         _initialize();
 
         if(_token != address(0)) token = _token;
         startTime = _startTime;
-        endTime = _endTime;
-        cap = _cap;
+        vault = _vault;
         paytoken = _paytoken;
         maxRatio = 1;
         ratioType = uint(REWARD_RATIOTYPE.LINEAR_TIME);
@@ -68,8 +57,9 @@ contract Crowdsale
 
     // low level token purchase function
     function buyTokens(uint256 duration) public payable {
-      require(paytoken == address(0), "Crowdsale: paytoken is non Zero");
-      require(validPurchaseETH(duration), "Crowdsale: validPurchaseETH is fail");
+      require(paytoken == address(0) && vault != address(0) && vaultHashName != 0, "Crowdsale: paytoken is non Zero");
+      require(block.timestamp >= startTime);
+      require(IFLDVault(vault).validClaimVault(calculateAmountByRatio(msg.value, duration)));
 
       uint256 weiAmount = msg.value;  // stake amount
 
@@ -92,8 +82,9 @@ contract Crowdsale
 
     // low level token purchase function
     function buyTokens(address _paytoken, uint256 amount, uint256 duration) external {
-      require(paytoken != address(0) && paytoken == _paytoken);
-      require(validPurchase(amount, duration));
+      require(paytoken != address(0) && paytoken == _paytoken && vault != address(0) && vaultHashName != 0);
+      require(block.timestamp >= startTime);
+      require(IFLDVault(vault).validClaimVault(calculateAmountByRatio(amount, duration)));
 
       // calculate token amount to be created
       uint256 rewardAmount = calculateAmountByRatio(amount, duration);
@@ -114,37 +105,6 @@ contract Crowdsale
       //forwardFunds();
     }
 
-    // send ether to the fund collection wallet
-    // override to create custom fund forwarding mechanisms
-    //function forwardFunds() internal {
-    //  wallet.transfer(msg.value);
-    //}
-
-    // @return true if the transaction can buy tokens
-    function validPurchase(uint256 _amount, uint256 duration) public view returns (bool) {
-      return validPeriod(duration) && validCap(_amount, duration);
-    }
-
-    function validPeriod(uint256 duration) public view returns (bool) {
-      bool withinPeriod = block.timestamp >= startTime && (block.timestamp + duration) <= endTime;
-      return withinPeriod;
-    }
-    function validCap(uint256 _amount, uint256 duration) public view returns (bool) {
-      bool withinCap = (weiRaised + calculateAmountByRatio(_amount, duration)) <= cap;
-      return withinCap;
-    }
-
-    function validPurchaseETH(uint256 duration) internal view returns (bool) {
-      bool nonZeroPurchase = msg.value != 0;
-      return nonZeroPurchase && validPurchase(msg.value, duration);
-    }
-
-    // @return true if crowdsale event has ended
-    function hasEnded() public view returns (bool) {
-      bool capReached = weiRaised >= cap;
-      return block.timestamp > endTime || capReached;
-    }
-
     function getRatio(uint256 _duration) public view returns (uint256 ratio) {
       if( ratioType == uint(REWARD_RATIOTYPE.LINEAR_TIME) ) return getLinearRatioByDuration(_duration);
       else return getRatioByDuration(_duration);
@@ -155,7 +115,7 @@ contract Crowdsale
       else return calculateAmountWithRatioByDuration(_amount, _duration);
     }
 
-    function withdraw() external returns (bool){
+     function withdraw() external returns (bool){
       uint256 unLockAmount = releaseUserLockStakedToken(msg.sender);
       require(unLockAmount > 0, "Crowdsale: There is no amount that can be withdrawn.");
       if(paytoken == address(0)){
@@ -167,17 +127,17 @@ contract Crowdsale
           require(success, "Crowdsale: withdraw failed.");
           emit Withdraw(paytoken, msg.sender, address(0), unLockAmount );
       } else {
-          IERC20(paytoken).transfer(msg.sender, unLockAmount);
+          require(IERC20(paytoken).transfer(msg.sender, unLockAmount));
           emit Withdraw(paytoken, msg.sender, paytoken, unLockAmount);
       }
       return true;
     }
 
     function rebuyToken(uint256 _duration) external {
-
+      require(block.timestamp >= startTime);
       // Extend lock's releaseTime
       uint256 rebuyAmount = rebuyUserLockStakedToken(msg.sender, block.timestamp + _duration);
-      require(validPurchase(rebuyAmount, _duration));
+      require(IFLDVault(vault).validClaimVault(calculateAmountByRatio(rebuyAmount, _duration)));
 
       // calculate token amount to be created
       uint256 rewardAmount = calculateAmountByRatio(rebuyAmount, _duration);
@@ -186,12 +146,12 @@ contract Crowdsale
       weiRaised += rewardAmount;
 
       // transfer token rewardAmount
-      IERC20(token).transfer(msg.sender, rewardAmount);
+      require(IERC20(token).transfer(msg.sender, rewardAmount));
       emit TokenRePurchase(paytoken, msg.sender, rebuyAmount, _duration, rewardAmount);
     }
 
-    function rebuyUserLockStakedToken(address _user, uint256 _releaseTime) internal returns (uint256 rebuyAmount) {
-      LibTokenSale.LockAmount[] storage userLocks = userLockStakedToken[_user];
+  function rebuyUserLockStakedToken(address _user, uint256 _releaseTime) internal returns (uint256 rebuyAmount) {
+      LibTokenMining.LockAmount[] storage userLocks = userLockStakedToken[_user];
       rebuyAmount = 0;
 
       for (uint256 i = 0; i< userLocks.length; i++){
@@ -203,8 +163,9 @@ contract Crowdsale
     }
 
 
+
     function releaseUserLockStakedToken(address _user) internal returns (uint256 unLockAmount) {
-      LibTokenSale.LockAmount[] storage userLocks = userLockStakedToken[_user];
+      LibTokenMining.LockAmount[] storage userLocks = userLockStakedToken[_user];
       unLockAmount = 0;
 
       for (uint256 i = 0; i< userLocks.length; i++){
@@ -231,7 +192,7 @@ contract Crowdsale
       }
     }
 
-    function getAllUserLocks(address _user) public view returns (LibTokenSale.LockAmount[] memory) {
+    function getAllUserLocks(address _user) public view returns (LibTokenMining.LockAmount[] memory) {
       return userLockStakedToken[_user];
     }
 
@@ -239,13 +200,12 @@ contract Crowdsale
       counts = userLockStakedToken[_user].length;
     }
 
-    function getUserLocks(address _user, uint256 _index) public view returns (LibTokenSale.LockAmount memory) {
+    function getUserLocks(address _user, uint256 _index) public view returns (LibTokenMining.LockAmount memory) {
       require(_index < userLockStakedToken[_user].length);
       return userLockStakedToken[_user][_index];
     }
 
 
-    // low level token purchase function
     function addLockStakedToken(
         address _user,
         uint256 _amount,
@@ -255,7 +215,7 @@ contract Crowdsale
     {
         require(_user != address(0) && _amount > 0 && _releaseTime > block.timestamp );
         bool addLock = false;
-        LibTokenSale.LockAmount[] storage userLocks = userLockStakedToken[_user];
+        LibTokenMining.LockAmount[] storage userLocks = userLockStakedToken[_user];
 
         for (uint256 i = 0; i< userLocks.length; i++){
           if (userLocks[i].released == true && userLocks[i].releaseTime < block.timestamp) {
@@ -265,6 +225,7 @@ contract Crowdsale
             addLock = true;
           }
         }
-        if(!addLock) userLocks.push(LibTokenSale.LockAmount(false, _releaseTime, _amount));
+        if(!addLock) userLocks.push(LibTokenMining.LockAmount(false, _releaseTime, _amount));
     }
+
 }

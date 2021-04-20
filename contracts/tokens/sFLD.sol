@@ -45,7 +45,7 @@ contract sFLD is IFLD, AccessControl, VerifySignature {
                 address(this)
             )
         );
-
+        _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
         _setupRole(ADMIN_ROLE, msg.sender);
 
         _setRoleAdmin(BURNER_ROLE, ADMIN_ROLE);
