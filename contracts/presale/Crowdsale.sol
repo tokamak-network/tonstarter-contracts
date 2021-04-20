@@ -1,5 +1,5 @@
 //SPDX-License-Identifier: Unlicense
-pragma solidity ^0.7.0;
+pragma solidity ^0.7.6;
 pragma abicoder v2;
 
 import "../interfaces/IERC20.sol";
@@ -28,7 +28,7 @@ contract Crowdsale
     */
     event TokenPurchase(address indexed purchaser, uint256 value, uint256 duration, uint256 amount);
     event TokenRePurchase(address indexed purchaser, uint256 value, uint256 duration, uint256 amount);
-
+    event Withdraw(address indexed from, address token, uint256 value);
 
   // event Withdraw(address indexed from, address indexed beneficiary,);
 
@@ -46,6 +46,8 @@ contract Crowdsale
         require(_endTime >= _startTime && _endTime >= block.timestamp);
         require(_token != address(0));
         require(_cap > 0);
+
+        _initialize();
 
         if(_token != address(0)) token = _token;
         startTime = _startTime;
@@ -104,14 +106,14 @@ contract Crowdsale
 
       // transfer token rewardAmount
       IERC20(token).transfer(msg.sender, rewardAmount);
-      TokenPurchase(msg.sender, weiAmount, duration, rewardAmount);
+      emit TokenPurchase(msg.sender, weiAmount, duration, rewardAmount);
 
       //forwardFunds();
     }
 
 
     // low level token purchase function
-    function buyTokens(address _paytoken, uint256 amount, uint256 duration) public {
+    function buyTokens(address _paytoken, uint256 amount, uint256 duration) external {
       require(paytoken != address(0) && paytoken == _paytoken);
       require(validPurchase(amount, duration));
 
@@ -129,7 +131,7 @@ contract Crowdsale
 
       // transfer token rewardAmount
       IERC20(token).transfer(msg.sender, rewardAmount);
-      TokenPurchase(msg.sender, amount, duration, rewardAmount);
+      emit TokenPurchase(msg.sender, amount, duration, rewardAmount);
 
       //forwardFunds();
     }
@@ -175,7 +177,7 @@ contract Crowdsale
       else return calculateAmountWithRatioByDuration(_amount, _duration);
     }
 
-    function withdraw() public returns (bool){
+    function withdraw() external returns (bool){
       uint256 unLockAmount = releaseUserLockStakedToken(msg.sender);
       require(unLockAmount > 0, "Crowdsale: There is no amount that can be withdrawn.");
       if(paytoken == address(0)){
@@ -185,14 +187,15 @@ contract Crowdsale
           // msg.sender.transfer(unLockAmount);
           (bool success, ) = msg.sender.call{value: unLockAmount}("");
           require(success, "Crowdsale: withdraw failed.");
-
+          emit Withdraw(msg.sender, address(0), unLockAmount );
       } else {
           IERC20(paytoken).transfer(msg.sender, unLockAmount);
+          emit Withdraw(msg.sender, paytoken, unLockAmount);
       }
       return true;
     }
 
-    function rebuyToken(uint256 _duration) public {
+    function rebuyToken(uint256 _duration) external {
 
       // Extend lock's releaseTime
       uint256 rebuyAmount = rebuyUserLockStakedToken(msg.sender, block.timestamp + _duration);
@@ -206,7 +209,7 @@ contract Crowdsale
 
       // transfer token rewardAmount
       IERC20(token).transfer(msg.sender, rewardAmount);
-      TokenRePurchase(msg.sender, rebuyAmount, _duration, rewardAmount);
+      emit TokenRePurchase(msg.sender, rebuyAmount, _duration, rewardAmount);
     }
 
     function rebuyUserLockStakedToken(address _user, uint256 _releaseTime) internal returns (uint256 rebuyAmount) {
@@ -258,7 +261,7 @@ contract Crowdsale
       counts = userLockStakedToken[_user].length;
     }
 
-    function lengthAllUserLocks(address _user, uint256 _index) public view returns (LibTokenSale.LockAmount memory) {
+    function getUserLocks(address _user, uint256 _index) public view returns (LibTokenSale.LockAmount memory) {
       require(_index < userLockStakedToken[_user].length);
       return userLockStakedToken[_user][_index];
     }

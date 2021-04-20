@@ -248,7 +248,6 @@ describe('Crowdsale with ETH ', function () {
                 await timeout(15);
             }
 
-
         }
 
     });

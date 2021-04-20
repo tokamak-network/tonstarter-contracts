@@ -1,5 +1,5 @@
 //SPDX-License-Identifier: Unlicense
-pragma solidity ^0.7.0;
+pragma solidity ^0.7.6;
 
 interface ISFLD {
     // event Approval(address indexed owner, address indexed spender, uint value);

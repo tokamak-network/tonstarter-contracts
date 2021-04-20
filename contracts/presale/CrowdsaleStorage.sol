@@ -1,5 +1,5 @@
 //SPDX-License-Identifier: Unlicense
-pragma solidity ^0.7.0;
+pragma solidity ^0.7.6;
 
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "../libraries/LibTokenSale.sol";
@@ -36,7 +36,8 @@ contract CrowdsaleStorage is AccessControl{
   //
   mapping(address => LibTokenSale.LockAmount[]) public userLockStakedToken;
 
-  constructor() {
+  function _initialize()
+    internal {
     _setupRole(ADMIN_ROLE, msg.sender);
   }
 
