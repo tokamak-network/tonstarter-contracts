@@ -5,6 +5,9 @@ import '../interfaces/IFLD.sol';
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import './VerifySignature.sol';
 
+/**
+* This is a platform token.
+*/
 contract FLD is IFLD, AccessControl, VerifySignature {
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
     bytes32 public constant MINTER_ROLE = keccak256("MINTER");
@@ -85,29 +88,39 @@ contract FLD is IFLD, AccessControl, VerifySignature {
         balanceOf[to] += value;
         emit Transfer(from, to, value);
     }
-
+    /**
+    * Issue a token.
+    */
     function mint(address to, uint256 amount) external override returns (bool) {
         require(hasRole(MINTER_ROLE, msg.sender), "FLD: Caller is not a minter");
         _mint(to, amount);
         return true;
     }
-
+    /**
+    * burn a token.
+    */
     function burn(address from, uint256 amount) external override returns (bool) {
         require(hasRole(BURNER_ROLE, msg.sender), "FLD: Caller is not a burner");
         _burn(from, amount);
         return true;
     }
-
+    /**
+    * The sender authorize spender to spend sender's tokens in the amount.
+    */
     function approve(address spender, uint256 value) external override returns (bool) {
         _approve(msg.sender, spender, value);
         return true;
     }
-
+    /**
+    * The sender sends the value of this token to addressTO.
+    */
     function transfer(address to, uint256 value) external override returns (bool) {
         _transfer(msg.sender, to, value);
         return true;
     }
-
+    /**
+    * The sender sends the amount of tokens from fromAddress to toAddress.
+    */
     function transferFrom(
         address from,
         address to,
@@ -123,6 +136,10 @@ contract FLD is IFLD, AccessControl, VerifySignature {
         return true;
     }
 
+    /**
+    * Authorizes the owner's token to be used by the spender as much as the value.
+    * The signature must have the owner's signature.
+    */
     function permit(
         address owner,
         address spender,
@@ -140,6 +157,11 @@ contract FLD is IFLD, AccessControl, VerifySignature {
         _approve(owner, spender, value);
     }
 
+    /**
+    * Authorizes the owner's token to be used by the spender as much as the value.
+    * The signature must have the owner's signature.
+    * Make sure the signature is correct.
+    */
     function permitVerify(
         address _signer,
         address _to, uint256 _amount,  uint256 _period,

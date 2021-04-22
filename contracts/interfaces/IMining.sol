@@ -4,7 +4,7 @@ pragma abicoder v2;
 
 import "../libraries/LibTokenSale.sol";
 
-interface IPreMining{
+interface IMining{
 
     event TokenPurchase(address indexed purchaser, uint256 value, uint256 duration, uint256 amount);
     event TokenRePurchase(address indexed purchaser, uint256 value, uint256 duration, uint256 amount);
@@ -59,12 +59,6 @@ interface IPreMining{
     function validPeriod(uint256 duration) external view returns (bool);
 
     /**
-    * When the FLD is mined by sending the amount for a period of time,
-    * it returns true if the vault limit is not exceeded.
-    */
-    function validCap(uint256 _amount, uint256 duration) external view returns (bool);
-
-    /**
     * Calculate the mining rate when locked during the period.
     * Depending on the type of mining, it is calculated at a linear rate over time,
     * or at a fixed rate for each specific period unit.
@@ -94,19 +88,29 @@ interface IPreMining{
      */
     function getUserLocks(address user, uint256 index) external view returns (LibTokenSale.LockAmount memory);
 
-     // The token being sold
+    // The token being sold
     function token() external view returns (address);
 
+    // vault address
+    function vault() external view returns (address);
+
+    // The name(hash) of the vault to use.
+    function vaultHashName() external view returns (bytes32);
 
     // The paytoken payed ( if paytoken is ether, paytoken is address(0) )
     function paytoken() external view returns (address);
 
-    //  start and end timestamps where mining are allowed (both inclusive)
+    // Mining period
     function startTime() external view returns (uint256);
     function endTime() external view returns (uint256);
 
-    // Minable amount
-    function cap() external view returns (uint256);
+    /**
+    * When calculating the mining rate with the mining period,
+    * this value is used as the unit period
+    * if the method of calculating the ratio over time is used.
+    */
+    function uintMiningPeriods() external view returns (uint256);
+
     /**
      * When only Ether is sent, the mining period is set to this value.
      * When creating a contract, this value is set as the end time-start time.
@@ -121,4 +125,5 @@ interface IPreMining{
 
     // 0:  linearly ratio by time, 1:step fixed ratio
     function ratioType() external view returns (uint);
+
 }

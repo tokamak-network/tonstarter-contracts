@@ -20,11 +20,6 @@ const utils = ethers.utils
 const {
     defaultSender, accounts, contract, web3, provider , privateKeys
 } = require('@openzeppelin/test-environment');
-/*
-// ...
-  await provider.queue.onIdle();
-  const url = provider.wrappedProvider.host;
-  */
 
 const { padLeft, toBN, toWei, fromWei , keccak256 , soliditySha3 , solidityKeccak256 } = require('web3-utils');
 

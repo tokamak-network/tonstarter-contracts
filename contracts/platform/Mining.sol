@@ -12,6 +12,7 @@ import './StepFixedRatio.sol';
 
 /**
  * @title Mining
+ * Investors can submit Ether or specific tokens to lock them in the contract and mine FLD tokens.
  * @dev
  */
 contract Mining
@@ -57,7 +58,10 @@ contract Mining
       buyToken(defaultDuration);
     }
 
-    // low level token purchase function
+     /**
+     * By sending Ether, you can lock the contract and get the FLD token.
+     * The longer the lock period, the more FLD tokens you can take.
+     */
     function buyToken(uint256 _duration) public payable {
       require(paytoken == address(0) && vault != address(0) && vaultHashName != 0, "Mining: check values fail");
       require(validPeriod(_duration));
@@ -78,11 +82,13 @@ contract Mining
       require(IERC20(token).transfer(msg.sender, rewardAmount));
       emit TokenPurchase(address(0), msg.sender, weiAmount, _duration, rewardAmount);
 
-      //forwardFunds();
     }
 
 
-    // low level token purchase function
+    /**
+     * By sending erc20 token(_paytoken), _paytoken is locked in the contract. You can get the FLD token.
+     * The longer the lock period, the more FLD tokens you can take.
+     */
     function buyTokens(address _paytoken, uint256 amount, uint256 _duration) external {
       require(paytoken != address(0) && paytoken == _paytoken
         && vault != address(0) && vaultHashName != 0, "Mining: check values fail");
@@ -105,25 +111,41 @@ contract Mining
       require(IERC20(token).transfer(msg.sender, rewardAmount));
       emit TokenPurchase(_paytoken, msg.sender, amount, _duration, rewardAmount);
 
-      //forwardFunds();
     }
 
+    /**
+    * Returns true if it is a miningable period.
+    */
     function validPeriod(uint256 duration) public view returns (bool) {
       bool withinPeriod = block.timestamp >= startTime && (block.timestamp + duration) <= endTime;
       return withinPeriod;
     }
 
+    /**
+    * Calculate the mining rate when locked during the period.
+    * Depending on the type of mining, it is calculated at a linear rate over time,
+    * or at a fixed rate for each specific period unit.
+    */
     function getRatio(uint256 _duration) public view returns (uint256 ratio) {
       if( ratioType == uint(REWARD_RATIOTYPE.LINEAR_TIME) ) return getLinearRatioByDuration(_duration);
       else return getRatioByDuration(_duration);
     }
 
+    /**
+    * When the amount is locked for a period, the amount of mining is calculated.
+    * Depending on the type of mining, it is calculated at a linear rate over time,
+    * or at a fixed rate for each specific period unit.
+    */
     function calculateAmountByRatio(uint256 _amount, uint256 _duration) public view returns (uint256 ratio) {
       if( ratioType == uint(REWARD_RATIOTYPE.LINEAR_TIME) ) return calculateAmountLinearRatioByDuration(_amount, _duration);
       else return calculateAmountWithRatioByDuration(_amount, _duration);
     }
 
-     function withdraw() external returns (bool){
+
+    /**
+    * After the lock period is over, you can get the Ether or tokens that were locked.
+    */
+    function withdraw() external returns (bool){
       uint256 unLockAmount = releaseUserLockStakedToken(msg.sender);
       require(unLockAmount > 0, "Mining: There is no amount that can be withdrawn.");
       if(paytoken == address(0)){
@@ -141,6 +163,9 @@ contract Mining
       return true;
     }
 
+    /**
+    * After the lock period expires, you can re-lock the locked Ether or token and get FLD.
+    */
     function rebuyToken(uint256 _duration) external {
       require(validPeriod(_duration));
       // Extend lock's releaseTime
@@ -158,7 +183,10 @@ contract Mining
       emit TokenRePurchase(paytoken, msg.sender, rebuyAmount, _duration, rewardAmount);
     }
 
-  function rebuyUserLockStakedToken(address _user, uint256 _releaseTime) internal returns (uint256 rebuyAmount) {
+   /**
+    * Extend lock's releaseTime of user.
+    */
+    function rebuyUserLockStakedToken(address _user, uint256 _releaseTime) internal returns (uint256 rebuyAmount) {
       LibTokenMining.LockAmount[] storage userLocks = userLockStakedToken[_user];
       rebuyAmount = 0;
 
@@ -170,8 +198,9 @@ contract Mining
       }
     }
 
-
-
+    /**
+    * Funds that have passed the lockout period is released.
+    */
     function releaseUserLockStakedToken(address _user) internal returns (uint256 unLockAmount) {
       LibTokenMining.LockAmount[] storage userLocks = userLockStakedToken[_user];
       unLockAmount = 0;
@@ -183,14 +212,22 @@ contract Mining
         }
       }
     }
-
+    /**
+     * dev test
+     */
     function curBlockTimeStamp() public view returns (uint256 curTime) {
        return block.timestamp;
     }
+    /**
+     * dev test
+     */
     function curBlockNumber() public view returns (uint256 curNumber) {
        return block.number;
     }
 
+    /**
+     * How much money can be withdrawn
+     */
     function canWithdrawAmount(address _user) public view returns (uint256 validAmount) {
       validAmount = 0;
       for (uint256 i = 0; i< userLockStakedToken[_user].length; i++){
@@ -200,20 +237,31 @@ contract Mining
       }
     }
 
+    /**
+     * the user funding array currently being managed
+     */
     function getAllUserLocks(address _user) public view returns (LibTokenMining.LockAmount[] memory) {
       return userLockStakedToken[_user];
     }
 
+    /**
+     * length of the user fund array currently being managed
+     */
     function lengthAllUserLocks(address _user) public view returns (uint256 counts) {
       counts = userLockStakedToken[_user].length;
     }
 
+    /**
+     * the user funding info of index currently being managed
+     */
     function getUserLocks(address _user, uint256 _index) public view returns (LibTokenMining.LockAmount memory) {
       require(_index < userLockStakedToken[_user].length);
       return userLockStakedToken[_user][_index];
     }
 
-
+    /**
+     * Lock the user's token amount until releaseTime
+     */
     function addLockStakedToken(
         address _user,
         uint256 _amount,

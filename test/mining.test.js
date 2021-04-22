@@ -46,6 +46,8 @@ const ADMIN_ROLE = keccak256("ADMIN");
 const MINTER_ROLE = keccak256("MINTER");
 const BURNER_ROLE = keccak256("BURNER");
 const CLAIMER_ROLE = keccak256("CLAIMER");
+const PHASE2_VAULT_HASH = keccak256("PHASE2_VAULT");
+const EVENT_VAULT_HASH = keccak256("EVENT_VAULT");
 
 const logFlag = false;
 
@@ -77,9 +79,13 @@ describe('Mining Contract', function () {
         // mint fld to vault
         await fldVault.setFLD(fld.address, {from:defaultSender});
         await fld.mint(fldVault.address, utils.parseUnits(initialTotal, 18), {from:defaultSender});
+        // add Vault Name
+        await fldVault.addPhaseVault(PHASE2_VAULT_HASH, utils.parseUnits(initialTotal, 18), {from:defaultSender})
 
         await fldVault2.setFLD(fld.address, {from:defaultSender});
         await fld.mint(fldVault2.address, utils.parseUnits(initialTotal, 18), {from:defaultSender});
+        // add Vault Name
+        await fldVault2.addPhaseVault(PHASE2_VAULT_HASH, utils.parseUnits(initialTotal, 18), {from:defaultSender})
 
         // claimFLD to user1 for test
         testToken = await TestToken.new({from:defaultSender});
@@ -97,6 +103,11 @@ describe('Mining Contract', function () {
             zeroAddress,
             {from:defaultSender});
 
+        await expect(
+            fldVault.claimVault(mining.address,  utils.parseUnits(sendAmountForTest, 18), {from:defaultSender} )
+        ).to.be.revertedWith("FLDVault: contract vault name is zero");
+
+        await fldVault.setContractVaultName(mining.address, PHASE2_VAULT_HASH, {from:defaultSender});
     });
 
     it('create mining contract with paytoken TestToken ', async function () {
@@ -109,6 +120,12 @@ describe('Mining Contract', function () {
             fldVault.address,
             testToken.address,
             {from:defaultSender});
+
+        await expect(
+            fldVault.claimVault(miningFLD.address,  utils.parseUnits(sendAmountForTest, 18), {from:defaultSender} )
+        ).to.be.revertedWith("FLDVault: contract vault name is zero");
+
+        await fldVault.setContractVaultName(miningFLD.address, PHASE2_VAULT_HASH, {from:defaultSender});
     });
 
     it('changeVaultHashName ', async function () {
@@ -116,10 +133,13 @@ describe('Mining Contract', function () {
         let preVaultHashName =  await mining.vaultHashName();
         await mining.changeVaultHashName(hash,{from:defaultSender});
         expect(preVaultHashName).be.to.not.equal(await mining.vaultHashName());
+
     });
 
     it('changeVault ', async function () {
         let preVault =  await mining.vault();
+
+        await fldVault2.setContractVaultName(mining.address, PHASE2_VAULT_HASH, {from:defaultSender});
         await mining.changeVault(fldVault2.address,{from:defaultSender});
         expect(preVault).be.to.not.equal(await mining.vault());
     });
@@ -142,6 +162,7 @@ describe('Mining Contract', function () {
         await mining.changeUintMiningPeriods(toBN(uintMiningPeriods+''),{from:defaultSender});
         expect(prevUintMiningPeriods).be.to.not.equal(await mining.uintMiningPeriods());
     });
+
     it('changeDefaultDuration ', async function () {
         let defaultDurationTemp = await mining.defaultDuration();
         let defaultDuration = '300' ;
@@ -156,8 +177,6 @@ describe('Mining Contract', function () {
         expect(changeRatioType).be.to.not.equal(await mining.ratioType());
         await mining.changeRewardRatioType(0,{from:defaultSender});
     });
-
-
 
     it('buyTokens - Etehr ', async function () {
         let userFldBalance = [0,0];

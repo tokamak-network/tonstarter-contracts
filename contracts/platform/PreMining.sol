@@ -10,18 +10,13 @@ import './StepFixedRatio.sol';
 
 /**
  * @title PreMining
+ * Investors can submit Ether or specific tokens to lock them in the contract and mine FLD tokens.
  * @dev
  */
 contract PreMining
     is
     PreMiningStorageSetting, StepFixedRatio, Initializable  {
-    /**
-    * event for token purchase logging
-    * @param purchaser who paid for the tokens
-    * @param value weis paid for purchase
-    * @param duration staking period
-    * @param amount amount of tokens purchased
-    */
+
     event TokenPurchase(address indexed paytoken, address indexed purchaser, uint256 value, uint256 duration, uint256 amount);
     event TokenRePurchase(address indexed paytoken, address indexed purchaser, uint256 value, uint256 duration, uint256 amount);
     event Withdraw(address indexed paytoken, address indexed from, address token, uint256 value);
@@ -62,7 +57,10 @@ contract PreMining
     }
 
 
-    // low level token purchase function
+    /**
+     * By sending Ether, you can lock the contract and get the FLD token.
+     * The longer the lock period, the more FLD tokens you can take.
+     */
     function buyToken(uint256 duration) public payable {
       require(paytoken == address(0), "Crowdsale: paytoken is non Zero");
       require(validPurchaseETH(duration), "Crowdsale: validPurchaseETH is fail");
@@ -82,11 +80,13 @@ contract PreMining
       require(IERC20(token).transfer(msg.sender, rewardAmount));
       emit TokenPurchase(address(0), msg.sender, weiAmount, duration, rewardAmount);
 
-      //forwardFunds();
     }
 
 
-    // low level token purchase function
+    /**
+     * By sending erc20 token(_paytoken), _paytoken is locked in the contract. You can get the FLD token.
+     * The longer the lock period, the more FLD tokens you can take.
+     */
     function buyTokens(address _paytoken, uint256 amount, uint256 duration) external {
       require(paytoken != address(0) && paytoken == _paytoken);
       require(validPurchase(amount, duration));
@@ -107,50 +107,64 @@ contract PreMining
       require(IERC20(token).transfer(msg.sender, rewardAmount));
       emit TokenPurchase(_paytoken, msg.sender, amount, duration, rewardAmount);
 
-      //forwardFunds();
     }
 
-    // send ether to the fund collection wallet
-    // override to create custom fund forwarding mechanisms
-    //function forwardFunds() internal {
-    //  wallet.transfer(msg.value);
-    //}
-
-    // @return true if the transaction can buy tokens
+    /**
+    * When the FLD is mined by sending the erc20 token amount for a period of time,
+    * it returns true if the FLD can be obtained(mined).
+    */
     function validPurchase(uint256 _amount, uint256 duration) public view returns (bool) {
       return validPeriod(duration) && validCap(_amount, duration);
     }
-
-    function validPeriod(uint256 duration) public view returns (bool) {
-      bool withinPeriod = block.timestamp >= startTime && (block.timestamp + duration) <= endTime;
-      return withinPeriod;
-    }
-    function validCap(uint256 _amount, uint256 duration) public view returns (bool) {
-      bool withinCap = (weiRaised + calculateAmountByRatio(_amount, duration)) <= cap;
-      return withinCap;
-    }
-
+    /**
+    * When the FLD is mined by sending the ether amount for a period of time,
+    * it returns true if the FLD can be obtained(mined).
+    */
     function validPurchaseETH(uint256 duration) internal view returns (bool) {
       bool nonZeroPurchase = msg.value != 0;
       return nonZeroPurchase && validPurchase(msg.value, duration);
     }
 
-    // @return true if crowdsale event has ended
-    function hasEnded() public view returns (bool) {
-      bool capReached = weiRaised >= cap;
-      return block.timestamp > endTime || capReached;
+    /**
+    * Returns true if it is a miningable period.
+    */
+    function validPeriod(uint256 duration) public view returns (bool) {
+      bool withinPeriod = block.timestamp >= startTime && (block.timestamp + duration) <= endTime;
+      return withinPeriod;
     }
 
+    /**
+    * When the FLD is mined by sending the amount for a period of time,
+    * it returns true if the vault limit is not exceeded.
+    */
+    function validCap(uint256 _amount, uint256 duration) public view returns (bool) {
+      bool withinCap = (weiRaised + calculateAmountByRatio(_amount, duration)) <= cap;
+      return withinCap;
+    }
+
+    /**
+    * Calculate the mining rate when locked during the period.
+    * Depending on the type of mining, it is calculated at a linear rate over time,
+    * or at a fixed rate for each specific period unit.
+    */
     function getRatio(uint256 _duration) public view returns (uint256 ratio) {
       if( ratioType == uint(REWARD_RATIOTYPE.LINEAR_TIME) ) return getLinearRatioByDuration(_duration);
       else return getRatioByDuration(_duration);
     }
 
+    /**
+    * When the amount is locked for a period, the amount of mining is calculated.
+    * Depending on the type of mining, it is calculated at a linear rate over time,
+    * or at a fixed rate for each specific period unit.
+    */
     function calculateAmountByRatio(uint256 _amount, uint256 _duration) public view returns (uint256 ratio) {
       if( ratioType == uint(REWARD_RATIOTYPE.LINEAR_TIME) ) return calculateAmountLinearRatioByDuration(_amount, _duration);
       else return calculateAmountWithRatioByDuration(_amount, _duration);
     }
 
+    /**
+    * After the lock period is over, you can get the Ether or tokens that were locked.
+    */
     function withdraw() external returns (bool){
       uint256 unLockAmount = releaseUserLockStakedToken(msg.sender);
       require(unLockAmount > 0, "Crowdsale: There is no amount that can be withdrawn.");
@@ -169,6 +183,9 @@ contract PreMining
       return true;
     }
 
+    /**
+    * After the lock period expires, you can re-lock the locked Ether or token and get FLD.
+    */
     function rebuyToken(uint256 _duration) external {
 
       // Extend lock's releaseTime
@@ -186,6 +203,9 @@ contract PreMining
       emit TokenRePurchase(paytoken, msg.sender, rebuyAmount, _duration, rewardAmount);
     }
 
+    /**
+    * Extend lock's releaseTime of user.
+    */
     function rebuyUserLockStakedToken(address _user, uint256 _releaseTime) internal returns (uint256 rebuyAmount) {
       LibTokenSale.LockAmount[] storage userLocks = userLockStakedToken[_user];
       rebuyAmount = 0;
@@ -198,7 +218,9 @@ contract PreMining
       }
     }
 
-
+    /**
+    * Funds that have passed the lockout period is released.
+    */
     function releaseUserLockStakedToken(address _user) internal returns (uint256 unLockAmount) {
       LibTokenSale.LockAmount[] storage userLocks = userLockStakedToken[_user];
       unLockAmount = 0;
@@ -211,13 +233,9 @@ contract PreMining
       }
     }
 
-    function curBlockTimeStamp() public view returns (uint256 curTime) {
-       return block.timestamp;
-    }
-    function curBlockNumber() public view returns (uint256 curNumber) {
-       return block.number;
-    }
-
+    /**
+     * How much money can be withdrawn
+     */
     function canWithdrawAmount(address _user) public view returns (uint256 validAmount) {
       validAmount = 0;
       for (uint256 i = 0; i< userLockStakedToken[_user].length; i++){
@@ -227,21 +245,44 @@ contract PreMining
       }
     }
 
+    /**
+     * You can view the current lock storage of your account.
+     */
     function getAllUserLocks(address _user) public view returns (LibTokenSale.LockAmount[] memory) {
       return userLockStakedToken[_user];
     }
 
+    /**
+     * the current lock storage length of your account.
+     */
     function lengthAllUserLocks(address _user) public view returns (uint256 counts) {
       counts = userLockStakedToken[_user].length;
     }
 
+    /**
+     * You can view the lock storage of array index of your account.
+     */
     function getUserLocks(address _user, uint256 _index) public view returns (LibTokenSale.LockAmount memory) {
       require(_index < userLockStakedToken[_user].length);
       return userLockStakedToken[_user][_index];
     }
 
+    /**
+     * dev test
+     */
+    function curBlockTimeStamp() public view returns (uint256 curTime) {
+       return block.timestamp;
+    }
+    /**
+     * dev test
+     */
+    function curBlockNumber() public view returns (uint256 curNumber) {
+       return block.number;
+    }
 
-    // low level token purchase function
+    /**
+     * Lock the user's token amount until releaseTime
+     */
     function addLockStakedToken(
         address _user,
         uint256 _amount,
