@@ -19,8 +19,6 @@ contract Mining
     is
     MiningStorageSetting, StepFixedRatio, Initializable  {
 
-    address internal zeroAddr = address(0);
-
     event TokenPurchase(address indexed paytoken, address indexed purchaser, uint256 value, uint256 duration, uint256 amount);
     event TokenRePurchase(address indexed paytoken, address indexed purchaser, uint256 value, uint256 duration, uint256 amount);
     event Withdraw(address indexed paytoken, address indexed from, address token, uint256 value);

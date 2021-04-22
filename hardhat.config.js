@@ -8,7 +8,7 @@ require('dotenv').config()
 module.exports = {
   defaultNetwork: "rinkeby",
   networks: {
-    /*hardhat: {
+    hardhat: {
       accounts: {
         mnemonic: process.env.MNEMONIC_HARDHAT,
         count: 30,
@@ -16,10 +16,12 @@ module.exports = {
         accountsBalance: '10000000000000000000000',
       },
       chainId: 31337,
-    }, */
+    },
     rinkeby: {
       url: `https://rinkeby.infura.io/v3/${process.env.InfuraKey}`,
-      accounts: ['0x30bfca3986e777d023144fb9db4f9f1cf9dbfb6b6f0b9479d6a9276f168c733c'],
+      accounts: [
+        `${process.env.ACCOUNT0_PK}`,
+        `${process.env.ACCOUNT1_PK}` ],
       gasMultiplier: 1.25
     },/*
     localhost: {
