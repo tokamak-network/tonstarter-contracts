@@ -32,20 +32,24 @@ contract MiningStorageSetting is MiningStorage {
         external
         onlyOwner
     {
-        require(_hash != 0x0);
+        require(_hash != 0x0 && vaultHashName != _hash );
 
         vaultHashName = _hash;
     }
 
-    function changeStartTime(
-        uint256 _startTime
+    function changeStartEndTime(
+        uint256 _startTime,
+        uint256 _endTime
     )
         external
         onlyOwner
     {
-        require(_startTime > 0 && _startTime != startTime);
+        require(_startTime > 0 && _endTime > 0 && _startTime < _endTime);
+        require(_startTime != startTime || _endTime != endTime );
 
         startTime = _startTime;
+        endTime = _endTime;
+        uintMiningPeriods = _endTime - _startTime;
     }
 
     function changeUintMiningPeriods(

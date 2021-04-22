@@ -19,6 +19,7 @@ contract MiningStorage is AccessControl{
 
   // start and end timestamps where investments are allowed (both inclusive)
   uint256 public startTime;
+  uint256 public endTime;
   uint256 public uintMiningPeriods;
   uint256 public defaultDuration;
 

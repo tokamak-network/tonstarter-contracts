@@ -12,7 +12,7 @@
 
 In one terminal run `npx hardhat node`
 
-Then in another run `npm run test`
+Then in another run `npm run test` or `npm run test:mocha`
 
 ### Deploy to Ethereum
 

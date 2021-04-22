@@ -26,6 +26,7 @@ contract Mining
 
     function initialize(
         uint256 _startTime,
+        uint256 _endTime,
         address _token,
         address _vault,
         address _paytoken
@@ -41,56 +42,58 @@ contract Mining
 
         if(_token != address(0)) token = _token;
         startTime = _startTime;
+        endTime = _endTime;
         vault = _vault;
         paytoken = _paytoken;
         maxRatio = 1;
         ratioType = uint(REWARD_RATIOTYPE.LINEAR_TIME);
-        defaultDuration = 60*60*24*14; // 2 weeks ;
-
+        defaultDuration = 60*60*24*14;
+        uintMiningPeriods = _endTime - _startTime;
+        vaultHashName = PHASE2_VAULT_HASH;
     }
 
     receive() external payable {
       require(paytoken == address(0) && defaultDuration > 0 && msg.value > 0 );
-      buyTokens(defaultDuration);
+      buyToken(defaultDuration);
     }
 
-
     // low level token purchase function
-    function buyTokens(uint256 duration) public payable {
-      require(paytoken == address(0) && vault != address(0) && vaultHashName != 0, "Crowdsale: paytoken is non Zero");
-      require(block.timestamp >= startTime);
-      require(IFLDVault(vault).validClaimVault(calculateAmountByRatio(msg.value, duration)));
+    function buyToken(uint256 _duration) public payable {
+      require(paytoken == address(0) && vault != address(0) && vaultHashName != 0, "Mining: check values fail");
+      require(validPeriod(_duration));
+      require(IFLDVault(vault).validClaimVault(calculateAmountByRatio(msg.value, _duration)));
 
       uint256 weiAmount = msg.value;  // stake amount
 
       // calculate token amount to be created
-      uint256 rewardAmount = calculateAmountByRatio(weiAmount, duration);
+      uint256 rewardAmount = calculateAmountByRatio(weiAmount, _duration);
 
       // lock
-      addLockStakedToken(msg.sender, weiAmount, block.timestamp+duration);
+      addLockStakedToken(msg.sender, weiAmount, block.timestamp+_duration);
 
       // update state
       weiRaised += rewardAmount;
 
       // transfer token rewardAmount
       require(IERC20(token).transfer(msg.sender, rewardAmount));
-      emit TokenPurchase(address(0), msg.sender, weiAmount, duration, rewardAmount);
+      emit TokenPurchase(address(0), msg.sender, weiAmount, _duration, rewardAmount);
 
       //forwardFunds();
     }
 
 
     // low level token purchase function
-    function buyTokens(address _paytoken, uint256 amount, uint256 duration) external {
-      require(paytoken != address(0) && paytoken == _paytoken && vault != address(0) && vaultHashName != 0);
-      require(block.timestamp >= startTime);
-      require(IFLDVault(vault).validClaimVault(calculateAmountByRatio(amount, duration)));
+    function buyTokens(address _paytoken, uint256 amount, uint256 _duration) external {
+      require(paytoken != address(0) && paytoken == _paytoken
+        && vault != address(0) && vaultHashName != 0, "Mining: check values fail");
+      require(validPeriod(_duration));
+      require(IFLDVault(vault).validClaimVault(calculateAmountByRatio(amount, _duration)));
 
       // calculate token amount to be created
-      uint256 rewardAmount = calculateAmountByRatio(amount, duration);
+      uint256 rewardAmount = calculateAmountByRatio(amount, _duration);
 
       // lock
-      addLockStakedToken(msg.sender, amount, block.timestamp+duration);
+      addLockStakedToken(msg.sender, amount, block.timestamp+_duration);
 
       // update state
       weiRaised += rewardAmount;
@@ -100,9 +103,14 @@ contract Mining
 
       // transfer token rewardAmount
       require(IERC20(token).transfer(msg.sender, rewardAmount));
-      emit TokenPurchase(_paytoken, msg.sender, amount, duration, rewardAmount);
+      emit TokenPurchase(_paytoken, msg.sender, amount, _duration, rewardAmount);
 
       //forwardFunds();
+    }
+
+    function validPeriod(uint256 duration) public view returns (bool) {
+      bool withinPeriod = block.timestamp >= startTime && (block.timestamp + duration) <= endTime;
+      return withinPeriod;
     }
 
     function getRatio(uint256 _duration) public view returns (uint256 ratio) {
@@ -117,14 +125,14 @@ contract Mining
 
      function withdraw() external returns (bool){
       uint256 unLockAmount = releaseUserLockStakedToken(msg.sender);
-      require(unLockAmount > 0, "Crowdsale: There is no amount that can be withdrawn.");
+      require(unLockAmount > 0, "Mining: There is no amount that can be withdrawn.");
       if(paytoken == address(0)){
           address payable self = address(uint160(address(this)));
-          require(self.balance >= unLockAmount, "Crowdsale: balance i slack to withdraw.");
+          require(self.balance >= unLockAmount, "Mining: balance i slack to withdraw.");
 
           // msg.sender.transfer(unLockAmount);
           (bool success, ) = msg.sender.call{value: unLockAmount}("");
-          require(success, "Crowdsale: withdraw failed.");
+          require(success, "Mining: withdraw failed.");
           emit Withdraw(paytoken, msg.sender, address(0), unLockAmount );
       } else {
           require(IERC20(paytoken).transfer(msg.sender, unLockAmount));
@@ -134,7 +142,7 @@ contract Mining
     }
 
     function rebuyToken(uint256 _duration) external {
-      require(block.timestamp >= startTime);
+      require(validPeriod(_duration));
       // Extend lock's releaseTime
       uint256 rebuyAmount = rebuyUserLockStakedToken(msg.sender, block.timestamp + _duration);
       require(IFLDVault(vault).validClaimVault(calculateAmountByRatio(rebuyAmount, _duration)));
