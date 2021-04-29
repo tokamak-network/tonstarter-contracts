@@ -55,8 +55,6 @@ interface IStake1Vault {
         external view
         returns (uint256[] memory);
 
-
-
     function fld() external view returns (address);
     function paytoken() external view returns (address);
     function cap() external view returns (uint256);

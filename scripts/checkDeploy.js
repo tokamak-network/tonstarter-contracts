@@ -35,11 +35,16 @@ const CLAIMER_ROLE = keccak256("CLAIMER");
 const PHASE2_VAULT_HASH = keccak256("PHASE2_VAULT");
 const EVENT_VAULT_HASH = keccak256("EVENT_VAULT");
 
+const fldtoken = '0x08F36b925467188830887A1b1abfcd9ad68621F3';
+const registry = '0x3ddE16b82B92A40642A566aac9bc22b9e8023448';
+const factory = '0x2f8D6E6D35728A82C003F1054eD9684aF1ce34Ac';
+const logic = '0x4bEa5ead63d6eE25D9801E305B4D9dB378135af4';
+const proxy = '0x340780f192fe554069431EA1f5F8848b48364E14';
 
 async function deployMain(defaultSender) {
 
    const [deployer, user1 ] = await ethers.getSigners();
-
+        /*
     const FLD = await ethers.getContractFactory("FLD");
     const fld = await FLD.deploy();
     console.log("fld:", fld.address);
@@ -61,19 +66,29 @@ async function deployMain(defaultSender) {
     await stake1Proxy.upgradeTo(stake1Logic.address);
     console.log("upgradeTo:" );
 
-    /*
-    const stakeEntry = await ethers.getContractAt("Stake1Logic", stake1Proxy.address);
+    const stakeEntry = await ethers.getContractAt("Stake1Logic", proxy);
+    //const _logic = await stakeEntry.implementation();
+    //console.log("_logic:" , _logic);
+
     console.log("stakeEntry:" , stakeEntry.address);
 
-    await stakeEntry.setStore(fld.address, stakeRegistry.address, stakeFactory.address);
+    await stakeEntry.setStore(fldtoken, registry, factory);
     console.log("setStore:"  );
 
-    await stakeRegistry.grantRole(ADMIN_ROLE, stake1Proxy.address);
+    const stakeRegistry = await ethers.getContractAt("StakeRegistry", registry);
+    await stakeRegistry.grantRole(ADMIN_ROLE, proxy);
     console.log("grantRole:"  );
 
-    await fld.mint(deployer, utils.parseUnits(initialTotal, 18));
+    console.log("utils.parseUnits(initialTotal, 18):", utils.parseUnits(initialTotal, 18));
+    const fld = await ethers.getContractAt("FLD", fldtoken);
+    console.log("fld:", fld.address);
+    console.log("deployer:", deployer.address);
+
+    //await fld.grantRole(MINTER_ROLE, deployer.address);
+
+    await fld.mint(deployer.address, utils.parseUnits(initialTotal, 18));
     console.log("fld mint:", fld.address);
-    */
+
 
     let out = {};
     out.FLD = fld;
@@ -84,6 +99,8 @@ async function deployMain(defaultSender) {
     out.StakeFactory = StakeFactory;
 
     return out;
+    */
+    return null;
 }
 
 async function main() {
@@ -98,7 +115,7 @@ async function main() {
     console.log("Account balance:", (await deployer.getBalance()).toString());
 
     let contracts = await deployMain(deployer);
-
+    /*
     // The address the Contract WILL have once mined
     const out = {};
 
@@ -111,6 +128,7 @@ async function main() {
     save(
       process.env.NETWORK,out
     );
+    */
 
 }
 

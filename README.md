@@ -18,7 +18,7 @@ Then in another run `npm run test` or `npm run test:mocha`
 
 Create/modify network config in `hardhat.config.ts` and add API key and private key, then run:
 
-`npx hardhat run --network rinkeby scripts/deploy.ts`
+`npx hardhat run --network rinkeby scripts/deploy.js`
 
 ### Verify on Etherscan
 

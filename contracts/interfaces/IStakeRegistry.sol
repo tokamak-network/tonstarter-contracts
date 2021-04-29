@@ -23,4 +23,15 @@ interface IStakeRegistry {
     external view
     returns (bool valid);
 
+    function phasesAll(
+        uint256 _index
+    )
+        external view
+        returns (address[] memory);
+
+    function stakeContractsOfVaultAll(
+        address _vault
+    )
+        external view
+        returns (address[] memory);
 }

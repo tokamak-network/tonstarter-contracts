@@ -108,7 +108,7 @@ describe('StakeVault Contract', function () {
         stakeStartBlock = saleStartBlock + 15;
 
     });
-
+    /*
     it('Pharse1_ETH_Staking Vault', async function () {
         //let library = await LibTokenStake1.new();
         //vault_phase1_eth.link('LibTokenStake1', library.address);
@@ -123,10 +123,12 @@ describe('StakeVault Contract', function () {
             utils.parseUnits(Pharse1_ETH_Staking, 18),
             toBN(saleStartBlock),
             toBN(stakeStartBlock),
+            stakefactory.address,
             {from:defaultSender});
         await fld.mint(vault_phase1_eth.address, utils.parseUnits(Pharse1_ETH_Staking, 18), {from:defaultSender});
-        await vault_phase1_eth.grantRole(ADMIN_ROLE,stakefactory.address,{from:defaultSender});
+
     });
+    */
     /*
     it('Pharse1_TON_Staking Vault', async function () {
         // mint fld to vault
@@ -171,7 +173,7 @@ describe('StakeVault Contract', function () {
         await stake1proxy.upgradeTo(stake1logic.address, {from:defaultSender});
 
     });
-
+/*
     it('Register Vault', async function () {
 
         // add Vault
@@ -179,7 +181,7 @@ describe('StakeVault Contract', function () {
             toBN('1'),
             HASH_Pharse1_ETH_Staking, vault_phase1_eth.address ,
             {from:defaultSender});
-            /*
+
         await stakeregister.addVault(
             toBN('1'),
             HASH_Pharse1_TON_Staking, vault_phase1_ton.address ,
@@ -192,18 +194,35 @@ describe('StakeVault Contract', function () {
             toBN('1'),
             HASH_Pharse1_DEV_Mining, vault_phase1_dev.address ,
             {from:defaultSender});
-            */
+
 
     });
-
+*/
     it('stakeEntry set', async function () {
         stakeEntry = await Stake1Logic.at(stake1proxy.address,{from:defaultSender});
-        await stakeEntry.setStore(stakeregister.address, stakefactory.address,{from:defaultSender});
+        await stakeEntry.setStore(fld.address, stakeregister.address, stakefactory.address,{from:defaultSender});
         await stakeregister.grantRole(ADMIN_ROLE,stake1proxy.address,{from:defaultSender});
-
-
     });
 
+    it('stakeEntry create Vault', async function () {
+        //let library = await LibTokenStake1.new();
+        //vault_phase1_eth.link('LibTokenStake1', library.address);
+
+         // create vault
+        vault_phase1_eth = await Stake1Vault.new({from:defaultSender});
+
+        // mint fld to vault
+        await vault_phase1_eth.initialize(
+            fld.address,
+            zeroAddress,
+            utils.parseUnits(Pharse1_ETH_Staking, 18),
+            toBN(saleStartBlock),
+            toBN(stakeStartBlock),
+            stakefactory.address,
+            {from:defaultSender});
+        await fld.mint(vault_phase1_eth.address, utils.parseUnits(Pharse1_ETH_Staking, 18), {from:defaultSender});
+        //await vault_phase1_eth.grantRole(ADMIN_ROLE,stakefactory.address,{from:defaultSender});
+    });
     it('createStakeContract ', async function () {
         for(let i = 0; i < testStakingPeriodBlocks.length; i++){
             await stakeEntry.createStakeContract(

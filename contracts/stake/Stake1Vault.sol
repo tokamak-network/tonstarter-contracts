@@ -79,9 +79,10 @@ contract Stake1Vault is  AccessControl {
         address _paytoken,
         uint256 _cap,
         uint256 _saleStartBlcok,
-        uint256 _stakeStartBlcok
+        uint256 _stakeStartBlcok,
+        address _stakefactory
     ) external  onlyOwner {
-        require(_fld != address(0), "Stake1Vault: input is zero");
+        require(_fld != address(0) && _stakefactory != address(0), "Stake1Vault: input is zero");
         require(_cap > 0 , "Stake1Vault: _cap is zero");
         require(_saleStartBlcok < _stakeStartBlcok && _stakeStartBlcok > 0 , "Stake1Vault: startBlock is unavailable");
 
@@ -91,6 +92,8 @@ contract Stake1Vault is  AccessControl {
         paytoken = _paytoken;
         saleStartBlock = _saleStartBlcok;
         stakeStartBlock = _stakeStartBlcok;
+
+        grantRole(ADMIN_ROLE, _stakefactory);
     }
 
     /**
@@ -261,4 +264,14 @@ contract Stake1Vault is  AccessControl {
     {
         return stakeInfos[_account].totalRewardAmount;
     }
+
+    function infos()
+        external view
+        returns
+        (address, uint256, uint256,
+        uint256, uint256, uint256, bool)
+    {
+        return (paytoken, cap, saleStartBlock, stakeStartBlock, stakeEndBlock, blockTotalReward, saleClosed);
+    }
+
 }

@@ -10,6 +10,7 @@ contract StakeProxyStorage  {
     IStakeRegistry public stakeRegistry;
     IStakeFactory public stakeFactory;
     uint256 public secondsPerBlock;
+    address public fld;
 
     modifier validStakeRegistry() {
         require(address(stakeRegistry) != address(0), "StakeStorage: stakeRegistry is zero");

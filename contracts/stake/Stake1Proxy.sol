@@ -3,7 +3,7 @@ pragma solidity ^0.7.6;
 pragma abicoder v2;
 
 import "./StakeProxyStorage.sol";
-import "../../node_modules/@openzeppelin/contracts/access/AccessControl.sol";
+import "@openzeppelin/contracts/access/AccessControl.sol";
 
 contract Stake1Proxy is StakeProxyStorage, AccessControl {
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");

@@ -3,7 +3,7 @@ pragma solidity ^0.7.6;
 import { IERC20 } from "../interfaces/IERC20.sol";
 import { ITON } from "../interfaces/ITON.sol";
 import { IDepositManager } from "../interfaces/IDepositManager.sol";
-import "../../node_modules/@openzeppelin/contracts/access/AccessControl.sol";
+import "@openzeppelin/contracts/access/AccessControl.sol";
 
 /// @title The connector that integrates zkopru and tokamak
 contract TokamakStaker is AccessControl

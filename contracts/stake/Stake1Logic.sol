@@ -5,9 +5,11 @@ pragma abicoder v2;
 import { SafeMath } from "../utils/math/SafeMath.sol";
 
 import "./StakeProxyStorage.sol";
-import "../../node_modules/@openzeppelin/contracts/access/AccessControl.sol";
+import "@openzeppelin/contracts/access/AccessControl.sol";
 import { IStakeFactory } from "../interfaces/IStakeFactory.sol";
 import { IStakeRegistry } from "../interfaces/IStakeRegistry.sol";
+import { IStake1Vault } from "../interfaces/IStake1Vault.sol";
+import { Stake1Vault } from "./Stake1Vault.sol";
 
 contract Stake1Logic is StakeProxyStorage, AccessControl {
     using SafeMath for uint256;
@@ -27,16 +29,28 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
         require(_hash != ZERO_HASH, "Stake1Proxy: zero hash");
         _;
     }
+
+    //////////////////////////////
+    // Events
+    //////////////////////////////
+    event CreatedVault(address indexed vault, address paytoken, uint256 cap);
+
+
     //////////////////////////////////////////////////////////////////////
     // setters
     function setStore(
+        address _fld,
         address _stakeRegistry,
         address _stakeFactory
     ) external   onlyOwner{
+        setFLD(_fld);
         setStakeRegistry(_stakeRegistry);
         setStakeFactory(_stakeFactory);
     }
 
+    function setFLD(address _fld) public  onlyOwner nonZero(_fld) {
+        fld = _fld;
+    }
 
     function setStakeRegistry(address _stakeRegistry) public  onlyOwner nonZero(_stakeRegistry) {
         stakeRegistry = IStakeRegistry(_stakeRegistry);
@@ -48,13 +62,20 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
 
     //////////////////////////////////////////////////////////////////////
     // Admin Functions
-    function addVault(
-        uint _pahse,
-        bytes32 _vaultName,
-        address _vault
-    )   external onlyOwner
+    function createVault(
+        address _paytoken,
+        uint256 _cap,
+        uint256 _saleStartBlcok,
+        uint256 _stakeStartBlcok,
+        uint256 _pahse,
+        bytes32 _vaultName
+    )   external
     {
-        stakeRegistry.addVault(_pahse, _vaultName, _vault);
+        Stake1Vault vault = new Stake1Vault();
+        vault.initialize(fld, _paytoken, _cap, _saleStartBlcok, _stakeStartBlcok, address(stakeFactory));
+        stakeRegistry.addVault(_pahse, _vaultName, address(vault));
+
+        emit CreatedVault(address(vault), _paytoken, _cap);
     }
 
     function createStakeContract(
@@ -71,6 +92,37 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
         address _contract = stakeFactory.deploy(_pahse, _vault, _name, token, paytoken, periodBlock);
         require(_contract != address(0), "Stake1Proxy: stakeFactory.deploy fail");
         stakeRegistry.addStakeContract(_vault, _contract);
+    }
+
+    function closeSale(
+        address _vault
+    )
+        external
+    {
+        IStake1Vault(_vault).closeSale();
+    }
+
+    function addVault(
+        uint _pahse,
+        bytes32 _vaultName,
+        address _vault
+    )   external onlyOwner
+    {
+        stakeRegistry.addVault(_pahse, _vaultName, _vault);
+    }
+
+    function stakeContractsOfVault(address _vault)
+        external view nonZero(_vault)
+        returns (address[] memory)
+    {
+        return IStake1Vault(_vault).stakeAddressesAll();
+    }
+
+    function vaultsOfPahse(uint256 _phaseIndex)
+        external view
+        returns (address[] memory)
+    {
+        return stakeRegistry.phasesAll(_phaseIndex);
     }
 
 
