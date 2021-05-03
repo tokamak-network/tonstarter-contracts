@@ -41,11 +41,23 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
     function setStore(
         address _fld,
         address _stakeRegistry,
-        address _stakeFactory
-    ) external   onlyOwner{
+        address _stakeFactory,
+        address _ton,
+        address _wton,
+        address _depositManager
+    )
+        external
+        onlyOwner
+        nonZero(_ton)
+        nonZero(_wton)
+        nonZero(_depositManager)
+    {
         setFLD(_fld);
         setStakeRegistry(_stakeRegistry);
         setStakeFactory(_stakeFactory);
+        ton =  _ton;
+        wton = _wton;
+        depositManager = _depositManager;
     }
 
     function setFLD(address _fld) public  onlyOwner nonZero(_fld) {
@@ -89,7 +101,7 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
     {
         require(stakeRegistry.validVault(_pahse, _vault), "Stake1Proxy: unvalidVault");
 
-        address _contract = stakeFactory.deploy(_pahse, _vault, _name, token, paytoken, periodBlock);
+        address _contract = stakeFactory.deploy(_pahse, _vault, _name, token, paytoken, periodBlock, [ton, wton, depositManager]);
         require(_contract != address(0), "Stake1Proxy: stakeFactory.deploy fail");
         stakeRegistry.addStakeContract(_vault, _contract);
     }

@@ -1,12 +1,15 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.7.6;
-import { IERC20 } from "../interfaces/IERC20.sol";
+//import { IERC20 } from "../interfaces/IERC20.sol";
 import { ITON } from "../interfaces/ITON.sol";
 import { IDepositManager } from "../interfaces/IDepositManager.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
+//import { ERC165 } from "@openzeppelin/contracts/introspection/ERC165.sol";
+
+
 
 /// @title The connector that integrates zkopru and tokamak
-contract TokamakStaker is AccessControl
+abstract contract TokamakStaker is AccessControl
 {
 
     address public ton;
@@ -89,7 +92,7 @@ contract TokamakStaker is AccessControl
         require(depositManager != address(0) && _layer2 != address(0), "TokamakStaker: zero address");
         IDepositManager(depositManager).processRequest(_layer2,receiveTON);
     }
-
+    /*
     function tokenTransfer(
         address to,
         uint256 amount
@@ -98,5 +101,5 @@ contract TokamakStaker is AccessControl
     {
         IERC20(ton).transfer(to, amount);
     }
-
+    */
 }

@@ -12,7 +12,8 @@ contract StakeFactory  {
         string memory _name,
         address _token,
         address _paytoken,
-        uint256 _period
+        uint256 _period,
+        address[3] memory tokamakAddr
     )
         public
         returns (address)
@@ -26,6 +27,7 @@ contract StakeFactory  {
             uint256 stakeStart = vault.stakeStartBlock();
             require( saleStart < stakeStart && stakeStart > 0 );
             c.initialize(_token, _paytoken, _vault, saleStart, stakeStart, _period );
+            c.setTokamak(tokamakAddr[0], tokamakAddr[1], tokamakAddr[2]);
             vault.addSubVaultOfStake(_name, address(c), _period);
             c.grantRole(ADMIN_ROLE, msg.sender);
             c.revokeRole(ADMIN_ROLE, address(this));

@@ -25,3 +25,7 @@ Create/modify network config in `hardhat.config.ts` and add API key and private 
 Using the [hardhat-etherscan plugin](https://hardhat.org/plugins/nomiclabs-hardhat-etherscan.html), add Etherscan API key to `hardhat.config.ts`, then run:
 
 `npx hardhat verify --network rinkeby <DEPLOYED ADDRESS>`
+
+## To do the tokamak ton integration test
+git clone https://github.com/Onther-Tech/plasma-evm-contracts
+npm run compile:plasma

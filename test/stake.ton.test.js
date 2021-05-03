@@ -24,19 +24,18 @@ require('chai').should();
 const { padLeft, toBN, toWei, fromWei , keccak256 , soliditySha3 , solidityKeccak256 } = require('web3-utils');
 
 const { getSignature , signatureVaildTime, timeout } = require('./common');
+
 //------------------------
-const StakeFactory = contract.fromArtifact('StakeFactory');
-const StakeRegistry = contract.fromArtifact('StakeRegistry');
-const FLD = contract.fromArtifact('FLD');
-const FLDVault = contract.fromArtifact('FLDVault');
+const ICO20Contracts = require('../utils/ico_test_deploy.js');
+let ico20Contracts;
+let TokamakContractsDeployed ;
+let ICOContractsDeployed ;
+//------------------------
 const Stake1Vault = contract.fromArtifact('Stake1Vault');
-const Stake1Logic = contract.fromArtifact('Stake1Logic');
-const Stake1Proxy = contract.fromArtifact('Stake1Proxy');
 const Stake1 = contract.fromArtifact('Stake1');
 const IERC20 = contract.fromArtifact('IERC20');
+//----------------------
 
-const LibTokenStake1 = contract.fromArtifact('LibTokenStake1');
-//------------------------
 const initialTotal = '10000000000.' + '0'.repeat(18);
 const Pharse1_TON_Staking = '175000000.' + '0'.repeat(18);
 const Pharse1_ETH_Staking = '175000000.' + '0'.repeat(18);
@@ -65,12 +64,11 @@ const EVENT_VAULT_HASH = keccak256("EVENT_VAULT");
 
 const logFlag = true;
 
-
 describe('StakeProxy ', function () {
 
     let weth , fld, stakeregister , stakefactory, stake1proxy, stake1logic ;
     let vault_phase1_eth,  vault_phase1_ton, vault_phase1_fldethlp, vault_phase1_dev;
-
+    let ton, wton, depositManager, seigManager ;
     let stakeEntry ;
 
     let a1, a2, tokenInfo;
@@ -94,84 +92,104 @@ describe('StakeProxy ', function () {
     let stakeStartBlock = 0;
 
     before(async function () {
+         this.timeout(1000000);
+        ico20Contracts = new ICO20Contracts();
+    });
+
+    it('ico20Contracts init  ', async function () {
         this.timeout(1000000);
+        ICOContractsDeployed = await ico20Contracts.initializeICO20Contracts(defaultSender);
 
-        // create fld
-        fld = await FLD.new({from:defaultSender});
+    });
+    it('tokamakContracts init  ', async function () {
+        this.timeout(1000000);
+        TokamakContractsDeployed = await ico20Contracts.initializePlasmaEvmContracts(defaultSender);
 
-        stakeregister = await StakeRegistry.new({from:defaultSender});
-        stakefactory = await StakeFactory.new({from:defaultSender});
-        stake1logic = await Stake1Logic.new({from:defaultSender});
-        stake1proxy = await Stake1Proxy.new({from:defaultSender});
+        let cons = await ico20Contracts.getPlasamContracts();
+        ton = cons.ton;
+        wton = cons.wton;
+        depositManager = cons.depositManager;
+        seigManager = cons.seigManager;
+    });
 
-        saleStartBlock = await time.latestBlock();
+    it('Set StakeEntry  ', async function () {
+        this.timeout(1000000);
+        stakeEntry = await ico20Contracts.setEntry(defaultSender);
+        console.log('stakeEntry',stakeEntry.address);
+
+        let cons = await ico20Contracts.getICOContracts();
+        fld = cons.fld;
+        stakeregister = cons.stakeregister;
+        stakefactory = cons.stakefactory;
+        stake1proxy = cons.stake1proxy;
+        stake1logic = cons.stake1logic;
+
+    });
+    it('stakeEntry create TON Vault ', async function () {
+        const current = await time.latestBlock();
+        saleStartBlock = current;
         saleStartBlock = parseInt(saleStartBlock.toString());
-        stakeStartBlock = saleStartBlock + 15;
+        stakeStartBlock = saleStartBlock + 20;
 
-    });
-
-    it('Stake1Proxy upgradeTo ', async function () {
-
-        await stake1proxy.upgradeTo(stake1logic.address, {from:defaultSender});
-
-    });
-    it('stakeEntry set', async function () {
-        stakeEntry = await Stake1Logic.at(stake1proxy.address,{from:defaultSender});
-        await stakeEntry.setStore(fld.address, stakeregister.address, stakefactory.address,{from:defaultSender});
-        await stakeregister.grantRole(ADMIN_ROLE,stake1proxy.address,{from:defaultSender});
-    });
-
-    it('stakeEntry create Vault', async function () {
+        if(logFlag) {
+            console.log(`\n\nCurrent block: ${current} `);
+            console.log(` saleStartBlock `,saleStartBlock);
+            console.log(` stakeStartBlock `,stakeStartBlock);
+        }
 
         let tx = await stakeEntry.createVault(
-            zeroAddress,
-            utils.parseUnits(Pharse1_ETH_Staking, 18),
+            ton.address,
+            utils.parseUnits(Pharse1_TON_Staking, 18),
             toBN(saleStartBlock),
             toBN(stakeStartBlock),
             toBN('1'),
-            HASH_Pharse1_ETH_Staking
+            HASH_Pharse1_TON_Staking
             ,{from:defaultSender});
 
         let vaultAddress = tx.receipt.logs[tx.receipt.logs.length-1].args.vault ;
-        vault_phase1_eth = await Stake1Vault.at(vaultAddress, {from:defaultSender});
-        await fld.mint(vault_phase1_eth.address, utils.parseUnits(Pharse1_ETH_Staking, 18), {from:defaultSender});
+        vault_phase1_ton = await Stake1Vault.at(vaultAddress, {from:defaultSender});
+        await fld.mint(vault_phase1_ton.address, utils.parseUnits(Pharse1_TON_Staking, 18), {from:defaultSender});
 
     });
 
-    it('createStakeContract ', async function () {
+    it('createStakeContract TON ', async function () {
         for(let i = 0; i < testStakingPeriodBlocks.length; i++){
             await stakeEntry.createStakeContract(
                 toBN('1'),
-                vault_phase1_eth.address,
+                vault_phase1_ton.address,
                 fld.address,
-                zeroAddress,
+                ton.address,
                 toBN(testStakingPeriodBlocks[i]+''),
-                'PHASE1_ETH_'+testStakingPeriodBlocks[i]+'_BLOCKS',
+                'PHASE1_TON_'+testStakingPeriodBlocks[i]+'_BLOCKS',
                 {from:defaultSender});
         }
     });
-    it('Stake ether : Phase1 : 1st Contract: user1 ', async function () {
-        let stakeAddresses = await stakeEntry.stakeContractsOfVault(vault_phase1_eth.address);
+
+    it('Stake TON : Phase1 : 1st Contract: user1 ', async function () {
+        let stakeAddresses = await stakeEntry.stakeContractsOfVault(vault_phase1_ton.address);
         let stakeContractAddress = null;
         for(let i = 0; i < stakeAddresses.length; i++){
             stakeContractAddress = stakeAddresses[i];
             if (stakeContractAddress != null) {
                 let stakeContract = await Stake1.at(stakeContractAddress);
 
-                await stakeContract.sendTransaction(
-                    {from:user1, value:toWei(testUser1StakingAmount[i],'ether')});
+                // general erc20 - need to approve
+                // await stakeContract.stake(toWei(testUser1StakingAmount[i],'ether'), {from: user1});
+                // await stakeContract.stake(toWei(testUser2StakingAmount[i],'ether'), {from: user2});
 
-                await stakeContract.sendTransaction(
-                    {from:user2, value:toWei(testUser2StakingAmount[i],'ether')});
+                // ton
+                await ico20Contracts.stake(stakeContractAddress, user1, toWei(testUser1StakingAmount[i],'ether') );
+                await ico20Contracts.stake(stakeContractAddress, user2, toWei(testUser2StakingAmount[i],'ether') );
 
             }
         }
     });
 
-    it('closeSale : Phase1 : closeSale ', async function () {
-        await stakeEntry.closeSale(vault_phase1_eth.address, {from:user1});
+    it('closeSale TON : Phase1 : closeSale  ', async function () {
+        await stakeEntry.closeSale(vault_phase1_ton.address, {from:user1});
     });
- /*
+
+    /*
     it('Stake Contracts List : Phase1 ', async function () {
         let phases1 = await stakeEntry.vaultsOfPahse(toBN('1'));
         for(let i = 0; i< phases1.length; i++){
@@ -187,10 +205,11 @@ describe('StakeProxy ', function () {
         if(logFlag) console.log(`Current block: ${current} `);
     });
 
+
     it('claim reward ', async function () {
         this.timeout(1000000);
         await timeout(15);
-        let stakeAddresses = await stakeEntry.stakeContractsOfVault(vault_phase1_eth.address);
+        let stakeAddresses = await stakeEntry.stakeContractsOfVault(vault_phase1_ton.address);
         for(let i = 0; i< 3; i++){
 
             let delayBlock = testClaimBlock[i];
@@ -236,7 +255,7 @@ describe('StakeProxy ', function () {
     it('withdraw ', async function () {
         this.timeout(1000000);
         await timeout(20);
-        let stakeAddresses = await stakeEntry.stakeContractsOfVault(vault_phase1_eth.address);
+        let stakeAddresses = await stakeEntry.stakeContractsOfVault(vault_phase1_ton.address);
         const latest = await time.latestBlock();
         await time.advanceBlockTo(parseInt(latest) + 15);
         let current = await time.latestBlock();
@@ -315,8 +334,8 @@ describe('StakeProxy ', function () {
             if (paytoken == zeroAddress) {
                 payTokenBalance = await web3.eth.getBalance(_contract) ;
             } else {
-                let ercTemp = IERC20.at(paytoken);
-                payTokenBalance = ercTemp.balanceOf(_contract);
+                let ercTemp = await IERC20.at(paytoken);
+                payTokenBalance = await ercTemp.balanceOf(_contract);
             }
             console.log(' token',  token );
             console.log(' paytoken',  paytoken );

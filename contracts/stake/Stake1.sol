@@ -2,14 +2,18 @@
 pragma solidity ^0.7.0;
 
 import { IStake1Vault } from "../interfaces/IStake1Vault.sol";
-import { IERC20 } from "../interfaces/IERC20.sol";
-
+//import { IERC20 } from "../interfaces/IERC20.sol";
+import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "../libraries/LibTokenStake1.sol";
 import "./Stake1Storage.sol";
 import "../connection/TokamakStaker.sol";
+import { ERC165Checker } from "@openzeppelin/contracts/introspection/ERC165Checker.sol";
+import { SafeERC20 } from "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
+import { OnApprove } from "../tokens/OnApprove.sol";
 
-contract Stake1 is Stake1Storage, TokamakStaker
+contract Stake1 is Stake1Storage, TokamakStaker, OnApprove
 {
+    using SafeERC20 for IERC20;
     /*
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
     modifier nonZero(address _addr) {
@@ -62,12 +66,54 @@ contract Stake1 is Stake1Storage, TokamakStaker
         endBlock = startBlock + _period;
     }
 
+
+
     /**
     * public
     */
     receive() external payable {
       stake(0);
     }
+    //////////////////////////////////////////////////////////////////////
+    // Staking TON
+    function onApprove(
+        address owner,
+        address spender,
+        uint256 tonAmount,
+        bytes calldata data
+    ) external override returns (bool) {
+
+        (address _spender, uint256 _amount) = _decodeStakeData(data);
+
+        require(tonAmount == _amount && spender == _spender, "Stake1: tonAmount != stakingAmount ");
+        require(stakeOnApprove(msg.sender, owner, _spender, _amount), "Stake1: stakeOnApprove fails ");
+        return true;
+    }
+
+    function _decodeStakeData(bytes calldata input)
+        internal
+        pure
+        returns (address spender, uint256 amount)
+    {
+        (spender,amount) = abi.decode(input, (address,uint256));
+    }
+
+
+    function stakeOnApprove(address from, address _owner, address _spender, uint256 _amount) public returns (bool)
+    {
+        require((paytoken == from && _amount > 0 && _spender == address(this)), "Stake1: stakeOnApprove init fail");
+
+        require(block.number >= saleStartBlock && saleStartBlock < startBlock, "Stake1: stakeTON period is unavailable");
+
+        LibTokenStake1.StakedAmount storage staked = userStaked[_owner];
+        staked.amount += _amount;
+        totalStakedAmount += _amount;
+
+        require(IERC20(from).transferFrom(_owner, _spender, _amount), "DAOCommittee: failed to transfer ton from creator");
+
+        return true;
+    }
+    //---
 
     function stake(uint256 _amount) public payable
     {
@@ -88,6 +134,7 @@ contract Stake1 is Stake1Storage, TokamakStaker
             require(IERC20(paytoken).transferFrom(msg.sender, address(this), amount));
 
     }
+
 
     function withdraw()
         external

@@ -17,4 +17,16 @@ interface IStake1 {
 
     function userStaked(address account) external returns (LibTokenStake1.StakedAmount memory) ;
     function stake(uint256 amount) external payable ;
+
+     function onApprove(
+        address owner,
+        address spender,
+        uint256 tonAmount,
+        bytes calldata data
+    )
+        external
+        returns (bool);
+
+    function stakeOnApprove(address _owner, address _spender, uint256 _amount) external ;
+
 }

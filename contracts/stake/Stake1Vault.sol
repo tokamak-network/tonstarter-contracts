@@ -5,7 +5,8 @@ pragma abicoder v2;
 import "../libraries/LibTokenStake1.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import { IFLD } from "../interfaces/IFLD.sol";
-import { IERC20 } from "../interfaces/IERC20.sol";
+//import { IERC20 } from "../interfaces/IERC20.sol";
+import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import { IFLDVault } from "../interfaces/IFLDVault.sol";
 import { IStake1 } from "../interfaces/IStake1.sol";
 /**
@@ -163,7 +164,7 @@ contract Stake1Vault is  AccessControl {
             if(paytoken == address(0)) {
                 stakeInfo.balance = address(uint160(stake)).balance;
             } else {
-                stakeInfo.balance = IERC20(stake).balanceOf(address(this));
+                stakeInfo.balance = IERC20(paytoken).balanceOf(stake);
             }
         }
 
@@ -172,7 +173,6 @@ contract Stake1Vault is  AccessControl {
             LibTokenStake1.stakeInfo storage totalcheck = stakeInfos[stakeAddresses[i1]];
             uint256 total = 0;
             for(uint j = 0; j < stakeAddresses.length; j++){
-                //LibTokenStake1.stakeInfo storage subcheck = stakeInfos[stakeAddresses[j]];
                 if (stakeInfos[stakeAddresses[j]].endBlock >= totalcheck.endBlock){
                     total += stakeInfos[stakeAddresses[j]].balance;
                 }
