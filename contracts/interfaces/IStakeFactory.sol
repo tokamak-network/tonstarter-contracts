@@ -10,7 +10,7 @@ interface IStakeFactory {
         address _token,
         address _paytoken,
         uint256 _period,
-        address[3] memory tokamakAddr
+        address[4] memory tokamakAddr
     )
         external
         returns (address);

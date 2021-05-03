@@ -64,7 +64,9 @@ contract ExchangeGovernToken
     )
         external
     {
-        require(msg.sender != address(0) && _amountFLD > 0 && exchangeWeight > 0, "ExchangeGovernToken: check _amountFLD or exchangeWeight ");
+
+        require(msg.sender != address(0) && _amountFLD > 0 && exchangeWeight > 0,
+            "ExchangeGovernToken: check _amountFLD or exchangeWeight ");
         require(fld.balanceOf(msg.sender) >= _amountFLD, "ExchangeGovernToken: FLD.balanceOf is lack.");
 
         fld.permit(msg.sender, address(this), _amountFLD, deadline, signature);

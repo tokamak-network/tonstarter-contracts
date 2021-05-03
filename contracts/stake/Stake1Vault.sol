@@ -7,7 +7,6 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 import { IFLD } from "../interfaces/IFLD.sol";
 //import { IERC20 } from "../interfaces/IERC20.sol";
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import { IFLDVault } from "../interfaces/IFLDVault.sol";
 import { IStake1 } from "../interfaces/IStake1.sol";
 /**
 FLD Token's Vault
@@ -114,6 +113,7 @@ contract Stake1Vault is  AccessControl {
     }
 
     function changeOrderedEndBlocks(uint256[] memory _ordered) external  onlyOwner {
+        // solhint-disable-next-line max-line-length
         require(stakeEndBlock < block.number && orderedEndBlocks.length > 0 && orderedEndBlocks.length == _ordered.length , "Stake1Vault: changeOrderedEndBlocks fails");
         orderedEndBlocks = _ordered;
     }
@@ -128,6 +128,7 @@ contract Stake1Vault is  AccessControl {
     )
         external  onlyOwner
     {
+        // solhint-disable-next-line max-line-length
         require(stakeContract != address(0) && cap > 0  && periodBlocks > 0 , "Stake1Vault: addStakerInVault init fails");
         require(block.number < stakeStartBlock, "Stake1Vault: Already started stake" ) ;
         require(saleClosed == false , "Stake1Vault: closed sale" ) ;
@@ -182,8 +183,10 @@ contract Stake1Vault is  AccessControl {
             // reward total
             uint256 totalReward = 0;
             for(uint k = i1; k > 0; k--){
+                // solhint-disable-next-line max-line-length
                 totalReward += (stakeInfos[stakeAddresses[k]].endBlock - stakeInfos[stakeAddresses[k-1]].endBlock) * blockTotalReward * totalcheck.balance /  stakeEndBlockTotal[stakeInfos[stakeAddresses[k]].endBlock];
             }
+            // solhint-disable-next-line max-line-length
             totalReward += (stakeInfos[stakeAddresses[0]].endBlock - stakeInfos[stakeAddresses[0]].startBlcok) * blockTotalReward * totalcheck.balance /  stakeEndBlockTotal[stakeInfos[stakeAddresses[0]].endBlock];
 
             totalcheck.totalRewardAmount = totalReward;
@@ -204,9 +207,12 @@ contract Stake1Vault is  AccessControl {
         require(fldBalance >= _amount, "Stake1Vault: claimVault: not enough balance");
 
         LibTokenStake1.stakeInfo storage stakeInfo = stakeInfos[msg.sender];
+        // solhint-disable-next-line max-line-length
         require(stakeInfo.startBlcok > 0, "Stake1Vault: claimVault startBlcok is zero");
-        require(stakeInfo.totalRewardAmount > 0
-            && (stakeInfo.totalRewardAmount - stakeInfo.claimRewardAmount - _amount) > 0 , "Stake1Vault: claim amount is wrong");
+
+        // solhint-disable-next-line max-line-length
+        require(stakeInfo.totalRewardAmount > 0 && (stakeInfo.totalRewardAmount - stakeInfo.claimRewardAmount - _amount) > 0 ,
+             "Stake1Vault: claim amount is wrong");
 
         stakeInfo.claimRewardAmount += _amount;
 
@@ -226,8 +232,9 @@ contract Stake1Vault is  AccessControl {
 
         LibTokenStake1.stakeInfo storage stakeInfo = stakeInfos[_to];
         require(stakeInfo.startBlcok > 0, "Stake1Vault: claimVault startBlcok is zero");
-        require(stakeInfo.totalRewardAmount > 0
-            && (stakeInfo.totalRewardAmount - stakeInfo.claimRewardAmount - _amount) > 0 , "Stake1Vault: claim amount is wrong");
+        // solhint-disable-next-line max-line-length
+        require(stakeInfo.totalRewardAmount > 0 && (stakeInfo.totalRewardAmount - stakeInfo.claimRewardAmount - _amount) > 0
+            , "Stake1Vault: claim amount is wrong");
 
         return stakeInfo.totalRewardAmount;
     }

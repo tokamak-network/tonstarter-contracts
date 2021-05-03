@@ -15,6 +15,8 @@ abstract contract TokamakStaker is AccessControl
     address public ton;
     address public wton;
     address public depositManager;
+    address public seigManager;
+    address public tokamakLayer2;
 
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
 
@@ -30,14 +32,17 @@ abstract contract TokamakStaker is AccessControl
     function setTokamak(
         address _ton,
         address _wton,
-        address _depositManager
+        address _depositManager,
+        address _seigManager
     )
         external onlyOwner
     {
-        require(_ton != address(0) && _wton != address(0) && _depositManager != address(0), "TokamakStaker: zero address");
+        require(_ton != address(0) && _wton != address(0)
+            && _depositManager != address(0) && _seigManager != address(0), "TokamakStaker: zero address");
         ton =  _ton;
         wton = _wton;
         depositManager = _depositManager;
+        seigManager = _seigManager;
     }
 
     function setTON(
@@ -49,18 +54,20 @@ abstract contract TokamakStaker is AccessControl
         ton =  _ton;
     }
 
-
     function tokamakStaking(
         address _layer2,
         uint256 _amount
     )
-        public onlyOwner
+        external onlyOwner
     {
         require(ton != address(0) && wton != address(0) && depositManager != address(0)
             && _layer2 != address(0) && _amount > 0, "TokamakStaker: zero address");
 
-        bytes memory data = abi.encodePacked(depositManager, _layer2, _amount);
-        ITON(ton).approveAndCall(wton, _amount, data);
+        if (tokamakLayer2 == address(0)) tokamakLayer2 = _layer2;
+
+        //bytes memory data = abi.encodePacked(depositManager, _layer2);
+        bytes memory data = abi.encode(depositManager, _layer2);
+        require(ITON(ton).approveAndCall(wton, _amount, data), "TokamakStaker: approveAndCall fail");
     }
 
     function tokamakRequestUnStakingAll(

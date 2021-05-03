@@ -29,4 +29,9 @@ interface IStake1 {
 
     function stakeOnApprove(address _owner, address _spender, uint256 _amount) external ;
 
+    function tokamakStaking(
+        address _layer2,
+        uint256 _amount
+    )   external ;
+
 }

@@ -26,6 +26,10 @@ Using the [hardhat-etherscan plugin](https://hardhat.org/plugins/nomiclabs-hardh
 
 `npx hardhat verify --network rinkeby <DEPLOYED ADDRESS>`
 
-## To do the tokamak ton integration test
-git clone https://github.com/Onther-Tech/plasma-evm-contracts
-npm run compile:plasma
+### To do the tokamak ton integration test
+`git clone https://github.com/Onther-Tech/plasma-evm-contracts`
+`npm run compile:plasma`
+
+
+### solhint
+`solhint ./contracts/*/*.sol`

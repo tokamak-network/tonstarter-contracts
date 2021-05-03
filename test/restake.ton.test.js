@@ -10,6 +10,11 @@ const {
     defaultSender, accounts, contract, web3, privateKeys
 } = require('@openzeppelin/test-environment');
 
+const [ candidate1, candidate2, candidate3, user1, user2, user3, user4,user5,operator1,operator2] = accounts;
+const candidates = [candidate1, candidate2, candidate3];
+const users = [user1, user2, user3, user4, user5];
+const operators = [operator1,operator2];
+
 //const { expectEvent } = require('openzeppelin-test-helpers');
 
 const BN = require('bn.js');
@@ -35,7 +40,6 @@ const Stake1Vault = contract.fromArtifact('Stake1Vault');
 const Stake1 = contract.fromArtifact('Stake1');
 const IERC20 = contract.fromArtifact('IERC20');
 //----------------------
-
 const initialTotal = '10000000000.' + '0'.repeat(18);
 const Pharse1_TON_Staking = '175000000.' + '0'.repeat(18);
 const Pharse1_ETH_Staking = '175000000.' + '0'.repeat(18);
@@ -69,16 +73,18 @@ describe('StakeProxy ', function () {
     let weth , fld, stakeregister , stakefactory, stake1proxy, stake1logic ;
     let vault_phase1_eth,  vault_phase1_ton, vault_phase1_fldethlp, vault_phase1_dev;
     let ton, wton, depositManager, seigManager ;
-    let stakeEntry ;
+    let stakeEntry , layer2 ;
 
     let a1, a2, tokenInfo;
     let sendAmount = '1';
+    /*
     let admin = accounts[0];
     let user1 = accounts[1];
     let user2 = accounts[2];
     let userPrivate2 = privateKeys[2];
+    */
 
-    let testStakingPeriodBlocks = [10,20];
+    let testStakingPeriodBlocks = [20,30];
     let testStakingUsers = [user1, user2];
     let testUser1StakingAmount = ['10', '5'];
     let testUser2StakingAmount = ['10', '20'];
@@ -125,6 +131,7 @@ describe('StakeProxy ', function () {
         stake1logic = cons.stake1logic;
 
     });
+
     it('stakeEntry create TON Vault ', async function () {
         const current = await time.latestBlock();
         saleStartBlock = current;
@@ -152,7 +159,7 @@ describe('StakeProxy ', function () {
 
     });
 
-    it('createStakeContract TON ', async function () {
+    it('createStakeContract with TON ', async function () {
         for(let i = 0; i < testStakingPeriodBlocks.length; i++){
             await stakeEntry.createStakeContract(
                 toBN('1'),
@@ -165,7 +172,7 @@ describe('StakeProxy ', function () {
         }
     });
 
-    it('Stake TON : Phase1 : 1st Contract: user1 ', async function () {
+    it('Stake TON ', async function () {
         let stakeAddresses = await stakeEntry.stakeContractsOfVault(vault_phase1_ton.address);
         let stakeContractAddress = null;
         for(let i = 0; i < stakeAddresses.length; i++){
@@ -185,9 +192,83 @@ describe('StakeProxy ', function () {
         }
     });
 
-    it('closeSale TON : Phase1 : closeSale  ', async function () {
+    it('closeSale TON Vault  ', async function () {
         await stakeEntry.closeSale(vault_phase1_ton.address, {from:user1});
     });
+
+    it('addOperator on TOKAMAK ', async function () {
+      //  console.log('operator1',operator1);
+        layer2 = await ico20Contracts.addOperator(operator1);
+    });
+
+    //stakeContract에 있는 톤을 Operator에 스테이킹
+    it('Staking locked tons in stakeContract to Operator', async function () {
+        this.timeout(1000000);
+        await timeout(20);
+        let stakeAddresses = await stakeEntry.stakeContractsOfVault(vault_phase1_ton.address);
+        const latest = await time.latestBlock();
+        await time.advanceBlockTo(parseInt(latest) + 15);
+        let current = await time.latestBlock();
+        if(logFlag) console.log(`\n\nCurrent block: ${current} `);
+        for(let i = 0; i < stakeAddresses.length; i++){
+            console.log(`\n\n ************* restake ton to tokamak : `,i, stakeAddresses[i] );
+            let stakeContract1 = await Stake1.at(stakeAddresses[i]);
+            let endBlock = await stakeContract1.endBlock();
+
+            if (current < endBlock) {
+                let tonAmount = await ton.balanceOf(stakeAddresses[i]);
+                console.log('tonAmount:',tonAmount.toString());
+                let wtonAmount = await wton.balanceOf(stakeAddresses[i]);
+                console.log('wtonAmount:',wtonAmount.toString());
+
+                if (tonAmount.gt(toBN('0'))){
+                    await stakeEntry.tokamakStaking(stakeAddresses[i], layer2.address,  tonAmount, {from: defaultSender});
+
+                    let accStakedAccount = await depositManager.accStakedAccount(stakeAddresses[i]);
+                    console.log('depositManager accStakedAccount:',accStakedAccount.toString());
+                    let stakeOf = await seigManager.stakeOf(layer2.address, stakeAddresses[i]);
+                    console.log('seigManager stakeOf:',stakeOf.toString());
+
+                    let current = await time.latestBlock();
+                    if(logFlag) console.log(`\n\nCurrent block: ${current} `);
+
+                    let tonAmountAfter = await ton.balanceOf(stakeAddresses[i]);
+                    console.log('tonAmountAfter:',tonAmountAfter.toString());
+                    let wtonAmountAfter = await wton.balanceOf(stakeAddresses[i]);
+                    console.log('wtonAmountAfter:',wtonAmountAfter.toString());
+                }
+            }
+        }
+    });
+
+    //토카막에 톤을 스테이킹한 후, 리워드 출금요청
+    it('After staking tones in Tokamak, request withdrawal of rewards', async function () {
+        this.timeout(1000000);
+        await timeout(20);
+
+    });
+
+    //출금지연블록 후에, 리워드 출금
+    it('Process reward withdrawal after withdrawal delay block', async function () {
+        this.timeout(1000000);
+        await timeout(20);
+
+    });
+
+    //토카막에 스테이킹되어 있는 원금 출금 요청
+    it('Request for withdrawal of principal funds staked in Tokamak', async function () {
+        this.timeout(1000000);
+        await timeout(20);
+
+    });
+
+    //토카막에 스테이킹되어 있는 원금 출금 요청
+    it('Process principal funds withdrawal after withdrawal delay block', async function () {
+        this.timeout(1000000);
+        await timeout(20);
+
+    });
+
     /*
     it('Stake Contracts List : Phase1 ', async function () {
         let phases1 = await stakeEntry.vaultsOfPahse(toBN('1'));
@@ -203,7 +284,6 @@ describe('StakeProxy ', function () {
         const current = await time.latestBlock();
         if(logFlag) console.log(`Current block: ${current} `);
     });
-
     it('claim reward ', async function () {
         this.timeout(1000000);
         await timeout(15);
@@ -249,7 +329,7 @@ describe('StakeProxy ', function () {
             }
         }
     });
-    */
+
     it('withdraw ', async function () {
         this.timeout(1000000);
         await timeout(20);
@@ -284,8 +364,7 @@ describe('StakeProxy ', function () {
 
         }
     });
-
-
+*/
     async function logStakeContracts(_phase, _phaseVault ){
         console.log('\n\n############### logStakeContracts [ PHASE',1,']',  _phaseVault);
         const vault = await Stake1Vault.at(_phaseVault);

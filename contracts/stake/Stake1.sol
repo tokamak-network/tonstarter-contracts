@@ -102,13 +102,13 @@ contract Stake1 is Stake1Storage, TokamakStaker, OnApprove
     function stakeOnApprove(address from, address _owner, address _spender, uint256 _amount) public returns (bool)
     {
         require((paytoken == from && _amount > 0 && _spender == address(this)), "Stake1: stakeOnApprove init fail");
-
+        // solhint-disable-next-line max-line-length
         require(block.number >= saleStartBlock && saleStartBlock < startBlock, "Stake1: stakeTON period is unavailable");
 
         LibTokenStake1.StakedAmount storage staked = userStaked[_owner];
         staked.amount += _amount;
         totalStakedAmount += _amount;
-
+        // solhint-disable-next-line max-line-length
         require(IERC20(from).transferFrom(_owner, _spender, _amount), "DAOCommittee: failed to transfer ton from creator");
 
         return true;

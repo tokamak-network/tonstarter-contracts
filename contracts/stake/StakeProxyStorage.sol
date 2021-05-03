@@ -15,6 +15,7 @@ contract StakeProxyStorage  {
     address public ton;
     address public wton;
     address public depositManager;
+    address public seigManager;
 
     modifier validStakeRegistry() {
         require(address(stakeRegistry) != address(0), "StakeStorage: stakeRegistry is zero");

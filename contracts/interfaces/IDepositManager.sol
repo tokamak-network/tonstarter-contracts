@@ -20,6 +20,7 @@ interface IDepositManager {
   function accUnstakedAccount(address account) external view returns (uint256 wtonAmount);
 
   function withdrawalRequestIndex(address layer2, address account) external view returns (uint256 index);
+  // solhint-disable-next-line max-line-length
   function withdrawalRequest(address layer2, address account, uint256 index) external view returns (uint128 withdrawableBlockNumber, uint128 amount, bool processed );
 
   function WITHDRAWAL_DELAY() external view returns (uint256);

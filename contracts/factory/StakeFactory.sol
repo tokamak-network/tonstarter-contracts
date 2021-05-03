@@ -13,7 +13,7 @@ contract StakeFactory  {
         address _token,
         address _paytoken,
         uint256 _period,
-        address[3] memory tokamakAddr
+        address[4] memory tokamakAddr
     )
         public
         returns (address)
@@ -23,11 +23,12 @@ contract StakeFactory  {
         if (_pahse == 1) {
             Stake1 c = new Stake1();
             IStake1Vault vault = IStake1Vault(_vault);
+
             uint256 saleStart = vault.saleStartBlock();
             uint256 stakeStart = vault.stakeStartBlock();
             require( saleStart < stakeStart && stakeStart > 0 );
             c.initialize(_token, _paytoken, _vault, saleStart, stakeStart, _period );
-            c.setTokamak(tokamakAddr[0], tokamakAddr[1], tokamakAddr[2]);
+            c.setTokamak(tokamakAddr[0], tokamakAddr[1], tokamakAddr[2], tokamakAddr[3]);
             vault.addSubVaultOfStake(_name, address(c), _period);
             c.grantRole(ADMIN_ROLE, msg.sender);
             c.revokeRole(ADMIN_ROLE, address(this));

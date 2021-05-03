@@ -9,6 +9,7 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 import { IStakeFactory } from "../interfaces/IStakeFactory.sol";
 import { IStakeRegistry } from "../interfaces/IStakeRegistry.sol";
 import { IStake1Vault } from "../interfaces/IStake1Vault.sol";
+import { IStake1 } from "../interfaces/IStake1.sol";
 import { Stake1Vault } from "./Stake1Vault.sol";
 
 contract Stake1Logic is StakeProxyStorage, AccessControl {
@@ -44,7 +45,8 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
         address _stakeFactory,
         address _ton,
         address _wton,
-        address _depositManager
+        address _depositManager,
+        address _seigManager
     )
         external
         onlyOwner
@@ -58,6 +60,7 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
         ton =  _ton;
         wton = _wton;
         depositManager = _depositManager;
+        seigManager = _seigManager;
     }
 
     function setFLD(address _fld) public  onlyOwner nonZero(_fld) {
@@ -100,8 +103,8 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
     )   external onlyOwner
     {
         require(stakeRegistry.validVault(_pahse, _vault), "Stake1Proxy: unvalidVault");
-
-        address _contract = stakeFactory.deploy(_pahse, _vault, _name, token, paytoken, periodBlock, [ton, wton, depositManager]);
+        // solhint-disable-next-line max-line-length
+        address _contract = stakeFactory.deploy(_pahse, _vault, _name, token, paytoken, periodBlock, [ton, wton, depositManager, seigManager]);
         require(_contract != address(0), "Stake1Proxy: stakeFactory.deploy fail");
         stakeRegistry.addStakeContract(_vault, _contract);
     }
@@ -135,6 +138,15 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
         returns (address[] memory)
     {
         return stakeRegistry.phasesAll(_phaseIndex);
+    }
+
+    function tokamakStaking(
+        address _stakeContract,
+        address _layer2,
+        uint256 _amount
+    )   external onlyOwner
+    {
+        IStake1(_stakeContract).tokamakStaking(_layer2, _amount);
     }
 
 
