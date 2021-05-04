@@ -57,7 +57,8 @@ const CoinageFactory = contract.fromArtifact('CoinageFactory');
 const Layer2Registry = contract.fromArtifact('Layer2Registry');
 const AutoRefactorCoinage = contract.fromArtifact('AutoRefactorCoinage');
 const PowerTON = contract.fromArtifact('PowerTON');
-const OldDAOVaultMock = contract.fromArtifact('OldDAOVaultMock');
+//const OldDAOVaultMock = contract.fromArtifact('OldDAOVaultMock');
+const DAOVault = contract.fromArtifact('DAOVault');
 
 const EtherToken = contract.fromArtifact('EtherToken');
 const EpochHandler = contract.fromArtifact('EpochHandler');
@@ -127,7 +128,7 @@ class ICO20Contracts {
     this.registry = null;
     this.depositManager = null;
     this.factory = null;
-    this.oldDaoVault = null;
+    //this.oldDaoVault = null;
     this.seigManager = null;
     this.powerton = null;
 
@@ -225,8 +226,8 @@ class ICO20Contracts {
       this.factory = await CoinageFactory.new({from:owner});
 
       let currentTime = await time.latest();
-      //this.daoVault = await DAOVault.new(this.wton.address, currentTime,{from:owner});
-      this.oldDaoVault = await OldDAOVaultMock.new(this.wton.address, currentTime,{from:owner});
+      this.daoVault = await DAOVault.new(this.wton.address, currentTime,{from:owner});
+      //this.oldDaoVault = await OldDAOVaultMock.new(this.wton.address, currentTime,{from:owner});
 
       this.seigManager = await SeigManager.new(
         this.ton.address,
@@ -247,7 +248,7 @@ class ICO20Contracts {
 
       await this.seigManager.setPowerTON(this.powerton.address,{from:owner});
       await this.powerton.start({from:owner});
-      await this.seigManager.setDao(this.oldDaoVault.address,{from:owner});
+      await this.seigManager.setDao(this.daoVault.address,{from:owner});
       await this.wton.addMinter(this.seigManager.address,{from:owner});
       await this.ton.addMinter(this.wton.address,{from:owner});
 
@@ -267,7 +268,7 @@ class ICO20Contracts {
       await users.map(account => this.ton.transfer(account, TON_INITIAL_HOLDERS.toFixed(TON_UNIT)),{from:owner});
       await operators.map(account => this.ton.transfer(account, TON_INITIAL_HOLDERS.toFixed(TON_UNIT)),{from:owner});
 
-      await this.wton.mint(this.oldDaoVault.address, TON_VAULT_AMOUNT.toFixed(WTON_UNIT),{from:owner});
+      await this.wton.mint(this.daoVault.address, TON_VAULT_AMOUNT.toFixed(WTON_UNIT),{from:owner});
 
       await this.seigManager.setMinimumAmount(TON_MINIMUM_STAKE_AMOUNT.times(WTON_TON_RATIO).toFixed(WTON_UNIT),{from:owner})
 
@@ -277,7 +278,7 @@ class ICO20Contracts {
         registry: this.registry ,
         depositManager: this.depositManager,
         coinageFactory: this.factory,
-        oldDaoVault: this.oldDaoVault,
+        daoVault: this.daoVault,
         seigManager : this.seigManager,
         powerton: this.powerton
       }
@@ -361,7 +362,7 @@ class ICO20Contracts {
           registry: this.registry,
           depositManager: this.depositManager,
           coinageFactory: this.coinageFactory,
-          oldDaoVault: this.oldDaoVault,
+          daoVault: this.daoVault,
           seigManager: this.seigManager,
           powerton: this.powerton
         };
