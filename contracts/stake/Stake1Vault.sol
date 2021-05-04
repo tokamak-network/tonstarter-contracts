@@ -8,11 +8,10 @@ import { IFLD } from "../interfaces/IFLD.sol";
 //import { IERC20 } from "../interfaces/IERC20.sol";
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import { IStake1 } from "../interfaces/IStake1.sol";
-/**
-FLD Token's Vault
-*/
-contract Stake1Vault is  AccessControl {
+import "../interfaces/IStake1Vault.sol";
 
+/// @notice FLD Token's Vault - stores the fld for the period of time
+contract Stake1Vault is AccessControl {
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
     bytes32 public constant CLAIMER_ROLE = keccak256("CLAIMER");
     bytes32 public constant MANAGER_ROLE = keccak256("MANAGER");
@@ -42,6 +41,7 @@ contract Stake1Vault is  AccessControl {
         require(hasRole(ADMIN_ROLE, msg.sender), "Stake1Vault: Caller is not an admin");
         _;
     }
+
     modifier onlyManager() {
         require(hasRole(MANAGER_ROLE, msg.sender), "Stake1Vault: Caller is not a manager");
         _;
@@ -58,9 +58,6 @@ contract Stake1Vault is  AccessControl {
         _;
         _lock = 0;
     }
-    //////////////////////////////
-    // Events
-    //////////////////////////////
 
     event ClaimReward(address indexed from, address to, uint256 amount);
 
@@ -71,56 +68,56 @@ contract Stake1Vault is  AccessControl {
         _setupRole(CLAIMER_ROLE, msg.sender);
     }
 
-    receive() external payable {
-    }
+    receive() external payable { }
 
+    /// @dev Initializes all variables
+    /// @param _fld - FLD token address
+    /// @param _paytoken - FLD token address
+    /// @param _cap - FLD token address
+    /// @param _saleStartBlock - FLD token address
+    /// @param _stakeStartBlock - FLD token address
+    /// @param _stakefactory - FLD token address    
     function initialize(
         address _fld,
         address _paytoken,
         uint256 _cap,
-        uint256 _saleStartBlcok,
-        uint256 _stakeStartBlcok,
+        uint256 _saleStartBlock,
+        uint256 _stakeStartBlock,
         address _stakefactory
-    ) external  onlyOwner {
+    ) external onlyOwner {
         require(_fld != address(0) && _stakefactory != address(0), "Stake1Vault: input is zero");
-        require(_cap > 0 , "Stake1Vault: _cap is zero");
-        require(_saleStartBlcok < _stakeStartBlcok && _stakeStartBlcok > 0 , "Stake1Vault: startBlock is unavailable");
+        require(_cap > 0, "Stake1Vault: _cap is zero");
+        require(_saleStartBlock < _stakeStartBlock && _stakeStartBlock > 0, "Stake1Vault: startBlock is unavailable");
 
-        //self = address(uint160(address(this)));
         fld = IFLD(_fld);
         cap = _cap;
         paytoken = _paytoken;
-        saleStartBlock = _saleStartBlcok;
-        stakeStartBlock = _stakeStartBlcok;
+        saleStartBlock = _saleStartBlock;
+        stakeStartBlock = _stakeStartBlock;
 
         grantRole(ADMIN_ROLE, _stakefactory);
     }
 
-    /**
-    * Set the FLD address.
-    */
+    /// @dev Sets FLD address
     function setFLD(address _fld) external  onlyOwner {
         require(_fld != address(0), "Stake1Vault: input is zero");
         fld = IFLD(_fld);
-
     }
-    /**
-    * change the cap of vault.
-    */
+
+    /// @dev Change cap of the vault 
     function changeCap(uint256 _cap) external  onlyOwner {
         require(_cap > 0 && cap != _cap , "Stake1Vault: changeCap fails");
         cap = _cap;
     }
 
+    /// @dev Change orders
     function changeOrderedEndBlocks(uint256[] memory _ordered) external  onlyOwner {
         // solhint-disable-next-line max-line-length
         require(stakeEndBlock < block.number && orderedEndBlocks.length > 0 && orderedEndBlocks.length == _ordered.length , "Stake1Vault: changeOrderedEndBlocks fails");
         orderedEndBlocks = _ordered;
     }
 
-    /**
-    * add Stake Contract
-    */
+    /// @dev Add stake contract
     function addSubVaultOfStake(
         string memory _name,
         address stakeContract,
@@ -128,14 +125,13 @@ contract Stake1Vault is  AccessControl {
     )
         external  onlyOwner
     {
-        // solhint-disable-next-line max-line-length
-        require(stakeContract != address(0) && cap > 0  && periodBlocks > 0 , "Stake1Vault: addStakerInVault init fails");
-        require(block.number < stakeStartBlock, "Stake1Vault: Already started stake" ) ;
-        require(saleClosed == false , "Stake1Vault: closed sale" ) ;
+        require(stakeContract != address(0) && cap > 0  && periodBlocks > 0, "Stake1Vault: addStakerInVault init fails");
+        require(block.number < stakeStartBlock, "Stake1Vault: Already started stake" );
+        require(saleClosed == false, "Stake1Vault: closed sale" );
         require(paytoken == IStake1(stakeContract).paytoken(), "Different paytoken");
 
         LibTokenStake1.stakeInfo storage info = stakeInfos[stakeContract];
-        require(info.startBlcok == 0, "Stake1Vault: Already added" ) ;
+        require(info.startBlcok == 0, "Stake1Vault: Already added" );
 
         stakeAddresses.push(stakeContract);
         uint256 _endBlock = stakeStartBlock + periodBlocks;
@@ -148,16 +144,13 @@ contract Stake1Vault is  AccessControl {
         orderedEndBlocks.push(stakeEndBlock);
     }
 
-    /**
-    * close Sale ,
-    */
-    function closeSale()
-        external
-    {
+    /// @dev Close sale
+    function closeSale() external {
         require(cap > 0 && stakeStartBlock > 0 && stakeEndBlock > 0 && stakeStartBlock < stakeEndBlock
             && block.number < stakeEndBlock, "Stake1Vault: closeSale init fail");
         require(stakeAddresses.length > 0, "Stake1Vault: no stakes");
         blockTotalReward = cap / (stakeEndBlock - stakeStartBlock);
+
         // update balance
         for(uint i = 0; i < stakeAddresses.length; i++){
             address stake = stakeAddresses[i];
@@ -170,8 +163,8 @@ contract Stake1Vault is  AccessControl {
         }
 
         // update total
-        for(uint i1 = 0; i1 < stakeAddresses.length; i1++){
-            LibTokenStake1.stakeInfo storage totalcheck = stakeInfos[stakeAddresses[i1]];
+        for(uint i = 0; i < stakeAddresses.length; i++){
+            LibTokenStake1.stakeInfo storage totalcheck = stakeInfos[stakeAddresses[i]];
             uint256 total = 0;
             for(uint j = 0; j < stakeAddresses.length; j++){
                 if (stakeInfos[stakeAddresses[j]].endBlock >= totalcheck.endBlock){
@@ -182,11 +175,11 @@ contract Stake1Vault is  AccessControl {
 
             // reward total
             uint256 totalReward = 0;
-            for(uint k = i1; k > 0; k--){
-                // solhint-disable-next-line max-line-length
-                totalReward += (stakeInfos[stakeAddresses[k]].endBlock - stakeInfos[stakeAddresses[k-1]].endBlock) * blockTotalReward * totalcheck.balance /  stakeEndBlockTotal[stakeInfos[stakeAddresses[k]].endBlock];
+            for(uint k = i; k > 0; k--){
+                totalReward += (
+                    stakeInfos[stakeAddresses[k]].endBlock - stakeInfos[stakeAddresses[k-1]].endBlock
+                ) * blockTotalReward * totalcheck.balance /  stakeEndBlockTotal[stakeInfos[stakeAddresses[k]].endBlock];
             }
-            // solhint-disable-next-line max-line-length
             totalReward += (stakeInfos[stakeAddresses[0]].endBlock - stakeInfos[stakeAddresses[0]].startBlcok) * blockTotalReward * totalcheck.balance /  stakeEndBlockTotal[stakeInfos[stakeAddresses[0]].endBlock];
 
             totalcheck.totalRewardAmount = totalReward;
@@ -195,13 +188,8 @@ contract Stake1Vault is  AccessControl {
         saleClosed = true;
     }
 
-    /**
-    * The sender approves spender(_to) to spend sender's  tokens(_token) in the amount(_amount).
-    */
-    function claim(address _to, uint256 _amount)
-        external
-        returns (bool )
-    {
+    /// @dev The sender approves spender(_to) to spend sender's  tokens(_token) in the amount(_amount).    
+    function claim(address _to, uint256 _amount) external returns (bool) {   
         require(saleClosed && _amount > 0 , "Stake1Vault: disclose sale");
         uint256 fldBalance = fld.balanceOf(address(this));
         require(fldBalance >= _amount, "Stake1Vault: claimVault: not enough balance");
@@ -222,9 +210,8 @@ contract Stake1Vault is  AccessControl {
         return true;
     }
 
-    function canClaim(address _to, uint256 _amount)
-        external view
-        returns (uint256 )
+    /// @dev 
+    function canClaim(address _to, uint256 _amount) external view returns (uint256 )
     {
         require(saleClosed, "Stake1Vault: disclose sale");
         uint256 fldBalance = fld.balanceOf(address(this));
@@ -232,28 +219,22 @@ contract Stake1Vault is  AccessControl {
 
         LibTokenStake1.stakeInfo storage stakeInfo = stakeInfos[_to];
         require(stakeInfo.startBlcok > 0, "Stake1Vault: claimVault startBlcok is zero");
-        // solhint-disable-next-line max-line-length
-        require(stakeInfo.totalRewardAmount > 0 && (stakeInfo.totalRewardAmount - stakeInfo.claimRewardAmount - _amount) > 0
-            , "Stake1Vault: claim amount is wrong");
 
+        require(stakeInfo.totalRewardAmount > 0, "Stake1Vault: claim amount is wrong");
+        require(stakeInfo.totalRewardAmount - stakeInfo.claimRewardAmount - _amount > 0, "Stake1Vault: wrong");
         return stakeInfo.totalRewardAmount;
     }
 
 
-    /**
-    * Returns the FLD balance stored in the vault.
-    */
-    function balanceFLDAvailableAmount()
-        external
-        view
-        onlyClaimer
-        returns (uint256)
-    {
+    
+    /// @dev Returns the FLD balance stored in the vault
+    function balanceFLDAvailableAmount() external view onlyClaimer returns (uint256) {
         return  fld.balanceOf(address(this));
     }
 
-    function stakeAddressesAll()
-        external view
+    /// @dev Returns all addresses 
+    function stakeAddressesAll() external view
+
         returns (address[] memory)
     {
         return stakeAddresses;
@@ -272,11 +253,11 @@ contract Stake1Vault is  AccessControl {
         return stakeInfos[_account].totalRewardAmount;
     }
 
+    /// @dev Returns info
     function infos()
         external view
         returns
-        (address, uint256, uint256,
-        uint256, uint256, uint256, bool)
+        (address, uint256, uint256, uint256, uint256, uint256, bool)
     {
         return (paytoken, cap, saleStartBlock, stakeStartBlock, stakeEndBlock, blockTotalReward, saleClosed);
     }
