@@ -5,7 +5,6 @@ pragma abicoder v2;
 import "./StakeProxyStorage.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 
-
 /// @title Proxy for Stake contracts in Phase 1
 /// @notice 
 contract Stake1Proxy is StakeProxyStorage, AccessControl {
@@ -16,11 +15,14 @@ contract Stake1Proxy is StakeProxyStorage, AccessControl {
     event Upgraded(address indexed implementation);
 
     modifier onlyOwner() {
-        require(hasRole(ADMIN_ROLE, msg.sender), "Stake1Proxy: msg.sender is not an admin");
+        require(
+            hasRole(ADMIN_ROLE, msg.sender),
+            "Stake1Proxy: msg.sender is not an admin"
+        );
         _;
     }
 
-    constructor() public {
+    constructor() {
         _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
         _setupRole(ADMIN_ROLE, msg.sender);
         _setupRole(ADMIN_ROLE, address(this));
@@ -37,7 +39,10 @@ contract Stake1Proxy is StakeProxyStorage, AccessControl {
     /// @param impl New implementation contract address
     function upgradeTo(address impl) external onlyOwner {
         require(impl != address(0), "Stake1Proxy: input is zero");
-        require(_implementation != impl, "Stake1Proxy: The input address is same as the state");
+        require(
+            _implementation != impl,
+            "Stake1Proxy: The input address is same as the state"
+        );
         _implementation = impl;
         emit Upgraded(impl);
     }
@@ -53,7 +58,10 @@ contract Stake1Proxy is StakeProxyStorage, AccessControl {
 
     function _fallback() internal {
         address _impl = implementation();
-        require(_impl != address(0) && !pauseProxy, "Stake1Proxy: impl is zero OR proxy is false");
+        require(
+            _impl != address(0) && !pauseProxy,
+            "Stake1Proxy: impl is zero OR proxy is false"
+        );
 
         assembly {
             // Copy msg.data. We take full control of memory in this inline assembly
@@ -69,9 +77,13 @@ contract Stake1Proxy is StakeProxyStorage, AccessControl {
             returndatacopy(0, 0, returndatasize())
 
             switch result
-            // delegatecall returns 0 on error.
-            case 0 { revert(0, returndatasize()) }
-            default { return(0, returndatasize()) }
+                // delegatecall returns 0 on error.
+                case 0 {
+                    revert(0, returndatasize())
+                }
+                default {
+                    return(0, returndatasize())
+                }
         }
     }
 }

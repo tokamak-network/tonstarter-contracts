@@ -11,7 +11,9 @@
     "test": "npx hardhat test",
     "test:mocha": "npx mocha --recursive --exit",
     "coverage": "npm run build && npx hardhat coverage --temp artifacts --network coverage",
-    "deploy-rinkeby": "npx hardhat run --network rinkeby scripts/deploy.js"
+    "deploy-rinkeby": "npx hardhat run --network rinkeby scripts/deploy.js",
+    "solhint": "./node_modules/.bin/solhint -f table contracts/**/*.sol",
+    "prettier:solidity": "./node_modules/.bin/prettier --write contracts/**/*.sol"
   },
   "license": "MIT",
   "devDependencies": {
@@ -38,7 +40,9 @@
     "hardhat": "^2.1.1",
     "hardhat-typechain": "^0.3.5",
     "jest": "^26.6.3",
-    "solhint": "^3.3.1",
+    "prettier": "^1.19.1",
+    "prettier-plugin-solidity": "*",
+    "solhint": "^3.3.4",
     "solhint-plugin-prettier": "^0.0.5",
     "solidity-coverage": "^0.7.16",
     "ts-generator": "^0.1.1",

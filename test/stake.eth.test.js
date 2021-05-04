@@ -176,7 +176,7 @@ describe('StakeProxy ', function () {
   });
 
   it('Stake Contracts List : Phase1 ', async function () {
-    const phases1 = await stakeEntry.vaultsOfPahse(toBN('1'));
+    const phases1 = await stakeEntry.vaultsOfPhase(toBN('1'));
     for (let i = 0; i < phases1.length; i++) {
       const phaseVault = phases1[i];
       if (phaseVault != null) {
