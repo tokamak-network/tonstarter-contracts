@@ -18,7 +18,6 @@ chai.use(require('chai-bn')(BN)).should();
 const StakeFactoryAbi = require('../build/contracts/StakeFactory.json').abi;
 const StakeRegistryAbi = require('../build/contracts/StakeRegistry.json').abi;
 const FLDAbi = require('../build/contracts/FLD.json').abi;
-const FLDVaultAbi = require('../build/contracts/FLDVault.json').abi;
 const Stake1VaultAbi = require('../build/contracts/Stake1Vault.json').abi;
 const Stake1LogicAbi = require('../build/contracts/Stake1Logic.json').abi;
 const Stake1ProxyAbi = require('../build/contracts/Stake1Proxy.json').abi;
@@ -29,7 +28,6 @@ const IERC20Abi = require('../build/contracts/IERC20.json').abi;
 const StakeFactory = contract.fromArtifact('StakeFactory');
 const StakeRegistry = contract.fromArtifact('StakeRegistry');
 const FLD = contract.fromArtifact('FLD');
-const FLDVault = contract.fromArtifact('FLDVault');
 const Stake1Vault = contract.fromArtifact('Stake1Vault');
 const Stake1Logic = contract.fromArtifact('Stake1Logic');
 const Stake1Proxy = contract.fromArtifact('Stake1Proxy');
@@ -286,74 +284,6 @@ class ICO20Contracts {
 
   }
 
-  /*
-  initializeDaoContracts  = async function (owner ) {
-      //this = self;
-      this.daoVault = await DAOVault.new(this.ton.address, this.wton.address,{from:owner});
-      this.agendaManager = await DAOAgendaManager.new({from:owner});
-      this.candidateFactory = await CandidateFactory.new({from:owner});
-      this.committee = await DAOCommittee.new({from:owner});
-      this.daoCommitteeProxy = await DAOCommitteeProxy.new(
-        this.ton.address,
-        this.committee.address,
-        this.seigManager.address,
-        this.registry.address,
-        this.agendaManager.address,
-        this.candidateFactory.address,
-        this.daoVault.address,
-        {from:owner}
-      );
-      let impl = await this.daoCommitteeProxy.implementation({from:owner}) ;
-
-      this.committeeProxy = await DAOCommittee.at(this.daoCommitteeProxy.address,{from:owner});
-
-      await this.committeeProxy.increaseMaxMember(3, 2, {from:owner});
-
-      ////////////////////////////////////////////////////////////////////////
-      // test setting
-      await this.committeeProxy.setActivityRewardPerSecond(toBN("1"),{from:owner});
-      await this.agendaManager.setMinimumNoticePeriodSeconds(toBN("10000"),{from:owner});
-      await this.agendaManager.setMinimumVotingPeriodSeconds(toBN("10000"),{from:owner});
-
-      ////////////////////////////////////////////////////////////////////////
-
-      await this.registry.transferOwnership(this.committeeProxy.address,{from:owner});
-      await this.daoVault.transferOwnership(this.committeeProxy.address,{from:owner});
-      await this.agendaManager.setCommittee(this.committeeProxy.address,{from:owner});
-      await this.agendaManager.transferOwnership(this.committeeProxy.address,{from:owner});
-     // await this.committee.transferOwnership(this.committeeProxy.address,{from:owner});
-     // let byteZERO = 0x0;
-     // await this.committee.grantRole( byteZERO, this.committeeProxy.address,{from:owner});
-
-      await this.ton.addMinter(this.committeeProxy.address);
-      await this.ton.transferOwnership(this.committeeProxy.address);
-
-      await this.wton.addMinter(this.committeeProxy.address);
-      await this.wton.transferOwnership(this.committeeProxy.address);
-
-      await this.seigManager.addPauser(this.committeeProxy.address);
-      await this.seigManager.renouncePauser();
-
-      await this.seigManager.transferOwnership(this.committeeProxy.address);
-      await this.depositManager.transferOwnership(this.committeeProxy.address);
-
-      await this.ton.renounceMinter();
-      await this.wton.renounceMinter();
-
-      await this.powerton.addPauser(this.committeeProxy.address);
-      await this.powerton.renouncePauser();
-      await this.powerton.transferOwnership(this.committeeProxy.address);
-
-      let returnData ={
-        daoVault: this.daoVault,
-        agendaManager: this.agendaManager,
-        candidateFactory: this.candidateFactory ,
-        committee: this.committee,
-        committeeProxy: this.committeeProxy
-      }
-      return  returnData;
-  }
-  */
 
   getPlasamContracts  = function () {
       return {
@@ -486,51 +416,6 @@ class ICO20Contracts {
 
   }
 
-  /*
-  addCandidate = async function (candidate) {
-    const minimum = await this.seigManager.minimumAmount();
-    const beforeTonBalance = await this.ton.balanceOf(candidate);
-
-    const stakeAmountTON = TON_MINIMUM_STAKE_AMOUNT.toFixed(TON_UNIT);
-    const stakeAmountWTON = TON_MINIMUM_STAKE_AMOUNT.times(WTON_TON_RATIO).toFixed(WTON_UNIT);
-    const testMemo = candidate + " memo string";
-    await this.committeeProxy.createCandidate(testMemo, {from: candidate});
-
-    const candidateContractAddress = await this.committeeProxy.candidateContract(candidate);
-
-    (await this.registry.layer2s(candidateContractAddress)).should.be.equal(true);
-
-    await this.deposit(candidateContractAddress, candidate, stakeAmountTON);
-
-    const afterTonBalance = await this.ton.balanceOf(candidate);
-    beforeTonBalance.sub(afterTonBalance).should.be.bignumber.equal(stakeAmountTON);
-
-    const coinageAddress = await this.seigManager.coinages(candidateContractAddress);
-    const coinage = await AutoRefactorCoinage.at(coinageAddress);
-
-    if (this.layer2s == null) this.layer2s = [];
-    let layer2 = await Candidate.at(candidateContractAddress);
-    this.layer2s.push(layer2);
-
-    if (this.coinages == null) this.coinages = [];
-    this.coinages.push(coinage);
-
-    const stakedAmount = await coinage.balanceOf(candidate);
-    stakedAmount.should.be.bignumber.equal(stakeAmountWTON);
-
-    const candidatesLength = await this.committeeProxy.candidatesLength();
-    let foundCandidate = false;
-    for (let i = 0; i < candidatesLength; i++) {
-      const address = await this.committeeProxy.candidates(i);
-      if (address === candidate) {
-        foundCandidate = true;
-        break;
-      }
-    }
-    foundCandidate.should.be.equal(true);
-  }
-  */
-
   deposit = async function(candidateContractAddress, account, tonAmount) {
     const beforeBalance = await this.ton.balanceOf(account);
     beforeBalance.should.be.bignumber.gte(tonAmount);
@@ -661,4 +546,4 @@ class ICO20Contracts {
 }
 
 
-  module.exports =  ICO20Contracts;
+module.exports =  ICO20Contracts;

@@ -2,7 +2,6 @@
 pragma solidity ^0.7.6;
 
 interface IStakeFactory {
-
     function deploy(
         uint256 _pahse,
         address _vault,
@@ -11,8 +10,5 @@ interface IStakeFactory {
         address _paytoken,
         uint256 _period,
         address[4] memory tokamakAddr
-    )
-        external
-        returns (address);
-
+    ) external returns (address);
 }

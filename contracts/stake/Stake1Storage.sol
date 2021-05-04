@@ -4,9 +4,7 @@ pragma solidity ^0.7.6;
 //import { IERC20 } from "../interfaces/IERC20.sol";
 import "../libraries/LibTokenStake1.sol";
 
-
 contract Stake1Storage {
-
     // The token being sold
     address public token;
 
@@ -25,6 +23,5 @@ contract Stake1Storage {
 
     // the current lock storage of your account.
     mapping(address => LibTokenStake1.StakedAmount) public userStaked;
-    uint internal _lock;
-
+    uint256 internal _lock;
 }
