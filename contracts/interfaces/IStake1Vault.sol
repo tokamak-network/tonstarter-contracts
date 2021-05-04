@@ -2,59 +2,30 @@
 pragma solidity ^0.7.6;
 pragma abicoder v2;
 import "../libraries/LibTokenStake1.sol";
-interface IStake1Vault {
 
+
+interface IStake1Vault {
     function initialize(
         address _fld,
         address _paytoken,
         uint256 _cap,
         uint256 _saleStartBlcok,
         uint256 _stakeStartBlcok
-    ) external ;
+    ) external;
 
-    /**
-    * Set the FLD address.
-    */
+    /// @dev Sets the FLD address
     function setFLD(address _ton) external;
 
-    /**
-    * change the cap of vault.
-    */
-    function changeCap(uint256 _cap) external ;
-
-    function changeOrderedEndBlocks(uint256[] memory _ordered) external ;
-
-    function addSubVaultOfStake(
-        string memory _name,
-        address stakeContract,
-        uint256 periodBlocks
-    )
-        external ;
-
-
-    function closeSale()
-        external ;
-
-    function claim(address _to, uint256 _amount)
-        external
-        returns (bool);
-
-    function canClaim(address _to, uint256 _amount)
-        external view
-        returns (uint256 );
-
-    function totalRewardAmount(address _account)
-        external view
-        returns (uint256 );
-
-    function stakeAddressesAll()
-        external view
-        returns (address[] memory) ;
-
-    function orderedEndBlocksAll()
-        external view
-        returns (uint256[] memory);
-
+    /// @dev Changes the cap of vault.
+    function changeCap(uint256 _cap) external;
+    function changeOrderedEndBlocks(uint256[] memory _ordered) external;
+    function addSubVaultOfStake(string memory _name, address stakeContract, uint256 periodBlocks) external;
+    function closeSale() external;   
+    function claim(address _to, uint256 _amount) external returns (bool);
+    function canClaim(address _to, uint256 _amount) external view returns (uint256);
+    function totalRewardAmount(address _account) external view returns (uint256 );
+    function stakeAddressesAll() external view returns (address[] memory);
+    function orderedEndBlocksAll() external view returns (uint256[] memory);
     function fld() external view returns (address);
     function paytoken() external view returns (address);
     function cap() external view returns (uint256);

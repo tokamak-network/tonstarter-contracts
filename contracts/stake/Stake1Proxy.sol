@@ -5,6 +5,8 @@ pragma abicoder v2;
 import "./StakeProxyStorage.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 
+
+/// @title Proxy for Stake contracts in Phase 1
 contract Stake1Proxy is StakeProxyStorage, AccessControl {
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
     address internal _implementation;
@@ -17,8 +19,7 @@ contract Stake1Proxy is StakeProxyStorage, AccessControl {
         _;
     }
 
-    constructor()
-    {
+    constructor() public {
         _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
         _setupRole(ADMIN_ROLE, msg.sender);
         _setupRole(ADMIN_ROLE, address(this));
@@ -40,6 +41,7 @@ contract Stake1Proxy is StakeProxyStorage, AccessControl {
         emit Upgraded(impl);
     }
 
+    /// @dev returns the implementation
     function implementation() public view returns (address) {
         return _implementation;
     }

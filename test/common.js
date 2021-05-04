@@ -3,10 +3,10 @@ const { BigNumber, utils } = require("ethers")
 const { ethers, upgrades } = require("hardhat")
 */
 //const { deployProxy, upgradeProxy } = require('@openzeppelin/truffle-upgrades');
-const { ethers } = require('ethers')
+const { ethers } = require('ethers');
 
-const BigNumber = ethers.BigNumber // https://docs.ethers.io/v5/api/utils/bignumber/
-const utils = ethers.utils
+const BigNumber = ethers.BigNumber; // https://docs.ethers.io/v5/api/utils/bignumber/
+const utils = ethers.utils;
 const { padLeft, toBN, toWei, fromWei , keccak256 , soliditySha3 , solidityKeccak256 } = require('web3-utils');
 const {
     defaultSender, accounts, contract, web3, provider , privateKeys
@@ -39,4 +39,4 @@ module.exports ={
     getSignature,
     signatureVaildTime,
     timeout
-}
+};

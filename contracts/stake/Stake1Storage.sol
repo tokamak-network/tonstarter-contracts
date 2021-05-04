@@ -4,7 +4,8 @@ pragma solidity ^0.7.6;
 //import { IERC20 } from "../interfaces/IERC20.sol";
 import "../libraries/LibTokenStake1.sol";
 
-contract Stake1Storage  {
+
+contract Stake1Storage {
 
     // The token being sold
     address public token;

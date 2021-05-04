@@ -2,9 +2,9 @@
 //const { ethers, upgrades } = require("hardhat")
 
 const { time, expectEvent } = require("@openzeppelin/test-helpers");
-const { ethers } = require('ethers')
-const BigNumber = ethers.BigNumber // https://docs.ethers.io/v5/api/utils/bignumber/
-const utils = ethers.utils
+const { ethers } = require('ethers');
+const BigNumber = ethers.BigNumber; // https://docs.ethers.io/v5/api/utils/bignumber/
+const utils = ethers.utils;
 
 const {
     defaultSender, accounts, contract, web3, privateKeys

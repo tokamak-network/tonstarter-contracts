@@ -5,7 +5,8 @@ import "../libraries/LibTokenStake.sol";
 import { IStakeFactory } from "../interfaces/IStakeFactory.sol";
 import { IStakeRegistry } from "../interfaces/IStakeRegistry.sol";
 
-contract StakeProxyStorage  {
+
+contract StakeProxyStorage {
 
     IStakeRegistry public stakeRegistry;
     IStakeFactory public stakeFactory;

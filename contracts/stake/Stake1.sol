@@ -11,8 +11,8 @@ import { ERC165Checker } from "@openzeppelin/contracts/introspection/ERC165Check
 import { SafeERC20 } from "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import { OnApprove } from "../tokens/OnApprove.sol";
 
-contract Stake1 is TokamakStaker, OnApprove
-{
+
+contract Stake1 is TokamakStaker, OnApprove {
     using SafeERC20 for IERC20;
     /*
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
@@ -25,6 +25,7 @@ contract Stake1 is TokamakStaker, OnApprove
         _;
     }
     */
+
     modifier lock() {
         require(_lock == 0, "Stake1Vault: LOCKED");
         _lock = 1;
@@ -35,12 +36,10 @@ contract Stake1 is TokamakStaker, OnApprove
     //////////////////////////////
     // Events
     //////////////////////////////
-
     event Claimed(address indexed from, uint256 amount, uint256 currentBlcok);
     event Withdrawal(address indexed from, address indexed to, uint256 amount, uint256 currentBlcok);
 
-    constructor()
-    {
+    constructor() {
         _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
         _setupRole(ADMIN_ROLE, msg.sender);
     }
@@ -66,25 +65,19 @@ contract Stake1 is TokamakStaker, OnApprove
         endBlock = startBlock + _period;
     }
 
-
-
-    /**
-    * public
-    */
     receive() external payable {
       stake(0);
     }
-    //////////////////////////////////////////////////////////////////////
-    // Staking TON
+
+    /// @dev Approves
     function onApprove(
         address owner,
         address spender,
         uint256 tonAmount,
         bytes calldata data
-    ) external override returns (bool) {
-
+    ) external override returns (bool)
+    {
         (address _spender, uint256 _amount) = _decodeStakeData(data);
-
         require(tonAmount == _amount && spender == _spender, "Stake1: tonAmount != stakingAmount ");
         require(stakeOnApprove(msg.sender, owner, _spender, _amount), "Stake1: stakeOnApprove fails ");
         return true;
@@ -95,50 +88,49 @@ contract Stake1 is TokamakStaker, OnApprove
         pure
         returns (address spender, uint256 amount)
     {
-        (spender,amount) = abi.decode(input, (address,uint256));
+        (spender, amount) = abi.decode(input, (address, uint256));
     }
 
 
     function stakeOnApprove(address from, address _owner, address _spender, uint256 _amount) public returns (bool)
     {
         require((paytoken == from && _amount > 0 && _spender == address(this)), "Stake1: stakeOnApprove init fail");
-        // solhint-disable-next-line max-line-length
-        require(block.number >= saleStartBlock && saleStartBlock < startBlock, "Stake1: stakeTON period is unavailable");
+        require(
+            block.number >= saleStartBlock && saleStartBlock < startBlock,
+            "Stake1: stakeTON period is unavailable"
+        );
 
         LibTokenStake1.StakedAmount storage staked = userStaked[_owner];
         staked.amount += _amount;
         totalStakedAmount += _amount;
-        // solhint-disable-next-line max-line-length
-        require(IERC20(from).transferFrom(_owner, _spender, _amount), "DAOCommittee: failed to transfer ton from creator");
-
+        require(
+            IERC20(from).transferFrom(_owner, _spender, _amount),
+            "DAOCommittee: failed to transfer ton from creator"
+        );
         return true;
     }
-    //---
 
-    function stake(uint256 _amount) public payable
-    {
+    function stake(uint256 _amount) public payable {
         require(
             (paytoken == address(0) && msg.value > 0)
-            ||
-            (paytoken != address(0) && _amount > 0), "Stake1: amount is zero");
-
+            || (paytoken != address(0) && _amount > 0),
+            "Stake1: amount is zero"
+        );
         require(block.number >= saleStartBlock && saleStartBlock < startBlock, "Stake1: period is unavailable");
+
         uint256 amount = _amount;
-        if (paytoken == address(0)) amount = msg.value;
+        if (paytoken == address(0))
+            amount = msg.value;
 
         LibTokenStake1.StakedAmount storage staked = userStaked[msg.sender];
         staked.amount += amount;
         totalStakedAmount += amount;
-
         if (paytoken != address(0))
             require(IERC20(paytoken).transferFrom(msg.sender, address(this), amount));
-
     }
 
-
-    function withdraw()
-        external
-    {
+    /// @dev To withdraw
+    function withdraw() external {
         require(endBlock > 0 && endBlock < block.number, "Stake1: on staking period");
         LibTokenStake1.StakedAmount storage staked = userStaked[msg.sender];
 
@@ -164,9 +156,8 @@ contract Stake1 is TokamakStaker, OnApprove
         emit Withdrawal(address(this), msg.sender, amount, block.number);
     }
 
-    function claim()
-        external lock
-    {
+    /// @dev Claim for reward
+    function claim() external lock {
         require(IStake1Vault(vault).saleClosed() == true, "Stake1: disclose sale.");
         address account = msg.sender;
         uint256 rewardClaim = 0;
@@ -191,17 +182,13 @@ contract Stake1 is TokamakStaker, OnApprove
         emit Claimed(account, rewardClaim, currentBlock );
     }
 
-    function canRewardAmount(address account)
-        public view
-        returns (uint256 )
-    {
+    function canRewardAmount(address account) public view returns (uint256) {
         uint256 reward = 0;
-
-        //LibTokenStake1.StakedAmount storage staked = userStaked[account];
-        if (block.number  < startBlock || userStaked[account].amount == 0
+        if (block.number < startBlock || userStaked[account].amount == 0
             || userStaked[account].claimedBlock > endBlock
-            || userStaked[account].claimedBlock > block.number ) reward = 0;
-        else {
+            || userStaked[account].claimedBlock > block.number ) {
+            reward = 0;
+        } else {
             uint256 startR = startBlock;
             uint256 endR = endBlock;
             if(startR < userStaked[account].claimedBlock) startR = userStaked[account].claimedBlock;
@@ -232,15 +219,4 @@ contract Stake1 is TokamakStaker, OnApprove
         }
         return reward;
     }
-
-    /**
-    * internal
-    */
-
-
-    /**
-    * private
-    */
-
-
 }

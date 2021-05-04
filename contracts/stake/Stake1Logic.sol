@@ -63,18 +63,6 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
         seigManager = _seigManager;
     }
 
-    function setFLD(address _fld) public  onlyOwner nonZero(_fld) {
-        fld = _fld;
-    }
-
-    function setStakeRegistry(address _stakeRegistry) public  onlyOwner nonZero(_stakeRegistry) {
-        stakeRegistry = IStakeRegistry(_stakeRegistry);
-    }
-
-    function setStakeFactory(address _stakeFactory) public   onlyOwner nonZero(_stakeFactory) {
-        stakeFactory = IStakeFactory(_stakeFactory);
-    }
-
     //////////////////////////////////////////////////////////////////////
     // Admin Functions
     function createVault(
@@ -133,7 +121,7 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
         return IStake1Vault(_vault).stakeAddressesAll();
     }
 
-    function vaultsOfPahse(uint256 _phaseIndex)
+    function vaultsOfPhase(uint256 _phaseIndex)
         external view
         returns (address[] memory)
     {
@@ -157,6 +145,7 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
         IStake1(_stakeContract).tokamakRequestUnStakingAll(_layer2);
     }
 
+    /// @dev Requests unstaking
     function tokamakRequestUnStaking(
         address _stakeContract,
         address _layer2,
@@ -166,6 +155,7 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
         IStake1(_stakeContract).tokamakRequestUnStaking(_layer2, _amount);
     }
 
+    /// @dev Processes unstaking
     function tokamakProcessUnStaking(
         address _stakeContract,
         address _layer2,
@@ -173,5 +163,20 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
     )   external onlyOwner
     {
         IStake1(_stakeContract).tokamakProcessUnStaking(_layer2, receiveTON);
+    }
+
+    /// @dev Sets FLD address
+    function setFLD(address _fld) public  onlyOwner nonZero(_fld) {
+        fld = _fld;
+    }
+
+    /// @dev Sets Stake Registry address
+    function setStakeRegistry(address _stakeRegistry) public  onlyOwner nonZero(_stakeRegistry) {
+        stakeRegistry = IStakeRegistry(_stakeRegistry);
+    }
+
+    /// @dev Sets Stake Factory address
+    function setStakeFactory(address _stakeFactory) public onlyOwner nonZero(_stakeFactory) {
+        stakeFactory = IStakeFactory(_stakeFactory);
     }
 }
