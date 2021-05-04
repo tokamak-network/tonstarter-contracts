@@ -149,5 +149,29 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
         IStake1(_stakeContract).tokamakStaking(_layer2, _amount);
     }
 
+    function tokamakRequestUnStakingAll(
+        address _stakeContract,
+        address _layer2
+    )   external onlyOwner
+    {
+        IStake1(_stakeContract).tokamakRequestUnStakingAll(_layer2);
+    }
 
+    function tokamakRequestUnStaking(
+        address _stakeContract,
+        address _layer2,
+        uint256 _amount
+    )   external onlyOwner
+    {
+        IStake1(_stakeContract).tokamakRequestUnStaking(_layer2, _amount);
+    }
+
+    function tokamakProcessUnStaking(
+        address _stakeContract,
+        address _layer2,
+        bool receiveTON
+    )   external onlyOwner
+    {
+        IStake1(_stakeContract).tokamakProcessUnStaking(_layer2, receiveTON);
+    }
 }

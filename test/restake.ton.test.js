@@ -217,56 +217,191 @@ describe('StakeProxy ', function () {
 
             if (current < endBlock) {
                 let tonAmount = await ton.balanceOf(stakeAddresses[i]);
-                console.log('tonAmount:',tonAmount.toString());
+                console.log('tonAmount:',utils.formatUnits(tonAmount.toString(), 18) ,'TON' );
                 let wtonAmount = await wton.balanceOf(stakeAddresses[i]);
-                console.log('wtonAmount:',wtonAmount.toString());
+                console.log('wtonAmount:',utils.formatUnits(wtonAmount.toString(), 27) ,'TON' );
 
                 if (tonAmount.gt(toBN('0'))){
+
+                    // 토카막에 스테이킹  : Staking TON in Tokamak
                     await stakeEntry.tokamakStaking(stakeAddresses[i], layer2.address,  tonAmount, {from: defaultSender});
 
                     let accStakedAccount = await depositManager.accStakedAccount(stakeAddresses[i]);
-                    console.log('depositManager accStakedAccount:',accStakedAccount.toString());
+                    console.log('depositManager accStakedAccount:', utils.formatUnits(accStakedAccount.toString(), 27) ,'TON' );
                     let stakeOf = await seigManager.stakeOf(layer2.address, stakeAddresses[i]);
-                    console.log('seigManager stakeOf:',stakeOf.toString());
+                    console.log('seigManager stakeOf:', utils.formatUnits(stakeOf.toString(), 27)  ,'TON');
 
                     let current = await time.latestBlock();
                     if(logFlag) console.log(`\n\nCurrent block: ${current} `);
 
                     let tonAmountAfter = await ton.balanceOf(stakeAddresses[i]);
-                    console.log('tonAmountAfter:',tonAmountAfter.toString());
+                    console.log('tonAmountAfter:',utils.formatUnits(tonAmountAfter.toString(), 18) ,'TON' );
                     let wtonAmountAfter = await wton.balanceOf(stakeAddresses[i]);
-                    console.log('wtonAmountAfter:',wtonAmountAfter.toString());
+                    console.log('wtonAmountAfter:',utils.formatUnits(wtonAmountAfter.toString(), 27) ,'TON' );
+
                 }
             }
         }
     });
 
-    //토카막에 톤을 스테이킹한 후, 리워드 출금요청
-    it('After staking tones in Tokamak, request withdrawal of rewards', async function () {
+    //토카막: 리워드 업데이트.
+    it('updateRewardTokamak', async function () {
+        this.timeout(1000000);
+        await timeout(20);
+        await ico20Contracts.updateRewardTokamak(layer2, operator1);
+    });
+
+    //토카막에 톤 스테이킹후, 리워드 출금 요청
+    it('After staking TON in Tokamak, request withdrawal of rewards', async function () {
         this.timeout(1000000);
         await timeout(20);
 
+        let stakeAddresses = await stakeEntry.stakeContractsOfVault(vault_phase1_ton.address);
+        const latest = await time.latestBlock();
+        await time.advanceBlockTo(parseInt(latest) + 15);
+        let current = await time.latestBlock();
+        if(logFlag) console.log(`\n\nCurrent block: ${current} `);
+        for(let i = 0; i < stakeAddresses.length; i++){
+            console.log(`\n\n ************* request withdrawal of rewards : `,i, stakeAddresses[i] );
+            let stakeContract1 = await Stake1.at(stakeAddresses[i]);
+            let totalStakedAmount = await stakeContract1.totalStakedAmount();
+            console.log('totalStakedAmount:', utils.formatUnits(totalStakedAmount.toString(),18), 'TON' );
+            let totalStakedAmountWtonStr = totalStakedAmount.toString()+'000000000';
+
+            // 코인에이지 팩터때문에 여유분이 있어야 되는듯.
+            let totalStakedAmountWton = toBN(totalStakedAmountWtonStr).add(toBN('1'));
+            // check stakeOf
+            let stakeOf = await seigManager.stakeOf(layer2.address, stakeAddresses[i]);
+            console.log('seigManager stakeOf:',utils.formatUnits(stakeOf.toString(), 27) ,'TON' );
+
+            if(stakeOf.gt(totalStakedAmountWton)){
+                // 토카막에 리워드 양만큼만 언스테이킹 요청 : Request UnStaking TON in Tokamak
+                // 원금은 출금하지 않는 함수.
+                let _amount = stakeOf.sub(totalStakedAmountWton);
+                console.log('** Request UnStaking _amount:', utils.formatUnits(_amount.toString(), 27) ,'TON');
+                await stakeEntry.tokamakRequestUnStaking(stakeAddresses[i], layer2.address, _amount, {from: defaultSender});
+                let accStakedAccount = await depositManager.accStakedAccount(stakeAddresses[i]);
+                console.log('depositManager accStakedAccount:', utils.formatUnits(accStakedAccount.toString(), 27) ,'TON' );
+                let stakeOfAfterRequest = await seigManager.stakeOf(layer2.address, stakeAddresses[i]);
+                console.log('seigManager stakeOf After Request:', utils.formatUnits(stakeOfAfterRequest.toString(), 27)  ,'TON');
+
+            }else{
+                console.log('No rewards have been added.');
+            }
+        }
     });
 
     //출금지연블록 후에, 리워드 출금
     it('Process reward withdrawal after withdrawal delay block', async function () {
         this.timeout(1000000);
+
+        let delayBlocks = await depositManager.globalWithdrawalDelay();
+        const latest = await time.latestBlock();
+        await time.advanceBlockTo(parseInt(latest) + parseInt(delayBlocks));
+        let current = await time.latestBlock();
+        if(logFlag) console.log(`\n\nCurrent block: ${current} `, 'delayBlocks:', delayBlocks.toString());
         await timeout(20);
 
+        let stakeAddresses = await stakeEntry.stakeContractsOfVault(vault_phase1_ton.address);
+        for(let i = 0; i < stakeAddresses.length; i++){
+            console.log(`\n\n ************* Process withdrawal of rewards : `,i, stakeAddresses[i] );
+            let tonAmount = await ton.balanceOf(stakeAddresses[i]);
+            console.log('tonAmount:',utils.formatUnits(tonAmount.toString(), 18) ,'TON' );
+            let wtonAmount  = await wton.balanceOf(stakeAddresses[i]);
+            console.log('wtonAmount:',utils.formatUnits(wtonAmount.toString(), 27) ,'TON' );
+
+            let stakeContract1 = await Stake1.at(stakeAddresses[i]);
+            let totalStakedAmount = await stakeContract1.totalStakedAmount();
+            console.log('totalStakedAmount:', utils.formatUnits(totalStakedAmount.toString(),18), 'TON' );
+
+            let stakeOf = await seigManager.stakeOf(layer2.address, stakeAddresses[i]);
+            console.log('seigManager stakeOf:',utils.formatUnits(stakeOf.toString(), 27) ,'TON' );
+
+            let pendingUnstaked = await stakeContract1.tokamakPendingUnstaked(layer2.address);
+            console.log('pendingUnstaked:',utils.formatUnits(pendingUnstaked.toString(), 27) ,'TON' );
+
+            //리워드 출금, TON으로 출금함.
+            await stakeEntry.tokamakProcessUnStaking(stakeAddresses[i], layer2.address, true, {from: defaultSender});
+
+            let tonAmountAfter = await ton.balanceOf(stakeAddresses[i]);
+            console.log('** tonAmount After Process UnStaking:',utils.formatUnits(tonAmountAfter.toString(), 18) ,'TON' );
+            let wtonAmountAfter = await wton.balanceOf(stakeAddresses[i]);
+            console.log('wtonAmount After Process UnStaking:',utils.formatUnits(wtonAmountAfter.toString(), 27) ,'TON' );
+        }
     });
 
     //토카막에 스테이킹되어 있는 원금 출금 요청
     it('Request for withdrawal of principal funds staked in Tokamak', async function () {
         this.timeout(1000000);
-        await timeout(20);
+       // await timeout(20);
+        let stakeAddresses = await stakeEntry.stakeContractsOfVault(vault_phase1_ton.address);
+        const latest = await time.latestBlock();
+        let current = await time.latestBlock();
+        if(logFlag) console.log(`\n\nCurrent block: ${current} `);
+        for(let i = 0; i < stakeAddresses.length; i++){
+            console.log(`\n\n ************* request withdrawal of all : `,i, stakeAddresses[i] );
+            let tonAmount = await ton.balanceOf(stakeAddresses[i]);
+            console.log('tonAmount:',utils.formatUnits(tonAmount.toString(), 18) ,'TON' );
+            let wtonAmount  = await wton.balanceOf(stakeAddresses[i]);
+            console.log('wtonAmount:',utils.formatUnits(wtonAmount.toString(), 27) ,'TON' );
 
+             let stakeContract1 = await Stake1.at(stakeAddresses[i]);
+            // check stakeOf
+            let stakeOf = await seigManager.stakeOf(layer2.address, stakeAddresses[i]);
+            console.log('seigManager stakeOf:',utils.formatUnits(stakeOf.toString(), 27) ,'TON' );
+
+            // 토카막에 모든 금액 언스테이킹 요청 : Request UnStaking TON in Tokamak
+            await stakeEntry.tokamakRequestUnStakingAll(stakeAddresses[i], layer2.address, {from: defaultSender});
+
+            let pendingUnstaked = await stakeContract1.tokamakPendingUnstaked(layer2.address);
+            console.log('** pendingUnstaked:',utils.formatUnits(pendingUnstaked.toString(), 27) ,'TON' );
+
+            let accStakedAccount = await depositManager.accStakedAccount(stakeAddresses[i]);
+            console.log('depositManager accStakedAccount:', utils.formatUnits(accStakedAccount.toString(), 27) ,'TON' );
+            let stakeOfAfterRequest = await seigManager.stakeOf(layer2.address, stakeAddresses[i]);
+            console.log('seigManager stakeOf After Request:', utils.formatUnits(stakeOfAfterRequest.toString(), 27)  ,'TON');
+
+        }
     });
 
-    //토카막에 스테이킹되어 있는 원금 출금 요청
+    //토카막에 스테이킹되어 있는 원금 출금처리
     it('Process principal funds withdrawal after withdrawal delay block', async function () {
         this.timeout(1000000);
+        //await timeout(20);
+
+        let delayBlocks = await depositManager.globalWithdrawalDelay();
+        const latest = await time.latestBlock();
+        await time.advanceBlockTo(parseInt(latest) + parseInt(delayBlocks));
+        let current = await time.latestBlock();
+        if(logFlag) console.log(`\n\nCurrent block: ${current} `, 'delayBlocks:', delayBlocks.toString());
         await timeout(20);
 
+        let stakeAddresses = await stakeEntry.stakeContractsOfVault(vault_phase1_ton.address);
+        for(let i = 0; i < stakeAddresses.length; i++){
+            console.log(`\n\n ************* Process withdrawal of all : `,i, stakeAddresses[i] );
+            let tonAmount = await ton.balanceOf(stakeAddresses[i]);
+            console.log('tonAmount:',utils.formatUnits(tonAmount.toString(), 18) ,'TON' );
+            let wtonAmount  = await wton.balanceOf(stakeAddresses[i]);
+            console.log('wtonAmount:',utils.formatUnits(wtonAmount.toString(), 27) ,'TON' );
+
+            let stakeContract1 = await Stake1.at(stakeAddresses[i]);
+            let totalStakedAmount = await stakeContract1.totalStakedAmount();
+            console.log('totalStakedAmount:', utils.formatUnits(totalStakedAmount.toString(),18), 'TON' );
+
+            let stakeOf = await seigManager.stakeOf(layer2.address, stakeAddresses[i]);
+            console.log('seigManager stakeOf:',utils.formatUnits(stakeOf.toString(), 27) ,'TON' );
+
+            let pendingUnstaked = await stakeContract1.tokamakPendingUnstaked(layer2.address);
+            console.log('pendingUnstaked:',utils.formatUnits(pendingUnstaked.toString(), 27) ,'TON' );
+
+            //리워드 출금, TON으로 출금함.
+            await stakeEntry.tokamakProcessUnStaking(stakeAddresses[i], layer2.address, true, {from: defaultSender});
+
+            let tonAmountAfter = await ton.balanceOf(stakeAddresses[i]);
+            console.log('** tonAmount After Process UnStaking:',utils.formatUnits(tonAmountAfter.toString(), 18) ,'TON' );
+            let wtonAmountAfter = await wton.balanceOf(stakeAddresses[i]);
+            console.log('wtonAmount After Process UnStaking:',utils.formatUnits(wtonAmountAfter.toString(), 27) ,'TON' );
+        }
     });
 
     /*

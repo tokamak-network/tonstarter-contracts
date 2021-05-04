@@ -11,7 +11,7 @@ import { ERC165Checker } from "@openzeppelin/contracts/introspection/ERC165Check
 import { SafeERC20 } from "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import { OnApprove } from "../tokens/OnApprove.sol";
 
-contract Stake1 is Stake1Storage, TokamakStaker, OnApprove
+contract Stake1 is TokamakStaker, OnApprove
 {
     using SafeERC20 for IERC20;
     /*

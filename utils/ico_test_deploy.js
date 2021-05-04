@@ -444,6 +444,47 @@ class ICO20Contracts {
     return layer2;
   }
 
+  makePos = (v1, v2) => {
+        v1 = toBN(v1);
+        v2 = toBN(v2);
+
+        const a = v1.mul(toBN(2).pow(toBN(128)));
+        return a.add(v2).toString();
+  };
+
+  updateRewardTokamak = async function(layer2Contract, _operator){
+    const [
+          costNRB,
+          NRELength,
+          currentForkNumber,
+        ] = await Promise.all([
+          layer2Contract.COST_NRB(),
+          layer2Contract.NRELength(),
+          layer2Contract.currentFork(),
+        ]);
+        const fork = await layer2Contract.forks(currentForkNumber);
+        const epochNumber = parseInt(fork.lastEpoch) + 1;
+        const startBlockNumber = parseInt(fork.lastBlock) + 1;
+        const endBlockNumber = parseInt(startBlockNumber) + parseInt(NRELength) - 1;
+
+        // pos1 = fork number * 2^128 + epoch number
+        // pos2 = start block number * 2^128 + end block number
+        const pos1 = this.makePos(currentForkNumber, epochNumber);
+        const pos2 = this.makePos(startBlockNumber, endBlockNumber);
+        const dummyBytes = '0xdb431b544b2f5468e3f771d7843d9c5df3b4edcf8bc1c599f18f0b4ea8709bc3';
+        //console.log('pos1', pos1, 'pos2', pos2, 'dummyBytes', dummyBytes, 'costNRB', costNRB) ;
+
+        await layer2Contract.submitNRE(
+            pos1,
+            pos2,
+            dummyBytes,
+            dummyBytes,
+            dummyBytes,
+            {from: _operator}
+          );
+
+  }
+
   /*
   addCandidate = async function (candidate) {
     const minimum = await this.seigManager.minimumAmount();

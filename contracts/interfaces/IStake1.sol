@@ -34,4 +34,38 @@ interface IStake1 {
         uint256 _amount
     )   external ;
 
+    function tokamakRequestUnStakingAll(
+        address _layer2
+    )   external ;
+
+    function tokamakRequestUnStaking(
+        address _layer2,
+        uint256 _amount
+    )   external;
+
+    function tokamakProcessUnStaking(
+        address _layer2,
+        bool receiveTON
+    )   external;
+
+    function tokamakPendingUnstaked(
+        address _layer2
+    )
+        external view returns (uint256 wtonAmount);
+
+    function tokamakAccStaked(
+        address _layer2
+    )
+        external view returns (uint256 wtonAmount);
+
+    function tokamakAccUnstaked(
+        address _layer2
+    )
+        external view returns (uint256 wtonAmount);
+
+    function tokamakStakeOf(
+        address _layer2
+    )
+        external view returns (uint256 wtonAmount);
+
 }
