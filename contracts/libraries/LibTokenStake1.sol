@@ -8,7 +8,7 @@ library LibTokenStake1 {
         uint256 startBlock;
     }
 
-    struct stakeInfo {
+    struct StakeInfo {
         string name;
         uint256 startBlcok;
         uint256 endBlock;
