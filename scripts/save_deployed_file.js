@@ -1,4 +1,4 @@
-const fs = require('fs')
+const fs = require('fs');
 
 module.exports = function (network, deployed) {
   if (!fs.existsSync(`../deployed.${network}.json`)) {
@@ -7,6 +7,5 @@ module.exports = function (network, deployed) {
     });
   }
 
-  fs.writeFileSync(`deployed.${network}.json`, JSON.stringify(deployed, null, 2))
-
-}
+  fs.writeFileSync(`deployed.${network}.json`, JSON.stringify(deployed, null, 2));
+};

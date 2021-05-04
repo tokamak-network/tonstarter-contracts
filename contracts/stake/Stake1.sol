@@ -33,9 +33,6 @@ contract Stake1 is TokamakStaker, OnApprove {
         _lock = 0;
     }
 
-    //////////////////////////////
-    // Events
-    //////////////////////////////
     event Claimed(address indexed from, uint256 amount, uint256 currentBlcok);
     event Withdrawal(address indexed from, address indexed to, uint256 amount, uint256 currentBlcok);
 
@@ -44,6 +41,7 @@ contract Stake1 is TokamakStaker, OnApprove {
         _setupRole(ADMIN_ROLE, msg.sender);
     }
 
+    /// @dev Initialize
     function initialize(
         address _token,
         address _paytoken,
@@ -63,10 +61,6 @@ contract Stake1 is TokamakStaker, OnApprove {
         if(_startBlock == 0) startBlock = block.number;
         else startBlock = _startBlock;
         endBlock = startBlock + _period;
-    }
-
-    receive() external payable {
-      stake(0);
     }
 
     /// @dev Approves
@@ -91,9 +85,8 @@ contract Stake1 is TokamakStaker, OnApprove {
         (spender, amount) = abi.decode(input, (address, uint256));
     }
 
-
-    function stakeOnApprove(address from, address _owner, address _spender, uint256 _amount) public returns (bool)
-    {
+    /// @dev 
+    function stakeOnApprove(address from, address _owner, address _spender, uint256 _amount) public returns (bool) {
         require((paytoken == from && _amount > 0 && _spender == address(this)), "Stake1: stakeOnApprove init fail");
         require(
             block.number >= saleStartBlock && saleStartBlock < startBlock,
@@ -110,6 +103,8 @@ contract Stake1 is TokamakStaker, OnApprove {
         return true;
     }
 
+
+    /// @dev Stake amount
     function stake(uint256 _amount) public payable {
         require(
             (paytoken == address(0) && msg.value > 0)
@@ -182,6 +177,7 @@ contract Stake1 is TokamakStaker, OnApprove {
         emit Claimed(account, rewardClaim, currentBlock );
     }
 
+    /// @dev Returns the amount that can be rewarded
     function canRewardAmount(address account) public view returns (uint256) {
         uint256 reward = 0;
         if (block.number < startBlock || userStaked[account].amount == 0
@@ -218,5 +214,10 @@ contract Stake1 is TokamakStaker, OnApprove {
             }
         }
         return reward;
+    }
+
+    /// @dev 
+    receive() external payable {
+      stake(0);
     }
 }

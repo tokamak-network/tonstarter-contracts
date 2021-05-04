@@ -1,11 +1,11 @@
-const { BigNumber } = require("ethers");
-const { ethers, upgrades } = require("hardhat");
+const { BigNumber } = require('ethers');
+const { ethers, upgrades } = require('hardhat');
 const utils = ethers.utils;
 const save = require('./save_deployed_file');
 
-const { padLeft, toBN, toWei, fromWei , keccak256 , soliditySha3 , solidityKeccak256 } = require('web3-utils');
+const { padLeft, toBN, toWei, fromWei, keccak256, soliditySha3, solidityKeccak256 } = require('web3-utils');
 
-require('dotenv').config()
+require('dotenv').config();
 
 const initialTotal = process.env.initialTotal + '.' + '0'.repeat(18);
 
@@ -25,43 +25,41 @@ const Pharse3_FLDETH_Staking = process.env.Pharse3_FLDETH_Staking + '.' + '0'.re
 const Pharse3_FLD_Staking = process.env.Pharse3_FLD_Staking + '.' + '0'.repeat(18);
 const Pharse3_DEV_Mining = process.env.Pharse3_DEV_Mining + '.' + '0'.repeat(18);
 
-let zeroAddress = '0x0000000000000000000000000000000000000000';
-let sendAmountForTest = '10000' ;
+const zeroAddress = '0x0000000000000000000000000000000000000000';
+const sendAmountForTest = '10000';
 
-const ADMIN_ROLE = keccak256("ADMIN");
-const MINTER_ROLE = keccak256("MINTER");
-const BURNER_ROLE = keccak256("BURNER");
-const CLAIMER_ROLE = keccak256("CLAIMER");
-const PHASE2_VAULT_HASH = keccak256("PHASE2_VAULT");
-const EVENT_VAULT_HASH = keccak256("EVENT_VAULT");
+const ADMIN_ROLE = keccak256('ADMIN');
+const MINTER_ROLE = keccak256('MINTER');
+const BURNER_ROLE = keccak256('BURNER');
+const CLAIMER_ROLE = keccak256('CLAIMER');
+const PHASE2_VAULT_HASH = keccak256('PHASE2_VAULT');
+const EVENT_VAULT_HASH = keccak256('EVENT_VAULT');
 
+async function deployMain (defaultSender) {
+  const [deployer, user1] = await ethers.getSigners();
 
-async function deployMain(defaultSender) {
+  const FLD = await ethers.getContractFactory('FLD');
+  const fld = await FLD.deploy();
+  console.log('fld:', fld.address);
 
-   const [deployer, user1 ] = await ethers.getSigners();
+  const StakeRegistry = await ethers.getContractFactory('StakeRegistry');
+  const Stake1Logic = await ethers.getContractFactory('Stake1Logic');
+  const Stake1Proxy = await ethers.getContractFactory('Stake1Proxy');
+  const StakeFactory = await ethers.getContractFactory('StakeFactory');
 
-    const FLD = await ethers.getContractFactory("FLD");
-    const fld = await FLD.deploy();
-    console.log("fld:", fld.address);
+  const stakeRegistry = await StakeRegistry.deploy();
+  console.log('stakeRegistry:', stakeRegistry.address);
+  const stakeFactory = await StakeFactory.deploy();
+  console.log('stakeFactory:', stakeFactory.address);
+  const stake1Logic = await Stake1Logic.deploy();
+  console.log('stake1Logic:', stake1Logic.address);
+  const stake1Proxy = await Stake1Proxy.deploy();
+  console.log('stake1Proxy:', stake1Proxy.address);
 
-    const StakeRegistry = await ethers.getContractFactory("StakeRegistry");
-    const Stake1Logic = await ethers.getContractFactory("Stake1Logic");
-    const Stake1Proxy = await ethers.getContractFactory("Stake1Proxy");
-    const StakeFactory = await ethers.getContractFactory("StakeFactory");
+  await stake1Proxy.upgradeTo(stake1Logic.address);
+  console.log('upgradeTo:');
 
-    const stakeRegistry = await StakeRegistry.deploy();
-    console.log("stakeRegistry:", stakeRegistry.address);
-    const stakeFactory = await StakeFactory.deploy();
-    console.log("stakeFactory:", stakeFactory.address);
-    const stake1Logic = await Stake1Logic.deploy();
-    console.log("stake1Logic:", stake1Logic.address);
-    const stake1Proxy = await Stake1Proxy.deploy();
-    console.log("stake1Proxy:", stake1Proxy.address);
-
-    await stake1Proxy.upgradeTo(stake1Logic.address);
-    console.log("upgradeTo:" );
-
-    /*
+  /*
     const stakeEntry = await ethers.getContractAt("Stake1Logic", stake1Proxy.address);
     console.log("stakeEntry:" , stakeEntry.address);
 
@@ -75,43 +73,41 @@ async function deployMain(defaultSender) {
     console.log("fld mint:", fld.address);
     */
 
-    let out = {};
-    out.FLD = fld;
+  const out = {};
+  out.FLD = fld;
 
-    out.StakeRegistry = StakeRegistry;
-    out.Stake1Logic = Stake1Logic;
-    out.Stake1Proxy = Stake1Proxy;
-    out.StakeFactory = StakeFactory;
+  out.StakeRegistry = StakeRegistry;
+  out.Stake1Logic = Stake1Logic;
+  out.Stake1Proxy = Stake1Proxy;
+  out.StakeFactory = StakeFactory;
 
-    return out;
+  return out;
 }
 
-async function main() {
+async function main () {
+  const [deployer, user1] = await ethers.getSigners();
+  const users = await ethers.getSigners();
+  console.log(
+    'Deploying contracts with the account:',
+    deployer.address
+  );
 
-    const [deployer, user1 ] = await ethers.getSigners();
-    const users = await ethers.getSigners();
-    console.log(
-      "Deploying contracts with the account:",
-      deployer.address
-    );
+  console.log('Account balance:', (await deployer.getBalance()).toString());
 
-    console.log("Account balance:", (await deployer.getBalance()).toString());
+  const contracts = await deployMain(deployer);
 
-    let contracts = await deployMain(deployer);
+  // The address the Contract WILL have once mined
+  const out = {};
 
-    // The address the Contract WILL have once mined
-    const out = {};
+  out.FLD = contracts.FLD.address;
+  out.StakeRegistry = contracts.StakeRegistry.address;
+  out.Stake1Logic = contracts.Stake1Logic.address;
+  out.Stake1Proxy = contracts.Stake1Proxy.address;
+  out.StakeFactory = contracts.StakeFactory.address;
 
-    out.FLD = contracts.FLD.address;
-    out.StakeRegistry = contracts.StakeRegistry.address;
-    out.Stake1Logic = contracts.Stake1Logic.address;
-    out.Stake1Proxy = contracts.Stake1Proxy.address;
-    out.StakeFactory = contracts.StakeFactory.address;
-
-    save(
-      process.env.NETWORK,out
-    );
-
+  save(
+    process.env.NETWORK, out
+  );
 }
 
 main()

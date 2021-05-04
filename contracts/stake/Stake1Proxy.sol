@@ -7,6 +7,7 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 
 
 /// @title Proxy for Stake contracts in Phase 1
+/// @notice 
 contract Stake1Proxy is StakeProxyStorage, AccessControl {
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
     address internal _implementation;
