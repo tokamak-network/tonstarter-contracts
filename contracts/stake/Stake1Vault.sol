@@ -180,6 +180,7 @@ contract Stake1Vault is AccessControl {
 
     /// @dev Close sale
     function closeSale() external {
+        require(saleClosed == false, "Stake1Vault: sale is already closed");
         require(
             cap > 0 &&
                 stakeStartBlock > 0 &&
