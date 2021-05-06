@@ -82,11 +82,12 @@ contract Stake1Vault is AccessControl {
 
     /// @dev Initializes all variables
     /// @param _fld - FLD token address
-    /// @param _paytoken - FLD token address
-    /// @param _cap - FLD token address
-    /// @param _saleStartBlock - FLD token address
-    /// @param _stakeStartBlock - FLD token address
-    /// @param _stakefactory - FLD token address
+    /// @param _paytoken - Tokens staked by users, can be used as ERC20 tokens.
+    //                     (In case of ETH, input address(0))
+    /// @param _cap - Maximum amount of rewards issued
+    /// @param _saleStartBlock - Sales start block
+    /// @param _stakeStartBlock - Staking start block
+    /// @param _stakefactory - Staking end block
     function initialize(
         address _fld,
         address _paytoken,
@@ -237,7 +238,10 @@ contract Stake1Vault is AccessControl {
         saleClosed = true;
     }
 
-    /// @dev The sender approves spender(_to) to spend sender's  tokens(_token) in the amount(_amount).
+    /// @dev
+    /// sender is a staking contract.
+    /// A function that pays the amount(_amount) to _to by the staking contract.
+    /// A function that _to claim the amount(_amount) from the staking contract and gets the FLD in the vault.
     function claim(address _to, uint256 _amount) external returns (bool) {
         require(saleClosed && _amount > 0, "Stake1Vault: disclose sale");
         uint256 fldBalance = fld.balanceOf(address(this));
@@ -271,7 +275,7 @@ contract Stake1Vault is AccessControl {
         return true;
     }
 
-    /// @dev
+    /// @dev How much you can claim
     function canClaim(address _to, uint256 _amount)
         external
         view
