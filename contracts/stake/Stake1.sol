@@ -158,7 +158,7 @@ contract Stake1 is TokamakStaker, OnApprove {
 
         uint256 amount = staked.amount;
 
-        // todo: restaking reward
+        // TODO: restaking reward
         require(
             staked.amount > 0 && staked.releasedAmount <= staked.amount,
             "Stake1: releasedAmount > stakedAmount"
@@ -168,6 +168,7 @@ contract Stake1 is TokamakStaker, OnApprove {
         staked.releasedBlock = block.number;
         staked.released = true;
 
+        // check if we send in ethers or in tokens
         if (paytoken == address(0)) {
             address payable self = address(uint160(address(this)));
             require(self.balance >= amount);

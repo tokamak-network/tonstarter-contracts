@@ -1,6 +1,7 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity ^0.7.6;
 
+
 library LibTokenStake1 {
     struct StakeInfo {
         string name;
