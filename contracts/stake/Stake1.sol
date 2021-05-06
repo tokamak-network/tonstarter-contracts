@@ -98,9 +98,17 @@ contract Stake1 is TokamakStaker, OnApprove {
         (spender, amount) = abi.decode(input, (address, uint256));
     }
 
-    /// @dev 
-    function stakeOnApprove(address from, address _owner, address _spender, uint256 _amount) public returns (bool) {
-        require((paytoken == from && _amount > 0 && _spender == address(this)), "Stake1: stakeOnApprove init fail");
+    /// @dev
+    function stakeOnApprove(
+        address from,
+        address _owner,
+        address _spender,
+        uint256 _amount
+    ) public returns (bool) {
+        require(
+            (paytoken == from && _amount > 0 && _spender == address(this)),
+            "Stake1: stakeOnApprove init fail"
+        );
         require(
             block.number >= saleStartBlock && saleStartBlock < startBlock,
             "Stake1: stakeTON period is unavailable"
@@ -115,7 +123,6 @@ contract Stake1 is TokamakStaker, OnApprove {
         );
         return true;
     }
-
 
     /// @dev Stake amount
     function stake(uint256 _amount) public payable {
@@ -260,8 +267,8 @@ contract Stake1 is TokamakStaker, OnApprove {
         return reward;
     }
 
-    /// @dev 
+    /// @dev
     receive() external payable {
-      stake(0);
+        stake(0);
     }
 }
