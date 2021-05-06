@@ -251,13 +251,10 @@ contract Stake1Vault is AccessControl {
         );
 
         LibTokenStake1.StakeInfo storage stakeInfo = stakeInfos[msg.sender];
-        // solhint-disable-next-line max-line-length
         require(
             stakeInfo.startBlcok > 0,
             "Stake1Vault: claimVault startBlcok is zero"
         );
-
-        // solhint-disable-next-line max-line-length
         require(
             stakeInfo.totalRewardAmount > 0 &&
                 (stakeInfo.totalRewardAmount -
@@ -323,10 +320,12 @@ contract Stake1Vault is AccessControl {
         return stakeAddresses;
     }
 
+    /// @dev Ordered end blocks
     function orderedEndBlocksAll() external view returns (uint256[] memory) {
         return orderedEndBlocks;
     }
 
+    /// @dev Total reward amount
     function totalRewardAmount(address _account)
         external
         view

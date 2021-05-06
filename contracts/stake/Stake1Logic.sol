@@ -30,6 +30,7 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
         require(_addr != address(0), "Stake1Proxy: zero address");
         _;
     }
+
     modifier nonZeroHash(bytes32 _hash) {
         require(_hash != ZERO_HASH, "Stake1Proxy: zero hash");
         _;
@@ -151,6 +152,7 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
         IStake1(_stakeContract).tokamakStaking(_layer2, _amount);
     }
 
+    /// @dev Requests unstaking all
     function tokamakRequestUnStakingAll(address _stakeContract, address _layer2)
         external
         onlyOwner

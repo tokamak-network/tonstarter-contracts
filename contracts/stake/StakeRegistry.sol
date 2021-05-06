@@ -32,8 +32,9 @@ contract StakeRegistry is AccessControl {
         _setupRole(ADMIN_ROLE, msg.sender);
     }
 
+    /// @dev Adds vault
     function addVault(
-        uint256 _pahse,
+        uint256 _phase,
         bytes32 _vaultName,
         address _vault
     ) external onlyOwner {
@@ -43,24 +44,27 @@ contract StakeRegistry is AccessControl {
         );
         vaults[_vaultName] = _vault;
         vaultNames[_vault] = _vaultName;
-        phases[_pahse].push(_vault);
+        phases[_phase].push(_vault);
     }
 
-    function validVault(uint256 _pahse, address _vault)
+
+    /// @dev Checks if a vault is withing the given phase
+    function validVault(uint256 _phase, address _vault)
         external
         view
         returns (bool valid)
     {
         require(
-            phases[_pahse].length > 0 && vaultNames[_vault] != ZERO_HASH,
+            phases[_phase].length > 0 && vaultNames[_vault] != ZERO_HASH,
             "StakeRegistry: validVault is fail"
         );
 
-        for (uint256 i = 0; i < phases[_pahse].length; i++) {
-            if (_vault == phases[_pahse][i]) valid = true;
+        for (uint256 i = 0; i < phases[_phase].length; i++) {
+            if (_vault == phases[_phase][i]) valid = true;
         }
     }
 
+    /// @dev Stores vault and stake, and maps them togethers
     function addStakeContract(address _vault, address _stakeContract)
         external
         onlyOwner
