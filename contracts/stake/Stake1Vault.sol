@@ -258,6 +258,10 @@ contract Stake1Vault is AccessControl {
             "Stake1Vault: claimVault startBlcok is zero"
         );
         require(
+            stakeInfo.totalRewardAmount >= stakeInfo.claimRewardAmount + _amount,
+            "Stake1Vault: claim amount exceeds the reward left"
+        );
+        require(
             stakeInfo.totalRewardAmount > 0 &&
                 (stakeInfo.totalRewardAmount -
                     stakeInfo.claimRewardAmount -
@@ -296,6 +300,10 @@ contract Stake1Vault is AccessControl {
         require(
             stakeInfo.totalRewardAmount > 0,
             "Stake1Vault: claim amount is wrong"
+        );
+        require(
+            stakeInfo.totalRewardAmount >= stakeInfo.claimRewardAmount + _amount,
+            "Stake1Vault: claim amount exceeds the reward left"
         );
         require(
             stakeInfo.totalRewardAmount -
