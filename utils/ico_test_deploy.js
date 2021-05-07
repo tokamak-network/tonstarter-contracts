@@ -18,7 +18,8 @@ chai.use(require('chai-bn')(BN)).should();
 const StakeFactoryAbi = require('../build/contracts/StakeFactory.json').abi;
 const StakeRegistryAbi = require('../build/contracts/StakeRegistry.json').abi;
 const FLDAbi = require('../build/contracts/FLD.json').abi;
-// const FLDVaultAbi = require('../build/contracts/FLDVault.json').abi;
+const SFLDAbi = require('../build/contracts/SFLD.json').abi;
+const StakeForSFLDAbi = require('../build/contracts/StakeForSFLD.json').abi;
 const Stake1VaultAbi = require('../build/contracts/Stake1Vault.json').abi;
 const Stake1LogicAbi = require('../build/contracts/Stake1Logic.json').abi;
 const Stake1ProxyAbi = require('../build/contracts/Stake1Proxy.json').abi;
@@ -29,7 +30,8 @@ const IERC20Abi = require('../build/contracts/IERC20.json').abi;
 const StakeFactory = contract.fromArtifact('StakeFactory');
 const StakeRegistry = contract.fromArtifact('StakeRegistry');
 const FLD = contract.fromArtifact('FLD');
-// const FLDVault = contract.fromArtifact('FLDVault');
+const SFLD = contract.fromArtifact('SFLD');
+const StakeForSFLD = contract.fromArtifact('StakeForSFLD');
 const Stake1Vault = contract.fromArtifact('Stake1Vault');
 const Stake1Logic = contract.fromArtifact('Stake1Logic');
 const Stake1Proxy = contract.fromArtifact('Stake1Proxy');
@@ -86,6 +88,8 @@ const WTON_UNIT = 'ray';
 const WTON_TON_RATIO = _WTON_TON('1');
 
 const ADMIN_ROLE = keccak256('ADMIN');
+const MINTER_ROLE = keccak256('MINTER');
+const BURNER_ROLE = keccak256('BURNER');
 
 const WITHDRAWAL_DELAY = 10;
 const SEIG_PER_BLOCK = _WTON('3.92');
@@ -122,6 +126,8 @@ class ICO20Contracts {
     this.committeeProxy = null;
 
     this.fld = null;
+    this.sfld = null;
+    this.stakeForSFLD = null;
     this.stakeregister = null;
     this.stakefactory = null;
     this.stake1proxy = null;
@@ -145,6 +151,8 @@ class ICO20Contracts {
       Candidate: null,
       CommitteeProxy: null,
       FLD: null,
+      SFLD: null,
+      StakeForSFLD: null,
       StakeFactory: null,
       StakeRegistry: null,
       Stake1Logic: null,
@@ -158,6 +166,8 @@ class ICO20Contracts {
     // this = self;
     // console.log(' initializeICO20Contracts owner:',owner );
     this.fld = null;
+    this.sfld = null;
+    //this.stakeForSFLD = null;
     this.stakeregister = null;
     this.stakefactory = null;
     this.stake1proxy = null;
@@ -168,16 +178,21 @@ class ICO20Contracts {
     this.vault_phase1_dev = null;
 
     this.fld = await FLD.new({ from: owner });
+    this.sfld = await SFLD.new({ from: owner });
+    //this.stakeForSFLD = await StakeForSFLD.new({ from: owner });
     this.stakeregister = await StakeRegistry.new({ from: owner });
     this.stakefactory = await StakeFactory.new({ from: owner });
     this.stake1logic = await Stake1Logic.new({ from: owner });
     this.stake1proxy = await Stake1Proxy.new({ from: owner });
+
     await this.stake1proxy.upgradeTo(this.stake1logic.address, { from: owner });
 
     this.stakeEntry = await Stake1Logic.at(this.stake1proxy.address, { from: owner });
 
     const returnData = {
       fld: this.fld,
+      sfld: this.sfld,
+      // stakeForSFLD: this.stakeForSFLD,
       stakeregister: this.stakeregister,
       stakefactory: this.stakefactory,
       stake1logic: this.stake1logic,
@@ -187,6 +202,19 @@ class ICO20Contracts {
     // console.log(' initializeICO20Contracts  :',returnData );
 
     return returnData;
+  }
+
+  createStaekForSFLD = async function (startB, owner) {
+    let stakeForSFLD = await StakeForSFLD.new({ from: owner });
+
+    await stakeForSFLD.initialize(this.fld.address, this.sfld.address, startB, { from: owner });
+
+    this.fld.grantRole(MINTER_ROLE, stakeForSFLD.address, { from: owner });
+    this.fld.grantRole(BURNER_ROLE, stakeForSFLD.address, { from: owner });
+    this.sfld.grantRole(MINTER_ROLE, stakeForSFLD.address, { from: owner });
+    this.sfld.grantRole(BURNER_ROLE, stakeForSFLD.address, { from: owner });
+
+    return stakeForSFLD;
   }
 
   initializePlasmaEvmContracts = async function (owner) {
@@ -281,6 +309,8 @@ class ICO20Contracts {
   getICOContracts = function () {
     return {
       fld: this.fld,
+      sfld: this.sfld,
+      // stakeFroSFLD: this.stakeFroSFLD,
       stakeregister: this.stakeregister,
       stakefactory: this.stakefactory,
       stake1logic: this.stake1logic,

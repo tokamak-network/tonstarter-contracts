@@ -29,7 +29,7 @@ contract SFLD is IFLD, AccessControl, VerifySignature {
     modifier onlyOwner() {
         require(
             hasRole(ADMIN_ROLE, msg.sender),
-            "sFLD: Caller is not an admin"
+            "SFLD: Caller is not an admin"
         );
         _;
     }
@@ -97,7 +97,7 @@ contract SFLD is IFLD, AccessControl, VerifySignature {
     function mint(address to, uint256 amount) external override returns (bool) {
         require(
             hasRole(MINTER_ROLE, msg.sender),
-            "sFLD: Caller is not a minter"
+            "SFLD: Caller is not a minter"
         );
         _mint(to, amount);
         return true;
@@ -113,7 +113,7 @@ contract SFLD is IFLD, AccessControl, VerifySignature {
     {
         require(
             hasRole(BURNER_ROLE, msg.sender),
-            "sFLD: Caller is not a burner"
+            "SFLD: Caller is not a burner"
         );
         _burn(from, amount);
         return true;
@@ -169,7 +169,7 @@ contract SFLD is IFLD, AccessControl, VerifySignature {
         uint256 deadline,
         bytes memory signature
     ) external override {
-        require(deadline >= block.timestamp, "sFLD: EXPIRED");
+        require(deadline >= block.timestamp, "SFLD: EXPIRED");
         bytes32 messageHash =
             getPermitMessageHash(owner, spender, value, deadline);
         bytes32 ethSignedMessageHash = getEthSignedMessageHash(messageHash);
@@ -177,7 +177,7 @@ contract SFLD is IFLD, AccessControl, VerifySignature {
             recoverSigner(ethSignedMessageHash, signature);
         require(
             recoveredAddress != address(0) && recoveredAddress == owner,
-            "sFLD: INVALID_SIGNATURE"
+            "SFLD: INVALID_SIGNATURE"
         );
         _approve(owner, spender, value);
     }

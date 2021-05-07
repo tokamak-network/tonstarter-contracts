@@ -47,7 +47,6 @@ contract StakeRegistry is AccessControl {
         phases[_phase].push(_vault);
     }
 
-
     /// @dev Checks if a vault is withing the given phase
     function validVault(uint256 _phase, address _vault)
         external

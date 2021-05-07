@@ -1,7 +1,6 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity ^0.7.6;
 
-
 library LibTokenStake1 {
     struct StakeInfo {
         string name;
@@ -20,4 +19,16 @@ library LibTokenStake1 {
         uint256 releasedAmount;
         bool released;
     }
+
+    struct StakedAmountForSFLD {
+        uint256 amount;
+        uint256 startBlock;
+        uint256 periodBlock;
+        uint256 rewardPerBlock;
+        uint256 claimedBlock;
+        uint256 claimedAmount;
+        uint256 releasedBlock;
+        uint256 releasedAmount;
+    }
+
 }
