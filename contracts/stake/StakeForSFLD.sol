@@ -18,7 +18,7 @@ contract StakeForSFLD is AccessControl {
     uint256 public totalStakedAmount;
 
     uint256 public startBlock;
-    mapping(uint256 => uint256)  public rewardRatio; // periodBlock - rewardRatio
+    mapping(uint256 => uint256) public rewardRatio; // periodBlock - rewardRatio
 
     bool public started;
     mapping(address => LibTokenStake1.StakedAmountForSFLD) public userStaked;
@@ -40,15 +40,16 @@ contract StakeForSFLD is AccessControl {
         _setupRole(ADMIN_ROLE, msg.sender);
     }
 
-    function initialize
-    (
+    function initialize(
         address _fld,
         address _sfld,
         uint256 _startBlock
     ) external onlyOwner {
         require(
-            _fld != address(0) && _sfld != address(0) && _startBlock > 0
-            && started == false,
+            _fld != address(0) &&
+                _sfld != address(0) &&
+                _startBlock > 0 &&
+                started == false,
             "StakeForSFLD: input is zero"
         );
 
@@ -61,23 +62,12 @@ contract StakeForSFLD is AccessControl {
     /**
      * external
      */
-    function setStarted
-    (
-        bool _started
-    )
-        external onlyOwner
-    {
+    function setStarted(bool _started) external onlyOwner {
         require(started != _started, "StakeForSFLD: same status");
         started = _started;
     }
 
-    function addRewardRatio
-    (
-        uint period,
-        uint256 ratio
-    )
-        external onlyOwner
-    {
+    function addRewardRatio(uint256 period, uint256 ratio) external onlyOwner {
         require(started == true, "StakeForSFLD: not started");
         rewardRatio[period] = ratio;
     }
@@ -90,16 +80,23 @@ contract StakeForSFLD is AccessControl {
         uint256 deadline,
         bytes memory signature
     ) external {
-        require(amount > 0 && started == true && deadline > 0, "StakeForSFLD: amount is zero");
+        require(
+            amount > 0 && started == true && deadline > 0,
+            "StakeForSFLD: amount is zero"
+        );
         //Rewards for the period have not been registered.
-        require(rewardRatio[_periodBlock] > 0, "StakeForSFLD: unegistered period");
+        require(
+            rewardRatio[_periodBlock] > 0,
+            "StakeForSFLD: unegistered period"
+        );
 
         require(
             fld.balanceOf(msg.sender) >= amount,
             "StakeForSFLD: FLD.balanceOf is lack."
         );
 
-        LibTokenStake1.StakedAmountForSFLD storage staked = userStaked[msg.sender];
+        LibTokenStake1.StakedAmountForSFLD storage staked =
+            userStaked[msg.sender];
         require(staked.startBlock < block.number, "StakeForSFLD: not started");
 
         staked.amount += amount;
@@ -113,28 +110,36 @@ contract StakeForSFLD is AccessControl {
 
     /// dev. SFLD is minted according to the ratio of the specified period.
     function claim() external {
-        LibTokenStake1.StakedAmountForSFLD storage staked = userStaked[msg.sender];
-        require(started == true && staked.startBlock < block.number, "StakeForSFLD: not started");
-        require( staked.amount > 0,
-            "StakeForSFLD: amount > 0"
+        LibTokenStake1.StakedAmountForSFLD storage staked =
+            userStaked[msg.sender];
+        require(
+            started == true && staked.startBlock < block.number,
+            "StakeForSFLD: not started"
         );
+        require(staked.amount > 0, "StakeForSFLD: amount > 0");
 
         if (staked.rewardPerBlock == 0) {
-            staked.rewardPerBlock = (staked.amount * rewardRatio[staked.periodBlock]) / staked.periodBlock;
+            staked.rewardPerBlock =
+                (staked.amount * rewardRatio[staked.periodBlock]) /
+                staked.periodBlock;
         }
 
         require(
-            staked.claimedAmount < staked.amount * rewardRatio[staked.periodBlock],
+            staked.claimedAmount <
+                staked.amount * rewardRatio[staked.periodBlock],
             "StakeForSFLD: Already claimed all"
         );
 
         uint256 rewardClaim = 0;
-        if ( staked.startBlock + staked.periodBlock < block.number) {
-            rewardClaim =  (staked.amount * rewardRatio[staked.periodBlock]) - staked.claimedAmount;
+        if (staked.startBlock + staked.periodBlock < block.number) {
+            rewardClaim =
+                (staked.amount * rewardRatio[staked.periodBlock]) -
+                staked.claimedAmount;
         } else {
             // Amount you can be rewarded currently
-            uint256 pastBlocks =  block.number - staked.startBlock;
-            if(staked.claimedBlock > 0 && staked.claimedBlock < block.number) pastBlocks = block.number - staked.claimedBlock;
+            uint256 pastBlocks = block.number - staked.startBlock;
+            if (staked.claimedBlock > 0 && staked.claimedBlock < block.number)
+                pastBlocks = block.number - staked.claimedBlock;
             rewardClaim = pastBlocks * staked.rewardPerBlock;
         }
 
@@ -148,31 +153,43 @@ contract StakeForSFLD is AccessControl {
 
     /// dev. You can change to FLD as much as you have SFLD. exchage SFLD to FLD.
     /// check again later.
-    function withdraw
-    (
+    function withdraw(
         uint256 amount,
         uint256 deadline,
         bytes memory signature
-    )
-        external
-    {
-        LibTokenStake1.StakedAmountForSFLD storage staked = userStaked[msg.sender];
-        require(started == true && staked.releasedBlock == 0, "StakeForSFLD: not started");
+    ) external {
+        LibTokenStake1.StakedAmountForSFLD storage staked =
+            userStaked[msg.sender];
         require(
-            staked.amount > 0 && block.number > staked.startBlock + staked.periodBlock,
+            started == true && staked.releasedBlock == 0,
+            "StakeForSFLD: not started"
+        );
+        require(
+            staked.amount > 0 &&
+                block.number > staked.startBlock + staked.periodBlock,
             "StakeForSFLD: staking period is not end"
         );
 
         uint256 sfldBalance = sfld.balanceOf(msg.sender);
-        require(sfldBalance > 0 && amount == sfldBalance, "StakeForSFLD: balanceOf SFLD is zero");
+        require(
+            sfldBalance > 0 && amount == sfldBalance,
+            "StakeForSFLD: balanceOf SFLD is zero"
+        );
 
         staked.releasedAmount += sfldBalance;
         staked.releasedBlock = block.number;
 
         uint256 fldBalance = fld.balanceOf(address(this));
-        if(sfldBalance > fldBalance) fld.mint(address(this), sfldBalance - fldBalance);
+        if (sfldBalance > fldBalance)
+            fld.mint(address(this), sfldBalance - fldBalance);
 
-        sfld.permit(msg.sender, address(this), sfldBalance, deadline, signature);
+        sfld.permit(
+            msg.sender,
+            address(this),
+            sfldBalance,
+            deadline,
+            signature
+        );
 
         require(
             sfld.burn(msg.sender, sfldBalance),
@@ -184,7 +201,6 @@ contract StakeForSFLD is AccessControl {
             "StakeForSFLD: withdraw fld.transfer fail"
         );
     }
-
 
     /**
      * public

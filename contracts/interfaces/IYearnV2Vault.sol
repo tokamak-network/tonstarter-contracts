@@ -2,18 +2,17 @@
 pragma solidity ^0.7.6;
 
 interface IYearnV2Vault {
+    function calcTotalValue() external returns (uint256 underlyingAmount);
 
-    function calcTotalValue() external returns (uint underlyingAmount) ;
+    function deposit(uint256 amount) external;
 
-    function deposit(uint amount) external ;
+    function withdraw(uint256 amount) external;
 
-    function withdraw(uint amount) external ;
+    function underlyingYield() external returns (uint256);
 
-    function underlyingYield() external returns (uint) ;
+    function unclaimedProfit(address user) external view returns (uint256);
 
-    function unclaimedProfit(address user) external view returns (uint256) ;
-
-    function claim() external ;
+    function claim() external;
 
     // Used to claim on behalf of certain contracts e.g. Uniswap pool
     //function claimOnBehalf(address recipient) external ;
@@ -22,6 +21,4 @@ interface IYearnV2Vault {
     // This protects users from an upgrade to a malicious strategy
     // Users must watch the timelock contract on Etherscan for any transactions
     //function setStrat(IStrat strat_, bool force) external ;
-
 }
-

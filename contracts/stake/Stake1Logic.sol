@@ -60,10 +60,9 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
         depositManager = _depositManager;
         seigManager = _seigManager;
     }
+
     ///
-    function setFactory(
-        address _stakeFactory
-    ) external onlyOwner {
+    function setFactory(address _stakeFactory) external onlyOwner {
         setStakeFactory(_stakeFactory);
     }
 

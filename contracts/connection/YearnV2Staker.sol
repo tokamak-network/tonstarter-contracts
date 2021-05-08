@@ -26,38 +26,56 @@ contract YearnV2Staker is Stake1Storage, AccessControl {
         _;
     }
 
-    function setYearnV2(
-        address _vault
-    ) external onlyOwner {
-        require(
-            _vault != address(0),
-            "YearnV2Staker: zero address"
-        );
+    function setYearnV2(address _vault) external onlyOwner {
+        require(_vault != address(0), "YearnV2Staker: zero address");
         yearnV2Vault = _vault;
     }
 
-    function yearnV2_calcTotalValue() external onlyOwner nonZero(yearnV2Vault) returns (uint underlyingAmount) {
+    function yearnV2_calcTotalValue()
+        external
+        onlyOwner
+        nonZero(yearnV2Vault)
+        returns (uint256 underlyingAmount)
+    {
         return IYearnV2Vault(yearnV2Vault).calcTotalValue();
     }
 
-    function yearnV2_deposit(uint amount) external onlyOwner nonZero(yearnV2Vault) {
+    function yearnV2_deposit(uint256 amount)
+        external
+        onlyOwner
+        nonZero(yearnV2Vault)
+    {
         IYearnV2Vault(yearnV2Vault).deposit(amount);
     }
 
-    function yearnV2_withdraw(uint amount) external onlyOwner nonZero(yearnV2Vault) {
+    function yearnV2_withdraw(uint256 amount)
+        external
+        onlyOwner
+        nonZero(yearnV2Vault)
+    {
         IYearnV2Vault(yearnV2Vault).withdraw(amount);
     }
 
-    function yearnV2_underlyingYield() external onlyOwner nonZero(yearnV2Vault) returns (uint) {
+    function yearnV2_underlyingYield()
+        external
+        onlyOwner
+        nonZero(yearnV2Vault)
+        returns (uint256)
+    {
         return IYearnV2Vault(yearnV2Vault).underlyingYield();
     }
 
-    function yearnV2_unclaimedProfit(address user) external view onlyOwner nonZero(yearnV2Vault) returns (uint256) {
+    function yearnV2_unclaimedProfit(address user)
+        external
+        view
+        onlyOwner
+        nonZero(yearnV2Vault)
+        returns (uint256)
+    {
         return IYearnV2Vault(yearnV2Vault).unclaimedProfit(user);
     }
 
     function yearnV2_claim() external onlyOwner nonZero(yearnV2Vault) {
         IYearnV2Vault(yearnV2Vault).claim();
     }
-
 }

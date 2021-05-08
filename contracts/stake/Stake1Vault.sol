@@ -149,7 +149,10 @@ contract Stake1Vault is AccessControl {
 
     /// @dev Sets FLD address
     function setYearnV2Vault(address _yearnV2Vault) external onlyOwner {
-        require(_yearnV2Vault != address(0), "Stake1Vault: _yearnV2Vault is zero");
+        require(
+            _yearnV2Vault != address(0),
+            "Stake1Vault: _yearnV2Vault is zero"
+        );
         yearnV2Vault = _yearnV2Vault;
     }
 

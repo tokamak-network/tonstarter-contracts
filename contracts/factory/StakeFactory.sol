@@ -7,6 +7,7 @@ import {StakeForStableCoin} from "../stake/StakeForStableCoin.sol";
 
 contract StakeFactory {
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
+
     function deploy(
         uint256 _pahse,
         address _vault,
@@ -28,9 +29,9 @@ contract StakeFactory {
         address yearnV2Vault = vault.yearnV2Vault();
 
         require(
-                saleStart < stakeStart && stakeStart > 0,
-                "StakeFactory: start error"
-            );
+            saleStart < stakeStart && stakeStart > 0,
+            "StakeFactory: start error"
+        );
 
         if (stakeType == 0) {
             Stake1 c = new Stake1();
@@ -52,10 +53,13 @@ contract StakeFactory {
             c.grantRole(ADMIN_ROLE, msg.sender);
             c.revokeRole(ADMIN_ROLE, address(this));
             return address(c);
+        } else if (stakeType == 2) {
+            // if paytoken is stable coin, stakeContract is YearnV2Staker
 
-        } else if (stakeType == 2) { // if paytoken is stable coin, stakeContract is YearnV2Staker
-
-            require(yearnV2Vault != address(0), "StakeFactory: yearnV2Vault is zero");
+            require(
+                yearnV2Vault != address(0),
+                "StakeFactory: yearnV2Vault is zero"
+            );
             StakeForStableCoin c = new StakeForStableCoin();
             c.initialize(
                 _token,
