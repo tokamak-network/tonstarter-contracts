@@ -28,6 +28,8 @@ contract Stake1Vault is AccessControl {
     uint256 public stakeEndBlock;
     uint256 public blockTotalReward;
     bool public saleClosed;
+    uint256 public stakeType; // 0 : Stake1 ( eth or ton) , 2 : stable coin
+    address public yearnV2Vault;
 
     address[] public stakeAddresses;
     mapping(address => LibTokenStake1.StakeInfo) public stakeInfos;
@@ -87,14 +89,16 @@ contract Stake1Vault is AccessControl {
     /// @param _cap - Maximum amount of rewards issued
     /// @param _saleStartBlock - Sales start block
     /// @param _stakeStartBlock - Staking start block
-    /// @param _stakefactory - Staking end block
+    /// @param _stakefactory - factory address to create stakeContract
+    /// @param _stakeType - if paytokein is stable coin, it is true.
     function initialize(
         address _fld,
         address _paytoken,
         uint256 _cap,
         uint256 _saleStartBlock,
         uint256 _stakeStartBlock,
-        address _stakefactory
+        address _stakefactory,
+        uint256 _stakeType
     ) external onlyOwner {
         require(
             _fld != address(0) && _stakefactory != address(0),
@@ -111,6 +115,7 @@ contract Stake1Vault is AccessControl {
         paytoken = _paytoken;
         saleStartBlock = _saleStartBlock;
         stakeStartBlock = _stakeStartBlock;
+        stakeType = _stakeType;
 
         grantRole(ADMIN_ROLE, _stakefactory);
     }
@@ -140,6 +145,12 @@ contract Stake1Vault is AccessControl {
             "Stake1Vault: changeOrderedEndBlocks fails"
         );
         orderedEndBlocks = _ordered;
+    }
+
+    /// @dev Sets FLD address
+    function setYearnV2Vault(address _yearnV2Vault) external onlyOwner {
+        require(_yearnV2Vault != address(0), "Stake1Vault: _yearnV2Vault is zero");
+        yearnV2Vault = _yearnV2Vault;
     }
 
     /// @dev Add stake contract

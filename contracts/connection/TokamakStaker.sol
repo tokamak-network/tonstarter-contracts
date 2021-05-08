@@ -1,15 +1,16 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.7.6;
-//import { IERC20 } from "../interfaces/IERC20.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {ITON} from "../interfaces/ITON.sol";
 import {IDepositManager} from "../interfaces/IDepositManager.sol";
 import {ISeigManager} from "../interfaces/ISeigManager.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 //import { ERC165 } from "@openzeppelin/contracts/introspection/ERC165.sol";
 import "../stake/Stake1Storage.sol";
+import {OnApprove} from "../tokens/OnApprove.sol";
 
 /// @title The connector that integrates zkopru and tokamak
-contract TokamakStaker is Stake1Storage, AccessControl {
+contract TokamakStaker is Stake1Storage, AccessControl, OnApprove {
     address public ton;
     address public wton;
     address public depositManager;
@@ -19,13 +20,13 @@ contract TokamakStaker is Stake1Storage, AccessControl {
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
 
     modifier nonZero(address _addr) {
-        require(_addr != address(0), "Stake1Proxy: zero address");
+        require(_addr != address(0), "TokamakStaker: zero address");
         _;
     }
     modifier onlyOwner() {
         require(
             hasRole(ADMIN_ROLE, msg.sender),
-            "Stake1Proxy: Caller is not an admin"
+            "TokamakStaker: Caller is not an admin"
         );
         _;
     }
@@ -55,6 +56,59 @@ contract TokamakStaker is Stake1Storage, AccessControl {
             "TokamakStaker: zero address"
         );
         ton = _ton;
+    }
+
+    /// @dev Approves
+    function onApprove(
+        address owner,
+        address spender,
+        uint256 tonAmount,
+        bytes calldata data
+    ) external override returns (bool) {
+        (address _spender, uint256 _amount) = _decodeStakeData(data);
+        require(
+            tonAmount == _amount && spender == _spender,
+            "Stake1: tonAmount != stakingAmount "
+        );
+        require(
+            stakeOnApprove(msg.sender, owner, _spender, _amount),
+            "Stake1: stakeOnApprove fails "
+        );
+        return true;
+    }
+
+    function _decodeStakeData(bytes calldata input)
+        internal
+        pure
+        returns (address spender, uint256 amount)
+    {
+        (spender, amount) = abi.decode(input, (address, uint256));
+    }
+
+    /// @dev
+    function stakeOnApprove(
+        address from,
+        address _owner,
+        address _spender,
+        uint256 _amount
+    ) public returns (bool) {
+        require(
+            (paytoken == from && _amount > 0 && _spender == address(this)),
+            "Stake1: stakeOnApprove init fail"
+        );
+        require(
+            block.number >= saleStartBlock && saleStartBlock < startBlock,
+            "Stake1: stakeTON period is unavailable"
+        );
+
+        LibTokenStake1.StakedAmount storage staked = userStaked[_owner];
+        staked.amount += _amount;
+        totalStakedAmount += _amount;
+        require(
+            IERC20(from).transferFrom(_owner, _spender, _amount),
+            "DAOCommittee: failed to transfer ton from creator"
+        );
+        return true;
     }
 
     function tokamakStaking(address _layer2, uint256 _amount)

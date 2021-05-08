@@ -50,6 +50,10 @@ interface IStake1Vault {
 
     function cap() external view returns (uint256);
 
+    function stakeType() external view returns (uint256);
+
+    function yearnV2Vault() external view returns (address);
+
     function saleStartBlock() external view returns (uint256);
 
     function stakeStartBlock() external view returns (uint256);

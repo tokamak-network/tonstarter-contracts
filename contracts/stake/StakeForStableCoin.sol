@@ -5,13 +5,14 @@ import {IStake1Vault} from "../interfaces/IStake1Vault.sol";
 //import { IERC20 } from "../interfaces/IERC20.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "../libraries/LibTokenStake1.sol";
-import "../connection/TokamakStaker.sol";
+import "./Stake1Storage.sol";
+import "../connection/YearnV2Staker.sol";
 import {
     ERC165Checker
 } from "@openzeppelin/contracts/introspection/ERC165Checker.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 
-contract Stake1 is TokamakStaker {
+contract StakeForStableCoin is YearnV2Staker {
     using SafeERC20 for IERC20;
 
     modifier lock() {

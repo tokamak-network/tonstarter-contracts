@@ -60,6 +60,12 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
         depositManager = _depositManager;
         seigManager = _seigManager;
     }
+    ///
+    function setFactory(
+        address _stakeFactory
+    ) external onlyOwner {
+        setStakeFactory(_stakeFactory);
+    }
 
     //////////////////////////////////////////////////////////////////////
     // Admin Functions
@@ -69,7 +75,8 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
         uint256 _saleStartBlcok,
         uint256 _stakeStartBlcok,
         uint256 _pahse,
-        bytes32 _vaultName
+        bytes32 _vaultName,
+        uint256 _stakeType
     ) external {
         Stake1Vault vault = new Stake1Vault();
         vault.initialize(
@@ -78,7 +85,8 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
             _cap,
             _saleStartBlcok,
             _stakeStartBlcok,
-            address(stakeFactory)
+            address(stakeFactory),
+            _stakeType
         );
         stakeRegistry.addVault(_pahse, _vaultName, address(vault));
 
