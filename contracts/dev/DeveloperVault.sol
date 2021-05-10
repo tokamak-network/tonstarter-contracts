@@ -3,7 +3,7 @@ pragma solidity ^0.7.6;
 
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import { IFLD } from "../interfaces/IFLD.sol";
-
+// import "hardhat/console";
 
 contract DeveloperVault is AccessControl {
   IFLD public fld;
@@ -12,13 +12,8 @@ contract DeveloperVault is AccessControl {
   uint256 public startRewardBlock;
   uint256 public claimsNumberMax;
   
-  modifier onlyAdmin {
-    require(
-        hasRole(DEFAULT_ADMIN_ROLE, msg.sender),
-        "DeveloperVault: Caller is not an admin"
-    );
-    _;
-  }
+  mapping(address => DeveloperInfo) public developersInfo;
+  address[] public developers;
 
   constructor (address admin) { 
     _setupRole(DEFAULT_ADMIN_ROLE, admin);
@@ -30,31 +25,38 @@ contract DeveloperVault is AccessControl {
     uint256 claimsNumber;
   }
 
-  mapping(address => DeveloperInfo) developers;
+  modifier onlyAdmin {
+    require(
+        hasRole(DEFAULT_ADMIN_ROLE, msg.sender),
+        "DeveloperVault: Caller is not an admin"
+    );
+    _;
+  }
 
   /// @dev Initialize
-  function init(
+  function initialize(
     address _fld,
     uint256 _cap,
     uint256 _rewardPeriod,
     uint256 _startRewardBlock,
     uint256 _claimsNumberMax,
-    address[] memory accounts,
-    uint256[] memory claimAmounts
+    address[] memory _developers,
+    uint256[] memory _claimAmounts
   ) external onlyAdmin {
-    require(claimAmounts.length == accounts.length);
+    require(_claimAmounts.length == _developers.length, "DeveloperVault");
     fld = IFLD(_fld);
     cap = _cap;
     rewardPeriod = _rewardPeriod;
     startRewardBlock = _startRewardBlock;
     claimsNumberMax = _claimsNumberMax;
+    developers = _developers;
 
     uint256 totalClaimPossible = 0;
-    for (uint i = 0; i < accounts.length; ++i) {
-      totalClaimPossible += claimsNumberMax * claimAmounts[i];
-      developers[accounts[i]] = DeveloperInfo({
+    for (uint i = 0; i < developers.length; ++i) {
+      totalClaimPossible += claimsNumberMax * _claimAmounts[i];
+      developersInfo[developers[i]] = DeveloperInfo({
         registered: true,
-        claimAmount: claimAmounts[i],
+        claimAmount: _claimAmounts[i],
         claimsNumber: 0
       });
     }
@@ -64,15 +66,23 @@ contract DeveloperVault is AccessControl {
 
   /// @dev Developers can receive their FLDs 
   function claimReward() external {
-    DeveloperInfo storage devInfo = developers[msg.sender];
+    DeveloperInfo storage devInfo = developersInfo[msg.sender];
     require(devInfo.registered == true, "DeveloperVault: developer is not registered");
-
-    devInfo.claimsNumber += 1;
-    require(devInfo.claimsNumber <= claimsNumberMax, "DeveloperVault: number of claims exceeds max");
+    require(devInfo.claimsNumber < claimsNumberMax, "DeveloperVault: number of claims exceeds max");
 
     uint256 currentBlockRewardNumber = startRewardBlock + devInfo.claimsNumber * rewardPeriod;
-    require(currentBlockRewardNumber < block.number, "Period for reward has not been reached");
+    require(currentBlockRewardNumber <= block.number, "Period for reward has not been reached");
+
+    devInfo.claimsNumber += 1;
 
     require(fld.transfer(msg.sender, devInfo.claimAmount), "Stake1Vault: FLD transfer fail");
+  }
+
+  /// @dev Returns current reward block for sender
+  function currentRewardBlock() external view returns (uint256) {
+    DeveloperInfo memory devInfo = developersInfo[msg.sender];
+    require(devInfo.registered == true, "DeveloperVault: developer is not registered");
+    uint256 currentBlockRewardNumber = startRewardBlock + devInfo.claimsNumber * rewardPeriod;
+    return currentBlockRewardNumber;
   }
 }
