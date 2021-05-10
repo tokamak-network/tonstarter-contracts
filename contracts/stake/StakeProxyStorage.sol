@@ -14,6 +14,8 @@ contract StakeProxyStorage {
     address public wton;
     address public depositManager;
     address public seigManager;
+    //address public uniswapRouter;
+    //address public yearnV2Vault;
 
     modifier validStakeRegistry() {
         require(

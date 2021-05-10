@@ -31,7 +31,7 @@ contract Stake1Vault is AccessControl {
     uint256 public blockTotalReward;
     bool public saleClosed;
     uint256 public stakeType; // 0 : Stake1 ( eth or ton) , 2 : stable coin
-    address public yearnV2Vault;
+    address public defiAddr; // uniswapRouter or yraenV2Vault
 
     address[] public stakeAddresses;
     mapping(address => LibTokenStake1.StakeInfo) public stakeInfos;
@@ -100,7 +100,8 @@ contract Stake1Vault is AccessControl {
         uint256 _saleStartBlock,
         uint256 _stakeStartBlock,
         address _stakefactory,
-        uint256 _stakeType
+        uint256 _stakeType,
+        address _defiAddr
     ) external onlyOwner {
         require(
             _fld != address(0) && _stakefactory != address(0),
@@ -118,6 +119,7 @@ contract Stake1Vault is AccessControl {
         saleStartBlock = _saleStartBlock;
         stakeStartBlock = _stakeStartBlock;
         stakeType = _stakeType;
+        defiAddr = _defiAddr;
 
         grantRole(ADMIN_ROLE, _stakefactory);
     }
@@ -149,13 +151,13 @@ contract Stake1Vault is AccessControl {
         orderedEndBlocks = _ordered;
     }
 
-    /// @dev Sets FLD address
-    function setYearnV2Vault(address _yearnV2Vault) external onlyOwner {
+    /// @dev Set Defi Address
+    function setDefiAddr(address _defiAddr) external onlyOwner {
         require(
-            _yearnV2Vault != address(0),
-            "Stake1Vault: _yearnV2Vault is zero"
+            _defiAddr != address(0) && defiAddr != _defiAddr,
+            "Stake1Vault: _defiAddr is zero"
         );
-        yearnV2Vault = _yearnV2Vault;
+        defiAddr = _defiAddr;
     }
 
     /// @dev Add stake contract

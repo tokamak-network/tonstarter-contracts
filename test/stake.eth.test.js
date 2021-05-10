@@ -135,7 +135,8 @@ describe('StakeProxy ', function () {
       toBN(stakeStartBlock),
       toBN('1'),
       HASH_Pharse1_ETH_Staking,
-      toBN('0')
+      toBN('0'),
+      zeroAddress
       , { from: defaultSender });
 
     const vaultAddress = tx.receipt.logs[tx.receipt.logs.length - 1].args.vault;
