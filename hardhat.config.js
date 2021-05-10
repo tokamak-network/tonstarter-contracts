@@ -6,7 +6,7 @@ require("@nomiclabs/hardhat-waffle");
 require('dotenv').config()
 
 module.exports = {
-  defaultNetwork: "rinkeby",
+  defaultNetwork: "localhost",
   networks: {
     hardhat: {
       accounts: {
