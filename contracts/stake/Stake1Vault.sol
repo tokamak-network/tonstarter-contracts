@@ -10,7 +10,9 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {IStake1} from "../interfaces/IStake1.sol";
 import "../interfaces/IStake1Vault.sol";
 
-/// @notice FLD Token's Vault - stores the fld for the period of time
+/// @title FLD Token's Vault - stores the fld for the period of time
+/// @notice A vault is associated with the set of stake contracts.
+/// Stake contracts can interact with the vault to claim fld tokens
 contract Stake1Vault is AccessControl {
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
     bytes32 public constant CLAIMER_ROLE = keccak256("CLAIMER");
@@ -192,6 +194,7 @@ contract Stake1Vault is AccessControl {
 
     /// @dev Close sale
     function closeSale() external {
+        require(saleClosed == false, "Stake1Vault: sale is already closed");
         require(
             cap > 0 &&
                 stakeStartBlock > 0 &&
@@ -270,6 +273,10 @@ contract Stake1Vault is AccessControl {
             "Stake1Vault: claimVault startBlcok is zero"
         );
         require(
+            stakeInfo.totalRewardAmount >= stakeInfo.claimRewardAmount + _amount,
+            "Stake1Vault: claim amount exceeds the reward left"
+        );
+        require(
             stakeInfo.totalRewardAmount > 0 &&
                 (stakeInfo.totalRewardAmount -
                     stakeInfo.claimRewardAmount -
@@ -308,6 +315,10 @@ contract Stake1Vault is AccessControl {
         require(
             stakeInfo.totalRewardAmount > 0,
             "Stake1Vault: claim amount is wrong"
+        );
+        require(
+            stakeInfo.totalRewardAmount >= stakeInfo.claimRewardAmount + _amount,
+            "Stake1Vault: claim amount exceeds the reward left"
         );
         require(
             stakeInfo.totalRewardAmount -
