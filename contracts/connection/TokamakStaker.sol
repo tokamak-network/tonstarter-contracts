@@ -4,6 +4,8 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {ITON} from "../interfaces/ITON.sol";
 import {IDepositManager} from "../interfaces/IDepositManager.sol";
 import {ISeigManager} from "../interfaces/ISeigManager.sol";
+//import {IUniswapActor} from "../interfaces/IUniswapActor.sol";
+
 import "@openzeppelin/contracts/access/AccessControl.sol";
 //import { ERC165 } from "@openzeppelin/contracts/introspection/ERC165.sol";
 import "../stake/Stake1Storage.sol";
@@ -16,6 +18,10 @@ contract TokamakStaker is Stake1Storage, AccessControl, OnApprove {
     address public depositManager;
     address public seigManager;
     address public tokamakLayer2;
+    address internal _uniswapRouter;
+
+    // reward from tokamak
+    uint256 public rewardTokamak;
 
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
 
@@ -23,6 +29,7 @@ contract TokamakStaker is Stake1Storage, AccessControl, OnApprove {
         require(_addr != address(0), "TokamakStaker: zero address");
         _;
     }
+
     modifier onlyOwner() {
         require(
             hasRole(ADMIN_ROLE, msg.sender),
@@ -35,7 +42,8 @@ contract TokamakStaker is Stake1Storage, AccessControl, OnApprove {
         address _ton,
         address _wton,
         address _depositManager,
-        address _seigManager
+        address _seigManager,
+        address _defiAddr
     ) external onlyOwner {
         require(
             _ton != address(0) &&
@@ -48,14 +56,36 @@ contract TokamakStaker is Stake1Storage, AccessControl, OnApprove {
         wton = _wton;
         depositManager = _depositManager;
         seigManager = _seigManager;
+        _uniswapRouter = _defiAddr;
     }
 
-    function setTON(address _ton) external onlyOwner {
+    // function setTON(address _ton) external onlyOwner {
+    //     require(
+    //         _ton != address(0) && ton != _ton,
+    //         "TokamakStaker: zero address"
+    //     );
+    //     ton = _ton;
+    // }
+
+    function setUniswapRouter(address _router) external onlyOwner {
+        // TODO: check!!
+        require(block.number < saleStartBlock, "TokamakStaker: Already started");
         require(
-            _ton != address(0) && ton != _ton,
+            _router != address(0) && _uniswapRouter != _router,
             "TokamakStaker: zero address"
         );
-        ton = _ton;
+        _uniswapRouter = _router;
+    }
+
+    function approveUniswapRouter
+    (
+        uint256 amount
+    ) external {
+        require(IERC20(paytoken).approve(_uniswapRouter, amount), "YearnV2Staker: approve fail");
+    }
+
+    function uniswapRouter() public view returns (address){
+        return _uniswapRouter;
     }
 
     /// @dev Approves
@@ -85,7 +115,7 @@ contract TokamakStaker is Stake1Storage, AccessControl, OnApprove {
         (spender, amount) = abi.decode(input, (address, uint256));
     }
 
-    /// @dev
+    /// @dev stake with ton
     function stakeOnApprove(
         address from,
         address _owner,
@@ -158,6 +188,7 @@ contract TokamakStaker is Stake1Storage, AccessControl, OnApprove {
         tokamakLayer2 = address(0);
     }
 
+    // unstaking except to principal fund
     function tokamakRequestUnStaking(address _layer2, uint256 _amount)
         public
         onlyOwner
@@ -175,6 +206,7 @@ contract TokamakStaker is Stake1Storage, AccessControl, OnApprove {
             stakeOf - _amount >= totalStakedAmount,
             "TokamakStaker: The withdrawal balance is lack"
         );
+
         IDepositManager(depositManager).requestWithdrawal(_layer2, _amount);
     }
 
@@ -186,11 +218,17 @@ contract TokamakStaker is Stake1Storage, AccessControl, OnApprove {
             depositManager != address(0) && _layer2 != address(0),
             "TokamakStaker: zero address"
         );
+
+        uint256 pending = tokamakPendingUnstaked(_layer2);
+        uint256 balanceOf = ITON(ton).balanceOf(address(this));
+
+        rewardTokamak = balanceOf + pending - totalStakedAmount;
+
         IDepositManager(depositManager).processRequest(_layer2, receiveTON);
     }
 
     function tokamakPendingUnstaked(address _layer2)
-        external
+        public
         view
         returns (uint256 wtonAmount)
     {

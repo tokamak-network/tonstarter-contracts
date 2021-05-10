@@ -26,7 +26,7 @@ contract StakeFactory {
         uint256 saleStart = vault.saleStartBlock();
         uint256 stakeStart = vault.stakeStartBlock();
         uint256 stakeType = vault.stakeType();
-        address yearnV2Vault = vault.yearnV2Vault();
+        address defiAddr = vault.defiAddr();
 
         require(
             saleStart < stakeStart && stakeStart > 0,
@@ -34,6 +34,7 @@ contract StakeFactory {
         );
 
         if (stakeType == 0) {
+
             Stake1 c = new Stake1();
             c.initialize(
                 _token,
@@ -47,19 +48,19 @@ contract StakeFactory {
                 tokamakAddr[0],
                 tokamakAddr[1],
                 tokamakAddr[2],
-                tokamakAddr[3]
+                tokamakAddr[3],
+                defiAddr
             );
+
             vault.addSubVaultOfStake(_name, address(c), _period);
             c.grantRole(ADMIN_ROLE, msg.sender);
             c.revokeRole(ADMIN_ROLE, address(this));
             return address(c);
+
         } else if (stakeType == 2) {
+
             // if paytoken is stable coin, stakeContract is YearnV2Staker
 
-            require(
-                yearnV2Vault != address(0),
-                "StakeFactory: yearnV2Vault is zero"
-            );
             StakeForStableCoin c = new StakeForStableCoin();
             c.initialize(
                 _token,
@@ -69,7 +70,7 @@ contract StakeFactory {
                 stakeStart,
                 _period
             );
-            c.setYearnV2(yearnV2Vault);
+            c.setYearnV2(defiAddr);
             vault.addSubVaultOfStake(_name, address(c), _period);
             c.grantRole(ADMIN_ROLE, msg.sender);
             c.revokeRole(ADMIN_ROLE, address(this));

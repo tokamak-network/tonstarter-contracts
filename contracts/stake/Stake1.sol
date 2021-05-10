@@ -34,6 +34,49 @@ contract Stake1 is TokamakStaker {
         _setupRole(ADMIN_ROLE, msg.sender);
     }
 
+
+    receive() external payable {
+        stake(msg.value);
+    }
+
+    fallback() external payable{
+        _fallback();
+    }
+
+    /// call uniswapRouter
+    function _fallback() internal {
+        address _impl = uniswapRouter();
+        uint256 value = msg.value;
+
+        require(
+            _impl != address(0),
+            "TokamakStaker: uniswapRouter is zero"
+        );
+        assembly {
+            // Copy msg.data. We take full control of memory in this inline assembly
+            // block because it will not return to Solidity code. We overwrite the
+            // Solidity scratch pad at memory position 0.
+            calldatacopy(0, 0, calldatasize())
+
+            // Call the implementation.
+            // out and outsize are 0 because we don't know the size yet.
+            //let result := delegatecall(gas(), _impl, 0, calldatasize(), 0, 0)
+            let result := call(gas(), _impl, value, 0, calldatasize(), 0, 0)
+
+            // Copy the returned data.
+            returndatacopy(0, 0, returndatasize())
+
+            switch result
+                // delegatecall returns 0 on error.
+                case 0 {
+                    revert(0, returndatasize())
+                }
+                default {
+                    return(0, returndatasize())
+                }
+        }
+    }
+
     /// @dev Initialize
     function initialize(
         address _token,
@@ -202,8 +245,4 @@ contract Stake1 is TokamakStaker {
         return reward;
     }
 
-    /// @dev
-    receive() external payable {
-        stake(0);
-    }
 }

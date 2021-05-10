@@ -30,6 +30,21 @@ Using the [hardhat-etherscan plugin](https://hardhat.org/plugins/nomiclabs-hardh
 `git clone https://github.com/Onther-Tech/plasma-evm-contracts`
 `npm run compile:plasma`
 
+### To integration test with Uniswap
+`git clone https://github.com/Uniswap/uniswap-v2-core.git`
+`cd uniswap-v2-core`
+`yarn`
+`yarn compile`
+`cd..`
+`npm run compile:uniswap-core`
+
+`git clone https://github.com/Uniswap/uniswap-v2-periphery.git`
+`cd uniswap-v2-periphery`
+`yarn`
+`yarn compile`
+`cd..`
+`npm run compile:uniswap-periphery`
+
 
 ### solhint
 `solhint ./contracts/*/*.sol`

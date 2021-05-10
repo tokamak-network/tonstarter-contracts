@@ -51,6 +51,8 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
         address _wton,
         address _depositManager,
         address _seigManager
+        // address _uniswapRouter,
+        // address _yearnV2Vault
     ) external onlyOwner nonZero(_ton) nonZero(_wton) nonZero(_depositManager) {
         setFLD(_fld);
         setStakeRegistry(_stakeRegistry);
@@ -59,13 +61,23 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
         wton = _wton;
         depositManager = _depositManager;
         seigManager = _seigManager;
+        //uniswapRouter = _uniswapRouter;
+        //yearnV2Vault = _yearnV2Vault;
     }
 
     ///
     function setFactory(address _stakeFactory) external onlyOwner {
         setStakeFactory(_stakeFactory);
     }
+    /*
+    function setUniswapRouter(address _addr) external onlyOwner nonZero(_addr) {
+        uniswapRouter = _addr;
+    }
 
+    function setYearnV2Vault(address _addr) external onlyOwner nonZero(_addr) {
+        yearnV2Vault = _addr;
+    }
+    */
     //////////////////////////////////////////////////////////////////////
     // Admin Functions
     function createVault(
@@ -75,7 +87,8 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
         uint256 _stakeStartBlcok,
         uint256 _pahse,
         bytes32 _vaultName,
-        uint256 _stakeType
+        uint256 _stakeType,
+        address _defiAddr
     ) external {
         Stake1Vault vault = new Stake1Vault();
         vault.initialize(
@@ -85,7 +98,8 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
             _saleStartBlcok,
             _stakeStartBlcok,
             address(stakeFactory),
-            _stakeType
+            _stakeType,
+            _defiAddr
         );
         stakeRegistry.addVault(_pahse, _vaultName, address(vault));
 
@@ -207,4 +221,14 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
     {
         stakeFactory = IStakeFactory(_stakeFactory);
     }
+
+    function vaultsOfPahse(uint256 _phase)
+        public
+        nonZero(address(stakeRegistry))
+        returns (address[] memory)
+    {
+        return stakeRegistry.phasesAll(_phase);
+    }
+
+
 }

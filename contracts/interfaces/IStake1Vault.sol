@@ -52,7 +52,7 @@ interface IStake1Vault {
 
     function stakeType() external view returns (uint256);
 
-    function yearnV2Vault() external view returns (address);
+    function defiAddr() external view returns (address);
 
     function saleStartBlock() external view returns (uint256);
 
