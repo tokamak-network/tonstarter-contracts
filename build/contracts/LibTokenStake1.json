@@ -1,0 +1,1237 @@
+{
+  "contractName": "LibTokenStake1",
+  "abi": [],
+  "metadata": "{\"compiler\":{\"version\":\"0.7.6+commit.7338295f\"},\"language\":\"Solidity\",\"output\":{\"abi\":[],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"/Users/kadyrbeknarmamatov/code/ico20-contracts/contracts/libraries/LibTokenStake1.sol\":\"LibTokenStake1\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"/Users/kadyrbeknarmamatov/code/ico20-contracts/contracts/libraries/LibTokenStake1.sol\":{\"keccak256\":\"0x4cfc0c40cab2ee67f226816877a71f9eb3938789cbacef2dece288f262ca13a0\",\"license\":\"Unlicense\",\"urls\":[\"bzz-raw://cbb298ee8c1e52738a8501f317315751e8deea85979712f7fb3bb832da07d178\",\"dweb:/ipfs/Qma7CzuxaEVVbP8hbT6o9hgrNeiLtYZBEYAeFZYd8Jaas7\"]}},\"version\":1}",
+  "bytecode": "0x60566023600b82828239805160001a607314601657fe5b30600052607381538281f3fe73000000000000000000000000000000000000000030146080604052600080fdfea264697066735822122044134e273e9e147a90096a85374ace523c323be597eb5f231cbf27ce69c7856564736f6c63430007060033",
+  "deployedBytecode": "0x73000000000000000000000000000000000000000030146080604052600080fdfea264697066735822122044134e273e9e147a90096a85374ace523c323be597eb5f231cbf27ce69c7856564736f6c63430007060033",
+  "immutableReferences": {},
+  "generatedSources": [],
+  "deployedGeneratedSources": [],
+  "sourceMap": "62:706:15:-:0;;;;;;;;;;;;;;;;;;;;;;;;;",
+  "deployedSourceMap": "62:706:15:-:0;;;;;;;;",
+  "source": "//SPDX-License-Identifier: Unlicense\npragma solidity ^0.7.6;\n\nlibrary LibTokenStake1 {\n    struct StakeInfo {\n        string name;\n        uint256 startBlcok;\n        uint256 endBlock;\n        uint256 balance;\n        uint256 totalRewardAmount;\n        uint256 claimRewardAmount;\n    }\n\n    struct StakedAmount {\n        uint256 amount;\n        uint256 claimedBlock;\n        uint256 claimedAmount;\n        uint256 releasedBlock;\n        uint256 releasedAmount;\n        bool released;\n    }\n\n    struct StakedAmountForSFLD {\n        uint256 amount;\n        uint256 startBlock;\n        uint256 periodBlock;\n        uint256 rewardPerBlock;\n        uint256 claimedBlock;\n        uint256 claimedAmount;\n        uint256 releasedBlock;\n        uint256 releasedAmount;\n    }\n}\n",
+  "sourcePath": "/Users/kadyrbeknarmamatov/code/ico20-contracts/contracts/libraries/LibTokenStake1.sol",
+  "ast": {
+    "absolutePath": "/Users/kadyrbeknarmamatov/code/ico20-contracts/contracts/libraries/LibTokenStake1.sol",
+    "exportedSymbols": {
+      "LibTokenStake1": [
+        2275
+      ]
+    },
+    "id": 2276,
+    "license": "Unlicense",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 2231,
+        "literals": [
+          "solidity",
+          "^",
+          "0.7",
+          ".6"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "37:23:15"
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "library",
+        "fullyImplemented": true,
+        "id": 2275,
+        "linearizedBaseContracts": [
+          2275
+        ],
+        "name": "LibTokenStake1",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "canonicalName": "LibTokenStake1.StakeInfo",
+            "id": 2244,
+            "members": [
+              {
+                "constant": false,
+                "id": 2233,
+                "mutability": "mutable",
+                "name": "name",
+                "nodeType": "VariableDeclaration",
+                "scope": 2244,
+                "src": "118:11:15",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_string_storage_ptr",
+                  "typeString": "string"
+                },
+                "typeName": {
+                  "id": 2232,
+                  "name": "string",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "118:6:15",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_storage_ptr",
+                    "typeString": "string"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2235,
+                "mutability": "mutable",
+                "name": "startBlcok",
+                "nodeType": "VariableDeclaration",
+                "scope": 2244,
+                "src": "139:18:15",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 2234,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "139:7:15",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2237,
+                "mutability": "mutable",
+                "name": "endBlock",
+                "nodeType": "VariableDeclaration",
+                "scope": 2244,
+                "src": "167:16:15",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 2236,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "167:7:15",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2239,
+                "mutability": "mutable",
+                "name": "balance",
+                "nodeType": "VariableDeclaration",
+                "scope": 2244,
+                "src": "193:15:15",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 2238,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "193:7:15",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2241,
+                "mutability": "mutable",
+                "name": "totalRewardAmount",
+                "nodeType": "VariableDeclaration",
+                "scope": 2244,
+                "src": "218:25:15",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 2240,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "218:7:15",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2243,
+                "mutability": "mutable",
+                "name": "claimRewardAmount",
+                "nodeType": "VariableDeclaration",
+                "scope": 2244,
+                "src": "253:25:15",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 2242,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "253:7:15",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "visibility": "internal"
+              }
+            ],
+            "name": "StakeInfo",
+            "nodeType": "StructDefinition",
+            "scope": 2275,
+            "src": "91:194:15",
+            "visibility": "public"
+          },
+          {
+            "canonicalName": "LibTokenStake1.StakedAmount",
+            "id": 2257,
+            "members": [
+              {
+                "constant": false,
+                "id": 2246,
+                "mutability": "mutable",
+                "name": "amount",
+                "nodeType": "VariableDeclaration",
+                "scope": 2257,
+                "src": "321:14:15",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 2245,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "321:7:15",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2248,
+                "mutability": "mutable",
+                "name": "claimedBlock",
+                "nodeType": "VariableDeclaration",
+                "scope": 2257,
+                "src": "345:20:15",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 2247,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "345:7:15",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2250,
+                "mutability": "mutable",
+                "name": "claimedAmount",
+                "nodeType": "VariableDeclaration",
+                "scope": 2257,
+                "src": "375:21:15",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 2249,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "375:7:15",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2252,
+                "mutability": "mutable",
+                "name": "releasedBlock",
+                "nodeType": "VariableDeclaration",
+                "scope": 2257,
+                "src": "406:21:15",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 2251,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "406:7:15",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2254,
+                "mutability": "mutable",
+                "name": "releasedAmount",
+                "nodeType": "VariableDeclaration",
+                "scope": 2257,
+                "src": "437:22:15",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 2253,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "437:7:15",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2256,
+                "mutability": "mutable",
+                "name": "released",
+                "nodeType": "VariableDeclaration",
+                "scope": 2257,
+                "src": "469:13:15",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_bool",
+                  "typeString": "bool"
+                },
+                "typeName": {
+                  "id": 2255,
+                  "name": "bool",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "469:4:15",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  }
+                },
+                "visibility": "internal"
+              }
+            ],
+            "name": "StakedAmount",
+            "nodeType": "StructDefinition",
+            "scope": 2275,
+            "src": "291:198:15",
+            "visibility": "public"
+          },
+          {
+            "canonicalName": "LibTokenStake1.StakedAmountForSFLD",
+            "id": 2274,
+            "members": [
+              {
+                "constant": false,
+                "id": 2259,
+                "mutability": "mutable",
+                "name": "amount",
+                "nodeType": "VariableDeclaration",
+                "scope": 2274,
+                "src": "532:14:15",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 2258,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "532:7:15",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2261,
+                "mutability": "mutable",
+                "name": "startBlock",
+                "nodeType": "VariableDeclaration",
+                "scope": 2274,
+                "src": "556:18:15",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 2260,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "556:7:15",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2263,
+                "mutability": "mutable",
+                "name": "periodBlock",
+                "nodeType": "VariableDeclaration",
+                "scope": 2274,
+                "src": "584:19:15",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 2262,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "584:7:15",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2265,
+                "mutability": "mutable",
+                "name": "rewardPerBlock",
+                "nodeType": "VariableDeclaration",
+                "scope": 2274,
+                "src": "613:22:15",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 2264,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "613:7:15",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2267,
+                "mutability": "mutable",
+                "name": "claimedBlock",
+                "nodeType": "VariableDeclaration",
+                "scope": 2274,
+                "src": "645:20:15",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 2266,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "645:7:15",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2269,
+                "mutability": "mutable",
+                "name": "claimedAmount",
+                "nodeType": "VariableDeclaration",
+                "scope": 2274,
+                "src": "675:21:15",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 2268,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "675:7:15",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2271,
+                "mutability": "mutable",
+                "name": "releasedBlock",
+                "nodeType": "VariableDeclaration",
+                "scope": 2274,
+                "src": "706:21:15",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 2270,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "706:7:15",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2273,
+                "mutability": "mutable",
+                "name": "releasedAmount",
+                "nodeType": "VariableDeclaration",
+                "scope": 2274,
+                "src": "737:22:15",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 2272,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "737:7:15",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "visibility": "internal"
+              }
+            ],
+            "name": "StakedAmountForSFLD",
+            "nodeType": "StructDefinition",
+            "scope": 2275,
+            "src": "495:271:15",
+            "visibility": "public"
+          }
+        ],
+        "scope": 2276,
+        "src": "62:706:15"
+      }
+    ],
+    "src": "37:732:15"
+  },
+  "legacyAST": {
+    "attributes": {
+      "absolutePath": "/Users/kadyrbeknarmamatov/code/ico20-contracts/contracts/libraries/LibTokenStake1.sol",
+      "exportedSymbols": {
+        "LibTokenStake1": [
+          2275
+        ]
+      },
+      "license": "Unlicense"
+    },
+    "children": [
+      {
+        "attributes": {
+          "literals": [
+            "solidity",
+            "^",
+            "0.7",
+            ".6"
+          ]
+        },
+        "id": 2231,
+        "name": "PragmaDirective",
+        "src": "37:23:15"
+      },
+      {
+        "attributes": {
+          "abstract": false,
+          "baseContracts": [
+            null
+          ],
+          "contractDependencies": [
+            null
+          ],
+          "contractKind": "library",
+          "fullyImplemented": true,
+          "linearizedBaseContracts": [
+            2275
+          ],
+          "name": "LibTokenStake1",
+          "scope": 2276
+        },
+        "children": [
+          {
+            "attributes": {
+              "canonicalName": "LibTokenStake1.StakeInfo",
+              "name": "StakeInfo",
+              "scope": 2275,
+              "visibility": "public"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "constant": false,
+                  "mutability": "mutable",
+                  "name": "name",
+                  "scope": 2244,
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "type": "string",
+                  "visibility": "internal"
+                },
+                "children": [
+                  {
+                    "attributes": {
+                      "name": "string",
+                      "type": "string"
+                    },
+                    "id": 2232,
+                    "name": "ElementaryTypeName",
+                    "src": "118:6:15"
+                  }
+                ],
+                "id": 2233,
+                "name": "VariableDeclaration",
+                "src": "118:11:15"
+              },
+              {
+                "attributes": {
+                  "constant": false,
+                  "mutability": "mutable",
+                  "name": "startBlcok",
+                  "scope": 2244,
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "type": "uint256",
+                  "visibility": "internal"
+                },
+                "children": [
+                  {
+                    "attributes": {
+                      "name": "uint256",
+                      "type": "uint256"
+                    },
+                    "id": 2234,
+                    "name": "ElementaryTypeName",
+                    "src": "139:7:15"
+                  }
+                ],
+                "id": 2235,
+                "name": "VariableDeclaration",
+                "src": "139:18:15"
+              },
+              {
+                "attributes": {
+                  "constant": false,
+                  "mutability": "mutable",
+                  "name": "endBlock",
+                  "scope": 2244,
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "type": "uint256",
+                  "visibility": "internal"
+                },
+                "children": [
+                  {
+                    "attributes": {
+                      "name": "uint256",
+                      "type": "uint256"
+                    },
+                    "id": 2236,
+                    "name": "ElementaryTypeName",
+                    "src": "167:7:15"
+                  }
+                ],
+                "id": 2237,
+                "name": "VariableDeclaration",
+                "src": "167:16:15"
+              },
+              {
+                "attributes": {
+                  "constant": false,
+                  "mutability": "mutable",
+                  "name": "balance",
+                  "scope": 2244,
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "type": "uint256",
+                  "visibility": "internal"
+                },
+                "children": [
+                  {
+                    "attributes": {
+                      "name": "uint256",
+                      "type": "uint256"
+                    },
+                    "id": 2238,
+                    "name": "ElementaryTypeName",
+                    "src": "193:7:15"
+                  }
+                ],
+                "id": 2239,
+                "name": "VariableDeclaration",
+                "src": "193:15:15"
+              },
+              {
+                "attributes": {
+                  "constant": false,
+                  "mutability": "mutable",
+                  "name": "totalRewardAmount",
+                  "scope": 2244,
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "type": "uint256",
+                  "visibility": "internal"
+                },
+                "children": [
+                  {
+                    "attributes": {
+                      "name": "uint256",
+                      "type": "uint256"
+                    },
+                    "id": 2240,
+                    "name": "ElementaryTypeName",
+                    "src": "218:7:15"
+                  }
+                ],
+                "id": 2241,
+                "name": "VariableDeclaration",
+                "src": "218:25:15"
+              },
+              {
+                "attributes": {
+                  "constant": false,
+                  "mutability": "mutable",
+                  "name": "claimRewardAmount",
+                  "scope": 2244,
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "type": "uint256",
+                  "visibility": "internal"
+                },
+                "children": [
+                  {
+                    "attributes": {
+                      "name": "uint256",
+                      "type": "uint256"
+                    },
+                    "id": 2242,
+                    "name": "ElementaryTypeName",
+                    "src": "253:7:15"
+                  }
+                ],
+                "id": 2243,
+                "name": "VariableDeclaration",
+                "src": "253:25:15"
+              }
+            ],
+            "id": 2244,
+            "name": "StructDefinition",
+            "src": "91:194:15"
+          },
+          {
+            "attributes": {
+              "canonicalName": "LibTokenStake1.StakedAmount",
+              "name": "StakedAmount",
+              "scope": 2275,
+              "visibility": "public"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "constant": false,
+                  "mutability": "mutable",
+                  "name": "amount",
+                  "scope": 2257,
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "type": "uint256",
+                  "visibility": "internal"
+                },
+                "children": [
+                  {
+                    "attributes": {
+                      "name": "uint256",
+                      "type": "uint256"
+                    },
+                    "id": 2245,
+                    "name": "ElementaryTypeName",
+                    "src": "321:7:15"
+                  }
+                ],
+                "id": 2246,
+                "name": "VariableDeclaration",
+                "src": "321:14:15"
+              },
+              {
+                "attributes": {
+                  "constant": false,
+                  "mutability": "mutable",
+                  "name": "claimedBlock",
+                  "scope": 2257,
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "type": "uint256",
+                  "visibility": "internal"
+                },
+                "children": [
+                  {
+                    "attributes": {
+                      "name": "uint256",
+                      "type": "uint256"
+                    },
+                    "id": 2247,
+                    "name": "ElementaryTypeName",
+                    "src": "345:7:15"
+                  }
+                ],
+                "id": 2248,
+                "name": "VariableDeclaration",
+                "src": "345:20:15"
+              },
+              {
+                "attributes": {
+                  "constant": false,
+                  "mutability": "mutable",
+                  "name": "claimedAmount",
+                  "scope": 2257,
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "type": "uint256",
+                  "visibility": "internal"
+                },
+                "children": [
+                  {
+                    "attributes": {
+                      "name": "uint256",
+                      "type": "uint256"
+                    },
+                    "id": 2249,
+                    "name": "ElementaryTypeName",
+                    "src": "375:7:15"
+                  }
+                ],
+                "id": 2250,
+                "name": "VariableDeclaration",
+                "src": "375:21:15"
+              },
+              {
+                "attributes": {
+                  "constant": false,
+                  "mutability": "mutable",
+                  "name": "releasedBlock",
+                  "scope": 2257,
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "type": "uint256",
+                  "visibility": "internal"
+                },
+                "children": [
+                  {
+                    "attributes": {
+                      "name": "uint256",
+                      "type": "uint256"
+                    },
+                    "id": 2251,
+                    "name": "ElementaryTypeName",
+                    "src": "406:7:15"
+                  }
+                ],
+                "id": 2252,
+                "name": "VariableDeclaration",
+                "src": "406:21:15"
+              },
+              {
+                "attributes": {
+                  "constant": false,
+                  "mutability": "mutable",
+                  "name": "releasedAmount",
+                  "scope": 2257,
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "type": "uint256",
+                  "visibility": "internal"
+                },
+                "children": [
+                  {
+                    "attributes": {
+                      "name": "uint256",
+                      "type": "uint256"
+                    },
+                    "id": 2253,
+                    "name": "ElementaryTypeName",
+                    "src": "437:7:15"
+                  }
+                ],
+                "id": 2254,
+                "name": "VariableDeclaration",
+                "src": "437:22:15"
+              },
+              {
+                "attributes": {
+                  "constant": false,
+                  "mutability": "mutable",
+                  "name": "released",
+                  "scope": 2257,
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "type": "bool",
+                  "visibility": "internal"
+                },
+                "children": [
+                  {
+                    "attributes": {
+                      "name": "bool",
+                      "type": "bool"
+                    },
+                    "id": 2255,
+                    "name": "ElementaryTypeName",
+                    "src": "469:4:15"
+                  }
+                ],
+                "id": 2256,
+                "name": "VariableDeclaration",
+                "src": "469:13:15"
+              }
+            ],
+            "id": 2257,
+            "name": "StructDefinition",
+            "src": "291:198:15"
+          },
+          {
+            "attributes": {
+              "canonicalName": "LibTokenStake1.StakedAmountForSFLD",
+              "name": "StakedAmountForSFLD",
+              "scope": 2275,
+              "visibility": "public"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "constant": false,
+                  "mutability": "mutable",
+                  "name": "amount",
+                  "scope": 2274,
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "type": "uint256",
+                  "visibility": "internal"
+                },
+                "children": [
+                  {
+                    "attributes": {
+                      "name": "uint256",
+                      "type": "uint256"
+                    },
+                    "id": 2258,
+                    "name": "ElementaryTypeName",
+                    "src": "532:7:15"
+                  }
+                ],
+                "id": 2259,
+                "name": "VariableDeclaration",
+                "src": "532:14:15"
+              },
+              {
+                "attributes": {
+                  "constant": false,
+                  "mutability": "mutable",
+                  "name": "startBlock",
+                  "scope": 2274,
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "type": "uint256",
+                  "visibility": "internal"
+                },
+                "children": [
+                  {
+                    "attributes": {
+                      "name": "uint256",
+                      "type": "uint256"
+                    },
+                    "id": 2260,
+                    "name": "ElementaryTypeName",
+                    "src": "556:7:15"
+                  }
+                ],
+                "id": 2261,
+                "name": "VariableDeclaration",
+                "src": "556:18:15"
+              },
+              {
+                "attributes": {
+                  "constant": false,
+                  "mutability": "mutable",
+                  "name": "periodBlock",
+                  "scope": 2274,
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "type": "uint256",
+                  "visibility": "internal"
+                },
+                "children": [
+                  {
+                    "attributes": {
+                      "name": "uint256",
+                      "type": "uint256"
+                    },
+                    "id": 2262,
+                    "name": "ElementaryTypeName",
+                    "src": "584:7:15"
+                  }
+                ],
+                "id": 2263,
+                "name": "VariableDeclaration",
+                "src": "584:19:15"
+              },
+              {
+                "attributes": {
+                  "constant": false,
+                  "mutability": "mutable",
+                  "name": "rewardPerBlock",
+                  "scope": 2274,
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "type": "uint256",
+                  "visibility": "internal"
+                },
+                "children": [
+                  {
+                    "attributes": {
+                      "name": "uint256",
+                      "type": "uint256"
+                    },
+                    "id": 2264,
+                    "name": "ElementaryTypeName",
+                    "src": "613:7:15"
+                  }
+                ],
+                "id": 2265,
+                "name": "VariableDeclaration",
+                "src": "613:22:15"
+              },
+              {
+                "attributes": {
+                  "constant": false,
+                  "mutability": "mutable",
+                  "name": "claimedBlock",
+                  "scope": 2274,
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "type": "uint256",
+                  "visibility": "internal"
+                },
+                "children": [
+                  {
+                    "attributes": {
+                      "name": "uint256",
+                      "type": "uint256"
+                    },
+                    "id": 2266,
+                    "name": "ElementaryTypeName",
+                    "src": "645:7:15"
+                  }
+                ],
+                "id": 2267,
+                "name": "VariableDeclaration",
+                "src": "645:20:15"
+              },
+              {
+                "attributes": {
+                  "constant": false,
+                  "mutability": "mutable",
+                  "name": "claimedAmount",
+                  "scope": 2274,
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "type": "uint256",
+                  "visibility": "internal"
+                },
+                "children": [
+                  {
+                    "attributes": {
+                      "name": "uint256",
+                      "type": "uint256"
+                    },
+                    "id": 2268,
+                    "name": "ElementaryTypeName",
+                    "src": "675:7:15"
+                  }
+                ],
+                "id": 2269,
+                "name": "VariableDeclaration",
+                "src": "675:21:15"
+              },
+              {
+                "attributes": {
+                  "constant": false,
+                  "mutability": "mutable",
+                  "name": "releasedBlock",
+                  "scope": 2274,
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "type": "uint256",
+                  "visibility": "internal"
+                },
+                "children": [
+                  {
+                    "attributes": {
+                      "name": "uint256",
+                      "type": "uint256"
+                    },
+                    "id": 2270,
+                    "name": "ElementaryTypeName",
+                    "src": "706:7:15"
+                  }
+                ],
+                "id": 2271,
+                "name": "VariableDeclaration",
+                "src": "706:21:15"
+              },
+              {
+                "attributes": {
+                  "constant": false,
+                  "mutability": "mutable",
+                  "name": "releasedAmount",
+                  "scope": 2274,
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "type": "uint256",
+                  "visibility": "internal"
+                },
+                "children": [
+                  {
+                    "attributes": {
+                      "name": "uint256",
+                      "type": "uint256"
+                    },
+                    "id": 2272,
+                    "name": "ElementaryTypeName",
+                    "src": "737:7:15"
+                  }
+                ],
+                "id": 2273,
+                "name": "VariableDeclaration",
+                "src": "737:22:15"
+              }
+            ],
+            "id": 2274,
+            "name": "StructDefinition",
+            "src": "495:271:15"
+          }
+        ],
+        "id": 2275,
+        "name": "ContractDefinition",
+        "src": "62:706:15"
+      }
+    ],
+    "id": 2276,
+    "name": "SourceUnit",
+    "src": "37:732:15"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.7.6+commit.7338295f.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "3.4.0",
+  "updatedAt": "2021-05-10T09:27:57.814Z",
+  "devdoc": {
+    "kind": "dev",
+    "methods": {},
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {},
+    "version": 1
+  }
+}
