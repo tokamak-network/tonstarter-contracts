@@ -110,17 +110,14 @@ describe("DeveloperVault", function () {
   it("should claim and succeed 3", async function () {
     await time.advanceBlockTo(parseInt(startRewardBlock) + 2 * parseInt(rewardPeriod));
 
-    await DeveloperVault.connect(dev1).claimReward()
+    await DeveloperVault.connect(dev1).claimReward();
     expect(await FLD.balanceOf(dev1.address)).to.equal(30);
 
-    await DeveloperVault.connect(dev2).claimReward()
+    await DeveloperVault.connect(dev2).claimReward();
     expect(await FLD.balanceOf(dev2.address)).to.equal(9);
     
-    await DeveloperVault.connect(dev3).claimReward()
-    expect(await FLD.balanceOf(dev3.address)).to.equal(10);
-    
-    await DeveloperVault.connect(dev3).claimReward()
-    expect(await FLD.balanceOf(dev3.address)).to.equal(15); 
+    await DeveloperVault.connect(dev3).claimReward(); // receive last 2 periods rewards at once
+    expect(await FLD.balanceOf(dev3.address)).to.equal(15);
   });
 
   it("should claim and fail 3", async function () {

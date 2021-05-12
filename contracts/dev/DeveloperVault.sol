@@ -73,9 +73,13 @@ contract DeveloperVault is AccessControl {
     uint256 currentBlockRewardNumber = startRewardBlock + devInfo.claimsNumber * rewardPeriod;
     require(currentBlockRewardNumber <= block.number, "Period for reward has not been reached");
 
-    devInfo.claimsNumber += 1;
-
-    require(fld.transfer(msg.sender, devInfo.claimAmount), "Stake1Vault: FLD transfer fail");
+    uint256 allPastRewards = 0;  
+    while (currentBlockRewardNumber <= block.number) {
+      allPastRewards += devInfo.claimAmount;
+      devInfo.claimsNumber += 1;
+      currentBlockRewardNumber = startRewardBlock + devInfo.claimsNumber * rewardPeriod;
+    }
+    require(fld.transfer(msg.sender, allPastRewards), "Stake1Vault: FLD transfer fail");
   }
 
   /// @dev Returns current reward block for sender
