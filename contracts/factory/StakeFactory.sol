@@ -1,24 +1,35 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.7.6;
 
-import {Stake1} from "../stake/Stake1.sol";
+import {IStake1Factory} from "../interfaces/IStake1Factory.sol";
+import {IStakeForStableCoinFactory} from "../interfaces/IStakeForStableCoinFactory.sol";
 import {IStake1Vault} from "../interfaces/IStake1Vault.sol";
-import {StakeForStableCoin} from "../stake/StakeForStableCoin.sol";
 
 contract StakeFactory {
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
 
+    address public stake1Factory ;
+    address public stakeStableCoinFactory ;
+
+    constructor(address _stake1Factory, address _stableFactory) {
+        require(
+            _stake1Factory != address(0) && _stableFactory != address(0),
+            "StakeFactory: init fail" );
+        stake1Factory = _stake1Factory;
+        stakeStableCoinFactory = _stableFactory;
+    }
+
+
     function deploy(
         uint256 _pahse,
         address _vault,
-        string memory _name,
         address _token,
         address _paytoken,
         uint256 _period,
         address[4] memory tokamakAddr
     ) public returns (address) {
         require(
-            _vault != address(0) && _pahse == 1,
+            _vault != address(0),
             "StakeFactory: deploy init fail"
         );
 
@@ -26,55 +37,38 @@ contract StakeFactory {
         uint256 saleStart = vault.saleStartBlock();
         uint256 stakeStart = vault.stakeStartBlock();
         uint256 stakeType = vault.stakeType();
-        address defiAddr = vault.defiAddr();
 
         require(
             saleStart < stakeStart && stakeStart > 0,
             "StakeFactory: start error"
         );
 
-        if (stakeType == 0) {
+        if (stakeType <= 1) {
 
-            Stake1 c = new Stake1();
-            c.initialize(
-                _token,
-                _paytoken,
-                address(vault),
-                saleStart,
-                stakeStart,
-                _period
-            );
-            c.setTokamak(
-                tokamakAddr[0],
-                tokamakAddr[1],
-                tokamakAddr[2],
-                tokamakAddr[3],
-                defiAddr
-            );
+            require(stake1Factory != address(0), "StakeFactory: stake1Factory zero");
 
-            vault.addSubVaultOfStake(_name, address(c), _period);
-            c.grantRole(ADMIN_ROLE, msg.sender);
-            c.revokeRole(ADMIN_ROLE, address(this));
-            return address(c);
+            return IStake1Factory(stake1Factory).deploy(
+                    _pahse,
+                    _vault,
+                    _token,
+                    _paytoken,
+                    _period,
+                    tokamakAddr,
+                    msg.sender
+            );
 
         } else if (stakeType == 2) {
 
-            // if paytoken is stable coin, stakeContract is YearnV2Staker
+            require(stakeStableCoinFactory != address(0), "StakeFactory: stakeStableCoinFactory zero");
 
-            StakeForStableCoin c = new StakeForStableCoin();
-            c.initialize(
-                _token,
-                _paytoken,
-                address(vault),
-                saleStart,
-                stakeStart,
-                _period
+            return IStakeForStableCoinFactory(stakeStableCoinFactory).deploy(
+                    _pahse,
+                    _vault,
+                    _token,
+                    _paytoken,
+                    _period,
+                    msg.sender
             );
-            c.setYearnV2(defiAddr);
-            vault.addSubVaultOfStake(_name, address(c), _period);
-            c.grantRole(ADMIN_ROLE, msg.sender);
-            c.revokeRole(ADMIN_ROLE, address(this));
-            return address(c);
         }
 
         return address(0);

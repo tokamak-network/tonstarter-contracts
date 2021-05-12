@@ -27,6 +27,8 @@ const Stake1Abi = require('../build/contracts/Stake1.json').abi;
 const IERC20Abi = require('../build/contracts/IERC20.json').abi;
 
 // ico2.0 contracts
+const Stake1Factory = contract.fromArtifact('Stake1Factory');
+const StakeForStableCoinFactory = contract.fromArtifact('StakeForStableCoinFactory');
 const StakeFactory = contract.fromArtifact('StakeFactory');
 const StakeRegistry = contract.fromArtifact('StakeRegistry');
 const FLD = contract.fromArtifact('FLD');
@@ -168,6 +170,9 @@ class ICO20Contracts {
     this.fld = null;
     this.sfld = null;
     //this.stakeForSFLD = null;
+    this.stake1factory = null;
+    this.stakeForStableCoinFactory = null;
+
     this.stakeregister = null;
     this.stakefactory = null;
     this.stake1proxy = null;
@@ -181,7 +186,11 @@ class ICO20Contracts {
     this.sfld = await SFLD.new({ from: owner });
     //this.stakeForSFLD = await StakeForSFLD.new({ from: owner });
     this.stakeregister = await StakeRegistry.new({ from: owner });
-    this.stakefactory = await StakeFactory.new({ from: owner });
+
+    this.stake1factory = await Stake1Factory.new({ from: owner });
+    this.stakeForStableCoinFactory = await StakeForStableCoinFactory.new({ from: owner });
+
+    this.stakefactory = await StakeFactory.new(this.stake1factory.address,this.stakeForStableCoinFactory.address, { from: owner });
     this.stake1logic = await Stake1Logic.new({ from: owner });
     this.stake1proxy = await Stake1Proxy.new({ from: owner });
 

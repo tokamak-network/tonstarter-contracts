@@ -60,17 +60,17 @@ contract StakeForStableCoin is YearnV2Staker {
     }
 
     receive() external payable {
-        stake(msg.value);
+        // stake(msg.value);
     }
-
+    /*
     /// call yearnV2Vault
-    fallback() external {
+    fallback() external payable{
         _fallback();
     }
 
     function _fallback() internal {
         address _impl = yearnV2Vault();
-        uint256 value = msg.value;
+        //uint256 value = msg.value;
 
         require(
             _impl != address(0),
@@ -85,7 +85,7 @@ contract StakeForStableCoin is YearnV2Staker {
             // Call the implementation.
             // out and outsize are 0 because we don't know the size yet.
             //let result := delegatecall(gas(), _impl, 0, calldatasize(), 0, 0)
-            let result := call(gas(), _impl, value, 0, calldatasize(), 0, 0)
+            let result := call(gas(), _impl, 0, 0, calldatasize(), 0, 0)
 
             // Copy the returned data.
             returndatacopy(0, 0, returndatasize())
@@ -100,7 +100,7 @@ contract StakeForStableCoin is YearnV2Staker {
                 }
         }
     }
-
+    */
     /// @dev Stake amount
     function stake(uint256 _amount) public payable {
         require(

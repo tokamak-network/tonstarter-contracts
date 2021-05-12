@@ -30,4 +30,5 @@ library LibTokenStake1 {
         uint256 releasedBlock;
         uint256 releasedAmount;
     }
+
 }

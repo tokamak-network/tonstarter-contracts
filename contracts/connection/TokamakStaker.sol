@@ -88,6 +88,15 @@ contract TokamakStaker is Stake1Storage, AccessControl, OnApprove {
         return _uniswapRouter;
     }
 
+    /// TODO: Withdrawal for operating profit
+    function withdrawProfit
+    (
+        address _token,
+        uint256 amount
+    ) external {
+
+    }
+
     /// @dev Approves
     function onApprove(
         address owner,
@@ -291,4 +300,7 @@ contract TokamakStaker is Stake1Storage, AccessControl, OnApprove {
         IERC20(ton).transfer(to, amount);
     }
     */
+
+
+
 }
