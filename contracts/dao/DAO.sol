@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.7.6;
 
 import "../interfaces/ISFLD.sol";
@@ -24,20 +25,21 @@ contract DAO {
     uint256 votingDeadline;
     bool open;
     bytes32 agendaHash;
+    bool passed;
 
     // Receipient info
     address payable recipient;
-    uint256 amount;
     
     // Votes info
-    uint256 yesVotes;
-    uint256 noVotes;
+    uint256 yesVotesCount;
+    uint256 noVotesCount;
+    mapping (address => bool) yesVotes;
+    mapping (address => bool) noVotes;
   }
 
   /// @dev Create new agenda
   function newAgenda(
     address payable _recipient,
-    uint256 _amount,
     bytes memory _transactionData
   ) external returns (uint256 _agendaID) {
     Agenda storage agenda = agendas[agendaIDCounter];
@@ -49,11 +51,11 @@ contract DAO {
     agenda.open = true;
 
     agenda.recipient = _recipient;
-    agenda.amount = _amount;
-    agenda.agendaHash = keccak256(abi.encodePacked(_recipient, _amount, _transactionData));
+    agenda.agendaHash = keccak256(abi.encodePacked(_recipient, _transactionData));
+    agenda.passed = false;
 
-    agenda.yesVotes = 0;
-    agenda.noVotes = 0;
+    agenda.yesVotesCount = 0;
+    agenda.noVotesCount = 0;
   }
 
   /// @dev Votes for agenda
@@ -62,11 +64,23 @@ contract DAO {
     require(agenda.exists == true, "No such an agenda");
     require(block.timestamp <= agenda.votingDeadline, "Voting deadline has passed");
     require(agenda.open == true, "Agenda is not open");
-    
+
+    // Clear previous vote if any
+    if (agenda.yesVotes[msg.sender]) {
+      agenda.yesVotesCount -= 1;
+      agenda.yesVotes[msg.sender] = false;
+    } else if (agenda.noVotes[msg.sender]) {
+      agenda.noVotesCount -= 1;
+      agenda.noVotes[msg.sender] = false;
+    }
+
+    // Add vote
     if (_yes) {
-      agenda.yesVotes += 1;
+      agenda.yesVotesCount += 1;
+      agenda.yesVotes[msg.sender] = true;
     } else {
-      agenda.noVotes += 1;
+      agenda.noVotesCount += 1;
+      agenda.noVotes[msg.sender] = true;
     }
   }
 
@@ -80,19 +94,46 @@ contract DAO {
     require(agenda.votingDeadline < block.timestamp, "Voting deadline has not yet passed");
     require(agenda.open == true, "Agenda is not open");
     require(
-      agenda.agendaHash == keccak256(abi.encodePacked(agenda.recipient, agenda.amount, _transactionData)),
+      agenda.agendaHash == keccak256(abi.encodePacked(agenda.recipient, _transactionData)),
       "Given transactionData is not valid"
     );
-    console.log("YESVOTES: %d", agenda.yesVotes);
-    console.log("NOVOTES: %d", agenda.noVotes);
     
-    if (agenda.yesVotes > agenda.noVotes) {
-      console.log("YES");
-      (bool success, ) = agenda.recipient.call{value: agenda.amount}(_transactionData);
+    if (agenda.yesVotesCount > agenda.noVotesCount) {
+      (bool success, ) = agenda.recipient.call(_transactionData);
       require(success, "Cannot call");
+      agenda.passed = true;
     }
 
-    // agenda.open = false;
+    agenda.open = false;
     _success = true;
+  }
+
+
+  /// @dev Get agenda info
+  function getAgenda(uint256 agendaID)
+    external
+    view
+    returns (
+      address,
+      uint256,
+      bytes32,
+      bool,
+      bool,
+      uint256,
+      uint256
+    )
+  {
+    Agenda storage agenda = agendas[agendaID];
+    require(agenda.exists == true, "No such an agenda");
+
+    return (
+      agenda.recipient,
+      agenda.votingDeadline,
+      agenda.agendaHash,
+      agenda.passed,
+      agenda.open,
+      agenda.yesVotesCount,
+      agenda.noVotesCount      
+    );
   }
 }

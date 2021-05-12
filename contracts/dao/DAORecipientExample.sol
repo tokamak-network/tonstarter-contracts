@@ -1,5 +1,5 @@
+// SPDX-License-Identifier: UNLICENSED
 pragma solidity^0.7.6;
-import "hardhat/console.sol";
 
 contract DAORecipientExample {
   address public DAOAddress;
