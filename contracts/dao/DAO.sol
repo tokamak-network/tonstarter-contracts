@@ -92,7 +92,7 @@ contract DAO {
       require(success, "Cannot call");
     }
 
-    agenda.open = false;
+    // agenda.open = false;
     _success = true;
   }
 }

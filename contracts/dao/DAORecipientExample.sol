@@ -3,8 +3,8 @@ import "hardhat/console.sol";
 
 contract DAORecipientExample {
   address public DAOAddress;
-  uint256 fib0 = 0;
-  uint256 fib1 = 1;
+  uint256 fib0 = 3;
+  uint256 fib1 = 5;
 
   constructor (address _DAOAddress) {
     DAOAddress = _DAOAddress;
@@ -22,9 +22,5 @@ contract DAORecipientExample {
 
   function getFib() view external returns (uint256) {
     return fib1;
-  }
-
-  fallback () external {
-    console.log("RECEIVED");
   }
 }

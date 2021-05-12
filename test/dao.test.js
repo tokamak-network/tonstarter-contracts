@@ -36,7 +36,7 @@ describe("DAO", function () {
   });
 
   it("should check current fib", async function () {
-    expect(await DAORecipient.getFib()).to.be.equal(1);
+    expect(await DAORecipient.getFib()).to.be.equal(5);
   });
 
   it("should vote yes from user1", async function () {
@@ -69,6 +69,18 @@ describe("DAO", function () {
   });
 
   it("should check current fib", async function () {
-    expect(await DAORecipient.getFib()).to.be.equal(2);
+    expect(await DAORecipient.getFib()).to.be.equal(8);
+  });
+
+  it("should execute function", async function () {
+    await time.increase(time.duration.weeks(2));
+    await DAO.connect(user4).executeAgenda(
+      "1",
+      ethers.utils.keccak256(ethers.utils.toUtf8Bytes("generateNextFib()")),
+    );
+  });
+
+  it("should check current fib", async function () {
+    expect(await DAORecipient.getFib()).to.be.equal(13);
   });
 });
