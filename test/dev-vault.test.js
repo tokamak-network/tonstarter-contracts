@@ -18,8 +18,8 @@ describe("DeveloperVault", function () {
 
     const FLDContract = await ethers.getContractFactory("FLD");
     FLD = await FLDContract.connect(deployer).deploy();
+    await FLD.deployed();
     await FLD.connect(deployer).mint(DeveloperVault.address, "10000000");
-
   });
 
   it("should initialize vault", async function () {

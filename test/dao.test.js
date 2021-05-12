@@ -2,144 +2,73 @@ const { expect } = require("chai");
 const { time, expectEvent } = require('@openzeppelin/test-helpers');
 
 describe("DAO", function () {
-  let deployer, admin, dev1, dev2, dev3;
-  let DeveloperVault;
-  let FLD;
-
-  let cap, rewardPeriod, startRewardBlock, claimsNumberMax, developers, amounts;
-
+  let deployer, user1, user2, user3;
+  let SFLD;
+  let DAO;
+  let DAORecipient;
 
   // Init
   before(async function () {
-    [deployer, admin, dev1, dev2, dev3, unregisteredDev] = await ethers.getSigners();
-    const DeveloperVaultContract = await ethers.getContractFactory("DAO");
-    DeveloperVault = await DeveloperVaultContract.connect(deployer).deploy(admin.address);
-    await DeveloperVault.deployed();
+    [deployer, user1, user2, user3, user4] = await ethers.getSigners();
 
-    const FLDContract = await ethers.getContractFactory("FLD");
-    FLD = await FLDContract.connect(deployer).deploy();
-    await FLD.connect(deployer).mint(DeveloperVault.address, "10000000");
+    const SFLDContract = await ethers.getContractFactory("SFLD");
+    SFLD = await SFLDContract.connect(deployer).deploy();
+    await SFLD.deployed();
 
+    const DAOContract = await ethers.getContractFactory("DAO");
+    DAO = await DAOContract.connect(deployer).deploy(SFLD.address);
+    await DAO.deployed();
+    await SFLD.connect(deployer).mint(DAO.address, "10000000");
+
+    const DAORecipientContract = await ethers.getContractFactory("DAORecipientExample");
+    DAORecipient = await DAORecipientContract.connect(deployer).deploy(DAO.address);
+    await DAORecipient.deployed();    
   });
 
-  it("should initialize vault", async function () {
-    cap = "10000000";
-    rewardPeriod = "10"; // 10 blocks
-    startRewardBlock = (parseInt(await time.latestBlock()) + 10).toString();
-    claimsNumberMax = "3";
-    developers = [dev1.address, dev2.address, dev3.address];
-    amounts = ["10", "3", "5"];
-    await DeveloperVault.connect(admin).initialize(
-      FLD.address,
-      cap,
-      rewardPeriod,
-      startRewardBlock,
-      claimsNumberMax,
-      developers,
-      amounts,
+  it("should create new agenda", async function () {
+    console.log("loo");
+    console.log(ethers.utils.keccak256(ethers.utils.toUtf8Bytes("generateNextFib()")));
+    await DAO.connect(user1).newAgenda(
+      DAORecipient.address,
+      "0",
+      ethers.utils.keccak256(ethers.utils.toUtf8Bytes("generateNextFib()")),
     );
   });
 
-  it("should claim and fail 1", async function () {
-    await expect(
-      DeveloperVault.connect(dev1).claimReward()
-    ).to.be.revertedWith("Period for reward has not been reached");
-    expect(await FLD.balanceOf(dev1.address)).to.equal(0);
-
-    await expect(
-      DeveloperVault.connect(dev2).claimReward()
-    ).to.be.revertedWith("Period for reward has not been reached");
-    expect(await FLD.balanceOf(dev2.address)).to.equal(0); 
-
-    await expect(
-      DeveloperVault.connect(dev3).claimReward()
-    ).to.be.revertedWith("Period for reward has not been reached");
-    expect(await FLD.balanceOf(dev3.address)).to.equal(0); 
-  });
-  
-  it("should claim and succeed 1", async function () {
-    const currentBlockTime = parseInt(startRewardBlock); // too early to claim reward for second round
-    await time.advanceBlockTo(currentBlockTime);
-
-    await DeveloperVault.connect(dev1).claimReward()
-    expect(await FLD.balanceOf(dev1.address)).to.equal(10);
-
-    await DeveloperVault.connect(dev2).claimReward()
-    expect(await FLD.balanceOf(dev2.address)).to.equal(3);
-    
-    await DeveloperVault.connect(dev3).claimReward()
-    expect(await FLD.balanceOf(dev3.address)).to.equal(5); 
+  it("should check current fib", async function () {
+    expect(await DAORecipient.getFib()).to.be.equal(1);
   });
 
-  it("should fail for unregistered account", async function () {
-    await expect(
-      DeveloperVault.connect(unregisteredDev).claimReward()
-    ).to.be.revertedWith("DeveloperVault: developer is not registered");
+  it("should vote yes from user1", async function () {
+    await DAO.connect(user1).vote(
+      "1",
+      true
+    );
   });
 
-  it("should claim and fail 2", async function () {
-    const currentBlockTime = parseInt(startRewardBlock) + parseInt(rewardPeriod) - 2; // too early to claim reward for second round
-    await time.advanceBlockTo(currentBlockTime);
-
-    await expect(
-      DeveloperVault.connect(dev1).claimReward()
-    ).to.be.revertedWith("Period for reward has not been reached");
-    expect(await FLD.balanceOf(dev1.address)).to.equal(10);
-
-    await expect(
-      DeveloperVault.connect(dev2).claimReward()
-    ).to.be.revertedWith("Period for reward has not been reached");
-    expect(await FLD.balanceOf(dev2.address)).to.equal(3); 
-
-    await expect(
-      DeveloperVault.connect(dev3).claimReward()
-    ).to.be.revertedWith("Period for reward has not been reached");
-    expect(await FLD.balanceOf(dev3.address)).to.equal(5); 
-  });
-  
-  it("should claim and succeed 2", async function () {
-    await time.advanceBlockTo(parseInt(startRewardBlock) + parseInt(rewardPeriod));
-
-    await DeveloperVault.connect(dev1).claimReward()
-    expect(await FLD.balanceOf(dev1.address)).to.equal(20);
-
-    await DeveloperVault.connect(dev2).claimReward()
-    expect(await FLD.balanceOf(dev2.address)).to.equal(6);
+  it("should vote yes from user1", async function () {
+    await DAO.connect(user2).vote(
+      "1",
+      false
+    );
   });
 
-  it("should claim and succeed 3", async function () {
-    await time.advanceBlockTo(parseInt(startRewardBlock) + 2 * parseInt(rewardPeriod));
-
-    await DeveloperVault.connect(dev1).claimReward()
-    expect(await FLD.balanceOf(dev1.address)).to.equal(30);
-
-    await DeveloperVault.connect(dev2).claimReward()
-    expect(await FLD.balanceOf(dev2.address)).to.equal(9);
-    
-    await DeveloperVault.connect(dev3).claimReward()
-    expect(await FLD.balanceOf(dev3.address)).to.equal(10);
-    
-    await DeveloperVault.connect(dev3).claimReward()
-    expect(await FLD.balanceOf(dev3.address)).to.equal(15); 
+  it("should vote yes from user1", async function () {
+    await DAO.connect(user3).vote(
+      "1",
+      true
+    );
   });
 
-  it("should claim and fail 3", async function () {
-    const currentBlockTime = parseInt(startRewardBlock) + 3 * parseInt(rewardPeriod);
-    await time.advanceBlockTo(currentBlockTime);
+  it("should execute function", async function () {
+    await time.increase(time.duration.weeks(2));
+    await DAO.connect(user4).executeAgenda(
+      "1",
+      ethers.utils.keccak256(ethers.utils.toUtf8Bytes("generateNextFib()")),
+    );
+  });
 
-    await expect(
-      DeveloperVault.connect(dev1).claimReward()
-    ).to.be.revertedWith("DeveloperVault: number of claims exceeds max");
-    expect(await FLD.balanceOf(dev1.address)).to.equal(30);
-
-    await expect(
-      DeveloperVault.connect(dev2).claimReward()
-    ).to.be.revertedWith("DeveloperVault: number of claims exceeds max");
-    expect(await FLD.balanceOf(dev2.address)).to.equal(9); 
-
-    await expect(
-      DeveloperVault.connect(dev3).claimReward()
-    ).to.be.revertedWith("DeveloperVault: number of claims exceeds max");
-    expect(await FLD.balanceOf(dev3.address)).to.equal(15); 
+  it("should check current fib", async function () {
+    expect(await DAORecipient.getFib()).to.be.equal(2);
   });
 });

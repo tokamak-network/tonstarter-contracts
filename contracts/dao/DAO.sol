@@ -1,6 +1,7 @@
 pragma solidity ^0.7.6;
 
 import "../interfaces/ISFLD.sol";
+import "hardhat/console.sol";
 
 contract DAO {
   uint256 public VOTING_DEADLINE_PERIOD = 2 weeks;
@@ -13,7 +14,6 @@ contract DAO {
   constructor (address _sfldAddress) {
     agendaIDCounter = 1;
     sfld = ISFLD(_sfldAddress);
-
   }
 
   struct Agenda {
@@ -83,8 +83,11 @@ contract DAO {
       agenda.agendaHash == keccak256(abi.encodePacked(agenda.recipient, agenda.amount, _transactionData)),
       "Given transactionData is not valid"
     );
-
-    if (agenda.yesVotes > agenda.noVotes) {  
+    console.log("YESVOTES: %d", agenda.yesVotes);
+    console.log("NOVOTES: %d", agenda.noVotes);
+    
+    if (agenda.yesVotes > agenda.noVotes) {
+      console.log("YES");
       (bool success, ) = agenda.recipient.call{value: agenda.amount}(_transactionData);
       require(success, "Cannot call");
     }
