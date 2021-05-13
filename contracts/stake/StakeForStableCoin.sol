@@ -62,6 +62,7 @@ contract StakeForStableCoin is YearnV2Staker {
     receive() external payable {
         // stake(msg.value);
     }
+
     /*
     /// call yearnV2Vault
     fallback() external payable{
@@ -244,5 +245,4 @@ contract StakeForStableCoin is YearnV2Staker {
         }
         return reward;
     }
-
 }

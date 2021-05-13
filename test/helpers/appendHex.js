@@ -1,6 +1,6 @@
-const { marshalString, unmarshalString } = require('./marshal');
+const { marshalString, unmarshalString } = require("./marshal");
 
-function appendHex (str1, str2) {
+function appendHex(str1, str2) {
   return marshalString(unmarshalString(str1) + unmarshalString(str2));
 }
 

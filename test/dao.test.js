@@ -1,5 +1,5 @@
 const { expect } = require("chai");
-const { time, expectEvent } = require('@openzeppelin/test-helpers');
+const { time, expectEvent } = require("@openzeppelin/test-helpers");
 
 describe("DAO", function () {
   let deployer, user1, user2, user3;
@@ -15,29 +15,33 @@ describe("DAO", function () {
     SFLD = await SFLDContract.connect(deployer).deploy();
     await SFLD.deployed();
 
-
-
     const DAOContract = await ethers.getContractFactory("DAO");
     const DAO = await DAOContract.connect(deployer).deploy();
     await DAO.deployed();
     await SFLD.connect(deployer).mint(DAO.address, "10000000");
-  
+
     const DAOProxyContract = await ethers.getContractFactory("DAOProxy");
-    const DAOProxy = await DAOProxyContract.connect(deployer).deploy(SFLD.address);
+    const DAOProxy = await DAOProxyContract.connect(deployer).deploy(
+      SFLD.address
+    );
     await DAOProxy.deployed();
     DAOProxy.upgradeTo(DAO.address);
-  
+
     DAOEntry = await DAOContract.attach(DAOProxy.address);
 
-    const DAORecipientContract = await ethers.getContractFactory("DAORecipientExample");
-    DAORecipient = await DAORecipientContract.connect(deployer).deploy(DAOProxy.address);
-    await DAORecipient.deployed();    
+    const DAORecipientContract = await ethers.getContractFactory(
+      "DAORecipientExample"
+    );
+    DAORecipient = await DAORecipientContract.connect(deployer).deploy(
+      DAOProxy.address
+    );
+    await DAORecipient.deployed();
   });
 
   it("should create new agenda", async function () {
     await DAOEntry.connect(user1).newAgenda(
       DAORecipient.address,
-      ethers.utils.keccak256(ethers.utils.toUtf8Bytes("generateNextFib()")),
+      ethers.utils.keccak256(ethers.utils.toUtf8Bytes("generateNextFib()"))
     );
   });
 
@@ -55,7 +59,7 @@ describe("DAO", function () {
     await time.increase(time.duration.weeks(2));
     await DAOEntry.connect(user4).executeAgenda(
       "1",
-      ethers.utils.keccak256(ethers.utils.toUtf8Bytes("generateNextFib()")),
+      ethers.utils.keccak256(ethers.utils.toUtf8Bytes("generateNextFib()"))
     );
   });
 

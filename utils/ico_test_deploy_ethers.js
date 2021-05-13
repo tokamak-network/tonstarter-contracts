@@ -1,43 +1,72 @@
 const { expect } = require("chai");
 const {
-  BN, constants, expectEvent, expectRevert, time, ether,
-} = require('@openzeppelin/test-helpers');
+  BN,
+  constants,
+  expectEvent,
+  expectRevert,
+  time,
+  ether,
+} = require("@openzeppelin/test-helpers");
 
-const { padLeft, toBN, toWei, fromWei, keccak256, soliditySha3, solidityKeccak256 } = require('web3-utils');
+const {
+  padLeft,
+  toBN,
+  toWei,
+  fromWei,
+  keccak256,
+  soliditySha3,
+  solidityKeccak256,
+} = require("web3-utils");
 
-const chai = require('chai');
-chai.use(require('chai-bn')(BN)).should();
+const chai = require("chai");
+chai.use(require("chai-bn")(BN)).should();
 
-const { createCurrency, createCurrencyRatio } = require('@makerdao/currency');
+const { createCurrency, createCurrencyRatio } = require("@makerdao/currency");
 
-const _TON = createCurrency('TON');
-const _WTON = createCurrency('WTON');
+const _TON = createCurrency("TON");
+const _WTON = createCurrency("WTON");
 const _WTON_TON = createCurrencyRatio(_WTON, _TON);
 
-const TON_UNIT = 'wei';
-const WTON_UNIT = 'ray';
-const WTON_TON_RATIO = _WTON_TON('1');
+const TON_UNIT = "wei";
+const WTON_UNIT = "ray";
+const WTON_TON_RATIO = _WTON_TON("1");
 
 // ico2.0 contracts
-let StakeFactory, StakeRegistry, FLD, SFLD, StakeForSFLD, Stake1Vault, Stake1Logic, Stake1Proxy, Stake1, IERC20 ;
-let Stake1Factory, StakeForStableCoinFactory ;
+let StakeFactory,
+  StakeRegistry,
+  FLD,
+  SFLD,
+  StakeForSFLD,
+  Stake1Vault,
+  Stake1Logic,
+  Stake1Proxy,
+  Stake1,
+  IERC20;
+let Stake1Factory, StakeForStableCoinFactory;
 
 // plasma-evm-contracts
-let TON, WTON, DepositManager, SeigManager, CoinageFactory, Layer2Registry, AutoRefactorCoinage, PowerTON, DAOVault;
+let TON,
+  WTON,
+  DepositManager,
+  SeigManager,
+  CoinageFactory,
+  Layer2Registry,
+  AutoRefactorCoinage,
+  PowerTON,
+  DAOVault;
 let EtherToken, EpochHandler, SubmitHandler, Layer2;
 
-
 let o;
-process.on('exit', function () {
+process.on("exit", function () {
   console.log(o);
 });
 
 // const [candidate1, candidate2, candidate3, user1, user2, user3, user4, user5, operator1, operator2] = await ethers.getSigners();
-let candidates, users, operators ;
-let deployer ;
+let candidates, users, operators;
+let deployer;
 
 class ICO20Contracts {
-  constructor () {
+  constructor() {
     this.ton = null;
     this.wton = null;
     this.registry = null;
@@ -94,7 +123,18 @@ class ICO20Contracts {
   }
 
   initializeICO20Contracts = async function (owner) {
-    const [candidate1, candidate2, candidate3, user1, user2, user3, user4, user5, operator1, operator2] = await ethers.getSigners();
+    const [
+      candidate1,
+      candidate2,
+      candidate3,
+      user1,
+      user2,
+      user3,
+      user4,
+      user5,
+      operator1,
+      operator2,
+    ] = await ethers.getSigners();
     candidates = [candidate1, candidate2, candidate3];
     users = [user1, user2, user3, user4, user5];
     operators = [operator1, operator2];
@@ -118,7 +158,9 @@ class ICO20Contracts {
     this.stakeForStableCoinFactory = null;
 
     Stake1Factory = await ethers.getContractFactory("Stake1Factory");
-    StakeForStableCoinFactory = await ethers.getContractFactory("StakeForStableCoinFactory");
+    StakeForStableCoinFactory = await ethers.getContractFactory(
+      "StakeForStableCoinFactory"
+    );
 
     StakeFactory = await ethers.getContractFactory("StakeFactory");
     StakeRegistry = await ethers.getContractFactory("StakeRegistry");
@@ -134,16 +176,24 @@ class ICO20Contracts {
     this.sfld = await SFLD.connect(owner).deploy();
 
     this.stake1factory = await Stake1Factory.connect(owner).deploy();
-    this.stakeForStableCoinFactory = await StakeForStableCoinFactory.connect(owner).deploy();
+    this.stakeForStableCoinFactory = await StakeForStableCoinFactory.connect(
+      owner
+    ).deploy();
 
     this.stakeregister = await StakeRegistry.connect(owner).deploy();
-    this.stakefactory = await StakeFactory.connect(owner).deploy(this.stake1factory.address, this.stakeForStableCoinFactory.address);
+    this.stakefactory = await StakeFactory.connect(owner).deploy(
+      this.stake1factory.address,
+      this.stakeForStableCoinFactory.address
+    );
     this.stake1logic = await Stake1Logic.connect(owner).deploy();
     this.stake1proxy = await Stake1Proxy.connect(owner).deploy();
 
     await this.stake1proxy.connect(owner).upgradeTo(this.stake1logic.address);
 
-    this.stakeEntry = await ethers.getContractAt("Stake1Logic", this.stake1proxy.address);
+    this.stakeEntry = await ethers.getContractAt(
+      "Stake1Logic",
+      this.stake1proxy.address
+    );
 
     const returnData = {
       fld: this.fld,
@@ -153,12 +203,12 @@ class ICO20Contracts {
       stakefactory: this.stakefactory,
       stake1logic: this.stake1logic,
       stake1proxy: this.stake1proxy,
-      stakeEntry: this.stakeEntry
+      stakeEntry: this.stakeEntry,
     };
     // console.log(' initializeICO20Contracts  :',returnData );
 
     return returnData;
-  }
+  };
 
   initializePlasmaEvmContracts = async function (owner) {
     // this = self;
@@ -172,7 +222,6 @@ class ICO20Contracts {
     SeigManager = await ethers.getContractFactory("SeigManager");
     PowerTON = await ethers.getContractFactory("PowerTON");
 
-
     this.ton = await TON.connect(owner).deploy();
     this.wton = await WTON.connect(owner).deploy(this.ton.address);
     this.registry = await Layer2Registry.connect(owner).deploy();
@@ -185,7 +234,8 @@ class ICO20Contracts {
 
     const currentTime = await time.latest();
     this.daoVault = await DAOVault.connect(owner).deploy(
-      this.wton.address, currentTime
+      this.wton.address,
+      currentTime
     );
 
     this.seigManager = await SeigManager.connect(owner).deploy(
@@ -210,25 +260,52 @@ class ICO20Contracts {
     await this.wton.connect(owner).addMinter(this.seigManager.address);
     await this.ton.connect(owner).addMinter(this.wton.address);
 
-    await Promise.all([
-      this.depositManager,
-      this.wton,
-    ].map(contract => contract.connect(owner).setSeigManager(this.seigManager.address )));
+    await Promise.all(
+      [this.depositManager, this.wton].map((contract) =>
+        contract.connect(owner).setSeigManager(this.seigManager.address)
+      )
+    );
 
     // ton setting
-    await this.ton.connect(owner).mint(deployer, TON_INITIAL_SUPPLY.toFixed(TON_UNIT));
-    await this.ton.connect(owner).approve(this.wton.address, TON_INITIAL_SUPPLY.toFixed(TON_UNIT));
+    await this.ton
+      .connect(owner)
+      .mint(deployer, TON_INITIAL_SUPPLY.toFixed(TON_UNIT));
+    await this.ton
+      .connect(owner)
+      .approve(this.wton.address, TON_INITIAL_SUPPLY.toFixed(TON_UNIT));
 
-    this.seigManager.connect(owner).setPowerTONSeigRate(POWERTON_SEIG_RATE.toFixed(WTON_UNIT));
-    this.seigManager.connect(owner).setDaoSeigRate(DAO_SEIG_RATE.toFixed(WTON_UNIT));
+    this.seigManager
+      .connect(owner)
+      .setPowerTONSeigRate(POWERTON_SEIG_RATE.toFixed(WTON_UNIT));
+    this.seigManager
+      .connect(owner)
+      .setDaoSeigRate(DAO_SEIG_RATE.toFixed(WTON_UNIT));
     this.seigManager.connect(owner).setPseigRate(PSEIG_RATE.toFixed(WTON_UNIT));
-    await candidates.map(account => this.ton.connect(owner).transfer(account, TON_INITIAL_HOLDERS.toFixed(TON_UNIT)));
-    await users.map(account => this.ton.connect(owner).transfer(account, TON_INITIAL_HOLDERS.toFixed(TON_UNIT)));
-    await operators.map(account => this.ton.connect(owner).transfer(account, TON_INITIAL_HOLDERS.toFixed(TON_UNIT)));
+    await candidates.map((account) =>
+      this.ton
+        .connect(owner)
+        .transfer(account, TON_INITIAL_HOLDERS.toFixed(TON_UNIT))
+    );
+    await users.map((account) =>
+      this.ton
+        .connect(owner)
+        .transfer(account, TON_INITIAL_HOLDERS.toFixed(TON_UNIT))
+    );
+    await operators.map((account) =>
+      this.ton
+        .connect(owner)
+        .transfer(account, TON_INITIAL_HOLDERS.toFixed(TON_UNIT))
+    );
 
-    await this.wton.connect(owner).mint(this.daoVault.address, TON_VAULT_AMOUNT.toFixed(WTON_UNIT));
+    await this.wton
+      .connect(owner)
+      .mint(this.daoVault.address, TON_VAULT_AMOUNT.toFixed(WTON_UNIT));
 
-    await this.seigManager.connect(owner).setMinimumAmount(TON_MINIMUM_STAKE_AMOUNT.times(WTON_TON_RATIO).toFixed(WTON_UNIT));
+    await this.seigManager
+      .connect(owner)
+      .setMinimumAmount(
+        TON_MINIMUM_STAKE_AMOUNT.times(WTON_TON_RATIO).toFixed(WTON_UNIT)
+      );
 
     const returnData = {
       ton: this.ton,
@@ -238,10 +315,10 @@ class ICO20Contracts {
       coinageFactory: this.factory,
       daoVault: this.daoVault,
       seigManager: this.seigManager,
-      powerton: this.powerton
+      powerton: this.powerton,
     };
     return returnData;
-  }
+  };
 
   getICOContracts = function () {
     return {
@@ -252,9 +329,9 @@ class ICO20Contracts {
       stakefactory: this.stakefactory,
       stake1logic: this.stake1logic,
       stake1proxy: this.stake1proxy,
-      stakeEntry: this.stakeEntry
+      stakeEntry: this.stakeEntry,
     };
-  }
+  };
 
   setEntry = async function (owner) {
     await this.stakeEntry.setStore(
@@ -265,13 +342,15 @@ class ICO20Contracts {
       this.wton.address,
       this.depositManager.address,
       this.seigManager.address,
-      { from: owner });
+      { from: owner }
+    );
 
-    await this.stakeregister.connect(owner).grantRole(ADMIN_ROLE, this.stake1proxy.address );
+    await this.stakeregister
+      .connect(owner)
+      .grantRole(ADMIN_ROLE, this.stake1proxy.address);
 
     return this.stakeEntry;
-  }
-
+  };
 }
 
 module.exports = ICO20Contracts;

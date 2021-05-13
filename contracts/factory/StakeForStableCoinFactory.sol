@@ -47,6 +47,5 @@ contract StakeForStableCoinFactory {
         c.grantRole(ADMIN_ROLE, owner);
         c.revokeRole(ADMIN_ROLE, address(this));
         return address(c);
-
     }
 }

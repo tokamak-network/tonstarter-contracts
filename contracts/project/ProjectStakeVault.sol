@@ -5,9 +5,13 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 
 interface IProject {
     function developer() external view returns (address);
+
     function startBlock() external view returns (uint256);
+
     function endBlock() external view returns (uint256);
+
     function token() external view returns (address);
+
     function pair() external view returns (address);
 }
 
@@ -31,11 +35,14 @@ contract ProjectStakeVault is AccessControl {
     }
 
     function initialize(address _project, address _staketoken)
-        external onlyOwner
+        external
+        onlyOwner
     {
-        require(_project!= address(0) && _staketoken != address(0), "ProjectStakeVault: zero");
+        require(
+            _project != address(0) && _staketoken != address(0),
+            "ProjectStakeVault: zero"
+        );
         project = _project;
         staketoken = _staketoken;
     }
-
 }

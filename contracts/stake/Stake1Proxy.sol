@@ -56,7 +56,7 @@ contract Stake1Proxy is StakeProxyStorage, AccessControl {
         _fallback();
     }
 
-    fallback() external payable{
+    fallback() external payable {
         _fallback();
     }
 

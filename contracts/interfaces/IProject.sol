@@ -2,7 +2,6 @@
 pragma solidity ^0.7.6;
 
 interface IProject {
-
     function setToken(address _token) external;
 
     function setPair(address _pair) external;
@@ -12,17 +11,13 @@ interface IProject {
         uint256 dev,
         uint256 rewardGeneral,
         uint256 rewardLP
-    )
-        external ;
+    ) external;
 
-    function createDevVault()
-        external;
+    function createDevVault() external;
 
-    function createStakeVault(bool boolPair)
-        external;
+    function createStakeVault(bool boolPair) external;
 
-    function execTokenDistribution()
-        external;
+    function execTokenDistribution() external;
 
     function createTokenSale(
         uint256 startTime,
@@ -30,7 +25,5 @@ interface IProject {
         uint256 softCap,
         uint256 hardCap,
         uint256 price
-    )
-        external;
-
+    ) external;
 }

@@ -30,10 +30,12 @@ contract Stake1Storage {
     mapping(address => uint256[]) private operateRewardBlockIndex;
 
     // user => token => claimed operateRewardBlockIndex
-    mapping(address => mapping(address => uint256)) public userProfitWithdrawalIndex;
+    mapping(address => mapping(address => uint256))
+        public userProfitWithdrawalIndex;
 
     // user => token => claimedAmount
-    mapping(address => mapping(address => uint256)) public userProfitWithdrawalAmount;
+    mapping(address => mapping(address => uint256))
+        public userProfitWithdrawalAmount;
 
     uint256 internal _lock;
 }

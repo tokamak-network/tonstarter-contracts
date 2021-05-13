@@ -2,7 +2,6 @@
 pragma solidity ^0.7.6;
 
 interface IUniswapActor {
-
     function swapToPrice(
         address tokenA,
         address tokenB,
@@ -12,5 +11,5 @@ interface IUniswapActor {
         uint256 maxSpendTokenB,
         address to,
         uint256 deadline
-    ) external ;
+    ) external;
 }

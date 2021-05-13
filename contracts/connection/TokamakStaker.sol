@@ -69,7 +69,10 @@ contract TokamakStaker is Stake1Storage, AccessControl, OnApprove {
 
     function setUniswapRouter(address _router) external onlyOwner {
         // TODO: check!!
-        require(block.number < saleStartBlock, "TokamakStaker: Already started");
+        require(
+            block.number < saleStartBlock,
+            "TokamakStaker: Already started"
+        );
         require(
             _router != address(0) && _uniswapRouter != _router,
             "TokamakStaker: zero address"
@@ -77,25 +80,19 @@ contract TokamakStaker is Stake1Storage, AccessControl, OnApprove {
         _uniswapRouter = _router;
     }
 
-    function approveUniswapRouter
-    (
-        uint256 amount
-    ) external {
-        require(IERC20(paytoken).approve(_uniswapRouter, amount), "YearnV2Staker: approve fail");
+    function approveUniswapRouter(uint256 amount) external {
+        require(
+            IERC20(paytoken).approve(_uniswapRouter, amount),
+            "YearnV2Staker: approve fail"
+        );
     }
 
-    function uniswapRouter() public view returns (address){
+    function uniswapRouter() public view returns (address) {
         return _uniswapRouter;
     }
 
     /// TODO: Withdrawal for operating profit
-    function withdrawProfit
-    (
-        address _token,
-        uint256 amount
-    ) external {
-
-    }
+    function withdrawProfit(address _token, uint256 amount) external {}
 
     /// @dev Approves
     function onApprove(
@@ -300,7 +297,4 @@ contract TokamakStaker is Stake1Storage, AccessControl, OnApprove {
         IERC20(ton).transfer(to, amount);
     }
     */
-
-
-
 }

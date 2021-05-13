@@ -6,10 +6,7 @@ import {ProjectDevVault} from "../project/ProjectDevVault.sol";
 contract ProjectDevVaultFactory {
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
 
-    function deploy(
-        address project
-    ) public returns (address) {
-
+    function deploy(address project) public returns (address) {
         ProjectDevVault vault = new ProjectDevVault();
         vault.initialize(project);
 

@@ -34,7 +34,6 @@ contract ProjectManagerLogic1 is ProjectManagerStorage, AccessControl {
     // Events
     //////////////////////////////
 
-
     //////////////////////////////////////////////////////////////////////
     // setters
     function setStore(
@@ -45,7 +44,8 @@ contract ProjectManagerLogic1 is ProjectManagerStorage, AccessControl {
         address _projectStakeVaultFactory,
         address _projectDevVaultFactory
     )
-        external onlyOwner
+        external
+        onlyOwner
         nonZero(_fld)
         nonZero(_projectRegistry)
         nonZero(_projectFactory)
@@ -71,9 +71,14 @@ contract ProjectManagerLogic1 is ProjectManagerStorage, AccessControl {
         uint256 _tokenPrice,
         uint256 _startBlock
     ) external nonZero(projectRegistry) {
-
-        require(defaultStakingPeriod > 0, "ProjectManagerLogic1: defaultStakingPeriod zero");
-        require(payCreateProjectFee(), "ProjectManagerLogic1: payCreateProjectFee fail");
+        require(
+            defaultStakingPeriod > 0,
+            "ProjectManagerLogic1: defaultStakingPeriod zero"
+        );
+        require(
+            payCreateProjectFee(),
+            "ProjectManagerLogic1: payCreateProjectFee fail"
+        );
 
         string memory tokenName = _tokenName;
         string memory symbol = _symbol;
@@ -85,27 +90,32 @@ contract ProjectManagerLogic1 is ProjectManagerStorage, AccessControl {
         // 0 is none project
         uint256 _projectId = projectId.length + 1;
 
-        address project = IProjectFactory(projectFactory).deploy(
-            _projectId,
-            _projectName,
-            startBlock,
-            endBlock,
-            _tokenPrice,
-            msg.sender,
-            address(0),
-            tokenName,
-            symbol
-        );
+        address project =
+            IProjectFactory(projectFactory).deploy(
+                _projectId,
+                _projectName,
+                startBlock,
+                endBlock,
+                _tokenPrice,
+                msg.sender,
+                address(0),
+                tokenName,
+                symbol
+            );
         require(project != address(0), "ProjectManagerLogic1: project zero");
 
         // 토큰을 만든다.
-        address projectToken = IProjectTokenFactory(projectTokenFactory).deploy(
+        address projectToken =
+            IProjectTokenFactory(projectTokenFactory).deploy(
                 tokenName,
                 symbol,
                 _totalSupply,
                 project
             );
-        require(projectToken != address(0), "ProjectManagerLogic1: projectToken zero");
+        require(
+            projectToken != address(0),
+            "ProjectManagerLogic1: projectToken zero"
+        );
         IProject(project).setToken(projectToken);
 
         // register Project
@@ -120,9 +130,7 @@ contract ProjectManagerLogic1 is ProjectManagerStorage, AccessControl {
         );
     }
 
-    function payCreateProjectFee()
-        public  pure returns (bool)
-    {
+    function payCreateProjectFee() public pure returns (bool) {
         return true;
     }
 
@@ -136,9 +144,13 @@ contract ProjectManagerLogic1 is ProjectManagerStorage, AccessControl {
         onlyOwner
         nonZero(_fldRewardVault)
     {
-        require(fldRewardVault != _fldRewardVault, "ProjectManagerLogic1: same");
+        require(
+            fldRewardVault != _fldRewardVault,
+            "ProjectManagerLogic1: same"
+        );
         fldRewardVault = _fldRewardVault;
     }
+
     function setAirdropVault(address _airdropVault)
         public
         onlyOwner
@@ -152,18 +164,18 @@ contract ProjectManagerLogic1 is ProjectManagerStorage, AccessControl {
         public
         onlyOwner
     {
-        require(_defaultStakingPeriod > 0 && defaultStakingPeriod != _defaultStakingPeriod,
+        require(
+            _defaultStakingPeriod > 0 &&
+                defaultStakingPeriod != _defaultStakingPeriod,
             "ProjectManagerLogic1: input zero"
         );
 
         defaultStakingPeriod = _defaultStakingPeriod;
     }
 
-    function setDefaultAirdrop(uint256 _defaultAirdrop)
-        public
-        onlyOwner
-    {
-        require(_defaultAirdrop > 0 && defaultAirdrop != _defaultAirdrop,
+    function setDefaultAirdrop(uint256 _defaultAirdrop) public onlyOwner {
+        require(
+            _defaultAirdrop > 0 && defaultAirdrop != _defaultAirdrop,
             "ProjectManagerLogic1: input zero"
         );
 

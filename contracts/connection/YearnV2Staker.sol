@@ -27,16 +27,19 @@ contract YearnV2Staker is Stake1Storage, AccessControl {
     }
 
     function setYearnV2(address _vault) external onlyOwner {
-        require(block.number < saleStartBlock, "TokamakStaker: Already started");
+        require(
+            block.number < saleStartBlock,
+            "TokamakStaker: Already started"
+        );
         require(_vault != address(0), "YearnV2Staker: zero address");
         _yearnV2Vault = _vault;
     }
 
-    function approveYearnV2Vault
-    (
-        uint256 amount
-    ) external {
-        require(IERC20(paytoken).approve(_yearnV2Vault, amount), "YearnV2Staker: approve fail");
+    function approveYearnV2Vault(uint256 amount) external {
+        require(
+            IERC20(paytoken).approve(_yearnV2Vault, amount),
+            "YearnV2Staker: approve fail"
+        );
     }
 
     function yearnV2Vault() public view returns (address) {
@@ -90,5 +93,4 @@ contract YearnV2Staker is Stake1Storage, AccessControl {
     function yearnV2_claim() external onlyOwner nonZero(_yearnV2Vault) {
         IYearnV2Vault(_yearnV2Vault).claim();
     }
-
 }

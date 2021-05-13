@@ -5,15 +5,12 @@ import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 
 contract ProjectToken is ERC20, AccessControl {
-
-    constructor (
+    constructor(
         string memory name,
         string memory symbol,
         uint256 totalSupply,
         address to
-    )
-        ERC20(name, symbol)
-    {
-         _mint(to, totalSupply * 10 ** uint(decimals()));
+    ) ERC20(name, symbol) {
+        _mint(to, totalSupply * 10**uint256(decimals()));
     }
 }

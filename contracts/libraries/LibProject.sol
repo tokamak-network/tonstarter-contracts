@@ -2,7 +2,6 @@
 pragma solidity ^0.7.6;
 
 library LibProject {
-
     struct TokenSale {
         address project;
         uint256 index;
@@ -24,7 +23,7 @@ library LibProject {
         string symbol;
     }
 
-    struct TokenDistribution{
+    struct TokenDistribution {
         uint256 airdrop;
         uint256 dev;
         uint256 rewardGeneral;
@@ -36,7 +35,7 @@ library LibProject {
         uint256 rewardLPAmount;
     }
 
-    struct SaleIncomeDistribution{
+    struct SaleIncomeDistribution {
         uint256 dev;
         uint256 defi;
         uint256 remain;

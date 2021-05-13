@@ -18,7 +18,6 @@ contract ProjectFactory {
         string memory _tokenName,
         string memory _symbol
     ) public returns (address) {
-
         Project project = new Project();
         project.initialize(
             _projectId,

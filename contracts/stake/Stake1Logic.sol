@@ -51,9 +51,15 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
         address _wton,
         address _depositManager,
         address _seigManager
+    )
+        external
         // address _uniswapRouter,
         // address _yearnV2Vault
-    ) external onlyOwner nonZero(_ton) nonZero(_wton) nonZero(_depositManager) {
+        onlyOwner
+        nonZero(_ton)
+        nonZero(_wton)
+        nonZero(_depositManager)
+    {
         setFLD(_fld);
         setStakeRegistry(_stakeRegistry);
         setStakeFactory(_stakeFactory);
@@ -69,6 +75,7 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
     function setFactory(address _stakeFactory) external onlyOwner {
         setStakeFactory(_stakeFactory);
     }
+
     /*
     function setUniswapRouter(address _addr) external onlyOwner nonZero(_addr) {
         uniswapRouter = _addr;
@@ -135,6 +142,10 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
 
         IStake1Vault(_vault).addSubVaultOfStake(_name, _contract, periodBlock);
         stakeRegistry.addStakeContract(_vault, _contract);
+    }
+
+    function currentBlock() external view returns (uint256) {
+        return block.number;
     }
 
     function closeSale(address _vault) external {
@@ -224,12 +235,11 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
     }
 
     function vaultsOfPahse(uint256 _phase)
-        public view
+        public
+        view
         nonZero(address(stakeRegistry))
         returns (address[] memory)
     {
         return stakeRegistry.phasesAll(_phase);
     }
-
-
 }

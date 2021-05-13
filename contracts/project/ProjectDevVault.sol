@@ -22,10 +22,7 @@ contract ProjectDevVault is AccessControl {
         _setupRole(ADMIN_ROLE, msg.sender);
     }
 
-    function initialize(address _project)
-        external onlyOwner
-    {
+    function initialize(address _project) external onlyOwner {
         project = _project;
     }
-
 }

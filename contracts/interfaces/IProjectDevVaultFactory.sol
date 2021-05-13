@@ -2,9 +2,5 @@
 pragma solidity ^0.7.6;
 
 interface IProjectDevVaultFactory {
-
-    function deploy(
-        address project
-    ) external returns (address);
-
+    function deploy(address project) external returns (address);
 }

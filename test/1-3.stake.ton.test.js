@@ -1,45 +1,57 @@
-const { time, expectEvent } = require('@openzeppelin/test-helpers');
-const { ethers } = require('ethers');
+const { time, expectEvent } = require("@openzeppelin/test-helpers");
+const { ethers } = require("ethers");
 const utils = ethers.utils;
 
 const {
-  defaultSender, accounts, contract, web3, privateKeys
-} = require('@openzeppelin/test-environment');
+  defaultSender,
+  accounts,
+  contract,
+  web3,
+  privateKeys,
+} = require("@openzeppelin/test-environment");
 
-const BN = require('bn.js');
+const BN = require("bn.js");
 
-const chai = require('chai');
-const { solidity } = require('ethereum-waffle');
+const chai = require("chai");
+const { solidity } = require("ethereum-waffle");
 const { expect } = chai;
-chai.use(require('chai-bn')(BN));
+chai.use(require("chai-bn")(BN));
 chai.use(solidity);
-require('chai').should();
+require("chai").should();
 
-const { padLeft, toBN, toWei, fromWei, keccak256, soliditySha3, solidityKeccak256 } = require('web3-utils');
+const {
+  padLeft,
+  toBN,
+  toWei,
+  fromWei,
+  keccak256,
+  soliditySha3,
+  solidityKeccak256,
+} = require("web3-utils");
 
-const { getSignature, signatureVaildTime, timeout } = require('./common');
+const { getSignature, signatureVaildTime, timeout } = require("./common");
 
 // ------------------------
-const ICO20Contracts = require('../utils/ico_test_deploy.js');
+const ICO20Contracts = require("../utils/ico_test_deploy.js");
 let ico20Contracts;
 let TokamakContractsDeployed;
 let ICOContractsDeployed;
 // ------------------------
-const Stake1Vault = contract.fromArtifact('Stake1Vault');
-const Stake1 = contract.fromArtifact('Stake1');
-const IERC20 = contract.fromArtifact('IERC20');
+const Stake1Vault = contract.fromArtifact("Stake1Vault");
+const Stake1 = contract.fromArtifact("Stake1");
+const IERC20 = contract.fromArtifact("IERC20");
 // ----------------------
 
-const initialTotal = '10000000000.' + '0'.repeat(18);
-const Pharse1_TON_Staking = '175000000.' + '0'.repeat(18);
-const Pharse1_ETH_Staking = '175000000.' + '0'.repeat(18);
-const Pharse1_FLDETHLP_Staking = '150000000.' + '0'.repeat(18);
-const Pharse1_DEV_Mining = '150000000.' + '0'.repeat(18);
+const initialTotal = "10000000000." + "0".repeat(18);
+const Pharse1_TON_Staking = "175000000." + "0".repeat(18);
+const Pharse1_ETH_Staking = "175000000." + "0".repeat(18);
+const Pharse1_FLDETHLP_Staking = "150000000." + "0".repeat(18);
+const Pharse1_DEV_Mining = "150000000." + "0".repeat(18);
 
-const HASH_Pharse1_TON_Staking = keccak256('PHASE1_TON_STAKING');
-const HASH_Pharse1_ETH_Staking = keccak256('PHASE1_ETH_STAKING');
-const HASH_Pharse1_FLDETHLP_Staking = keccak256('PHASE1_FLDETHLP_Staking');
-const HASH_Pharse1_DEV_Mining = keccak256('PHASE1_DEV_Mining');
+const HASH_Pharse1_TON_Staking = keccak256("PHASE1_TON_STAKING");
+const HASH_Pharse1_ETH_Staking = keccak256("PHASE1_ETH_STAKING");
+const HASH_Pharse1_FLDETHLP_Staking = keccak256("PHASE1_FLDETHLP_Staking");
+const HASH_Pharse1_DEV_Mining = keccak256("PHASE1_DEV_Mining");
 
 const saleStartBlock = 0;
 let salePeriod = (60 * 60 * 24 * 14) / 13;
@@ -47,25 +59,28 @@ let stakePeriod = (60 * 60 * 24 * 30) / 13;
 salePeriod = parseInt(salePeriod);
 stakePeriod = parseInt(stakePeriod);
 
-const zeroAddress = '0x0000000000000000000000000000000000000000';
+const zeroAddress = "0x0000000000000000000000000000000000000000";
 
-const ADMIN_ROLE = keccak256('ADMIN');
-const MINTER_ROLE = keccak256('MINTER');
-const BURNER_ROLE = keccak256('BURNER');
-const CLAIMER_ROLE = keccak256('CLAIMER');
-const PHASE2_VAULT_HASH = keccak256('PHASE2_VAULT');
-const EVENT_VAULT_HASH = keccak256('EVENT_VAULT');
+const ADMIN_ROLE = keccak256("ADMIN");
+const MINTER_ROLE = keccak256("MINTER");
+const BURNER_ROLE = keccak256("BURNER");
+const CLAIMER_ROLE = keccak256("CLAIMER");
+const PHASE2_VAULT_HASH = keccak256("PHASE2_VAULT");
+const EVENT_VAULT_HASH = keccak256("EVENT_VAULT");
 
 const logFlag = false;
 
-describe('Stake TON ', function () {
+describe("Stake TON ", function () {
   let weth, fld, stakeregister, stakefactory, stake1proxy, stake1logic;
-  let vault_phase1_eth, vault_phase1_ton, vault_phase1_fldethlp, vault_phase1_dev;
+  let vault_phase1_eth,
+    vault_phase1_ton,
+    vault_phase1_fldethlp,
+    vault_phase1_dev;
   let ton, wton, depositManager, seigManager;
   let stakeEntry;
 
   let a1, a2, tokenInfo;
-  const sendAmount = '1';
+  const sendAmount = "1";
   const admin = accounts[0];
   const user1 = accounts[1];
   const user2 = accounts[2];
@@ -73,14 +88,14 @@ describe('Stake TON ', function () {
 
   const testStakingPeriodBlocks = [10, 20];
   const testStakingUsers = [user1, user2];
-  const testUser1StakingAmount = ['10', '5'];
-  const testUser2StakingAmount = ['10', '20'];
+  const testUser1StakingAmount = ["10", "5"];
+  const testUser2StakingAmount = ["10", "20"];
   const testClaimBlock = [5, 10, 5, 5];
 
-  const sendAmountForTest = '1';
-  const sendAmountForTest2 = '5';
-  const buyTokensEtehrs = ['10', '5', '20', '2'];
-  const buyTokensDurations = ['10', '60', '120', '150'];
+  const sendAmountForTest = "1";
+  const sendAmountForTest2 = "5";
+  const buyTokensEtehrs = ["10", "5", "20", "2"];
+  const buyTokensDurations = ["10", "60", "120", "150"];
   let saleStartBlock = 0;
   let stakeStartBlock = 0;
 
@@ -89,13 +104,16 @@ describe('Stake TON ', function () {
     ico20Contracts = new ICO20Contracts();
   });
 
-  it('ico20Contracts init  ', async function () {
+  it("ico20Contracts init  ", async function () {
     this.timeout(1000000);
-    ICOContractsDeployed = await ico20Contracts.initializeICO20Contracts(defaultSender);
+    ICOContractsDeployed = await ico20Contracts.initializeICO20Contracts(
+      defaultSender
+    );
   });
-  it('tokamakContracts init  ', async function () {
+  it("tokamakContracts init  ", async function () {
     this.timeout(1000000);
-    TokamakContractsDeployed = await ico20Contracts.initializePlasmaEvmContracts(defaultSender);
+    TokamakContractsDeployed =
+      await ico20Contracts.initializePlasmaEvmContracts(defaultSender);
 
     const cons = await ico20Contracts.getPlasamContracts();
     ton = cons.ton;
@@ -104,7 +122,7 @@ describe('Stake TON ', function () {
     seigManager = cons.seigManager;
   });
 
-  it('Set StakeEntry  ', async function () {
+  it("Set StakeEntry  ", async function () {
     this.timeout(1000000);
     stakeEntry = await ico20Contracts.setEntry(defaultSender);
 
@@ -115,7 +133,7 @@ describe('Stake TON ', function () {
     stake1proxy = cons.stake1proxy;
     stake1logic = cons.stake1logic;
   });
-  it('stakeEntry create TON Vault ', async function () {
+  it("stakeEntry create TON Vault ", async function () {
     const current = await time.latestBlock();
     saleStartBlock = current;
     saleStartBlock = parseInt(saleStartBlock.toString());
@@ -123,8 +141,8 @@ describe('Stake TON ', function () {
 
     if (logFlag) {
       console.log(`\n\nCurrent block: ${current} `);
-      console.log(' saleStartBlock ', saleStartBlock);
-      console.log(' stakeStartBlock ', stakeStartBlock);
+      console.log(" saleStartBlock ", saleStartBlock);
+      console.log(" stakeStartBlock ", stakeStartBlock);
     }
 
     const tx = await stakeEntry.createVault(
@@ -132,32 +150,42 @@ describe('Stake TON ', function () {
       utils.parseUnits(Pharse1_TON_Staking, 18),
       toBN(saleStartBlock),
       toBN(stakeStartBlock),
-      toBN('1'),
+      toBN("1"),
       HASH_Pharse1_TON_Staking,
-      toBN('0'),
-      zeroAddress
-      , { from: defaultSender });
+      toBN("0"),
+      zeroAddress,
+      { from: defaultSender }
+    );
 
     const vaultAddress = tx.receipt.logs[tx.receipt.logs.length - 1].args.vault;
-    vault_phase1_ton = await Stake1Vault.at(vaultAddress, { from: defaultSender });
-    await fld.mint(vault_phase1_ton.address, utils.parseUnits(Pharse1_TON_Staking, 18), { from: defaultSender });
+    vault_phase1_ton = await Stake1Vault.at(vaultAddress, {
+      from: defaultSender,
+    });
+    await fld.mint(
+      vault_phase1_ton.address,
+      utils.parseUnits(Pharse1_TON_Staking, 18),
+      { from: defaultSender }
+    );
   });
 
-  it('createStakeContract TON ', async function () {
+  it("createStakeContract TON ", async function () {
     for (let i = 0; i < testStakingPeriodBlocks.length; i++) {
       await stakeEntry.createStakeContract(
-        toBN('1'),
+        toBN("1"),
         vault_phase1_ton.address,
         fld.address,
         ton.address,
-        toBN(testStakingPeriodBlocks[i] + ''),
-        'PHASE1_TON_' + testStakingPeriodBlocks[i] + '_BLOCKS',
-        { from: defaultSender });
+        toBN(testStakingPeriodBlocks[i] + ""),
+        "PHASE1_TON_" + testStakingPeriodBlocks[i] + "_BLOCKS",
+        { from: defaultSender }
+      );
     }
   });
 
-  it('Stake TON : Phase1 : 1st Contract: user1 ', async function () {
-    const stakeAddresses = await stakeEntry.stakeContractsOfVault(vault_phase1_ton.address);
+  it("Stake TON : Phase1 : 1st Contract: user1 ", async function () {
+    const stakeAddresses = await stakeEntry.stakeContractsOfVault(
+      vault_phase1_ton.address
+    );
     let stakeContractAddress = null;
     for (let i = 0; i < stakeAddresses.length; i++) {
       stakeContractAddress = stakeAddresses[i];
@@ -169,13 +197,21 @@ describe('Stake TON ', function () {
         // await stakeContract.stake(toWei(testUser2StakingAmount[i],'ether'), {from: user2});
 
         // ton
-        await ico20Contracts.stake(stakeContractAddress, user1, toWei(testUser1StakingAmount[i], 'ether'));
-        await ico20Contracts.stake(stakeContractAddress, user2, toWei(testUser2StakingAmount[i], 'ether'));
+        await ico20Contracts.stake(
+          stakeContractAddress,
+          user1,
+          toWei(testUser1StakingAmount[i], "ether")
+        );
+        await ico20Contracts.stake(
+          stakeContractAddress,
+          user2,
+          toWei(testUser2StakingAmount[i], "ether")
+        );
       }
     }
   });
 
-  it('closeSale TON : Phase1 : closeSale  ', async function () {
+  it("closeSale TON : Phase1 : closeSale  ", async function () {
     await stakeEntry.closeSale(vault_phase1_ton.address, { from: user1 });
   });
   /*
@@ -240,17 +276,20 @@ describe('Stake TON ', function () {
         }
     });
     */
-  it('withdraw ', async function () {
+  it("withdraw ", async function () {
     this.timeout(1000000);
     await timeout(20);
-    const stakeAddresses = await stakeEntry.stakeContractsOfVault(vault_phase1_ton.address);
+    const stakeAddresses = await stakeEntry.stakeContractsOfVault(
+      vault_phase1_ton.address
+    );
     const latest = await time.latestBlock();
     await time.advanceBlockTo(parseInt(latest) + 15);
     let current = await time.latestBlock();
     if (logFlag) console.log(`\n\nCurrent block: ${current} `);
 
     for (let i = 0; i < stakeAddresses.length; i++) {
-      if (logFlag) console.log('\n\n ************* withdraw : ', i, stakeAddresses[i]);
+      if (logFlag)
+        console.log("\n\n ************* withdraw : ", i, stakeAddresses[i]);
       const stakeContract1 = await Stake1.at(stakeAddresses[i]);
       const endBlock = await stakeContract1.endBlock();
       while (endBlock.gt(current)) {
@@ -261,23 +300,38 @@ describe('Stake TON ', function () {
       }
 
       const payTokenBalance1 = await web3.eth.getBalance(user1);
-      if (logFlag) console.log('\n payTokenBalance1:', fromWei(payTokenBalance1.toString(), 'ether'));
+      if (logFlag)
+        console.log(
+          "\n payTokenBalance1:",
+          fromWei(payTokenBalance1.toString(), "ether")
+        );
 
-      if (logFlag) await logUserStaked(stakeAddresses[i], user1, 'user1 pre withdraw');
+      if (logFlag)
+        await logUserStaked(stakeAddresses[i], user1, "user1 pre withdraw");
 
       await stakeContract1.withdraw({ from: user1 });
       await timeout(2);
 
       const payTokenBalance2 = await web3.eth.getBalance(user1);
-      if (logFlag) console.log('\n payTokenBalance2:', fromWei(payTokenBalance2.toString(), 'ether'));
-      if (logFlag) await logUserStaked(stakeAddresses[i], user1, 'user1 after withdraw');
+      if (logFlag)
+        console.log(
+          "\n payTokenBalance2:",
+          fromWei(payTokenBalance2.toString(), "ether")
+        );
+      if (logFlag)
+        await logUserStaked(stakeAddresses[i], user1, "user1 after withdraw");
     }
   });
 
-  async function logStakeContracts (_phase, _phaseVault) {
-    console.log('\n\n############### logStakeContracts [ PHASE', 1, ']', _phaseVault);
+  async function logStakeContracts(_phase, _phaseVault) {
+    console.log(
+      "\n\n############### logStakeContracts [ PHASE",
+      1,
+      "]",
+      _phaseVault
+    );
     const vault = await Stake1Vault.at(_phaseVault);
-    console.log('vault', vault.address);
+    console.log("vault", vault.address);
     const paytoken = await vault.paytoken();
     const cap = await vault.cap();
     const saleStartBlock = await vault.saleStartBlock();
@@ -288,25 +342,34 @@ describe('Stake TON ', function () {
     const orderedEndBlocks = await vault.orderedEndBlocksAll();
     const stakeAddresses = await vault.stakeAddressesAll();
 
-    console.log('cap', utils.formatUnits(cap.toString(), 18));
-    console.log('paytoken', paytoken);
-    console.log('saleStartBlock', saleStartBlock.toString());
-    console.log('stakeStartBlock', stakeStartBlock.toString());
-    console.log('stakeEndBlock', stakeEndBlock.toString());
-    console.log('blockTotalReward', utils.formatUnits(blockTotalReward.toString(), 18));
-    console.log('saleClosed', saleClosed);
-    console.log('stakeAddresses', stakeAddresses);
+    console.log("cap", utils.formatUnits(cap.toString(), 18));
+    console.log("paytoken", paytoken);
+    console.log("saleStartBlock", saleStartBlock.toString());
+    console.log("stakeStartBlock", stakeStartBlock.toString());
+    console.log("stakeEndBlock", stakeEndBlock.toString());
+    console.log(
+      "blockTotalReward",
+      utils.formatUnits(blockTotalReward.toString(), 18)
+    );
+    console.log("saleClosed", saleClosed);
+    console.log("stakeAddresses", stakeAddresses);
 
-    console.log('\n\n----------- stakeEndBlockTotal ');
+    console.log("\n\n----------- stakeEndBlockTotal ");
     for (let i = 0; i < orderedEndBlocks.length; i++) {
-      const stakeEndBlockTotal = await vault.stakeEndBlockTotal(orderedEndBlocks[i]);
-      console.log(' stakeEndBlockTotal', orderedEndBlocks[i].toString(), utils.formatUnits(stakeEndBlockTotal.toString(), 18));
+      const stakeEndBlockTotal = await vault.stakeEndBlockTotal(
+        orderedEndBlocks[i]
+      );
+      console.log(
+        " stakeEndBlockTotal",
+        orderedEndBlocks[i].toString(),
+        utils.formatUnits(stakeEndBlockTotal.toString(), 18)
+      );
     }
     for (let i = 0; i < stakeAddresses.length; i++) {
       const _contract = stakeAddresses[i];
       const stakeInfo = await vault.stakeInfos(_contract);
 
-      console.log('\n\n----------- Stake Contract ', _contract);
+      console.log("\n\n----------- Stake Contract ", _contract);
       const stakeContract = await Stake1.at(_contract);
       const token = await stakeContract.token();
       const paytoken = await stakeContract.paytoken();
@@ -317,44 +380,74 @@ describe('Stake TON ', function () {
       const rewardClaimedTotal = await stakeContract.rewardClaimedTotal();
       const totalStakedAmount = await stakeContract.totalStakedAmount();
 
-      let payTokenBalance = toBN('0');
+      let payTokenBalance = toBN("0");
       if (paytoken === zeroAddress) {
         payTokenBalance = await web3.eth.getBalance(_contract);
       } else {
         const ercTemp = await IERC20.at(paytoken);
         payTokenBalance = await ercTemp.balanceOf(_contract);
       }
-      console.log(' token', token);
-      console.log(' paytoken', paytoken);
-      console.log(' contract-Vault', contractVault);
-      console.log(' saleStartBlock', saleStartBlock.toString());
-      console.log(' startBlock', startBlock.toString());
-      console.log(' endBlock', endBlock.toString());
-      console.log(' rewardClaimedTotal', utils.formatUnits(rewardClaimedTotal.toString(), 18));
-      console.log(' totalStakedAmount', utils.formatUnits(totalStakedAmount.toString(), 18));
-      console.log(' ** payTokenBalance', utils.formatUnits(payTokenBalance.toString(), 18));
+      console.log(" token", token);
+      console.log(" paytoken", paytoken);
+      console.log(" contract-Vault", contractVault);
+      console.log(" saleStartBlock", saleStartBlock.toString());
+      console.log(" startBlock", startBlock.toString());
+      console.log(" endBlock", endBlock.toString());
+      console.log(
+        " rewardClaimedTotal",
+        utils.formatUnits(rewardClaimedTotal.toString(), 18)
+      );
+      console.log(
+        " totalStakedAmount",
+        utils.formatUnits(totalStakedAmount.toString(), 18)
+      );
+      console.log(
+        " ** payTokenBalance",
+        utils.formatUnits(payTokenBalance.toString(), 18)
+      );
 
-      console.log(' name', stakeInfo.name);
-      console.log(' startBlcok', stakeInfo.startBlcok.toString());
-      console.log(' endBlock', stakeInfo.endBlock.toString());
-      console.log(' balance', utils.formatUnits(stakeInfo.balance.toString(), 18));
-      console.log(' totalRewardAmount', utils.formatUnits(stakeInfo.totalRewardAmount.toString(), 18));
-      console.log(' claimRewardAmount', utils.formatUnits(stakeInfo.claimRewardAmount.toString(), 18));
+      console.log(" name", stakeInfo.name);
+      console.log(" startBlcok", stakeInfo.startBlcok.toString());
+      console.log(" endBlock", stakeInfo.endBlock.toString());
+      console.log(
+        " balance",
+        utils.formatUnits(stakeInfo.balance.toString(), 18)
+      );
+      console.log(
+        " totalRewardAmount",
+        utils.formatUnits(stakeInfo.totalRewardAmount.toString(), 18)
+      );
+      console.log(
+        " claimRewardAmount",
+        utils.formatUnits(stakeInfo.claimRewardAmount.toString(), 18)
+      );
 
-      await logUserStaked(_contract, user1, 'user1');
-      await logUserStaked(_contract, user2, 'user2');
+      await logUserStaked(_contract, user1, "user1");
+      await logUserStaked(_contract, user2, "user2");
     }
   }
 
-  async function logUserStaked (_contract, _user, username) {
-    console.log('\n\n*********** logUserStaked [', _contract, ']', username, _user);
+  async function logUserStaked(_contract, _user, username) {
+    console.log(
+      "\n\n*********** logUserStaked [",
+      _contract,
+      "]",
+      username,
+      _user
+    );
     const stakeContract = await Stake1.at(_contract);
     const userStaked = await stakeContract.userStaked(_user);
-    console.log('amount', utils.formatUnits(userStaked.amount.toString(), 18));
-    console.log('claimedBlock', userStaked.claimedBlock.toString());
-    console.log('claimedAmount', utils.formatUnits(userStaked.claimedAmount.toString(), 18));
-    console.log('releasedBlock', userStaked.releasedBlock.toString());
-    console.log('releasedAmount', utils.formatUnits(userStaked.releasedAmount.toString(), 18));
-    console.log('released', userStaked.released.toString());
+    console.log("amount", utils.formatUnits(userStaked.amount.toString(), 18));
+    console.log("claimedBlock", userStaked.claimedBlock.toString());
+    console.log(
+      "claimedAmount",
+      utils.formatUnits(userStaked.claimedAmount.toString(), 18)
+    );
+    console.log("releasedBlock", userStaked.releasedBlock.toString());
+    console.log(
+      "releasedAmount",
+      utils.formatUnits(userStaked.releasedAmount.toString(), 18)
+    );
+    console.log("released", userStaked.released.toString());
   }
 });

@@ -2,7 +2,6 @@
 pragma solidity ^0.7.6;
 
 interface IStake1Logic {
-
     function setStore(
         address _fld,
         address _stakeRegistry,
@@ -11,7 +10,7 @@ interface IStake1Logic {
         address _wton,
         address _depositManager,
         address _seigManager
-    ) external ;
+    ) external;
 
     function setFactory(address _stakeFactory) external;
 
@@ -24,7 +23,7 @@ interface IStake1Logic {
         bytes32 _vaultName,
         uint256 _stakeType,
         address _defiAddr
-    ) external ;
+    ) external;
 
     function createStakeContract(
         uint256 _pahse,
@@ -33,7 +32,7 @@ interface IStake1Logic {
         address paytoken,
         uint256 periodBlock,
         string memory _name
-    ) external ;
+    ) external;
 
     function closeSale(address _vault) external;
 
@@ -57,7 +56,7 @@ interface IStake1Logic {
         address _stakeContract,
         address _layer2,
         uint256 _amount
-    ) external ;
+    ) external;
 
     function tokamakRequestUnStakingAll(address _stakeContract, address _layer2)
         external;
@@ -72,17 +71,11 @@ interface IStake1Logic {
         address _stakeContract,
         address _layer2,
         bool receiveTON
-    ) external ;
-
+    ) external;
 
     function setFLD(address _fld) external;
 
-    function setStakeRegistry(address _stakeRegistry)
-        external;
+    function setStakeRegistry(address _stakeRegistry) external;
 
-
-    function setStakeFactory(address _stakeFactory)
-        external;
-
-
+    function setStakeFactory(address _stakeFactory) external;
 }

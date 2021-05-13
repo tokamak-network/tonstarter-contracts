@@ -73,6 +73,10 @@ contract Stake1Vault is AccessControl {
         _lock = 0;
     }
 
+    //////////////////////////////
+    // Events
+    //////////////////////////////
+    event ClosedSale(uint256 amount);
     event ClaimReward(address indexed from, address to, uint256 amount);
 
     constructor() {
@@ -200,8 +204,8 @@ contract Stake1Vault is AccessControl {
         require(
             cap > 0 &&
                 stakeStartBlock > 0 &&
-                stakeEndBlock > 0 &&
                 stakeStartBlock < stakeEndBlock &&
+                block.number > stakeStartBlock &&
                 block.number < stakeEndBlock,
             "Stake1Vault: closeSale init fail"
         );
@@ -218,7 +222,7 @@ contract Stake1Vault is AccessControl {
                 stakeInfo.balance = IERC20(paytoken).balanceOf(stake);
             }
         }
-
+        uint256 sum = 0;
         // update total
         for (uint256 i = 0; i < stakeAddresses.length; i++) {
             LibTokenStake1.StakeInfo storage totalcheck =
@@ -233,6 +237,7 @@ contract Stake1Vault is AccessControl {
                 }
             }
             stakeEndBlockTotal[totalcheck.endBlock] = total;
+            sum += total;
 
             // reward total
             uint256 totalReward = 0;
@@ -255,6 +260,7 @@ contract Stake1Vault is AccessControl {
         }
 
         saleClosed = true;
+        emit ClosedSale(sum);
     }
 
     /// @dev
@@ -275,7 +281,8 @@ contract Stake1Vault is AccessControl {
             "Stake1Vault: claimVault startBlcok is zero"
         );
         require(
-            stakeInfo.totalRewardAmount >= stakeInfo.claimRewardAmount + _amount,
+            stakeInfo.totalRewardAmount >=
+                stakeInfo.claimRewardAmount + _amount,
             "Stake1Vault: claim amount exceeds the reward left"
         );
         require(
@@ -319,7 +326,8 @@ contract Stake1Vault is AccessControl {
             "Stake1Vault: claim amount is wrong"
         );
         require(
-            stakeInfo.totalRewardAmount >= stakeInfo.claimRewardAmount + _amount,
+            stakeInfo.totalRewardAmount >=
+                stakeInfo.claimRewardAmount + _amount,
             "Stake1Vault: claim amount exceeds the reward left"
         );
         require(
@@ -336,8 +344,10 @@ contract Stake1Vault is AccessControl {
     function balanceFLDAvailableAmount()
         external
         view
-        onlyClaimer
-        returns (uint256)
+        returns (
+            // onlyClaimer
+            uint256
+        )
     {
         return fld.balanceOf(address(this));
     }

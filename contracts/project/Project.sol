@@ -7,21 +7,26 @@ import "../libraries/LibProject.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 
-import {IProjectStakeVaultFactory} from "../interfaces/IProjectStakeVaultFactory.sol";
-import {IProjectDevVaultFactory} from "../interfaces/IProjectDevVaultFactory.sol";
+import {
+    IProjectStakeVaultFactory
+} from "../interfaces/IProjectStakeVaultFactory.sol";
+import {
+    IProjectDevVaultFactory
+} from "../interfaces/IProjectDevVaultFactory.sol";
 
 interface IManager {
     function airdropVault() external view returns (address);
+
     function projectRegistry() external view returns (address);
+
     function projectDevVaultFactory() external view returns (address);
+
     function projectStakeVaultFactory() external view returns (address);
 
     function defaultAirdrop() external view returns (uint256);
-
 }
 
-contract Project is AccessControl  {
-
+contract Project is AccessControl {
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
     bytes32 public constant DEV_ROLE = keccak256("DEVELOPER");
     uint256 public projectId;
@@ -93,13 +98,9 @@ contract Project is AccessControl  {
         address _token,
         string memory _tokenName,
         string memory _symbol
-    )
-        external onlyOwner
-    {
+    ) external onlyOwner {
         require(
-            _projectId > 0 &&
-                _startBlock > 0 &&
-                _endBlock > _startBlock ,
+            _projectId > 0 && _startBlock > 0 && _endBlock > _startBlock,
             "Project: input error"
         );
 
@@ -128,15 +129,14 @@ contract Project is AccessControl  {
         uint256 dev,
         uint256 rewardGeneral,
         uint256 rewardLP
-    )
-        external onlyDev
-    {
-        require(boolTokenDistribution == false, "Project: execTokenDistribution done");
+    ) external onlyDev {
+        require(
+            boolTokenDistribution == false,
+            "Project: execTokenDistribution done"
+        );
         uint256 defaultAirdrop = IManager(manager).defaultAirdrop();
         require(
-            airdrop >= defaultAirdrop &&
-            dev > 0 &&
-            rewardGeneral > 0,
+            airdrop >= defaultAirdrop && dev > 0 && rewardGeneral > 0,
             "Project: setTokenDistribution input fail"
         );
 
@@ -146,9 +146,7 @@ contract Project is AccessControl  {
         tokenDistribution.rewardLP = rewardLP;
     }
 
-    function createDevVault()
-        external onlyDev nonZero(manager)
-    {
+    function createDevVault() external onlyDev nonZero(manager) {
         address factory = IManager(manager).projectDevVaultFactory();
         require(factory != address(0), "Project: ProjectDevVaultFactory zero");
         address vault = IProjectDevVaultFactory(factory).deploy(address(this));
@@ -156,56 +154,72 @@ contract Project is AccessControl  {
         devVault = vault;
     }
 
-    function createStakeVault(bool boolPair)
-        external onlyDev nonZero(manager)
-    {
+    function createStakeVault(bool boolPair) external onlyDev nonZero(manager) {
         address factory = IManager(manager).projectStakeVaultFactory();
-        require(factory != address(0), "Project: ProjectStakeVaultFactory zero");
+        require(
+            factory != address(0),
+            "Project: ProjectStakeVaultFactory zero"
+        );
         address vault;
 
         if (!boolPair) {
             require(stakeVault == address(0), "Project: already create");
-            vault = IProjectStakeVaultFactory(factory).deploy(address(this), token);
+            vault = IProjectStakeVaultFactory(factory).deploy(
+                address(this),
+                token
+            );
             require(vault != address(0), "Project: vault zero");
             stakeVault = vault;
         } else {
             require(stakeLPVault == address(0), "Project: already create");
-            vault = IProjectStakeVaultFactory(factory).deploy(address(this), pair);
+            vault = IProjectStakeVaultFactory(factory).deploy(
+                address(this),
+                pair
+            );
             require(vault != address(0), "Project: vault zero");
             stakeLPVault = vault;
         }
     }
 
-    function execTokenDistribution()
-        external onlyDev nonZero(manager)
-    {
-        require(boolTokenDistribution == false, "Project: execTokenDistribution done");
+    function execTokenDistribution() external onlyDev nonZero(manager) {
+        require(
+            boolTokenDistribution == false,
+            "Project: execTokenDistribution done"
+        );
         uint256 balance = IERC20(token).balanceOf(address(this));
         uint256 total = IERC20(token).totalSupply();
         require(balance == total, "Project: balance is not total");
         address airdropVault = IManager(manager).airdropVault();
         require(
             devVault != address(0) &&
-            stakeVault != address(0) &&
-            airdropVault != address(0),
-            "Project: vault is zero");
+                stakeVault != address(0) &&
+                airdropVault != address(0),
+            "Project: vault is zero"
+        );
 
         require(
             tokenDistribution.airdrop > 0 &&
-            tokenDistribution.dev > 0 &&
-            tokenDistribution.rewardGeneral > 0,
-            "Project: tokenDistribution is zero");
+                tokenDistribution.dev > 0 &&
+                tokenDistribution.rewardGeneral > 0,
+            "Project: tokenDistribution is zero"
+        );
 
         boolTokenDistribution = true;
 
-        tokenDistribution.airdropAmount = total * tokenDistribution.airdrop / 10 ** 18;
-        tokenDistribution.devAmount = total * tokenDistribution.dev / 10 ** 18;
-        tokenDistribution.rewardGeneralAmount = total * tokenDistribution.rewardGeneral / 10 ** 18;
+        tokenDistribution.airdropAmount =
+            (total * tokenDistribution.airdrop) /
+            10**18;
+        tokenDistribution.devAmount = (total * tokenDistribution.dev) / 10**18;
+        tokenDistribution.rewardGeneralAmount =
+            (total * tokenDistribution.rewardGeneral) /
+            10**18;
 
         IERC20(token).transfer(airdropVault, tokenDistribution.airdropAmount);
         IERC20(token).transfer(devVault, tokenDistribution.devAmount);
-        IERC20(token).transfer(stakeVault, tokenDistribution.rewardGeneralAmount);
-
+        IERC20(token).transfer(
+            stakeVault,
+            tokenDistribution.rewardGeneralAmount
+        );
     }
 
     function createTokenSale(
@@ -214,14 +228,9 @@ contract Project is AccessControl  {
         uint256 softCap,
         uint256 hardCap,
         uint256 price
-    )
-        external onlyOwner
-    {
+    ) external onlyOwner {
         require(
-            startTime > 0 &&
-                endTime > startTime &&
-                hardCap > 0 &&
-                price > 0,
+            startTime > 0 && endTime > startTime && hardCap > 0 && price > 0,
             "Project: input error"
         );
 
@@ -236,6 +245,4 @@ contract Project is AccessControl  {
         sale.price = price;
         tokenSalesIndex.push(index);
     }
-
-
 }

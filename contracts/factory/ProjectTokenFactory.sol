@@ -12,13 +12,8 @@ contract ProjectTokenFactory {
         uint256 _totalSupply,
         address to
     ) public returns (address) {
-
-        ProjectToken token = new ProjectToken(
-            _tokenName,
-            _symbol,
-            _totalSupply,
-            to
-        );
+        ProjectToken token =
+            new ProjectToken(_tokenName, _symbol, _totalSupply, to);
 
         token.grantRole(ADMIN_ROLE, to);
         token.revokeRole(ADMIN_ROLE, address(this));

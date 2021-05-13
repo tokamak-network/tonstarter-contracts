@@ -1,9 +1,7 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity ^0.7.6;
 
-
 contract ProjectManagerStorage {
-
     address public projectRegistry;
     address public projectFactory;
     address public projectTokenFactory;
@@ -34,7 +32,4 @@ contract ProjectManagerStorage {
         );
         _;
     }
-
-
-
 }

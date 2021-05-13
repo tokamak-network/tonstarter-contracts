@@ -43,11 +43,9 @@ contract ProjectRegistry is AccessControl {
         string memory name,
         string memory symbol
     ) external onlyOwner {
-
-        require(_project != address(0),
-            "ProjectRegistry: project is zero"
-        );
-        require(projectId[_projectId] == address(0),
+        require(_project != address(0), "ProjectRegistry: project is zero");
+        require(
+            projectId[_projectId] == address(0),
             "ProjectRegistry: Already registered"
         );
 
@@ -64,19 +62,11 @@ contract ProjectRegistry is AccessControl {
     }
 
     /// @dev Checks if a vault is withing the given phase
-    function validProject(address _project)
-        external
-        view
-        returns (bool valid)
-    {
+    function validProject(address _project) external view returns (bool valid) {
         valid = projectInfo[_project].deployed;
     }
 
-    function projectById(uint256 _index)
-        external
-        view
-        returns (address)
-    {
+    function projectById(uint256 _index) external view returns (address) {
         return projectId[_index];
     }
 

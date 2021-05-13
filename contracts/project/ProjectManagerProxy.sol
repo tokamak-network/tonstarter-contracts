@@ -23,11 +23,9 @@ contract ProjectManagerProxy is ProjectManagerStorage, AccessControl {
     }
 
     constructor() {
-
         _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
         _setupRole(ADMIN_ROLE, msg.sender);
         _setupRole(ADMIN_ROLE, address(this));
-
     }
 
     /// @notice Set pause state
@@ -57,7 +55,7 @@ contract ProjectManagerProxy is ProjectManagerStorage, AccessControl {
         _fallback();
     }
 
-    fallback() external payable{
+    fallback() external payable {
         _fallback();
     }
 
