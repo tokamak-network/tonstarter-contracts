@@ -1,8 +1,8 @@
 const { expect } = require("chai");
-const { time, expectEvent } = require('@openzeppelin/test-helpers');
+const { time, expectEvent } = require("@openzeppelin/test-helpers");
 
 // ------------------------
-const ICO20Contracts = require('../utils/ico_test_deploy_ethers.js');
+const ICO20Contracts = require("../utils/ico_test_deploy_ethers.js");
 let ico20Contracts;
 let TokamakContractsDeployed;
 let ICOContractsDeployed;
@@ -10,37 +10,45 @@ let ICOContractsDeployed;
 describe("ProjectManager", function () {
   let deployer, admin, dev1, dev2, dev3;
   let projectManagerProxy, projectManagerLogic1, projectManager;
-  let stake1Vault ;
+  let stake1Vault;
   let fld;
   let contracts;
   let ton, wton, depositManager, seigManager;
   let cap, rewardPeriod, startRewardBlock, claimsNumberMax, developers, amounts;
 
-
   // Init
   before(async function () {
     this.timeout(1000000);
-    [deployer, admin, dev1, dev2, dev3, unregisteredDev] = await ethers.getSigners();
+    [deployer, admin, dev1, dev2, dev3, unregisteredDev] =
+      await ethers.getSigners();
 
-    const ProjectManagerLogic1 = await ethers.getContractFactory("ProjectManagerLogic1");
-    const ProjectManagerProxy = await ethers.getContractFactory("ProjectManagerProxy");
+    const ProjectManagerLogic1 = await ethers.getContractFactory(
+      "ProjectManagerLogic1"
+    );
+    const ProjectManagerProxy = await ethers.getContractFactory(
+      "ProjectManagerProxy"
+    );
     const Stake1Vault = await ethers.getContractFactory("Stake1Vault");
     const Stake1 = await ethers.getContractFactory("Stake1");
 
     projectManagerProxy = await ProjectManagerProxy.connect(deployer).deploy();
-    projectManagerLogic1 = await ProjectManagerLogic1.connect(deployer).deploy();
-
+    projectManagerLogic1 = await ProjectManagerLogic1.connect(
+      deployer
+    ).deploy();
   });
-  it('ico20Contracts init  ', async function () {
+  it("ico20Contracts init  ", async function () {
     this.timeout(1000000);
     ico20Contracts = new ICO20Contracts();
-    ICOContractsDeployed = await ico20Contracts.initializeICO20Contracts(deployer);
+    ICOContractsDeployed = await ico20Contracts.initializeICO20Contracts(
+      deployer
+    );
     fld = ICOContractsDeployed.fld;
   });
 
-  it('tokamakContracts init  ', async function () {
+  it("tokamakContracts init  ", async function () {
     this.timeout(1000000);
-    TokamakContractsDeployed = await ico20Contracts.initializePlasmaEvmContracts(deployer);
+    TokamakContractsDeployed =
+      await ico20Contracts.initializePlasmaEvmContracts(deployer);
 
     const cons = await ico20Contracts.getPlasamContracts();
     ton = cons.ton;

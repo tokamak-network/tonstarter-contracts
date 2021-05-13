@@ -74,7 +74,8 @@ const CLAIMER_ROLE = keccak256("CLAIMER");
 const PHASE2_VAULT_HASH = keccak256("PHASE2_VAULT");
 const EVENT_VAULT_HASH = keccak256("EVENT_VAULT");
 
-const logFlag = false;
+const logFlag = true;
+
 
 describe("Phase1. StakeContract with ETH", function () {
   let weth, fld, stakeregister, stakefactory, stake1proxy, stake1logic;
@@ -92,16 +93,15 @@ describe("Phase1. StakeContract with ETH", function () {
   const user2 = accounts[2];
   const userPrivate2 = privateKeys[2];
 
-  const testStakingPeriodBlocks = [10, 20];
+  const testStakingPeriodBlocks = [50, 100];
   const testStakingUsers = [user1, user2];
-  const testUser1StakingAmount = ["10", "5"];
-  const testUser2StakingAmount = ["10", "20"];
-  const testClaimBlock = [5, 10, 5, 5];
+  const testUser1StakingAmount = ["100", "20"];
+  const testUser2StakingAmount = ["50", "100"];
+  const testClaimBlock = [10, 20, 50, 60];
 
-  const sendAmountForTest = "1";
-  const sendAmountForTest2 = "5";
-  const buyTokensEtehrs = ["10", "5", "20", "2"];
-  const buyTokensDurations = ["10", "60", "120", "150"];
+  let salePeriod = 50;
+  let stakingPeriod = 100;
+
   let saleStartBlock = 0;
   let stakeStartBlock = 0;
   let stakeAddresses;
@@ -143,8 +143,8 @@ describe("Phase1. StakeContract with ETH", function () {
       const current = await time.latestBlock();
       saleStartBlock = current;
       saleStartBlock = parseInt(saleStartBlock.toString());
-      saleStartBlock = saleStartBlock + 20;
-      stakeStartBlock = saleStartBlock + 20;
+      saleStartBlock = saleStartBlock + salePeriod;
+      stakeStartBlock = saleStartBlock + stakingPeriod;
 
       if (logFlag) {
         console.log(`\n\nCurrent block: ${current} `);
@@ -217,6 +217,8 @@ describe("Phase1. StakeContract with ETH", function () {
         stakeContractAddress = stakeAddresses[i];
         if (stakeContractAddress != null) {
           const stakeContract = await Stake1.at(stakeContractAddress);
+          console.log('Stake',i,' User1 :', testUser1StakingAmount[i] );
+          console.log('Stake',i,' User2 :', testUser2StakingAmount[i] );
 
           await stakeContract.sendTransaction({
             from: user1,
@@ -271,39 +273,21 @@ describe("Phase1. StakeContract with ETH", function () {
   });
 
   describe('# Function Test For Claim ', async function () {
-    let reward , stakeContract, testUser , blockIndex;
-    testUser = testStakingUsers[0];
-
-    it("After a few blocks, rewards are earned.", async function () {
-      blockIndex = 0;
-      let delayBlock = testClaimBlock[blockIndex];
-      const latest = await time.latestBlock();
-      await time.advanceBlockTo(parseInt(latest) + delayBlock);
-      stakeContract = await Stake1.at(stakeAddresses[blockIndex]);
-      reward = await stakeContract.canRewardAmount(testUser);
-      expect(reward.toString()).to.bignumber.above(wei("0").toString());
-    });
-
-    it("can claim a reward.", async function () {
-      let fldBalance1 = await fld.balanceOf(testStakingUsers[u]);
-      await stakeContract.claim({ from: testStakingUsers[u] });
-      let fldBalance2 = await fld.balanceOf(testStakingUsers[u]);
-      expect(fldBalance1.toString()).to.be.equal(fldBalance2.toString());
-    });
-
-
     it("You can claim a reward after the sales closing function is performed", async function () {
 
-      for (let i = 0; i < 3; i++) {
-        let delayBlock = testClaimBlock[i];
-        const latest = await time.latestBlock();
-        await time.advanceBlockTo(parseInt(latest) + delayBlock);
+      for (let i = 0; i < 1; i++) {
+
+        let testBlcok = stakeStartBlock + testClaimBlock[i] ;
+        if (logFlag) console.log(`\n ------- testBlcok:`, testBlcok);
+        await time.advanceBlockTo(testBlcok-1);
+        let current = await time.latestBlock();
+        if (logFlag) console.log(`\n\nCurrent block: ${current} `);
 
         if (stakeAddresses.length > 0) {
           for (let j = 0; j < 1; j++) {
             let stakeContract = await Stake1.at(stakeAddresses[j]);
             for (let u = 0; u < 1; u++) {
-              //if (logFlag)
+              if (logFlag)
               console.log("\n testStakingUsers[u]: ", u, testStakingUsers[u]);
 
               let reward = await stakeContract.canRewardAmount(
@@ -325,9 +309,9 @@ describe("Phase1. StakeContract with ETH", function () {
                   console.log(
                     ` tx.receipt.logs :  `,
                     tx.receipt.logs[0].event,
-                    tx.receipt.logs[0].args.from,
-                    tx.receipt.logs[0].args.amount.toString(),
-                    tx.receipt.logs[0].args.currentBlcok.toString()
+                    //tx.receipt.logs[0].args.from,
+                    tx.receipt.logs[0].args.amount.toString()
+                   // tx.receipt.logs[0].args.currentBlcok.toString()
                   );
 
                 let fldBalance2 = await fld.balanceOf(testStakingUsers[u]);
@@ -358,61 +342,60 @@ describe("Phase1. StakeContract with ETH", function () {
     });
   });
 
-
-  /*
-  it('Stake Contracts List : Phase1 ', async function () {
-    const phases1 = await stakeEntry.vaultsOfPhase(toBN('1'));
-    for (let i = 0; i < phases1.length; i++) {
-      const phaseVault = phases1[i];
-      if (phaseVault != null) {
-        console.log('phaseVault ', i, phaseVault);
-        const contractsInVault = await stakeEntry.stakeContractsOfVault(phaseVault);
-        console.log('contractsInVault ', contractsInVault);
-        await logStakeContracts(1, phaseVault);
+  describe('# Staking Log', async function () {
+    it('Stake Contracts List : Phase1 ', async function () {
+      const phases1 = await stakeEntry.vaultsOfPhase(toBN('1'));
+      for (let i = 0; i < phases1.length; i++) {
+        const phaseVault = phases1[i];
+        if (phaseVault != null) {
+          console.log('phaseVault ', i, phaseVault);
+          const contractsInVault = await stakeEntry.stakeContractsOfVault(phaseVault);
+          console.log('contractsInVault ', contractsInVault);
+          await logStakeContracts(1, phaseVault);
+        }
       }
-    }
-    const current = await time.latestBlock();
-    if (logFlag) console.log(`Current block: ${current} `);
+      const current = await time.latestBlock();
+      if (logFlag) console.log(`Current block: ${current} `);
+    });
+  });
+  /*
+  describe('# Function Test For withdraw ', async function () {
+    it('withdraw ', async function () {
+      this.timeout(1000000);
+      await timeout(20);
+      const stakeAddresses = await stakeEntry.stakeContractsOfVault(vault_phase1_eth.address);
+      const latest = await time.latestBlock();
+      await time.advanceBlockTo(parseInt(latest) + 15);
+      let current = await time.latestBlock();
+      if (logFlag) console.log(`\n\nCurrent block: ${current} `);
+
+      for (let i = 0; i < stakeAddresses.length; i++) {
+        console.log('\n\n ************* withdraw : ', i, stakeAddresses[i]);
+        const stakeContract1 = await Stake1.at(stakeAddresses[i]);
+        const endBlock = await stakeContract1.endBlock();
+        while (endBlock.gt(current)) {
+          await time.advanceBlockTo(parseInt(current) + 5);
+          await timeout(13);
+          current = await time.latestBlock();
+          if (logFlag) console.log(`\n\nCurrent block: ${current} `);
+        }
+
+        const payTokenBalance1 = await web3.eth.getBalance(user1);
+        console.log('\n payTokenBalance1:', fromWei(payTokenBalance1.toString(), 'ether'));
+
+        await logUserStaked(stakeAddresses[i], user1, 'user1 pre withdraw');
+
+        await stakeContract1.withdraw({ from: user1 });
+        await timeout(2);
+
+        const payTokenBalance2 = await web3.eth.getBalance(user1);
+        console.log('\n payTokenBalance2:', fromWei(payTokenBalance2.toString(), 'ether'));
+        await logUserStaked(stakeAddresses[i], user1, 'user1 after withdraw');
+      }
+    });
   });
   */
 
-
-  /*
-  it('withdraw ', async function () {
-    this.timeout(1000000);
-    await timeout(20);
-    const stakeAddresses = await stakeEntry.stakeContractsOfVault(vault_phase1_eth.address);
-    const latest = await time.latestBlock();
-    await time.advanceBlockTo(parseInt(latest) + 15);
-    let current = await time.latestBlock();
-    if (logFlag) console.log(`\n\nCurrent block: ${current} `);
-
-    for (let i = 0; i < stakeAddresses.length; i++) {
-      console.log('\n\n ************* withdraw : ', i, stakeAddresses[i]);
-      const stakeContract1 = await Stake1.at(stakeAddresses[i]);
-      const endBlock = await stakeContract1.endBlock();
-      while (endBlock.gt(current)) {
-        await time.advanceBlockTo(parseInt(current) + 5);
-        await timeout(13);
-        current = await time.latestBlock();
-        if (logFlag) console.log(`\n\nCurrent block: ${current} `);
-      }
-
-      const payTokenBalance1 = await web3.eth.getBalance(user1);
-      console.log('\n payTokenBalance1:', fromWei(payTokenBalance1.toString(), 'ether'));
-
-      await logUserStaked(stakeAddresses[i], user1, 'user1 pre withdraw');
-
-      await stakeContract1.withdraw({ from: user1 });
-      await timeout(2);
-
-      const payTokenBalance2 = await web3.eth.getBalance(user1);
-      console.log('\n payTokenBalance2:', fromWei(payTokenBalance2.toString(), 'ether'));
-      await logUserStaked(stakeAddresses[i], user1, 'user1 after withdraw');
-    }
-  });
-
-*/
   async function logStakeContracts(_phase, _phaseVault) {
     console.log(
       "\n\n############### logStakeContracts [ PHASE",
