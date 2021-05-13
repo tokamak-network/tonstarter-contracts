@@ -11,11 +11,11 @@ contract DeveloperVault is AccessControl {
   uint256 public rewardPeriod;
   uint256 public startRewardBlock;
   uint256 public claimsNumberMax;
-  
+
   mapping(address => DeveloperInfo) public developersInfo;
   address[] public developers;
 
-  constructor (address admin) { 
+  constructor (address admin) {
     _setupRole(DEFAULT_ADMIN_ROLE, admin);
   }
 
@@ -64,7 +64,7 @@ contract DeveloperVault is AccessControl {
   }
 
 
-  /// @dev Developers can receive their FLDs 
+  /// @dev Developers can receive their FLDs
   function claimReward() external {
     DeveloperInfo storage devInfo = developersInfo[msg.sender];
     require(devInfo.registered == true, "DeveloperVault: developer is not registered");

@@ -64,7 +64,7 @@ const EVENT_VAULT_HASH = keccak256('EVENT_VAULT');
 
 const logFlag = true;
 
-describe('StakeProxy ', function () {
+describe('Phase1. StakeContract with ETH', function () {
   let weth, fld, stakeregister, stakefactory, stake1proxy, stake1logic;
   let vault_phase1_eth, vault_phase1_ton, vault_phase1_fldethlp, vault_phase1_dev;
 
@@ -104,10 +104,10 @@ describe('StakeProxy ', function () {
     TokamakContractsDeployed = await ico20Contracts.initializePlasmaEvmContracts(defaultSender);
   });
 
-  it('Set StakeEntry  ', async function () {
+  it('Set StakeProxy  ', async function () {
     this.timeout(1000000);
     stakeEntry = await ico20Contracts.setEntry(defaultSender);
-    console.log('stakeEntry', stakeEntry.address);
+    if (logFlag) console.log('StakeProxy', stakeEntry.address);
 
     const cons = await ico20Contracts.getICOContracts();
     fld = cons.fld;
@@ -116,9 +116,9 @@ describe('StakeProxy ', function () {
     stake1proxy = cons.stake1proxy;
     stake1logic = cons.stake1logic;
   });
-  it('stakeEntry create Vault', async function () {
+  it('Create Vault', async function () {
     const current = await time.latestBlock();
-    saleStartBlock = current;
+    saleStartBlock = current + 4 ;
     saleStartBlock = parseInt(saleStartBlock.toString());
     stakeStartBlock = saleStartBlock + 20;
 
@@ -156,7 +156,7 @@ describe('StakeProxy ', function () {
         { from: defaultSender });
     }
   });
-  it('Stake ether : Phase1 : 1st Contract: user1 ', async function () {
+  it('Stake ETH ', async function () {
     const stakeAddresses = await stakeEntry.stakeContractsOfVault(vault_phase1_eth.address);
     let stakeContractAddress = null;
     for (let i = 0; i < stakeAddresses.length; i++) {
@@ -173,7 +173,12 @@ describe('StakeProxy ', function () {
     }
   });
 
-  it('closeSale : Phase1 : closeSale ', async function () {
+  it('Close Sale fail when sale did not end.', async function () {
+    const latest = await time.latestBlock();
+    await stakeEntry.closeSale(vault_phase1_eth.address, { from: user1 });
+  });
+
+  it('Close Sale', async function () {
     await stakeEntry.closeSale(vault_phase1_eth.address, { from: user1 });
   });
 

@@ -123,7 +123,6 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
             stakeFactory.deploy(
                 _pahse,
                 _vault,
-                _name,
                 token,
                 paytoken,
                 periodBlock,
@@ -133,6 +132,8 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
             _contract != address(0),
             "Stake1Proxy: stakeFactory.deploy fail"
         );
+
+        IStake1Vault(_vault).addSubVaultOfStake(_name, _contract, periodBlock);
         stakeRegistry.addStakeContract(_vault, _contract);
     }
 
@@ -223,7 +224,7 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
     }
 
     function vaultsOfPahse(uint256 _phase)
-        public
+        public view
         nonZero(address(stakeRegistry))
         returns (address[] memory)
     {

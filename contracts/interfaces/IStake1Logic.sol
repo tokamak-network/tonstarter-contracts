@@ -11,9 +11,8 @@ interface IStake1Logic {
         address _wton,
         address _depositManager,
         address _seigManager
-        // address _uniswapRouter,
-        // address _yearnV2Vault
     ) external ;
+
     function setFactory(address _stakeFactory) external;
 
     function createVault(

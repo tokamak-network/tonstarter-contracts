@@ -1,6 +1,7 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity ^0.7.0;
 
+import {IUniswapV2Router01} from "../interfaces/IUniswapV2Router01.sol";
 import {IStake1Vault} from "../interfaces/IStake1Vault.sol";
 //import { IERC20 } from "../interfaces/IERC20.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
@@ -10,6 +11,7 @@ import {
     ERC165Checker
 } from "@openzeppelin/contracts/introspection/ERC165Checker.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
+
 
 contract Stake1 is TokamakStaker {
     using SafeERC20 for IERC20;
@@ -34,47 +36,8 @@ contract Stake1 is TokamakStaker {
         _setupRole(ADMIN_ROLE, msg.sender);
     }
 
-
     receive() external payable {
-        stake(msg.value);
-    }
-
-    fallback() external payable{
-        _fallback();
-    }
-
-    /// call uniswapRouter
-    function _fallback() internal {
-        address _impl = uniswapRouter();
-        uint256 value = msg.value;
-
-        require(
-            _impl != address(0),
-            "TokamakStaker: uniswapRouter is zero"
-        );
-        assembly {
-            // Copy msg.data. We take full control of memory in this inline assembly
-            // block because it will not return to Solidity code. We overwrite the
-            // Solidity scratch pad at memory position 0.
-            calldatacopy(0, 0, calldatasize())
-
-            // Call the implementation.
-            // out and outsize are 0 because we don't know the size yet.
-            //let result := delegatecall(gas(), _impl, 0, calldatasize(), 0, 0)
-            let result := call(gas(), _impl, value, 0, calldatasize(), 0, 0)
-
-            // Copy the returned data.
-            returndatacopy(0, 0, returndatasize())
-
-            switch result
-                // delegatecall returns 0 on error.
-                case 0 {
-                    revert(0, returndatasize())
-                }
-                default {
-                    return(0, returndatasize())
-                }
-        }
+        // stake(msg.value);
     }
 
     /// @dev Initialize
@@ -245,4 +208,66 @@ contract Stake1 is TokamakStaker {
         return reward;
     }
 
+    ///
+    function addLiquidity(
+        address tokenA,
+        address tokenB,
+        uint amountADesired,
+        uint amountBDesired,
+        uint amountAMin,
+        uint amountBMin,
+        address to,
+        uint deadline
+    )
+        external onlyOwner
+        returns (uint amountA, uint amountB, uint liquidity)
+    {
+        // (bool success, bytes memory data) = _uniswapRouter.call(
+        //     abi.encodeWithSignature("addLiquidity(address,address,uint,uint,uint,uint,address,uint)")
+        // );
+        // require(success, "addLiquidity fail");
+        // (amountA, amountB, liquidity) = abi.decode(data, (uint, uint, uint));
+        return IUniswapV2Router01(_uniswapRouter).addLiquidity(tokenA, tokenB, amountADesired, amountBDesired, amountAMin, amountBMin, to, deadline);
+    }
+
+    function removeLiquidity(
+        address tokenA,
+        address tokenB,
+        uint liquidity,
+        uint amountAMin,
+        uint amountBMin,
+        address to,
+        uint deadline
+    )
+        external onlyOwner
+        returns (uint amountA, uint amountB)
+    {
+        return IUniswapV2Router01(_uniswapRouter).removeLiquidity(tokenA, tokenB, liquidity, amountAMin, amountBMin, to, deadline);
+    }
+
+    function swapExactTokensForTokens(
+        uint amountIn,
+        uint amountOutMin,
+        address[] calldata path,
+        address to,
+        uint deadline
+    )
+        external onlyOwner
+        returns (uint[] memory amounts)
+    {
+        return IUniswapV2Router01(_uniswapRouter).swapExactTokensForTokens(amountIn, amountOutMin, path, to, deadline);
+    }
+
+    function swapTokensForExactTokens(
+        uint amountOut,
+        uint amountInMax,
+        address[] calldata path,
+        address to,
+        uint deadline
+    )
+        external onlyOwner
+        returns (uint[] memory amounts)
+    {
+        return IUniswapV2Router01(_uniswapRouter).swapTokensForExactTokens(amountOut, amountInMax, path, to, deadline);
+    }
 }

@@ -1,16 +1,10 @@
-// const { BigNumber, utils } = require("ethers")
-// const { ethers, upgrades } = require("hardhat")
-
 const { time, expectEvent } = require('@openzeppelin/test-helpers');
 const { ethers } = require('ethers');
-const BigNumber = ethers.BigNumber; // https://docs.ethers.io/v5/api/utils/bignumber/
 const utils = ethers.utils;
 
 const {
   defaultSender, accounts, contract, web3, privateKeys
 } = require('@openzeppelin/test-environment');
-
-// const { expectEvent } = require('openzeppelin-test-helpers');
 
 const BN = require('bn.js');
 
@@ -62,9 +56,9 @@ const CLAIMER_ROLE = keccak256('CLAIMER');
 const PHASE2_VAULT_HASH = keccak256('PHASE2_VAULT');
 const EVENT_VAULT_HASH = keccak256('EVENT_VAULT');
 
-const logFlag = true;
+const logFlag = false;
 
-describe('StakeProxy ', function () {
+describe('Stake TON ', function () {
   let weth, fld, stakeregister, stakefactory, stake1proxy, stake1logic;
   let vault_phase1_eth, vault_phase1_ton, vault_phase1_fldethlp, vault_phase1_dev;
   let ton, wton, depositManager, seigManager;
@@ -113,7 +107,6 @@ describe('StakeProxy ', function () {
   it('Set StakeEntry  ', async function () {
     this.timeout(1000000);
     stakeEntry = await ico20Contracts.setEntry(defaultSender);
-    console.log('stakeEntry', stakeEntry.address);
 
     const cons = await ico20Contracts.getICOContracts();
     fld = cons.fld;
@@ -193,8 +186,8 @@ describe('StakeProxy ', function () {
             if (phaseVault != null){
                 console.log('phaseVault ',i,phaseVault );
                 let contractsInVault = await stakeEntry.stakeContractsOfVault(phaseVault);
-                console.log('contractsInVault ',contractsInVault );
-                await logStakeContracts(1,phaseVault );
+                if (logFlag) console.log('contractsInVault ',contractsInVault );
+                if (logFlag) await logStakeContracts(1,phaseVault );
             }
         }
         const current = await time.latestBlock();
@@ -216,28 +209,28 @@ describe('StakeProxy ', function () {
             if (stakeAddresses.length > 0){
                 for(let j = 0; j< 1; j++){
                     let stakeContract = await Stake1.at(stakeAddresses[j]);
-                    console.log(`\n stakeAddresses[j]: `,j, stakeAddresses[j] );
+                    if (logFlag) console.log(`\n stakeAddresses[j]: `,j, stakeAddresses[j] );
 
                     for (let u = 0; u < 1; u++) {
-                        console.log('\n testStakingUsers[u]: ',u, testStakingUsers[u] );
+                        if (logFlag) console.log('\n testStakingUsers[u]: ',u, testStakingUsers[u] );
 
                         let reward = await stakeContract.canRewardAmount(testStakingUsers[u]);
-                        console.log(` \n------- user`,u, testStakingUsers[u] );
-                        console.log(` reward:  `, fromWei(reward.toString(),'ether') );
+                        if (logFlag) console.log(` \n------- user`,u, testStakingUsers[u] );
+                        if (logFlag) console.log(` reward:  `, fromWei(reward.toString(),'ether') );
 
                         if(reward.gt(toBN('0'))){
 
                            let fldBalance1 = await fld.balanceOf(testStakingUsers[u]);
-                           console.log(` pre claim -> fldBalance1 :  `, fromWei(fldBalance1.toString(),'ether'));
+                           if (logFlag) console.log(` pre claim -> fldBalance1 :  `, fromWei(fldBalance1.toString(),'ether'));
 
                             let tx = await stakeContract.claim({from:testStakingUsers[u]});
-                            console.log(` tx.receipt.logs :  `, tx.receipt.logs[0].event , tx.receipt.logs[0].args.from ,tx.receipt.logs[0].args.amount.toString() ,tx.receipt.logs[0].args.currentBlcok.toString()  );
+                            if (logFlag) console.log(` tx.receipt.logs :  `, tx.receipt.logs[0].event , tx.receipt.logs[0].args.from ,tx.receipt.logs[0].args.amount.toString() ,tx.receipt.logs[0].args.currentBlcok.toString()  );
 
                            let fldBalance2 = await fld.balanceOf(testStakingUsers[u]);
-                           console.log(` after claim -> fldBalance2 :  `, fromWei(fldBalance2.toString(),'ether'));
+                           if (logFlag) console.log(` after claim -> fldBalance2 :  `, fromWei(fldBalance2.toString(),'ether'));
 
                             let rewardClaimedTotal2 = await stakeContract.rewardClaimedTotal();
-                            console.log(`after claim -> stakeContract rewardClaimedTotal2 :  `, fromWei(rewardClaimedTotal2.toString(),'ether') );
+                            if (logFlag) console.log(`after claim -> stakeContract rewardClaimedTotal2 :  `, fromWei(rewardClaimedTotal2.toString(),'ether') );
                             await logUserStaked(stakeAddresses[j], testStakingUsers[u], 'user1');
 
                         }
@@ -257,7 +250,7 @@ describe('StakeProxy ', function () {
     if (logFlag) console.log(`\n\nCurrent block: ${current} `);
 
     for (let i = 0; i < stakeAddresses.length; i++) {
-      console.log('\n\n ************* withdraw : ', i, stakeAddresses[i]);
+      if (logFlag) console.log('\n\n ************* withdraw : ', i, stakeAddresses[i]);
       const stakeContract1 = await Stake1.at(stakeAddresses[i]);
       const endBlock = await stakeContract1.endBlock();
       while (endBlock.gt(current)) {
@@ -268,16 +261,16 @@ describe('StakeProxy ', function () {
       }
 
       const payTokenBalance1 = await web3.eth.getBalance(user1);
-      console.log('\n payTokenBalance1:', fromWei(payTokenBalance1.toString(), 'ether'));
+      if (logFlag) console.log('\n payTokenBalance1:', fromWei(payTokenBalance1.toString(), 'ether'));
 
-      await logUserStaked(stakeAddresses[i], user1, 'user1 pre withdraw');
+      if (logFlag) await logUserStaked(stakeAddresses[i], user1, 'user1 pre withdraw');
 
       await stakeContract1.withdraw({ from: user1 });
       await timeout(2);
 
       const payTokenBalance2 = await web3.eth.getBalance(user1);
-      console.log('\n payTokenBalance2:', fromWei(payTokenBalance2.toString(), 'ether'));
-      await logUserStaked(stakeAddresses[i], user1, 'user1 after withdraw');
+      if (logFlag) console.log('\n payTokenBalance2:', fromWei(payTokenBalance2.toString(), 'ether'));
+      if (logFlag) await logUserStaked(stakeAddresses[i], user1, 'user1 after withdraw');
     }
   });
 

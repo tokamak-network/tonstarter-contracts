@@ -3,7 +3,6 @@ pragma solidity ^0.7.6;
 pragma abicoder v2;
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import {IFLD} from "../interfaces/IFLD.sol";
-import {IERC20} from "../interfaces/IERC20.sol";
 
 contract StakeRegistry is AccessControl {
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");

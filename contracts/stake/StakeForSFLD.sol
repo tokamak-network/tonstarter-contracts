@@ -3,7 +3,6 @@ pragma solidity ^0.7.0;
 
 import "../interfaces/IFLD.sol";
 import "../interfaces/ISFLD.sol";
-import "../interfaces/IERC20.sol";
 import "../libraries/LibTokenStake1.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 
