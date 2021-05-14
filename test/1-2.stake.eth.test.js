@@ -1,6 +1,3 @@
-// const { BigNumber, utils } = require("ethers")
-// const { ethers, upgrades } = require("hardhat")
-
 const { ether, wei, time, expectEvent } = require("@openzeppelin/test-helpers");
 const { ethers } = require("ethers");
 const BigNumber = ethers.BigNumber; // https://docs.ethers.io/v5/api/utils/bignumber/
@@ -13,8 +10,6 @@ const {
   web3,
   privateKeys,
 } = require("@openzeppelin/test-environment");
-
-// const { expectEvent } = require('openzeppelin-test-helpers');
 
 const BN = require("bn.js");
 
@@ -59,18 +54,7 @@ const Stake1Vault = contract.fromArtifact("Stake1Vault");
 const StakeTON = contract.fromArtifact("StakeTON");
 const IERC20 = contract.fromArtifact("IERC20");
 // ----------------------
-/*
-const initialTotal = "10000000000." + "0".repeat(18);
-const Pharse1_TON_Staking = "175000000." + "0".repeat(18);
-const Pharse1_ETH_Staking = "175000000." + "0".repeat(18);
-const Pharse1_FLDETHLP_Staking = "150000000." + "0".repeat(18);
-const Pharse1_DEV_Mining = "150000000." + "0".repeat(18);
 
-const HASH_Pharse1_TON_Staking = keccak256("PHASE1_TON_STAKING");
-const HASH_Pharse1_ETH_Staking = keccak256("PHASE1_ETH_STAKING");
-const HASH_Pharse1_FLDETHLP_Staking = keccak256("PHASE1_FLDETHLP_Staking");
-const HASH_Pharse1_DEV_Mining = keccak256("PHASE1_DEV_Mining");
-*/
 const saleStartBlock = 0;
 let salePeriod = (60 * 60 * 24 * 14) / 13;
 let stakePeriod = (60 * 60 * 24 * 30) / 13;
