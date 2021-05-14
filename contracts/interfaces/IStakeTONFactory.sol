@@ -1,7 +1,7 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity ^0.7.6;
 
-interface IStake1Factory {
+interface IStakeTONFactory {
     function deploy(
         uint256 _pahse,
         address _vault,

@@ -83,7 +83,7 @@ contract TokamakStaker is Stake1Storage, AccessControl, OnApprove {
     function approveUniswapRouter(uint256 amount) external {
         require(
             IERC20(paytoken).approve(_uniswapRouter, amount),
-            "YearnV2Staker: approve fail"
+            "TokamakStaker: approve fail"
         );
     }
 
@@ -104,11 +104,11 @@ contract TokamakStaker is Stake1Storage, AccessControl, OnApprove {
         (address _spender, uint256 _amount) = _decodeStakeData(data);
         require(
             tonAmount == _amount && spender == _spender,
-            "Stake1: tonAmount != stakingAmount "
+            "TokamakStaker: tonAmount != stakingAmount "
         );
         require(
             stakeOnApprove(msg.sender, owner, _spender, _amount),
-            "Stake1: stakeOnApprove fails "
+            "TokamakStaker: stakeOnApprove fails "
         );
         return true;
     }
@@ -130,11 +130,11 @@ contract TokamakStaker is Stake1Storage, AccessControl, OnApprove {
     ) public returns (bool) {
         require(
             (paytoken == from && _amount > 0 && _spender == address(this)),
-            "Stake1: stakeOnApprove init fail"
+            "TokamakStaker: stakeOnApprove init fail"
         );
         require(
             block.number >= saleStartBlock && saleStartBlock < startBlock,
-            "Stake1: stakeTON period is unavailable"
+            "TokamakStaker: stakeTON period is unavailable"
         );
 
         LibTokenStake1.StakedAmount storage staked = userStaked[_owner];
@@ -142,7 +142,7 @@ contract TokamakStaker is Stake1Storage, AccessControl, OnApprove {
         totalStakedAmount += _amount;
         require(
             IERC20(from).transferFrom(_owner, _spender, _amount),
-            "DAOCommittee: failed to transfer ton from creator"
+            "TokamakStaker: failed to transfer ton from creator"
         );
         return true;
     }

@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.7.6;
 
-import {Stake1} from "../stake/Stake1.sol";
+import {StakeTON} from "../stake/StakeTON.sol";
 import {IStake1Vault} from "../interfaces/IStake1Vault.sol";
 
-contract Stake1Factory {
+contract StakeTONFactory {
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
 
     function deploy(
@@ -32,7 +32,7 @@ contract Stake1Factory {
             "Stake1Factory: start error"
         );
 
-        Stake1 c = new Stake1();
+        StakeTON c = new StakeTON();
         c.initialize(
             _token,
             _paytoken,

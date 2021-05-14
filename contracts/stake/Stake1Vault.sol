@@ -30,13 +30,13 @@ contract Stake1Vault is AccessControl {
     uint256 public stakeEndBlock;
     uint256 public blockTotalReward;
     bool public saleClosed;
-    uint256 public stakeType; // 0 : Stake1 ( eth or ton) , 2 : stable coin
+    uint256 public stakeType; // 0 : StakeTON ( eth or ton) , 2 : StakeForStableCoin (stable coin)
     address public defiAddr; // uniswapRouter or yraenV2Vault
 
     address[] public stakeAddresses;
     mapping(address => LibTokenStake1.StakeInfo) public stakeInfos;
 
-    uint256[] public orderedEndBlocks;
+    uint256[] public orderedEndBlocks; // Ascending orders
     mapping(uint256 => uint256) public stakeEndBlockTotal;
 
     //mapping(bytes32 => uint) private lock;

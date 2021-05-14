@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.7.6;
 
-import {IStake1Factory} from "../interfaces/IStake1Factory.sol";
+import {IStakeTONFactory} from "../interfaces/IStakeTONFactory.sol";
 import {
     IStakeForStableCoinFactory
 } from "../interfaces/IStakeForStableCoinFactory.sol";
@@ -10,15 +10,15 @@ import {IStake1Vault} from "../interfaces/IStake1Vault.sol";
 contract StakeFactory {
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
 
-    address public stake1Factory;
+    address public stakeTONFactory;
     address public stakeStableCoinFactory;
 
-    constructor(address _stake1Factory, address _stableFactory) {
+    constructor(address _stakeTONFactory, address _stableFactory) {
         require(
-            _stake1Factory != address(0) && _stableFactory != address(0),
+            _stakeTONFactory != address(0) && _stableFactory != address(0),
             "StakeFactory: init fail"
         );
-        stake1Factory = _stake1Factory;
+        stakeTONFactory = _stakeTONFactory;
         stakeStableCoinFactory = _stableFactory;
     }
 
@@ -44,12 +44,12 @@ contract StakeFactory {
 
         if (stakeType <= 1) {
             require(
-                stake1Factory != address(0),
-                "StakeFactory: stake1Factory zero"
+                stakeTONFactory != address(0),
+                "StakeFactory: stakeTONFactory zero"
             );
 
             return
-                IStake1Factory(stake1Factory).deploy(
+                IStakeTONFactory(stakeTONFactory).deploy(
                     _pahse,
                     _vault,
                     _token,

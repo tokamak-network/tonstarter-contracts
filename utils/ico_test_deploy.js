@@ -31,7 +31,7 @@ const {
 const chai = require("chai");
 const { expect } = chai;
 chai.use(require("chai-bn")(BN)).should();
-
+/*
 const StakeFactoryAbi = require("../build/contracts/StakeFactory.json").abi;
 const StakeRegistryAbi = require("../build/contracts/StakeRegistry.json").abi;
 const FLDAbi = require("../build/contracts/FLD.json").abi;
@@ -40,11 +40,11 @@ const StakeForSFLDAbi = require("../build/contracts/StakeForSFLD.json").abi;
 const Stake1VaultAbi = require("../build/contracts/Stake1Vault.json").abi;
 const Stake1LogicAbi = require("../build/contracts/Stake1Logic.json").abi;
 const Stake1ProxyAbi = require("../build/contracts/Stake1Proxy.json").abi;
-const Stake1Abi = require("../build/contracts/Stake1.json").abi;
+const StakeTONAbi = require("../build/contracts/StakeTON.json").abi;
 const IERC20Abi = require("../build/contracts/IERC20.json").abi;
-
+*/
 // ico2.0 contracts
-const Stake1Factory = contract.fromArtifact("Stake1Factory");
+const StakeTONFactory = contract.fromArtifact("StakeTONFactory");
 const StakeForStableCoinFactory = contract.fromArtifact(
   "StakeForStableCoinFactory"
 );
@@ -56,7 +56,7 @@ const StakeForSFLD = contract.fromArtifact("StakeForSFLD");
 const Stake1Vault = contract.fromArtifact("Stake1Vault");
 const Stake1Logic = contract.fromArtifact("Stake1Logic");
 const Stake1Proxy = contract.fromArtifact("Stake1Proxy");
-const Stake1 = contract.fromArtifact("Stake1");
+const StakeTON = contract.fromArtifact("StakeTON");
 const IERC20 = contract.fromArtifact("IERC20");
 
 const LibTokenStake1 = contract.fromArtifact("LibTokenStake1");
@@ -137,6 +137,19 @@ const PSEIG_RATE = _WTON("0.4");
 
 const TON_MINIMUM_STAKE_AMOUNT = _TON("1000");
 
+
+const initialTotal = "10000000000." + "0".repeat(18);
+const Pharse1_TON_Staking = "175000000." + "0".repeat(18);
+const Pharse1_ETH_Staking = "175000000." + "0".repeat(18);
+const Pharse1_FLDETHLP_Staking = "150000000." + "0".repeat(18);
+const Pharse1_DEV_Mining = "150000000." + "0".repeat(18);
+
+const HASH_Pharse1_TON_Staking = keccak256("PHASE1_TON_STAKING");
+const HASH_Pharse1_ETH_Staking = keccak256("PHASE1_ETH_STAKING");
+const HASH_Pharse1_FLDETHLP_Staking = keccak256("PHASE1_FLDETHLP_Staking");
+const HASH_Pharse1_DEV_Mining = keccak256("PHASE1_DEV_Mining");
+
+
 class ICO20Contracts {
   constructor() {
     this.ton = null;
@@ -190,7 +203,7 @@ class ICO20Contracts {
       Stake1Logic: null,
       Stake1Proxy: null,
       Stake1Vault: null,
-      Stake1: null,
+      StakeTON: null,
     };
   }
 
@@ -200,7 +213,7 @@ class ICO20Contracts {
     this.fld = null;
     this.sfld = null;
     //this.stakeForSFLD = null;
-    this.stake1factory = null;
+    this.stakeTONfactory = null;
     this.stakeForStableCoinFactory = null;
 
     this.stakeregister = null;
@@ -217,13 +230,13 @@ class ICO20Contracts {
     //this.stakeForSFLD = await StakeForSFLD.new({ from: owner });
     this.stakeregister = await StakeRegistry.new({ from: owner });
 
-    this.stake1factory = await Stake1Factory.new({ from: owner });
+    this.stakeTONfactory = await StakeTONFactory.new({ from: owner });
     this.stakeForStableCoinFactory = await StakeForStableCoinFactory.new({
       from: owner,
     });
 
     this.stakefactory = await StakeFactory.new(
-      this.stake1factory.address,
+      this.stakeTONfactory.address,
       this.stakeForStableCoinFactory.address,
       { from: owner }
     );
@@ -727,7 +740,7 @@ class ICO20Contracts {
 
   logStake = async function (_contract, user1, user2) {
       console.log("\n\n----------- Stake Contract ", _contract);
-      const stakeContract = await Stake1.at(_contract);
+      const stakeContract = await StakeTON.at(_contract);
       const token = await stakeContract.token();
       const paytoken = await stakeContract.paytoken();
       const contractVault = await stakeContract.vault();
@@ -814,7 +827,7 @@ class ICO20Contracts {
       const stakeInfo = await vault.stakeInfos(_contract);
 
       console.log("\n\n----------- Stake Contract ", _contract);
-      const stakeContract = await Stake1.at(_contract);
+      const stakeContract = await StakeTON.at(_contract);
       const token = await stakeContract.token();
       const paytoken = await stakeContract.paytoken();
       const contractVault = await stakeContract.vault();
@@ -879,7 +892,7 @@ class ICO20Contracts {
       username,
       _user
     );
-    const stakeContract = await Stake1.at(_contract);
+    const stakeContract = await StakeTON.at(_contract);
     const userStaked = await stakeContract.userStaked(_user);
     console.log("amount", utils.formatUnits(userStaked.amount.toString(), 18));
     console.log("claimedBlock", userStaked.claimedBlock.toString());
@@ -897,4 +910,15 @@ class ICO20Contracts {
 
 }
 
-module.exports = ICO20Contracts;
+module.exports = {
+  ICO20Contracts,
+  initialTotal,
+  Pharse1_TON_Staking,
+  Pharse1_ETH_Staking,
+  Pharse1_FLDETHLP_Staking,
+  Pharse1_DEV_Mining,
+  HASH_Pharse1_TON_Staking,
+  HASH_Pharse1_ETH_Staking,
+  HASH_Pharse1_FLDETHLP_Staking,
+  HASH_Pharse1_DEV_Mining
+  };

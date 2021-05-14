@@ -11,7 +11,7 @@ import {
 } from "@openzeppelin/contracts/introspection/ERC165Checker.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 
-contract Stake1 is TokamakStaker {
+contract StakeTON is TokamakStaker {
     using SafeERC20 for IERC20;
 
     modifier lock() {
@@ -67,21 +67,23 @@ contract Stake1 is TokamakStaker {
         require(
             (paytoken == address(0) && msg.value == _amount) ||
                 (paytoken != address(0) && _amount > 0),
-            "Stake1: amount is zero"
+            "StakeTON: amount is zero"
         );
         require(
             block.number >= saleStartBlock &&
                 saleStartBlock < startBlock &&
                 block.number < startBlock,
-            "Stake1: period is unavailable"
+            "StakeTON: period is unavailable"
         );
+
+        require(!IStake1Vault(vault).saleClosed(), "StakeTON: Sale does not end");
 
         uint256 amount = _amount;
         if (paytoken == address(0)) amount = msg.value;
         else
             require(
                 IERC20(paytoken).balanceOf(msg.sender) >= amount,
-                "Stake1: balance is lack"
+                "StakeTON: balance is lack"
             );
 
         LibTokenStake1.StakedAmount storage staked = userStaked[msg.sender];
@@ -99,7 +101,7 @@ contract Stake1 is TokamakStaker {
     function withdraw() external {
         require(
             endBlock > 0 && endBlock < block.number,
-            "Stake1: on staking period"
+            "StakeTON: on staking period"
         );
         LibTokenStake1.StakedAmount storage staked = userStaked[msg.sender];
 
@@ -108,7 +110,7 @@ contract Stake1 is TokamakStaker {
         // TODO: restaking reward
         require(
             staked.amount > 0 && staked.releasedAmount <= staked.amount,
-            "Stake1: releasedAmount > stakedAmount"
+            "StakeTON: releasedAmount > stakedAmount"
         );
 
         staked.releasedAmount = staked.amount;
@@ -120,11 +122,11 @@ contract Stake1 is TokamakStaker {
             address payable self = address(uint160(address(this)));
             require(self.balance >= amount);
             (bool success, ) = msg.sender.call{value: amount}("");
-            require(success, "Stake1: withdraw eth send failed.");
+            require(success, "StakeTON: withdraw eth send failed.");
         } else {
             require(
                 IERC20(paytoken).transfer(msg.sender, amount),
-                "Stake1: withdraw transfer fail"
+                "StakeTON: withdraw transfer fail"
             );
         }
 
@@ -135,24 +137,24 @@ contract Stake1 is TokamakStaker {
     function claim() external lock {
         require(
             IStake1Vault(vault).saleClosed() == true,
-            "Stake1: The sale is not closed"
+            "StakeTON: The sale is not closed"
         );
         address account = msg.sender;
         uint256 rewardClaim = 0;
         uint256 currentBlock = block.number;
 
         LibTokenStake1.StakedAmount storage staked = userStaked[account];
-        require(staked.claimedBlock < endBlock, "Stake1: claimed");
+        require(staked.claimedBlock < endBlock, "StakeTON: claimed");
 
         rewardClaim = canRewardAmount(account);
 
-        require(rewardClaim > 0, "Stake1: reward is zero");
+        require(rewardClaim > 0, "StakeTON: reward is zero");
 
         uint256 rewardTotal =
             IStake1Vault(vault).totalRewardAmount(address(this));
         require(
             (rewardClaimedTotal + rewardClaim) <= rewardTotal,
-            "Stake1: total reward exceeds"
+            "StakeTON: total reward exceeds"
         );
 
         staked.claimedBlock = currentBlock;
