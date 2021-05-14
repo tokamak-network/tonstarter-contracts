@@ -9,7 +9,7 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 import {IStakeFactory} from "../interfaces/IStakeFactory.sol";
 import {IStakeRegistry} from "../interfaces/IStakeRegistry.sol";
 import {IStake1Vault} from "../interfaces/IStake1Vault.sol";
-import {IStake1} from "../interfaces/IStake1.sol";
+import {IStakeTON} from "../interfaces/IStakeTON.sol";
 import {Stake1Vault} from "./Stake1Vault.sol";
 
 contract Stake1Logic is StakeProxyStorage, AccessControl {
@@ -123,7 +123,7 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
     ) external onlyOwner {
         require(
             stakeRegistry.validVault(_pahse, _vault),
-            "Stake1Proxy: unvalidVault"
+            "Stake1Logic: unvalidVault"
         );
         // solhint-disable-next-line max-line-length
         address _contract =
@@ -137,7 +137,7 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
             );
         require(
             _contract != address(0),
-            "Stake1Proxy: stakeFactory.deploy fail"
+            "Stake1Logic: stakeFactory.deploy fail"
         );
 
         IStake1Vault(_vault).addSubVaultOfStake(_name, _contract, periodBlock);
@@ -182,7 +182,7 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
         address _layer2,
         uint256 _amount
     ) external onlyOwner {
-        IStake1(_stakeContract).tokamakStaking(_layer2, _amount);
+        IStakeTON(_stakeContract).tokamakStaking(_layer2, _amount);
     }
 
     /// @dev Requests unstaking all
@@ -190,7 +190,7 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
         external
         onlyOwner
     {
-        IStake1(_stakeContract).tokamakRequestUnStakingAll(_layer2);
+        IStakeTON(_stakeContract).tokamakRequestUnStakingAll(_layer2);
     }
 
     /// @dev Requests unstaking
@@ -199,7 +199,7 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
         address _layer2,
         uint256 _amount
     ) external onlyOwner {
-        IStake1(_stakeContract).tokamakRequestUnStaking(_layer2, _amount);
+        IStakeTON(_stakeContract).tokamakRequestUnStaking(_layer2, _amount);
     }
 
     /// @dev Processes unstaking
@@ -208,7 +208,7 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
         address _layer2,
         bool receiveTON
     ) external onlyOwner {
-        IStake1(_stakeContract).tokamakProcessUnStaking(_layer2, receiveTON);
+        IStakeTON(_stakeContract).tokamakProcessUnStaking(_layer2, receiveTON);
     }
 
     /// @dev Sets FLD address

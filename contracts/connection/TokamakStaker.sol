@@ -8,20 +8,11 @@ import {ISeigManager} from "../interfaces/ISeigManager.sol";
 
 import "@openzeppelin/contracts/access/AccessControl.sol";
 //import { ERC165 } from "@openzeppelin/contracts/introspection/ERC165.sol";
-import "../stake/Stake1Storage.sol";
+import "../stake/StakeTONStorage.sol";
 import {OnApprove} from "../tokens/OnApprove.sol";
 
 /// @title The connector that integrates zkopru and tokamak
-contract TokamakStaker is Stake1Storage, AccessControl, OnApprove {
-    address public ton;
-    address public wton;
-    address public depositManager;
-    address public seigManager;
-    address public tokamakLayer2;
-    address internal _uniswapRouter;
-
-    // reward from tokamak
-    uint256 public rewardTokamak;
+contract TokamakStaker is StakeTONStorage, AccessControl, OnApprove {
 
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
 

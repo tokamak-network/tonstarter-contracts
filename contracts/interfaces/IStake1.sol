@@ -26,45 +26,4 @@ interface IStake1 {
         returns (LibTokenStake1.StakedAmount memory);
 
     function stake(uint256 amount) external payable;
-
-    function onApprove(
-        address owner,
-        address spender,
-        uint256 tonAmount,
-        bytes calldata data
-    ) external returns (bool);
-
-    function stakeOnApprove(
-        address _owner,
-        address _spender,
-        uint256 _amount
-    ) external;
-
-    function tokamakStaking(address _layer2, uint256 _amount) external;
-
-    function tokamakRequestUnStakingAll(address _layer2) external;
-
-    function tokamakRequestUnStaking(address _layer2, uint256 _amount) external;
-
-    function tokamakProcessUnStaking(address _layer2, bool receiveTON) external;
-
-    function tokamakPendingUnstaked(address _layer2)
-        external
-        view
-        returns (uint256 wtonAmount);
-
-    function tokamakAccStaked(address _layer2)
-        external
-        view
-        returns (uint256 wtonAmount);
-
-    function tokamakAccUnstaked(address _layer2)
-        external
-        view
-        returns (uint256 wtonAmount);
-
-    function tokamakStakeOf(address _layer2)
-        external
-        view
-        returns (uint256 wtonAmount);
 }

@@ -2,13 +2,13 @@
 pragma solidity ^0.7.6;
 pragma abicoder v2;
 
+import {IFLD} from "../interfaces/IFLD.sol";
+import "../interfaces/IStake1Vault.sol";
+import "../interfaces/IStake1.sol";
+
 import "../libraries/LibTokenStake1.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
-import {IFLD} from "../interfaces/IFLD.sol";
-//import { IERC20 } from "../interfaces/IERC20.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {IStake1} from "../interfaces/IStake1.sol";
-import "../interfaces/IStake1Vault.sol";
 
 /// @title FLD Token's Vault - stores the fld for the period of time
 /// @notice A vault is associated with the set of stake contracts.

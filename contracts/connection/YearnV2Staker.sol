@@ -5,11 +5,10 @@ import {IYearnV2Vault} from "../interfaces/IYearnV2Vault.sol";
 
 import "@openzeppelin/contracts/access/AccessControl.sol";
 //import { ERC165 } from "@openzeppelin/contracts/introspection/ERC165.sol";
-import "../stake/Stake1Storage.sol";
+import "../stake/StakeYearnStorage.sol";
 
 /// @title The connector that integrates zkopru and tokamak
-contract YearnV2Staker is Stake1Storage, AccessControl {
-    address private _yearnV2Vault;
+contract YearnV2Staker is StakeYearnStorage, AccessControl {
 
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
 
@@ -32,65 +31,61 @@ contract YearnV2Staker is Stake1Storage, AccessControl {
             "TokamakStaker: Already started"
         );
         require(_vault != address(0), "YearnV2Staker: zero address");
-        _yearnV2Vault = _vault;
+        yearnV2Vault = _vault;
     }
 
     function approveYearnV2Vault(uint256 amount) external {
         require(
-            IERC20(paytoken).approve(_yearnV2Vault, amount),
+            IERC20(paytoken).approve(yearnV2Vault, amount),
             "YearnV2Staker: approve fail"
         );
-    }
-
-    function yearnV2Vault() public view returns (address) {
-        return _yearnV2Vault;
     }
 
     function yearnV2_calcTotalValue()
         external
         onlyOwner
-        nonZero(_yearnV2Vault)
+        nonZero(yearnV2Vault)
         returns (uint256 underlyingAmount)
     {
-        return IYearnV2Vault(_yearnV2Vault).calcTotalValue();
+        return IYearnV2Vault(yearnV2Vault).calcTotalValue();
     }
 
     function yearnV2_deposit(uint256 amount)
         external
         onlyOwner
-        nonZero(_yearnV2Vault)
+        nonZero(yearnV2Vault)
     {
-        IYearnV2Vault(_yearnV2Vault).deposit(amount);
+        IYearnV2Vault(yearnV2Vault).deposit(amount);
     }
 
     function yearnV2_withdraw(uint256 amount)
         external
         onlyOwner
-        nonZero(_yearnV2Vault)
+        nonZero(yearnV2Vault)
     {
-        IYearnV2Vault(_yearnV2Vault).withdraw(amount);
+        IYearnV2Vault(yearnV2Vault).withdraw(amount);
     }
 
     function yearnV2_underlyingYield()
         external
         onlyOwner
-        nonZero(_yearnV2Vault)
+        nonZero(yearnV2Vault)
         returns (uint256)
     {
-        return IYearnV2Vault(_yearnV2Vault).underlyingYield();
+        return IYearnV2Vault(yearnV2Vault).underlyingYield();
     }
 
     function yearnV2_unclaimedProfit(address user)
         external
         view
         onlyOwner
-        nonZero(_yearnV2Vault)
+        nonZero(yearnV2Vault)
         returns (uint256)
     {
-        return IYearnV2Vault(_yearnV2Vault).unclaimedProfit(user);
+        return IYearnV2Vault(yearnV2Vault).unclaimedProfit(user);
     }
 
-    function yearnV2_claim() external onlyOwner nonZero(_yearnV2Vault) {
-        IYearnV2Vault(_yearnV2Vault).claim();
+    function yearnV2_claim() external onlyOwner nonZero(yearnV2Vault) {
+        IYearnV2Vault(yearnV2Vault).claim();
     }
 }

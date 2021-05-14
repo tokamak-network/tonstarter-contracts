@@ -2,7 +2,10 @@
 pragma solidity ^0.7.6;
 
 import {IStake1Vault} from "../interfaces/IStake1Vault.sol";
+import {IStakeForStableCoin} from "../interfaces/IStakeForStableCoin.sol";
+
 import {StakeForStableCoin} from "../stake/StakeForStableCoin.sol";
+import {StakeYearnProxy} from "../stake/StakeYearnProxy.sol";
 
 contract StakeForStableCoinFactory {
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
@@ -17,7 +20,7 @@ contract StakeForStableCoinFactory {
     ) public returns (address) {
         require(
             _vault != address(0) && _pahse == 1,
-            "StakeFactory: deploy init fail"
+            "StakeForStableCoinFactory: deploy init fail"
         );
 
         IStake1Vault vault = IStake1Vault(_vault);
@@ -28,13 +31,15 @@ contract StakeForStableCoinFactory {
 
         require(
             saleStart < stakeStart && stakeStart > 0,
-            "StakeFactory: start error"
+            "StakeForStableCoinFactory: start error"
         );
 
         // if paytoken is stable coin, stakeContract is YearnV2Staker
+        StakeYearnProxy proxy = new StakeYearnProxy();
+        StakeForStableCoin logic = new StakeForStableCoin();
+        proxy.upgradeTo(address(logic));
 
-        StakeForStableCoin c = new StakeForStableCoin();
-        c.initialize(
+        IStakeForStableCoin(address(proxy)).initialize(
             _token,
             _paytoken,
             address(vault),
@@ -42,10 +47,12 @@ contract StakeForStableCoinFactory {
             stakeStart,
             period
         );
-        c.setYearnV2(defiAddr);
-        // vault.addSubVaultOfStake(_name, address(c), period);
-        c.grantRole(ADMIN_ROLE, owner);
-        c.revokeRole(ADMIN_ROLE, address(this));
-        return address(c);
+
+        IStakeForStableCoin(address(proxy)).setYearnV2(defiAddr);
+
+        // vault.addSubVaultOfStake(_name, address(proxy), period);
+        proxy.grantRole(ADMIN_ROLE, owner);
+        proxy.revokeRole(ADMIN_ROLE, address(this));
+        return address(proxy);
     }
 }
