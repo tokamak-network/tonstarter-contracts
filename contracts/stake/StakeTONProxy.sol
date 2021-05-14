@@ -2,12 +2,14 @@
 pragma solidity ^0.7.6;
 pragma abicoder v2;
 
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./StakeTONStorage.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
+import {OnApprove} from "../tokens/OnApprove.sol";
 
 /// @title Proxy for Stake contracts in Phase 1
 /// @notice
-contract StakeTONProxy is StakeTONStorage, AccessControl {
+contract StakeTONProxy is StakeTONStorage, AccessControl, OnApprove {
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
     address internal _implementation;
     bool public pauseProxy;
@@ -89,4 +91,59 @@ contract StakeTONProxy is StakeTONStorage, AccessControl {
                 }
         }
     }
+
+    /// @dev Approves
+    function onApprove(
+        address owner,
+        address spender,
+        uint256 tonAmount,
+        bytes calldata data
+    ) external override returns (bool) {
+        (address _spender, uint256 _amount) = _decodeStakeData(data);
+        require(
+            tonAmount == _amount && spender == _spender,
+            "TokamakStaker: tonAmount != stakingAmount "
+        );
+        require(
+            stakeOnApprove(msg.sender, owner, _spender, _amount),
+            "TokamakStaker: stakeOnApprove fails "
+        );
+        return true;
+    }
+
+    function _decodeStakeData(bytes calldata input)
+        internal
+        pure
+        returns (address spender, uint256 amount)
+    {
+        (spender, amount) = abi.decode(input, (address, uint256));
+    }
+
+    /// @dev stake with ton
+    function stakeOnApprove(
+        address from,
+        address _owner,
+        address _spender,
+        uint256 _amount
+    ) public returns (bool) {
+        require(
+            (paytoken == from && _amount > 0 && _spender == address(this)),
+            "TokamakStaker: stakeOnApprove init fail"
+        );
+        require(
+            block.number >= saleStartBlock && saleStartBlock < startBlock
+            && block.number < startBlock,
+            "TokamakStaker: stakeTON period is unavailable"
+        );
+
+        LibTokenStake1.StakedAmount storage staked = userStaked[_owner];
+        staked.amount += _amount;
+        totalStakedAmount += _amount;
+        require(
+            IERC20(from).transferFrom(_owner, _spender, _amount),
+            "TokamakStaker: failed to transfer ton from creator"
+        );
+        return true;
+    }
+
 }

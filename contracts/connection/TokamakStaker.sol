@@ -9,10 +9,10 @@ import {ISeigManager} from "../interfaces/ISeigManager.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 //import { ERC165 } from "@openzeppelin/contracts/introspection/ERC165.sol";
 import "../stake/StakeTONStorage.sol";
-import {OnApprove} from "../tokens/OnApprove.sol";
+// import {OnApprove} from "../tokens/OnApprove.sol";
 
 /// @title The connector that integrates zkopru and tokamak
-contract TokamakStaker is StakeTONStorage, AccessControl, OnApprove {
+contract TokamakStaker is StakeTONStorage, AccessControl {
 
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
 
@@ -85,6 +85,7 @@ contract TokamakStaker is StakeTONStorage, AccessControl, OnApprove {
     /// TODO: Withdrawal for operating profit
     function withdrawProfit(address _token, uint256 amount) external {}
 
+    /*
     /// @dev Approves
     function onApprove(
         address owner,
@@ -137,7 +138,7 @@ contract TokamakStaker is StakeTONStorage, AccessControl, OnApprove {
         );
         return true;
     }
-
+    */
     function tokamakStaking(address _layer2, uint256 _amount)
         external
         onlyOwner
