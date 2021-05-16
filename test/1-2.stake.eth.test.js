@@ -100,19 +100,18 @@ describe("Phase1. StakeContract with ETH", function () {
     ico20Contracts = new ICO20Contracts();
   });
 
-  describe('# Global Setting', async function () {
-    it("ico20Contracts init  ", async function () {
-      this.timeout(1000000);
-      ICOContractsDeployed = await ico20Contracts.initializeICO20Contracts(
-        defaultSender
-      );
-    });
-    it("tokamakContracts init  ", async function () {
-      this.timeout(1000000);
-      TokamakContractsDeployed =
-        await ico20Contracts.initializePlasmaEvmContracts(defaultSender);
-    });
-
+  it("ico20Contracts init  ", async function () {
+    this.timeout(1000000);
+    ICOContractsDeployed = await ico20Contracts.initializeICO20Contracts(
+      defaultSender
+    );
+  });
+  it("tokamakContracts init  ", async function () {
+    this.timeout(1000000);
+    TokamakContractsDeployed =
+      await ico20Contracts.initializePlasmaEvmContracts(defaultSender);
+  });
+  
   it('Set StakeProxy  ', async function () {
     this.timeout(1000000);
     stakeEntry = await ico20Contracts.setEntry(defaultSender);
