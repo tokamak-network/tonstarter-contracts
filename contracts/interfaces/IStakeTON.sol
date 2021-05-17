@@ -58,11 +58,11 @@ interface IStakeTON {
         uint256 _amount
     ) external;
 
-    function tokamakStaking(address _layer2, uint256 _amount) external;
+    function tokamakStaking(address _layer2) external;
 
     function tokamakRequestUnStakingAll(address _layer2) external;
 
-    function tokamakRequestUnStaking(address _layer2, uint256 _amount) external;
+    function tokamakRequestUnStakingReward(address _layer2) external;
 
     function tokamakProcessUnStaking(address _layer2, bool receiveTON) external;
 

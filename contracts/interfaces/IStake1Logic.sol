@@ -54,17 +54,15 @@ interface IStake1Logic {
 
     function tokamakStaking(
         address _stakeContract,
-        address _layer2,
-        uint256 _amount
+        address _layer2
     ) external;
 
     function tokamakRequestUnStakingAll(address _stakeContract, address _layer2)
         external;
 
-    function tokamakRequestUnStaking(
+    function tokamakRequestUnStakingReward(
         address _stakeContract,
-        address _layer2,
-        uint256 _amount
+        address _layer2
     ) external;
 
     function tokamakProcessUnStaking(

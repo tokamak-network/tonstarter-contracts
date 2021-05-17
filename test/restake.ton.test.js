@@ -385,10 +385,9 @@ describe("StakeProxy ", function () {
           utils.formatUnits(_amount.toString(), 27),
           "TON"
         );
-        await stakeEntry.tokamakRequestUnStaking(
+        await stakeEntry.tokamakRequestUnStakingReward(
           stakeAddresses[i],
           layer2.address,
-          _amount,
           { from: defaultSender }
         );
         const accStakedAccount = await depositManager.accStakedAccount(

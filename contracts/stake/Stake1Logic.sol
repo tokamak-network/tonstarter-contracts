@@ -21,7 +21,7 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
     modifier onlyOwner() {
         require(
             hasRole(ADMIN_ROLE, msg.sender),
-            "Stake1Proxy: Caller is not an admin"
+            ""
         );
         _;
     }
@@ -179,27 +179,24 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
 
     function tokamakStaking(
         address _stakeContract,
-        address _layer2,
-        uint256 _amount
-    ) external onlyOwner {
-        IStakeTON(_stakeContract).tokamakStaking(_layer2, _amount);
+        address _layer2
+    ) external {
+        IStakeTON(_stakeContract).tokamakStaking(_layer2);
     }
 
     /// @dev Requests unstaking all
     function tokamakRequestUnStakingAll(address _stakeContract, address _layer2)
         external
-        onlyOwner
     {
         IStakeTON(_stakeContract).tokamakRequestUnStakingAll(_layer2);
     }
 
     /// @dev Requests unstaking
-    function tokamakRequestUnStaking(
+    function tokamakRequestUnStakingReward(
         address _stakeContract,
-        address _layer2,
-        uint256 _amount
-    ) external onlyOwner {
-        IStakeTON(_stakeContract).tokamakRequestUnStaking(_layer2, _amount);
+        address _layer2
+    ) external {
+        IStakeTON(_stakeContract).tokamakRequestUnStakingReward(_layer2);
     }
 
     /// @dev Processes unstaking
@@ -207,7 +204,7 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
         address _stakeContract,
         address _layer2,
         bool receiveTON
-    ) external onlyOwner {
+    ) external {
         IStakeTON(_stakeContract).tokamakProcessUnStaking(_layer2, receiveTON);
     }
 

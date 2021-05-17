@@ -103,6 +103,14 @@ contract StakeTON is TokamakStaker {
             endBlock > 0 && endBlock < block.number,
             "StakeTON: on staking period"
         );
+
+        if (tokamakLayer2 != address(0)) {
+            require(
+                ISeigManager(seigManager).stakeOf(tokamakLayer2, address(this)) == 0 &&
+                IDepositManager(depositManager).pendingUnstaked(tokamakLayer2, address(this)) == 0,
+                "StakeTON: unstaking to tokamak");
+        }
+
         LibTokenStake1.StakedAmount storage staked = userStaked[msg.sender];
 
         uint256 amount = staked.amount;
