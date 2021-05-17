@@ -908,6 +908,61 @@ class ICO20Contracts {
     console.log("released", userStaked.released.toString());
   }
 
+  logTONBalance = async function (_layer2, stakerAddress, logFlag){
+    console.log('TON BALANCE -- user : ',stakerAddress );
+    const tonAmount = await this.ton.balanceOf(stakerAddress);
+    console.log(
+      "tonAmount:",
+      utils.formatUnits(tonAmount.toString(), 18),
+      "TON"
+    );
+    const wtonAmount = await this.wton.balanceOf(stakerAddress);
+    console.log(
+      "wtonAmount:",
+      utils.formatUnits(wtonAmount.toString(), 27),
+      "WTON"
+    );
+
+    return tonAmount;
+  }
+
+  logTokamakLayerBalance = async function (_layer2, stakerAddress){
+    console.log('\n ------ TON Staked Amount - stakeContract: ', stakerAddress );
+    const accStakedAccount = await this.depositManager.accStakedAccount(
+            stakerAddress
+    );
+    console.log(
+      " - depositManager accStakedAccount:",
+      utils.formatUnits(accStakedAccount.toString(), 27),
+      "WTON "
+    );
+    const stakeOf = await this.seigManager.stakeOf(
+      _layer2,
+      stakerAddress
+    );
+
+    console.log(
+      " - seigManager stakeOf in layer2:",
+      utils.formatUnits(stakeOf.toString(), 27),
+      "WTON "
+    );
+
+    const pendingUnstaked = await this.depositManager.pendingUnstaked(
+      _layer2,
+      stakerAddress
+    );
+    console.log(
+        " - pendingUnstaked:",
+        utils.formatUnits(pendingUnstaked.toString(), 27),
+        "WTON "
+    );
+
+    let stakeContract = await StakeTON.at(stakerAddress);
+    let fromTokamak = await stakeContract.fromTokamak();
+    console.log(' - fromTokamak In StakeContract:',utils.formatUnits(fromTokamak.toString(), 27) ,' WTON\n');
+
+  }
+
 }
 
 module.exports = {

@@ -2,6 +2,7 @@ require('dotenv').config();
 const path = require('path');
 // const HDWalletProvider = require("@truffle/hdwallet-provider");
 //const PrivateKeyProvider = require('truffle-privatekey-provider');
+require('dotenv').config()
 
 module.exports = {
   contracts_build_directory : path.join(__dirname, "build/contracts"),
@@ -12,6 +13,14 @@ module.exports = {
       port: 9545,
       gas: 6721975,
       network_id: '*', // eslint-disable-line camelcase,
+    },
+    rinkeby: {
+      provider: () => new HDWalletProvider(
+        process.env.MNEMONIC_HARDHAT, `https://rinkeby.infura.io/v3/${process.env.InfuraKey}`
+      ),
+      network_id: 4,
+      gasPrice: 10e9,
+      skipDryRun: true
     },
   //   ropsten: {
   //     provider: ropstenProvider,
@@ -53,4 +62,10 @@ module.exports = {
       },
     },
   },
+  plugins: [
+    'truffle-plugin-verify'
+  ],
+  api_keys: {
+    etherscan: `${process.env.APIKey}`
+  }
 };

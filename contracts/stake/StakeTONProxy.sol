@@ -19,7 +19,7 @@ contract StakeTONProxy is StakeTONStorage, AccessControl, OnApprove {
     modifier onlyOwner() {
         require(
             hasRole(ADMIN_ROLE, msg.sender),
-            "StakeTONProxy: msg.sender is not an admin"
+            "not an admin"
         );
         _;
     }
@@ -128,12 +128,12 @@ contract StakeTONProxy is StakeTONStorage, AccessControl, OnApprove {
     ) public returns (bool) {
         require(
             (paytoken == from && _amount > 0 && _spender == address(this)),
-            "TokamakStaker: stakeOnApprove init fail"
+            "stakeOnApprove init fail"
         );
         require(
             block.number >= saleStartBlock && saleStartBlock < startBlock
             && block.number < startBlock,
-            "TokamakStaker: stakeTON period is unavailable"
+            "period is unavailable"
         );
 
         LibTokenStake1.StakedAmount storage staked = userStaked[_owner];
@@ -141,7 +141,7 @@ contract StakeTONProxy is StakeTONStorage, AccessControl, OnApprove {
         totalStakedAmount += _amount;
         require(
             IERC20(from).transferFrom(_owner, _spender, _amount),
-            "TokamakStaker: failed to transfer ton from creator"
+            "transfer fail"
         );
         return true;
     }

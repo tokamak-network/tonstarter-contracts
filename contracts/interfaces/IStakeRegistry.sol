@@ -3,9 +3,9 @@ pragma solidity ^0.7.6;
 
 interface IStakeRegistry {
     function addVault(
+        address _vault,
         uint256 _pahse,
-        bytes32 _vaultName,
-        address _vault
+        bytes32 _vaultName
     ) external;
 
     function addStakeContract(address _vault, address _stakeContract) external;
