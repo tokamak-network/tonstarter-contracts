@@ -1,12 +1,21 @@
+const chai = require("chai");
+const { expect } = require("chai");
+
+const { solidity } = require("ethereum-waffle");
+chai.use(solidity);
+
 const { defaultSender, accounts, contract } = require("@openzeppelin/test-environment");
 const { time } = require("@openzeppelin/test-helpers");
 const { ICO20Contracts } = require("../utils/ico_test_deploy.js");
 const { ethers } = require("ethers");
-const { toBN, toWei, keccak256 } = require("web3-utils");
-const Stake1Vault = contract.fromArtifact("Stake1Vault");
-const StakeTON = contract.fromArtifact("StakeTON");
+const { toBN, toWei, keccak256, fromWei } = require("web3-utils");
+
 const Pharse1_ETH_Staking = "175000000." + "0".repeat(18);
 const zeroAddress = "0x0000000000000000000000000000000000000000";
+
+const Stake1Vault = contract.fromArtifact("Stake1Vault");
+const StakeTON = contract.fromArtifact("StakeTON");
+const StakeTONProxy = contract.fromArtifact("StakeTONProxy");
 
 describe ("Upgradable Stake Contracts", function () {
   const usersInfo = [
@@ -95,24 +104,45 @@ describe ("Upgradable Stake Contracts", function () {
     // Store stake addresses
     const stakeAddresses = await stakeEntry.stakeContractsOfVault(Vault.address);
     for (let i = 0; i < stakingContractInfo.length; ++i) {
-      stakingContractInfo[i].stakeAddress = stakeAddresses[i];
+      stakingContractInfo[i].address = stakeAddresses[i];
     }
   });
 
-  it("should stake ethers", async function () {
+  it("should upgrade stake to invalid contract", async function () {
     this.timeout(10000000);
     const currentBlockTime = parseInt(saleStartBlock);
     await time.advanceBlockTo(currentBlockTime);
     for (let i = 0; i < stakingContractInfo.length; ++i) {
-      const { stakeAddress } = stakingContractInfo[i];
+      const { address: stakeAddress } = stakingContractInfo[i];
+      const stakeProxy = await StakeTONProxy.at(stakeAddress);
       const stakeContract = await StakeTON.at(stakeAddress);
+      const oldImplementationAddress = await stakeProxy.implementation();
+      const newImplementation = ICO20Instances.fld.address; // random address
+ 
+      // upgrade to non-working implementation
+      await stakeEntry.upgradeStakeTo(stakeAddress, newImplementation, { from: defaultSender });
+      
+      
+      // try to use it
+      for (const user of usersInfo) {
+        const { name, address, stakes } = user;
+        await expect(
+          stakeContract.sendTransaction({
+            from: address,
+            value: toWei(toBN(stakes[i].amount), "ether"),
+          })
+        ).to.be.reverted;
+      }
+      
+      // upgrade to non-working implementation
+      await stakeEntry.upgradeStakeTo(stakeAddress, oldImplementationAddress);
       for (const user of usersInfo) {
         const { name, address, stakes } = user;
         await stakeContract.sendTransaction({
           from: address,
           value: toWei(toBN(stakes[i].amount), "ether"),
         });
-      }    
+      }
     }
   });
 
@@ -120,5 +150,37 @@ describe ("Upgradable Stake Contracts", function () {
     const current = parseInt(stakeStartBlock);
     await time.advanceBlockTo(current);
     await stakeEntry.closeSale(Vault.address, { from: defaultSender });
+  });
+
+  it("should claim rewards", async function () {
+    this.timeout(10000000);
+    const fld = ICO20Instances.fld;
+
+    for (const { claimBlock } of [{claimBlock: 10}, {claimBlock: 60}]) {
+      let block = stakeStartBlock + claimBlock;
+      await time.advanceBlockTo(block - 1);
+      for (const { name: stakeName, address: stakeAddress, period: stakePeriod } of stakingContractInfo) {
+        const stakeContract = await StakeTON.at(stakeAddress);
+        for (const { address: userAddress } of usersInfo) {
+          const reward = await stakeContract.canRewardAmount(userAddress);
+          console.log({ reward: reward.toString() });
+
+          const fldBalance = await fld.balanceOf(userAddress);
+          await stakeContract.claim({ from: userAddress });
+          block++;
+          console.log({ fldBalance: fldBalance.toString() });
+
+          const newFldBalance = await fld.balanceOf(userAddress);
+          await expect(newFldBalance).to.be.bignumber.above(fldBalance);
+          console.log({ newFldBalance: newFldBalance.toString() });
+
+          const rewardClaimedTotal = await stakeContract.rewardClaimedTotal();
+          console.log(fromWei(rewardClaimedTotal.toString(), "ether"));
+
+          const { amount, claimedAmount } = await stakeContract.userStaked(userAddress);
+          console.log({ amount: amount.toString(), claimedAmount: claimedAmount.toString() });
+        }
+      }
+    }
   });
 });

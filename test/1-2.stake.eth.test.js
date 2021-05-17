@@ -63,7 +63,7 @@ stakePeriod = parseInt(stakePeriod);
 
 const zeroAddress = "0x0000000000000000000000000000000000000000";
 
-const logFlag = 0;
+const logFlag = 1;
 
 describe("Phase1. StakeContract with ETH", function () {
   let weth, fld, stakeregister, stakefactory, stake1proxy, stake1logic;
