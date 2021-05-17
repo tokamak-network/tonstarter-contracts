@@ -40,6 +40,16 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
     // Events
     //////////////////////////////
     event CreatedVault(address indexed vault, address paytoken, uint256 cap);
+    event CreatedStakeContract(address indexed vault, address indexed stakeContract, uint256 phase);
+    /*
+    event ClosedSale(address indexed vault, address from);
+    event TokamakStaked(address indexed stakeContract, address from, address layer2);
+    event TokamakRequestedUnStakingAll(address indexed stakeContract, address from, address layer2);
+    event TokamakRequestedUnStakingReward(address indexed stakeContract, address from, address layer2);
+    event TokamakProcessedUnStaking(address indexed stakeContract, address from, address layer2, bool receiveTON);
+    */
+    event SetStakeFactory(address stakeFactory);
+    event SetStakeRegistry(address stakeRegistry);
 
     //////////////////////////////////////////////////////////////////////
     // setters
@@ -53,8 +63,6 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
         address _seigManager
     )
         external
-        // address _uniswapRouter,
-        // address _yearnV2Vault
         onlyOwner
         nonZero(_ton)
         nonZero(_wton)
@@ -67,8 +75,7 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
         wton = _wton;
         depositManager = _depositManager;
         seigManager = _seigManager;
-        //uniswapRouter = _uniswapRouter;
-        //yearnV2Vault = _yearnV2Vault;
+
     }
 
     ///
@@ -76,15 +83,6 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
         setStakeFactory(_stakeFactory);
     }
 
-    /*
-    function setUniswapRouter(address _addr) external onlyOwner nonZero(_addr) {
-        uniswapRouter = _addr;
-    }
-
-    function setYearnV2Vault(address _addr) external onlyOwner nonZero(_addr) {
-        yearnV2Vault = _addr;
-    }
-    */
     //////////////////////////////////////////////////////////////////////
     // Admin Functions
     function createVault(
@@ -92,7 +90,7 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
         uint256 _cap,
         uint256 _saleStartBlcok,
         uint256 _stakeStartBlcok,
-        uint256 _pahse,
+        uint256 _phase,
         bytes32 _vaultName,
         uint256 _stakeType,
         address _defiAddr
@@ -108,13 +106,13 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
             _stakeType,
             _defiAddr
         );
-        stakeRegistry.addVault(_pahse, _vaultName, address(vault));
+        stakeRegistry.addVault(address(vault), _phase, _vaultName);
 
         emit CreatedVault(address(vault), _paytoken, _cap);
     }
 
     function createStakeContract(
-        uint256 _pahse,
+        uint256 _phase,
         address _vault,
         address token,
         address paytoken,
@@ -122,13 +120,13 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
         string memory _name
     ) external onlyOwner {
         require(
-            stakeRegistry.validVault(_pahse, _vault),
+            stakeRegistry.validVault(_phase, _vault),
             "Stake1Logic: unvalidVault"
         );
         // solhint-disable-next-line max-line-length
         address _contract =
             stakeFactory.deploy(
-                _pahse,
+                _phase,
                 _vault,
                 token,
                 paytoken,
@@ -137,11 +135,13 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
             );
         require(
             _contract != address(0),
-            "Stake1Logic: stakeFactory.deploy fail"
+            "Stake1Logic: deploy fail"
         );
 
         IStake1Vault(_vault).addSubVaultOfStake(_name, _contract, periodBlock);
         stakeRegistry.addStakeContract(_vault, _contract);
+
+        emit CreatedStakeContract(_vault, _contract, _phase);
     }
 
     function currentBlock() external view returns (uint256) {
@@ -150,14 +150,17 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
 
     function closeSale(address _vault) external {
         IStake1Vault(_vault).closeSale();
+
+        // emit ClosedSale(_vault, msg.sender);
     }
 
     function addVault(
-        uint256 _pahse,
+        uint256 _phase,
         bytes32 _vaultName,
         address _vault
     ) external onlyOwner {
-        stakeRegistry.addVault(_pahse, _vaultName, _vault);
+
+        stakeRegistry.addVault(_vault, _phase, _vaultName);
     }
 
     function stakeContractsOfVault(address _vault)
@@ -182,6 +185,7 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
         address _layer2
     ) external {
         IStakeTON(_stakeContract).tokamakStaking(_layer2);
+        //emit TokamakStaked(_stakeContract, msg.sender, _layer2);
     }
 
     /// @dev Requests unstaking all
@@ -189,6 +193,7 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
         external
     {
         IStakeTON(_stakeContract).tokamakRequestUnStakingAll(_layer2);
+        //emit TokamakRequestedUnStakingAll(_stakeContract, msg.sender, _layer2);
     }
 
     /// @dev Requests unstaking
@@ -197,6 +202,7 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
         address _layer2
     ) external {
         IStakeTON(_stakeContract).tokamakRequestUnStakingReward(_layer2);
+        //emit TokamakRequestedUnStakingReward(_stakeContract, msg.sender, _layer2);
     }
 
     /// @dev Processes unstaking
@@ -206,6 +212,7 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
         bool receiveTON
     ) external {
         IStakeTON(_stakeContract).tokamakProcessUnStaking(_layer2, receiveTON);
+        //emit TokamakProcessedUnStaking(_stakeContract, msg.sender, _layer2, receiveTON);
     }
 
     /// @dev Sets FLD address
@@ -220,6 +227,7 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
         nonZero(_stakeRegistry)
     {
         stakeRegistry = IStakeRegistry(_stakeRegistry);
+        emit SetStakeRegistry(_stakeRegistry);
     }
 
     /// @dev Sets Stake Factory address
@@ -229,6 +237,7 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
         nonZero(_stakeFactory)
     {
         stakeFactory = IStakeFactory(_stakeFactory);
+        emit SetStakeFactory(_stakeFactory);
     }
 
     function vaultsOfPahse(uint256 _phase)

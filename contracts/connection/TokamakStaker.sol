@@ -1,16 +1,21 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.7.6;
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {ITON} from "../interfaces/ITON.sol";
 import {IStake1Vault} from "../interfaces/IStake1Vault.sol";
-import {IDepositManager} from "../interfaces/IDepositManager.sol";
-import {ISeigManager} from "../interfaces/ISeigManager.sol";
+import {IIDepositManager} from "../interfaces/IIDepositManager.sol";
+import {IISeigManager} from "../interfaces/IISeigManager.sol";
 //import {IUniswapActor} from "../interfaces/IUniswapActor.sol";
 
 import "@openzeppelin/contracts/access/AccessControl.sol";
-//import { ERC165 } from "@openzeppelin/contracts/introspection/ERC165.sol";
 import "../stake/StakeTONStorage.sol";
-// import {OnApprove} from "../tokens/OnApprove.sol";
+interface IERC20BASE {
+    function totalSupply() external view returns (uint);
+    function balanceOf(address owner) external view returns (uint);
+    //function allowance(address owner, address spender) external view returns (uint);
+    function approve(address spender, uint value) external returns (bool);
+    function transfer(address to, uint value) external returns (bool);
+    function transferFrom(address from, address to, uint value) external returns (bool);
+}
 
 /// @title The connector that integrates zkopru and tokamak
 contract TokamakStaker is StakeTONStorage, AccessControl {
@@ -22,6 +27,18 @@ contract TokamakStaker is StakeTONStorage, AccessControl {
         _;
     }
 
+    modifier sameTokamakLayer(address _addr) {
+        require(tokamakLayer2 == _addr, "different layer");
+        _;
+    }
+
+    modifier nonZeroInit() {
+        require(ton != address(0) &&
+                wton != address(0) &&
+                depositManager != address(0) &&
+                seigManager != address(0), "init zero address");
+        _;
+    }
     modifier onlyOwner() {
         require(
             hasRole(ADMIN_ROLE, msg.sender),
@@ -30,35 +47,39 @@ contract TokamakStaker is StakeTONStorage, AccessControl {
         _;
     }
 
+    //////////////////////////////
+    // Events
+    //////////////////////////////
+
+    event SetTokamak(address ton, address wton, address depositManager, address seigManager, address defiAddr);
+    event SetUniswapRouter(address router);
+    /*
+    event tokamakStaked(address layer2, uint256 amount);
+    event tokamakRequestedUnStakingAll(address layer2);
+    event tokamakRequestedUnStakingReward(address layer2);
+    event tokamakProcessedUnStaking(address layer2, bool receiveTON);
+    */
     function setTokamak(
         address _ton,
         address _wton,
         address _depositManager,
         address _seigManager,
         address _defiAddr
-    ) external onlyOwner {
-        require(
-            _ton != address(0) &&
-                _wton != address(0) &&
-                _depositManager != address(0) &&
-                _seigManager != address(0),
-            "TokamakStaker: zero address"
-        );
+    ) external onlyOwner
+        nonZero(_ton)
+        nonZero(_wton)
+        nonZero(_depositManager)
+        nonZero(_seigManager)
+    {
         ton = _ton;
         wton = _wton;
         depositManager = _depositManager;
         seigManager = _seigManager;
         _uniswapRouter = _defiAddr;
         tokamakLayer2 = address(0);
-    }
 
-    // function setTON(address _ton) external onlyOwner {
-    //     require(
-    //         _ton != address(0) && ton != _ton,
-    //         "TokamakStaker: zero address"
-    //     );
-    //     ton = _ton;
-    // }
+        emit SetTokamak(ton, wton, depositManager, seigManager, _defiAddr);
+    }
 
     function setUniswapRouter(address _router) external onlyOwner {
         // TODO: check!!
@@ -71,11 +92,13 @@ contract TokamakStaker is StakeTONStorage, AccessControl {
             "TokamakStaker: zero address"
         );
         _uniswapRouter = _router;
+
+        emit SetUniswapRouter(_router);
     }
 
     function approveUniswapRouter(uint256 amount) external {
         require(
-            IERC20(paytoken).approve(_uniswapRouter, amount),
+            IERC20BASE(paytoken).approve(_uniswapRouter, amount),
             "TokamakStaker: approve fail"
         );
     }
@@ -84,90 +107,25 @@ contract TokamakStaker is StakeTONStorage, AccessControl {
         return _uniswapRouter;
     }
 
-    /// TODO: Withdrawal for operating profit
-    function withdrawProfit(address _token, uint256 amount) external {}
-
-    /*
-    /// @dev Approves
-    function onApprove(
-        address owner,
-        address spender,
-        uint256 tonAmount,
-        bytes calldata data
-    ) external override returns (bool) {
-        (address _spender, uint256 _amount) = _decodeStakeData(data);
-        require(
-            tonAmount == _amount && spender == _spender,
-            "TokamakStaker: tonAmount != stakingAmount "
-        );
-        require(
-            stakeOnApprove(msg.sender, owner, _spender, _amount),
-            "TokamakStaker: stakeOnApprove fails "
-        );
-        return true;
-    }
-
-    function _decodeStakeData(bytes calldata input)
-        internal
-        pure
-        returns (address spender, uint256 amount)
-    {
-        (spender, amount) = abi.decode(input, (address, uint256));
-    }
-
-    /// @dev stake with ton
-    function stakeOnApprove(
-        address from,
-        address _owner,
-        address _spender,
-        uint256 _amount
-    ) public returns (bool) {
-        require(
-            (paytoken == from && _amount > 0 && _spender == address(this)),
-            "TokamakStaker: stakeOnApprove init fail"
-        );
-        require(
-            block.number >= saleStartBlock && saleStartBlock < startBlock,
-            "TokamakStaker: stakeTON period is unavailable"
-        );
-
-        LibTokenStake1.StakedAmount storage staked = userStaked[_owner];
-        staked.amount += _amount;
-        totalStakedAmount += _amount;
-        require(
-            IERC20(from).transferFrom(_owner, _spender, _amount),
-            "TokamakStaker: failed to transfer ton from creator"
-        );
-        return true;
-    }
-    */
     function tokamakStaking(address _layer2)
-        external
+        external nonZeroInit nonZero(_layer2)
     {
-        require(
-            ton != address(0) &&
-                wton != address(0) &&
-                depositManager != address(0) &&
-                seigManager != address(0) &&
-                _layer2 != address(0),
-            "TokamakStaker: zero address"
-        );
         require(
             IStake1Vault(vault).saleClosed() == true,
-            "TokamakStaker: The sale is not closed"
+            "not closed"
         );
-        uint256 _amount = IERC20(ton).balanceOf(address(this));
+        uint256 _amount = IERC20BASE(ton).balanceOf(address(this));
         require(
                 _amount > 0,
-            "TokamakStaker: ton.balance is zero"
+            "zero"
         );
 
         if (tokamakLayer2 == address(0)) tokamakLayer2 = _layer2;
         else {
             uint256 stakeOf =
-                ISeigManager(seigManager).stakeOf(tokamakLayer2, address(this));
+                IISeigManager(seigManager).stakeOf(tokamakLayer2, address(this));
 
-            uint256 pendingUnstaked = IDepositManager(depositManager).pendingUnstaked(
+            uint256 pendingUnstaked = IIDepositManager(depositManager).pendingUnstaked(
                 tokamakLayer2,
                 address(this)
             );
@@ -175,153 +133,116 @@ contract TokamakStaker is StakeTONStorage, AccessControl {
             if (stakeOf > 0 || pendingUnstaked > 0) {
                 require(
                     tokamakLayer2 == _layer2,
-                    "TokamakStaker: layer2 is different "
+                    "different layer"
                 );
             } else {
                 if (tokamakLayer2 != _layer2) tokamakLayer2 == _layer2;
             }
         }
-
+        toTokamak += _amount;
         bytes memory data = abi.encode(depositManager, _layer2);
         require(
             ITON(ton).approveAndCall(wton, _amount, data),
-            "TokamakStaker: approveAndCall fail"
+            "approveAndCall fail"
         );
+
+        //emit tokamakStaked(_layer2, _amount);
     }
 
     function tokamakRequestUnStakingAll(address _layer2)
         public
-        nonZero(depositManager)
+        nonZeroInit sameTokamakLayer(_layer2)
     {
-        require(
-            tokamakLayer2 == _layer2,
-            "TokamakStaker: layer2 is different "
-        );
-        IDepositManager(depositManager).requestWithdrawalAll(_layer2);
+        IIDepositManager(depositManager).requestWithdrawalAll(_layer2);
+
+        //emit tokamakRequestedUnStakingAll(_layer2);
     }
 
-    // unstaking except to principal fund
-    //function tokamakRequestUnStaking(address _layer2, uint256 _amount)
     function tokamakRequestUnStakingReward(address _layer2)
-        public
+        public nonZeroInit sameTokamakLayer(_layer2)
     {
         require(
-            depositManager != address(0) &&
-                _layer2 == tokamakLayer2,
-            "TokamakStaker: zero address"
-        );
-        require(
             IStake1Vault(vault).saleClosed() == true,
-            "TokamakStaker: The sale is not closed"
+            "not closed"
         );
 
         uint256 stakeOf =
-            ISeigManager(seigManager).stakeOf(_layer2, address(this));
+            IISeigManager(seigManager).stakeOf(_layer2, address(this));
 
 
         require(
             stakeOf > (totalStakedAmount * 10**9) + 1,
-            "TokamakStaker: reward amount is too small"
+            "too small"
         );
 
         uint256 _amount = stakeOf - (totalStakedAmount * 10**9)  - 1;
         require(
                 _amount > 0,
-            "TokamakStaker: amount is zero"
+            "zero"
         );
 
-        // require(
-        //     stakeOf - _amount >= totalStakedAmount,
-        //     "TokamakStaker: The withdrawal balance is lack"
-        // );
+        IIDepositManager(depositManager).requestWithdrawal(_layer2, _amount);
 
-        IDepositManager(depositManager).requestWithdrawal(_layer2, _amount);
+        //emit tokamakRequestedUnStakingReward(_layer2);
     }
 
     function tokamakProcessUnStaking(address _layer2, bool receiveTON)
-        public
+        public nonZeroInit sameTokamakLayer(_layer2)
     {
         require(
-            depositManager != address(0) && _layer2 == tokamakLayer2,
-            "TokamakStaker: zero address"
-        );
-        require(
             IStake1Vault(vault).saleClosed() == true,
-            "TokamakStaker: The sale is not closed"
+            "not closed"
         );
 
-        uint256 stakeOf = ISeigManager(seigManager).stakeOf(tokamakLayer2, address(this));
+        uint256 stakeOf = IISeigManager(seigManager).stakeOf(tokamakLayer2, address(this));
         if (stakeOf == 0 ) tokamakLayer2 = address(0);
 
-        fromTokamak += IDepositManager(depositManager).pendingUnstaked(
+        fromTokamak += IIDepositManager(depositManager).pendingUnstaked(
                 _layer2,
                 address(this)
             );
-        IDepositManager(depositManager).processRequest(_layer2, receiveTON);
+        IIDepositManager(depositManager).processRequest(_layer2, receiveTON);
+
+        //emit tokamakProcessedUnStaking(_layer2, receiveTON);
     }
 
     function tokamakPendingUnstaked(address _layer2)
-        public
+        public nonZeroInit nonZero(_layer2)
         view
         returns (uint256 wtonAmount)
     {
-        require(
-            depositManager != address(0) && _layer2 != address(0),
-            "TokamakStaker: zero address"
-        );
         return
-            IDepositManager(depositManager).pendingUnstaked(
+            IIDepositManager(depositManager).pendingUnstaked(
                 _layer2,
                 address(this)
             );
     }
 
     function tokamakAccStaked(address _layer2)
-        external
+        external nonZeroInit nonZero(_layer2)
         view
         returns (uint256 wtonAmount)
     {
-        require(
-            seigManager != address(0) && _layer2 != address(0),
-            "TokamakStaker: zero address"
-        );
+
         return
-            IDepositManager(depositManager).accStaked(_layer2, address(this));
+            IIDepositManager(depositManager).accStaked(_layer2, address(this));
     }
 
     function tokamakAccUnstaked(address _layer2)
-        external
+        external nonZeroInit nonZero(_layer2)
         view
         returns (uint256 wtonAmount)
     {
-        require(
-            seigManager != address(0) && _layer2 != address(0),
-            "TokamakStaker: zero address"
-        );
         return
-            IDepositManager(depositManager).accUnstaked(_layer2, address(this));
+            IIDepositManager(depositManager).accUnstaked(_layer2, address(this));
     }
 
     function tokamakStakeOf(address _layer2)
-        external
+        external nonZeroInit nonZero(_layer2)
         view
         returns (uint256 wtonAmount)
     {
-        require(
-            seigManager != address(0) && _layer2 != address(0),
-            "TokamakStaker: zero address"
-        );
-        return ISeigManager(seigManager).stakeOf(_layer2, address(this));
+        return IISeigManager(seigManager).stakeOf(_layer2, address(this));
     }
 
-    /*
-    function tokenTransfer(
-        address to,
-        uint256 amount
-    )
-        public onlyOwner
-    {
-        IERC20(ton).transfer(to, amount);
-    }
-    */
 }

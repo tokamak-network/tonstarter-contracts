@@ -37,9 +37,9 @@ interface IStake1Logic {
     function closeSale(address _vault) external;
 
     function addVault(
+        address _vault,
         uint256 _pahse,
-        bytes32 _vaultName,
-        address _vault
+        bytes32 _vaultName
     ) external;
 
     function stakeContractsOfVault(address _vault)

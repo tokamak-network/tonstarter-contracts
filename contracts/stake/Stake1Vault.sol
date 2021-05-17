@@ -77,7 +77,7 @@ contract Stake1Vault is AccessControl {
     // Events
     //////////////////////////////
     event ClosedSale(uint256 amount);
-    event ClaimReward(address indexed from, address to, uint256 amount);
+    event ClaimedReward(address indexed from, address to, uint256 amount);
 
     constructor() {
         _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
@@ -200,16 +200,16 @@ contract Stake1Vault is AccessControl {
 
     /// @dev Close sale
     function closeSale() external {
-        require(saleClosed == false, "Stake1Vault: sale is already closed");
+        require(saleClosed == false, "already closed");
         require(
             cap > 0 &&
                 stakeStartBlock > 0 &&
                 stakeStartBlock < stakeEndBlock &&
                 block.number > stakeStartBlock &&
                 block.number < stakeEndBlock,
-            "Stake1Vault: closeSale init fail"
+            "closeSale init fail"
         );
-        require(stakeAddresses.length > 0, "Stake1Vault: no stakes");
+        require(stakeAddresses.length > 0, "no stakes");
         blockTotalReward = cap / (stakeEndBlock - stakeStartBlock);
 
         // update balance
@@ -268,22 +268,22 @@ contract Stake1Vault is AccessControl {
     /// A function that pays the amount(_amount) to _to by the staking contract.
     /// A function that _to claim the amount(_amount) from the staking contract and gets the FLD in the vault.
     function claim(address _to, uint256 _amount) external returns (bool) {
-        require(saleClosed && _amount > 0, "Stake1Vault: disclose sale");
+        require(saleClosed && _amount > 0, "disclose sale");
         uint256 fldBalance = fld.balanceOf(address(this));
         require(
             fldBalance >= _amount,
-            "Stake1Vault: claimVault: not enough balance"
+            "not enough balance"
         );
 
         LibTokenStake1.StakeInfo storage stakeInfo = stakeInfos[msg.sender];
         require(
             stakeInfo.startBlcok > 0,
-            "Stake1Vault: claimVault startBlcok is zero"
+            "zero"
         );
         require(
             stakeInfo.totalRewardAmount >=
                 stakeInfo.claimRewardAmount + _amount,
-            "Stake1Vault: claim amount exceeds the reward left"
+            "claim amount exceeds"
         );
         require(
             stakeInfo.totalRewardAmount > 0 &&
@@ -291,14 +291,14 @@ contract Stake1Vault is AccessControl {
                     stakeInfo.claimRewardAmount -
                     _amount) >
                 0,
-            "Stake1Vault: claim amount is wrong"
+            "amount is wrong"
         );
 
         stakeInfo.claimRewardAmount += _amount;
 
-        require(fld.transfer(_to, _amount), "Stake1Vault: FLD transfer fail");
+        require(fld.transfer(_to, _amount), "FLD transfer fail");
 
-        emit ClaimReward(msg.sender, _to, _amount);
+        emit ClaimedReward(msg.sender, _to, _amount);
         return true;
     }
 
@@ -308,27 +308,27 @@ contract Stake1Vault is AccessControl {
         view
         returns (uint256)
     {
-        require(saleClosed, "Stake1Vault: disclose sale");
+        require(saleClosed, "disclose");
         uint256 fldBalance = fld.balanceOf(address(this));
         require(
             fldBalance >= _amount,
-            "Stake1Vault: claimVault: not enough balance"
+            "not enough"
         );
 
         LibTokenStake1.StakeInfo storage stakeInfo = stakeInfos[_to];
         require(
             stakeInfo.startBlcok > 0,
-            "Stake1Vault: claimVault startBlcok is zero"
+            "startBlcok is zero"
         );
 
         require(
             stakeInfo.totalRewardAmount > 0,
-            "Stake1Vault: claim amount is wrong"
+            "amount is wrong"
         );
         require(
             stakeInfo.totalRewardAmount >=
                 stakeInfo.claimRewardAmount + _amount,
-            "Stake1Vault: claim amount exceeds the reward left"
+            "amount exceeds"
         );
         require(
             stakeInfo.totalRewardAmount -

@@ -17,7 +17,7 @@ contract Stake1Proxy is StakeProxyStorage, AccessControl {
     modifier onlyOwner() {
         require(
             hasRole(ADMIN_ROLE, msg.sender),
-            "Stake1Proxy: msg.sender is not an admin"
+            "no admin"
         );
         _;
     }
@@ -38,10 +38,10 @@ contract Stake1Proxy is StakeProxyStorage, AccessControl {
     /// @notice Set implementation contract
     /// @param impl New implementation contract address
     function upgradeTo(address impl) external onlyOwner {
-        require(impl != address(0), "Stake1Proxy: input is zero");
+        require(impl != address(0), "input is zero");
         require(
             _implementation != impl,
-            "Stake1Proxy: The input address is same as the state"
+            "same"
         );
         _implementation = impl;
         emit Upgraded(impl);
@@ -64,7 +64,7 @@ contract Stake1Proxy is StakeProxyStorage, AccessControl {
         address _impl = implementation();
         require(
             _impl != address(0) && !pauseProxy,
-            "Stake1Proxy: impl is zero OR proxy is false"
+            "impl OR proxy is false"
         );
 
         assembly {

@@ -28,8 +28,6 @@ describe("ProjectManager", function () {
     const ProjectManagerProxy = await ethers.getContractFactory(
       "ProjectManagerProxy"
     );
-    const Stake1Vault = await ethers.getContractFactory("Stake1Vault");
-    const Stake1 = await ethers.getContractFactory("Stake1");
 
     projectManagerProxy = await ProjectManagerProxy.connect(deployer).deploy();
     projectManagerLogic1 = await ProjectManagerLogic1.connect(
@@ -44,7 +42,7 @@ describe("ProjectManager", function () {
     );
     fld = ICOContractsDeployed.fld;
   });
-
+  /*
   it("tokamakContracts init  ", async function () {
     this.timeout(1000000);
     TokamakContractsDeployed =
@@ -56,7 +54,7 @@ describe("ProjectManager", function () {
     depositManager = cons.depositManager;
     seigManager = cons.seigManager;
   });
-  /*
+
   it('Set StakeEntry  ', async function () {
     this.timeout(1000000);
     stakeEntry = await ico20Contracts.setEntry(deployer);

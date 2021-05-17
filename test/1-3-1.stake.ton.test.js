@@ -211,14 +211,14 @@ describe("Phase1. StakeContract with TON", function () {
         ton.approveAndCall(stakeAddresses[0], tonAmount, param, {
           from: account,
         })
-      ).to.be.revertedWith("TokamakStaker: stakeTON period is unavailable");
+      ).to.be.revertedWith("unavailable");
 
     });
 
     it("2. If the sales period does not start, the sales closing function fails.", async function () {
       await expect(
         stakeEntry.closeSale(vault_phase1_ton.address, { from: user1 })
-      ).to.be.revertedWith("Stake1Vault: closeSale init fail");
+      ).to.be.revertedWith("closeSale init fail");
     });
 
   });
@@ -259,7 +259,7 @@ describe("Phase1. StakeContract with TON", function () {
     it("2. If the sales period is not over, the sales closing function will fail.", async function () {
       await expect(
         stakeEntry.closeSale(vault_phase1_ton.address, { from: user1 })
-      ).to.be.revertedWith("Stake1Vault: closeSale init fail");
+      ).to.be.revertedWith("closeSale init fail");
     });
 
     it("3. Ether staking is not allowed after the sale period is over.", async function () {
@@ -279,7 +279,7 @@ describe("Phase1. StakeContract with TON", function () {
         ton.approveAndCall(stakeAddresses[0], tonAmount, param, {
           from: account,
         })
-      ).to.be.revertedWith("TokamakStaker: stakeTON period is unavailable");
+      ).to.be.revertedWith("unavailable");
 
     });
 
@@ -287,7 +287,7 @@ describe("Phase1. StakeContract with TON", function () {
       const stakeContract = await StakeTON.at(stakeAddresses[0]);
       await expect(
         stakeContract.claim({ from: testStakingUsers[0] })
-      ).to.be.revertedWith("StakeTON: The sale is not closed");
+      ).to.be.revertedWith("not closed");
     });
 
   });
@@ -306,7 +306,7 @@ describe("Phase1. StakeContract with TON", function () {
             layer2.address,
             { from: user1 }
           )
-      ).to.be.revertedWith("TokamakStaker: The sale is not closed");
+      ).to.be.revertedWith("not closed");
 
     });
 
@@ -317,7 +317,7 @@ describe("Phase1. StakeContract with TON", function () {
           layer2.address,
           { from: user1 }
         )
-      ).to.be.revertedWith("TokamakStaker: zero address");
+      ).to.be.revertedWith("different layer");
     });
 
     it("4. If the sales closing function is not performed, cannot processWithdraw to Tokamak.", async function () {
@@ -328,7 +328,7 @@ describe("Phase1. StakeContract with TON", function () {
           true,
           { from: user1 }
         )
-      ).to.be.revertedWith("TokamakStaker: zero address");
+      ).to.be.revertedWith("different layer");
     });
   });
 
@@ -343,14 +343,9 @@ describe("Phase1. StakeContract with TON", function () {
     it("2. The sales closing function can be performed only once.", async function () {
       await expect(
         stakeEntry.closeSale(vault_phase1_ton.address, { from: user1 })
-      ).to.be.revertedWith("Stake1Vault: sale is already closed");
+      ).to.be.revertedWith("already closed");
     });
 
-    it("2. The sales closing function can be performed only once.", async function () {
-      await expect(
-        stakeEntry.closeSale(vault_phase1_ton.address, { from: user1 })
-      ).to.be.revertedWith("Stake1Vault: sale is already closed");
-    });
   });
 
   describe('# 7. Function Test1 For Withdraw ', async function () {
@@ -361,7 +356,7 @@ describe("Phase1. StakeContract with TON", function () {
       const stakeContract1 = await StakeTON.at(stakeAddresses[i]);
       await expect(
         stakeContract1.withdraw({ from: user1 })
-      ).to.be.revertedWith("StakeTON: on staking period");
+      ).to.be.revertedWith("not end");
     });
   });
 
@@ -667,13 +662,13 @@ describe("Phase1. StakeContract with TON", function () {
 
   describe('# 12. Function Test2 For Withdraw ', async function () {
 
-    it('1. you cannot withdraw unless don\'t unstaking a whole amount in tokamak.', async function () {
+    it('1. you cannot withdraw if don\'t unstaking a whole amount in tokamak.', async function () {
       let i = 0;
       await ico20Contracts.updateRewardTokamak(layer2, operator1);
       const stakeContract1 = await StakeTON.at(stakeAddresses[i]);
       await expect(
         stakeContract1.withdraw({ from: user1 })
-      ).to.be.revertedWith("StakeTON: unstaking to tokamak.");
+      ).to.be.revertedWith("remain amount in tokamak");
     });
 
     it('2. unstaking a whole amount in tokamak.', async function () {
@@ -716,21 +711,20 @@ describe("Phase1. StakeContract with TON", function () {
           );
         }
       }
-      /*
-      for (let i = 0; i < stakeAddresses.length; i++) {
-        console.log(`\n i: `, i, stakeAddresses[i]);
-        await ico20Contracts.logTokamakLayerBalance(layer2.address, stakeAddresses[i]);
-        let payTokenBalanceContract1 =  await ton.balanceOf(stakeAddresses[i]);
-        console.log(' ton balance of contract', fromWei(payTokenBalanceContract1.toString(),'ether') );
-      } */
+
+      if (logFlag)
+        for (let i = 0; i < stakeAddresses.length; i++) {
+          console.log(`\n i: `, i, stakeAddresses[i]);
+          await ico20Contracts.logTokamakLayerBalance(layer2.address, stakeAddresses[i]);
+          let payTokenBalanceContract1 =  await ton.balanceOf(stakeAddresses[i]);
+          console.log(' ton balance of contract', fromWei(payTokenBalanceContract1.toString(),'ether') );
+        }
 
     });
 
     it('3. can withdraw after the staking end block is passed. ', async function () {
       this.timeout(1000000);
-      // stakeEndBlock = await vault_phase1_ton.stakeEndBlock();
-      // stakeEndBlock = parseInt(stakeEndBlock.toString())+1;
-      // await time.advanceBlockTo(stakeEndBlock-1);
+
       if(logFlag) {
         requestBlock = await time.latestBlock();
         console.log(`\n Withdrawal block: ${requestBlock} `);
@@ -742,9 +736,21 @@ describe("Phase1. StakeContract with TON", function () {
         const stakeContract1 = await StakeTON.at(stakeAddresses[i]);
         let payTokenBalanceContract1 =  await ton.balanceOf(stakeAddresses[i]);
         let payTokenBalance1 = await ton.balanceOf(user1);
+
+        let fromTokamak = await stakeContract1.fromTokamak();
+        let toTokamak = await stakeContract1.toTokamak();
+        let totalStakedAmount = await stakeContract1.totalStakedAmount();
+        let withdrawStakedAmount = totalStakedAmount.sub(toTokamak).add(fromTokamak.div(toBN(10**9)));
+
+        const userStaked = await stakeContract1.userStaked(user1);
+        let userAmount = userStaked.amount;
+        let amount = withdrawStakedAmount.mul(userAmount).div(totalStakedAmount);
+        // console.log('amount', amount.toString(), fromWei(amount.toString(), 'ether') ,'TON');
+
         if (logFlag){
           console.log('\n stakeContract\'s payTokenBalance1:', fromWei(payTokenBalanceContract1.toString(), 'ether'));
           console.log('\n user1\'s payTokenBalance1:', fromWei(payTokenBalance1.toString(), 'ether'));
+          await ico20Contracts.logTokamakLayerBalance(layer2.address, stakeAddresses[i]);
           await ico20Contracts.logUserStaked(stakeAddresses[i], user1, 'user1 pre withdraw');
         }
 
@@ -763,8 +769,6 @@ describe("Phase1. StakeContract with TON", function () {
       }
     });
 
-    it('4. TODO: 리워드 부분을 어떻게 나눠가질 것인지 개발', async function () {
-    });
   });
 
 });
