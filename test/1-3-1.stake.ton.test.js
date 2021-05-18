@@ -54,15 +54,18 @@ const StakeTON = contract.fromArtifact("StakeTON");
 const IERC20 = contract.fromArtifact("IERC20");
 // ----------------------
 
-const saleStartBlock = 0;
-let salePeriod = (60 * 60 * 24 * 14) / 13;
-let stakePeriod = (60 * 60 * 24 * 30) / 13;
-salePeriod = parseInt(salePeriod);
-stakePeriod = parseInt(stakePeriod);
+saleStartBlock = 100;
+let salePeriod = 50;
+let stakingPeriod = 100;
+
+//let salePeriod = (60 * 60 * 24 * 14) / 13;
+//let stakePeriod = (60 * 60 * 24 * 30) / 13;
+//salePeriod = parseInt(salePeriod);
+//stakePeriod = parseInt(stakePeriod);
 
 const zeroAddress = "0x0000000000000000000000000000000000000000";
 
-const logFlag = false;
+let logFlag = false;
 
 describe("Phase1. StakeContract with TON", function () {
   let weth, fld, stakeregister, stakefactory, stake1proxy, stake1logic;
@@ -71,42 +74,40 @@ describe("Phase1. StakeContract with TON", function () {
     vault_phase1_fldethlp,
     vault_phase1_dev;
   let ton, wton, depositManager, seigManager;
-  let stakeEntry;
+  let stakeEntry, layer2;
 
   let a1, a2, tokenInfo;
   const sendAmount = "1";
   const admin = accounts[0];
   const user1 = accounts[1];
   const user2 = accounts[2];
+  const operator1 = accounts[3];
   const userPrivate2 = privateKeys[2];
 
   const testStakingPeriodBlocks = [50, 100];
   const testStakingUsers = [user1, user2];
   const testUser1StakingAmount = ["100", "20"];
   const testUser2StakingAmount = ["50", "100"];
-  const testClaimBlock = [10, 60];
+  const testClaimBlock = [20, 60];
 
   const sendAmountForTest = "1";
   const sendAmountForTest2 = "5";
   const buyTokensEtehrs = ["10", "5", "20", "2"];
   const buyTokensDurations = ["10", "60", "120", "150"];
 
-
-  let salePeriod = 50;
-  let stakingPeriod = 100;
-
-  let saleStartBlock = 0;
+  //let saleStartBlock = 0;
   let stakeStartBlock = 0;
   let stakeEndBlock = 0;
   let stakeAddresses;
-
+  let requestBlock = 0;
+  let globalWithdrawalDelay = 0;
 
   before(async function () {
     this.timeout(1000000);
     ico20Contracts = new ICO20Contracts();
   });
 
-  describe('# Global Setting', async function () {
+  describe('# 1. Global Setting', async function () {
     it("ico20Contracts init  ", async function () {
       this.timeout(1000000);
       ICOContractsDeployed = await ico20Contracts.initializeICO20Contracts(
@@ -124,6 +125,7 @@ describe("Phase1. StakeContract with TON", function () {
       wton = cons.wton;
       depositManager = cons.depositManager;
       seigManager = cons.seigManager;
+      globalWithdrawalDelay = await depositManager.globalWithdrawalDelay();
     });
 
     it("Set StakeProxy  ", async function () {
@@ -140,10 +142,9 @@ describe("Phase1. StakeContract with TON", function () {
     });
   });
 
-  describe('# Vault & StakeContract Setting', async function () {
+  describe('# 2. Vault & StakeContract Setting', async function () {
     it("1. Create Vault", async function () {
       const current = await time.latestBlock();
-      saleStartBlock = 100;
       saleStartBlock = parseInt(saleStartBlock.toString());
       saleStartBlock = saleStartBlock + salePeriod;
       stakeStartBlock = saleStartBlock + stakingPeriod;
@@ -195,7 +196,8 @@ describe("Phase1. StakeContract with TON", function () {
       );
     });
   });
-  describe('# Function Test For Sale ', async function () {
+
+  describe('# 3. Function Test For Sale ', async function () {
     it("1. If the sale period does not start, staking will fail.", async function () {
 
       let tonAmount = testUser1StakingAmount[0];
@@ -209,19 +211,19 @@ describe("Phase1. StakeContract with TON", function () {
         ton.approveAndCall(stakeAddresses[0], tonAmount, param, {
           from: account,
         })
-      ).to.be.revertedWith("TokamakStaker: stakeTON period is unavailable");
+      ).to.be.revertedWith("unavailable");
 
     });
 
     it("2. If the sales period does not start, the sales closing function fails.", async function () {
       await expect(
         stakeEntry.closeSale(vault_phase1_ton.address, { from: user1 })
-      ).to.be.revertedWith("Stake1Vault: closeSale init fail");
+      ).to.be.revertedWith("closeSale init fail");
     });
 
   });
 
-  describe('# Function Test For Staking ', async function () {
+  describe('# 4. Function Test For Staking ', async function () {
     it("1. If during the sale period and staking has not started yet, then Ether is staked.", async function () {
 
       this.timeout(1000000);
@@ -257,7 +259,7 @@ describe("Phase1. StakeContract with TON", function () {
     it("2. If the sales period is not over, the sales closing function will fail.", async function () {
       await expect(
         stakeEntry.closeSale(vault_phase1_ton.address, { from: user1 })
-      ).to.be.revertedWith("Stake1Vault: closeSale init fail");
+      ).to.be.revertedWith("closeSale init fail");
     });
 
     it("3. Ether staking is not allowed after the sale period is over.", async function () {
@@ -277,7 +279,7 @@ describe("Phase1. StakeContract with TON", function () {
         ton.approveAndCall(stakeAddresses[0], tonAmount, param, {
           from: account,
         })
-      ).to.be.revertedWith("TokamakStaker: stakeTON period is unavailable");
+      ).to.be.revertedWith("unavailable");
 
     });
 
@@ -285,26 +287,68 @@ describe("Phase1. StakeContract with TON", function () {
       const stakeContract = await StakeTON.at(stakeAddresses[0]);
       await expect(
         stakeContract.claim({ from: testStakingUsers[0] })
-      ).to.be.revertedWith("StakeTON: The sale is not closed");
+      ).to.be.revertedWith("not closed");
     });
 
-    it("5. When the sales period is over, the sales closing function can be performed.", async function () {
-      await stakeEntry.closeSale(vault_phase1_ton.address, { from: user1 });
+  });
 
+  describe('# 5. Function Test1 For Tokamak Interface ', async function () {
+
+    it("1. addOperator on TOKAMAK ", async function () {
+      layer2 = await ico20Contracts.addOperator(operator1);
+    });
+
+    it("2. If the sales closing function is not performed, cannot stake to Tokamak.", async function () {
+      let i = 0;
+      await expect(
+        stakeEntry.tokamakStaking(
+            stakeAddresses[i],
+            layer2.address,
+            { from: user1 }
+          )
+      ).to.be.revertedWith("not closed");
+
+    });
+
+    it("3. If the sales closing function is not performed, cannot requestWithdraw to Tokamak.", async function () {
+      await expect(
+        stakeEntry.tokamakRequestUnStakingReward(
+          stakeAddresses[0],
+          layer2.address,
+          { from: user1 }
+        )
+      ).to.be.revertedWith("different layer");
+    });
+
+    it("4. If the sales closing function is not performed, cannot processWithdraw to Tokamak.", async function () {
+      await expect(
+        stakeEntry.tokamakProcessUnStaking(
+          stakeAddresses[0],
+          layer2.address,
+          true,
+          { from: user1 }
+        )
+      ).to.be.revertedWith("different layer");
+    });
+  });
+
+  describe('# 6. Function Test For CloseSale', async function () {
+    it("1. When the sales period is over, the sales closing function can be performed.", async function () {
+      await stakeEntry.closeSale(vault_phase1_ton.address, { from: user1 });
       if (logFlag) {
         await ico20Contracts.logVault(vault_phase1_ton.address);
       }
     });
 
-    it("6. The sales closing function can be performed only once.", async function () {
+    it("2. The sales closing function can be performed only once.", async function () {
       await expect(
         stakeEntry.closeSale(vault_phase1_ton.address, { from: user1 })
-      ).to.be.revertedWith("Stake1Vault: sale is already closed");
+      ).to.be.revertedWith("already closed");
     });
 
   });
 
-  describe('# Function Test1 For Withdraw ', async function () {
+  describe('# 7. Function Test1 For Withdraw ', async function () {
     it("1. cannot withdraw unless the staking deadline has passed.", async function () {
       let current = await time.latestBlock();
       if (logFlag) console.log(`\n\n Current block: ${current} `);
@@ -312,20 +356,48 @@ describe("Phase1. StakeContract with TON", function () {
       const stakeContract1 = await StakeTON.at(stakeAddresses[i]);
       await expect(
         stakeContract1.withdraw({ from: user1 })
-      ).to.be.revertedWith("StakeTON: on staking period");
+      ).to.be.revertedWith("not end");
     });
   });
 
-  describe('# Function Test For Claim ', async function () {
-    it("2. You can claim a reward after the sales closing function is performed", async function () {
-      this.timeout(1000000);
+  describe('# 8. Function Test2 For Tokamak Interface ', async function () {
+
+    it("1. can staking total staked amount in Tokamak after the staking closeSale is performed.", async function () {
+
       for (let i = 0; i < 2; i++) {
+        await stakeEntry.tokamakStaking(
+            stakeAddresses[i],
+            layer2.address,
+            { from: user1 }
+          );
+
+          if (logFlag) {
+            await ico20Contracts.logTokamakLayerBalance(layer2.address, stakeAddresses[i]);
+            let stakeContract = await StakeTON.at(stakeAddresses[i]);
+            let totalStakedAmount = await stakeContract.totalStakedAmount();
+            console.log('totalStakedAmount',i,utils.formatUnits(totalStakedAmount.toString(), 18) ,' TON');
+          }
+      }
+
+    });
+  });
+
+  describe('# 9. Function Test1 For Claim ', async function () {
+    it("1. You can claim a reward after the sales closing function is performed", async function () {
+      this.timeout(1000000);
+
+      let i = 0;
+      //for (let i = 0; i < 2; i++) {
         let testBlcok = stakeStartBlock + testClaimBlock[i] ;
-       // if (logFlag) console.log(`\n ------- ClaimBlcok:`, testBlcok);
+        // if (logFlag)
+        if (logFlag) console.log(`\n ====== delay blocks for test :`, testBlcok);
+
         await time.advanceBlockTo(testBlcok-1);
-        //let current = await time.latestBlock();
-        //if (logFlag) console.log(`\n\n Current block: ${current} `);
-        if (logFlag) console.log(`\n ====== delay blocks for test :`);
+        requestBlock = await time.latestBlock();
+        requestBlock = parseInt(requestBlock)+1;
+        if (logFlag) console.log(`\n ====== current block :`, requestBlock);
+
+
         if (stakeAddresses.length > 0) {
           for (let j = 0; j < stakeAddresses.length; j++) {
             if (logFlag) console.log(`\n ----  StakeContract:`, j);
@@ -335,21 +407,9 @@ describe("Phase1. StakeContract with TON", function () {
                 console.log(`\n ------- ClaimBlcok:`, testBlcok);
                 console.log("\n testStakingUsers : ", u, testStakingUsers[u]);
               }
-              /*
-              let rewardCheck = await stakeContract.canRewardAmountForTest(
-                testStakingUsers[u]
-              );
-              if (logFlag) console.log(` \n------- rewardCheck.reward`, fromWei(rewardCheck.reward.toString(), "ether"));
-              if (logFlag) console.log(` \n------- rewardCheck.startR`, rewardCheck.startR.toString() );
-              if (logFlag) console.log(` \n------- rewardCheck.endR`, rewardCheck.endR.toString());
-              if (logFlag) console.log(` \n------- rewardCheck.blockTotalReward`, fromWei(rewardCheck.blockTotalReward.toString(), "ether"));
-              */
               let reward = await stakeContract.canRewardAmount(
                 testStakingUsers[u]
               );
-              //if (logFlag) console.log(` \n------- user`, u, testStakingUsers[u]);
-              //if (logFlag) console.log(` reward:  `, fromWei(reward.toString(), "ether"));
-
               if (reward.gt(toBN("0"))) {
                 let fldBalance1 = await fld.balanceOf(testStakingUsers[u]);
                 if (logFlag)
@@ -396,33 +456,310 @@ describe("Phase1. StakeContract with TON", function () {
             }
           }
         }
-      }
+      //}
     });
   });
 
-  describe('# Function Test2 For Withdraw ', async function () {
-    it('1. can withdraw after the staking end block is passed. ', async function () {
+  describe('# 10. Function Test3 For Tokamak Interface ', async function () {
+
+    it("1. updateReward ", async function () {
+      await ico20Contracts.updateRewardTokamak(layer2, operator1);
+    });
+
+    it("2. can request withdrawal of a reward TON in tokamak.", async function () {
+      let i = 0;
+      requestBlock = await time.latestBlock();
+      requestBlock = parseInt(requestBlock)+1;
+      const pendingUnstaked1 = await depositManager.pendingUnstaked(
+        layer2.address,
+        stakeAddresses[i]
+      );
+      await stakeEntry.tokamakRequestUnStakingReward(
+            stakeAddresses[i],
+            layer2.address,
+            { from: user1 }
+        );
+      const pendingUnstaked2 = await depositManager.pendingUnstaked(
+        layer2.address,
+        stakeAddresses[i]
+      );
+      await expect(pendingUnstaked2.toString()).to.be.bignumber.above(pendingUnstaked1.toString());
+      if (logFlag) await ico20Contracts.logTokamakLayerBalance(layer2.address, stakeAddresses[i]);
+
+    });
+
+    it("3. can\'t process withdrawal of a reward TON in tokamak unless pass the delay blocks", async function () {
+
+      await expect(
+        stakeEntry.tokamakProcessUnStaking(
+            stakeAddresses[0],
+            layer2.address,
+            true,
+            { from: user1 }
+        )
+      ).to.be.revertedWith("DepositManager: wait for withdrawal delay.");
+
+    });
+
+    it("4. can process withdrawal of a reward TON in tokamak after passing the delay blocks", async function () {
+
+      let delayBlocks = requestBlock + parseInt(globalWithdrawalDelay.toString()) ;
+      await time.advanceBlockTo(delayBlocks-1);
+
+      let i = 0;
+      const tonBalance1 = await ton.balanceOf(stakeAddresses[i] );
+      if (logFlag) {
+        console.log(i, ',Prev tokamakProcessUnStaking ' );
+        await ico20Contracts.logTONBalance(layer2.address, stakeAddresses[i], true);
+      }
+      await stakeEntry.tokamakProcessUnStaking(
+            stakeAddresses[i],
+            layer2.address,
+            true,
+            { from: user1 }
+        );
+      const tonBalance2 = await ton.balanceOf(stakeAddresses[i] );
+      await expect(tonBalance2.toString()).to.be.bignumber.above(tonBalance1.toString());
+      if (logFlag) {
+        console.log(i, ',After tokamakProcessUnStaking ' );
+        await ico20Contracts.logTONBalance(layer2.address, stakeAddresses[i], true);
+      }
+    });
+
+    it("5. can request/process withdrawal of a whole amount staked in Tokamak.", async function () {
+      let delayBlocks = requestBlock + parseInt(globalWithdrawalDelay.toString()) + 5;
+      await time.advanceBlockTo(delayBlocks);
+      await ico20Contracts.updateRewardTokamak(layer2, operator1);
+
+      // --- tokamakRequestUnStakingAll
+      let i = 1;
+      requestBlock = await time.latestBlock();
+      requestBlock = parseInt(requestBlock)+1;
+
+      if (logFlag) {
+        console.log(i, ',Prev tokamakRequestUnStakingAll ' );
+        await ico20Contracts.logTokamakLayerBalance(layer2.address,stakeAddresses[i]);
+      }
+      const pendingUnstaked1 = await depositManager.pendingUnstaked(
+        layer2.address,
+        stakeAddresses[i]
+      );
+      await stakeEntry.tokamakRequestUnStakingAll(
+            stakeAddresses[i],
+            layer2.address,
+            { from: user1 }
+        );
+      const pendingUnstaked2 = await depositManager.pendingUnstaked(
+        layer2.address,
+        stakeAddresses[i]
+      );
+      await expect(pendingUnstaked2.toString()).to.be.bignumber.above(pendingUnstaked1.toString());
+      if (logFlag) {
+        console.log(i, ',After tokamakRequestUnStakingAll ' );
+        await ico20Contracts.logTokamakLayerBalance(layer2.address, stakeAddresses[i]);
+      }
+
+      // --- tokamakProcessUnStaking
+      delayBlocks = requestBlock + parseInt(globalWithdrawalDelay.toString()) ;
+      await time.advanceBlockTo(delayBlocks-1);
+
+      const tonBalance1 = await ton.balanceOf(stakeAddresses[i]);
+      if (logFlag) {
+        console.log(i, ',Prev tokamakProcessUnStaking ' );
+        await ico20Contracts.logTONBalance(layer2.address, stakeAddresses[i], true);
+      }
+      await stakeEntry.tokamakProcessUnStaking(
+            stakeAddresses[i],
+            layer2.address,
+            true,
+            { from: user1 }
+        );
+      const tonBalance2 = await ton.balanceOf(stakeAddresses[i] );
+      await expect(tonBalance2.toString()).to.be.bignumber.above(tonBalance1.toString());
+      if (logFlag) {
+        console.log(i, ',After tokamakProcessUnStaking ' );
+        await ico20Contracts.logTONBalance(layer2.address, stakeAddresses[i], true);
+     }
+    });
+  });
+
+  describe('# 11. Function Test2 For Claim after passed blocks ', async function () {
+
+    it("1. You can claim a reward after the sales closing function is performed", async function () {
       this.timeout(1000000);
+
+      let i = 1;
+      //for (let i = 0; i < 2; i++) {
+        let testBlcok = stakeStartBlock + testClaimBlock[i] ;
+        await time.advanceBlockTo(testBlcok-1);
+        requestBlock = await time.latestBlock();
+        requestBlock = parseInt(requestBlock)+1;
+
+        if (logFlag){
+          console.log(`\n ====== current block :`, requestBlock);
+        }
+        if (stakeAddresses.length > 0) {
+          for (let j = 0; j < stakeAddresses.length; j++) {
+            if (logFlag) console.log(`\n ----  StakeContract:`, j);
+            let stakeContract = await StakeTON.at(stakeAddresses[j]);
+            for (let u = 0; u < 2; u++) {
+              if (logFlag){
+                console.log(`\n ------- ClaimBlcok:`, testBlcok);
+                console.log("\n testStakingUsers : ", u, testStakingUsers[u]);
+              }
+              let reward = await stakeContract.canRewardAmount(
+                testStakingUsers[u]
+              );
+              if (reward.gt(toBN("0"))) {
+                let fldBalance1 = await fld.balanceOf(testStakingUsers[u]);
+                if (logFlag)
+                  console.log(
+                    ` pre claim -> fldBalance1 :  `,
+                    fromWei(fldBalance1.toString(), "ether")
+                  );
+
+                let tx = await stakeContract.claim({ from: testStakingUsers[u] });
+                testBlcok++;
+
+                if (logFlag)
+                  console.log(
+                    ` tx.receipt.logs :  `,
+                    tx.receipt.logs[0].event,
+                    //tx.receipt.logs[0].args.from,
+                    fromWei(tx.receipt.logs[0].args.amount.toString(),'ether'),
+                    tx.receipt.logs[0].args.currentBlcok.toString()
+                  );
+
+                let fldBalance2 = await fld.balanceOf(testStakingUsers[u]);
+                if (logFlag)
+                  console.log(
+                    ` after claim -> fldBalance2 :  `,
+                    fromWei(fldBalance2.toString(), "ether")
+                  );
+
+                await expect(fldBalance2).to.be.bignumber.above(fldBalance1);
+
+                let rewardClaimedTotal2 =
+                  await stakeContract.rewardClaimedTotal();
+                if (logFlag)
+                  console.log(
+                    `after claim -> stakeContract rewardClaimedTotal2 :  `,
+                    fromWei(rewardClaimedTotal2.toString(), "ether")
+                  );
+                if (logFlag)
+                  await ico20Contracts.logUserStaked(
+                    stakeAddresses[j],
+                    testStakingUsers[u],
+                    "user1"
+                  );
+              }
+            }
+          }
+        }
+      //}
+    });
+  });
+
+  describe('# 12. Function Test2 For Withdraw ', async function () {
+
+    it('1. you cannot withdraw if don\'t unstaking a whole amount in tokamak.', async function () {
+      let i = 0;
+      await ico20Contracts.updateRewardTokamak(layer2, operator1);
+      const stakeContract1 = await StakeTON.at(stakeAddresses[i]);
+      await expect(
+        stakeContract1.withdraw({ from: user1 })
+      ).to.be.revertedWith("remain amount in tokamak");
+    });
+
+    it('2. unstaking a whole amount in tokamak.', async function () {
+
+      //-- tokamakRequestUnStakingAll
       stakeEndBlock = await vault_phase1_ton.stakeEndBlock();
       stakeEndBlock = parseInt(stakeEndBlock.toString())+1;
       await time.advanceBlockTo(stakeEndBlock-1);
-      if(logFlag) console.log(`\n Withdrawal block: ${stakeEndBlock} `);
+      if (logFlag) console.log(`\n unstaking block: ${stakeEndBlock} `);
+      for (let i = 0; i < stakeAddresses.length; i++) {
+        let stakeOf = await seigManager.stakeOf(
+          layer2.address,
+          stakeAddresses[i]
+        );
+
+        if(stakeOf.gt(toBN(0))){
+           await stakeEntry.tokamakRequestUnStakingAll(
+              stakeAddresses[i],
+              layer2.address,
+              { from: user1 }
+          );
+        }
+      }
+
+      //-- tokamakProcessUnStaking
+      let delayBlocks = stakeEndBlock + parseInt(globalWithdrawalDelay.toString()) + 5;
+      await time.advanceBlockTo(delayBlocks);
 
       for (let i = 0; i < stakeAddresses.length; i++) {
-        if (logFlag) console.log('\n  ************* withdraw : ', i, stakeAddresses[i]);
-        const stakeContract1 = await StakeTON.at(stakeAddresses[i]);
+        let pendingUnstaked = await depositManager.pendingUnstaked(
+          layer2.address,
+          stakeAddresses[i]
+        );
+        if(pendingUnstaked.gt(toBN(0))){
+          await stakeEntry.tokamakProcessUnStaking(
+            stakeAddresses[i],
+            layer2.address,
+            true,
+            { from: user1 }
+          );
+        }
+      }
 
+      if (logFlag)
+        for (let i = 0; i < stakeAddresses.length; i++) {
+          console.log(`\n i: `, i, stakeAddresses[i]);
+          await ico20Contracts.logTokamakLayerBalance(layer2.address, stakeAddresses[i]);
+          let payTokenBalanceContract1 =  await ton.balanceOf(stakeAddresses[i]);
+          console.log(' ton balance of contract', fromWei(payTokenBalanceContract1.toString(),'ether') );
+        }
+
+    });
+
+    it('3. can withdraw after the staking end block is passed. ', async function () {
+      this.timeout(1000000);
+
+      if(logFlag) {
+        requestBlock = await time.latestBlock();
+        console.log(`\n Withdrawal block: ${requestBlock} `);
+      }
+
+      for (let i = 0; i < stakeAddresses.length; i++) {
+        if (logFlag)
+          console.log('\n  ************* withdraw : ', i, stakeAddresses[i]);
+        const stakeContract1 = await StakeTON.at(stakeAddresses[i]);
+        let payTokenBalanceContract1 =  await ton.balanceOf(stakeAddresses[i]);
         let payTokenBalance1 = await ton.balanceOf(user1);
+
+        let fromTokamak = await stakeContract1.fromTokamak();
+        let toTokamak = await stakeContract1.toTokamak();
+        let totalStakedAmount = await stakeContract1.totalStakedAmount();
+        let withdrawStakedAmount = totalStakedAmount.sub(toTokamak).add(fromTokamak.div(toBN(10**9)));
+
+        const userStaked = await stakeContract1.userStaked(user1);
+        let userAmount = userStaked.amount;
+        let amount = withdrawStakedAmount.mul(userAmount).div(totalStakedAmount);
+        // console.log('amount', amount.toString(), fromWei(amount.toString(), 'ether') ,'TON');
+
         if (logFlag){
+          console.log('\n stakeContract\'s payTokenBalance1:', fromWei(payTokenBalanceContract1.toString(), 'ether'));
           console.log('\n user1\'s payTokenBalance1:', fromWei(payTokenBalance1.toString(), 'ether'));
+          await ico20Contracts.logTokamakLayerBalance(layer2.address, stakeAddresses[i]);
           await ico20Contracts.logUserStaked(stakeAddresses[i], user1, 'user1 pre withdraw');
         }
 
         await stakeContract1.withdraw({ from: user1 });
         stakeEndBlock++;
-
-        const payTokenBalance2 = await ton.balanceOf(user1);
+        let payTokenBalanceContract2 =  await ton.balanceOf(stakeAddresses[i]);
+        let payTokenBalance2 = await ton.balanceOf(user1);
         if (logFlag){
+          console.log('\n stakeContract\'s payTokenBalance1:', fromWei(payTokenBalanceContract2.toString(), 'ether'));
           console.log('\n user1\'s payTokenBalance2:', fromWei(payTokenBalance2.toString(), 'ether'));
           await ico20Contracts.logUserStaked(stakeAddresses[i], user1, 'user1 after withdraw');
         }
@@ -431,6 +768,7 @@ describe("Phase1. StakeContract with TON", function () {
 
       }
     });
+
   });
 
 });

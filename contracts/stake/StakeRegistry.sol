@@ -25,6 +25,11 @@ contract StakeRegistry is AccessControl {
         );
         _;
     }
+    //////////////////////////////
+    // Events
+    //////////////////////////////
+    event AddedVault(address indexed vault, uint256 phase);
+    event AddedStakeContract(address indexed vault, address indexed stakeContract);
 
     constructor() {
         _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
@@ -33,9 +38,9 @@ contract StakeRegistry is AccessControl {
 
     /// @dev Adds vault
     function addVault(
+        address _vault,
         uint256 _phase,
-        bytes32 _vaultName,
-        address _vault
+        bytes32 _vaultName
     ) external onlyOwner {
         require(
             vaultNames[_vault] == ZERO_HASH || vaults[_vaultName] == address(0),
@@ -44,6 +49,40 @@ contract StakeRegistry is AccessControl {
         vaults[_vaultName] = _vault;
         vaultNames[_vault] = _vaultName;
         phases[_phase].push(_vault);
+
+        emit AddedVault(_vault, _phase);
+    }
+
+    /// @dev Stores vault and stake, and maps them togethers
+    function addStakeContract(address _vault, address _stakeContract)
+        external
+        onlyOwner
+    {
+        require(
+            vaultNames[_vault] != ZERO_HASH &&
+                stakeContractVault[_stakeContract] == address(0),
+            "StakeRegistry: input is zero"
+        );
+        stakeContractVault[_stakeContract] = _vault;
+        stakeContractsOfVault[_vault].push(_stakeContract);
+
+        emit AddedStakeContract(_vault, _stakeContract);
+    }
+
+    function phasesAll(uint256 _index)
+        external
+        view
+        returns (address[] memory)
+    {
+        return phases[_index];
+    }
+
+    function stakeContractsOfVaultAll(address _vault)
+        external
+        view
+        returns (address[] memory)
+    {
+        return stakeContractsOfVault[_vault];
     }
 
     /// @dev Checks if a vault is withing the given phase
@@ -62,33 +101,4 @@ contract StakeRegistry is AccessControl {
         }
     }
 
-    /// @dev Stores vault and stake, and maps them togethers
-    function addStakeContract(address _vault, address _stakeContract)
-        external
-        onlyOwner
-    {
-        require(
-            vaultNames[_vault] != ZERO_HASH &&
-                stakeContractVault[_stakeContract] == address(0),
-            "StakeRegistry: input is zero"
-        );
-        stakeContractVault[_stakeContract] = _vault;
-        stakeContractsOfVault[_vault].push(_stakeContract);
-    }
-
-    function phasesAll(uint256 _index)
-        external
-        view
-        returns (address[] memory)
-    {
-        return phases[_index];
-    }
-
-    function stakeContractsOfVaultAll(address _vault)
-        external
-        view
-        returns (address[] memory)
-    {
-        return stakeContractsOfVault[_vault];
-    }
 }

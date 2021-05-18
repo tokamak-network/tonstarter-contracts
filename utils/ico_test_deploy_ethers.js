@@ -40,9 +40,9 @@ let StakeFactory,
   Stake1Vault,
   Stake1Logic,
   Stake1Proxy,
-  Stake1,
+  StakeTON,
   IERC20;
-let Stake1Factory, StakeForStableCoinFactory;
+let StakeTONFactory, StakeForStableCoinFactory;
 
 // plasma-evm-contracts
 let TON,
@@ -154,11 +154,11 @@ class ICO20Contracts {
     this.vault_phase1_fldethlp = null;
     this.vault_phase1_dev = null;
 
-    this.stake1factory = null;
+    this.stakeTONfactory = null;
     this.stakeForStableCoinFactory = null;
 
-    Stake1Factory = await ethers.getContractFactory("Stake1Factory");
-    StakeForStableCoinFactory = await ethers.getContractFactory(
+    this.stakeTONfactory = await ethers.getContractFactory("StakeTONFactory");
+    this.stakeForStableCoinFactory = await ethers.getContractFactory(
       "StakeForStableCoinFactory"
     );
 
@@ -170,19 +170,22 @@ class ICO20Contracts {
     Stake1Vault = await ethers.getContractFactory("Stake1Vault");
     Stake1Logic = await ethers.getContractFactory("Stake1Logic");
     Stake1Proxy = await ethers.getContractFactory("Stake1Proxy");
-    Stake1 = await ethers.getContractFactory("Stake1");
+
+    StakeTONFactory = await ethers.getContractFactory("StakeTONFactory");
+    StakeForStableCoinFactory = await ethers.getContractFactory("StakeForStableCoinFactory");
 
     this.fld = await FLD.connect(owner).deploy();
     this.sfld = await SFLD.connect(owner).deploy();
 
-    this.stake1factory = await Stake1Factory.connect(owner).deploy();
+    this.stakeregister = await StakeRegistry.connect(owner).deploy();
+
+    this.stakeTONfactory = await StakeTONFactory.connect(owner).deploy();
     this.stakeForStableCoinFactory = await StakeForStableCoinFactory.connect(
       owner
     ).deploy();
 
-    this.stakeregister = await StakeRegistry.connect(owner).deploy();
     this.stakefactory = await StakeFactory.connect(owner).deploy(
-      this.stake1factory.address,
+      this.stakeTONfactory.address,
       this.stakeForStableCoinFactory.address
     );
     this.stake1logic = await Stake1Logic.connect(owner).deploy();
