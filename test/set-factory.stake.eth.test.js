@@ -113,7 +113,7 @@ describe ("Upgradable Stake Contracts", function () {
           toBN(period), // staking period
           name, // staking name
           { from: defaultSender }
-      )).to.be.reverted;
+      )).to.be.revertedWith("Function cannot be used");
     }
 
     await stakeEntry.setFactory(ICO20Instances.stakeFactory.address);

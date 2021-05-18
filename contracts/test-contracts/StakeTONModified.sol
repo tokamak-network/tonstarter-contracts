@@ -62,6 +62,7 @@ contract StakeTONModified is TokamakStaker {
 
     /// @dev Stake amount
     function stake(uint256 amount) public payable {
+        revert("Function cannot be used");
         require(
             (paytoken == address(0) && msg.value == amount) ||
                 (paytoken != address(0) && amount > 0),
@@ -142,7 +143,6 @@ contract StakeTONModified is TokamakStaker {
 
     /// @dev Claim for reward
     function claim() external lock {
-        revert("Function cannot be used");
         require(
             IStake1Vault(vault).saleClosed() == true,
             "not closed"

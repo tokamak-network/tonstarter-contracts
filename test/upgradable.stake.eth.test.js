@@ -16,6 +16,7 @@ const zeroAddress = "0x0000000000000000000000000000000000000000";
 const Stake1Vault = contract.fromArtifact("Stake1Vault");
 const StakeTON = contract.fromArtifact("StakeTON");
 const StakeTONProxy = contract.fromArtifact("StakeTONProxy");
+const StakeTONModified = contract.fromArtifact("StakeTONModified");
 
 describe ("Upgradable Stake Contracts", function () {
   const usersInfo = [
@@ -117,10 +118,10 @@ describe ("Upgradable Stake Contracts", function () {
       const stakeProxy = await StakeTONProxy.at(stakeAddress);
       const stakeContract = await StakeTON.at(stakeAddress);
       const oldImplementationAddress = await stakeProxy.implementation();
-      const newImplementation = ICO20Instances.fld.address; // random address
+      const newImplementation = await StakeTONModified.new({ from: defaultSender }); // random address
  
       // upgrade to non-working implementation
-      await stakeEntry.upgradeStakeTo(stakeAddress, newImplementation, { from: defaultSender });
+      await stakeEntry.upgradeStakeTo(stakeAddress, newImplementation.address, { from: defaultSender });
       
       
       // try to use it
@@ -131,10 +132,10 @@ describe ("Upgradable Stake Contracts", function () {
             from: address,
             value: toWei(toBN(stakes[i].amount), "ether"),
           })
-        ).to.be.reverted;
+        ).to.be.revertedWith("Function cannot be used");
       }
       
-      // upgrade to non-working implementation
+      // upgrade to working implementation
       await stakeEntry.upgradeStakeTo(stakeAddress, oldImplementationAddress);
       for (const user of usersInfo) {
         const { name, address, stakes } = user;
