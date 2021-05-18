@@ -16,7 +16,7 @@ const zeroAddress = "0x0000000000000000000000000000000000000000";
 const Stake1Vault = contract.fromArtifact("Stake1Vault");
 const StakeTON = contract.fromArtifact("StakeTON");
 const StakeTONProxy = contract.fromArtifact("StakeTONProxy");
-const StakeTONModified = contract.fromArtifact("StakeTONModified");
+const StakeFactoyModified = contract.fromArtifact("StakeFactoryModified");
 
 describe ("Upgradable Stake Contracts", function () {
   const usersInfo = [
@@ -37,7 +37,8 @@ describe ("Upgradable Stake Contracts", function () {
   let Vault;
   let stakeEntry;
   let saleStartBlock, stakeStartBlock;
-  
+  let stakeFactoryModified;
+
   const stakingContractInfo = [
     {name: "short staking", period: 50},
     {name: "long staking", period: 100}
@@ -47,6 +48,8 @@ describe ("Upgradable Stake Contracts", function () {
     this.timeout(1000000);
     contractsInitializer = new ICO20Contracts();
   });
+
+
 
   it("Initialize contracts", async function () {
     this.timeout(1000000);
@@ -62,6 +65,16 @@ describe ("Upgradable Stake Contracts", function () {
     ICO20Instances.stakeFactory = result.stakefactory;
     ICO20Instances.stake1proxy = result.stake1proxy;
     ICO20Instances.stake1logic = result.stake1logic;
+    ICO20Instances.stakeTONfactory = result.stakeTONfactory;
+    ICO20Instances.stakeForStableCoinFactory = result.stakeForStableCoinFactory;
+  });
+
+  it("Deploy stake contracts modified", async function () {
+    stakeFactoryModified = await StakeFactoyModified.new(
+      ICO20Instances.stakeTONfactory.address,
+      ICO20Instances.stakeForStableCoinFactory.address,
+      { from: defaultSender }
+    );
   });
 
   it('should create a vault', async function () {
@@ -89,9 +102,23 @@ describe ("Upgradable Stake Contracts", function () {
 
   it("should create stake contracts", async function () {
     this.timeout(10000000);
-
+    await stakeEntry.setFactory(stakeFactoryModified.address);
     for (const { name, period } of stakingContractInfo) {
-      await stakeEntry.createStakeContract(
+      await expect(
+        stakeEntry.createStakeContract(
+          toBN("1"), // phase number
+          Vault.address, // vault address
+          ICO20Instances.fld.address, // fld address
+          zeroAddress, // token address - ether
+          toBN(period), // staking period
+          name, // staking name
+          { from: defaultSender }
+      )).to.be.revertedWith("Function cannot be used");
+    }
+
+    await stakeEntry.setFactory(ICO20Instances.stakeFactory.address);
+    for (const { name, period } of stakingContractInfo) {
+      stakeEntry.createStakeContract(
         toBN("1"), // phase number
         Vault.address, // vault address
         ICO20Instances.fld.address, // fld address
@@ -109,34 +136,13 @@ describe ("Upgradable Stake Contracts", function () {
     }
   });
 
-  it("should upgrade stake to invalid contract", async function () {
+  it("should set new factory stake to invalid contract", async function () {
     this.timeout(10000000);
     const currentBlockTime = parseInt(saleStartBlock);
     await time.advanceBlockTo(currentBlockTime);
     for (let i = 0; i < stakingContractInfo.length; ++i) {
       const { address: stakeAddress } = stakingContractInfo[i];
-      const stakeProxy = await StakeTONProxy.at(stakeAddress);
       const stakeContract = await StakeTON.at(stakeAddress);
-      const oldImplementationAddress = await stakeProxy.implementation();
-      const newImplementation = await StakeTONModified.new({ from: defaultSender }); // random address
- 
-      // upgrade to non-working implementation
-      await stakeEntry.upgradeStakeTo(stakeAddress, newImplementation.address, { from: defaultSender });
-      
-      
-      // try to use it
-      for (const user of usersInfo) {
-        const { name, address, stakes } = user;
-        await expect(
-          stakeContract.sendTransaction({
-            from: address,
-            value: toWei(toBN(stakes[i].amount), "ether"),
-          })
-        ).to.be.revertedWith("Function cannot be used");
-      }
-      
-      // upgrade to working implementation
-      await stakeEntry.upgradeStakeTo(stakeAddress, oldImplementationAddress);
       for (const user of usersInfo) {
         const { name, address, stakes } = user;
         await stakeContract.sendTransaction({

@@ -253,6 +253,7 @@ class ICO20Contracts {
       fld: this.fld,
       sfld: this.sfld,
       // stakeForSFLD: this.stakeForSFLD,
+      stakeForStableCoinFactory: this.stakeForStableCoinFactory,
       stakeTONfactory: this.stakeTONfactory,
       stakeregister: this.stakeregister,
       stakefactory: this.stakefactory,
@@ -413,6 +414,8 @@ class ICO20Contracts {
       stake1logic: this.stake1logic,
       stake1proxy: this.stake1proxy,
       stakeEntry: this.stakeEntry,
+      stakeForStableCoinFactory: this.stakeForStableCoinFactory,
+      stakeTONfactory: this.stakeTONfactory,
     };
   };
 
