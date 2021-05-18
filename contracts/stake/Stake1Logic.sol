@@ -11,6 +11,7 @@ import {IStakeRegistry} from "../interfaces/IStakeRegistry.sol";
 import {IStake1Vault} from "../interfaces/IStake1Vault.sol";
 import {IStakeTON} from "../interfaces/IStakeTON.sol";
 import {Stake1Vault} from "./Stake1Vault.sol";
+import {IProxy} from "../interfaces/IProxy.sol";
 
 contract Stake1Logic is StakeProxyStorage, AccessControl {
     using SafeMath for uint256;
@@ -161,6 +162,10 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
     ) external onlyOwner {
 
         stakeRegistry.addVault(_vault, _phase, _vaultName);
+    }
+
+    function upgradeStakeTo(address _stakeProxy, address _implementation) external onlyOwner {
+        IProxy(_stakeProxy).upgradeTo(_implementation);
     }
 
     function stakeContractsOfVault(address _vault)

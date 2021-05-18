@@ -63,7 +63,7 @@ stakePeriod = parseInt(stakePeriod);
 
 const zeroAddress = "0x0000000000000000000000000000000000000000";
 
-const logFlag = 0;
+const logFlag = 1;
 
 describe("Phase1. StakeContract with ETH", function () {
   let weth, fld, stakeregister, stakefactory, stake1proxy, stake1logic;
@@ -100,19 +100,18 @@ describe("Phase1. StakeContract with ETH", function () {
     ico20Contracts = new ICO20Contracts();
   });
 
-  describe('# 1. Global Setting', async function () {
-    it("ico20Contracts init  ", async function () {
-      this.timeout(1000000);
-      ICOContractsDeployed = await ico20Contracts.initializeICO20Contracts(
-        defaultSender
-      );
-    });
-    it("tokamakContracts init  ", async function () {
-      this.timeout(1000000);
-      TokamakContractsDeployed =
-        await ico20Contracts.initializePlasmaEvmContracts(defaultSender);
-    });
-
+  it("ico20Contracts init  ", async function () {
+    this.timeout(1000000);
+    ICOContractsDeployed = await ico20Contracts.initializeICO20Contracts(
+      defaultSender
+    );
+  });
+  it("tokamakContracts init  ", async function () {
+    this.timeout(1000000);
+    TokamakContractsDeployed =
+      await ico20Contracts.initializePlasmaEvmContracts(defaultSender);
+  });
+  
   it('Set StakeProxy  ', async function () {
     this.timeout(1000000);
     stakeEntry = await ico20Contracts.setEntry(defaultSender);
