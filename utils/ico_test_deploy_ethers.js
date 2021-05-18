@@ -31,6 +31,21 @@ const TON_UNIT = "wei";
 const WTON_UNIT = "ray";
 const WTON_TON_RATIO = _WTON_TON("1");
 
+const WITHDRAWAL_DELAY = 10;
+const SEIG_PER_BLOCK = _WTON("3.92");
+const ROUND_DURATION = time.duration.minutes(5);
+
+const TON_INITIAL_SUPPLY = _TON("50000000");
+const TON_INITIAL_HOLDERS = _TON("1000000");
+const TON_VAULT_AMOUNT = _WTON("10000000");
+
+const POWERTON_SEIG_RATE = _WTON("0.1");
+const DAO_SEIG_RATE = _WTON("0.5");
+const PSEIG_RATE = _WTON("0.4");
+
+const TON_MINIMUM_STAKE_AMOUNT = _TON("1000");
+
+
 // ico2.0 contracts
 let StakeFactory,
   StakeRegistry,
@@ -224,7 +239,8 @@ class ICO20Contracts {
     DAOVault = await ethers.getContractFactory("DAOVault");
     SeigManager = await ethers.getContractFactory("SeigManager");
     PowerTON = await ethers.getContractFactory("PowerTON");
-
+    console.log("HI1");
+    
     this.ton = await TON.connect(owner).deploy();
     this.wton = await WTON.connect(owner).deploy(this.ton.address);
     this.registry = await Layer2Registry.connect(owner).deploy();
@@ -238,8 +254,9 @@ class ICO20Contracts {
     const currentTime = await time.latest();
     this.daoVault = await DAOVault.connect(owner).deploy(
       this.wton.address,
-      currentTime
+      currentTime.toString()
     );
+    console.log("HI2");
 
     this.seigManager = await SeigManager.connect(owner).deploy(
       this.ton.address,
@@ -249,6 +266,7 @@ class ICO20Contracts {
       SEIG_PER_BLOCK.toFixed(WTON_UNIT),
       this.factory.address
     );
+    console.log("HI3");
 
     this.powerton = await PowerTON.connect(owner).deploy(
       this.seigManager.address,
@@ -256,7 +274,7 @@ class ICO20Contracts {
       ROUND_DURATION
     );
     await this.powerton.connect(owner).init();
-
+    
     await this.seigManager.connect(owner).setPowerTON(this.powerton.address);
     await this.powerton.connect(owner).start();
     await this.seigManager.connect(owner).setDao(this.daoVault.address);
@@ -268,7 +286,8 @@ class ICO20Contracts {
         contract.connect(owner).setSeigManager(this.seigManager.address)
       )
     );
-
+    console.log("HI4");
+    
     // ton setting
     await this.ton
       .connect(owner)

@@ -253,6 +253,7 @@ class ICO20Contracts {
       fld: this.fld,
       sfld: this.sfld,
       // stakeForSFLD: this.stakeForSFLD,
+      stakeTONfactory: this.stakeTONfactory,
       stakeregister: this.stakeregister,
       stakefactory: this.stakefactory,
       stake1logic: this.stake1logic,
