@@ -1,7 +1,6 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity ^0.7.6;
 
-//import { IERC20 } from "../interfaces/IERC20.sol";
 import "../libraries/LibTokenStake1.sol";
 
 contract Stake1Storage {
@@ -26,17 +25,5 @@ contract Stake1Storage {
 
     uint256 internal _lock;
 
-    // operating profit storage
-    // token => block => amount
-    // mapping(address => mapping(uint256 => uint256)) private operateRewardBlock;
-    // mapping(address => uint256[]) private operateRewardBlockIndex;
-
-    // user => token => claimed operateRewardBlockIndex
-    // mapping(address => mapping(address => uint256))
-    //     public userProfitWithdrawalIndex;
-
-    // user => token => claimedAmount
-    // mapping(address => mapping(address => uint256))
-    //     public userProfitWithdrawalAmount;
 
 }

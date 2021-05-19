@@ -2,7 +2,8 @@
 pragma solidity ^0.7.6;
 pragma abicoder v2;
 
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {IStake1Vault} from "../interfaces/IStake1Vault.sol";
+import {IIERC20} from "../interfaces/IIERC20.sol";
 import "./StakeTONStorage.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import {OnApprove} from "../tokens/OnApprove.sol";
@@ -132,16 +133,21 @@ contract StakeTONProxy is StakeTONStorage, AccessControl, OnApprove {
             "stakeOnApprove init fail"
         );
         require(
-            block.number >= saleStartBlock && saleStartBlock < startBlock
-            && block.number < startBlock,
+            block.number >= saleStartBlock && block.number < startBlock,
             "period is unavailable"
         );
+
+        require(!IStake1Vault(vault).saleClosed(), "not end");
+        require(
+                IIERC20(paytoken).balanceOf(_owner) >= _amount,
+                "lack"
+            );
 
         LibTokenStake1.StakedAmount storage staked = userStaked[_owner];
         staked.amount += _amount;
         totalStakedAmount += _amount;
         require(
-            IERC20(from).transferFrom(_owner, _spender, _amount),
+            IIERC20(from).transferFrom(_owner, _spender, _amount),
             "transfer fail"
         );
         return true;
