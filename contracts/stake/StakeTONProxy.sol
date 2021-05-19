@@ -24,10 +24,11 @@ contract StakeTONProxy is StakeTONStorage, AccessControl, OnApprove {
         _;
     }
 
-    constructor() {
+    constructor(address _logic) {
         _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
         _setupRole(ADMIN_ROLE, msg.sender);
         _setupRole(ADMIN_ROLE, address(this));
+        _implementation = _logic;
     }
 
     /// @notice Set pause state
@@ -144,6 +145,33 @@ contract StakeTONProxy is StakeTONStorage, AccessControl, OnApprove {
             "transfer fail"
         );
         return true;
+    }
+
+    function setInit(
+        address[4] memory _addr,
+        address[4] memory _tokamak,
+        uint256[3] memory _intdata
+    ) external onlyOwner {
+        require(
+            _tokamak[0] != address(0) &&
+                _addr[2] != address(0) &&
+                _intdata[0] < _intdata[1], "setInit fail"
+        );
+        token = _addr[0];
+        paytoken = _addr[1];
+        vault = _addr[2];
+        _uniswapRouter = _addr[3];
+
+        ton = _tokamak[0];
+        wton = _tokamak[1];
+        depositManager = _tokamak[2];
+        seigManager = _tokamak[3];
+
+        tokamakLayer2 = address(0);
+
+        saleStartBlock = _intdata[0];
+        startBlock = _intdata[1];
+        endBlock = startBlock + _intdata[2];
     }
 
 }

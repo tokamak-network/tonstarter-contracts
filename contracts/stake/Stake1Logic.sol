@@ -126,15 +126,25 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
             stakeRegistry.validVault(_phase, _vault),
             "Stake1Logic: unvalidVault"
         );
+
+        IStake1Vault vault = IStake1Vault(_vault);
+        uint256 saleStart = vault.saleStartBlock();
+        uint256 stakeStart = vault.stakeStartBlock();
+        uint256 stakeType = vault.stakeType();
+        address defiAddr = vault.defiAddr();
+        uint256 phase = _phase;
+        uint256[3] memory iniInfo = [saleStart, stakeStart, periodBlock];
+        address[4] memory _addr = [token, paytoken, _vault, defiAddr];
+        address[4] memory tokamakAddr = [ton, wton, depositManager, seigManager];
+
         // solhint-disable-next-line max-line-length
         address _contract =
-            stakeFactory.deploy(
-                _phase,
-                _vault,
-                token,
-                paytoken,
-                periodBlock,
-                [ton, wton, depositManager, seigManager]
+            stakeFactory.create(
+                phase,
+                stakeType,
+                _addr,
+                tokamakAddr,
+                iniInfo
             );
         require(
             _contract != address(0),
@@ -142,9 +152,9 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
         );
 
         IStake1Vault(_vault).addSubVaultOfStake(_name, _contract, periodBlock);
-        stakeRegistry.addStakeContract(_vault, _contract);
+        stakeRegistry.addStakeContract(address(vault), _contract);
 
-        emit CreatedStakeContract(_vault, _contract, _phase);
+        emit CreatedStakeContract(address(vault), _contract, phase);
     }
 
     function currentBlock() external view returns (uint256) {

@@ -4,8 +4,6 @@ import {ITON} from "../interfaces/ITON.sol";
 import {IStake1Vault} from "../interfaces/IStake1Vault.sol";
 import {IIDepositManager} from "../interfaces/IIDepositManager.sol";
 import {IISeigManager} from "../interfaces/IISeigManager.sol";
-//import {IUniswapActor} from "../interfaces/IUniswapActor.sol";
-
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "../stake/StakeTONStorage.sol";
 interface IERC20BASE {
@@ -206,6 +204,7 @@ contract TokamakStaker is StakeTONStorage, AccessControl {
         //emit tokamakProcessedUnStaking(_layer2, receiveTON);
     }
 
+    /*
     function tokamakPendingUnstaked(address _layer2)
         public nonZeroInit nonZero(_layer2)
         view
@@ -244,5 +243,6 @@ contract TokamakStaker is StakeTONStorage, AccessControl {
     {
         return IISeigManager(seigManager).stakeOf(_layer2, address(this));
     }
+    */
 
 }

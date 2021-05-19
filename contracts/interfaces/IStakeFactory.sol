@@ -2,13 +2,12 @@
 pragma solidity ^0.7.6;
 
 interface IStakeFactory {
-    function deploy(
+    function create(
         uint256 _pahse,
-        address _vault,
-        address _token,
-        address _paytoken,
-        uint256 _period,
-        address[4] memory tokamakAddr
+        uint256 stakeType,
+        address[4] memory _addr,
+        address[4] memory tokamakAddr,
+        uint256[3] memory _intdata
     ) external returns (address);
 
     function setStakeTONFactory(address _stakeTONFactory)

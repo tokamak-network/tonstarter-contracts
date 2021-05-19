@@ -1,10 +1,11 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity ^0.7.0;
 
-import {IUniswapV2Router01} from "../interfaces/IUniswapV2Router01.sol";
+//import {IUniswapV2Router01} from "../interfaces/IUniswapV2Router01.sol";
 import {IStake1Vault} from "../interfaces/IStake1Vault.sol";
 import {IIERC20} from "../interfaces/IIERC20.sol";
 import "../libraries/LibTokenStake1.sol";
+import "../libraries/LibUniswap.sol";
 import "../connection/TokamakStaker.sol";
 import {
     ERC165Checker
@@ -151,7 +152,7 @@ contract StakeTON is TokamakStaker {
         LibTokenStake1.StakedAmount storage staked = userStaked[msg.sender];
         require(staked.claimedBlock < endBlock, "claimed");
 
-        rewardClaim = canRewardAmount(msg.sender);
+        rewardClaim = canRewardAmount(msg.sender, block.number);
 
         require(rewardClaim > 0, "reward is zero");
 
@@ -173,17 +174,17 @@ contract StakeTON is TokamakStaker {
 
     /// @dev Returns the amount that can be rewarded
     //function canRewardAmount(address account) public view returns (uint256) {
-    function canRewardAmount(address account)
+    function canRewardAmount(address account, uint256 specilaBlock)
         public view
         returns (uint256)
     {
         uint256 reward = 0;
 
         if (
-            block.number < startBlock ||
+            specilaBlock < startBlock ||
             userStaked[account].amount == 0 ||
             userStaked[account].claimedBlock > endBlock ||
-            userStaked[account].claimedBlock > block.number
+            userStaked[account].claimedBlock > specilaBlock
         ) {
             reward = 0;
         } else {
@@ -191,7 +192,7 @@ contract StakeTON is TokamakStaker {
             uint256 endR = endBlock;
             if (startR < userStaked[account].claimedBlock)
                 startR = userStaked[account].claimedBlock;
-            if (block.number < endR) endR = block.number;
+            if (specilaBlock < endR) endR = specilaBlock;
 
             uint256[] memory orderedEndBlocks =
                 IStake1Vault(vault).orderedEndBlocksAll();
@@ -226,157 +227,5 @@ contract StakeTON is TokamakStaker {
         }
         return reward;
     }
-    /*
-    function canRewardAmountForTest(address account)
-        public view
-        //returns (uint256)
-        returns (uint256 reward, uint256 startR, uint256 endR, uint256 blockTotalReward)
-    {
-        //uint256 reward = 0;
 
-        reward = 0;
-        startR = startBlock;
-        endR = endBlock;
-        blockTotalReward = 0;
-
-        if (
-            block.number < startBlock ||
-            userStaked[account].amount == 0 ||
-            userStaked[account].claimedBlock > endBlock ||
-            userStaked[account].claimedBlock > block.number
-        ) {
-            reward = 0;
-        } else {
-            //uint256 startR = startBlock;
-            //uint256 endR = endBlock;
-            if (startR < userStaked[account].claimedBlock)
-                startR = userStaked[account].claimedBlock;
-            if (block.number < endR) endR = block.number;
-
-            uint256[] memory orderedEndBlocks =
-                IStake1Vault(vault).orderedEndBlocksAll();
-
-            if (orderedEndBlocks.length > 0) {
-                uint256 _end = 0;
-                uint256 _total = 0;
-                //uint256 blockTotalReward = 0;
-                blockTotalReward = IStake1Vault(vault).blockTotalReward();
-
-                for (uint256 i = 0; i < orderedEndBlocks.length; i++) {
-                    _end = orderedEndBlocks[i];
-                    _total = IStake1Vault(vault).stakeEndBlockTotal(_end);
-
-                    if (endR <= _end) {
-                        reward +=
-                            (blockTotalReward *
-                                (endR - startR) *
-                                userStaked[account].amount) /
-                            _total;
-                        break;
-                    } else {
-                        reward +=
-                            (blockTotalReward *
-                                (_end - startR) *
-                                userStaked[account].amount) /
-                            _total;
-                        startR = _end;
-                    }
-                }
-            }
-        }
-        //return reward;
-    }
-    */
-
-    ///
-    function addLiquidity(
-        address tokenA,
-        address tokenB,
-        uint256 amountADesired,
-        uint256 amountBDesired,
-        uint256 amountAMin,
-        uint256 amountBMin,
-        address to,
-        uint256 deadline
-    )
-        external
-        onlyOwner
-        returns (
-            uint256 amountA,
-            uint256 amountB,
-            uint256 liquidity
-        )
-    {
-        // (bool success, bytes memory data) = _uniswapRouter.call(
-        //     abi.encodeWithSignature("addLiquidity(address,address,uint,uint,uint,uint,address,uint)")
-        // );
-        // require(success, "addLiquidity fail");
-        // (amountA, amountB, liquidity) = abi.decode(data, (uint, uint, uint));
-        return
-            IUniswapV2Router01(_uniswapRouter).addLiquidity(
-                tokenA,
-                tokenB,
-                amountADesired,
-                amountBDesired,
-                amountAMin,
-                amountBMin,
-                to,
-                deadline
-            );
-    }
-
-    function removeLiquidity(
-        address tokenA,
-        address tokenB,
-        uint256 liquidity,
-        uint256 amountAMin,
-        uint256 amountBMin,
-        address to,
-        uint256 deadline
-    ) external onlyOwner returns (uint256 amountA, uint256 amountB) {
-        return
-            IUniswapV2Router01(_uniswapRouter).removeLiquidity(
-                tokenA,
-                tokenB,
-                liquidity,
-                amountAMin,
-                amountBMin,
-                to,
-                deadline
-            );
-    }
-
-    function swapExactTokensForTokens(
-        uint256 amountIn,
-        uint256 amountOutMin,
-        address[] calldata path,
-        address to,
-        uint256 deadline
-    ) external onlyOwner returns (uint256[] memory amounts) {
-        return
-            IUniswapV2Router01(_uniswapRouter).swapExactTokensForTokens(
-                amountIn,
-                amountOutMin,
-                path,
-                to,
-                deadline
-            );
-    }
-
-    function swapTokensForExactTokens(
-        uint256 amountOut,
-        uint256 amountInMax,
-        address[] calldata path,
-        address to,
-        uint256 deadline
-    ) external onlyOwner returns (uint256[] memory amounts) {
-        return
-            IUniswapV2Router01(_uniswapRouter).swapTokensForExactTokens(
-                amountOut,
-                amountInMax,
-                path,
-                to,
-                deadline
-            );
-    }
 }

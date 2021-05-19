@@ -16,7 +16,6 @@ const {
 require("dotenv").config();
 
 const initialTotal = process.env.initialTotal + "." + "0".repeat(18);
-
 const Pharse1_TOTAL = process.env.Pharse1_TOTAL + "." + "0".repeat(18);
 const Pharse1_TON_Staking =
   process.env.Pharse1_TON_Staking + "." + "0".repeat(18);
@@ -74,7 +73,11 @@ async function deployMain(defaultSender) {
 
   const stakeRegistry = await ethers.getContractAt("StakeRegistry", registry);
   await stakeRegistry.grantRole(ADMIN_ROLE, proxy);
-  console.log("grantRole:");
+  console.log("stakeRegistry grantRole: proxy");
+
+  const stakeFactory = await ethers.getContractAt("StakeFactory", factory);
+  await stakeFactory.grantRole(ADMIN_ROLE, proxy);
+  console.log("stakeFactory grantRole: proxy");
 
   console.log(
     "utils.parseUnits(initialTotal, 18):",

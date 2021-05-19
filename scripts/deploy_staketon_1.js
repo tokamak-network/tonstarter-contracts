@@ -42,6 +42,9 @@ async function deployMain (defaultSender) {
   const fld = await FLD.deploy();
   console.log('fld:', fld.address);
 
+  const StakeTONLogicFactory = await ethers.getContractFactory('StakeTONLogicFactory');
+  const StakeTONProxyFactory = await ethers.getContractFactory('StakeTONProxyFactory');
+
   const StakeRegistry = await ethers.getContractFactory('StakeRegistry');
   const Stake1Logic = await ethers.getContractFactory('Stake1Logic');
   const Stake1Proxy = await ethers.getContractFactory('Stake1Proxy');
@@ -49,7 +52,13 @@ async function deployMain (defaultSender) {
   const StakeTONFactory = await ethers.getContractFactory("StakeTONFactory");
   const StakeForStableCoinFactory = await ethers.getContractFactory("StakeForStableCoinFactory");
 
-  const stakeTONFactory = await StakeTONFactory.deploy();
+  const stakeTONLogicFactory = await StakeTONLogicFactory.deploy();
+  console.log('StakeTONLogicFactory:', stakeTONLogicFactory.address);
+
+  const stakeTONProxyFactory = await StakeTONProxyFactory.deploy();
+  console.log('StakeTONProxyFactory:', stakeTONProxyFactory.address);
+
+  const stakeTONFactory = await StakeTONFactory.deploy(stakeTONProxyFactory.address, stakeTONLogicFactory.address);
   console.log('stakeTONFactory:', stakeTONFactory.address);
 
   const stakeForStableCoinFactory = await StakeForStableCoinFactory.deploy();
@@ -68,21 +77,10 @@ async function deployMain (defaultSender) {
   console.log('stake1Proxy:', stake1Proxy.address);
 
   await stake1Proxy.upgradeTo(stake1Logic.address);
-  console.log('upgradeTo:');
+  console.log('stake1Proxy upgradeTo:', stake1Logic.address);
 
-  /*
     const stakeEntry = await ethers.getContractAt("Stake1Logic", stake1Proxy.address);
     console.log("stakeEntry:" , stakeEntry.address);
-
-    await stakeEntry.setStore(fld.address, stakeRegistry.address, stakeFactory.address);
-    console.log("setStore:"  );
-
-    await stakeRegistry.grantRole(ADMIN_ROLE, stake1Proxy.address);
-    console.log("grantRole:"  );
-
-    await fld.mint(deployer, utils.parseUnits(initialTotal, 18));
-    console.log("fld mint:", fld.address);
-    */
 
   const out = {};
   out.FLD = fld.address;

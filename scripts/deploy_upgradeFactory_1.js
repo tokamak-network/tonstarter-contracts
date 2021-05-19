@@ -24,10 +24,19 @@ let proxy = loadDeployed(process.env.NETWORK,"Stake1Proxy");
 let tonFactory = loadDeployed(process.env.NETWORK,"StakeTONFactory");
 let stablecoinFactory = loadDeployed(process.env.NETWORK,"StakeForStableCoinFactory");
 
+
 async function deployStakeTONFactory(defaultSender) {
   const [deployer, user1] = await ethers.getSigners();
-  const StakeTONFactory = await ethers.getContractFactory("StakeTONFactory");
 
+  const StakeTONLogicFactory = await ethers.getContractFactory("StakeTONLogicFactory");
+  const stakeTONLogicFactory = await StakeTONLogicFactory.deploy();
+  console.log('StakeTONLogicFactory done:', stakeTONLogicFactory.address);
+
+  const StakeTONProxyFactory = await ethers.getContractFactory("StakeTONProxyFactory");
+  const stakeTONProxyFactory = await StakeTONProxyFactory.deploy();
+  console.log('StakeTONProxyFactory done:', stakeTONProxyFactory.address);
+
+  const StakeTONFactory = await ethers.getContractFactory("StakeTONFactory");
   const stakeTONFactory = await StakeTONFactory.deploy();
   console.log('StakeTONFactory done:', stakeTONFactory.address);
 
@@ -40,10 +49,10 @@ async function deployStakeFactory(defaultSender) {
   console.log("stablecoinFactory:", stablecoinFactory);
   const StakeFactory = await ethers.getContractFactory("StakeFactory");
 
-  const stakeFactory = await StakeFactory.deploy(tonFactory, stablecoinFactory);
+  const stakeFactory = await StakeFactory.deploy();
   console.log('StakeFactory done:', stakeFactory.address);
-  await stakeFactory.grantRole(ADMIN_ROLE, proxy);
-  console.log('StakeFactory grantRole done:', proxy);
+  //await stakeFactory.grantRole(ADMIN_ROLE, proxy);
+  //console.log('StakeFactory grantRole done:', proxy);
   return;
 }
 async function deployLogic1(defaultSender) {
@@ -84,8 +93,8 @@ async function main() {
 
   console.log("Account balance:", (await deployer.getBalance()).toString());
 
-  // await deployStakeTONFactory(deployer);
-  // await deployStakeFactory(deployer);
+  //await deployStakeTONFactory(deployer);
+  //await deployStakeFactory(deployer);
   //await setStakeFactory(deployer);
   //await deployLogic1(deployer);
   await upgradeLogic(deployer);
