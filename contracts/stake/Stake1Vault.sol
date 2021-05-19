@@ -39,7 +39,6 @@ contract Stake1Vault is AccessControl {
     uint256[] public orderedEndBlocks; // Ascending orders
     mapping(uint256 => uint256) public stakeEndBlockTotal;
 
-    //mapping(bytes32 => uint) private lock;
     uint256 private _lock;
 
     modifier onlyOwner() {
@@ -214,12 +213,12 @@ contract Stake1Vault is AccessControl {
 
         // update balance
         for (uint256 i = 0; i < stakeAddresses.length; i++) {
-            address stake = stakeAddresses[i];
-            LibTokenStake1.StakeInfo storage stakeInfo = stakeInfos[stake];
+            //address stake = stakeAddresses[i];
+            LibTokenStake1.StakeInfo storage stakeInfo = stakeInfos[stakeAddresses[i]];
             if (paytoken == address(0)) {
-                stakeInfo.balance = address(uint160(stake)).balance;
+                stakeInfo.balance = address(uint160(stakeAddresses[i])).balance;
             } else {
-                stakeInfo.balance = IERC20(paytoken).balanceOf(stake);
+                stakeInfo.balance = IERC20(paytoken).balanceOf(stakeAddresses[i]);
             }
         }
         uint256 sum = 0;

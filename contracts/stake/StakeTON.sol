@@ -75,7 +75,6 @@ contract StakeTON is TokamakStaker {
 
         require(!IStake1Vault(vault).saleClosed(), "not end");
 
-        // uint256 amount = _amount;
         if (paytoken == address(0)) amount = msg.value;
         else
             require(
@@ -109,6 +108,7 @@ contract StakeTON is TokamakStaker {
         }
 
         LibTokenStake1.StakedAmount storage staked = userStaked[msg.sender];
+        require(staked.released == false, "Already withdraw");
 
         uint256 amount = staked.amount;
 

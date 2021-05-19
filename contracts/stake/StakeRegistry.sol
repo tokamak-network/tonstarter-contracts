@@ -12,8 +12,8 @@ contract StakeRegistry is AccessControl {
 
     mapping(uint256 => address[]) public phases;
 
-    mapping(bytes32 => address) public vaults; // vaultNames - Vault
-    mapping(address => bytes32) public vaultNames; // vault - vaultNames
+    mapping(bytes32 => address) public vaults;      // vaultNames - Vault
+    mapping(address => bytes32) public vaultNames;  // vault - vaultNames
 
     mapping(address => address[]) public stakeContractsOfVault; // vault - stakeContracts[]
     mapping(address => address) public stakeContractVault; // stakeContract - vault

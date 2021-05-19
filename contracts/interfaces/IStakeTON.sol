@@ -45,6 +45,12 @@ interface IStakeTON {
 
     function stake(uint256 amount) external payable;
 
+    function claim() external ;
+
+    function withdraw() external ;
+
+    function canRewardAmount(address account) external view returns (uint256);
+
     function onApprove(
         address owner,
         address spender,

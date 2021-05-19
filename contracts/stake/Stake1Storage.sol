@@ -24,18 +24,19 @@ contract Stake1Storage {
     // the current lock storage of your account.
     mapping(address => LibTokenStake1.StakedAmount) public userStaked;
 
+    uint256 internal _lock;
+
     // operating profit storage
     // token => block => amount
-    mapping(address => mapping(uint256 => uint256)) private operateRewardBlock;
-    mapping(address => uint256[]) private operateRewardBlockIndex;
+    // mapping(address => mapping(uint256 => uint256)) private operateRewardBlock;
+    // mapping(address => uint256[]) private operateRewardBlockIndex;
 
     // user => token => claimed operateRewardBlockIndex
-    mapping(address => mapping(address => uint256))
-        public userProfitWithdrawalIndex;
+    // mapping(address => mapping(address => uint256))
+    //     public userProfitWithdrawalIndex;
 
     // user => token => claimedAmount
-    mapping(address => mapping(address => uint256))
-        public userProfitWithdrawalAmount;
+    // mapping(address => mapping(address => uint256))
+    //     public userProfitWithdrawalAmount;
 
-    uint256 internal _lock;
 }
