@@ -10,4 +10,10 @@ interface IStakeFactory {
         uint256 _period,
         address[4] memory tokamakAddr
     ) external returns (address);
+
+    function setStakeTONFactory(address _stakeTONFactory)
+        external;
+
+    function setStakeStableCoinFactory(address _stakeStableCoinFactory)
+        external;
 }

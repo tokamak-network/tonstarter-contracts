@@ -7,7 +7,7 @@ import {IStakeRegistry} from "../interfaces/IStakeRegistry.sol";
 contract StakeProxyStorage {
     IStakeRegistry public stakeRegistry;
     IStakeFactory public stakeFactory;
-    uint256 public secondsPerBlock;
+    // uint256 public secondsPerBlock;
     address public fld;
 
     address public ton;

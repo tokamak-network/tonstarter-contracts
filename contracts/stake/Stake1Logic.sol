@@ -51,6 +51,8 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
     */
     event SetStakeFactory(address stakeFactory);
     event SetStakeRegistry(address stakeRegistry);
+    event SetStakeTONFactory(address stakeTONFactory);
+    event SetStakeStableCoinFactory(address stakeStableCoinFactory);
 
     //////////////////////////////////////////////////////////////////////
     // setters
@@ -243,6 +245,24 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
     {
         stakeFactory = IStakeFactory(_stakeFactory);
         emit SetStakeFactory(_stakeFactory);
+    }
+
+    function setStakeTONFactory(address _stakeTONFactory)
+        public
+        onlyOwner
+        nonZero(_stakeTONFactory)
+    {
+        stakeFactory.setStakeTONFactory(_stakeTONFactory);
+        emit SetStakeTONFactory(_stakeTONFactory);
+    }
+
+    function setStakeStableCoinFactory(address _stakeStableCoinFactory)
+        public
+        onlyOwner
+        nonZero(_stakeStableCoinFactory)
+    {
+        stakeFactory.setStakeStableCoinFactory(_stakeStableCoinFactory);
+        emit SetStakeStableCoinFactory(_stakeStableCoinFactory);
     }
 
     function vaultsOfPahse(uint256 _phase)

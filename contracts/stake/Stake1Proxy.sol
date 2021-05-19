@@ -26,7 +26,6 @@ contract Stake1Proxy is StakeProxyStorage, AccessControl {
         _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
         _setupRole(ADMIN_ROLE, msg.sender);
         _setupRole(ADMIN_ROLE, address(this));
-        secondsPerBlock = 13;
     }
 
     /// @notice Set pause state

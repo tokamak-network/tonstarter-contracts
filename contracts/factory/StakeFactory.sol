@@ -6,13 +6,25 @@ import {
     IStakeForStableCoinFactory
 } from "../interfaces/IStakeForStableCoinFactory.sol";
 import {IStake1Vault} from "../interfaces/IStake1Vault.sol";
+import "@openzeppelin/contracts/access/AccessControl.sol";
 
-contract StakeFactory {
+contract StakeFactory is AccessControl{
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
 
     address public stakeTONFactory;
     address public stakeStableCoinFactory;
 
+    modifier onlyOwner() {
+        require(
+            hasRole(ADMIN_ROLE, msg.sender),
+            "not an admin"
+        );
+        _;
+    }
+    modifier nonZero(address _addr) {
+        require(_addr != address(0), "zero");
+        _;
+    }
     constructor(address _stakeTONFactory, address _stableFactory) {
         require(
             _stakeTONFactory != address(0) && _stableFactory != address(0),
@@ -20,6 +32,23 @@ contract StakeFactory {
         );
         stakeTONFactory = _stakeTONFactory;
         stakeStableCoinFactory = _stableFactory;
+        _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
+        _setupRole(ADMIN_ROLE, msg.sender);
+    }
+    function setStakeTONFactory(address _stakeTONFactory)
+        public
+        onlyOwner
+        nonZero(_stakeTONFactory)
+    {
+        stakeTONFactory = _stakeTONFactory;
+    }
+
+    function setStakeStableCoinFactory(address _stakeStableCoinFactory)
+        public
+        onlyOwner
+        nonZero(_stakeStableCoinFactory)
+    {
+        stakeStableCoinFactory = _stakeStableCoinFactory;
     }
 
     function deploy(
