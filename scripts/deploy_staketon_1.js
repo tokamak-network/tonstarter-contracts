@@ -44,7 +44,7 @@ async function deployMain (defaultSender) {
 
   const StakeTONLogicFactory = await ethers.getContractFactory('StakeTONLogicFactory');
   const StakeTONProxyFactory = await ethers.getContractFactory('StakeTONProxyFactory');
-
+  const StakeVaultFactory = await ethers.getContractFactory('StakeVaultFactory');
   const StakeRegistry = await ethers.getContractFactory('StakeRegistry');
   const Stake1Logic = await ethers.getContractFactory('Stake1Logic');
   const Stake1Proxy = await ethers.getContractFactory('Stake1Proxy');
@@ -69,6 +69,9 @@ async function deployMain (defaultSender) {
 
   const stakeRegistry = await StakeRegistry.deploy();
   console.log('stakeRegistry:', stakeRegistry.address);
+
+  const stakeVaultFactory = await StakeVaultFactory.deploy();
+  console.log('stakeVaultFactory:', stakeVaultFactory.address);
 
   const stake1Logic = await Stake1Logic.deploy();
   console.log('stake1Logic:', stake1Logic.address);

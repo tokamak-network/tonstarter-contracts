@@ -64,8 +64,11 @@ async function createStakeContractTON(tonVaultAddress, periodBlock, name) {
       name
     );
     //const gasLimitCalculated = await estimateGas();
+
+    let gasInt = estimateGas * 1.5 ;
+    gasInt = parseInt(gasInt);
     overrideOptions = {
-      gasLimit: estimateGas * 1.5
+      gasLimit: gasInt
     }
   } catch(error) {
     console.error(error);
@@ -98,9 +101,9 @@ async function main() {
   let curBlock = await provider.getBlockNumber();
   console.log('curBlock',curBlock);
 
-  let saleStartBlock = parseInt(curBlock)+ (60*5/13);
+  let saleStartBlock = parseInt(curBlock)+ (60*2/13);
   saleStartBlock = parseInt(saleStartBlock);
-  let stakeStartBlock = parseInt(saleStartBlock)+ (60*20/13);
+  let stakeStartBlock = parseInt(saleStartBlock)+ (60*5/13);
   stakeStartBlock = parseInt(stakeStartBlock);
 
   let ton_vault = {
@@ -108,19 +111,22 @@ async function main() {
     saleStartBlock : saleStartBlock,
     stakeStartBlock : stakeStartBlock,
     phase: 1,
-    hashName : keccak256("TON_TEST1"),
+    hashName : keccak256("TON_TEST_20210520_14"),
   }
 
-  //await createValueTON(ton_vault);
+  // await createValueTON(ton_vault);
 
   let periodBlockHour1 = 60 * 60 / 13;
   periodBlockHour1= parseInt(periodBlockHour1);
-  let vaultAddress ='0xd639C987252A15f5Aa15F7B0357b7E0017c37C98';
+
+  let periodBlockMin5 = 60 * 5 / 13;
+  periodBlockMin5= parseInt(periodBlockMin5);
+
+  let vaultAddress ='0xF461E52aC79eaCc412Fbf6b97B8CC89FFed491DD';
   console.log('vaultAddress',vaultAddress);
-  console.log('periodBlockHour1',periodBlockHour1);
+  console.log('periodBlockMin2',periodBlockMin5);
 
-  await createStakeContractTON(vaultAddress,periodBlockHour1,'TON_1_HOUR');
-
+  await createStakeContractTON(vaultAddress, periodBlockMin5,'TON_5_MIN');
 
 }
 

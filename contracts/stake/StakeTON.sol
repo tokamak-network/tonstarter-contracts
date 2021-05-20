@@ -179,6 +179,7 @@ contract StakeTON is TokamakStaker {
         returns (uint256)
     {
         uint256 reward = 0;
+        if(specilaBlock > endBlock ) specilaBlock = endBlock;
 
         if (
             specilaBlock < startBlock ||

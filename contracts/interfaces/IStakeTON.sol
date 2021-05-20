@@ -49,7 +49,7 @@ interface IStakeTON {
 
     function withdraw() external ;
 
-    function canRewardAmount(address account) external view returns (uint256);
+    function canRewardAmount(address account, uint256 claimBlock) external view returns (uint256);
 
     function onApprove(
         address owner,

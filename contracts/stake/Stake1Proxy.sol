@@ -13,7 +13,7 @@ contract Stake1Proxy is StakeProxyStorage, AccessControl {
     bool public pauseProxy;
 
     event Upgraded(address indexed implementation);
-    
+
     modifier onlyOwner() {
         require(
             hasRole(ADMIN_ROLE, msg.sender),

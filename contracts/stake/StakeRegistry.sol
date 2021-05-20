@@ -92,7 +92,7 @@ contract StakeRegistry is AccessControl {
         returns (bool valid)
     {
         require(
-            phases[_phase].length > 0 && vaultNames[_vault] != ZERO_HASH,
+            phases[_phase].length > 0  ,
             "StakeRegistry: validVault is fail"
         );
 

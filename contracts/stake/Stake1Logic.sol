@@ -6,12 +6,14 @@ import {SafeMath} from "../utils/math/SafeMath.sol";
 
 import "./StakeProxyStorage.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
+
+import {IProxy} from "../interfaces/IProxy.sol";
 import {IStakeFactory} from "../interfaces/IStakeFactory.sol";
 import {IStakeRegistry} from "../interfaces/IStakeRegistry.sol";
 import {IStake1Vault} from "../interfaces/IStake1Vault.sol";
 import {IStakeTON} from "../interfaces/IStakeTON.sol";
-import {Stake1Vault} from "./Stake1Vault.sol";
-import {IProxy} from "../interfaces/IProxy.sol";
+import {StakeVaultFactory} from "../factory/StakeVaultFactory.sol";
+
 
 contract Stake1Logic is StakeProxyStorage, AccessControl {
     using SafeMath for uint256;
@@ -60,6 +62,7 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
         address _fld,
         address _stakeRegistry,
         address _stakeFactory,
+        address _stakeVaultFactory,
         address _ton,
         address _wton,
         address _depositManager,
@@ -67,6 +70,7 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
     )
         external
         onlyOwner
+        nonZero(_stakeVaultFactory)
         nonZero(_ton)
         nonZero(_wton)
         nonZero(_depositManager)
@@ -74,6 +78,8 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
         setFLD(_fld);
         setStakeRegistry(_stakeRegistry);
         setStakeFactory(_stakeFactory);
+        stakeVaultFactory = IStakeVaultFactory(_stakeVaultFactory);
+
         ton = _ton;
         wton = _wton;
         depositManager = _depositManager;
@@ -82,22 +88,23 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
     }
 
     ///
-    function setFactory(address _stakeFactory) external onlyOwner {
-        setStakeFactory(_stakeFactory);
-    }
+    // function setFactory(address _stakeFactory) external onlyOwner {
+    //     setStakeFactory(_stakeFactory);
+    // }
 
     //////////////////////////////////////////////////////////////////////
     // Admin Functions
     function createVault(
         address _paytoken,
         uint256 _cap,
-        uint256 _saleStartBlcok,
-        uint256 _stakeStartBlcok,
+        uint256 _saleStartBlock,
+        uint256 _stakeStartBlock,
         uint256 _phase,
         bytes32 _vaultName,
         uint256 _stakeType,
         address _defiAddr
-    ) external {
+    ) external nonZero(address(stakeVaultFactory)) {
+        /*
         Stake1Vault vault = new Stake1Vault();
         vault.initialize(
             fld,
@@ -112,6 +119,17 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
         stakeRegistry.addVault(address(vault), _phase, _vaultName);
 
         emit CreatedVault(address(vault), _paytoken, _cap);
+
+        */
+        address vault = stakeVaultFactory.create(
+            [fld, _paytoken, address(stakeFactory), _defiAddr],
+            [_stakeType, _cap, _saleStartBlock, _stakeStartBlock],
+            address(this)
+        );
+        require(vault != address(0), "vault is zero");
+        stakeRegistry.addVault(vault, _phase, _vaultName);
+
+        emit CreatedVault(vault, _paytoken, _cap);
     }
 
     function createStakeContract(
@@ -275,6 +293,14 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
         emit SetStakeStableCoinFactory(_stakeStableCoinFactory);
     }
 
+    function setStakeVaultFactory(address _stakeVaultFactory)
+        public
+        onlyOwner
+        nonZero(_stakeVaultFactory)
+    {
+        stakeVaultFactory = IStakeVaultFactory(_stakeVaultFactory);
+    }
+
     function vaultsOfPahse(uint256 _phase)
         public
         view
@@ -283,4 +309,15 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
     {
         return stakeRegistry.phasesAll(_phase);
     }
+
+    function grantRole(address target, bytes32 role, address account) external onlyOwner  {
+        (bool success, ) = target.call(abi.encodeWithSignature("grantRole(bytes32,address)",role, account));
+        require(success,"grantRole fail");
+    }
+
+    function revokeRole(address target, bytes32 role, address account) external onlyOwner  {
+        (bool success, ) = target.call(abi.encodeWithSignature("revokeRole(bytes32,address)",role, account));
+        require(success,"revokeRole fail");
+    }
+
 }

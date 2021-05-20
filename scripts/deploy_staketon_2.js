@@ -39,6 +39,7 @@ const EVENT_VAULT_HASH = keccak256("EVENT_VAULT");
 let fldtoken = loadDeployed(process.env.NETWORK,"FLD");
 let registry = loadDeployed(process.env.NETWORK,"StakeRegistry");
 let factory = loadDeployed(process.env.NETWORK,"StakeFactory");
+let vaultfactory = loadDeployed(process.env.NETWORK,"StakeVaultFactory");
 let logic = loadDeployed(process.env.NETWORK,"Stake1Logic");
 let proxy = loadDeployed(process.env.NETWORK,"Stake1Proxy");
 
@@ -59,11 +60,14 @@ async function deployMain(defaultSender) {
   // console.log("_logic:" , _logic);
 
   console.log("stakeEntry:", stakeEntry.address);
+  console.log("vaultfactory:", vaultfactory);
+
 
   await stakeEntry.setStore(
     fldtoken,
     registry,
     factory,
+    vaultfactory,
     ton,
     wton,
     depositManager,
