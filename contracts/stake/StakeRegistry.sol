@@ -10,6 +10,11 @@ contract StakeRegistry is AccessControl {
     bytes32 public constant ZERO_HASH =
         0x0000000000000000000000000000000000000000000000000000000000000000;
 
+    address public ton;
+    address public wton;
+    address public depositManager;
+    address public seigManager;
+
     mapping(uint256 => address[]) public phases;
 
     mapping(bytes32 => address) public vaults;      // vaultNames - Vault
@@ -25,15 +30,41 @@ contract StakeRegistry is AccessControl {
         );
         _;
     }
+
+    modifier nonZero(address _addr) {
+        require(_addr != address(0), "zero address");
+        _;
+    }
+
     //////////////////////////////
     // Events
     //////////////////////////////
     event AddedVault(address indexed vault, uint256 phase);
     event AddedStakeContract(address indexed vault, address indexed stakeContract);
+    event SetTokamak(address ton, address wton, address depositManager, address seigManager);
 
     constructor() {
         _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
         _setupRole(ADMIN_ROLE, msg.sender);
+    }
+
+    function setTokamak(
+        address _ton,
+        address _wton,
+        address _depositManager,
+        address _seigManager
+    ) external onlyOwner
+        nonZero(_ton)
+        nonZero(_wton)
+        nonZero(_depositManager)
+        nonZero(_seigManager)
+    {
+        ton = _ton;
+        wton = _wton;
+        depositManager = _depositManager;
+        seigManager = _seigManager;
+
+        emit SetTokamak(ton, wton, depositManager, seigManager);
     }
 
     /// @dev Adds vault
@@ -67,6 +98,14 @@ contract StakeRegistry is AccessControl {
         stakeContractsOfVault[_vault].push(_stakeContract);
 
         emit AddedStakeContract(_vault, _stakeContract);
+    }
+
+    function getTokamak()
+        external
+        view
+        returns (address,address,address,address)
+    {
+        return (ton, wton, depositManager, seigManager);
     }
 
     function phasesAll(uint256 _index)

@@ -153,7 +153,7 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
         uint256 phase = _phase;
         uint256[3] memory iniInfo = [saleStart, stakeStart, periodBlock];
         address[4] memory _addr = [token, paytoken, _vault, defiAddr];
-        address[4] memory tokamakAddr = [ton, wton, depositManager, seigManager];
+        //address[4] memory tokamakAddr = [ton, wton, depositManager, seigManager];
 
         // solhint-disable-next-line max-line-length
         address _contract =
@@ -161,7 +161,7 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
                 phase,
                 stakeType,
                 _addr,
-                tokamakAddr,
+                address(stakeRegistry),
                 iniInfo
             );
         require(

@@ -73,9 +73,17 @@ async function deployMain(defaultSender) {
     depositManager,
     seigManager
   );
-  console.log("setStore:");
+  console.log("stakeEntry setStore:");
 
   const stakeRegistry = await ethers.getContractAt("StakeRegistry", registry);
+
+  await stakeRegistry.setTokamak(
+    ton,
+    wton,
+    depositManager,
+    seigManager);
+  console.log("stakeRegistry setTokamak:");
+
   await stakeRegistry.grantRole(ADMIN_ROLE, proxy);
   console.log("stakeRegistry grantRole: proxy");
 

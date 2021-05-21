@@ -19,7 +19,7 @@ contract StakeTONFactory {
     function create
     (
         address[4] memory _addr,
-        address[4] memory _tokamak,
+        address _registry,
         uint256[3] memory _intdata,
         address owner
     ) public returns (address) {
@@ -33,10 +33,10 @@ contract StakeTONFactory {
         // gas limit 1,733,511
         // used gas 1,693,642 {gas: gasleft()}
         (bool success, bytes memory returnData) = stakeTONProxyFactory.call(
-            abi.encodeWithSignature("deploy(address,address[4],address[4],uint256[3],address)",
+            abi.encodeWithSignature("deploy(address,address[4],address,uint256[3],address)",
             logic,
             _addr,
-            _tokamak,
+            _registry,
             _intdata,
             owner
             ));

@@ -155,11 +155,11 @@ contract StakeTONProxy is StakeTONStorage, AccessControl, OnApprove {
 
     function setInit(
         address[4] memory _addr,
-        address[4] memory _tokamak,
+        address _registry,
         uint256[3] memory _intdata
     ) external onlyOwner {
         require(
-            _tokamak[0] != address(0) &&
+            _registry != address(0) &&
                 _addr[2] != address(0) &&
                 _intdata[0] < _intdata[1], "setInit fail"
         );
@@ -168,10 +168,11 @@ contract StakeTONProxy is StakeTONStorage, AccessControl, OnApprove {
         vault = _addr[2];
         _uniswapRouter = _addr[3];
 
-        ton = _tokamak[0];
-        wton = _tokamak[1];
-        depositManager = _tokamak[2];
-        seigManager = _tokamak[3];
+        stakeRegistry = _registry;
+        // ton = _tokamak[0];
+        // wton = _tokamak[1];
+        // depositManager = _tokamak[2];
+        // seigManager = _tokamak[3];
 
         tokamakLayer2 = address(0);
 

@@ -10,7 +10,7 @@ contract StakeTONProxyFactory {
     (
         address _logic,
         address[4] memory _addr,
-        address[4] memory _tokamak,
+        address _registry,
         uint256[3] memory _intdata,
         address owner
     ) public returns (address) {
@@ -19,7 +19,7 @@ contract StakeTONProxyFactory {
 
         require(address(proxy) != address(0), "StakeTONProxy zero");
 
-        proxy.setInit(_addr, _tokamak, _intdata);
+        proxy.setInit(_addr, _registry, _intdata);
 
         proxy.grantRole(ADMIN_ROLE, owner);
         proxy.revokeRole(ADMIN_ROLE, address(this));

@@ -25,5 +25,4 @@ contract Stake1Storage {
 
     uint256 internal _lock;
 
-
 }

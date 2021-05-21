@@ -60,7 +60,7 @@ contract StakeFactory is AccessControl{
         uint256 _pahse,
         uint256 stakeType,
         address[4] memory _addr,
-        address[4] memory tokamakAddr,
+        address registry,
         uint256[3] memory _intdata
     )
         public onlyOwner
@@ -89,7 +89,7 @@ contract StakeFactory is AccessControl{
             );
 
             address proxy = IStakeTONFactory1(stakeTONFactory).create(
-                 _addr, tokamakAddr, _intdata, msg.sender);
+                 _addr, registry, _intdata, msg.sender);
 
             return proxy;
 

@@ -88,6 +88,12 @@ async function createStakeContract(vaultAddress, periodBlock, name, paytoken ) {
 }
 
 
+function timeout(sec) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, sec * 1000);
+  });
+}
+
 async function main() {
   const [deployer, user1] = await ethers.getSigners();
   const users = await ethers.getSigners();
@@ -101,7 +107,6 @@ async function main() {
 
   let saleStartBlock = parseInt(curBlock)+ (60*5/13);
   saleStartBlock = parseInt(saleStartBlock);
-  saleStartBlock = 8621310;
 
   let stakeStartBlock = parseInt(saleStartBlock)+ (60*15/13);
   stakeStartBlock = parseInt(stakeStartBlock);
@@ -137,27 +142,31 @@ async function main() {
 
   ////////////////////////////////////////////////////////
   // For TON Vault : hashName must be specified as a unique value.
-  // ton_vault.hashName = keccak256("ETH_TEST_20210521_09");
+  // ton_vault.hashName = keccak256("TON_TEST_20210522_01");
   // await createValue(ton_vault, ton);
 
   ////////////////////////////////////////////////////////
   // For TON StakeContract of Vault
   // write your vault .
-  // let vaultAddress ='0xF461E52aC79eaCc412Fbf6b97B8CC89FFed491DD';
-  // console.log('vaultAddress',vaultAddress);
-  // await createStakeContract(vaultAddress, periodBlockMin5,'TON_5_MIN', ton );
-
+   let vaultAddress ='0x7eCC1eC34Ca5a87B57308C4576C11fe2307E9e0f';
+   console.log('vaultAddress',vaultAddress);
+  //  await createStakeContract(vaultAddress, periodBlockMin5,'TON_5_MIN', ton );
+  //  console.log('createStakeContract TON_5_MIN');
+   timeout(1000);
+   await createStakeContract(vaultAddress, periodBlockMin30,'TON_30_MIN', ton );
+  console.log('createStakeContract TON_30_MIN');
   ////////////////////////////////////////////////////////
   // For Ether Vault
+  // ton_vault.hashName = keccak256("ETH_TEST_20210521_1440");
   // await createValue(ton_vault, zeroAddress);
 
   ////////////////////////////////////////////////////////
   // For Ether StakeContract of Vault
   // write your vault .
-  let vaultAddress ='0x768bDa43Bf18e36630649Aeabd750c3dEB5513c0';
-  console.log('vaultAddress',vaultAddress);
-  //await createStakeContract(vaultAddress, periodBlockMin5,'ETH_5_MIN', zeroAddress );
-   await createStakeContract(vaultAddress, periodBlockMin30,'ETH_30_MIN', zeroAddress );
+  // let vaultAddress ='0x23988d7f685A17BF5dB64246cF9231c8669dd8A0';
+  // console.log('vaultAddress',vaultAddress);
+  // await createStakeContract(vaultAddress, periodBlockMin5,'ETH_5_MIN', zeroAddress );
+  // await createStakeContract(vaultAddress, periodBlockMin30,'ETH_30_MIN', zeroAddress );
   // await createStakeContract(vaultAddress, periodBlockHour1,'ETH_1_HOUR', zeroAddress );
 
 

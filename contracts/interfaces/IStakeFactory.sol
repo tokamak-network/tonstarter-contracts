@@ -6,7 +6,7 @@ interface IStakeFactory {
         uint256 _pahse,
         uint256 stakeType,
         address[4] memory _addr,
-        address[4] memory tokamakAddr,
+        address registry,
         uint256[3] memory _intdata
     ) external returns (address);
 

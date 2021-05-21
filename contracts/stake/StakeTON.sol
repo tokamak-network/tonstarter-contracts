@@ -1,20 +1,20 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity ^0.7.0;
 
-import {IStake1Vault} from "../interfaces/IStake1Vault.sol";
+import {IIStake1Vault} from "../interfaces/IIStake1Vault.sol";
 import {IIERC20} from "../interfaces/IIERC20.sol";
 import "../libraries/LibTokenStake1.sol";
 import "../libraries/LibUniswap.sol";
 import "../connection/TokamakStaker.sol";
-import {
-    ERC165Checker
-} from "@openzeppelin/contracts/introspection/ERC165Checker.sol";
-import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
-import {SafeMath} from "../utils/math/SafeMath.sol";
+// import {
+//     ERC165Checker
+// } from "@openzeppelin/contracts/introspection/ERC165Checker.sol";
+//import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
+//import {SafeMath} from "../utils/math/SafeMath.sol";
 
 contract StakeTON is TokamakStaker {
-    using SafeERC20 for IIERC20;
-    using SafeMath for uint256;
+    //using SafeERC20 for IIERC20;
+    //using SafeMath for uint256;
 
     modifier lock() {
         require(_lock == 0, "LOCKED");
@@ -75,7 +75,7 @@ contract StakeTON is TokamakStaker {
             "unavailable"
         );
 
-        require(!IStake1Vault(vault).saleClosed(), "not end");
+        require(!IIStake1Vault(vault).saleClosed(), "not end");
 
         if (paytoken == address(0)) amount = msg.value;
         else
@@ -101,7 +101,10 @@ contract StakeTON is TokamakStaker {
             endBlock > 0 && endBlock < block.number,
             "not end"
         );
-
+        (address ton, address wton, address depositManager, address seigManager) = ITokamakRegistry(stakeRegistry).getTokamak();
+        require(ton != address(0) && wton != address(0) && depositManager != address(0) && seigManager != address(0),
+            "ITokamakRegistry zero"
+        );
         if (tokamakLayer2 != address(0)) {
             require(
                 IISeigManager(seigManager).stakeOf(tokamakLayer2, address(this)) == 0 &&
@@ -145,7 +148,7 @@ contract StakeTON is TokamakStaker {
     /// @dev Claim for reward
     function claim() external lock {
         require(
-            IStake1Vault(vault).saleClosed() == true,
+            IIStake1Vault(vault).saleClosed() == true,
             "not closed"
         );
         uint256 rewardClaim = 0;
@@ -158,7 +161,7 @@ contract StakeTON is TokamakStaker {
         require(rewardClaim > 0, "reward is zero");
 
         uint256 rewardTotal =
-            IStake1Vault(vault).totalRewardAmount(address(this));
+            IIStake1Vault(vault).totalRewardAmount(address(this));
         require(
             (rewardClaimedTotal + rewardClaim) <= rewardTotal,
             "total reward exceeds"
@@ -168,7 +171,7 @@ contract StakeTON is TokamakStaker {
         staked.claimedAmount += rewardClaim;
         rewardClaimedTotal += rewardClaim;
 
-        require(IStake1Vault(vault).claim(msg.sender, rewardClaim));
+        require(IIStake1Vault(vault).claim(msg.sender, rewardClaim));
 
         emit Claimed(msg.sender, rewardClaim, block.number);
     }
@@ -197,21 +200,21 @@ contract StakeTON is TokamakStaker {
             if (specilaBlock < endR) endR = specilaBlock;
 
             uint256[] memory orderedEndBlocks =
-                IStake1Vault(vault).orderedEndBlocksAll();
+                IIStake1Vault(vault).orderedEndBlocksAll();
 
             if (orderedEndBlocks.length > 0) {
                 uint256 _end = 0;
                 uint256 _start = startR;
                 uint256 _total = 0;
                 uint256 blockTotalReward = 0;
-                blockTotalReward = IStake1Vault(vault).blockTotalReward();
+                blockTotalReward = IIStake1Vault(vault).blockTotalReward();
 
                 address user = account;
                 uint256 amount = userStaked[user].amount;
 
                 for (uint256 i = 0; i < orderedEndBlocks.length; i++) {
                     _end = orderedEndBlocks[i];
-                    _total = IStake1Vault(vault).stakeEndBlockTotal(_end);
+                    _total = IIStake1Vault(vault).stakeEndBlockTotal(_end);
 
                     if (_start > _end) {
 
