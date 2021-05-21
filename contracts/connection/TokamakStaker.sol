@@ -50,6 +50,7 @@ contract TokamakStaker is StakeTONStorage, AccessControl {
     //////////////////////////////
 
     event SetTokamak(address ton, address wton, address depositManager, address seigManager, address defiAddr);
+    event SetTokamakLayer2(address layer2);
     event SetUniswapRouter(address router);
     /*
     event tokamakStaked(address layer2, uint256 amount);
@@ -92,6 +93,21 @@ contract TokamakStaker is StakeTONStorage, AccessControl {
         _uniswapRouter = _router;
 
         emit SetUniswapRouter(_router);
+    }
+
+    function setTokamakLayer2(address _layer2) external onlyOwner {
+        // TODO: check!!
+        // require(
+        //     block.number < saleStartBlock,
+        //     "TokamakStaker: Already started"
+        // );
+        require(
+            _layer2 != address(0) && tokamakLayer2 != _layer2,
+            "tokamakLayer2 zero "
+        );
+        tokamakLayer2 = _layer2;
+
+        emit SetTokamakLayer2(_layer2);
     }
 
     function approveUniswapRouter(uint256 amount) external {
@@ -151,8 +167,17 @@ contract TokamakStaker is StakeTONStorage, AccessControl {
         public
         nonZeroInit sameTokamakLayer(_layer2)
     {
-        IIDepositManager(depositManager).requestWithdrawalAll(_layer2);
+        uint256 pendingUnstaked = IIDepositManager(depositManager).pendingUnstaked(
+                _layer2,
+                address(this)
+            );
 
+        require(
+            pendingUnstaked == 0,
+            "need to ProcessUnStaking"
+        );
+
+        IIDepositManager(depositManager).requestWithdrawalAll(_layer2);
         //emit tokamakRequestedUnStakingAll(_layer2);
     }
 
@@ -162,6 +187,16 @@ contract TokamakStaker is StakeTONStorage, AccessControl {
         require(
             IStake1Vault(vault).saleClosed() == true,
             "not closed"
+        );
+
+        uint256 pendingUnstaked = IIDepositManager(depositManager).pendingUnstaked(
+                _layer2,
+                address(this)
+            );
+
+        require(
+            pendingUnstaked == 0,
+            "need to ProcessUnStaking"
         );
 
         uint256 stakeOf =
