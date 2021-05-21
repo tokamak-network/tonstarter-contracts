@@ -1,7 +1,6 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity ^0.7.0;
 
-//import {IUniswapV2Router01} from "../interfaces/IUniswapV2Router01.sol";
 import {IStake1Vault} from "../interfaces/IStake1Vault.sol";
 import {IIERC20} from "../interfaces/IIERC20.sol";
 import "../libraries/LibTokenStake1.sol";
@@ -11,9 +10,11 @@ import {
     ERC165Checker
 } from "@openzeppelin/contracts/introspection/ERC165Checker.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
+import {SafeMath} from "../utils/math/SafeMath.sol";
 
 contract StakeTON is TokamakStaker {
     using SafeERC20 for IIERC20;
+    using SafeMath for uint256;
 
     modifier lock() {
         require(_lock == 0, "LOCKED");
@@ -200,26 +201,31 @@ contract StakeTON is TokamakStaker {
 
             if (orderedEndBlocks.length > 0) {
                 uint256 _end = 0;
+                uint256 _start = startR;
                 uint256 _total = 0;
                 uint256 blockTotalReward = 0;
                 blockTotalReward = IStake1Vault(vault).blockTotalReward();
+
+                address user = account;
+                uint256 amount = userStaked[user].amount;
 
                 for (uint256 i = 0; i < orderedEndBlocks.length; i++) {
                     _end = orderedEndBlocks[i];
                     _total = IStake1Vault(vault).stakeEndBlockTotal(_end);
 
-                    if (endR <= _end) {
+                    if (_start > _end) {
+
+                    } else if (endR <= _end) {
                         reward +=
                             (blockTotalReward *
-                                (endR - startR) *
-                                userStaked[account].amount) /
+                                (endR - startR) * amount) /
                             _total;
                         break;
                     } else {
                         reward +=
                             (blockTotalReward *
                                 (_end - startR) *
-                                userStaked[account].amount) /
+                                amount) /
                             _total;
                         startR = _end;
                     }
@@ -228,5 +234,68 @@ contract StakeTON is TokamakStaker {
         }
         return reward;
     }
+    /*
+    function canRewardAmountTest(address account, uint256 specilaBlock)
+        public view
+        returns (uint256, uint256, uint256, uint256)
+    {
+        uint256 reward = 0;
+        uint256 startR = 0;
+        uint256 endR = 0;
+        uint256 blockTotalReward = 0;
+        if(specilaBlock > endBlock ) specilaBlock = endBlock;
 
+        if (
+            specilaBlock < startBlock ||
+            userStaked[account].amount == 0 ||
+            userStaked[account].claimedBlock > endBlock ||
+            userStaked[account].claimedBlock > specilaBlock
+        ) {
+            reward = 0;
+        } else {
+            startR = startBlock;
+            endR = endBlock;
+            if (startR < userStaked[account].claimedBlock)
+                startR = userStaked[account].claimedBlock;
+            if (specilaBlock < endR) endR = specilaBlock;
+
+            uint256[] memory orderedEndBlocks =
+                IStake1Vault(vault).orderedEndBlocksAll();
+
+            if (orderedEndBlocks.length > 0) {
+                uint256 _end = 0;
+                uint256 _start = startR;
+                uint256 _total = 0;
+                //uint256 blockTotalReward = 0;
+                blockTotalReward = IStake1Vault(vault).blockTotalReward();
+
+                address user = account;
+                uint256 amount = userStaked[user].amount;
+
+                for (uint256 i = 0; i < orderedEndBlocks.length; i++) {
+                    _end = orderedEndBlocks[i];
+                    _total = IStake1Vault(vault).stakeEndBlockTotal(_end);
+
+                    if (_start > _end) {
+
+                    } else if (endR <= _end) {
+                        reward +=
+                            (blockTotalReward *
+                                (endR - startR) * amount) /
+                            _total;
+                        break;
+                    } else {
+                        reward +=
+                            (blockTotalReward *
+                                (_end - startR) *
+                                amount) /
+                            _total;
+                        startR = _end;
+                    }
+                }
+            }
+        }
+        return (reward, startR, endR, blockTotalReward);
+    }
+    */
 }

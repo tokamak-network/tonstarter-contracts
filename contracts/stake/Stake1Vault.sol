@@ -204,8 +204,7 @@ contract Stake1Vault is AccessControl {
             cap > 0 &&
                 stakeStartBlock > 0 &&
                 stakeStartBlock < stakeEndBlock &&
-                block.number > stakeStartBlock &&
-                block.number < stakeEndBlock,
+                block.number > stakeStartBlock,
             "closeSale init fail"
         );
         require(stakeAddresses.length > 0, "no stakes");
@@ -280,17 +279,13 @@ contract Stake1Vault is AccessControl {
             "zero"
         );
         require(
+            stakeInfo.totalRewardAmount > 0,
+            "totalRewardAmount is zero"
+        );
+        require(
             stakeInfo.totalRewardAmount >=
                 stakeInfo.claimRewardAmount + _amount,
             "claim amount exceeds"
-        );
-        require(
-            stakeInfo.totalRewardAmount > 0 &&
-                (stakeInfo.totalRewardAmount -
-                    stakeInfo.claimRewardAmount -
-                    _amount) >
-                0,
-            "amount is wrong"
         );
 
         stakeInfo.claimRewardAmount += _amount;
@@ -329,13 +324,7 @@ contract Stake1Vault is AccessControl {
                 stakeInfo.claimRewardAmount + _amount,
             "amount exceeds"
         );
-        require(
-            stakeInfo.totalRewardAmount -
-                stakeInfo.claimRewardAmount -
-                _amount >
-                0,
-            "Stake1Vault: wrong"
-        );
+
         return stakeInfo.totalRewardAmount;
     }
 
