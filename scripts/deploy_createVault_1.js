@@ -125,18 +125,37 @@ async function main() {
   let periodBlockMin30 = 60 * 30 / 13;
   periodBlockMin30= parseInt(periodBlockMin30);
 
-  // ton
+
+////////////////////////////////////////////////////////
+//   Making Vault when staking TON or ETH
+// 1. Make a Vault. hashName must be specified as a unique value.
+// 2. After confirming that the vault is deployed in the rinkeby,
+//    write the generated tone address directly to vaultAddress.
+// 3. Uncomment and execute createStakeContract creation for the desired period.
+// Note: If you want to enter multiple createStakeContracts, you must create a contract with a shorter period.
+
+
+  ////////////////////////////////////////////////////////
+  // For TON Vault : hashName must be specified as a unique value.
+  // ton_vault.hashName = keccak256("ETH_TEST_20210521_09");
   // await createValue(ton_vault, ton);
+
+  ////////////////////////////////////////////////////////
+  // For TON StakeContract of Vault
+  // write your vault .
   // let vaultAddress ='0xF461E52aC79eaCc412Fbf6b97B8CC89FFed491DD';
   // console.log('vaultAddress',vaultAddress);
-  // console.log('periodBlockMin2',periodBlockMin5);
   // await createStakeContract(vaultAddress, periodBlockMin5,'TON_5_MIN', ton );
 
-  // ether
+  ////////////////////////////////////////////////////////
+  // For Ether Vault
   // await createValue(ton_vault, zeroAddress);
+
+  ////////////////////////////////////////////////////////
+  // For Ether StakeContract of Vault
+  // write your vault .
   let vaultAddress ='0x768bDa43Bf18e36630649Aeabd750c3dEB5513c0';
   console.log('vaultAddress',vaultAddress);
-  console.log('periodBlockMin2',periodBlockMin5);
   //await createStakeContract(vaultAddress, periodBlockMin5,'ETH_5_MIN', zeroAddress );
    await createStakeContract(vaultAddress, periodBlockMin30,'ETH_30_MIN', zeroAddress );
   // await createStakeContract(vaultAddress, periodBlockHour1,'ETH_1_HOUR', zeroAddress );
