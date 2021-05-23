@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.7.6;
 
+import {IStakeSimpleFactory} from "../interfaces/IStakeSimpleFactory.sol";
 import {IStakeTONFactory1} from "../interfaces/IStakeTONFactory1.sol";
 import {IStakeProxy} from "../interfaces/IStakeProxy.sol";
 import {IStakeTON} from "../interfaces/IStakeTON.sol";
@@ -14,6 +15,7 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 contract StakeFactory is AccessControl{
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
 
+    address public stakeSimpleFactory;
     address public stakeTONFactory;
     address public stakeStableCoinFactory;
 
@@ -29,15 +31,29 @@ contract StakeFactory is AccessControl{
         _;
     }
 
-    constructor(address _stakeTONFactory, address _stableFactory) {
+    constructor(
+        address _stakeSimpleFactory,
+        address _stakeTONFactory,
+        address _stableFactory
+    ) {
         require(
+            _stakeSimpleFactory != address(0) &&
             _stakeTONFactory != address(0) && _stableFactory != address(0),
             "StakeFactory: init fail"
         );
+        stakeSimpleFactory = _stakeSimpleFactory;
         stakeTONFactory = _stakeTONFactory;
         stakeStableCoinFactory = _stableFactory;
         _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
         _setupRole(ADMIN_ROLE, msg.sender);
+    }
+
+    function setStakeSimpleFactory(address _stakeSimpleFactory)
+        public
+        onlyOwner
+        nonZero(_stakeSimpleFactory)
+    {
+        stakeSimpleFactory = _stakeSimpleFactory;
     }
 
     function setStakeTONFactory(address _stakeTONFactory)
@@ -63,10 +79,10 @@ contract StakeFactory is AccessControl{
         address registry,
         uint256[3] memory _intdata
     )
-        public onlyOwner
+        external onlyOwner
         returns (address)
     {
-        require(_addr[2] != address(0), "StakeFactory: deploy init fail");
+        require(_addr[2] != address(0), "vault zero");
         /**
         token = _addr[0];
         paytoken = _addr[1];
@@ -82,14 +98,25 @@ contract StakeFactory is AccessControl{
         startBlock = _intdata[1];
         endBlock = startBlock + _intdata[2];
          */
-        if (stakeType <= 1) {
+         if (stakeType == 0) { // TON Staking
             require(
                 stakeTONFactory != address(0),
-                "StakeFactory: stakeTONFactory zero"
+                "stakeTONFactory zero"
             );
 
             address proxy = IStakeTONFactory1(stakeTONFactory).create(
                  _addr, registry, _intdata, msg.sender);
+
+            return proxy;
+
+        } else if (stakeType == 1) { // ERC20 Simple Staking
+            require(
+                stakeSimpleFactory != address(0),
+                "stakeSimpleFactory zero"
+            );
+
+            address proxy = IStakeSimpleFactory(stakeTONFactory).create(
+                 [_addr[0], _addr[1], _addr[2]], _intdata, msg.sender);
 
             return proxy;
 

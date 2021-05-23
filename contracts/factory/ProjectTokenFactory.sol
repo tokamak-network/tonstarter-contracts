@@ -11,7 +11,7 @@ contract ProjectTokenFactory {
         string memory _symbol,
         uint256 _totalSupply,
         address to
-    ) public returns (address) {
+    ) external returns (address) {
         ProjectToken token =
             new ProjectToken(_tokenName, _symbol, _totalSupply, to);
 

@@ -10,7 +10,7 @@ contract StakeVaultFactory {
         address[4] memory _addr,
         uint256[4] memory _intInfo,
         address owner
-    ) public returns (address) {
+    ) external returns (address) {
 
         address _fld = _addr[0];
         address _paytoken = _addr[1];

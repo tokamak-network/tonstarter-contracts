@@ -6,7 +6,7 @@ import {ProjectStakeVault} from "../project/ProjectStakeVault.sol";
 contract ProjectStakeVaultFactory {
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
 
-    function deploy(address project, address token) public returns (address) {
+    function deploy(address project, address token) external returns (address) {
         ProjectStakeVault vault = new ProjectStakeVault();
         vault.initialize(project, token);
 

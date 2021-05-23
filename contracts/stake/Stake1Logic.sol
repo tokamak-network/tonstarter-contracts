@@ -1,22 +1,17 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.7.6;
-pragma abicoder v2;
-
-import {SafeMath} from "../utils/math/SafeMath.sol";
-
-import "./StakeProxyStorage.sol";
-import "@openzeppelin/contracts/access/AccessControl.sol";
 
 import {IProxy} from "../interfaces/IProxy.sol";
 import {IStakeFactory} from "../interfaces/IStakeFactory.sol";
 import {IStakeRegistry} from "../interfaces/IStakeRegistry.sol";
 import {IStake1Vault} from "../interfaces/IStake1Vault.sol";
-import {IStakeTON} from "../interfaces/IStakeTON.sol";
-import {StakeVaultFactory} from "../factory/StakeVaultFactory.sol";
+import {IStakeTONTokamak} from "../interfaces/IStakeTONTokamak.sol";
 
+import "@openzeppelin/contracts/access/AccessControl.sol";
+import "./StakeProxyStorage.sol";
 
 contract Stake1Logic is StakeProxyStorage, AccessControl {
-    using SafeMath for uint256;
+
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
     bytes32 public constant ZERO_HASH =
         0x0000000000000000000000000000000000000000000000000000000000000000;
@@ -30,20 +25,17 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
     }
 
     modifier nonZero(address _addr) {
-        require(_addr != address(0), "Stake1Proxy: zero address");
+        require(_addr != address(0), "zero address");
         _;
     }
 
-    modifier nonZeroHash(bytes32 _hash) {
-        require(_hash != ZERO_HASH, "Stake1Proxy: zero hash");
-        _;
-    }
 
     //////////////////////////////
     // Events
     //////////////////////////////
     event CreatedVault(address indexed vault, address paytoken, uint256 cap);
     event CreatedStakeContract(address indexed vault, address indexed stakeContract, uint256 phase);
+    event SetStakeRegistry(address stakeRegistry);
     /*
     event ClosedSale(address indexed vault, address from);
     event TokamakStaked(address indexed stakeContract, address from, address layer2);
@@ -51,10 +43,8 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
     event TokamakRequestedUnStakingReward(address indexed stakeContract, address from, address layer2);
     event TokamakProcessedUnStaking(address indexed stakeContract, address from, address layer2, bool receiveTON);
     */
-    event SetStakeFactory(address stakeFactory);
-    event SetStakeRegistry(address stakeRegistry);
-    event SetStakeTONFactory(address stakeTONFactory);
-    event SetStakeStableCoinFactory(address stakeStableCoinFactory);
+
+
 
     //////////////////////////////////////////////////////////////////////
     // setters
@@ -84,16 +74,9 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
         wton = _wton;
         depositManager = _depositManager;
         seigManager = _seigManager;
-
     }
 
-    ///
-    // function setFactory(address _stakeFactory) external onlyOwner {
-    //     setStakeFactory(_stakeFactory);
-    // }
 
-    //////////////////////////////////////////////////////////////////////
-    // Admin Functions
     function createVault(
         address _paytoken,
         uint256 _cap,
@@ -104,23 +87,7 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
         uint256 _stakeType,
         address _defiAddr
     ) external nonZero(address(stakeVaultFactory)) {
-        /*
-        Stake1Vault vault = new Stake1Vault();
-        vault.initialize(
-            fld,
-            _paytoken,
-            _cap,
-            _saleStartBlcok,
-            _stakeStartBlcok,
-            address(stakeFactory),
-            _stakeType,
-            _defiAddr
-        );
-        stakeRegistry.addVault(address(vault), _phase, _vaultName);
 
-        emit CreatedVault(address(vault), _paytoken, _cap);
-
-        */
         address vault = stakeVaultFactory.create(
             [fld, _paytoken, address(stakeFactory), _defiAddr],
             [_stakeType, _cap, _saleStartBlock, _stakeStartBlock],
@@ -142,7 +109,7 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
     ) external onlyOwner {
         require(
             stakeRegistry.validVault(_phase, _vault),
-            "Stake1Logic: unvalidVault"
+            "unvalidVault"
         );
 
         IStake1Vault vault = IStake1Vault(_vault);
@@ -153,7 +120,6 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
         uint256 phase = _phase;
         uint256[3] memory iniInfo = [saleStart, stakeStart, periodBlock];
         address[4] memory _addr = [token, paytoken, _vault, defiAddr];
-        //address[4] memory tokamakAddr = [ton, wton, depositManager, seigManager];
 
         // solhint-disable-next-line max-line-length
         address _contract =
@@ -166,7 +132,7 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
             );
         require(
             _contract != address(0),
-            "Stake1Logic: deploy fail"
+            "deploy fail"
         );
 
         IStake1Vault(_vault).addSubVaultOfStake(_name, _contract, periodBlock);
@@ -219,7 +185,7 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
         address _stakeContract,
         address _layer2
     ) external {
-        IStakeTON(_stakeContract).tokamakStaking(_layer2);
+        IStakeTONTokamak(_stakeContract).tokamakStaking(_layer2);
         //emit TokamakStaked(_stakeContract, msg.sender, _layer2);
     }
 
@@ -227,7 +193,7 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
     function tokamakRequestUnStakingAll(address _stakeContract, address _layer2)
         external
     {
-        IStakeTON(_stakeContract).tokamakRequestUnStakingAll(_layer2);
+        IStakeTONTokamak(_stakeContract).tokamakRequestUnStakingAll(_layer2);
         //emit TokamakRequestedUnStakingAll(_stakeContract, msg.sender, _layer2);
     }
 
@@ -236,7 +202,7 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
         address _stakeContract,
         address _layer2
     ) external {
-        IStakeTON(_stakeContract).tokamakRequestUnStakingReward(_layer2);
+        IStakeTONTokamak(_stakeContract).tokamakRequestUnStakingReward(_layer2);
         //emit TokamakRequestedUnStakingReward(_stakeContract, msg.sender, _layer2);
     }
 
@@ -246,7 +212,7 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
         address _layer2,
         bool receiveTON
     ) external {
-        IStakeTON(_stakeContract).tokamakProcessUnStaking(_layer2, receiveTON);
+        IStakeTONTokamak(_stakeContract).tokamakProcessUnStaking(_layer2, receiveTON);
         //emit TokamakProcessedUnStaking(_stakeContract, msg.sender, _layer2, receiveTON);
     }
 
@@ -272,7 +238,6 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
         nonZero(_stakeFactory)
     {
         stakeFactory = IStakeFactory(_stakeFactory);
-        emit SetStakeFactory(_stakeFactory);
     }
 
     function setStakeTONFactory(address _stakeTONFactory)
@@ -281,7 +246,6 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
         nonZero(_stakeTONFactory)
     {
         stakeFactory.setStakeTONFactory(_stakeTONFactory);
-        emit SetStakeTONFactory(_stakeTONFactory);
     }
 
     function setStakeStableCoinFactory(address _stakeStableCoinFactory)
@@ -290,7 +254,6 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
         nonZero(_stakeStableCoinFactory)
     {
         stakeFactory.setStakeStableCoinFactory(_stakeStableCoinFactory);
-        emit SetStakeStableCoinFactory(_stakeStableCoinFactory);
     }
 
     function setStakeVaultFactory(address _stakeVaultFactory)

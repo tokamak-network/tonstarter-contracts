@@ -4,6 +4,7 @@ pragma abicoder v2;
 
 import {IStake1Vault} from "../interfaces/IStake1Vault.sol";
 import {IIERC20} from "../interfaces/IIERC20.sol";
+import {SafeMath} from "../utils/math/SafeMath.sol";
 import "./StakeTONStorage.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import {OnApprove} from "../tokens/OnApprove.sol";
@@ -11,6 +12,7 @@ import {OnApprove} from "../tokens/OnApprove.sol";
 /// @title Proxy for Stake contracts in Phase 1
 /// @notice
 contract StakeTONProxy is StakeTONStorage, AccessControl, OnApprove {
+    using SafeMath for uint256;
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
     address internal _implementation;
     bool public pauseProxy;
@@ -144,8 +146,8 @@ contract StakeTONProxy is StakeTONStorage, AccessControl, OnApprove {
             );
 
         LibTokenStake1.StakedAmount storage staked = userStaked[_owner];
-        staked.amount += _amount;
-        totalStakedAmount += _amount;
+        staked.amount = staked.amount.add(_amount);
+        totalStakedAmount = totalStakedAmount.add(_amount);
         require(
             IIERC20(from).transferFrom(_owner, _spender, _amount),
             "transfer fail"
@@ -169,16 +171,12 @@ contract StakeTONProxy is StakeTONStorage, AccessControl, OnApprove {
         _uniswapRouter = _addr[3];
 
         stakeRegistry = _registry;
-        // ton = _tokamak[0];
-        // wton = _tokamak[1];
-        // depositManager = _tokamak[2];
-        // seigManager = _tokamak[3];
 
         tokamakLayer2 = address(0);
 
         saleStartBlock = _intdata[0];
         startBlock = _intdata[1];
-        endBlock = startBlock + _intdata[2];
+        endBlock = startBlock.add(_intdata[2]);
     }
 
 }

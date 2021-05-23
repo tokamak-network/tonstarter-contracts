@@ -1,8 +1,7 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity ^0.7.6;
-pragma abicoder v2;
+
 import "@openzeppelin/contracts/access/AccessControl.sol";
-import {IFLD} from "../interfaces/IFLD.sol";
 
 contract StakeRegistry is AccessControl {
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
@@ -48,6 +47,7 @@ contract StakeRegistry is AccessControl {
         _setupRole(ADMIN_ROLE, msg.sender);
     }
 
+    /// @dev Set address for Tokamak integration
     function setTokamak(
         address _ton,
         address _wton,
@@ -100,6 +100,7 @@ contract StakeRegistry is AccessControl {
         emit AddedStakeContract(_vault, _stakeContract);
     }
 
+    /// @dev Get addresses for Tokamak interface
     function getTokamak()
         external
         view
@@ -108,6 +109,7 @@ contract StakeRegistry is AccessControl {
         return (ton, wton, depositManager, seigManager);
     }
 
+    /// @dev Get addresses of vaults of index phase
     function phasesAll(uint256 _index)
         external
         view
@@ -116,6 +118,7 @@ contract StakeRegistry is AccessControl {
         return phases[_index];
     }
 
+    /// @dev Get addresses of staker of _vault
     function stakeContractsOfVaultAll(address _vault)
         external
         view

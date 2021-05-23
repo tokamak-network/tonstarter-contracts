@@ -138,6 +138,7 @@ contract TokamakStaker is StakeTONStorage, AccessControl {
     function tokamakStaking(address _layer2)
         external nonZero(stakeRegistry) nonZero(_layer2)
     {
+        require(block.number <= endBlock, "period end");
         require(
             IIStake1Vault(vault).saleClosed() == true,
             "not closed"

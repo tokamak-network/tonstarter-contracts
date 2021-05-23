@@ -47,6 +47,9 @@ let ton = loadDeployed(process.env.NETWORK,"TON");
 let wton = loadDeployed(process.env.NETWORK,"WTON");
 let depositManager = loadDeployed(process.env.NETWORK,"DepositManager");
 let seigManager = loadDeployed(process.env.NETWORK,"SeigManager");
+console.log("proxy:", proxy);
+console.log("ton:", ton);
+console.log("wton:", wton);
 
 async function deployMain(defaultSender) {
   const [deployer, user1] = await ethers.getSigners();

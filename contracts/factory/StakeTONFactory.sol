@@ -22,7 +22,7 @@ contract StakeTONFactory {
         address _registry,
         uint256[3] memory _intdata,
         address owner
-    ) public returns (address) {
+    ) external returns (address) {
 
         // used gas limit 2,672,614
         // used gas 2,631,878   1000000

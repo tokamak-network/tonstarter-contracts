@@ -4,20 +4,27 @@ pragma solidity ^0.7.0;
 import "../interfaces/IFLD.sol";
 import "../interfaces/ISFLD.sol";
 import "../libraries/LibTokenStake1.sol";
+import {SafeMath} from "../utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 
 contract StakeForSFLD is AccessControl {
+    using SafeMath for uint256;
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
 
+    // reward token : FLD
     IFLD public fld;
+    // governance token : SFLD
     ISFLD public sfld;
 
     // amount of claimed SFLD in wei unit,
     uint256 public claimedSFLDTotal;
+
+    // amount of total staked ,
     uint256 public totalStakedAmount;
 
     uint256 public startBlock;
-    mapping(uint256 => uint256) public rewardRatio; // periodBlock - rewardRatio
+    // periodBlock - rewardRatio
+    mapping(uint256 => uint256) public rewardRatio;
 
     bool public started;
     mapping(address => LibTokenStake1.StakedAmountForSFLD) public userStaked;
@@ -98,10 +105,10 @@ contract StakeForSFLD is AccessControl {
             userStaked[msg.sender];
         require(staked.startBlock < block.number, "StakeForSFLD: not started");
 
-        staked.amount += amount;
+        staked.amount = staked.amount.add(amount);
         staked.startBlock = block.number;
         staked.periodBlock = _periodBlock;
-        totalStakedAmount += amount;
+        totalStakedAmount = totalStakedAmount.add(amount);
 
         fld.permit(msg.sender, address(this), amount, deadline, signature);
         fld.transferFrom(msg.sender, address(this), amount);
@@ -119,33 +126,31 @@ contract StakeForSFLD is AccessControl {
 
         if (staked.rewardPerBlock == 0) {
             staked.rewardPerBlock =
-                (staked.amount * rewardRatio[staked.periodBlock]) /
-                staked.periodBlock;
+                staked.amount.mul(rewardRatio[staked.periodBlock]).div(staked.periodBlock);
         }
 
         require(
             staked.claimedAmount <
-                staked.amount * rewardRatio[staked.periodBlock],
+                staked.amount.mul(rewardRatio[staked.periodBlock]),
             "StakeForSFLD: Already claimed all"
         );
 
         uint256 rewardClaim = 0;
-        if (staked.startBlock + staked.periodBlock < block.number) {
+        if (staked.startBlock.add(staked.periodBlock) < block.number) {
             rewardClaim =
-                (staked.amount * rewardRatio[staked.periodBlock]) -
-                staked.claimedAmount;
+                staked.amount.mul(rewardRatio[staked.periodBlock]).sub(staked.claimedAmount);
         } else {
             // Amount you can be rewarded currently
-            uint256 pastBlocks = block.number - staked.startBlock;
+            uint256 pastBlocks = block.number.sub(staked.startBlock);
             if (staked.claimedBlock > 0 && staked.claimedBlock < block.number)
-                pastBlocks = block.number - staked.claimedBlock;
-            rewardClaim = pastBlocks * staked.rewardPerBlock;
+                pastBlocks = block.number.sub(staked.claimedBlock);
+            rewardClaim = pastBlocks.mul(staked.rewardPerBlock);
         }
 
         require(rewardClaim > 0, "Stake1: reward is zero");
         staked.claimedBlock = block.number;
-        staked.claimedAmount += rewardClaim;
-        claimedSFLDTotal += rewardClaim;
+        staked.claimedAmount = staked.claimedAmount.add(rewardClaim);
+        claimedSFLDTotal = claimedSFLDTotal.add(rewardClaim);
 
         sfld.mint(msg.sender, rewardClaim);
     }
@@ -165,7 +170,7 @@ contract StakeForSFLD is AccessControl {
         );
         require(
             staked.amount > 0 &&
-                block.number > staked.startBlock + staked.periodBlock,
+                block.number > staked.startBlock.add(staked.periodBlock),
             "StakeForSFLD: staking period is not end"
         );
 
@@ -175,12 +180,12 @@ contract StakeForSFLD is AccessControl {
             "StakeForSFLD: balanceOf SFLD is zero"
         );
 
-        staked.releasedAmount += sfldBalance;
+        staked.releasedAmount = staked.releasedAmount.add(sfldBalance);
         staked.releasedBlock = block.number;
 
         uint256 fldBalance = fld.balanceOf(address(this));
         if (sfldBalance > fldBalance)
-            fld.mint(address(this), sfldBalance - fldBalance);
+            fld.mint(address(this), sfldBalance.sub(fldBalance));
 
         sfld.permit(
             msg.sender,

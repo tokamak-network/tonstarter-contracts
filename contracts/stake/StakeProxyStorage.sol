@@ -10,28 +10,10 @@ contract StakeProxyStorage {
     IStakeFactory public stakeFactory;
     IStakeVaultFactory public stakeVaultFactory;
 
-    // uint256 public secondsPerBlock;
     address public fld;
-
     address public ton;
     address public wton;
     address public depositManager;
     address public seigManager;
-
-    modifier validStakeRegistry() {
-        require(
-            address(stakeRegistry) != address(0),
-            "StakeStorage: stakeRegistry is zero"
-        );
-        _;
-    }
-
-    modifier validStakeFactory() {
-        require(
-            address(stakeFactory) != address(0),
-            "StakeStorage: invalid stakeFactory"
-        );
-        _;
-    }
 
 }

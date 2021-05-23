@@ -4,16 +4,23 @@ pragma solidity ^0.7.0;
 import {IIStake1Vault} from "../interfaces/IIStake1Vault.sol";
 import {IIERC20} from "../interfaces/IIERC20.sol";
 import "../libraries/LibTokenStake1.sol";
-import "../libraries/LibUniswap.sol";
 import {SafeMath} from "../utils/math/SafeMath.sol";
-import "../connection/TokamakStaker.sol";
+import "@openzeppelin/contracts/access/AccessControl.sol";
+import "../stake/StakeTONStorage.sol";
 
-/// @title Stake Contract
-/// @notice It can be staked in Tokamak. Can be swapped using Uniswap.
-/// Stake contracts can interact with the vault to claim fld tokens
-contract StakeTON is TokamakStaker {
+/// @title Simple Stake Contract
+/// @notice Stake contracts can interact with the vault to claim fld tokens
+contract StakeSimple is StakeTONStorage, AccessControl  {
     using SafeMath for uint256;
+    bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
 
+    modifier onlyOwner() {
+        require(
+            hasRole(ADMIN_ROLE, msg.sender),
+            "not an admin"
+        );
+        _;
+    }
     modifier lock() {
         require(_lock == 0, "LOCKED");
         _lock = 1;
@@ -98,32 +105,16 @@ contract StakeTON is TokamakStaker {
             endBlock > 0 && endBlock < block.number,
             "not end"
         );
-        (address ton, address wton, address depositManager, address seigManager) = ITokamakRegistry(stakeRegistry).getTokamak();
-        require(ton != address(0) && wton != address(0) && depositManager != address(0) && seigManager != address(0),
-            "ITokamakRegistry zero"
-        );
-        if (tokamakLayer2 != address(0)) {
-            require(
-                IISeigManager(seigManager).stakeOf(tokamakLayer2, address(this)) == 0 &&
-                IIDepositManager(depositManager).pendingUnstaked(tokamakLayer2, address(this)) == 0,
-                "remain amount in tokamak");
-        }
 
         LibTokenStake1.StakedAmount storage staked = userStaked[msg.sender];
         require(staked.released == false, "Already withdraw");
+        require(staked.releasedAmount <= staked.amount,"Amount wrong");
+
+        staked.released = true;
+        staked.releasedBlock = block.number;
 
         uint256 amount = staked.amount;
-        staked.releasedBlock = block.number;
-        staked.released = true;
-
-        if (paytoken != ton) {
-            require(staked.releasedAmount <= staked.amount,"Amount wrong");
-        } else if (paytoken == ton) {
-            //amount = ((totalStakedAmount - toTokamak) + (fromTokamak / 10 ** 9)) * staked.amount / totalStakedAmount;
-            amount = totalStakedAmount.sub(toTokamak).add(fromTokamak.div(10 ** 9)).mul(staked.amount).div(totalStakedAmount);
-        }
-        require(amount > 0 , "Amount wrong" );
-        staked.releasedAmount = amount;
+        staked.releasedAmount = staked.amount;
 
         // check if we send in ethers or in tokens
         if (paytoken == address(0)) {
@@ -217,7 +208,6 @@ contract StakeTON is TokamakStaker {
                     if (_start > _end) {
 
                     } else if (endR <= _end) {
-
                         // reward +=
                         //     (blockTotalReward *
                         //         (endR - startR) * amount) /
