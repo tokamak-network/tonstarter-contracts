@@ -10,6 +10,8 @@ import {IStakeTONTokamak} from "../interfaces/IStakeTONTokamak.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "./StakeProxyStorage.sol";
 
+//// @title Stake Platform Logic
+/// @notice Basic functions used in the platform are defined. 
 contract Stake1Logic is StakeProxyStorage, AccessControl {
 
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
@@ -76,7 +78,7 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
         seigManager = _seigManager;
     }
 
-
+    /// @dev create Vault 
     function createVault(
         address _paytoken,
         uint256 _cap,
@@ -98,7 +100,8 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
 
         emit CreatedVault(vault, _paytoken, _cap);
     }
-
+    
+    /// @dev create StakeContract in Vault
     function createStakeContract(
         uint256 _phase,
         address _vault,
@@ -139,18 +142,16 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
         stakeRegistry.addStakeContract(address(vault), _contract);
 
         emit CreatedStakeContract(address(vault), _contract, phase);
-    }
-
-    function currentBlock() external view returns (uint256) {
-        return block.number;
-    }
-
+    } 
+    
+    /// @dev close sale 
     function closeSale(address _vault) external {
         IStake1Vault(_vault).closeSale();
 
         // emit ClosedSale(_vault, msg.sender);
     }
-
+    
+    /// @dev add vault 
     function addVault(
         uint256 _phase,
         bytes32 _vaultName,
@@ -159,11 +160,13 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
 
         stakeRegistry.addVault(_vault, _phase, _vaultName);
     }
-
+    
+    // upgrade Stake Contract Logic 
     function upgradeStakeTo(address _stakeProxy, address _implementation) external onlyOwner {
         IProxy(_stakeProxy).upgradeTo(_implementation);
     }
-
+    
+    /// @dev Returns all staking contract addresses in vault
     function stakeContractsOfVault(address _vault)
         external
         view
@@ -171,16 +174,19 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
         returns (address[] memory)
     {
         return IStake1Vault(_vault).stakeAddressesAll();
-    }
-
-    function vaultsOfPhase(uint256 _phaseIndex)
-        external
+    } 
+    
+    /// @dev Returns a list of vaults corresponding to a specific phase
+    function vaultsOfPahse(uint256 _phase)
+        public
         view
+        nonZero(address(stakeRegistry))
         returns (address[] memory)
     {
-        return stakeRegistry.phasesAll(_phaseIndex);
+        return stakeRegistry.phasesAll(_phase);
     }
-
+    
+    /// @dev _stakeContract stakes the TON on layer2.
     function tokamakStaking(
         address _stakeContract,
         address _layer2
@@ -239,7 +245,8 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
     {
         stakeFactory = IStakeFactory(_stakeFactory);
     }
-
+    
+    /// @dev Sets Stake TON Factory address
     function setStakeTONFactory(address _stakeTONFactory)
         public
         onlyOwner
@@ -247,7 +254,8 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
     {
         stakeFactory.setStakeTONFactory(_stakeTONFactory);
     }
-
+    
+    /// @dev Sets Stake Stable Coin Factory address
     function setStakeStableCoinFactory(address _stakeStableCoinFactory)
         public
         onlyOwner
@@ -255,29 +263,23 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
     {
         stakeFactory.setStakeStableCoinFactory(_stakeStableCoinFactory);
     }
-
+    
+    /// @dev Sets Stake Vault Factory address
     function setStakeVaultFactory(address _stakeVaultFactory)
         public
         onlyOwner
         nonZero(_stakeVaultFactory)
     {
         stakeVaultFactory = IStakeVaultFactory(_stakeVaultFactory);
-    }
-
-    function vaultsOfPahse(uint256 _phase)
-        public
-        view
-        nonZero(address(stakeRegistry))
-        returns (address[] memory)
-    {
-        return stakeRegistry.phasesAll(_phase);
-    }
-
+    } 
+    
+    /// @dev Grant the privilege role to someone on the target.
     function grantRole(address target, bytes32 role, address account) external onlyOwner  {
         (bool success, ) = target.call(abi.encodeWithSignature("grantRole(bytes32,address)",role, account));
         require(success,"grantRole fail");
     }
-
+    
+    ///@dev Remove the privilege role from someone on the target. 
     function revokeRole(address target, bytes32 role, address account) external onlyOwner  {
         (bool success, ) = target.call(abi.encodeWithSignature("revokeRole(bytes32,address)",role, account));
         require(success,"revokeRole fail");
