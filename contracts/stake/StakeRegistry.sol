@@ -13,14 +13,21 @@ contract StakeRegistry is AccessControl {
     address public wton;
     address public depositManager;
     address public seigManager;
-
+    
+    // Contracts included in the phase
     mapping(uint256 => address[]) public phases;
-
-    mapping(bytes32 => address) public vaults;      // vaultNames - Vault
-    mapping(address => bytes32) public vaultNames;  // vault - vaultNames
-
-    mapping(address => address[]) public stakeContractsOfVault; // vault - stakeContracts[]
-    mapping(address => address) public stakeContractVault; // stakeContract - vault
+    
+    // Vault address mapping with vault name hash 
+    mapping(bytes32 => address) public vaults;     
+    
+    // Vault name hash mapping with vault address
+    mapping(address => bytes32) public vaultNames;   
+    
+    // List of staking contracts included in the vault
+    mapping(address => address[]) public stakeContractsOfVault;  
+    
+    // Vault address of staking contract
+    mapping(address => address) public stakeContractVault; 
 
     modifier onlyOwner() {
         require(
