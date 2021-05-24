@@ -2,18 +2,16 @@ require("@nomiclabs/hardhat-ethers");
 require('@openzeppelin/hardhat-upgrades');
 require("@nomiclabs/hardhat-etherscan");
 require("@nomiclabs/hardhat-waffle");
-
 require('dotenv').config()
-task("accounts", "Prints the list of accounts", async () => {
-  const accounts = await ethers.getSigners();
-  // const prov = await ethers.getDefaultProvider();
-  const provider = new ethers.providers.JsonRpcProvider();
 
-  for (const account of accounts) {
-    console.log(account.address);
-    console.log((await provider.getBalance(account.address)).toString());
-  }
-});
+require("./tasks/uniswap-v3-approve-erc20-task");
+require("./tasks/uniswap-v3-create-pool-task");
+require("./tasks/uniswap-v3-increase-liquidity-task");
+require("./tasks/uniswap-v3-mint-position-task");
+require("./tasks/uniswap-v3-swap-task");
+
+const { RINKEBY_UNISWAP_V3_ACCOUNT_PK1, RINKEBY_UNISWAP_V3_ACCOUNT_PK2 } = process.env;
+
 module.exports = {
   defaultNetwork: "localhost",
   networks: {
@@ -22,25 +20,12 @@ module.exports = {
       gasMultiplier: 100,
       blockGasLimit: 124500000,
     },
-    /*hardhat: {
-      accounts: {
-        mnemonic: process.env.MNEMONIC_HARDHAT,
-        count: 30,
-        initialIndex: 0,
-        accountsBalance: '10000000000000000000000',
-      },
-      chainId: 31337,
-    },*/
     rinkeby: {
       url: `https://rinkeby.infura.io/v3/${process.env.InfuraKey}`,
-      accounts: [
-        `${process.env.ACCOUNT0_PK}`,
-        `${process.env.ACCOUNT1_PK}` ],
-      gasMultiplier: 1.25
-    },/*
-    localhost: {
-      url: "http://127.0.0.1:9545"
-    }, */
+      accounts: [RINKEBY_UNISWAP_V3_ACCOUNT_PK1, RINKEBY_UNISWAP_V3_ACCOUNT_PK2],
+      gasMultiplier: 1.25,
+      gas: 200
+    }
   },
   etherscan: {
     apiKey: `${process.env.APIKey}`
