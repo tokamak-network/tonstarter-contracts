@@ -48,6 +48,12 @@ const StakeTONFactory = contract.fromArtifact("StakeTONFactory");
 const StakeForStableCoinFactory = contract.fromArtifact(
   "StakeForStableCoinFactory"
 );
+const StakeSimpleFactory = contract.fromArtifact("StakeSimpleFactory");
+const StakeVaultFactory = contract.fromArtifact("StakeVaultFactory");
+
+const StakeTONLogicFactory = contract.fromArtifact("StakeTONLogicFactory");
+const StakeTONProxyFactory = contract.fromArtifact("StakeTONProxyFactory");
+
 const StakeFactory = contract.fromArtifact("StakeFactory");
 const StakeRegistry = contract.fromArtifact("StakeRegistry");
 const FLD = contract.fromArtifact("FLD");
@@ -212,7 +218,10 @@ class ICO20Contracts {
     // console.log(' initializeICO20Contracts owner:',owner );
     this.fld = null;
     this.sfld = null;
-    //this.stakeForSFLD = null;
+
+    this.stakeVaultFactory = null;
+    this.stakeSimpleFactory = null;
+
     this.stakeTONfactory = null;
     this.stakeForStableCoinFactory = null;
 
@@ -230,6 +239,9 @@ class ICO20Contracts {
     //this.stakeForSFLD = await StakeForSFLD.new({ from: owner });
     this.stakeregister = await StakeRegistry.new({ from: owner });
 
+    this.stakeSimpleFactory = await StakeSimpleFactory.new({ from: owner });
+    this.stakeVaultFactory = await StakeVaultFactory.new({ from: owner });
+
     this.stakeTONLogicFactory = await StakeTONLogicFactory.new({ from: owner });
     this.stakeTONProxyFactory = await StakeTONProxyFactory.new({ from: owner });
 
@@ -244,6 +256,7 @@ class ICO20Contracts {
     });
 
     this.stakefactory = await StakeFactory.new(
+      this.stakeSimpleFactory.address,
       this.stakeTONfactory.address,
       this.stakeForStableCoinFactory.address,
       { from: owner }
@@ -432,6 +445,7 @@ class ICO20Contracts {
       this.fld.address,
       this.stakeregister.address,
       this.stakefactory.address,
+      this.stakeVaultFactory.address,
       this.ton.address,
       this.wton.address,
       this.depositManager.address,
@@ -439,9 +453,18 @@ class ICO20Contracts {
       { from: owner }
     );
 
+    await this.stakeregister.setTokamak(
+      this.ton.address,
+      this.wton.address,
+      this.depositManager.address,
+      this.seigManager.address
+      );
+
     await this.stakeregister.grantRole(ADMIN_ROLE, this.stake1proxy.address, {
       from: owner,
     });
+
+    await this.stakefactory.grantRole(ADMIN_ROLE, this.stake1proxy.address);
 
     return this.stakeEntry;
   };

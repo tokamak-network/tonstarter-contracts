@@ -407,8 +407,9 @@ describe("Phase1. StakeContract with TON", function () {
                 console.log(`\n ------- ClaimBlcok:`, testBlcok);
                 console.log("\n testStakingUsers : ", u, testStakingUsers[u]);
               }
+              let curBlock = await time.latestBlock();
               let reward = await stakeContract.canRewardAmount(
-                testStakingUsers[u]
+                testStakingUsers[u], curBlock
               );
               if (reward.gt(toBN("0"))) {
                 let fldBalance1 = await fld.balanceOf(testStakingUsers[u]);
@@ -607,8 +608,10 @@ describe("Phase1. StakeContract with TON", function () {
                 console.log(`\n ------- ClaimBlcok:`, testBlcok);
                 console.log("\n testStakingUsers : ", u, testStakingUsers[u]);
               }
+
+              let curBlock = await time.latestBlock();
               let reward = await stakeContract.canRewardAmount(
-                testStakingUsers[u]
+                testStakingUsers[u], curBlock
               );
               if (reward.gt(toBN("0"))) {
                 let fldBalance1 = await fld.balanceOf(testStakingUsers[u]);

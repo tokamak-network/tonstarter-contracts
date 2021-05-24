@@ -63,7 +63,7 @@ stakePeriod = parseInt(stakePeriod);
 
 const zeroAddress = "0x0000000000000000000000000000000000000000";
 
-const logFlag = 1;
+const logFlag = 0;
 
 describe("Phase1. StakeContract with ETH", function () {
   let weth, fld, stakeregister, stakefactory, stake1proxy, stake1logic;
@@ -111,7 +111,7 @@ describe("Phase1. StakeContract with ETH", function () {
     TokamakContractsDeployed =
       await ico20Contracts.initializePlasmaEvmContracts(defaultSender);
   });
-  
+
   it('Set StakeProxy  ', async function () {
     this.timeout(1000000);
     stakeEntry = await ico20Contracts.setEntry(defaultSender);
@@ -331,8 +331,10 @@ describe("Phase1. StakeContract with ETH", function () {
                 console.log(`\n ------- ClaimBlcok:`, testBlcok);
                 console.log("\n testStakingUsers : ", u, testStakingUsers[u]);
               }
+              let curBlock = await time.latestBlock();
+
               let reward = await stakeContract.canRewardAmount(
-                testStakingUsers[u]
+                testStakingUsers[u], curBlock
               );
 
               if (reward.gt(toBN("0"))) {
