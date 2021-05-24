@@ -48,10 +48,12 @@ const StakeTONFactory = contract.fromArtifact("StakeTONFactory");
 const StakeForStableCoinFactory = contract.fromArtifact(
   "StakeForStableCoinFactory"
 );
+
+const StakeSimple = contract.fromArtifact("StakeSimple");
 const StakeSimpleFactory = contract.fromArtifact("StakeSimpleFactory");
 const StakeVaultFactory = contract.fromArtifact("StakeVaultFactory");
 
-const StakeTONLogicFactory = contract.fromArtifact("StakeTONLogicFactory");
+const StakeTONLogic = contract.fromArtifact("StakeTON");
 const StakeTONProxyFactory = contract.fromArtifact("StakeTONProxyFactory");
 
 const StakeFactory = contract.fromArtifact("StakeFactory");
@@ -239,16 +241,22 @@ class ICO20Contracts {
     //this.stakeForSFLD = await StakeForSFLD.new({ from: owner });
     this.stakeregister = await StakeRegistry.new({ from: owner });
 
-    this.stakeSimpleFactory = await StakeSimpleFactory.new({ from: owner });
-    this.stakeVaultFactory = await StakeVaultFactory.new({ from: owner });
+    this.stakeSimple = await StakeSimple.new({ from: owner });
+    this.stakeSimpleFactory = await StakeSimpleFactory.new(
+      this.stakeSimple.address,
+      { from: owner });
 
-    this.stakeTONLogicFactory = await StakeTONLogicFactory.new({ from: owner });
+    this.stake1Vault = await Stake1Vault.new({ from: owner });
+    this.stakeVaultFactory = await StakeVaultFactory.new(
+      this.stake1Vault.address,
+      { from: owner });
+
+    this.stakeTONLogic = await StakeTONLogic.new({ from: owner });
     this.stakeTONProxyFactory = await StakeTONProxyFactory.new({ from: owner });
-
 
     this.stakeTONfactory = await StakeTONFactory.new(
       this.stakeTONProxyFactory.address,
-      this.stakeTONLogicFactory.address,
+      this.stakeTONLogic.address,
       { from: owner });
 
     this.stakeForStableCoinFactory = await StakeForStableCoinFactory.new({

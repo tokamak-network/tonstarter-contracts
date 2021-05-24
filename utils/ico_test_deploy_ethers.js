@@ -184,14 +184,13 @@ class ICO20Contracts {
     this.stakeVaultFactory = null;
     this.stakeSimpleFactory = null;
 
-
-
-
     StakeTONProxyFactory = await ethers.getContractFactory("StakeTONProxyFactory");
-    StakeTONLogicFactory = await ethers.getContractFactory(
-      "StakeTONLogicFactory"
+    StakeTONLogic = await ethers.getContractFactory(
+      "StakeTON"
     );
     StakeVaultFactory = await ethers.getContractFactory("StakeVaultFactory");
+
+    StakeSimple = await ethers.getContractFactory("StakeSimple");
     StakeSimpleFactory = await ethers.getContractFactory("StakeSimpleFactory");
 
     StakeFactory = await ethers.getContractFactory("StakeFactory");
@@ -211,15 +210,18 @@ class ICO20Contracts {
 
     this.stakeregister = await StakeRegistry.connect(owner).deploy();
 
-    this.stakeVaultFactory = await StakeVaultFactory.connect(owner).deploy();
-    this.stakeSimpleFactory = await StakeSimpleFactory.connect(owner).deploy();
+    this.stake1Vault = await Stake1Vault.new({ from: owner });
+    this.stakeVaultFactory = await StakeVaultFactory.connect(owner).deploy(this.stake1Vault.address);
+
+    this.stakeSimple = await StakeSimple.connect(owner).deploy();
+    this.stakeSimpleFactory = await StakeSimpleFactory.connect(owner).deploy(this.stakeSimple.address);
 
     this.stakeTONProxyFactory = await StakeTONProxyFactory.connect(owner).deploy();
-    this.stakeTONLogicFactory = await StakeTONLogicFactory.connect(owner).deploy();
+    this.stakeTONLogic = await StakeTONLogic.connect(owner).deploy();
 
     this.stakeTONfactory = await StakeTONFactory.connect(owner).deploy(
       this.stakeTONProxyFactory.address,
-      this.stakeTONLogicFactory.address
+      this.stakeTONLogic.address
     );
 
     this.stakeForStableCoinFactory = await StakeForStableCoinFactory.connect(

@@ -105,7 +105,7 @@ async function main() {
   let curBlock = await provider.getBlockNumber();
   console.log('curBlock',curBlock);
 
-  let saleStartBlock = parseInt(curBlock)+ (60*5/13);
+  let saleStartBlock = parseInt(curBlock)+ (60*2/13);
   saleStartBlock = parseInt(saleStartBlock);
 
   let stakeStartBlock = parseInt(saleStartBlock)+ (60*5/13);
@@ -151,13 +151,13 @@ async function main() {
 
   ////////////////////////////////////////////////////////
   // For TON Vault : hashName must be specified as a unique value.
-  //  ton_vault.hashName = keccak256("TON_TEST_20210524_2240");
+  //  ton_vault.hashName = keccak256("TON_TEST_20210525_0710");
   //  await createValue(ton_vault, ton);
 
   ////////////////////////////////////////////////////////
   // For TON StakeContract of Vault
   // write your vault .
-   let vaultAddress ='0x90773234CAF21219390acF3fb9a6589a522A879e';
+   let vaultAddress ='0xC2C9C135a929F143FED0005f7105b0Ea1509b9ff';
    console.log('vaultAddress',vaultAddress);
    await createStakeContract(vaultAddress, periodBlockMin2,'TON_2_MIN', ton );
    console.log('createStakeContract TON_2_MIN');
