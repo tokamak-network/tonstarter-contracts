@@ -749,6 +749,7 @@ class ICO20Contracts {
     const saleStartBlock = await vault.saleStartBlock();
     const stakeStartBlock = await vault.stakeStartBlock();
     const stakeEndBlock = await vault.stakeEndBlock();
+    const realEndBlock = await vault.realEndBlock();
     const blockTotalReward = await vault.blockTotalReward();
     const saleClosed = await vault.saleClosed();
     const orderedEndBlocks = await vault.orderedEndBlocksAll();
@@ -759,6 +760,7 @@ class ICO20Contracts {
     console.log("saleStartBlock", saleStartBlock.toString());
     console.log("stakeStartBlock", stakeStartBlock.toString());
     console.log("stakeEndBlock", stakeEndBlock.toString());
+    console.log("realEndBlock", realEndBlock.toString());
     console.log(
       "global reward per block",
       utils.formatUnits(blockTotalReward.toString(), 18)
@@ -784,6 +786,7 @@ class ICO20Contracts {
       const endBlock = await stakeContract.endBlock();
       const rewardClaimedTotal = await stakeContract.rewardClaimedTotal();
       const totalStakedAmount = await stakeContract.totalStakedAmount();
+
 
       let payTokenBalance = toBN("0");
       if (paytoken == zeroAddress) {
@@ -833,11 +836,13 @@ class ICO20Contracts {
     const saleClosed = await vault.saleClosed();
     const orderedEndBlocks = await vault.orderedEndBlocksAll();
     const stakeAddresses = await vault.stakeAddressesAll();
-
+    const realEndBlock = await vault.realEndBlock();
     console.log("cap", utils.formatUnits(cap.toString(), 18));
     console.log("paytoken", paytoken);
     console.log("saleStartBlock", saleStartBlock.toString());
     console.log("stakeStartBlock", stakeStartBlock.toString());
+    console.log("realEndBlock", realEndBlock.toString());
+
     console.log("stakeEndBlock", stakeEndBlock.toString());
     console.log(
       "blockTotalReward",
@@ -914,8 +919,8 @@ class ICO20Contracts {
         utils.formatUnits(stakeInfo.claimRewardAmount.toString(), 18)
       );
 
-      await logUserStaked(_contract, user1, "user1");
-      await logUserStaked(_contract, user2, "user2");
+      await this.logUserStaked(_contract, user1, "user1");
+      await this.logUserStaked(_contract, user2, "user2");
     }
   }
 

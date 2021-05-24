@@ -30,6 +30,7 @@ interface IIDepositManager {
 
     function requestWithdrawalAll(address layer2) external returns (bool);
 
-    function processRequests(address layer2, uint256 n) external returns (bool);
+    function processRequests(address layer2, uint256 n, bool receiveTON) external returns (bool);
+
 
 }

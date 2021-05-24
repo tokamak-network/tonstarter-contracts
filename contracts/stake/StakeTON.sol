@@ -14,13 +14,6 @@ import "../connection/TokamakStaker.sol";
 contract StakeTON is TokamakStaker {
     using SafeMath for uint256;
 
-    modifier lock() {
-        require(_lock == 0, "LOCKED");
-        _lock = 1;
-        _;
-        _lock = 0;
-    }
-
     //////////////////////////////
     // Events
     //////////////////////////////
@@ -38,26 +31,26 @@ contract StakeTON is TokamakStaker {
     }
 
     /// @dev Initialize
-    function initialize(
-        address _token,
-        address _paytoken,
-        address _vault,
-        uint256 _saleStartBlock,
-        uint256 _startBlock,
-        uint256 _period
-    ) external onlyOwner {
-        require(
-            _token != address(0) &&
-                _vault != address(0) &&
-                _saleStartBlock < _startBlock, "zero"
-        );
-        token = _token;
-        paytoken = _paytoken;
-        vault = _vault;
-        saleStartBlock = _saleStartBlock;
-        startBlock = _startBlock;
-        endBlock = startBlock.add(_period);
-    }
+    // function initialize(
+    //     address _token,
+    //     address _paytoken,
+    //     address _vault,
+    //     uint256 _saleStartBlock,
+    //     uint256 _startBlock,
+    //     uint256 _period
+    // ) external onlyOwner {
+    //     require(
+    //         _token != address(0) &&
+    //             _vault != address(0) &&
+    //             _saleStartBlock < _startBlock, "zero"
+    //     );
+    //     token = _token;
+    //     paytoken = _paytoken;
+    //     vault = _vault;
+    //     saleStartBlock = _saleStartBlock;
+    //     startBlock = _startBlock;
+    //     endBlock = startBlock.add(_period);
+    // }
 
     /// @dev Stake amount
     function stake(uint256 amount) public payable {
@@ -82,6 +75,7 @@ contract StakeTON is TokamakStaker {
             );
 
         LibTokenStake1.StakedAmount storage staked = userStaked[msg.sender];
+        if(staked.amount == 0) totalStakers = totalStakers.add(1);
         staked.amount = staked.amount.add(amount);
         totalStakedAmount = totalStakedAmount.add(amount);
         if (paytoken != address(0))
@@ -90,8 +84,8 @@ contract StakeTON is TokamakStaker {
             );
 
         emit Staked(msg.sender, amount);
-    }
-
+    } 
+    
     /// @dev To withdraw
     function withdraw() external {
         require(
@@ -140,8 +134,8 @@ contract StakeTON is TokamakStaker {
         }
 
         emit Withdrawal(msg.sender, amount);
-    }
-
+    } 
+    
     /// @dev Claim for reward
     function claim() external lock {
         require(
@@ -172,7 +166,7 @@ contract StakeTON is TokamakStaker {
 
         emit Claimed(msg.sender, rewardClaim, block.number);
     }
-
+      
     /// @dev Returns the amount that can be rewarded
     //function canRewardAmount(address account) public view returns (uint256) {
     function canRewardAmount(address account, uint256 specilaBlock)
@@ -212,17 +206,18 @@ contract StakeTON is TokamakStaker {
                 for (uint256 i = 0; i < orderedEndBlocks.length; i++) {
                     _end = orderedEndBlocks[i];
                     _total = IIStake1Vault(vault).stakeEndBlockTotal(_end);
-                    uint256 _period = endR.sub(startR);
-
+                    uint256 _period1 = endR.sub(startR);
+                    uint256 _period2 = _end.sub(startR);
                     if (_start > _end) {
 
                     } else if (endR <= _end) {
-
                         // reward +=
                         //     (blockTotalReward *
                         //         (endR - startR) * amount) /
                         //     _total;
-                        reward = reward.add(blockTotalReward.mul(_period).mul(amount).div(_total));
+                        if(_total > 0){ 
+                            reward = reward.add(blockTotalReward.mul(_period1).mul(amount).div(_total));
+                        }
                         break;
                     } else {
                         // reward +=
@@ -230,8 +225,9 @@ contract StakeTON is TokamakStaker {
                         //         (_end - startR) *
                         //         amount) /
                         //     _total;
-                        reward = reward.add(blockTotalReward.mul(_period).mul(amount).div(_total));
-
+                        if(_total > 0){ 
+                            reward = reward.add(blockTotalReward.mul(_period2).mul(amount).div(_total));
+                        }
                         startR = _end;
                     }
                 }
@@ -239,7 +235,7 @@ contract StakeTON is TokamakStaker {
         }
         return reward;
     }
-    /*
+    /* 
     function canRewardAmountTest(address account, uint256 specilaBlock)
         public view
         returns (uint256, uint256, uint256, uint256)
@@ -265,21 +261,21 @@ contract StakeTON is TokamakStaker {
             if (specilaBlock < endR) endR = specilaBlock;
 
             uint256[] memory orderedEndBlocks =
-                IStake1Vault(vault).orderedEndBlocksAll();
+                IIStake1Vault(vault).orderedEndBlocksAll();
 
             if (orderedEndBlocks.length > 0) {
                 uint256 _end = 0;
                 uint256 _start = startR;
                 uint256 _total = 0;
                 //uint256 blockTotalReward = 0;
-                blockTotalReward = IStake1Vault(vault).blockTotalReward();
+                blockTotalReward = IIStake1Vault(vault).blockTotalReward();
 
                 address user = account;
                 uint256 amount = userStaked[user].amount;
 
                 for (uint256 i = 0; i < orderedEndBlocks.length; i++) {
                     _end = orderedEndBlocks[i];
-                    _total = IStake1Vault(vault).stakeEndBlockTotal(_end);
+                    _total = IIStake1Vault(vault).stakeEndBlockTotal(_end);
 
                     if (_start > _end) {
 

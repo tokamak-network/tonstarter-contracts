@@ -14,4 +14,6 @@ contract StakeTONStorage is Stake1Storage {
     uint256 public fromTokamak;
     uint256 public toUniswapTON;
     uint public defiStatus;
+
+    uint256 public requestNum;
 }

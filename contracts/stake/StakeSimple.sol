@@ -89,6 +89,7 @@ contract StakeSimple is StakeTONStorage, AccessControl  {
             );
 
         LibTokenStake1.StakedAmount storage staked = userStaked[msg.sender];
+        if(staked.amount == 0) totalStakers = totalStakers.add(1);
         staked.amount = staked.amount.add(amount);
         totalStakedAmount = totalStakedAmount.add(amount);
         if (paytoken != address(0))

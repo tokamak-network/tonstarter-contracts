@@ -14,12 +14,12 @@ import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 contract StakeTONModified is TokamakStaker {
     using SafeERC20 for IIERC20;
 
-    modifier lock() {
-        require(_lock == 0, "LOCKED");
-        _lock = 1;
-        _;
-        _lock = 0;
-    }
+    // modifier lock() {
+    //     require(_lock == 0, "LOCKED");
+    //     _lock = 1;
+    //     _;
+    //     _lock = 0;
+    // }
 
     //////////////////////////////
     // Events

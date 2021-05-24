@@ -17,9 +17,11 @@ interface IStakeTON {
 
     function endBlock() external view returns (uint256);
 
-    function rewardRaised() external view returns (uint256);
+    function rewardClaimedTotal() external view returns (uint256);
 
     function totalStakedAmount() external view returns (uint256);
+
+    function totalStakers() external view returns (uint256);
 
     function userStaked(address account)
         external
@@ -33,14 +35,6 @@ interface IStakeTON {
         uint256 _startBlock,
         uint256 _period
     ) external ;
-
-    function setTokamak(
-        address _ton,
-        address _wton,
-        address _depositManager,
-        address _seigManager,
-        address _defiAddr
-    ) external;
 
 
     function stake(uint256 amount) external payable;
@@ -72,23 +66,5 @@ interface IStakeTON {
 
     function tokamakProcessUnStaking(address _layer2, bool receiveTON) external;
 
-    function tokamakPendingUnstaked(address _layer2)
-        external
-        view
-        returns (uint256 wtonAmount);
 
-    function tokamakAccStaked(address _layer2)
-        external
-        view
-        returns (uint256 wtonAmount);
-
-    function tokamakAccUnstaked(address _layer2)
-        external
-        view
-        returns (uint256 wtonAmount);
-
-    function tokamakStakeOf(address _layer2)
-        external
-        view
-        returns (uint256 wtonAmount);
 }

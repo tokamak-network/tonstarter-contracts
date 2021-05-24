@@ -2,6 +2,7 @@
 pragma solidity ^0.7.6;
 
 import {Stake1Vault} from "../stake/Stake1Vault.sol";
+import {StakeVaultProxy} from "../stake/StakeVaultProxy.sol";
 
 contract StakeVaultFactory {
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
@@ -22,7 +23,11 @@ contract StakeVaultFactory {
         uint256 _stakeStartBlock = _intInfo[3];
 
         Stake1Vault vault = new Stake1Vault();
-        vault.initialize(
+        require(address(vault) != address(0), "vault logic zero");
+
+        StakeVaultProxy proxy = new StakeVaultProxy(address(vault));
+
+        proxy.initialize(
             _fld,
             _paytoken,
             _cap,
@@ -33,9 +38,9 @@ contract StakeVaultFactory {
             _defiAddr
         );
 
-        vault.grantRole(ADMIN_ROLE, owner);
-        vault.revokeRole(ADMIN_ROLE, address(this));
+        proxy.grantRole(ADMIN_ROLE, owner);
+        proxy.revokeRole(ADMIN_ROLE, address(this));
 
-        return address(vault);
+        return address(proxy);
     }
 }
