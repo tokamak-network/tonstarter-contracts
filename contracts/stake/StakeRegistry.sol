@@ -3,12 +3,15 @@ pragma solidity ^0.7.6;
 
 import "@openzeppelin/contracts/access/AccessControl.sol";
 
+/// @title Stake Registry
+/// @notice Manage the vault list by phase. Manage the list of staking contracts in the vault. 
 contract StakeRegistry is AccessControl {
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
 
     bytes32 public constant ZERO_HASH =
         0x0000000000000000000000000000000000000000000000000000000000000000;
-
+    
+    // Addresses for Tokamak staking
     address public ton;
     address public wton;
     address public depositManager;
