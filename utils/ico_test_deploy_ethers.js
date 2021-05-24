@@ -57,7 +57,9 @@ let StakeFactory,
   Stake1Proxy,
   StakeTON,
   IERC20;
-let StakeTONFactory, StakeForStableCoinFactory;
+let StakeTONFactory, StakeForStableCoinFactory,
+  StakeVaultFactory,
+  StakeSimpleFactory;
 
 // plasma-evm-contracts
 let TON,
@@ -103,6 +105,13 @@ class ICO20Contracts {
     this.fld = null;
     this.sfld = null;
     this.stakeForSFLD = null;
+
+    this.stakeVaultFactory = null;
+    this.stakeSimpleFactory = null;
+
+    this.stakeTONfactory = null;
+    this.stakeForStableCoinFactory = null;
+
     this.stakeregister = null;
     this.stakefactory = null;
     this.stake1proxy = null;
@@ -172,10 +181,18 @@ class ICO20Contracts {
     this.stakeTONfactory = null;
     this.stakeForStableCoinFactory = null;
 
-    this.stakeTONfactory = await ethers.getContractFactory("StakeTONFactory");
-    this.stakeForStableCoinFactory = await ethers.getContractFactory(
-      "StakeForStableCoinFactory"
+    this.stakeVaultFactory = null;
+    this.stakeSimpleFactory = null;
+
+
+
+
+    StakeTONProxyFactory = await ethers.getContractFactory("StakeTONProxyFactory");
+    StakeTONLogicFactory = await ethers.getContractFactory(
+      "StakeTONLogicFactory"
     );
+    StakeVaultFactory = await ethers.getContractFactory("StakeVaultFactory");
+    StakeSimpleFactory = await ethers.getContractFactory("StakeSimpleFactory");
 
     StakeFactory = await ethers.getContractFactory("StakeFactory");
     StakeRegistry = await ethers.getContractFactory("StakeRegistry");
@@ -194,12 +211,23 @@ class ICO20Contracts {
 
     this.stakeregister = await StakeRegistry.connect(owner).deploy();
 
-    this.stakeTONfactory = await StakeTONFactory.connect(owner).deploy();
+    this.stakeVaultFactory = await StakeVaultFactory.connect(owner).deploy();
+    this.stakeSimpleFactory = await StakeSimpleFactory.connect(owner).deploy();
+
+    this.stakeTONProxyFactory = await StakeTONProxyFactory.connect(owner).deploy();
+    this.stakeTONLogicFactory = await StakeTONLogicFactory.connect(owner).deploy();
+
+    this.stakeTONfactory = await StakeTONFactory.connect(owner).deploy(
+      this.stakeTONProxyFactory.address,
+      this.stakeTONLogicFactory.address
+    );
+
     this.stakeForStableCoinFactory = await StakeForStableCoinFactory.connect(
       owner
     ).deploy();
 
     this.stakefactory = await StakeFactory.connect(owner).deploy(
+      this.stakeSimpleFactory.address,
       this.stakeTONfactory.address,
       this.stakeForStableCoinFactory.address
     );
@@ -240,7 +268,7 @@ class ICO20Contracts {
     SeigManager = await ethers.getContractFactory("SeigManager");
     PowerTON = await ethers.getContractFactory("PowerTON");
     console.log("HI1");
-    
+
     this.ton = await TON.connect(owner).deploy();
     this.wton = await WTON.connect(owner).deploy(this.ton.address);
     this.registry = await Layer2Registry.connect(owner).deploy();
@@ -274,7 +302,7 @@ class ICO20Contracts {
       ROUND_DURATION
     );
     await this.powerton.connect(owner).init();
-    
+
     await this.seigManager.connect(owner).setPowerTON(this.powerton.address);
     await this.powerton.connect(owner).start();
     await this.seigManager.connect(owner).setDao(this.daoVault.address);
@@ -287,7 +315,7 @@ class ICO20Contracts {
       )
     );
     console.log("HI4");
-    
+
     // ton setting
     await this.ton
       .connect(owner)
@@ -356,10 +384,11 @@ class ICO20Contracts {
   };
 
   setEntry = async function (owner) {
-    await this.stakeEntry.setStore(
+    await this.stakeEntry.connect(owner).setStore(
       this.fld.address,
       this.stakeregister.address,
       this.stakefactory.address,
+      this.stakeVaultFactory.address,
       this.ton.address,
       this.wton.address,
       this.depositManager.address,
@@ -368,6 +397,19 @@ class ICO20Contracts {
     );
 
     await this.stakeregister
+      .connect(owner)
+      .setTokamak(
+        this.ton.address,
+        this.wton.address,
+        this.depositManager.address,
+        this.seigManager.address
+      );
+
+    await this.stakeregister
+      .connect(owner)
+      .grantRole(ADMIN_ROLE, this.stake1proxy.address);
+
+    await this.stakefactory
       .connect(owner)
       .grantRole(ADMIN_ROLE, this.stake1proxy.address);
 
