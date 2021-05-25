@@ -1,41 +1,32 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity ^0.7.6;
 
-//import { IERC20 } from "../interfaces/IERC20.sol";
 import "../libraries/LibTokenStake1.sol";
 
 contract Stake1Storage {
-    // The token being sold
+    // reward token : FLD
     address public token;
 
-    // The paytoken payed ( if paytoken is ether, paytoken is address(0) )
+    // paytoken is the token that the user stakes. ( if paytoken is ether, paytoken is address(0) )
     address public paytoken;
+    // A vault that holds fld rewards.
     address public vault;
 
-    // start and end timestamps where mining are allowed (both inclusive)
+    // the start block for sale.
     uint256 public saleStartBlock;
+    // the staking start block, once staking starts, users can no longer apply for staking.
     uint256 public startBlock;
+    // the staking end block.
     uint256 public endBlock;
 
-    // amount of raised FLD in wei unit, (reward/mining FLD )
+    // the total amount claimed
     uint256 public rewardClaimedTotal;
+    // the total staked amount
     uint256 public totalStakedAmount;
 
-    // the current lock storage of your account.
+    // information staked by user
     mapping(address => LibTokenStake1.StakedAmount) public userStaked;
 
-    // operating profit storage
-    // token => block => amount
-    mapping(address => mapping(uint256 => uint256)) private operateRewardBlock;
-    mapping(address => uint256[]) private operateRewardBlockIndex;
-
-    // user => token => claimed operateRewardBlockIndex
-    mapping(address => mapping(address => uint256))
-        public userProfitWithdrawalIndex;
-
-    // user => token => claimedAmount
-    mapping(address => mapping(address => uint256))
-        public userProfitWithdrawalAmount;
-
     uint256 internal _lock;
+
 }

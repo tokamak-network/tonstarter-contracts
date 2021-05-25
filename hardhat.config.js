@@ -13,12 +13,21 @@ require("./tasks/uniswap-v3-swap-task");
 const { RINKEBY_UNISWAP_V3_ACCOUNT_PK1, RINKEBY_UNISWAP_V3_ACCOUNT_PK2 } = process.env;
 
 module.exports = {
-  defaultNetwork: "localhost",
+  defaultNetwork: "rinkeby",
   networks: {
     localhost: {
       gas: 9500000,
       gasMultiplier: 100,
       blockGasLimit: 124500000,
+    },
+    hardhat: {
+      accounts: {
+        mnemonic: process.env.MNEMONIC_HARDHAT,
+        count: 30,
+        initialIndex: 0,
+        accountsBalance: '10000000000000000000000',
+      },
+      chainId: 31337,
     },
     rinkeby: {
       url: `https://rinkeby.infura.io/v3/${process.env.InfuraKey}`,

@@ -16,7 +16,6 @@ const {
 require("dotenv").config();
 
 const initialTotal = process.env.initialTotal + "." + "0".repeat(18);
-
 const Pharse1_TOTAL = process.env.Pharse1_TOTAL + "." + "0".repeat(18);
 const Pharse1_TON_Staking =
   process.env.Pharse1_TON_Staking + "." + "0".repeat(18);
@@ -40,6 +39,7 @@ const EVENT_VAULT_HASH = keccak256("EVENT_VAULT");
 let fldtoken = loadDeployed(process.env.NETWORK,"FLD");
 let registry = loadDeployed(process.env.NETWORK,"StakeRegistry");
 let factory = loadDeployed(process.env.NETWORK,"StakeFactory");
+let vaultfactory = loadDeployed(process.env.NETWORK,"StakeVaultFactory");
 let logic = loadDeployed(process.env.NETWORK,"Stake1Logic");
 let proxy = loadDeployed(process.env.NETWORK,"Stake1Proxy");
 
@@ -47,6 +47,9 @@ let ton = loadDeployed(process.env.NETWORK,"TON");
 let wton = loadDeployed(process.env.NETWORK,"WTON");
 let depositManager = loadDeployed(process.env.NETWORK,"DepositManager");
 let seigManager = loadDeployed(process.env.NETWORK,"SeigManager");
+console.log("proxy:", proxy);
+console.log("ton:", ton);
+console.log("wton:", wton);
 
 async function deployMain(defaultSender) {
   const [deployer, user1] = await ethers.getSigners();
@@ -60,21 +63,36 @@ async function deployMain(defaultSender) {
   // console.log("_logic:" , _logic);
 
   console.log("stakeEntry:", stakeEntry.address);
+  console.log("vaultfactory:", vaultfactory);
+
 
   await stakeEntry.setStore(
     fldtoken,
     registry,
     factory,
+    vaultfactory,
     ton,
     wton,
     depositManager,
     seigManager
   );
-  console.log("setStore:");
+  console.log("stakeEntry setStore:");
 
   const stakeRegistry = await ethers.getContractAt("StakeRegistry", registry);
+
+  await stakeRegistry.setTokamak(
+    ton,
+    wton,
+    depositManager,
+    seigManager);
+  console.log("stakeRegistry setTokamak:");
+
   await stakeRegistry.grantRole(ADMIN_ROLE, proxy);
-  console.log("grantRole:");
+  console.log("stakeRegistry grantRole: proxy");
+
+  const stakeFactory = await ethers.getContractAt("StakeFactory", factory);
+  await stakeFactory.grantRole(ADMIN_ROLE, proxy);
+  console.log("stakeFactory grantRole: proxy");
 
   console.log(
     "utils.parseUnits(initialTotal, 18):",

@@ -230,7 +230,15 @@ class ICO20Contracts {
     //this.stakeForSFLD = await StakeForSFLD.new({ from: owner });
     this.stakeregister = await StakeRegistry.new({ from: owner });
 
-    this.stakeTONfactory = await StakeTONFactory.new({ from: owner });
+    this.stakeTONLogicFactory = await StakeTONLogicFactory.new({ from: owner });
+    this.stakeTONProxyFactory = await StakeTONProxyFactory.new({ from: owner });
+
+
+    this.stakeTONfactory = await StakeTONFactory.new(
+      this.stakeTONProxyFactory.address,
+      this.stakeTONLogicFactory.address,
+      { from: owner });
+
     this.stakeForStableCoinFactory = await StakeForStableCoinFactory.new({
       from: owner,
     });

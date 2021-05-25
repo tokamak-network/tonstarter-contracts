@@ -2,6 +2,8 @@
 pragma solidity ^0.7.6;
 
 library LibTokenStake1 {
+    enum DefiStatus { NONE, APPROVE, DEPOSITED, REQUESTWITHDRAW, WITHDRAW, END }
+
     struct StakeInfo {
         string name;
         uint256 startBlcok;

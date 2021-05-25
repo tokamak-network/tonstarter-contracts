@@ -1,12 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.7.6;
+//pragma abicoder v2;
 
+import "./Stake1Storage.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
-import "./StakeProxyStorage.sol";
 
-/// @title Proxy for Stake contracts in Phase 1
+/// @title Proxy for Simple Stake contracts
 /// @notice
-contract Stake1Proxy is StakeProxyStorage, AccessControl {
+contract StakeSimpleProxy is Stake1Storage, AccessControl {
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
     address internal _implementation;
     bool public pauseProxy;
@@ -16,15 +17,16 @@ contract Stake1Proxy is StakeProxyStorage, AccessControl {
     modifier onlyOwner() {
         require(
             hasRole(ADMIN_ROLE, msg.sender),
-            "no admin"
+            "not an admin"
         );
         _;
     }
 
-    constructor() {
+    constructor(address _logic) {
         _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
         _setupRole(ADMIN_ROLE, msg.sender);
         _setupRole(ADMIN_ROLE, address(this));
+        _implementation = _logic;
     }
 
     /// @notice Set pause state
@@ -62,7 +64,7 @@ contract Stake1Proxy is StakeProxyStorage, AccessControl {
         address _impl = implementation();
         require(
             _impl != address(0) && !pauseProxy,
-            "impl OR proxy is false"
+            "StakeYearnProxy: impl is zero OR proxy is false"
         );
 
         assembly {
@@ -88,4 +90,22 @@ contract Stake1Proxy is StakeProxyStorage, AccessControl {
                 }
         }
     }
+
+    function setInit(
+        address[3] memory _addr,
+        uint256[3] memory _intdata
+    ) external onlyOwner {
+        require(
+                _addr[2] != address(0) &&
+                _intdata[0] < _intdata[1], "setInit fail"
+        );
+        token = _addr[0];
+        paytoken = _addr[1];
+        vault = _addr[2];
+
+        saleStartBlock = _intdata[0];
+        startBlock = _intdata[1];
+        endBlock = startBlock + _intdata[2];
+    }
+
 }

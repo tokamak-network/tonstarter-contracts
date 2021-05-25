@@ -102,6 +102,10 @@ contract StakeTONModified is TokamakStaker {
             "not end"
         );
 
+        (address ton, address wton, address depositManager, address seigManager) = ITokamakRegistry(stakeRegistry).getTokamak();
+        require(ton != address(0) && wton != address(0) && depositManager != address(0) && seigManager != address(0),
+            "ITokamakRegistry zero"
+        );
         if (tokamakLayer2 != address(0)) {
             require(
                 IISeigManager(seigManager).stakeOf(tokamakLayer2, address(this)) == 0 &&

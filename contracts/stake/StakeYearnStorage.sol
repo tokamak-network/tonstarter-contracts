@@ -5,5 +5,4 @@ import "./Stake1Storage.sol";
 
 contract StakeYearnStorage is Stake1Storage {
     address public yearnV2Vault;
-
 }

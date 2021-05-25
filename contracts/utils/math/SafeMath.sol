@@ -144,9 +144,9 @@ library SafeMath {
      *
      * - The divisor cannot be zero.
      */
-    function mod(uint256 a, uint256 b) internal pure returns (uint256) {
-        return mod(a, b, "SafeMath: modulo by zero");
-    }
+    // function mod(uint256 a, uint256 b) internal pure returns (uint256) {
+    //     return mod(a, b, "SafeMath: modulo by zero");
+    // }
 
     /**
      * @dev Returns the remainder of dividing two unsigned integers. (unsigned integer modulo),
@@ -160,12 +160,12 @@ library SafeMath {
      *
      * - The divisor cannot be zero.
      */
-    function mod(
-        uint256 a,
-        uint256 b,
-        string memory errorMessage
-    ) internal pure returns (uint256) {
-        require(b != 0, errorMessage);
-        return a % b;
-    }
+    // function mod(
+    //     uint256 a,
+    //     uint256 b,
+    //     string memory errorMessage
+    // ) internal pure returns (uint256) {
+    //     require(b != 0, errorMessage);
+    //     return a % b;
+    // }
 }

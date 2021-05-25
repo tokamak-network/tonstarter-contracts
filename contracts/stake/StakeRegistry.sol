@@ -1,8 +1,7 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity ^0.7.6;
-pragma abicoder v2;
+
 import "@openzeppelin/contracts/access/AccessControl.sol";
-import {IFLD} from "../interfaces/IFLD.sol";
 
 contract StakeRegistry is AccessControl {
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
@@ -10,10 +9,15 @@ contract StakeRegistry is AccessControl {
     bytes32 public constant ZERO_HASH =
         0x0000000000000000000000000000000000000000000000000000000000000000;
 
+    address public ton;
+    address public wton;
+    address public depositManager;
+    address public seigManager;
+
     mapping(uint256 => address[]) public phases;
 
-    mapping(bytes32 => address) public vaults; // vaultNames - Vault
-    mapping(address => bytes32) public vaultNames; // vault - vaultNames
+    mapping(bytes32 => address) public vaults;      // vaultNames - Vault
+    mapping(address => bytes32) public vaultNames;  // vault - vaultNames
 
     mapping(address => address[]) public stakeContractsOfVault; // vault - stakeContracts[]
     mapping(address => address) public stakeContractVault; // stakeContract - vault
@@ -25,15 +29,42 @@ contract StakeRegistry is AccessControl {
         );
         _;
     }
+
+    modifier nonZero(address _addr) {
+        require(_addr != address(0), "zero address");
+        _;
+    }
+
     //////////////////////////////
     // Events
     //////////////////////////////
     event AddedVault(address indexed vault, uint256 phase);
     event AddedStakeContract(address indexed vault, address indexed stakeContract);
+    event SetTokamak(address ton, address wton, address depositManager, address seigManager);
 
     constructor() {
         _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
         _setupRole(ADMIN_ROLE, msg.sender);
+    }
+
+    /// @dev Set address for Tokamak integration
+    function setTokamak(
+        address _ton,
+        address _wton,
+        address _depositManager,
+        address _seigManager
+    ) external onlyOwner
+        nonZero(_ton)
+        nonZero(_wton)
+        nonZero(_depositManager)
+        nonZero(_seigManager)
+    {
+        ton = _ton;
+        wton = _wton;
+        depositManager = _depositManager;
+        seigManager = _seigManager;
+
+        emit SetTokamak(ton, wton, depositManager, seigManager);
     }
 
     /// @dev Adds vault
@@ -69,6 +100,16 @@ contract StakeRegistry is AccessControl {
         emit AddedStakeContract(_vault, _stakeContract);
     }
 
+    /// @dev Get addresses for Tokamak interface
+    function getTokamak()
+        external
+        view
+        returns (address,address,address,address)
+    {
+        return (ton, wton, depositManager, seigManager);
+    }
+
+    /// @dev Get addresses of vaults of index phase
     function phasesAll(uint256 _index)
         external
         view
@@ -77,6 +118,7 @@ contract StakeRegistry is AccessControl {
         return phases[_index];
     }
 
+    /// @dev Get addresses of staker of _vault
     function stakeContractsOfVaultAll(address _vault)
         external
         view
@@ -92,7 +134,7 @@ contract StakeRegistry is AccessControl {
         returns (bool valid)
     {
         require(
-            phases[_phase].length > 0 && vaultNames[_vault] != ZERO_HASH,
+            phases[_phase].length > 0  ,
             "StakeRegistry: validVault is fail"
         );
 

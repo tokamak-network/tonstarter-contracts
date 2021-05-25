@@ -1,64 +1,49 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.7.6;
 
-import {IStake1Vault} from "../interfaces/IStake1Vault.sol";
-import {IStakeTON} from "../interfaces/IStakeTON.sol";
-
-import {StakeTON} from "../stake/StakeTON.sol";
-import {StakeTONProxy} from "../stake/StakeTONProxy.sol";
-
 contract StakeTONFactory {
-    bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
 
-    function deploy(
-        uint256 _pahse,
-        address _vault,
-        address _token,
-        address _paytoken,
-        uint256 _period,
-        address[4] memory tokamakAddr,
+    address public stakeTONProxyFactory;
+    address public stakeTONLogicFactory;
+
+    constructor(address _stakeTONProxyFactory, address _stakeTONLogicFactory) {
+        require(
+            _stakeTONProxyFactory != address(0) &&
+            _stakeTONLogicFactory != address(0),
+            "stakeTONProxyFactory zero"
+        );
+        stakeTONProxyFactory = _stakeTONProxyFactory;
+        stakeTONLogicFactory = _stakeTONLogicFactory;
+    }
+
+    function create
+    (
+        address[4] memory _addr,
+        address _registry,
+        uint256[3] memory _intdata,
         address owner
-    ) public returns (address) {
-        require(
-            _vault != address(0) && _pahse == 1,
-            "StakeTONFactory: deploy init fail"
-        );
+    ) external returns (address) {
 
-        IStake1Vault vault = IStake1Vault(_vault);
-        uint256 saleStart = vault.saleStartBlock();
-        uint256 stakeStart = vault.stakeStartBlock();
-        address defiAddr = vault.defiAddr();
-        uint256 period = _period;
+        // used gas limit 2,672,614
+        // used gas 2,631,878   1000000
+        (bool success1, bytes memory returnData1) = stakeTONLogicFactory.call(abi.encodeWithSignature("deploy()"));
+        require(success1,"stakeTONLogicFactory fail");
+        address logic = abi.decode(returnData1, (address)) ;
 
-        require(
-            saleStart < stakeStart && stakeStart > 0,
-            "StakeTONFactory: start error"
-        );
+        // gas limit 1,733,511
+        // used gas 1,693,642 {gas: gasleft()}
+        (bool success, bytes memory returnData) = stakeTONProxyFactory.call(
+            abi.encodeWithSignature("deploy(address,address[4],address,uint256[3],address)",
+            logic,
+            _addr,
+            _registry,
+            _intdata,
+            owner
+            ));
+        require(success,"stakeTONProxyFactory fail");
+        address proxy = abi.decode(returnData, (address));
+        require(proxy != address(0), "StakeTONFactory create fail");
 
-        StakeTONProxy proxy = new StakeTONProxy();
-        StakeTON logic = new StakeTON();
-        proxy.upgradeTo(address(logic));
-
-
-        IStakeTON(address(proxy)).initialize(
-            _token,
-            _paytoken,
-            address(vault),
-            saleStart,
-            stakeStart,
-            period
-        );
-        IStakeTON(address(proxy)).setTokamak(
-            tokamakAddr[0],
-            tokamakAddr[1],
-            tokamakAddr[2],
-            tokamakAddr[3],
-            defiAddr
-        );
-
-        // vault.addSubVaultOfStake(_name, address(proxy), period);
-        proxy.grantRole(ADMIN_ROLE, owner);
-        proxy.revokeRole(ADMIN_ROLE, address(this));
-        return address(proxy);
+        return proxy;
     }
 }

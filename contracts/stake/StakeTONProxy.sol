@@ -2,7 +2,9 @@
 pragma solidity ^0.7.6;
 pragma abicoder v2;
 
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {IStake1Vault} from "../interfaces/IStake1Vault.sol";
+import {IIERC20} from "../interfaces/IIERC20.sol";
+import {SafeMath} from "../utils/math/SafeMath.sol";
 import "./StakeTONStorage.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import {OnApprove} from "../tokens/OnApprove.sol";
@@ -10,6 +12,7 @@ import {OnApprove} from "../tokens/OnApprove.sol";
 /// @title Proxy for Stake contracts in Phase 1
 /// @notice
 contract StakeTONProxy is StakeTONStorage, AccessControl, OnApprove {
+    using SafeMath for uint256;
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
     address internal _implementation;
     bool public pauseProxy;
@@ -24,10 +27,11 @@ contract StakeTONProxy is StakeTONStorage, AccessControl, OnApprove {
         _;
     }
 
-    constructor() {
+    constructor(address _logic) {
         _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
         _setupRole(ADMIN_ROLE, msg.sender);
         _setupRole(ADMIN_ROLE, address(this));
+        _implementation = _logic;
     }
 
     /// @notice Set pause state
@@ -131,19 +135,48 @@ contract StakeTONProxy is StakeTONStorage, AccessControl, OnApprove {
             "stakeOnApprove init fail"
         );
         require(
-            block.number >= saleStartBlock && saleStartBlock < startBlock
-            && block.number < startBlock,
+            block.number >= saleStartBlock && block.number < startBlock,
             "period is unavailable"
         );
 
-        LibTokenStake1.StakedAmount storage staked = userStaked[_owner];
-        staked.amount += _amount;
-        totalStakedAmount += _amount;
+        require(!IStake1Vault(vault).saleClosed(), "not end");
         require(
-            IERC20(from).transferFrom(_owner, _spender, _amount),
+                IIERC20(paytoken).balanceOf(_owner) >= _amount,
+                "lack"
+            );
+
+        LibTokenStake1.StakedAmount storage staked = userStaked[_owner];
+        staked.amount = staked.amount.add(_amount);
+        totalStakedAmount = totalStakedAmount.add(_amount);
+        require(
+            IIERC20(from).transferFrom(_owner, _spender, _amount),
             "transfer fail"
         );
         return true;
+    }
+
+    function setInit(
+        address[4] memory _addr,
+        address _registry,
+        uint256[3] memory _intdata
+    ) external onlyOwner {
+        require(
+            _registry != address(0) &&
+                _addr[2] != address(0) &&
+                _intdata[0] < _intdata[1], "setInit fail"
+        );
+        token = _addr[0];
+        paytoken = _addr[1];
+        vault = _addr[2];
+        _uniswapRouter = _addr[3];
+
+        stakeRegistry = _registry;
+
+        tokamakLayer2 = address(0);
+
+        saleStartBlock = _intdata[0];
+        startBlock = _intdata[1];
+        endBlock = startBlock.add(_intdata[2]);
     }
 
 }

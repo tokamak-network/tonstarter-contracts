@@ -3,65 +3,60 @@ pragma solidity ^0.7.6;
 pragma abicoder v2;
 
 import {IFLD} from "../interfaces/IFLD.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "../interfaces/IStake1Vault.sol";
 import "../interfaces/IStake1.sol";
-
 import "../libraries/LibTokenStake1.sol";
+import {SafeMath} from "../utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+
 
 /// @title FLD Token's Vault - stores the fld for the period of time
 /// @notice A vault is associated with the set of stake contracts.
 /// Stake contracts can interact with the vault to claim fld tokens
 contract Stake1Vault is AccessControl {
+    using SafeMath for uint256;
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
-    bytes32 public constant CLAIMER_ROLE = keccak256("CLAIMER");
-    bytes32 public constant MANAGER_ROLE = keccak256("MANAGER");
     bytes32 public constant ZERO_HASH =
         0x0000000000000000000000000000000000000000000000000000000000000000;
 
-    //address payable public self;
-
+    // reward token : FLD
     IFLD public fld;
+    // paytoken is the token that the user stakes.
     address public paytoken;
+    // allocated amount of fld
     uint256 public cap;
+    // the start block for sale.
     uint256 public saleStartBlock;
+    // the staking start block
     uint256 public stakeStartBlock;
+    // the staking end block.
     uint256 public stakeEndBlock;
+    // reward amount per block
     uint256 public blockTotalReward;
+    // sale closed flag
     bool public saleClosed;
-    uint256 public stakeType; // 0 : StakeTON ( eth or ton) , 2 : StakeForStableCoin (stable coin)
-    address public defiAddr; // uniswapRouter or yraenV2Vault
+    // Operation type of staking amount
+    uint256 public stakeType;
+    // External contract address used when operating the staking amount
+    address public defiAddr;
 
+    // a list of stakeContracts maintained by the vault
     address[] public stakeAddresses;
+    // the information of the stake contract
     mapping(address => LibTokenStake1.StakeInfo) public stakeInfos;
 
-    uint256[] public orderedEndBlocks; // Ascending orders
+    // the end blocks of the stake contracts, which must be in ascending order
+    uint256[] public orderedEndBlocks;
+    // the total staked amount stored at orderedEndBlock’s end block time
     mapping(uint256 => uint256) public stakeEndBlockTotal;
 
-    //mapping(bytes32 => uint) private lock;
     uint256 private _lock;
 
     modifier onlyOwner() {
         require(
             hasRole(ADMIN_ROLE, msg.sender),
             "Stake1Vault: Caller is not an admin"
-        );
-        _;
-    }
-
-    modifier onlyManager() {
-        require(
-            hasRole(MANAGER_ROLE, msg.sender),
-            "Stake1Vault: Caller is not a manager"
-        );
-        _;
-    }
-
-    modifier onlyClaimer() {
-        require(
-            hasRole(CLAIMER_ROLE, msg.sender),
-            "Stake1Vault: Caller is not a claimer"
         );
         _;
     }
@@ -81,9 +76,7 @@ contract Stake1Vault is AccessControl {
 
     constructor() {
         _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
-        _setRoleAdmin(CLAIMER_ROLE, ADMIN_ROLE);
         _setupRole(ADMIN_ROLE, msg.sender);
-        _setupRole(CLAIMER_ROLE, msg.sender);
     }
 
     receive() external payable {}
@@ -188,7 +181,7 @@ contract Stake1Vault is AccessControl {
         require(info.startBlcok == 0, "Stake1Vault: Already added");
 
         stakeAddresses.push(stakeContract);
-        uint256 _endBlock = stakeStartBlock + periodBlocks;
+        uint256 _endBlock = stakeStartBlock.add(periodBlocks);
 
         info.name = _name;
         info.startBlcok = stakeStartBlock;
@@ -205,21 +198,19 @@ contract Stake1Vault is AccessControl {
             cap > 0 &&
                 stakeStartBlock > 0 &&
                 stakeStartBlock < stakeEndBlock &&
-                block.number > stakeStartBlock &&
-                block.number < stakeEndBlock,
+                block.number > stakeStartBlock,
             "closeSale init fail"
         );
         require(stakeAddresses.length > 0, "no stakes");
-        blockTotalReward = cap / (stakeEndBlock - stakeStartBlock);
+        blockTotalReward = cap.div(stakeEndBlock.sub(stakeStartBlock));
 
         // update balance
         for (uint256 i = 0; i < stakeAddresses.length; i++) {
-            address stake = stakeAddresses[i];
-            LibTokenStake1.StakeInfo storage stakeInfo = stakeInfos[stake];
+            LibTokenStake1.StakeInfo storage stakeInfo = stakeInfos[stakeAddresses[i]];
             if (paytoken == address(0)) {
-                stakeInfo.balance = address(uint160(stake)).balance;
+                stakeInfo.balance = address(uint160(stakeAddresses[i])).balance;
             } else {
-                stakeInfo.balance = IERC20(paytoken).balanceOf(stake);
+                stakeInfo.balance = IERC20(paytoken).balanceOf(stakeAddresses[i]);
             }
         }
         uint256 sum = 0;
@@ -233,28 +224,45 @@ contract Stake1Vault is AccessControl {
                     stakeInfos[stakeAddresses[j]].endBlock >=
                     totalcheck.endBlock
                 ) {
-                    total += stakeInfos[stakeAddresses[j]].balance;
+                    //total += stakeInfos[stakeAddresses[j]].balance;
+                    total = total.add(stakeInfos[stakeAddresses[j]].balance);
                 }
             }
             stakeEndBlockTotal[totalcheck.endBlock] = total;
-            sum += total;
+            //sum += total;
+            sum = sum.add(total);
 
             // reward total
             uint256 totalReward = 0;
             for (uint256 k = i; k > 0; k--) {
-                totalReward +=
-                    ((stakeInfos[stakeAddresses[k]].endBlock -
-                        stakeInfos[stakeAddresses[k - 1]].endBlock) *
-                        blockTotalReward *
-                        totalcheck.balance) /
-                    stakeEndBlockTotal[stakeInfos[stakeAddresses[k]].endBlock];
+                // totalReward +=
+                //     ((stakeInfos[stakeAddresses[k]].endBlock -
+                //         stakeInfos[stakeAddresses[k - 1]].endBlock) *
+                //         blockTotalReward *
+                //         totalcheck.balance) /
+                //     stakeEndBlockTotal[stakeInfos[stakeAddresses[k]].endBlock];
+
+                totalReward = totalReward.add(
+                    stakeInfos[stakeAddresses[k]].endBlock
+                    .sub(stakeInfos[stakeAddresses[k - 1]].endBlock)
+                    .mul(blockTotalReward)
+                    .mul(totalcheck.balance)
+                    .div(stakeEndBlockTotal[stakeInfos[stakeAddresses[k]].endBlock])
+                );
             }
-            totalReward +=
-                ((stakeInfos[stakeAddresses[0]].endBlock -
-                    stakeInfos[stakeAddresses[0]].startBlcok) *
-                    blockTotalReward *
-                    totalcheck.balance) /
-                stakeEndBlockTotal[stakeInfos[stakeAddresses[0]].endBlock];
+            // totalReward +=
+            //     ((stakeInfos[stakeAddresses[0]].endBlock -
+            //         stakeInfos[stakeAddresses[0]].startBlcok) *
+            //         blockTotalReward *
+            //         totalcheck.balance) /
+            //     stakeEndBlockTotal[stakeInfos[stakeAddresses[0]].endBlock];
+            totalReward = totalReward.add(
+                stakeInfos[stakeAddresses[0]].endBlock
+                    .sub(stakeInfos[stakeAddresses[0]].startBlcok)
+                    .mul(blockTotalReward)
+                    .mul(totalcheck.balance)
+                    .div(stakeEndBlockTotal[stakeInfos[stakeAddresses[0]].endBlock])
+            );
 
             totalcheck.totalRewardAmount = totalReward;
         }
@@ -281,20 +289,16 @@ contract Stake1Vault is AccessControl {
             "zero"
         );
         require(
-            stakeInfo.totalRewardAmount >=
-                stakeInfo.claimRewardAmount + _amount,
-            "claim amount exceeds"
+            stakeInfo.totalRewardAmount > 0,
+            "totalRewardAmount is zero"
         );
         require(
-            stakeInfo.totalRewardAmount > 0 &&
-                (stakeInfo.totalRewardAmount -
-                    stakeInfo.claimRewardAmount -
-                    _amount) >
-                0,
-            "amount is wrong"
+            stakeInfo.totalRewardAmount >=
+                stakeInfo.claimRewardAmount.add(_amount),
+            "claim amount exceeds"
         );
 
-        stakeInfo.claimRewardAmount += _amount;
+        stakeInfo.claimRewardAmount = stakeInfo.claimRewardAmount.add(_amount);
 
         require(fld.transfer(_to, _amount), "FLD transfer fail");
 
@@ -327,16 +331,10 @@ contract Stake1Vault is AccessControl {
         );
         require(
             stakeInfo.totalRewardAmount >=
-                stakeInfo.claimRewardAmount + _amount,
+                stakeInfo.claimRewardAmount.add(_amount),
             "amount exceeds"
         );
-        require(
-            stakeInfo.totalRewardAmount -
-                stakeInfo.claimRewardAmount -
-                _amount >
-                0,
-            "Stake1Vault: wrong"
-        );
+
         return stakeInfo.totalRewardAmount;
     }
 
@@ -345,7 +343,6 @@ contract Stake1Vault is AccessControl {
         external
         view
         returns (
-            // onlyClaimer
             uint256
         )
     {

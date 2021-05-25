@@ -17,7 +17,7 @@ contract StakeForStableCoinFactory {
         address _paytoken,
         uint256 _period,
         address owner
-    ) public returns (address) {
+    ) external returns (address) {
         require(
             _vault != address(0) && _pahse == 1,
             "StakeForStableCoinFactory: deploy init fail"
