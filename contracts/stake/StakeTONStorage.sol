@@ -8,6 +8,7 @@ contract StakeTONStorage is Stake1Storage {
     address public stakeRegistry;
     address public tokamakLayer2;
     address internal _uniswapRouter;
+    address internal npm;
 
     // tokamak
     uint256 public toTokamak;

@@ -10,20 +10,34 @@ task("swap-task", "Create pool")
   .addParam("amountOutMinimum", " ")
   .addParam("deadline")
   .addParam("path")
-  .setAction(async ({ amountIn, account, routerAddress, deadline, path }) => {
+  .addParam("tokenOut")
+  .setAction(async ({ tokenOut, amountIn, account, routerAddress, deadline, path }) => {
     const swapper = await findAccount(account);
     const router = new ethers.Contract(routerAddress, ROUTER_ABI);
+    const amountOutMinimum = 10;
+    const feeRecipient = "0xfEE0000000000000000000000000000000000000";
 
     const params = {
       recipient: swapper.address,
       path,
       amountIn,
-      amountOutMinimum: 0,
+      amountOutMinimum,
       deadline
     };
     console.log({ params });
-
-    const tx = await router.connect(swapper).exactInput(params, {
+    const sweepParams = [
+      tokenOut,
+      amountOutMinimum,
+      swapper.address,
+      // 100,
+      // feeRecipient,
+    ];
+    console.log({ sweepParams })
+    const data = [
+      router.interface.encodeFunctionData('exactInput', [params]),
+      router.interface.encodeFunctionData('sweepToken', sweepParams),
+    ];
+    const tx = await router.connect(swapper).multicall(data, {
       gasLimit: 10000000, gasPrice: 5000000000
     });
     await tx.wait();
@@ -62,6 +76,7 @@ task("rinkeby-swap-task-weth-wton", "Create pool")
     await run("swap-task", {
       routerAddress,
       account,
+      tokenOut: wton,
       path: encodePath([weth, wton], [FeeAmount.MEDIUM]),
       amountIn: amount,
       amountOutMinimum: "0",
@@ -94,7 +109,7 @@ task("rinkeby-swap-task-weth-fld", "Create pool")
   .setAction(async ({ amount }) => {
     const {
       RINKEBY_SWAP_ROUTER_ADDRESS: routerAddress,
-      RINKEBY_UNISWAP_V3_ACCOUNT: account,
+      RINKEBY_UNISWAP_V3_ACCOUNT2: account,
       RINKEBY_FLD_ADDRESS: fld,
       RINKEBY_WETH_ADDRESS: weth,
     } = process.env;
@@ -103,7 +118,7 @@ task("rinkeby-swap-task-weth-fld", "Create pool")
       routerAddress,
       account,
       path: encodePath([weth, fld], [FeeAmount.MEDIUM]),
-      amount,
+      amountIn: amount,
       amountOutMinimum: "0",
       deadline: "1000000000000",
     });

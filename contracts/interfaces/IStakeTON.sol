@@ -39,7 +39,8 @@ interface IStakeTON {
         address _wton,
         address _depositManager,
         address _seigManager,
-        address _defiAddr
+        address _defiAddr,
+        address _npm
     ) external;
 
 

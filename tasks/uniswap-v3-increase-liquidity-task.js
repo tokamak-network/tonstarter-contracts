@@ -36,25 +36,33 @@ task("increase-liquidity", "Create pool")
     console.log({ params });
 
     const tx = await npm.connect(creator).increaseLiquidity(params, {
-      gasLimit: 10000000, gasPrice: 5000000000
+      gasLimit: 10000000, gasPrice: 10000000000
     });
     await tx.wait();
   });
 
-task("rinkeby-create-pool-wton-weth", "Create pool")
-  .setAction(async () => {
+task("rinkeby-increase-liquidity-wton-weth", "Create pool")
+  .addParam("amount0", "Amount0")
+  .addParam("amount1", "Amount1")
+  .setAction(async ({ amount0, amount1 }) => {
     const {
       RINKEBY_NONFUNGIBLE_POSITION_MANAGER_ADDRESS: npmAddress,
-      RINKEBY_UNISWAP_V3_ACCOUNT: creatorAddress,
-      RINKEBY_WTON_ADDRESS: token0,
-      RINKEBY_WETH_ADDRESS: token1,
+      RINKEBY_UNISWAP_V3_ACCOUNT: account,
     } = process.env;
 
+    const tokenId = "765";
+    const deadline = "1000000000000";
+
     await run("increase-liquidity", {
+      account,
       npmAddress,
-      creatorAddress,
-      token0,
-      token1
+
+      tokenId,
+      amount0Desired: amount0,
+      amount1Desired: amount1,
+      amount0Min: "0",
+      amount1Min: "0",
+      deadline
     });
   });
 

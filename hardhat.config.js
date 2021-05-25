@@ -9,6 +9,7 @@ require("./tasks/uniswap-v3-create-pool-task");
 require("./tasks/uniswap-v3-increase-liquidity-task");
 require("./tasks/uniswap-v3-mint-position-task");
 require("./tasks/uniswap-v3-swap-task");
+require("./tasks/view-tasks");
 
 const { RINKEBY_UNISWAP_V3_ACCOUNT_PK1, RINKEBY_UNISWAP_V3_ACCOUNT_PK2 } = process.env;
 

@@ -1,5 +1,6 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity ^0.7.0;
+pragma abicoder v2;
 
 import {IIStake1Vault} from "../interfaces/IIStake1Vault.sol";
 import {IIERC20} from "../interfaces/IIERC20.sol";
@@ -7,6 +8,15 @@ import "../libraries/LibTokenStake1.sol";
 import "../libraries/LibUniswap.sol";
 import {SafeMath} from "../utils/math/SafeMath.sol";
 import "../connection/TokamakStaker.sol";
+<<<<<<< Updated upstream
+=======
+import {
+    ERC165Checker
+} from "@openzeppelin/contracts/introspection/ERC165Checker.sol";
+import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
+import "@uniswap/v3-periphery/contracts/interfaces/INonfungiblePositionManager.sol"; 
+import "@uniswap/v3-periphery/contracts/interfaces/ISwapRouter.sol"; 
+>>>>>>> Stashed changes
 
 /// @title Stake Contract
 /// @notice It can be staked in Tokamak. Can be swapped using Uniswap.
@@ -303,4 +313,92 @@ contract StakeTON is TokamakStaker {
         return (reward, startR, endR, blockTotalReward);
     }
     */
+<<<<<<< Updated upstream
+=======
+    
+    
+    struct TokenInfo {
+        uint256 tokenId;
+        uint256 
+    }
+
+    ///
+    function increaseLiquidity(
+        uint256 tokenId,
+        uint256 amount0Desired,
+        uint256 amount1Desired,
+        uint256 amount0Min,
+        uint256 amount1Min,
+        uint256 deadline
+    )
+        external
+        onlyOwner
+        returns (
+            uint128 liquidity,
+            uint256 amount0,
+            uint256 amount1
+        )
+    {
+        INonfungiblePositionManager.IncreaseLiquidityParams memory params = INonfungiblePositionManager.IncreaseLiquidityParams({
+            tokenId: tokenId,
+            amount0Desired: amount0Desired,
+            amount1Desired: amount1Desired,
+            amount0Min: amount0Min,
+            amount1Min: amount1Min,
+            deadline: deadline
+        });
+        return INonfungiblePositionManager(npm).increaseLiquidity(params);
+    }
+
+    function decreaseLiquidity(
+        uint256 tokenId,
+        uint128 liquidity,
+        uint256 amount0Min,
+        uint256 amount1Min,
+        uint256 deadline
+    ) external onlyOwner returns (uint256 amountA, uint256 amountB) {
+        INonfungiblePositionManager.DecreaseLiquidityParams memory params = INonfungiblePositionManager.DecreaseLiquidityParams({
+            tokenId: tokenId,
+            liquidity: liquidity,
+            amount0Min: amount0Min,
+            amount1Min: amount1Min,
+            deadline: deadline
+        });
+        return INonfungiblePositionManager(npm).decreaseLiquidity(params);
+    }
+
+    function exactInput(
+        uint256 amountIn,
+        uint256 amountOutMin,
+        address[] calldata path,
+        address to,
+        uint256 deadline
+    ) external onlyOwner returns (uint256[] memory amounts) {
+        return
+            IUniswapV2Router01(_uniswapRouter).swapExactTokensForTokens(
+                amountIn,
+                amountOutMin,
+                path,
+                to,
+                deadline
+            );
+    }
+
+    function swapTokensForExactTokens(
+        uint256 amountOut,
+        uint256 amountInMax,
+        address[] calldata path,
+        address to,
+        uint256 deadline
+    ) external onlyOwner returns (uint256[] memory amounts) {
+        return
+            IUniswapV2Router01(_uniswapRouter).swapTokensForExactTokens(
+                amountOut,
+                amountInMax,
+                path,
+                to,
+                deadline
+            );
+    }
+>>>>>>> Stashed changes
 }

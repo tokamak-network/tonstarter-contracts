@@ -48,10 +48,14 @@ contract TokamakStaker is StakeTONStorage, AccessControl {
     // Events
     //////////////////////////////
 
+<<<<<<< Updated upstream
     //event SetTokamak(address ton, address wton, address depositManager, address seigManager, address defiAddr);
 
     event SetRegistryNDefi(address registry, address defiAddr);
     event SetTokamakLayer2(address layer2);
+=======
+    event SetTokamak(address ton, address wton, address depositManager, address seigManager, address defiAddr, address npm);
+>>>>>>> Stashed changes
     event SetUniswapRouter(address router);
     /*
     event tokamakStaked(address layer2, uint256 amount);
@@ -65,7 +69,8 @@ contract TokamakStaker is StakeTONStorage, AccessControl {
         address _wton,
         address _depositManager,
         address _seigManager,
-        address _defiAddr
+        address _defiAddr,
+        address _npm
     ) external onlyOwner
         nonZero(_ton)
         nonZero(_wton)
@@ -78,8 +83,9 @@ contract TokamakStaker is StakeTONStorage, AccessControl {
         seigManager = _seigManager;
         _uniswapRouter = _defiAddr;
         tokamakLayer2 = address(0);
+        npm = _npm;
 
-        emit SetTokamak(ton, wton, depositManager, seigManager, _defiAddr);
+        emit SetTokamak(ton, wton, depositManager, seigManager, _defiAddr, npm);
     }
     */
     function setRegistryNDefi(

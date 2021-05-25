@@ -45,7 +45,7 @@ task("rinkeby-approve-wton", "Approves amount to WTON")
   .addParam("amount", "Amount")
   .setAction(async ({ amount }) => {
     const {
-      RINKEBY_UNISWAP_V3_ACCOUNT: account,
+      RINKEBY_UNISWAP_V3_ACCOUNT2: account,
       RINKEBY_NONFUNGIBLE_POSITION_MANAGER_ADDRESS: npmAddress,
       RINKEBY_WTON_ADDRESS: tokenAddress,
     } = process.env;
@@ -78,8 +78,9 @@ task("rinkeby-approve-weth", "Approves amount to WETH")
   .addParam("amount", "Amount")
   .setAction(async ({ amount }) => {
     const {
-      RINKEBY_UNISWAP_V3_ACCOUNT: account,
+      RINKEBY_UNISWAP_V3_ACCOUNT2: account,
       RINKEBY_NONFUNGIBLE_POSITION_MANAGER_ADDRESS: npmAddress,
+      RINKEBY_SWAP_ROUTER_ADDRESS: swapRouter,
       RINKEBY_WETH_ADDRESS: tokenAddress,
     } = process.env;
     await run("approve-erc20", {
