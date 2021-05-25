@@ -8,15 +8,12 @@ import "../libraries/LibTokenStake1.sol";
 import "../libraries/LibUniswap.sol";
 import {SafeMath} from "../utils/math/SafeMath.sol";
 import "../connection/TokamakStaker.sol";
-<<<<<<< Updated upstream
-=======
 import {
     ERC165Checker
 } from "@openzeppelin/contracts/introspection/ERC165Checker.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "@uniswap/v3-periphery/contracts/interfaces/INonfungiblePositionManager.sol"; 
 import "@uniswap/v3-periphery/contracts/interfaces/ISwapRouter.sol"; 
->>>>>>> Stashed changes
 
 /// @title Stake Contract
 /// @notice It can be staked in Tokamak. Can be swapped using Uniswap.
@@ -313,16 +310,7 @@ contract StakeTON is TokamakStaker {
         return (reward, startR, endR, blockTotalReward);
     }
     */
-<<<<<<< Updated upstream
-=======
-    
-    
-    struct TokenInfo {
-        uint256 tokenId;
-        uint256 
-    }
 
-    ///
     function increaseLiquidity(
         uint256 tokenId,
         uint256 amount0Desired,
@@ -332,7 +320,6 @@ contract StakeTON is TokamakStaker {
         uint256 deadline
     )
         external
-        onlyOwner
         returns (
             uint128 liquidity,
             uint256 amount0,
@@ -367,38 +354,22 @@ contract StakeTON is TokamakStaker {
         return INonfungiblePositionManager(npm).decreaseLiquidity(params);
     }
 
-    function exactInput(
+    function swapTokens(    
+        bytes path,
+        address recipient,
+        uint256 deadline,
         uint256 amountIn,
-        uint256 amountOutMin,
-        address[] calldata path,
-        address to,
-        uint256 deadline
-    ) external onlyOwner returns (uint256[] memory amounts) {
-        return
-            IUniswapV2Router01(_uniswapRouter).swapExactTokensForTokens(
-                amountIn,
-                amountOutMin,
-                path,
-                to,
-                deadline
-            );
+        uint256 amountOutMinimum,
+        address tokenOut
+    ) external {
+        IUniswapRouter.ExactInputParams memory params = ISwapRouter.ExactInputParams({
+            path: path,
+            recipient: recipient,
+            deadline: deadline,
+            amountIn: amountIn,
+            amountOutMinimum
+        });
+        IUniswapRouter(swapRouter).exactInput(params);
+        IUniswapRouter(swapRouter).sweepToken(tokenOut, amountOutMinimum, recipient);
     }
-
-    function swapTokensForExactTokens(
-        uint256 amountOut,
-        uint256 amountInMax,
-        address[] calldata path,
-        address to,
-        uint256 deadline
-    ) external onlyOwner returns (uint256[] memory amounts) {
-        return
-            IUniswapV2Router01(_uniswapRouter).swapTokensForExactTokens(
-                amountOut,
-                amountInMax,
-                path,
-                to,
-                deadline
-            );
-    }
->>>>>>> Stashed changes
 }
