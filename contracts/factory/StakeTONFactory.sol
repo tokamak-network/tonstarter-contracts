@@ -5,7 +5,6 @@ pragma solidity ^0.7.6;
 contract StakeTONFactory {
 
     address public stakeTONProxyFactory;
-    //address public stakeTONLogicFactory;
     address public stakeTONLogic;
 
 
@@ -27,14 +26,6 @@ contract StakeTONFactory {
         address owner
     ) external returns (address) {
 
-        // used gas limit 2,672,614
-        // used gas 2,631,878   1000000
-        // (bool success1, bytes memory returnData1) = stakeTONLogicFactory.call(abi.encodeWithSignature("deploy()"));
-        // require(success1,"stakeTONLogicFactory fail");
-        // address logic = abi.decode(returnData1, (address)) ;
-
-        // gas limit 1,733,511
-        // used gas 1,693,642 {gas: gasleft()}
         (bool success, bytes memory returnData) = stakeTONProxyFactory.call(
             abi.encodeWithSignature("deploy(address,address[4],address,uint256[3],address)",
             stakeTONLogic,

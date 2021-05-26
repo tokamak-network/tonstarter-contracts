@@ -3,7 +3,6 @@ pragma solidity ^0.7.6;
 
 interface IStakeFactory {
     function create(
-        uint256 _pahse,
         uint256 stakeType,
         address[4] memory _addr,
         address registry,

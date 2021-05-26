@@ -6,11 +6,11 @@ import {IIERC20} from "../interfaces/IIERC20.sol";
 import "../libraries/LibTokenStake1.sol";
 import {SafeMath} from "../utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
-import "../stake/StakeTONStorage.sol";
+import "../stake/Stake1Storage.sol";
 
 /// @title Simple Stake Contract
 /// @notice Stake contracts can interact with the vault to claim fld tokens
-contract StakeSimple is StakeTONStorage, AccessControl  {
+contract StakeSimple is Stake1Storage, AccessControl  {
     using SafeMath for uint256;
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
 
@@ -204,25 +204,20 @@ contract StakeSimple is StakeTONStorage, AccessControl  {
                 for (uint256 i = 0; i < orderedEndBlocks.length; i++) {
                     _end = orderedEndBlocks[i];
                     _total = IIStake1Vault(vault).stakeEndBlockTotal(_end);
-                    uint256 _period = endR.sub(startR);
 
                     if (_start > _end) {
 
                     } else if (endR <= _end) {
-                        // reward +=
-                        //     (blockTotalReward *
-                        //         (endR - startR) * amount) /
-                        //     _total;
-                        reward = reward.add(blockTotalReward.mul(_period).mul(amount).div(_total));
+                        if(_total > 0){
+                            uint256 _period1 = endR.sub(startR);
+                            reward = reward.add(blockTotalReward.mul(_period1).mul(amount).div(_total));
+                        }
                         break;
                     } else {
-                        // reward +=
-                        //     (blockTotalReward *
-                        //         (_end - startR) *
-                        //         amount) /
-                        //     _total;
-                        reward = reward.add(blockTotalReward.mul(_period).mul(amount).div(_total));
-
+                        if(_total > 0){
+                            uint256 _period2 = _end.sub(startR);
+                            reward = reward.add(blockTotalReward.mul(_period2).mul(amount).div(_total));
+                        }
                         startR = _end;
                     }
                 }

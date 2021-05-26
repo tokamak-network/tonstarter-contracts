@@ -3,6 +3,10 @@ pragma solidity ^0.7.6;
 
 interface IIDepositManager {
 
+    function globalWithdrawalDelay() external
+        view
+        returns (uint256 withdrawalDelay);
+
     function accStaked(address layer2, address account)
         external
         view

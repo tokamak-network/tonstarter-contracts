@@ -2,7 +2,7 @@
 pragma solidity ^0.7.6;
 
 library LibTokenStake1 {
-    enum DefiStatus { NONE, APPROVE, DEPOSITED, REQUESTWITHDRAW, WITHDRAW, END }
+    enum DefiStatus { NONE, APPROVE, DEPOSITED, REQUESTWITHDRAW, REQUESTWITHDRAWALL, WITHDRAW, END }
 
     struct StakeInfo {
         string name;
@@ -19,6 +19,7 @@ library LibTokenStake1 {
         uint256 claimedAmount;
         uint256 releasedBlock;
         uint256 releasedAmount;
+        uint256 releasedFLDAmount;
         bool released;
     }
 

@@ -19,7 +19,7 @@ contract StakeTON is TokamakStaker {
     //////////////////////////////
     event Staked(address indexed to, uint256 amount);
     event Claimed(address indexed to, uint256 amount, uint256 currentBlcok);
-    event Withdrawal(address indexed to, uint256 amount);
+    event Withdrawal(address indexed to, uint256 tonAmount, uint256 fldAmount);
 
     constructor() {
         _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
@@ -84,8 +84,8 @@ contract StakeTON is TokamakStaker {
             );
 
         emit Staked(msg.sender, amount);
-    } 
-    
+    }
+
     /// @dev To withdraw
     function withdraw() external {
         require(
@@ -110,12 +110,18 @@ contract StakeTON is TokamakStaker {
         staked.releasedBlock = block.number;
         staked.released = true;
 
-        if (paytoken != ton) {
-            require(staked.releasedAmount <= staked.amount,"Amount wrong");
-        } else if (paytoken == ton) {
-            //amount = ((totalStakedAmount - toTokamak) + (fromTokamak / 10 ** 9)) * staked.amount / totalStakedAmount;
+        if (paytoken == ton) {
             amount = totalStakedAmount.sub(toTokamak).add(fromTokamak.div(10 ** 9)).mul(staked.amount).div(totalStakedAmount);
+            uint256 swappedFLD = swappedAmountFLD.mul(staked.amount).div(totalStakedAmount);
+
+            if (swappedAmountFLD > 0 && swappedFLD > 0 &&
+                swappedFLD <= IIERC20(token).balanceOf(address(this)) ){
+                staked.releasedFLDAmount = swappedFLD;
+            }
+        } else {
+            require(staked.releasedAmount <= staked.amount,"Amount wrong");
         }
+
         require(amount > 0 , "Amount wrong" );
         staked.releasedAmount = amount;
 
@@ -131,11 +137,18 @@ contract StakeTON is TokamakStaker {
                 IIERC20(paytoken).transfer(msg.sender, amount),
                 "transfer fail"
             );
+
+            if (staked.releasedFLDAmount > 0) {
+                require(
+                    IIERC20(token).transfer(msg.sender, staked.releasedFLDAmount),
+                    "transfer fld fail"
+                );
+            }
         }
 
-        emit Withdrawal(msg.sender, amount);
-    } 
-    
+        emit Withdrawal(msg.sender, amount, staked.releasedFLDAmount);
+    }
+
     /// @dev Claim for reward
     function claim() external lock {
         require(
@@ -166,7 +179,7 @@ contract StakeTON is TokamakStaker {
 
         emit Claimed(msg.sender, rewardClaim, block.number);
     }
-      
+
     /// @dev Returns the amount that can be rewarded
     //function canRewardAmount(address account) public view returns (uint256) {
     function canRewardAmount(address account, uint256 specilaBlock)
@@ -206,26 +219,18 @@ contract StakeTON is TokamakStaker {
                 for (uint256 i = 0; i < orderedEndBlocks.length; i++) {
                     _end = orderedEndBlocks[i];
                     _total = IIStake1Vault(vault).stakeEndBlockTotal(_end);
-                    uint256 _period1 = endR.sub(startR);
-                    uint256 _period2 = _end.sub(startR);
+
                     if (_start > _end) {
 
                     } else if (endR <= _end) {
-                        // reward +=
-                        //     (blockTotalReward *
-                        //         (endR - startR) * amount) /
-                        //     _total;
-                        if(_total > 0){ 
+                        if(_total > 0){
+                            uint256 _period1 = endR.sub(startR);
                             reward = reward.add(blockTotalReward.mul(_period1).mul(amount).div(_total));
                         }
                         break;
                     } else {
-                        // reward +=
-                        //     (blockTotalReward *
-                        //         (_end - startR) *
-                        //         amount) /
-                        //     _total;
-                        if(_total > 0){ 
+                        if(_total > 0){
+                            uint256 _period2 = _end.sub(startR);
                             reward = reward.add(blockTotalReward.mul(_period2).mul(amount).div(_total));
                         }
                         startR = _end;
@@ -235,7 +240,7 @@ contract StakeTON is TokamakStaker {
         }
         return reward;
     }
-    /* 
+    /*
     function canRewardAmountTest(address account, uint256 specilaBlock)
         public view
         returns (uint256, uint256, uint256, uint256)

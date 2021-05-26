@@ -3,13 +3,6 @@ pragma solidity ^0.7.6;
 
 import {IStakeSimpleFactory} from "../interfaces/IStakeSimpleFactory.sol";
 import {IStakeTONFactory1} from "../interfaces/IStakeTONFactory1.sol";
-import {IStakeProxy} from "../interfaces/IStakeProxy.sol";
-import {IStakeTON} from "../interfaces/IStakeTON.sol";
-
-import {
-    IStakeForStableCoinFactory
-} from "../interfaces/IStakeForStableCoinFactory.sol";
-import {IStake1Vault} from "../interfaces/IStake1Vault.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 
 contract StakeFactory is AccessControl{
@@ -17,7 +10,7 @@ contract StakeFactory is AccessControl{
 
     address public stakeSimpleFactory;
     address public stakeTONFactory;
-    address public stakeStableCoinFactory;
+    address public stakeDefiFactory;
 
     modifier onlyOwner() {
         require(
@@ -34,16 +27,16 @@ contract StakeFactory is AccessControl{
     constructor(
         address _stakeSimpleFactory,
         address _stakeTONFactory,
-        address _stableFactory
+        address _stakeDefiFactory
     ) {
         require(
             _stakeSimpleFactory != address(0) &&
-            _stakeTONFactory != address(0) && _stableFactory != address(0),
+            _stakeTONFactory != address(0),
             "StakeFactory: init fail"
         );
         stakeSimpleFactory = _stakeSimpleFactory;
         stakeTONFactory = _stakeTONFactory;
-        stakeStableCoinFactory = _stableFactory;
+        stakeDefiFactory = _stakeDefiFactory;
         _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
         _setupRole(ADMIN_ROLE, msg.sender);
     }
@@ -64,16 +57,15 @@ contract StakeFactory is AccessControl{
         stakeTONFactory = _stakeTONFactory;
     }
 
-    function setStakeStableCoinFactory(address _stakeStableCoinFactory)
+    function setStakeDefiFactory(address _stakeDefiFactory)
         public
         onlyOwner
-        nonZero(_stakeStableCoinFactory)
+        nonZero(_stakeDefiFactory)
     {
-        stakeStableCoinFactory = _stakeStableCoinFactory;
+        stakeDefiFactory = _stakeDefiFactory;
     }
 
     function create(
-        uint256 _pahse,
         uint256 stakeType,
         address[4] memory _addr,
         address registry,

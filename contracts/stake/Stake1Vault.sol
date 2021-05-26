@@ -20,8 +20,6 @@ contract Stake1Vault is StakeVaultStorage  {
     bytes32 public constant ZERO_HASH =
         0x0000000000000000000000000000000000000000000000000000000000000000;
 
-
-
     //////////////////////////////
     // Events
     //////////////////////////////
@@ -160,23 +158,19 @@ contract Stake1Vault is StakeVaultStorage  {
         realEndBlock = stakeEndBlock;
 
         // check balance, update balance
-        for (uint256 i = stakeAddresses.length-1; i > 0; i--) {
+        for (uint256 i = 0; i < stakeAddresses.length; i++) {
             LibTokenStake1.StakeInfo storage stakeInfo = stakeInfos[stakeAddresses[i]];
             if (paytoken == address(0)) {
                 stakeInfo.balance = address(uint160(stakeAddresses[i])).balance;
             } else {
-                stakeInfo.balance = IERC20(paytoken).balanceOf(stakeAddresses[i]);
+                (bool success, bytes memory returnData) = paytoken.call(abi.encodeWithSignature("balanceOf(address)", stakeAddresses[i]));
+                require(success, "balance call fail");
+                uint256 balanceAmount = abi.decode(returnData, (uint256));
+                stakeInfo.balance = balanceAmount;
             }
-            if(stakeInfo.balance == 0) realEndBlock = stakeInfos[stakeAddresses[i-1]].endBlock;
-            else break;
+            if(stakeInfo.balance > 0) realEndBlock = stakeInfos[stakeAddresses[i]].endBlock;
         }
 
-        LibTokenStake1.StakeInfo storage stakeInfo1 = stakeInfos[stakeAddresses[0]];
-        if (paytoken == address(0)) {
-            stakeInfo1.balance = address(uint160(stakeAddresses[0])).balance;
-        } else {
-            stakeInfo1.balance = IERC20(paytoken).balanceOf(stakeAddresses[0]);
-        }
         blockTotalReward = cap.div(realEndBlock.sub(stakeStartBlock));
 
         uint256 sum = 0;
@@ -319,7 +313,7 @@ contract Stake1Vault is StakeVaultStorage  {
         return orderedEndBlocks;
     }
 
-    /// @dev Total reward amount
+    /// @dev Total reward amount of stakeContract
     function totalRewardAmount(address _account)
         external
         view
