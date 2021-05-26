@@ -311,10 +311,12 @@ describe("Phase1. StakeContract with TON", function () {
     });
 
     it("3. If the sales closing function is not performed, cannot requestWithdraw to Tokamak.", async function () {
+      let wtonAmount = utils.parseUnits('1', 27);
       await expect(
-        stakeEntry.tokamakRequestUnStakingReward(
+        stakeEntry.tokamakRequestUnStaking(
           stakeAddresses[0],
           layer2.address,
+          wtonAmount,
           { from: user1 }
         )
       ).to.be.revertedWith("different layer");
@@ -469,15 +471,17 @@ describe("Phase1. StakeContract with TON", function () {
 
     it("2. can request withdrawal of a reward TON in tokamak.", async function () {
       let i = 0;
+      let wtonAmount = utils.parseUnits('1', 27);
       requestBlock = await time.latestBlock();
       requestBlock = parseInt(requestBlock)+1;
       const pendingUnstaked1 = await depositManager.pendingUnstaked(
         layer2.address,
         stakeAddresses[i]
       );
-      await stakeEntry.tokamakRequestUnStakingReward(
+      await stakeEntry.tokamakRequestUnStaking(
             stakeAddresses[i],
             layer2.address,
+            wtonAmount,
             { from: user1 }
         );
       const pendingUnstaked2 = await depositManager.pendingUnstaked(
@@ -545,9 +549,13 @@ describe("Phase1. StakeContract with TON", function () {
         layer2.address,
         stakeAddresses[i]
       );
-      await stakeEntry.tokamakRequestUnStakingAll(
+
+      let wtonAmount = await seigManager.stakeOf(layer2.address, stakeAddresses[i]);
+
+      await stakeEntry.tokamakRequestUnStaking(
             stakeAddresses[i],
             layer2.address,
+            wtonAmount,
             { from: user1 }
         );
       const pendingUnstaked2 = await depositManager.pendingUnstaked(
@@ -688,9 +696,10 @@ describe("Phase1. StakeContract with TON", function () {
         );
 
         if(stakeOf.gt(toBN(0))){
-           await stakeEntry.tokamakRequestUnStakingAll(
+           await stakeEntry.tokamakRequestUnStaking(
               stakeAddresses[i],
               layer2.address,
+              stakeOf,
               { from: user1 }
           );
         }
