@@ -98,6 +98,8 @@ contract StakeDefiProxy is Stake1Storage, AccessControl {
         paytoken = _addr[1];
         vault = _addr[2];
 
+        stakeRegistry = _registry;
+
         saleStartBlock = _intdata[0];
         startBlock = _intdata[1];
         endBlock = startBlock + _intdata[2];

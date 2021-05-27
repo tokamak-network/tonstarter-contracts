@@ -73,7 +73,7 @@ contract StakeFactory is AccessControl {
         token = _addr[0];
         paytoken = _addr[1];
         vault = _addr[2];
-        _uniswapRouter = _addr[3];
+        _defiAddr = _addr[3];
 
         ton = _tokamak[0];
         wton = _tokamak[1];

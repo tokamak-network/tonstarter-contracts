@@ -116,6 +116,10 @@ contract StakeTON is TokamakStaker {
                 "remain amount in tokamak"
             );
         }
+        if (withdrawFlag == false) {
+            withdrawFlag = true;
+            swappedAmountFLD = IIERC20(token).balanceOf(address(this));
+        }
 
         LibTokenStake1.StakedAmount storage staked = userStaked[msg.sender];
         require(staked.released == false, "Already withdraw");
@@ -130,15 +134,17 @@ contract StakeTON is TokamakStaker {
                 .add(fromTokamak.div(10**9))
                 .mul(staked.amount)
                 .div(totalStakedAmount);
-            uint256 swappedFLD =
-                swappedAmountFLD.mul(staked.amount).div(totalStakedAmount);
 
-            if (
-                swappedAmountFLD > 0 &&
-                swappedFLD > 0 &&
-                swappedFLD <= IIERC20(token).balanceOf(address(this))
-            ) {
-                staked.releasedFLDAmount = swappedFLD;
+            if (swappedAmountFLD > 0) {
+                uint256 swappedFLD =
+                    swappedAmountFLD.mul(staked.amount).div(totalStakedAmount);
+
+                if (
+                    swappedFLD > 0 &&
+                    swappedFLD <= IIERC20(token).balanceOf(address(this))
+                ) {
+                    staked.releasedFLDAmount = swappedFLD;
+                }
             }
         } else {
             require(staked.releasedAmount <= staked.amount, "Amount wrong");

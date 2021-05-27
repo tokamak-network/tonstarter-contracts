@@ -239,7 +239,7 @@ class ICO20Contracts {
     this.fld = await FLD.new({ from: owner });
     this.sfld = await SFLD.new({ from: owner });
     //this.stakeForSFLD = await StakeForSFLD.new({ from: owner });
-    this.stakeregister = await StakeRegistry.new({ from: owner });
+    this.stakeregister = await StakeRegistry.new(this.fld.address,  { from: owner });
 
     this.stakeSimple = await StakeSimple.new({ from: owner });
     this.stakeSimpleFactory = await StakeSimpleFactory.new(

@@ -176,14 +176,21 @@ async function main() {
 
   ////////////////////////////////////////////////////////
   // For TON Vault : hashName must be specified as a unique value.
-  //  ton_vault.hashName = keccak256("TON_TEST_20210527_1640");
-  //  await createValue(ton_vault, ton);
+   ton_vault.hashName = keccak256("TON_TEST_20210527_2250");
+   await createValue(ton_vault, ton);
 
   ////////////////////////////////////////////////////////
   // For TON StakeContract of Vault
   // write your vault .
-  //  let vaultAddress ='0x9642beD260492C5A584A0Aac1A10AF448237EEeF';
+  //  let vaultAddress ='0x95a52bD51cD05AA4D92D1655B9FbAa9f28428cC4';
   //  console.log('vaultAddress',vaultAddress);
+  //  await createStakeContract(vaultAddress, periodBlockMin3,'TON_3_MIN', ton );
+  // console.log('createStakeContract periodBlockMin3 ');
+  // timeout(10000);
+  // await createStakeContract(vaultAddress, periodBlockMin5,'TON_5_MIN', ton );
+  // console.log('createStakeContract periodBlockMin5');
+  // timeout(10000);
+
   // await createStakeContract(vaultAddress, periodBlockDay1,'TON_1_DAY', ton );
   // console.log('createStakeContract periodBlockDay1 ');
   // timeout(10000);

@@ -6,6 +6,8 @@ import "../libraries/LibTokenStake1.sol";
 contract Stake1Storage {
     // reward token : FLD
     address public token;
+    // registry
+    address public stakeRegistry;
 
     // paytoken is the token that the user stakes. ( if paytoken is ether, paytoken is address(0) )
     address public paytoken;

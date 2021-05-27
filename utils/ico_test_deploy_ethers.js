@@ -208,7 +208,7 @@ class ICO20Contracts {
     this.fld = await FLD.connect(owner).deploy();
     this.sfld = await SFLD.connect(owner).deploy();
 
-    this.stakeregister = await StakeRegistry.connect(owner).deploy();
+    this.stakeregister = await StakeRegistry.connect(owner).deploy(this.fld.address);
 
     this.stake1Vault = await Stake1Vault.new({ from: owner });
     this.stakeVaultFactory = await StakeVaultFactory.connect(owner).deploy(this.stake1Vault.address);

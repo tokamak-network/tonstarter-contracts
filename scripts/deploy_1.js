@@ -79,7 +79,7 @@ async function deployMain (defaultSender) {
   const stakeFactory = await StakeFactory.deploy(stakeSimpleFactory.address, stakeTONFactory.address, stakeForStableCoinFactory.address);
   console.log('stakeFactory:', stakeFactory.address);
 
-  const stakeRegistry = await StakeRegistry.deploy();
+  const stakeRegistry = await StakeRegistry.deploy(fld.address);
   console.log('stakeRegistry:', stakeRegistry.address);
 
   const stake1Vault = await Stake1Vault.deploy();

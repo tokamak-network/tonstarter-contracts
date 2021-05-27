@@ -4,9 +4,14 @@ pragma solidity ^0.7.6;
 import "./Stake1Storage.sol";
 
 contract StakeTONStorage is Stake1Storage {
-    address public stakeRegistry;
     address public tokamakLayer2;
-    address internal _uniswapRouter;
+
+    // uniswap-v3
+    // address internal _uniswapRouter;
+    //address internal npm;
+    //bytes internal routerPath;
+    // address public wethAddress;
+    // uint256 public feeMedium;
 
     // tokamak
     uint256 public toTokamak;
@@ -16,4 +21,6 @@ contract StakeTONStorage is Stake1Storage {
     uint256 public defiStatus;
 
     uint256 public requestNum;
+
+    bool public withdrawFlag;
 }

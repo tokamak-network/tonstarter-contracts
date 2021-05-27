@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.7.6;
+pragma abicoder v2;
 import {ITON} from "../interfaces/ITON.sol";
 import {IIStake1Vault} from "../interfaces/IIStake1Vault.sol";
 import {IIDepositManager} from "../interfaces/IIDepositManager.sol";
@@ -7,6 +8,9 @@ import {IISeigManager} from "../interfaces/IISeigManager.sol";
 import {SafeMath} from "../utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "../stake/StakeTONStorage.sol";
+// import "@uniswap/v3-periphery/contracts/interfaces/INonfungiblePositionManager.sol";
+import "@uniswap/v3-periphery/contracts/interfaces/ISwapRouter.sol";
+import "@uniswap/v3-periphery/contracts/interfaces/IPeripheryPayments.sol";
 
 interface IERC20BASE {
     function totalSupply() external view returns (uint256);
@@ -34,6 +38,15 @@ interface ITokamakRegistry {
             address,
             address,
             address
+        );
+
+    function getUniswap()
+        external
+        view
+        returns (
+            address,
+            address,
+            uint256
         );
 }
 
@@ -70,9 +83,13 @@ contract TokamakStaker is StakeTONStorage, AccessControl {
     // Events
     //////////////////////////////
 
-    event SetRegistryNDefi(address registry, address defiAddr);
+    event SetRegistry(address registry);
     event SetTokamakLayer2(address layer2);
-    event SetUniswapRouter(address router);
+    event SetUniswapRouter(
+        address router,
+        address wethAddress,
+        uint256 feeMedium
+    );
 
     event tokamakStaked(address layer2, uint256 amount);
     event tokamakRequestedUnStaking(address layer2, uint256 amount);
@@ -82,30 +99,14 @@ contract TokamakStaker is StakeTONStorage, AccessControl {
         bool receiveTON
     );
 
-    function setRegistryNDefi(address _registry, address _defiAddr)
+    function setRegistry(address _registry)
         external
         onlyOwner
         nonZero(_registry)
     {
         stakeRegistry = _registry;
-        _uniswapRouter = _defiAddr;
 
-        emit SetRegistryNDefi(stakeRegistry, _defiAddr);
-    }
-
-    function setUniswapRouter(address _router) external onlyOwner {
-        // TODO: check!!
-        require(
-            block.number < saleStartBlock,
-            "TokamakStaker: Already started"
-        );
-        require(
-            _router != address(0) && _uniswapRouter != _router,
-            "TokamakStaker: zero address"
-        );
-        _uniswapRouter = _router;
-
-        emit SetUniswapRouter(_router);
+        emit SetRegistry(stakeRegistry);
     }
 
     function setTokamakLayer2(address _layer2) external onlyOwner {
@@ -124,14 +125,18 @@ contract TokamakStaker is StakeTONStorage, AccessControl {
     }
 
     function approveUniswapRouter(uint256 amount) external {
+        (, address uniswapRouter, ) =
+            ITokamakRegistry(stakeRegistry).getUniswap();
+
         require(
-            IERC20BASE(paytoken).approve(_uniswapRouter, amount),
+            uniswapRouter != address(0),
+            "TokamakStaker: uniswapRouter zero"
+        );
+
+        require(
+            IERC20BASE(paytoken).approve(uniswapRouter, amount),
             "TokamakStaker: approve fail"
         );
-    }
-
-    function uniswapRouter() public view returns (address) {
-        return _uniswapRouter;
     }
 
     function tokamakStaking(address _layer2)
@@ -252,6 +257,7 @@ contract TokamakStaker is StakeTONStorage, AccessControl {
             address depositManager,
             address seigManager
         ) = ITokamakRegistry(stakeRegistry).getTokamak();
+
         require(
             ton != address(0) &&
                 wton != address(0) &&
@@ -276,5 +282,73 @@ contract TokamakStaker is StakeTONStorage, AccessControl {
         );
 
         emit tokamakProcessedUnStaking(_layer2, rn, receiveTON);
+    }
+
+    function exchangeWTONtoFLD(
+        uint256 amountIn,
+        uint256 amountOutMinimum,
+        uint256 deadline
+    ) external returns (uint256 amountOut) {
+        require(IIStake1Vault(vault).saleClosed() == true, "not closed");
+
+        (address ton, address wton, , address seigManager) =
+            ITokamakRegistry(stakeRegistry).getTokamak();
+
+        require(
+            ton != address(0) &&
+                wton != address(0) &&
+                seigManager != address(0),
+            "tokamak zero"
+        );
+
+        (address wethAddress, address uniswapRouter, uint256 feeMedium) =
+            ITokamakRegistry(stakeRegistry).getUniswap();
+
+        require(
+            wethAddress != address(0) &&
+                uniswapRouter != address(0) &&
+                feeMedium > 0,
+            "uniswap zero"
+        );
+
+        uint256 _amount = IERC20BASE(ton).balanceOf(address(this));
+        uint256 stakeOf = 0;
+        if (tokamakLayer2 != address(0))
+            stakeOf = IISeigManager(seigManager).stakeOf(
+                tokamakLayer2,
+                address(this)
+            );
+        uint256 holdAmount = _amount;
+        if (stakeOf > 0) holdAmount = stakeOf.div(10**9).add(_amount);
+
+        require(
+            holdAmount > totalStakedAmount &&
+                holdAmount.sub(totalStakedAmount) >= amountIn,
+            "lack"
+        );
+
+        toUniswapTON += amountIn;
+        uint256 _amountIn = amountIn;
+        uint256 _deadline = deadline;
+        uint256 _amountOutMinimum = amountOutMinimum;
+        bytes memory path =
+            abi.encodePacked(wton, feeMedium, wethAddress, feeMedium, token);
+
+        ISwapRouter.ExactInputParams memory params =
+            ISwapRouter.ExactInputParams({
+                path: path,
+                recipient: msg.sender,
+                amountIn: _amountIn,
+                amountOutMinimum: _amountOutMinimum,
+                deadline: _deadline
+            });
+
+        amountOut = ISwapRouter(uniswapRouter).exactInput(params);
+
+        IPeripheryPayments(uniswapRouter).sweepToken(
+            wton,
+            _amountOutMinimum,
+            msg.sender
+        );
     }
 }
