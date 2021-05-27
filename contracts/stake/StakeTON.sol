@@ -1,5 +1,6 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity ^0.7.0;
+pragma abicoder v2;
 
 import {IIStake1Vault} from "../interfaces/IIStake1Vault.sol";
 import {IIERC20} from "../interfaces/IIERC20.sol";
@@ -7,6 +8,13 @@ import "../libraries/LibTokenStake1.sol";
 import "../libraries/LibUniswap.sol";
 import {SafeMath} from "../utils/math/SafeMath.sol";
 import "../connection/TokamakStaker.sol";
+import {
+    ERC165Checker
+} from "@openzeppelin/contracts/introspection/ERC165Checker.sol";
+import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
+import "@uniswap/v3-periphery/contracts/interfaces/INonfungiblePositionManager.sol"; 
+import "@uniswap/v3-periphery/contracts/interfaces/ISwapRouter.sol"; 
+import "@uniswap/v3-periphery/contracts/interfaces/IPeripheryPayments.sol"; 
 
 /// @title Stake Contract
 /// @notice It can be staked in Tokamak. Can be swapped using Uniswap.
@@ -303,4 +311,68 @@ contract StakeTON is TokamakStaker {
         return (reward, startR, endR, blockTotalReward);
     }
     */
+
+    function increaseLiquidity(
+        uint256 tokenId,
+        uint256 amount0Desired,
+        uint256 amount1Desired,
+        uint256 amount0Min,
+        uint256 amount1Min,
+        uint256 deadline
+    )
+        external
+        returns (
+            uint128 liquidity,
+            uint256 amount0,
+            uint256 amount1
+        )
+    {
+        INonfungiblePositionManager.IncreaseLiquidityParams memory params = INonfungiblePositionManager.IncreaseLiquidityParams({
+            tokenId: tokenId,
+            amount0Desired: amount0Desired,
+            amount1Desired: amount1Desired,
+            amount0Min: amount0Min,
+            amount1Min: amount1Min,
+            deadline: deadline
+        });
+        return INonfungiblePositionManager(npm).increaseLiquidity(params);
+    }
+
+    function decreaseLiquidity(
+        uint256 tokenId,
+        uint128 liquidity,
+        uint256 amount0Min,
+        uint256 amount1Min,
+        uint256 deadline
+    ) external onlyOwner returns (uint256 amountA, uint256 amountB) {
+        INonfungiblePositionManager.DecreaseLiquidityParams memory params = INonfungiblePositionManager.DecreaseLiquidityParams({
+            tokenId: tokenId,
+            liquidity: liquidity,
+            amount0Min: amount0Min,
+            amount1Min: amount1Min,
+            deadline: deadline
+        });
+        return INonfungiblePositionManager(npm).decreaseLiquidity(params);
+    }
+
+    function exchangeWTONtoFLD(uint256 amountIn, uint256 amountOutMinimum, uint256 deadline) external returns (uint256 amountOut){
+        address WTONAddress = 0x709bef48982Bbfd6F2D4Be24660832665F53406C;
+        address WETHAddress = 0xc778417E063141139Fce010982780140Aa0cD5Ab;
+        address FLDAddress = 0xfeeaf30B07d3267043e9EE7f26e244AdB55B3cCF;
+        uint256 feeMedium = 3000;
+
+        bytes memory path = abi.encodePacked(WTONAddress, feeMedium, WETHAddress, feeMedium, FLDAddress);
+
+
+        ISwapRouter.ExactInputParams memory params = ISwapRouter.ExactInputParams({
+            path: path,
+            recipient: msg.sender,
+            amountIn: amountIn,
+            amountOutMinimum: amountOutMinimum,
+            deadline: deadline
+        });
+
+        amountOut = ISwapRouter(_uniswapRouter).exactInput(params);
+        IPeripheryPayments(_uniswapRouter).sweepToken(WTONAddress, amountOutMinimum, msg.sender);
+    }
 }
