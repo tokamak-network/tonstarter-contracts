@@ -3,6 +3,7 @@ pragma solidity ^0.7.6;
 
 import {IStakeSimpleFactory} from "../interfaces/IStakeSimpleFactory.sol";
 import {IStakeTONFactory1} from "../interfaces/IStakeTONFactory1.sol";
+import {IStakeDefiFactory} from "../interfaces/IStakeDefiFactory.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 
 contract StakeFactory is AccessControl{
@@ -107,29 +108,25 @@ contract StakeFactory is AccessControl{
                 "stakeSimpleFactory zero"
             );
 
-            address proxy = IStakeSimpleFactory(stakeTONFactory).create(
+            address proxy = IStakeSimpleFactory(stakeSimpleFactory).create(
                  [_addr[0], _addr[1], _addr[2]], _intdata, msg.sender);
 
             return proxy;
 
-        }/*  else if (stakeType == 2) {
+        } else if (stakeType == 2) {
 
             require(
-                stakeStableCoinFactory != address(0),
-                "StakeFactory: stakeStableCoinFactory zero"
+                stakeDefiFactory != address(0),
+                "StakeFactory: stakeDefiFactory zero"
             );
 
-            return
-                IStakeForStableCoinFactory(stakeStableCoinFactory).deploy(
-                    _pahse,
-                    _vault,
-                    _token,
-                    _paytoken,
-                    _period,
-                    msg.sender
-                );
+            address proxy = IStakeDefiFactory(stakeDefiFactory).create(
+                 _addr, registry, _intdata, msg.sender);
+
+            return proxy;
+
         }
-        */
+
         return address(0);
     }
 }
