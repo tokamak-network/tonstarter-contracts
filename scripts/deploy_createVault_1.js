@@ -105,10 +105,10 @@ async function main() {
   let curBlock = await provider.getBlockNumber();
   console.log('curBlock',curBlock);
 
-  let saleStartBlock = parseInt(curBlock)+ (60*20/13);
+  let saleStartBlock = parseInt(curBlock)+ (60*5/13);
   saleStartBlock = parseInt(saleStartBlock);
 
-  let stakeStartBlock = parseInt(saleStartBlock)+ (60*20/13);
+  let stakeStartBlock = parseInt(saleStartBlock)+ (60*5/13);
   stakeStartBlock = parseInt(stakeStartBlock);
 
   let ton_vault = {
@@ -121,9 +121,21 @@ async function main() {
 
   console.log('vault',ton_vault);
 
+  let periodBlockMin2 = 60 * 2 / 13;
+  periodBlockMin2= parseInt(periodBlockMin2);
+
+  let periodBlockMin3 = 60 * 3 / 13;
+  periodBlockMin3= parseInt(periodBlockMin3);
 
   let periodBlockMin5 = 60 * 5 / 13;
   periodBlockMin5= parseInt(periodBlockMin5);
+
+  let periodBlockMin15 = 60 * 15 / 13;
+  periodBlockMin15= parseInt(periodBlockMin15);
+
+  let periodBlockMin20 = 60 * 20 / 13;
+  periodBlockMin20= parseInt(periodBlockMin20);
+
 
   let periodBlockMin30 = 60 * 30 / 13;
   periodBlockMin30= parseInt(periodBlockMin30);
@@ -146,43 +158,44 @@ async function main() {
 
   ////////////////////////////////////////////////////////
   // For TON Vault : hashName must be specified as a unique value.
-  // ton_vault.hashName = keccak256("TON_TEST_20210522_16");
-  // await createValue(ton_vault, ton);
+  //  ton_vault.hashName = keccak256("TON_TEST_20210526_1600");
+  //  await createValue(ton_vault, ton);
 
   ////////////////////////////////////////////////////////
   // For TON StakeContract of Vault
   // write your vault .
-  //  let vaultAddress ='0x57Ac4234c5E4CA367fB2b956679415d46f757CBd';
-  //  console.log('vaultAddress',vaultAddress);
-  //  await createStakeContract(vaultAddress, periodBlockMin5,'TON_5_MIN', ton );
-  //  console.log('createStakeContract TON_5_MIN');
-  //  timeout(10000);
-  //  await createStakeContract(vaultAddress, periodBlockMin30,'TON_30_MIN', ton );
-  // console.log('createStakeContract TON_30_MIN');
-  // timeout(10000);
-  //  await createStakeContract(vaultAddress, periodBlockHour1,'TON_1_HOUR', ton );
-  // console.log('createStakeContract TON_1_HOUR');
-  // timeout(10000);
-  //  await createStakeContract(vaultAddress, periodBlockHour2,'TON_2_HOUR', ton );
-  // console.log('createStakeContract TON_2_HOUR');
-  // timeout(10000);
+   let vaultAddress ='0x59fec64f4327a07bCd63585855c71E92628bcb58';
+   console.log('vaultAddress',vaultAddress);
+  await createStakeContract(vaultAddress, periodBlockMin3,'TON_3_MIN', ton );
+  console.log('createStakeContract TON_3_MIN');
+  timeout(10000);
+  await createStakeContract(vaultAddress, periodBlockMin5,'TON_5_MIN', ton );
+  console.log('createStakeContract TON_5_MIN');
+  timeout(10000);
+  await createStakeContract(vaultAddress, periodBlockMin15,'TON_15_MIN', ton );
+  console.log('createStakeContract TON_15_MIN');
+  timeout(10000);
+  await createStakeContract(vaultAddress, periodBlockMin30,'TON_30_MIN', ton );
+  console.log('createStakeContract TON_30_MIN');
+  timeout(10000);
+
   ////////////////////////////////////////////////////////
   // For Ether Vault
-  // ton_vault.hashName = keccak256("ETH_TEST_20210522_1640");
+  // ton_vault.hashName = keccak256("ETH_TEST_20210525_1500");
   // await createValue(ton_vault, zeroAddress);
 
   ////////////////////////////////////////////////////////
   // For Ether StakeContract of Vault
   // write your vault .
-  let vaultAddress ='0x564A0747511C4E0Bc67BB9e1EA9f193aB27C2E6f';
-  console.log('vaultAddress',vaultAddress);
-  await createStakeContract(vaultAddress, periodBlockMin5,'ETH_5_MIN', zeroAddress );
-  timeout(10000);
-  await createStakeContract(vaultAddress, periodBlockMin30,'ETH_30_MIN', zeroAddress );
-  timeout(10000);
-  await createStakeContract(vaultAddress, periodBlockHour1,'ETH_1_HOUR', zeroAddress );
-  timeout(10000);
-  await createStakeContract(vaultAddress, periodBlockHour2,'ETH_2_HOUR', zeroAddress );
+  // let vaultAddress ='0x7f5256fc598604f1441c01413DCa87578C632C69';
+  // console.log('vaultAddress',vaultAddress);
+  // await createStakeContract(vaultAddress, periodBlockMin5,'ETH_5_MIN', zeroAddress );
+  // timeout(10000);
+  // await createStakeContract(vaultAddress, periodBlockMin30,'ETH_30_MIN', zeroAddress );
+  // timeout(10000);
+  // await createStakeContract(vaultAddress, periodBlockHour1,'ETH_1_HOUR', zeroAddress );
+  // timeout(10000);
+  // await createStakeContract(vaultAddress, periodBlockHour2,'ETH_2_HOUR', zeroAddress );
 
 }
 

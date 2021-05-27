@@ -3,27 +3,18 @@ pragma solidity ^0.7.6;
 
 import {IStakeSimpleFactory} from "../interfaces/IStakeSimpleFactory.sol";
 import {IStakeTONFactory1} from "../interfaces/IStakeTONFactory1.sol";
-import {IStakeProxy} from "../interfaces/IStakeProxy.sol";
-import {IStakeTON} from "../interfaces/IStakeTON.sol";
-
-import {
-    IStakeForStableCoinFactory
-} from "../interfaces/IStakeForStableCoinFactory.sol";
-import {IStake1Vault} from "../interfaces/IStake1Vault.sol";
+import {IStakeDefiFactory} from "../interfaces/IStakeDefiFactory.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 
-contract StakeFactory is AccessControl{
+contract StakeFactory is AccessControl {
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
 
     address public stakeSimpleFactory;
     address public stakeTONFactory;
-    address public stakeStableCoinFactory;
+    address public stakeDefiFactory;
 
     modifier onlyOwner() {
-        require(
-            hasRole(ADMIN_ROLE, msg.sender),
-            "not an admin"
-        );
+        require(hasRole(ADMIN_ROLE, msg.sender), "not an admin");
         _;
     }
     modifier nonZero(address _addr) {
@@ -34,22 +25,21 @@ contract StakeFactory is AccessControl{
     constructor(
         address _stakeSimpleFactory,
         address _stakeTONFactory,
-        address _stableFactory
+        address _stakeDefiFactory
     ) {
         require(
-            _stakeSimpleFactory != address(0) &&
-            _stakeTONFactory != address(0) && _stableFactory != address(0),
+            _stakeSimpleFactory != address(0) && _stakeTONFactory != address(0),
             "StakeFactory: init fail"
         );
         stakeSimpleFactory = _stakeSimpleFactory;
         stakeTONFactory = _stakeTONFactory;
-        stakeStableCoinFactory = _stableFactory;
+        stakeDefiFactory = _stakeDefiFactory;
         _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
         _setupRole(ADMIN_ROLE, msg.sender);
     }
 
     function setStakeSimpleFactory(address _stakeSimpleFactory)
-        public
+        external
         onlyOwner
         nonZero(_stakeSimpleFactory)
     {
@@ -57,31 +47,27 @@ contract StakeFactory is AccessControl{
     }
 
     function setStakeTONFactory(address _stakeTONFactory)
-        public
+        external
         onlyOwner
         nonZero(_stakeTONFactory)
     {
         stakeTONFactory = _stakeTONFactory;
     }
 
-    function setStakeStableCoinFactory(address _stakeStableCoinFactory)
-        public
+    function setStakeDefiFactory(address _stakeDefiFactory)
+        external
         onlyOwner
-        nonZero(_stakeStableCoinFactory)
+        nonZero(_stakeDefiFactory)
     {
-        stakeStableCoinFactory = _stakeStableCoinFactory;
+        stakeDefiFactory = _stakeDefiFactory;
     }
 
     function create(
-        uint256 _pahse,
         uint256 stakeType,
-        address[4] memory _addr,
+        address[4] calldata _addr,
         address registry,
-        uint256[3] memory _intdata
-    )
-        external onlyOwner
-        returns (address)
-    {
+        uint256[3] calldata _intdata
+    ) external onlyOwner returns (address) {
         require(_addr[2] != address(0), "vault zero");
         /**
         token = _addr[0];
@@ -98,46 +84,51 @@ contract StakeFactory is AccessControl{
         startBlock = _intdata[1];
         endBlock = startBlock + _intdata[2];
          */
-         if (stakeType == 0) { // TON Staking
-            require(
-                stakeTONFactory != address(0),
-                "stakeTONFactory zero"
-            );
+        if (stakeType == 0) {
+            // TON Staking
+            require(stakeTONFactory != address(0), "stakeTONFactory zero");
 
-            address proxy = IStakeTONFactory1(stakeTONFactory).create(
-                 _addr, registry, _intdata, msg.sender);
+            address proxy =
+                IStakeTONFactory1(stakeTONFactory).create(
+                    _addr,
+                    registry,
+                    _intdata,
+                    msg.sender
+                );
 
             return proxy;
-
-        } else if (stakeType == 1) { // ERC20 Simple Staking
+        } else if (stakeType == 1) {
+            // ERC20 Simple Staking
             require(
                 stakeSimpleFactory != address(0),
                 "stakeSimpleFactory zero"
             );
 
-            address proxy = IStakeSimpleFactory(stakeTONFactory).create(
-                 [_addr[0], _addr[1], _addr[2]], _intdata, msg.sender);
-
-            return proxy;
-
-        }/*  else if (stakeType == 2) {
-
-            require(
-                stakeStableCoinFactory != address(0),
-                "StakeFactory: stakeStableCoinFactory zero"
-            );
-
-            return
-                IStakeForStableCoinFactory(stakeStableCoinFactory).deploy(
-                    _pahse,
-                    _vault,
-                    _token,
-                    _paytoken,
-                    _period,
+            address proxy =
+                IStakeSimpleFactory(stakeSimpleFactory).create(
+                    [_addr[0], _addr[1], _addr[2]],
+                    _intdata,
                     msg.sender
                 );
+
+            return proxy;
+        } else if (stakeType == 2) {
+            require(
+                stakeDefiFactory != address(0),
+                "StakeFactory: stakeDefiFactory zero"
+            );
+
+            address proxy =
+                IStakeDefiFactory(stakeDefiFactory).create(
+                    _addr,
+                    registry,
+                    _intdata,
+                    msg.sender
+                );
+
+            return proxy;
         }
-        */
+
         return address(0);
     }
 }

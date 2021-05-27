@@ -15,5 +15,4 @@ contract StakeProxyStorage {
     address public wton;
     address public depositManager;
     address public seigManager;
-
 }

@@ -6,19 +6,16 @@ import {IIERC20} from "../interfaces/IIERC20.sol";
 import "../libraries/LibTokenStake1.sol";
 import {SafeMath} from "../utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
-import "../stake/StakeTONStorage.sol";
+import "../stake/Stake1Storage.sol";
 
 /// @title Simple Stake Contract
 /// @notice Stake contracts can interact with the vault to claim fld tokens
-contract StakeSimple is StakeTONStorage, AccessControl  {
+contract StakeSimple is Stake1Storage, AccessControl {
     using SafeMath for uint256;
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
 
     modifier onlyOwner() {
-        require(
-            hasRole(ADMIN_ROLE, msg.sender),
-            "not an admin"
-        );
+        require(hasRole(ADMIN_ROLE, msg.sender), "not an admin");
         _;
     }
     modifier lock() {
@@ -56,7 +53,8 @@ contract StakeSimple is StakeTONStorage, AccessControl  {
         require(
             _token != address(0) &&
                 _vault != address(0) &&
-                _saleStartBlock < _startBlock, "zero"
+                _saleStartBlock < _startBlock,
+            "zero"
         );
         token = _token;
         paytoken = _paytoken;
@@ -74,26 +72,26 @@ contract StakeSimple is StakeTONStorage, AccessControl  {
             "zero"
         );
         require(
-            block.number >= saleStartBlock &&
-                block.number < startBlock,
+            block.number >= saleStartBlock && block.number < startBlock,
             "unavailable"
         );
 
         require(!IIStake1Vault(vault).saleClosed(), "not end");
 
         if (paytoken == address(0)) amount = msg.value;
-        else
-            require(
-                IIERC20(paytoken).balanceOf(msg.sender) >= amount,
-                "lack"
-            );
+        else require(IIERC20(paytoken).balanceOf(msg.sender) >= amount, "lack");
 
         LibTokenStake1.StakedAmount storage staked = userStaked[msg.sender];
+        if (staked.amount == 0) totalStakers = totalStakers.add(1);
         staked.amount = staked.amount.add(amount);
         totalStakedAmount = totalStakedAmount.add(amount);
         if (paytoken != address(0))
             require(
-                IIERC20(paytoken).transferFrom(msg.sender, address(this), amount)
+                IIERC20(paytoken).transferFrom(
+                    msg.sender,
+                    address(this),
+                    amount
+                )
             );
 
         emit Staked(msg.sender, amount);
@@ -101,14 +99,11 @@ contract StakeSimple is StakeTONStorage, AccessControl  {
 
     /// @dev To withdraw
     function withdraw() external {
-        require(
-            endBlock > 0 && endBlock < block.number,
-            "not end"
-        );
+        require(endBlock > 0 && endBlock < block.number, "not end");
 
         LibTokenStake1.StakedAmount storage staked = userStaked[msg.sender];
         require(staked.released == false, "Already withdraw");
-        require(staked.releasedAmount <= staked.amount,"Amount wrong");
+        require(staked.releasedAmount <= staked.amount, "Amount wrong");
 
         staked.released = true;
         staked.releasedBlock = block.number;
@@ -122,7 +117,6 @@ contract StakeSimple is StakeTONStorage, AccessControl  {
             require(self.balance >= amount);
             (bool success, ) = msg.sender.call{value: amount}("");
             require(success, "withdraw failed.");
-
         } else {
             require(
                 IIERC20(paytoken).transfer(msg.sender, amount),
@@ -135,10 +129,7 @@ contract StakeSimple is StakeTONStorage, AccessControl  {
 
     /// @dev Claim for reward
     function claim() external lock {
-        require(
-            IIStake1Vault(vault).saleClosed() == true,
-            "not closed"
-        );
+        require(IIStake1Vault(vault).saleClosed() == true, "not closed");
         uint256 rewardClaim = 0;
 
         LibTokenStake1.StakedAmount storage staked = userStaked[msg.sender];
@@ -167,11 +158,12 @@ contract StakeSimple is StakeTONStorage, AccessControl  {
     /// @dev Returns the amount that can be rewarded
     //function canRewardAmount(address account) public view returns (uint256) {
     function canRewardAmount(address account, uint256 specilaBlock)
-        public view
+        public
+        view
         returns (uint256)
     {
         uint256 reward = 0;
-        if(specilaBlock > endBlock ) specilaBlock = endBlock;
+        if (specilaBlock > endBlock) specilaBlock = endBlock;
 
         if (
             specilaBlock < startBlock ||
@@ -203,25 +195,26 @@ contract StakeSimple is StakeTONStorage, AccessControl  {
                 for (uint256 i = 0; i < orderedEndBlocks.length; i++) {
                     _end = orderedEndBlocks[i];
                     _total = IIStake1Vault(vault).stakeEndBlockTotal(_end);
-                    uint256 _period = endR.sub(startR);
 
-                    if (_start > _end) {
-
-                    } else if (endR <= _end) {
-                        // reward +=
-                        //     (blockTotalReward *
-                        //         (endR - startR) * amount) /
-                        //     _total;
-                        reward = reward.add(blockTotalReward.mul(_period).mul(amount).div(_total));
+                    if (_start > _end) {} else if (endR <= _end) {
+                        if (_total > 0) {
+                            uint256 _period1 = endR.sub(startR);
+                            reward = reward.add(
+                                blockTotalReward.mul(_period1).mul(amount).div(
+                                    _total
+                                )
+                            );
+                        }
                         break;
                     } else {
-                        // reward +=
-                        //     (blockTotalReward *
-                        //         (_end - startR) *
-                        //         amount) /
-                        //     _total;
-                        reward = reward.add(blockTotalReward.mul(_period).mul(amount).div(_total));
-
+                        if (_total > 0) {
+                            uint256 _period2 = _end.sub(startR);
+                            reward = reward.add(
+                                blockTotalReward.mul(_period2).mul(amount).div(
+                                    _total
+                                )
+                            );
+                        }
                         startR = _end;
                     }
                 }

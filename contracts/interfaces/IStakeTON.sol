@@ -17,9 +17,11 @@ interface IStakeTON {
 
     function endBlock() external view returns (uint256);
 
-    function rewardRaised() external view returns (uint256);
+    function rewardClaimedTotal() external view returns (uint256);
 
     function totalStakedAmount() external view returns (uint256);
+
+    function totalStakers() external view returns (uint256);
 
     function userStaked(address account)
         external
@@ -32,25 +34,18 @@ interface IStakeTON {
         uint256 _saleStartBlock,
         uint256 _startBlock,
         uint256 _period
-    ) external ;
-
-    function setTokamak(
-        address _ton,
-        address _wton,
-        address _depositManager,
-        address _seigManager,
-        address _defiAddr,
-        address _npm
     ) external;
-
 
     function stake(uint256 amount) external payable;
 
-    function claim() external ;
+    function claim() external;
 
-    function withdraw() external ;
+    function withdraw() external;
 
-    function canRewardAmount(address account, uint256 claimBlock) external view returns (uint256);
+    function canRewardAmount(address account, uint256 claimBlock)
+        external
+        view
+        returns (uint256);
 
     function onApprove(
         address owner,
@@ -67,29 +62,11 @@ interface IStakeTON {
 
     function tokamakStaking(address _layer2) external;
 
-    function tokamakRequestUnStakingAll(address _layer2) external;
+    function tokamakRequestUnStaking(address _layer2, uint256 amount) external;
 
-    function tokamakRequestUnStakingReward(address _layer2) external;
+    // function tokamakRequestUnStakingAll(address _layer2) external;
+
+    // function tokamakRequestUnStakingReward(address _layer2) external;
 
     function tokamakProcessUnStaking(address _layer2, bool receiveTON) external;
-
-    function tokamakPendingUnstaked(address _layer2)
-        external
-        view
-        returns (uint256 wtonAmount);
-
-    function tokamakAccStaked(address _layer2)
-        external
-        view
-        returns (uint256 wtonAmount);
-
-    function tokamakAccUnstaked(address _layer2)
-        external
-        view
-        returns (uint256 wtonAmount);
-
-    function tokamakStakeOf(address _layer2)
-        external
-        view
-        returns (uint256 wtonAmount);
 }

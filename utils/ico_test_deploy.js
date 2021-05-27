@@ -48,6 +48,14 @@ const StakeTONFactory = contract.fromArtifact("StakeTONFactory");
 const StakeForStableCoinFactory = contract.fromArtifact(
   "StakeForStableCoinFactory"
 );
+
+const StakeSimple = contract.fromArtifact("StakeSimple");
+const StakeSimpleFactory = contract.fromArtifact("StakeSimpleFactory");
+const StakeVaultFactory = contract.fromArtifact("StakeVaultFactory");
+
+const StakeTONLogic = contract.fromArtifact("StakeTON");
+const StakeTONProxyFactory = contract.fromArtifact("StakeTONProxyFactory");
+
 const StakeFactory = contract.fromArtifact("StakeFactory");
 const StakeRegistry = contract.fromArtifact("StakeRegistry");
 const FLD = contract.fromArtifact("FLD");
@@ -212,7 +220,10 @@ class ICO20Contracts {
     // console.log(' initializeICO20Contracts owner:',owner );
     this.fld = null;
     this.sfld = null;
-    //this.stakeForSFLD = null;
+
+    this.stakeVaultFactory = null;
+    this.stakeSimpleFactory = null;
+
     this.stakeTONfactory = null;
     this.stakeForStableCoinFactory = null;
 
@@ -230,13 +241,22 @@ class ICO20Contracts {
     //this.stakeForSFLD = await StakeForSFLD.new({ from: owner });
     this.stakeregister = await StakeRegistry.new({ from: owner });
 
-    this.stakeTONLogicFactory = await StakeTONLogicFactory.new({ from: owner });
-    this.stakeTONProxyFactory = await StakeTONProxyFactory.new({ from: owner });
+    this.stakeSimple = await StakeSimple.new({ from: owner });
+    this.stakeSimpleFactory = await StakeSimpleFactory.new(
+      this.stakeSimple.address,
+      { from: owner });
 
+    this.stake1Vault = await Stake1Vault.new({ from: owner });
+    this.stakeVaultFactory = await StakeVaultFactory.new(
+      this.stake1Vault.address,
+      { from: owner });
+
+    this.stakeTONLogic = await StakeTONLogic.new({ from: owner });
+    this.stakeTONProxyFactory = await StakeTONProxyFactory.new({ from: owner });
 
     this.stakeTONfactory = await StakeTONFactory.new(
       this.stakeTONProxyFactory.address,
-      this.stakeTONLogicFactory.address,
+      this.stakeTONLogic.address,
       { from: owner });
 
     this.stakeForStableCoinFactory = await StakeForStableCoinFactory.new({
@@ -244,6 +264,7 @@ class ICO20Contracts {
     });
 
     this.stakefactory = await StakeFactory.new(
+      this.stakeSimpleFactory.address,
       this.stakeTONfactory.address,
       this.stakeForStableCoinFactory.address,
       { from: owner }
@@ -432,6 +453,7 @@ class ICO20Contracts {
       this.fld.address,
       this.stakeregister.address,
       this.stakefactory.address,
+      this.stakeVaultFactory.address,
       this.ton.address,
       this.wton.address,
       this.depositManager.address,
@@ -439,9 +461,18 @@ class ICO20Contracts {
       { from: owner }
     );
 
+    await this.stakeregister.setTokamak(
+      this.ton.address,
+      this.wton.address,
+      this.depositManager.address,
+      this.seigManager.address
+      );
+
     await this.stakeregister.grantRole(ADMIN_ROLE, this.stake1proxy.address, {
       from: owner,
     });
+
+    await this.stakefactory.grantRole(ADMIN_ROLE, this.stake1proxy.address);
 
     return this.stakeEntry;
   };
@@ -726,6 +757,7 @@ class ICO20Contracts {
     const saleStartBlock = await vault.saleStartBlock();
     const stakeStartBlock = await vault.stakeStartBlock();
     const stakeEndBlock = await vault.stakeEndBlock();
+    const realEndBlock = await vault.realEndBlock();
     const blockTotalReward = await vault.blockTotalReward();
     const saleClosed = await vault.saleClosed();
     const orderedEndBlocks = await vault.orderedEndBlocksAll();
@@ -736,6 +768,7 @@ class ICO20Contracts {
     console.log("saleStartBlock", saleStartBlock.toString());
     console.log("stakeStartBlock", stakeStartBlock.toString());
     console.log("stakeEndBlock", stakeEndBlock.toString());
+    console.log("realEndBlock", realEndBlock.toString());
     console.log(
       "global reward per block",
       utils.formatUnits(blockTotalReward.toString(), 18)
@@ -761,6 +794,7 @@ class ICO20Contracts {
       const endBlock = await stakeContract.endBlock();
       const rewardClaimedTotal = await stakeContract.rewardClaimedTotal();
       const totalStakedAmount = await stakeContract.totalStakedAmount();
+
 
       let payTokenBalance = toBN("0");
       if (paytoken == zeroAddress) {
@@ -810,11 +844,13 @@ class ICO20Contracts {
     const saleClosed = await vault.saleClosed();
     const orderedEndBlocks = await vault.orderedEndBlocksAll();
     const stakeAddresses = await vault.stakeAddressesAll();
-
+    const realEndBlock = await vault.realEndBlock();
     console.log("cap", utils.formatUnits(cap.toString(), 18));
     console.log("paytoken", paytoken);
     console.log("saleStartBlock", saleStartBlock.toString());
     console.log("stakeStartBlock", stakeStartBlock.toString());
+    console.log("realEndBlock", realEndBlock.toString());
+
     console.log("stakeEndBlock", stakeEndBlock.toString());
     console.log(
       "blockTotalReward",
@@ -876,7 +912,7 @@ class ICO20Contracts {
       );
 
       console.log(" name", stakeInfo.name);
-      console.log(" startBlcok", stakeInfo.startBlcok.toString());
+      console.log(" startBlock", stakeInfo.startBlock.toString());
       console.log(" endBlock", stakeInfo.endBlock.toString());
       console.log(
         " balance",
@@ -891,8 +927,8 @@ class ICO20Contracts {
         utils.formatUnits(stakeInfo.claimRewardAmount.toString(), 18)
       );
 
-      await logUserStaked(_contract, user1, "user1");
-      await logUserStaked(_contract, user2, "user2");
+      await this.logUserStaked(_contract, user1, "user1");
+      await this.logUserStaked(_contract, user2, "user2");
     }
   }
 

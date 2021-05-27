@@ -1,27 +1,31 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.7.6;
 
-import "@openzeppelin/contracts/access/AccessControl.sol";
-import "./StakeProxyStorage.sol";
+//import "@openzeppelin/contracts/access/AccessControl.sol";
+import "./StakeVaultStorage.sol";
 
 /// @title Proxy for Stake contracts in Phase 1
 /// @notice
-contract Stake1Proxy is StakeProxyStorage, AccessControl {
-    bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
+contract StakeVaultProxy is StakeVaultStorage {
+    //bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
     address internal _implementation;
     bool public pauseProxy;
 
     event Upgraded(address indexed implementation);
 
-    modifier onlyOwner() {
-        require(hasRole(ADMIN_ROLE, msg.sender), "no admin");
-        _;
-    }
+    // modifier onlyOwner() {
+    //     require(
+    //         hasRole(ADMIN_ROLE, msg.sender),
+    //         "no admin"
+    //     );
+    //     _;
+    // }
 
-    constructor() {
+    constructor(address impl) {
         _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
         _setupRole(ADMIN_ROLE, msg.sender);
         _setupRole(ADMIN_ROLE, address(this));
+        _implementation = impl;
     }
 
     /// @notice Set pause state
@@ -78,5 +82,36 @@ contract Stake1Proxy is StakeProxyStorage, AccessControl {
                     return(0, returndatasize())
                 }
         }
+    }
+
+    function initialize(
+        address _fld,
+        address _paytoken,
+        uint256 _cap,
+        uint256 _saleStartBlock,
+        uint256 _stakeStartBlock,
+        address _stakefactory,
+        uint256 _stakeType,
+        address _defiAddr
+    ) external onlyOwner {
+        require(
+            _fld != address(0) && _stakefactory != address(0),
+            "Stake1Vault: input is zero"
+        );
+        require(_cap > 0, "Stake1Vault: _cap is zero");
+        require(
+            _saleStartBlock < _stakeStartBlock && _stakeStartBlock > 0,
+            "Stake1Vault: startBlock is unavailable"
+        );
+
+        fld = IFLD(_fld);
+        cap = _cap;
+        paytoken = _paytoken;
+        saleStartBlock = _saleStartBlock;
+        stakeStartBlock = _stakeStartBlock;
+        stakeType = _stakeType;
+        defiAddr = _defiAddr;
+
+        grantRole(ADMIN_ROLE, _stakefactory);
     }
 }

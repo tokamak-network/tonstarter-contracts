@@ -2,5 +2,5 @@
 pragma solidity ^0.7.6;
 
 interface IProxy {
-   function upgradeTo(address impl) external;
+    function upgradeTo(address impl) external;
 }

@@ -27,6 +27,8 @@ contract Stake1Storage {
     // information staked by user
     mapping(address => LibTokenStake1.StakedAmount) public userStaked;
 
-    uint256 internal _lock;
+    // total stakers
+    uint256 public totalStakers;
 
+    uint256 internal _lock;
 }

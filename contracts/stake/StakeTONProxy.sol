@@ -20,10 +20,7 @@ contract StakeTONProxy is StakeTONStorage, AccessControl, OnApprove {
     event Upgraded(address indexed implementation);
 
     modifier onlyOwner() {
-        require(
-            hasRole(ADMIN_ROLE, msg.sender),
-            "not an admin"
-        );
+        require(hasRole(ADMIN_ROLE, msg.sender), "not an admin");
         _;
     }
 
@@ -140,12 +137,11 @@ contract StakeTONProxy is StakeTONStorage, AccessControl, OnApprove {
         );
 
         require(!IStake1Vault(vault).saleClosed(), "not end");
-        require(
-                IIERC20(paytoken).balanceOf(_owner) >= _amount,
-                "lack"
-            );
+        require(IIERC20(paytoken).balanceOf(_owner) >= _amount, "lack");
 
         LibTokenStake1.StakedAmount storage staked = userStaked[_owner];
+        if (staked.amount == 0) totalStakers = totalStakers.add(1);
+
         staked.amount = staked.amount.add(_amount);
         totalStakedAmount = totalStakedAmount.add(_amount);
         require(
@@ -163,7 +159,8 @@ contract StakeTONProxy is StakeTONStorage, AccessControl, OnApprove {
         require(
             _registry != address(0) &&
                 _addr[2] != address(0) &&
-                _intdata[0] < _intdata[1], "setInit fail"
+                _intdata[0] < _intdata[1],
+            "setInit fail"
         );
         token = _addr[0];
         paytoken = _addr[1];
@@ -178,5 +175,4 @@ contract StakeTONProxy is StakeTONStorage, AccessControl, OnApprove {
         startBlock = _intdata[1];
         endBlock = startBlock.add(_intdata[2]);
     }
-
 }

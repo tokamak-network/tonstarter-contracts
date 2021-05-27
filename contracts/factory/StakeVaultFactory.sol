@@ -1,17 +1,24 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.7.6;
 
-import {Stake1Vault} from "../stake/Stake1Vault.sol";
+//import {Stake1Vault} from "../stake/Stake1Vault.sol";
+import {StakeVaultProxy} from "../stake/StakeVaultProxy.sol";
 
 contract StakeVaultFactory {
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
-    function create
-    (
+
+    address public stakeVaultLogic;
+
+    constructor(address _stakeVaultLogic) {
+        require(_stakeVaultLogic != address(0), "StakeVaultFactory zero");
+        stakeVaultLogic = _stakeVaultLogic;
+    }
+
+    function create(
         address[4] memory _addr,
         uint256[4] memory _intInfo,
         address owner
     ) external returns (address) {
-
         address _fld = _addr[0];
         address _paytoken = _addr[1];
         address _stakefactory = _addr[2];
@@ -21,8 +28,12 @@ contract StakeVaultFactory {
         uint256 _saleStartBlock = _intInfo[2];
         uint256 _stakeStartBlock = _intInfo[3];
 
-        Stake1Vault vault = new Stake1Vault();
-        vault.initialize(
+        // Stake1Vault vault = new Stake1Vault();
+        // require(address(vault) != address(0), "vault logic zero");
+
+        StakeVaultProxy proxy = new StakeVaultProxy(stakeVaultLogic);
+
+        proxy.initialize(
             _fld,
             _paytoken,
             _cap,
@@ -33,9 +44,9 @@ contract StakeVaultFactory {
             _defiAddr
         );
 
-        vault.grantRole(ADMIN_ROLE, owner);
-        vault.revokeRole(ADMIN_ROLE, address(this));
+        proxy.grantRole(ADMIN_ROLE, owner);
+        proxy.revokeRole(ADMIN_ROLE, address(this));
 
-        return address(vault);
+        return address(proxy);
     }
 }

@@ -9,6 +9,7 @@ contract VerifySignature {
         address _owner,
         address _spender,
         uint256 _amount,
+        uint256 _nonce,
         uint256 _period
     ) public pure returns (bytes32) {
         return
@@ -18,6 +19,7 @@ contract VerifySignature {
                     _owner,
                     _spender,
                     _amount,
+                    _nonce,
                     _period
                 )
             );

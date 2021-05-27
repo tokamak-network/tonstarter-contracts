@@ -63,7 +63,7 @@ stakePeriod = parseInt(stakePeriod);
 
 const zeroAddress = "0x0000000000000000000000000000000000000000";
 
-const logFlag = 0;
+const logFlag = 1;
 
 describe("Phase1. StakeContract with ETH", function () {
   let weth, fld, stakeregister, stakefactory, stake1proxy, stake1logic;
@@ -235,7 +235,8 @@ describe("Phase1. StakeContract with ETH", function () {
 
       let currentBlockTime = parseInt(saleStartBlock);
       await time.advanceBlockTo(currentBlockTime);
-      for (let i = 0; i < stakeAddresses.length; i++) {
+      //for (let i = 0; i < stakeAddresses.length; i++) {
+      for (let i = 0; i < 1; i++) {
         stakeContractAddress = stakeAddresses[i];
         if (stakeContractAddress != null) {
           const stakeContract = await StakeTON.at(stakeContractAddress);
@@ -291,6 +292,8 @@ describe("Phase1. StakeContract with ETH", function () {
 
       if (logFlag) {
         await ico20Contracts.logVault(vault_phase1_eth.address);
+        await ico20Contracts.logStakeContracts(toBN('1'), vault_phase1_eth.address);
+
       }
     });
 
@@ -301,7 +304,7 @@ describe("Phase1. StakeContract with ETH", function () {
       ).to.be.revertedWith("already closed");
     });
   });
-
+  /*
   describe('# 5. Function Test1 For Withdraw ', async function () {
     it("1. cannot withdraw unless the staking deadline has passed.", async function () {
       let current = await time.latestBlock();
@@ -418,5 +421,5 @@ describe("Phase1. StakeContract with ETH", function () {
       }
     });
   });
-
+  */
 });
