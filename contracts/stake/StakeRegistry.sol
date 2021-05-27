@@ -21,7 +21,7 @@ contract StakeRegistry is AccessControl {
     // uniswap router
     address public uniswapRouter;
     address public wethAddress;
-    uint256 public feeMedium;
+    uint256 public fee;
 
     // Contracts included in the phase
     mapping(uint256 => address[]) public phases;
@@ -68,7 +68,7 @@ contract StakeRegistry is AccessControl {
     event SetUniswap(
         address wethAddress,
         address uniswapRouter,
-        uint256 feeMedium
+        uint256 fee
     );
 
     constructor(address _fld) {
@@ -103,14 +103,14 @@ contract StakeRegistry is AccessControl {
     function setUniswap(
         address _wethAddress,
         address _uniswapRouter,
-        uint256 _feeMedium
+        uint256 _fee
     ) external onlyOwner nonZero(_wethAddress) nonZero(_uniswapRouter) {
-        require(_feeMedium > 0, "StakeRegistry: feeMedium is zero");
+        require(_fee > 0, "StakeRegistry: fee is zero");
         uniswapRouter = _uniswapRouter;
         wethAddress = _wethAddress;
-        feeMedium = _feeMedium;
+        fee = _fee;
 
-        emit SetUniswap(wethAddress, uniswapRouter, feeMedium);
+        emit SetUniswap(wethAddress, uniswapRouter, fee);
     }
 
     /// @dev Adds vault
@@ -170,7 +170,7 @@ contract StakeRegistry is AccessControl {
             uint256
         )
     {
-        return (wethAddress, uniswapRouter, feeMedium);
+        return (wethAddress, uniswapRouter, fee);
     }
 
     /// @dev Get addresses of vaults of index phase

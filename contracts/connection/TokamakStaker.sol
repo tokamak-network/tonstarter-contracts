@@ -87,7 +87,7 @@ contract TokamakStaker is StakeTONStorage, AccessControl {
     event SetUniswapRouter(
         address router,
         address wethAddress,
-        uint256 feeMedium
+        uint256 fee
     );
 
     event tokamakStaked(address layer2, uint256 amount);
@@ -300,13 +300,13 @@ contract TokamakStaker is StakeTONStorage, AccessControl {
             "tokamak zero"
         );
 
-        (address wethAddress, address uniswapRouter, uint256 feeMedium) =
+        (address wethAddress, address uniswapRouter, uint256 fee) =
             ITokamakRegistry(stakeRegistry).getUniswap();
 
         require(
             wethAddress != address(0) &&
                 uniswapRouter != address(0) &&
-                feeMedium > 0,
+                fee > 0,
             "uniswap zero"
         );
 
@@ -331,7 +331,7 @@ contract TokamakStaker is StakeTONStorage, AccessControl {
         uint256 _deadline = deadline;
         uint256 _amountOutMinimum = amountOutMinimum;
         bytes memory path =
-            abi.encodePacked(wton, feeMedium, wethAddress, feeMedium, token);
+            abi.encodePacked(wton, fee, wethAddress, fee, token);
 
         ISwapRouter.ExactInputParams memory params =
             ISwapRouter.ExactInputParams({
