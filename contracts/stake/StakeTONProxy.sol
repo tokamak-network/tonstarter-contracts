@@ -140,8 +140,6 @@ contract StakeTONProxy is StakeTONStorage, AccessControl, OnApprove {
         require(IIERC20(paytoken).balanceOf(_owner) >= _amount, "lack");
 
         LibTokenStake1.StakedAmount storage staked = userStaked[_owner];
-        if (staked.amount == 0) totalStakers = totalStakers.add(1);
-
         staked.amount = staked.amount.add(_amount);
         totalStakedAmount = totalStakedAmount.add(_amount);
         require(
@@ -165,7 +163,6 @@ contract StakeTONProxy is StakeTONStorage, AccessControl, OnApprove {
         token = _addr[0];
         paytoken = _addr[1];
         vault = _addr[2];
-        _uniswapRouter = _addr[3];
 
         stakeRegistry = _registry;
 

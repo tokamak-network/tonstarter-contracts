@@ -11,11 +11,17 @@ contract StakeRegistry is AccessControl {
     bytes32 public constant ZERO_HASH =
         0x0000000000000000000000000000000000000000000000000000000000000000;
 
+    address public fld;
     // Addresses for Tokamak staking
     address public ton;
     address public wton;
     address public depositManager;
     address public seigManager;
+
+    // uniswap router
+    address public uniswapRouter;
+    address public wethAddress;
+    uint256 public feeMedium;
 
     // Contracts included in the phase
     mapping(uint256 => address[]) public phases;
@@ -59,10 +65,16 @@ contract StakeRegistry is AccessControl {
         address depositManager,
         address seigManager
     );
+    event SetUniswap(
+        address wethAddress,
+        address uniswapRouter,
+        uint256 feeMedium
+    );
 
-    constructor() {
+    constructor(address _fld) {
         _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
         _setupRole(ADMIN_ROLE, msg.sender);
+        fld = _fld;
     }
 
     /// @dev Set address for Tokamak integration
@@ -85,6 +97,20 @@ contract StakeRegistry is AccessControl {
         seigManager = _seigManager;
 
         emit SetTokamak(ton, wton, depositManager, seigManager);
+    }
+
+    /// @dev Set values for Uniswap
+    function setUniswap(
+        address _wethAddress,
+        address _uniswapRouter,
+        uint256 _feeMedium
+    ) external onlyOwner nonZero(_wethAddress) nonZero(_uniswapRouter) {
+        require(_feeMedium > 0, "StakeRegistry: feeMedium is zero");
+        uniswapRouter = _uniswapRouter;
+        wethAddress = _wethAddress;
+        feeMedium = _feeMedium;
+
+        emit SetUniswap(wethAddress, uniswapRouter, feeMedium);
     }
 
     /// @dev Adds vault
@@ -132,6 +158,19 @@ contract StakeRegistry is AccessControl {
         )
     {
         return (ton, wton, depositManager, seigManager);
+    }
+
+    /// @dev Get addresses for Tokamak interface
+    function getUniswap()
+        external
+        view
+        returns (
+            address,
+            address,
+            uint256
+        )
+    {
+        return (wethAddress, uniswapRouter, feeMedium);
     }
 
     /// @dev Get addresses of vaults of index phase

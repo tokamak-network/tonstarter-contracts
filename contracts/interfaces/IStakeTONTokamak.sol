@@ -7,4 +7,10 @@ interface IStakeTONTokamak {
     function tokamakRequestUnStaking(address _layer2, uint256 amount) external;
 
     function tokamakProcessUnStaking(address _layer2, bool receiveTON) external;
+
+    function exchangeWTONtoFLD(
+        uint256 amountIn,
+        uint256 amountOutMinimum,
+        uint256 deadline
+    ) external returns (uint256 amountOut);
 }
