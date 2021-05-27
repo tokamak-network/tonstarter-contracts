@@ -43,7 +43,7 @@ contract StakeFactory is AccessControl{
     }
 
     function setStakeSimpleFactory(address _stakeSimpleFactory)
-        public
+        external
         onlyOwner
         nonZero(_stakeSimpleFactory)
     {
@@ -51,7 +51,7 @@ contract StakeFactory is AccessControl{
     }
 
     function setStakeTONFactory(address _stakeTONFactory)
-        public
+        external
         onlyOwner
         nonZero(_stakeTONFactory)
     {
@@ -59,7 +59,7 @@ contract StakeFactory is AccessControl{
     }
 
     function setStakeDefiFactory(address _stakeDefiFactory)
-        public
+        external
         onlyOwner
         nonZero(_stakeDefiFactory)
     {
@@ -68,9 +68,9 @@ contract StakeFactory is AccessControl{
 
     function create(
         uint256 stakeType,
-        address[4] memory _addr,
+        address[4] calldata _addr,
         address registry,
-        uint256[3] memory _intdata
+        uint256[3] calldata _intdata
     )
         external onlyOwner
         returns (address)
