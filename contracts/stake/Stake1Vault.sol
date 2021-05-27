@@ -130,13 +130,13 @@ contract Stake1Vault is StakeVaultStorage  {
         );
 
         LibTokenStake1.StakeInfo storage info = stakeInfos[stakeContract];
-        require(info.startBlcok == 0, "Stake1Vault: Already added");
+        require(info.startBlock == 0, "Stake1Vault: Already added");
 
         stakeAddresses.push(stakeContract);
         uint256 _endBlock = stakeStartBlock.add(periodBlocks);
 
         info.name = _name;
-        info.startBlcok = stakeStartBlock;
+        info.startBlock = stakeStartBlock;
         info.endBlock = _endBlock;
 
         if (stakeEndBlock < _endBlock) stakeEndBlock = _endBlock;
@@ -211,7 +211,7 @@ contract Stake1Vault is StakeVaultStorage  {
                 if(stakeEndBlockTotal[stakeInfos[stakeAddresses[0]].endBlock] > 0 ){
                     totalReward = totalReward.add(
                         stakeInfos[stakeAddresses[0]].endBlock
-                            .sub(stakeInfos[stakeAddresses[0]].startBlcok)
+                            .sub(stakeInfos[stakeAddresses[0]].startBlock)
                             .mul(blockTotalReward)
                             .mul(totalcheck.balance)
                             .div(stakeEndBlockTotal[stakeInfos[stakeAddresses[0]].endBlock])
@@ -239,7 +239,7 @@ contract Stake1Vault is StakeVaultStorage  {
 
         LibTokenStake1.StakeInfo storage stakeInfo = stakeInfos[msg.sender];
         require(
-            stakeInfo.startBlcok > 0,
+            stakeInfo.startBlock > 0,
             "zero"
         );
         require(
@@ -275,8 +275,8 @@ contract Stake1Vault is StakeVaultStorage  {
 
         LibTokenStake1.StakeInfo storage stakeInfo = stakeInfos[_to];
         require(
-            stakeInfo.startBlcok > 0,
-            "startBlcok is zero"
+            stakeInfo.startBlock > 0,
+            "startBlock is zero"
         );
 
         require(

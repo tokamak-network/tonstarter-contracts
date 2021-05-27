@@ -17,8 +17,8 @@ interface IStake1Logic {
     function createVault(
         address _paytoken,
         uint256 _cap,
-        uint256 _saleStartBlcok,
-        uint256 _stakeStartBlcok,
+        uint256 _saleStartBlock,
+        uint256 _stakeStartBlock,
         uint256 _pahse,
         bytes32 _vaultName,
         uint256 _stakeType,

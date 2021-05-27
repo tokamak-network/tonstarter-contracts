@@ -6,7 +6,7 @@ library LibTokenStake1 {
 
     struct StakeInfo {
         string name;
-        uint256 startBlcok;
+        uint256 startBlock;
         uint256 endBlock;
         uint256 balance;
         uint256 totalRewardAmount;

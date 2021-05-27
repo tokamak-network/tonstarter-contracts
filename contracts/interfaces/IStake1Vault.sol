@@ -8,8 +8,8 @@ interface IStake1Vault {
         address _fld,
         address _paytoken,
         uint256 _cap,
-        uint256 _saleStartBlcok,
-        uint256 _stakeStartBlcok
+        uint256 _saleStartBlock,
+        uint256 _stakeStartBlock
     ) external;
 
     /// @dev Sets the FLD address

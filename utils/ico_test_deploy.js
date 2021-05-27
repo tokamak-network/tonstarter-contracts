@@ -912,7 +912,7 @@ class ICO20Contracts {
       );
 
       console.log(" name", stakeInfo.name);
-      console.log(" startBlcok", stakeInfo.startBlcok.toString());
+      console.log(" startBlock", stakeInfo.startBlock.toString());
       console.log(" endBlock", stakeInfo.endBlock.toString());
       console.log(
         " balance",
