@@ -48,14 +48,10 @@ contract TokamakStaker is StakeTONStorage, AccessControl {
     // Events
     //////////////////////////////
 
-<<<<<<< Updated upstream
     //event SetTokamak(address ton, address wton, address depositManager, address seigManager, address defiAddr);
 
     event SetRegistryNDefi(address registry, address defiAddr);
     event SetTokamakLayer2(address layer2);
-=======
-    event SetTokamak(address ton, address wton, address depositManager, address seigManager, address defiAddr, address npm);
->>>>>>> Stashed changes
     event SetUniswapRouter(address router);
     /*
     event tokamakStaked(address layer2, uint256 amount);

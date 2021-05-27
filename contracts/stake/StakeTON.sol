@@ -14,6 +14,7 @@ import {
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "@uniswap/v3-periphery/contracts/interfaces/INonfungiblePositionManager.sol"; 
 import "@uniswap/v3-periphery/contracts/interfaces/ISwapRouter.sol"; 
+import "@uniswap/v3-periphery/contracts/interfaces/IPeripheryPayments.sol"; 
 
 /// @title Stake Contract
 /// @notice It can be staked in Tokamak. Can be swapped using Uniswap.
@@ -354,22 +355,24 @@ contract StakeTON is TokamakStaker {
         return INonfungiblePositionManager(npm).decreaseLiquidity(params);
     }
 
-    function swapTokens(    
-        bytes path,
-        address recipient,
-        uint256 deadline,
-        uint256 amountIn,
-        uint256 amountOutMinimum,
-        address tokenOut
-    ) external {
-        IUniswapRouter.ExactInputParams memory params = ISwapRouter.ExactInputParams({
+    function exchangeWTONtoFLD(uint256 amountIn, uint256 amountOutMinimum, uint256 deadline) external returns (uint256 amountOut){
+        address WTONAddress = 0x709bef48982Bbfd6F2D4Be24660832665F53406C;
+        address WETHAddress = 0xc778417E063141139Fce010982780140Aa0cD5Ab;
+        address FLDAddress = 0xfeeaf30B07d3267043e9EE7f26e244AdB55B3cCF;
+        uint256 feeMedium = 3000;
+
+        bytes memory path = abi.encodePacked(WTONAddress, feeMedium, WETHAddress, feeMedium, FLDAddress);
+
+
+        ISwapRouter.ExactInputParams memory params = ISwapRouter.ExactInputParams({
             path: path,
-            recipient: recipient,
-            deadline: deadline,
+            recipient: msg.sender,
             amountIn: amountIn,
-            amountOutMinimum
+            amountOutMinimum: amountOutMinimum,
+            deadline: deadline
         });
-        IUniswapRouter(swapRouter).exactInput(params);
-        IUniswapRouter(swapRouter).sweepToken(tokenOut, amountOutMinimum, recipient);
+
+        amountOut = ISwapRouter(_uniswapRouter).exactInput(params);
+        IPeripheryPayments(_uniswapRouter).sweepToken(WTONAddress, amountOutMinimum, msg.sender);
     }
 }

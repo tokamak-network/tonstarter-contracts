@@ -8,36 +8,9 @@ contract StakeTONFactory {
 
     constructor(address _stakeTONProxyFactory, address _stakeTONLogicFactory) {
         require(
-<<<<<<< Updated upstream
             _stakeTONProxyFactory != address(0) &&
             _stakeTONLogicFactory != address(0),
             "stakeTONProxyFactory zero"
-=======
-            saleStart < stakeStart && stakeStart > 0,
-            "StakeTONFactory: start error"
-        );
-
-        StakeTONProxy proxy = new StakeTONProxy();
-        StakeTON logic = new StakeTON();
-        proxy.upgradeTo(address(logic));
-
-
-        IStakeTON(address(proxy)).initialize(
-            _token,
-            _paytoken,
-            address(vault),
-            saleStart,
-            stakeStart,
-            period
-        );
-        IStakeTON(address(proxy)).setTokamak(
-            tokamakAddr[0],
-            tokamakAddr[1],
-            tokamakAddr[2],
-            tokamakAddr[3],
-            defiAddr,
-            defiAddr
->>>>>>> Stashed changes
         );
         stakeTONProxyFactory = _stakeTONProxyFactory;
         stakeTONLogicFactory = _stakeTONLogicFactory;
