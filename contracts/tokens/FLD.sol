@@ -59,14 +59,6 @@ contract FLD is IFLD, AccessControl, VerifySignature {
         _setupRole(MINTER_ROLE, msg.sender);
     }
 
-    function getChainId() external pure returns (uint256) {
-        uint256 chainId;
-        assembly {
-            chainId := chainid()
-        }
-        return chainId;
-    }
-
     function _mint(address to, uint256 value) internal {
         totalSupply += value;
         balanceOf[to] += value;
@@ -178,7 +170,7 @@ contract FLD is IFLD, AccessControl, VerifySignature {
     ) external override {
         require(deadline >= block.timestamp, "FLD: EXPIRED");
         bytes32 messageHash =
-            getPermitMessageHash(owner, spender, value, deadline);
+            getPermitMessageHash(owner, spender, value, nonces[owner]++, deadline);
         bytes32 ethSignedMessageHash = getEthSignedMessageHash(messageHash);
         address recoveredAddress =
             recoverSigner(ethSignedMessageHash, signature);
@@ -199,10 +191,11 @@ contract FLD is IFLD, AccessControl, VerifySignature {
         address _to,
         uint256 _amount,
         uint256 _period,
+        uint256 _nonce,
         bytes memory signature
     ) public pure returns (bool) {
         bytes32 messageHash =
-            getPermitMessageHash(_signer, _to, _amount, _period);
+            getPermitMessageHash(_signer, _to, _amount, _nonce, _period);
 
         bytes32 ethSignedMessageHash = getEthSignedMessageHash(messageHash);
 
