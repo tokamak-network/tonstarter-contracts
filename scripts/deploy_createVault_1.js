@@ -166,6 +166,7 @@ async function main() {
   //  await createStakeContract(vaultAddress, periodBlockHour2,'TON_2_HOUR', ton );
   // console.log('createStakeContract TON_2_HOUR');
   // timeout(10000);
+
   ////////////////////////////////////////////////////////
   // For Ether Vault
   // ton_vault.hashName = keccak256("ETH_TEST_20210522_1640");
