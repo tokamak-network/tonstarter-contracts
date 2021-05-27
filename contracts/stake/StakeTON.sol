@@ -389,25 +389,4 @@ contract StakeTON is TokamakStaker {
         });
         return INonfungiblePositionManager(npm).decreaseLiquidity(params);
     }
-
-    function exchangeWTONtoFLD(uint256 amountIn, uint256 amountOutMinimum, uint256 deadline) external returns (uint256 amountOut){
-        address WTONAddress = 0x709bef48982Bbfd6F2D4Be24660832665F53406C;
-        address WETHAddress = 0xc778417E063141139Fce010982780140Aa0cD5Ab;
-        address FLDAddress = 0xfeeaf30B07d3267043e9EE7f26e244AdB55B3cCF;
-        uint256 feeMedium = 3000;
-
-        bytes memory path = abi.encodePacked(WTONAddress, feeMedium, WETHAddress, feeMedium, FLDAddress);
-
-
-        ISwapRouter.ExactInputParams memory params = ISwapRouter.ExactInputParams({
-            path: path,
-            recipient: msg.sender,
-            amountIn: amountIn,
-            amountOutMinimum: amountOutMinimum,
-            deadline: deadline
-        });
-
-        amountOut = ISwapRouter(_uniswapRouter).exactInput(params);
-        IPeripheryPayments(_uniswapRouter).sweepToken(WTONAddress, amountOutMinimum, msg.sender);
-    }
 }

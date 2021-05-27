@@ -10,7 +10,6 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 import "../stake/StakeTONStorage.sol";
 // import "@uniswap/v3-periphery/contracts/interfaces/INonfungiblePositionManager.sol";
 import "@uniswap/v3-periphery/contracts/interfaces/ISwapRouter.sol";
-import "@uniswap/v3-periphery/contracts/interfaces/IPeripheryPayments.sol";
 
 interface IERC20BASE {
     function totalSupply() external view returns (uint256);
@@ -344,11 +343,5 @@ contract TokamakStaker is StakeTONStorage, AccessControl {
             });
 
         amountOut = ISwapRouter(uniswapRouter).exactInput(params);
-
-        IPeripheryPayments(uniswapRouter).sweepToken(
-            wton,
-            _amountOutMinimum,
-            msg.sender
-        );
     }
 }
