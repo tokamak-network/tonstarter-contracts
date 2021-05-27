@@ -171,7 +171,13 @@ contract SFLD is IFLD, AccessControl, VerifySignature {
     ) external override {
         require(deadline >= block.timestamp, "SFLD: EXPIRED");
         bytes32 messageHash =
-            getPermitMessageHash(owner, spender, value, nonces[owner]++, deadline);
+            getPermitMessageHash(
+                owner,
+                spender,
+                value,
+                nonces[owner]++,
+                deadline
+            );
         bytes32 ethSignedMessageHash = getEthSignedMessageHash(messageHash);
         address recoveredAddress =
             recoverSigner(ethSignedMessageHash, signature);

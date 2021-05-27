@@ -15,10 +15,7 @@ contract StakeDefiProxy is Stake1Storage, AccessControl {
     event Upgraded(address indexed implementation);
 
     modifier onlyOwner() {
-        require(
-            hasRole(ADMIN_ROLE, msg.sender),
-            "not an admin"
-        );
+        require(hasRole(ADMIN_ROLE, msg.sender), "not an admin");
         _;
     }
 
@@ -39,10 +36,7 @@ contract StakeDefiProxy is Stake1Storage, AccessControl {
     /// @param impl New implementation contract address
     function upgradeTo(address impl) external onlyOwner {
         require(impl != address(0), "input is zero");
-        require(
-            _implementation != impl,
-            "same"
-        );
+        require(_implementation != impl, "same");
         _implementation = impl;
         emit Upgraded(impl);
     }
@@ -97,8 +91,8 @@ contract StakeDefiProxy is Stake1Storage, AccessControl {
         uint256[3] memory _intdata
     ) external onlyOwner {
         require(
-                _addr[2] != address(0) &&
-                _intdata[0] < _intdata[1], "setInit fail"
+            _addr[2] != address(0) && _intdata[0] < _intdata[1],
+            "setInit fail"
         );
         token = _addr[0];
         paytoken = _addr[1];
@@ -108,5 +102,4 @@ contract StakeDefiProxy is Stake1Storage, AccessControl {
         startBlock = _intdata[1];
         endBlock = startBlock + _intdata[2];
     }
-
 }

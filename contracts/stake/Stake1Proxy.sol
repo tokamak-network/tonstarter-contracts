@@ -14,10 +14,7 @@ contract Stake1Proxy is StakeProxyStorage, AccessControl {
     event Upgraded(address indexed implementation);
 
     modifier onlyOwner() {
-        require(
-            hasRole(ADMIN_ROLE, msg.sender),
-            "no admin"
-        );
+        require(hasRole(ADMIN_ROLE, msg.sender), "no admin");
         _;
     }
 
@@ -37,10 +34,7 @@ contract Stake1Proxy is StakeProxyStorage, AccessControl {
     /// @param impl New implementation contract address
     function upgradeTo(address impl) external onlyOwner {
         require(impl != address(0), "input is zero");
-        require(
-            _implementation != impl,
-            "same"
-        );
+        require(_implementation != impl, "same");
         _implementation = impl;
         emit Upgraded(impl);
     }
@@ -60,10 +54,7 @@ contract Stake1Proxy is StakeProxyStorage, AccessControl {
 
     function _fallback() internal {
         address _impl = implementation();
-        require(
-            _impl != address(0) && !pauseProxy,
-            "impl OR proxy is false"
-        );
+        require(_impl != address(0) && !pauseProxy, "impl OR proxy is false");
 
         assembly {
             // Copy msg.data. We take full control of memory in this inline assembly

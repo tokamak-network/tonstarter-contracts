@@ -11,16 +11,12 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 import "./StakeProxyStorage.sol";
 
 contract Stake1Logic is StakeProxyStorage, AccessControl {
-
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
     bytes32 public constant ZERO_HASH =
         0x0000000000000000000000000000000000000000000000000000000000000000;
 
     modifier onlyOwner() {
-        require(
-            hasRole(ADMIN_ROLE, msg.sender),
-            ""
-        );
+        require(hasRole(ADMIN_ROLE, msg.sender), "");
         _;
     }
 
@@ -33,7 +29,11 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
     // Events
     //////////////////////////////
     event CreatedVault(address indexed vault, address paytoken, uint256 cap);
-    event CreatedStakeContract(address indexed vault, address indexed stakeContract, uint256 phase);
+    event CreatedStakeContract(
+        address indexed vault,
+        address indexed stakeContract,
+        uint256 phase
+    );
     event SetStakeRegistry(address stakeRegistry);
 
     //////////////////////////////////////////////////////////////////////
@@ -76,12 +76,12 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
         uint256 _stakeType,
         address _defiAddr
     ) external nonZero(address(stakeVaultFactory)) {
-
-        address vault = stakeVaultFactory.create(
-            [fld, _paytoken, address(stakeFactory), _defiAddr],
-            [_stakeType, _cap, _saleStartBlock, _stakeStartBlock],
-            address(this)
-        );
+        address vault =
+            stakeVaultFactory.create(
+                [fld, _paytoken, address(stakeFactory), _defiAddr],
+                [_stakeType, _cap, _saleStartBlock, _stakeStartBlock],
+                address(this)
+            );
         require(vault != address(0), "vault is zero");
         stakeRegistry.addVault(vault, _phase, _vaultName);
 
@@ -96,10 +96,7 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
         uint256 periodBlock,
         string memory _name
     ) external onlyOwner {
-        require(
-            stakeRegistry.validVault(_phase, _vault),
-            "unvalidVault"
-        );
+        require(stakeRegistry.validVault(_phase, _vault), "unvalidVault");
 
         IStake1Vault vault = IStake1Vault(_vault);
         uint256 saleStart = vault.saleStartBlock();
@@ -118,10 +115,7 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
                 address(stakeRegistry),
                 iniInfo
             );
-        require(
-            _contract != address(0),
-            "deploy fail"
-        );
+        require(_contract != address(0), "deploy fail");
 
         IStake1Vault(_vault).addSubVaultOfStake(_name, _contract, periodBlock);
         stakeRegistry.addStakeContract(address(vault), _contract);
@@ -144,11 +138,13 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
         bytes32 _vaultName,
         address _vault
     ) external onlyOwner {
-
         stakeRegistry.addVault(_vault, _phase, _vaultName);
     }
 
-    function upgradeStakeTo(address _stakeProxy, address _implementation) external onlyOwner {
+    function upgradeStakeTo(address _stakeProxy, address _implementation)
+        external
+        onlyOwner
+    {
         IProxy(_stakeProxy).upgradeTo(_implementation);
     }
 
@@ -169,18 +165,20 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
         return stakeRegistry.phasesAll(_phaseIndex);
     }
 
-    function tokamakStaking(
-        address _stakeContract,
-        address _layer2
-    ) external {
+    function tokamakStaking(address _stakeContract, address _layer2) external {
         IStakeTONTokamak(_stakeContract).tokamakStaking(_layer2);
     }
 
     /// @dev Requests unstaking all
-    function tokamakRequestUnStaking(address _stakeContract, address _layer2, uint256 amount)
-        external
-    {
-        IStakeTONTokamak(_stakeContract).tokamakRequestUnStaking(_layer2, amount);
+    function tokamakRequestUnStaking(
+        address _stakeContract,
+        address _layer2,
+        uint256 amount
+    ) external {
+        IStakeTONTokamak(_stakeContract).tokamakRequestUnStaking(
+            _layer2,
+            amount
+        );
     }
 
     /// @dev Processes unstaking
@@ -189,7 +187,10 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
         address _layer2,
         bool receiveTON
     ) external {
-        IStakeTONTokamak(_stakeContract).tokamakProcessUnStaking(_layer2, receiveTON);
+        IStakeTONTokamak(_stakeContract).tokamakProcessUnStaking(
+            _layer2,
+            receiveTON
+        );
     }
 
     /// @dev Sets FLD address
@@ -249,14 +250,35 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
         return stakeRegistry.phasesAll(_phase);
     }
 
-    function grantRole(address target, bytes32 role, address account) external onlyOwner  {
-        (bool success, ) = target.call(abi.encodeWithSignature("grantRole(bytes32,address)",role, account));
-        require(success,"grantRole fail");
+    function grantRole(
+        address target,
+        bytes32 role,
+        address account
+    ) external onlyOwner {
+        (bool success, ) =
+            target.call(
+                abi.encodeWithSignature(
+                    "grantRole(bytes32,address)",
+                    role,
+                    account
+                )
+            );
+        require(success, "grantRole fail");
     }
 
-    function revokeRole(address target, bytes32 role, address account) external onlyOwner  {
-        (bool success, ) = target.call(abi.encodeWithSignature("revokeRole(bytes32,address)",role, account));
-        require(success,"revokeRole fail");
+    function revokeRole(
+        address target,
+        bytes32 role,
+        address account
+    ) external onlyOwner {
+        (bool success, ) =
+            target.call(
+                abi.encodeWithSignature(
+                    "revokeRole(bytes32,address)",
+                    role,
+                    account
+                )
+            );
+        require(success, "revokeRole fail");
     }
-
 }

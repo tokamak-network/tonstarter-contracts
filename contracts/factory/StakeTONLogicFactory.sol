@@ -4,7 +4,6 @@ pragma solidity ^0.7.6;
 import {StakeTON} from "../stake/StakeTON.sol";
 
 contract StakeTONLogicFactory {
-
     function deploy() external returns (address) {
         StakeTON logic = new StakeTON();
         require(address(logic) != address(0), "StakeTONLogic zero");

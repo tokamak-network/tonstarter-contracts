@@ -9,7 +9,6 @@ import "../stake/StakeYearnStorage.sol";
 
 /// @title The connector that integrates zkopru and tokamak
 contract YearnV2Staker is StakeYearnStorage, AccessControl {
-
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
 
     modifier nonZero(address _addr) {

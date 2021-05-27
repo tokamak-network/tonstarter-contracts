@@ -25,7 +25,7 @@ contract StakeVaultProxy is StakeVaultStorage {
         _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
         _setupRole(ADMIN_ROLE, msg.sender);
         _setupRole(ADMIN_ROLE, address(this));
-         _implementation = impl;
+        _implementation = impl;
     }
 
     /// @notice Set pause state
@@ -38,10 +38,7 @@ contract StakeVaultProxy is StakeVaultStorage {
     /// @param impl New implementation contract address
     function upgradeTo(address impl) external onlyOwner {
         require(impl != address(0), "input is zero");
-        require(
-            _implementation != impl,
-            "same"
-        );
+        require(_implementation != impl, "same");
         _implementation = impl;
         emit Upgraded(impl);
     }
@@ -61,10 +58,7 @@ contract StakeVaultProxy is StakeVaultStorage {
 
     function _fallback() internal {
         address _impl = implementation();
-        require(
-            _impl != address(0) && !pauseProxy,
-            "impl OR proxy is false"
-        );
+        require(_impl != address(0) && !pauseProxy, "impl OR proxy is false");
 
         assembly {
             // Copy msg.data. We take full control of memory in this inline assembly
@@ -120,5 +114,4 @@ contract StakeVaultProxy is StakeVaultStorage {
 
         grantRole(ADMIN_ROLE, _stakefactory);
     }
-
 }

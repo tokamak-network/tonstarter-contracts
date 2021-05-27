@@ -9,8 +9,7 @@ interface IStakeFactory {
         uint256[3] memory _intdata
     ) external returns (address);
 
-    function setStakeTONFactory(address _stakeTONFactory)
-        external;
+    function setStakeTONFactory(address _stakeTONFactory) external;
 
     function setStakeStableCoinFactory(address _stakeStableCoinFactory)
         external;

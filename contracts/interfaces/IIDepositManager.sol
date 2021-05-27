@@ -2,8 +2,8 @@
 pragma solidity ^0.7.6;
 
 interface IIDepositManager {
-
-    function globalWithdrawalDelay() external
+    function globalWithdrawalDelay()
+        external
         view
         returns (uint256 withdrawalDelay);
 
@@ -34,7 +34,9 @@ interface IIDepositManager {
 
     function requestWithdrawalAll(address layer2) external returns (bool);
 
-    function processRequests(address layer2, uint256 n, bool receiveTON) external returns (bool);
-
-
+    function processRequests(
+        address layer2,
+        uint256 n,
+        bool receiveTON
+    ) external returns (bool);
 }

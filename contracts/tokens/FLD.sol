@@ -24,8 +24,7 @@ contract FLD is ERC20, AccessControl, VerifySignature {
         _;
     }
 
-    constructor() ERC20(name1, symbol1){
-
+    constructor() ERC20(name1, symbol1) {
         uint256 chainId;
         assembly {
             chainId := chainid()
@@ -65,10 +64,7 @@ contract FLD is ERC20, AccessControl, VerifySignature {
     /**
      * burn a token.
      */
-    function burn(address from, uint256 amount)
-        external
-        returns (bool)
-    {
+    function burn(address from, uint256 amount) external returns (bool) {
         require(
             hasRole(BURNER_ROLE, msg.sender),
             "FLD: Caller is not a burner"
@@ -90,7 +86,13 @@ contract FLD is ERC20, AccessControl, VerifySignature {
     ) external {
         require(deadline >= block.timestamp, "FLD: EXPIRED");
         bytes32 messageHash =
-            getPermitMessageHash(owner, spender, value, nonces[owner]++, deadline);
+            getPermitMessageHash(
+                owner,
+                spender,
+                value,
+                nonces[owner]++,
+                deadline
+            );
         bytes32 ethSignedMessageHash = getEthSignedMessageHash(messageHash);
         address recoveredAddress =
             recoverSigner(ethSignedMessageHash, signature);

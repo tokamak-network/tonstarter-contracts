@@ -10,20 +10,15 @@ contract StakeVaultFactory {
     address public stakeVaultLogic;
 
     constructor(address _stakeVaultLogic) {
-        require(
-            _stakeVaultLogic != address(0),
-            "StakeVaultFactory zero"
-        );
+        require(_stakeVaultLogic != address(0), "StakeVaultFactory zero");
         stakeVaultLogic = _stakeVaultLogic;
     }
 
-    function create
-    (
+    function create(
         address[4] memory _addr,
         uint256[4] memory _intInfo,
         address owner
     ) external returns (address) {
-
         address _fld = _addr[0];
         address _paytoken = _addr[1];
         address _stakefactory = _addr[2];

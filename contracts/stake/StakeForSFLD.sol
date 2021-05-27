@@ -125,8 +125,10 @@ contract StakeForSFLD is AccessControl {
         require(staked.amount > 0, "StakeForSFLD: amount > 0");
 
         if (staked.rewardPerBlock == 0) {
-            staked.rewardPerBlock =
-                staked.amount.mul(rewardRatio[staked.periodBlock]).div(staked.periodBlock);
+            staked.rewardPerBlock = staked
+                .amount
+                .mul(rewardRatio[staked.periodBlock])
+                .div(staked.periodBlock);
         }
 
         require(
@@ -137,8 +139,10 @@ contract StakeForSFLD is AccessControl {
 
         uint256 rewardClaim = 0;
         if (staked.startBlock.add(staked.periodBlock) < block.number) {
-            rewardClaim =
-                staked.amount.mul(rewardRatio[staked.periodBlock]).sub(staked.claimedAmount);
+            rewardClaim = staked
+                .amount
+                .mul(rewardRatio[staked.periodBlock])
+                .sub(staked.claimedAmount);
         } else {
             // Amount you can be rewarded currently
             uint256 pastBlocks = block.number.sub(staked.startBlock);

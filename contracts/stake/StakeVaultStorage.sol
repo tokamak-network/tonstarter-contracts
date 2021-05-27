@@ -5,10 +5,10 @@ import {IFLD} from "../interfaces/IFLD.sol";
 import "../libraries/LibTokenStake1.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 
-contract StakeVaultStorage is AccessControl{
+contract StakeVaultStorage is AccessControl {
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
 
-     // reward token : FLD
+    // reward token : FLD
     IFLD public fld;
     // paytoken is the token that the user stakes.
     address public paytoken;
@@ -56,5 +56,4 @@ contract StakeVaultStorage is AccessControl{
         _;
         _lock = 0;
     }
-
 }

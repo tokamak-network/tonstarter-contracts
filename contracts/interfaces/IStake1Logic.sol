@@ -52,10 +52,7 @@ interface IStake1Logic {
         view
         returns (address[] memory);
 
-    function tokamakStaking(
-        address _stakeContract,
-        address _layer2
-    ) external;
+    function tokamakStaking(address _stakeContract, address _layer2) external;
 
     function tokamakRequestUnStakingAll(address _stakeContract, address _layer2)
         external;

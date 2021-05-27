@@ -6,7 +6,7 @@ import {IStakeTONFactory1} from "../interfaces/IStakeTONFactory1.sol";
 import {IStakeDefiFactory} from "../interfaces/IStakeDefiFactory.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 
-contract StakeFactory is AccessControl{
+contract StakeFactory is AccessControl {
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
 
     address public stakeSimpleFactory;
@@ -14,10 +14,7 @@ contract StakeFactory is AccessControl{
     address public stakeDefiFactory;
 
     modifier onlyOwner() {
-        require(
-            hasRole(ADMIN_ROLE, msg.sender),
-            "not an admin"
-        );
+        require(hasRole(ADMIN_ROLE, msg.sender), "not an admin");
         _;
     }
     modifier nonZero(address _addr) {
@@ -31,8 +28,7 @@ contract StakeFactory is AccessControl{
         address _stakeDefiFactory
     ) {
         require(
-            _stakeSimpleFactory != address(0) &&
-            _stakeTONFactory != address(0),
+            _stakeSimpleFactory != address(0) && _stakeTONFactory != address(0),
             "StakeFactory: init fail"
         );
         stakeSimpleFactory = _stakeSimpleFactory;
@@ -71,10 +67,7 @@ contract StakeFactory is AccessControl{
         address[4] calldata _addr,
         address registry,
         uint256[3] calldata _intdata
-    )
-        external onlyOwner
-        returns (address)
-    {
+    ) external onlyOwner returns (address) {
         require(_addr[2] != address(0), "vault zero");
         /**
         token = _addr[0];
@@ -91,40 +84,49 @@ contract StakeFactory is AccessControl{
         startBlock = _intdata[1];
         endBlock = startBlock + _intdata[2];
          */
-         if (stakeType == 0) { // TON Staking
-            require(
-                stakeTONFactory != address(0),
-                "stakeTONFactory zero"
-            );
+        if (stakeType == 0) {
+            // TON Staking
+            require(stakeTONFactory != address(0), "stakeTONFactory zero");
 
-            address proxy = IStakeTONFactory1(stakeTONFactory).create(
-                 _addr, registry, _intdata, msg.sender);
+            address proxy =
+                IStakeTONFactory1(stakeTONFactory).create(
+                    _addr,
+                    registry,
+                    _intdata,
+                    msg.sender
+                );
 
             return proxy;
-
-        } else if (stakeType == 1) { // ERC20 Simple Staking
+        } else if (stakeType == 1) {
+            // ERC20 Simple Staking
             require(
                 stakeSimpleFactory != address(0),
                 "stakeSimpleFactory zero"
             );
 
-            address proxy = IStakeSimpleFactory(stakeSimpleFactory).create(
-                 [_addr[0], _addr[1], _addr[2]], _intdata, msg.sender);
+            address proxy =
+                IStakeSimpleFactory(stakeSimpleFactory).create(
+                    [_addr[0], _addr[1], _addr[2]],
+                    _intdata,
+                    msg.sender
+                );
 
             return proxy;
-
         } else if (stakeType == 2) {
-
             require(
                 stakeDefiFactory != address(0),
                 "StakeFactory: stakeDefiFactory zero"
             );
 
-            address proxy = IStakeDefiFactory(stakeDefiFactory).create(
-                 _addr, registry, _intdata, msg.sender);
+            address proxy =
+                IStakeDefiFactory(stakeDefiFactory).create(
+                    _addr,
+                    registry,
+                    _intdata,
+                    msg.sender
+                );
 
             return proxy;
-
         }
 
         return address(0);

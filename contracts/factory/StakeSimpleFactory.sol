@@ -9,21 +9,15 @@ contract StakeSimpleFactory {
     address public stakeSimpleLogic;
 
     constructor(address _stakeSimpleLogic) {
-        require(
-            _stakeSimpleLogic != address(0),
-            "StakeSimpleFactory zero"
-        );
+        require(_stakeSimpleLogic != address(0), "StakeSimpleFactory zero");
         stakeSimpleLogic = _stakeSimpleLogic;
     }
 
-    function create
-    (
+    function create(
         address[3] memory _addr,
         uint256[3] memory _intdata,
         address owner
     ) external returns (address) {
-
-
         StakeSimpleProxy proxy = new StakeSimpleProxy(stakeSimpleLogic);
         require(address(proxy) != address(0), "proxy zero");
 

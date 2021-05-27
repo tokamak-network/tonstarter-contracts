@@ -34,16 +34,18 @@ interface IStakeTON {
         uint256 _saleStartBlock,
         uint256 _startBlock,
         uint256 _period
-    ) external ;
-
+    ) external;
 
     function stake(uint256 amount) external payable;
 
-    function claim() external ;
+    function claim() external;
 
-    function withdraw() external ;
+    function withdraw() external;
 
-    function canRewardAmount(address account, uint256 claimBlock) external view returns (uint256);
+    function canRewardAmount(address account, uint256 claimBlock)
+        external
+        view
+        returns (uint256);
 
     function onApprove(
         address owner,
@@ -59,12 +61,12 @@ interface IStakeTON {
     ) external;
 
     function tokamakStaking(address _layer2) external;
+
     function tokamakRequestUnStaking(address _layer2, uint256 amount) external;
+
     // function tokamakRequestUnStakingAll(address _layer2) external;
 
     // function tokamakRequestUnStakingReward(address _layer2) external;
 
     function tokamakProcessUnStaking(address _layer2, bool receiveTON) external;
-
-
 }

@@ -4,17 +4,15 @@ pragma solidity ^0.7.6;
 import {StakeTONProxy} from "../stake/StakeTONProxy.sol";
 
 contract StakeTONProxyFactory {
-
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
-    function deploy
-    (
+
+    function deploy(
         address _logic,
         address[4] memory _addr,
         address _registry,
         uint256[3] memory _intdata,
         address owner
     ) external returns (address) {
-
         StakeTONProxy proxy = new StakeTONProxy(_logic);
 
         require(address(proxy) != address(0), "StakeTONProxy zero");

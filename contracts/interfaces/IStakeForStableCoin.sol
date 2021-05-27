@@ -34,7 +34,7 @@ interface IStakeForStableCoin {
         uint256 _saleStartBlock,
         uint256 _startBlock,
         uint256 _period
-    ) external ;
+    ) external;
 
     function setYearnV2(address _vault) external;
 
@@ -44,18 +44,13 @@ interface IStakeForStableCoin {
         external
         returns (uint256 underlyingAmount);
 
-    function yearnV2_deposit(uint256 amount)
-        external;
+    function yearnV2_deposit(uint256 amount) external;
 
-    function yearnV2_withdraw(uint256 amount)
-        external;
+    function yearnV2_withdraw(uint256 amount) external;
 
-    function yearnV2_unclaimedProfit(address user)
-        external;
+    function yearnV2_unclaimedProfit(address user) external;
 
-    function yearnV2_claim() external ;
+    function yearnV2_claim() external;
 
     function stake(uint256 amount) external;
-
-
 }

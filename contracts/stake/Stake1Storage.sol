@@ -31,5 +31,4 @@ contract Stake1Storage {
     uint256 public totalStakers;
 
     uint256 internal _lock;
-
 }
