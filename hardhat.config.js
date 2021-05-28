@@ -11,8 +11,17 @@ require('dotenv').config()
 // require("./tasks/uniswap-v3-swap-task");
 // require("./tasks/view-tasks");
 
-//const { RINKEBY_UNISWAP_V3_ACCOUNT_PK1, RINKEBY_UNISWAP_V3_ACCOUNT_PK2 } = process.env;
+// const { RINKEBY_UNISWAP_V3_ACCOUNT_PK1, RINKEBY_UNISWAP_V3_ACCOUNT_PK2 } = process.env;
+task("accounts", "Prints the list of accounts", async () => {
+  const accounts = await ethers.getSigners();
+  // const prov = await ethers.getDefaultProvider();
+  const provider = new ethers.providers.JsonRpcProvider();
 
+  for (const account of accounts) {
+    console.log(account.address);
+    console.log((await provider.getBalance(account.address)).toString());
+  }
+});
 module.exports = {
   defaultNetwork: "rinkeby",
   networks: {
@@ -32,9 +41,11 @@ module.exports = {
     },
     rinkeby: {
       url: `https://rinkeby.infura.io/v3/${process.env.InfuraKey}`,
-      accounts: [process.env.ACCOUNT0_PK, process.env.ACCOUNT1_PK],
-      gasMultiplier: 1.25,
-      gas: 200
+      accounts: [
+          `${process.env.ACCOUNT0_PK}`,
+          `${process.env.ACCOUNT1_PK}`
+          ],
+      gasMultiplier: 1.25
     }
   },
   etherscan: {
