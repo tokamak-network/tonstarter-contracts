@@ -54,14 +54,6 @@ console.log("wton:", wton);
 async function deployMain(defaultSender) {
   const [deployer, user1] = await ethers.getSigners();
 
-  // const stake1Proxy = await ethers.getContractAt("Stake1Proxy", proxy);
-  // const _logic1 = await stake1Proxy.implementation();
-  // console.log("_logic1:", _logic1);
-
-  // await stake1Proxy.upgradeTo(logic);
-  // console.log('stake1Proxy upgradeTo:', stake1Logic.address);
-
-
   //const stakeEntry = await ethers.getContractAt("Stake1Logic", proxy);
   // const _logic = await stakeEntry.implementation();
   // console.log("_logic:" , _logic);

@@ -94,11 +94,11 @@ async function deployMain (defaultSender) {
   const stake1Proxy = await Stake1Proxy.deploy();
   console.log('stake1Proxy:', stake1Proxy.address);
 
-  // await stake1Proxy.upgradeTo(stake1Logic.address);
-  // console.log('stake1Proxy upgradeTo:', stake1Logic.address);
+  await stake1Proxy.upgradeTo(stake1Logic.address);
+  console.log('stake1Proxy upgradeTo:', stake1Logic.address);
 
-  // const stakeEntry = await ethers.getContractAt("Stake1Logic", stake1Proxy.address);
-  // console.log("stakeEntry:" , stakeEntry.address);
+  const stakeEntry = await ethers.getContractAt("Stake1Logic", stake1Proxy.address);
+  console.log("stakeEntry:" , stakeEntry.address);
 
   const out = {};
   out.FLD = fld.address;
