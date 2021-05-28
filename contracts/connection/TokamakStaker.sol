@@ -354,7 +354,7 @@ contract TokamakStaker is StakeTONStorage, AccessControl {
         ISwapRouter.ExactInputParams memory params =
             ISwapRouter.ExactInputParams({
                 path: path,
-                recipient: msg.sender,
+                recipient: address(this),
                 amountIn: _amountIn,
                 amountOutMinimum: _amountOutMinimum,
                 deadline: _deadline
