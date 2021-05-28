@@ -327,7 +327,6 @@ describe("Phase1. StakeContract with TON", function () {
         stakeEntry.tokamakProcessUnStaking(
           stakeAddresses[0],
           layer2.address,
-          true,
           { from: user1 }
         )
       ).to.be.revertedWith("different layer");
@@ -499,7 +498,6 @@ describe("Phase1. StakeContract with TON", function () {
         stakeEntry.tokamakProcessUnStaking(
             stakeAddresses[0],
             layer2.address,
-            true,
             { from: user1 }
         )
       ).to.be.revertedWith("DepositManager: wait for withdrawal delay.");
@@ -512,7 +510,7 @@ describe("Phase1. StakeContract with TON", function () {
       await time.advanceBlockTo(delayBlocks-1);
 
       let i = 0;
-      const tonBalance1 = await ton.balanceOf(stakeAddresses[i] );
+      const wtonBalance1 = await wton.balanceOf(stakeAddresses[i] );
       if (logFlag) {
         console.log(i, ',Prev tokamakProcessUnStaking ' );
         await ico20Contracts.logTONBalance(layer2.address, stakeAddresses[i], true);
@@ -520,11 +518,10 @@ describe("Phase1. StakeContract with TON", function () {
       await stakeEntry.tokamakProcessUnStaking(
             stakeAddresses[i],
             layer2.address,
-            true,
             { from: user1 }
         );
-      const tonBalance2 = await ton.balanceOf(stakeAddresses[i] );
-      await expect(tonBalance2.toString()).to.be.bignumber.above(tonBalance1.toString());
+      const wtonBalance2 = await wton.balanceOf(stakeAddresses[i] );
+      await expect(wtonBalance2.toString()).to.be.bignumber.above(wtonBalance1.toString());
       if (logFlag) {
         console.log(i, ',After tokamakProcessUnStaking ' );
         await ico20Contracts.logTONBalance(layer2.address, stakeAddresses[i], true);
@@ -572,7 +569,7 @@ describe("Phase1. StakeContract with TON", function () {
       delayBlocks = requestBlock + parseInt(globalWithdrawalDelay.toString()) ;
       await time.advanceBlockTo(delayBlocks-1);
 
-      const tonBalance1 = await ton.balanceOf(stakeAddresses[i]);
+      const wtonBalance1 = await wton.balanceOf(stakeAddresses[i]);
       if (logFlag) {
         console.log(i, ',Prev tokamakProcessUnStaking ' );
         await ico20Contracts.logTONBalance(layer2.address, stakeAddresses[i], true);
@@ -580,11 +577,10 @@ describe("Phase1. StakeContract with TON", function () {
       await stakeEntry.tokamakProcessUnStaking(
             stakeAddresses[i],
             layer2.address,
-            true,
             { from: user1 }
         );
-      const tonBalance2 = await ton.balanceOf(stakeAddresses[i] );
-      await expect(tonBalance2.toString()).to.be.bignumber.above(tonBalance1.toString());
+      const wtonBalance2 = await wton.balanceOf(stakeAddresses[i] );
+      await expect(wtonBalance2.toString()).to.be.bignumber.above(wtonBalance1.toString());
       if (logFlag) {
         console.log(i, ',After tokamakProcessUnStaking ' );
         await ico20Contracts.logTONBalance(layer2.address, stakeAddresses[i], true);
@@ -718,7 +714,6 @@ describe("Phase1. StakeContract with TON", function () {
           await stakeEntry.tokamakProcessUnStaking(
             stakeAddresses[i],
             layer2.address,
-            true,
             { from: user1 }
           );
         }
@@ -728,8 +723,8 @@ describe("Phase1. StakeContract with TON", function () {
         for (let i = 0; i < stakeAddresses.length; i++) {
           console.log(`\n i: `, i, stakeAddresses[i]);
           await ico20Contracts.logTokamakLayerBalance(layer2.address, stakeAddresses[i]);
-          let payTokenBalanceContract1 =  await ton.balanceOf(stakeAddresses[i]);
-          console.log(' ton balance of contract', fromWei(payTokenBalanceContract1.toString(),'ether') );
+          let payTokenBalanceContract1 =  await wton.balanceOf(stakeAddresses[i]);
+          console.log(' wton balance of contract', utils.formatUnits(payTokenBalanceContract1.toString(), 27), ' WTON');
         }
 
     });
@@ -747,6 +742,11 @@ describe("Phase1. StakeContract with TON", function () {
           console.log('\n  ************* withdraw : ', i, stakeAddresses[i]);
         const stakeContract1 = await StakeTON.at(stakeAddresses[i]);
         let payTokenBalanceContract1 =  await ton.balanceOf(stakeAddresses[i]);
+        //console.log('payTokenBalanceContract1', payTokenBalanceContract1.toString(), fromWei(payTokenBalanceContract1.toString(), 'ether') ,'TON');
+
+        let payTokenBalanceContractWTON =  await wton.balanceOf(stakeAddresses[i]);
+        //console.log('payTokenBalanceContractWTON', payTokenBalanceContractWTON.toString(), utils.formatUnits(payTokenBalanceContractWTON.toString(), 27) ,'WTON');
+
         let payTokenBalance1 = await ton.balanceOf(user1);
 
         let fromTokamak = await stakeContract1.fromTokamak();
@@ -768,7 +768,14 @@ describe("Phase1. StakeContract with TON", function () {
 
         await stakeContract1.withdraw({ from: user1 });
         stakeEndBlock++;
+
         let payTokenBalanceContract2 =  await ton.balanceOf(stakeAddresses[i]);
+        //console.log('payTokenBalanceContract2', payTokenBalanceContract2.toString(), fromWei(payTokenBalanceContract2.toString(), 'ether') ,'TON');
+
+        let payTokenBalanceContractWTON2 =  await wton.balanceOf(stakeAddresses[i]);
+        //console.log('payTokenBalanceContractWTON2', payTokenBalanceContractWTON2.toString(), utils.formatUnits(payTokenBalanceContractWTON2.toString(), 27) ,'WTON');
+
+
         let payTokenBalance2 = await ton.balanceOf(user1);
         if (logFlag){
           console.log('\n stakeContract\'s payTokenBalance1:', fromWei(payTokenBalanceContract2.toString(), 'ether'));

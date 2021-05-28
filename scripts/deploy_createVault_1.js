@@ -24,7 +24,7 @@ let factory = loadDeployed(process.env.NETWORK,"StakeFactory");
 let logic = loadDeployed(process.env.NETWORK,"Stake1Logic");
 let proxy = loadDeployed(process.env.NETWORK,"Stake1Proxy");
 let tonFactory = loadDeployed(process.env.NETWORK,"StakeTONFactory");
-let stablecoinFactory = loadDeployed(process.env.NETWORK,"StakeForStableCoinFactory");
+
 let ton = loadDeployed(process.env.NETWORK,"TON");
 
 async function createValue(tonVault, paytoken) {
@@ -176,13 +176,13 @@ async function main() {
 
   ////////////////////////////////////////////////////////
   // For TON Vault : hashName must be specified as a unique value.
-   ton_vault.hashName = keccak256("TON_TEST_20210527_2250");
+   ton_vault.hashName = keccak256("TON_TEST_20210528_0900");
    await createValue(ton_vault, ton);
 
   ////////////////////////////////////////////////////////
   // For TON StakeContract of Vault
   // write your vault .
-  //  let vaultAddress ='0x95a52bD51cD05AA4D92D1655B9FbAa9f28428cC4';
+  //  let vaultAddress ='0xc50291699b5A6828C74360bcd96f88bc377C6C82';
   //  console.log('vaultAddress',vaultAddress);
   //  await createStakeContract(vaultAddress, periodBlockMin3,'TON_3_MIN', ton );
   // console.log('createStakeContract periodBlockMin3 ');

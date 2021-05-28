@@ -64,8 +64,7 @@ interface IStake1Logic {
 
     function tokamakProcessUnStaking(
         address _stakeContract,
-        address _layer2,
-        bool receiveTON
+        address _layer2
     ) external;
 
     function setFLD(address _fld) external;

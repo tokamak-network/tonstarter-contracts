@@ -56,7 +56,7 @@ async function deployMain (defaultSender) {
   const Stake1Proxy = await ethers.getContractFactory('Stake1Proxy');
   const StakeFactory = await ethers.getContractFactory('StakeFactory');
   const StakeTONFactory = await ethers.getContractFactory("StakeTONFactory");
-  const StakeForStableCoinFactory = await ethers.getContractFactory("StakeForStableCoinFactory");
+  const StakeDefiFactory = await ethers.getContractFactory("StakeDefiFactory");
 
   const stakeSimple = await StakeSimple.deploy();
   const stakeSimpleFactory = await StakeSimpleFactory.deploy(stakeSimple.address);
@@ -73,10 +73,10 @@ async function deployMain (defaultSender) {
   const stakeTONFactory = await StakeTONFactory.deploy(stakeTONProxyFactory.address, stakeTONLogic.address);
   console.log('stakeTONFactory:', stakeTONFactory.address);
 
-  const stakeForStableCoinFactory = await StakeForStableCoinFactory.deploy();
-  console.log('stakeForStableCoinFactory:', stakeForStableCoinFactory.address);
+  const stakeDefiFactory = await StakeDefiFactory.deploy(stakeSimple.address);
+  console.log('stakeDefiFactory:', stakeDefiFactory.address);
 
-  const stakeFactory = await StakeFactory.deploy(stakeSimpleFactory.address, stakeTONFactory.address, stakeForStableCoinFactory.address);
+  const stakeFactory = await StakeFactory.deploy(stakeSimpleFactory.address, stakeTONFactory.address, stakeDefiFactory.address);
   console.log('stakeFactory:', stakeFactory.address);
 
   const stakeRegistry = await StakeRegistry.deploy(fld.address);
@@ -94,21 +94,24 @@ async function deployMain (defaultSender) {
   const stake1Proxy = await Stake1Proxy.deploy();
   console.log('stake1Proxy:', stake1Proxy.address);
 
-  await stake1Proxy.upgradeTo(stake1Logic.address);
-  console.log('stake1Proxy upgradeTo:', stake1Logic.address);
+  // await stake1Proxy.upgradeTo(stake1Logic.address);
+  // console.log('stake1Proxy upgradeTo:', stake1Logic.address);
 
-  const stakeEntry = await ethers.getContractAt("Stake1Logic", stake1Proxy.address);
-  console.log("stakeEntry:" , stakeEntry.address);
+  // const stakeEntry = await ethers.getContractAt("Stake1Logic", stake1Proxy.address);
+  // console.log("stakeEntry:" , stakeEntry.address);
 
   const out = {};
   out.FLD = fld.address;
+  out.StakeSimple = stakeSimple.address;
   out.StakeSimpleFactory = stakeSimpleFactory.address;
   out.StakeTONLogic = stakeTONLogic.address;
   out.StakeTONProxyFactory = stakeTONProxyFactory.address;
   out.StakeTONFactory = stakeTONFactory.address;
-  out.StakeForStableCoinFactory = stakeForStableCoinFactory.address;
+  out.StakeDefiFactory = stakeDefiFactory.address;
   out.StakeFactory = stakeFactory.address;
   out.StakeRegistry = stakeRegistry.address;
+
+  out.Stake1Vault = stake1Vault.address;
   out.StakeVaultFactory = stakeVaultFactory.address;
   out.Stake1Logic = stake1Logic.address;
   out.Stake1Proxy = stake1Proxy.address;
@@ -132,13 +135,15 @@ async function main () {
 
   let out = {};
   out.FLD = contracts.FLD;
+  out.StakeSimple = contracts.StakeSimple;
   out.StakeSimpleFactory = contracts.StakeSimpleFactory;
-  out.StakeTONLogicFactory = contracts.StakeTONLogicFactory;
+  out.StakeTONLogic = contracts.StakeTONLogic;
   out.StakeTONProxyFactory = contracts.StakeTONProxyFactory;
   out.StakeTONFactory = contracts.StakeTONFactory;
-  out.StakeForStableCoinFactory = contracts.StakeForStableCoinFactory;
+  out.StakeDefiFactory = contracts.StakeDefiFactory;
   out.StakeFactory = contracts.StakeFactory;
   out.StakeRegistry = contracts.StakeRegistry;
+  out.Stake1Vault = contracts.Stake1Vault;
   out.StakeVaultFactory = contracts.StakeVaultFactory;
   out.Stake1Logic = contracts.Stake1Logic;
   out.Stake1Proxy = contracts.Stake1Proxy;

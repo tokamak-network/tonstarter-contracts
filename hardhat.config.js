@@ -4,14 +4,14 @@ require("@nomiclabs/hardhat-etherscan");
 require("@nomiclabs/hardhat-waffle");
 require('dotenv').config()
 
-require("./tasks/uniswap-v3-approve-erc20-task");
-require("./tasks/uniswap-v3-create-pool-task");
-require("./tasks/uniswap-v3-increase-liquidity-task");
-require("./tasks/uniswap-v3-mint-position-task");
-require("./tasks/uniswap-v3-swap-task");
-require("./tasks/view-tasks");
+// require("./tasks/uniswap-v3-approve-erc20-task");
+// require("./tasks/uniswap-v3-create-pool-task");
+// require("./tasks/uniswap-v3-increase-liquidity-task");
+// require("./tasks/uniswap-v3-mint-position-task");
+// require("./tasks/uniswap-v3-swap-task");
+// require("./tasks/view-tasks");
 
-const { RINKEBY_UNISWAP_V3_ACCOUNT_PK1, RINKEBY_UNISWAP_V3_ACCOUNT_PK2 } = process.env;
+//const { RINKEBY_UNISWAP_V3_ACCOUNT_PK1, RINKEBY_UNISWAP_V3_ACCOUNT_PK2 } = process.env;
 
 module.exports = {
   defaultNetwork: "rinkeby",
@@ -32,7 +32,7 @@ module.exports = {
     },
     rinkeby: {
       url: `https://rinkeby.infura.io/v3/${process.env.InfuraKey}`,
-      accounts: [RINKEBY_UNISWAP_V3_ACCOUNT_PK1, RINKEBY_UNISWAP_V3_ACCOUNT_PK2],
+      accounts: [process.env.ACCOUNT0_PK, process.env.ACCOUNT1_PK],
       gasMultiplier: 1.25,
       gas: 200
     }
