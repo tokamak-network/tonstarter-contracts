@@ -45,8 +45,8 @@ const IERC20Abi = require("../build/contracts/IERC20.json").abi;
 */
 // ico2.0 contracts
 const StakeTONFactory = contract.fromArtifact("StakeTONFactory");
-const StakeForStableCoinFactory = contract.fromArtifact(
-  "StakeForStableCoinFactory"
+const StakeDefiFactory = contract.fromArtifact(
+  "StakeDefiFactory"
 );
 
 const StakeSimple = contract.fromArtifact("StakeSimple");
@@ -225,7 +225,7 @@ class ICO20Contracts {
     this.stakeSimpleFactory = null;
 
     this.stakeTONfactory = null;
-    this.stakeForStableCoinFactory = null;
+    this.stakeDefiFactory = null;
 
     this.stakeregister = null;
     this.stakefactory = null;
@@ -259,14 +259,15 @@ class ICO20Contracts {
       this.stakeTONLogic.address,
       { from: owner });
 
-    this.stakeForStableCoinFactory = await StakeForStableCoinFactory.new({
+    this.stakeDefiFactory = await StakeDefiFactory.new(this.stakeSimple.address,
+    {
       from: owner,
     });
 
     this.stakefactory = await StakeFactory.new(
       this.stakeSimpleFactory.address,
       this.stakeTONfactory.address,
-      this.stakeForStableCoinFactory.address,
+      this.stakeDefiFactory.address,
       { from: owner }
     );
     this.stake1logic = await Stake1Logic.new({ from: owner });
@@ -282,7 +283,7 @@ class ICO20Contracts {
       fld: this.fld,
       sfld: this.sfld,
       // stakeForSFLD: this.stakeForSFLD,
-      stakeForStableCoinFactory: this.stakeForStableCoinFactory,
+      stakeDefiFactory: this.stakeDefiFactory,
       stakeTONfactory: this.stakeTONfactory,
       stakeregister: this.stakeregister,
       stakefactory: this.stakefactory,
@@ -443,7 +444,7 @@ class ICO20Contracts {
       stake1logic: this.stake1logic,
       stake1proxy: this.stake1proxy,
       stakeEntry: this.stakeEntry,
-      stakeForStableCoinFactory: this.stakeForStableCoinFactory,
+      stakeDefiFactory: this.stakeDefiFactory,
       stakeTONfactory: this.stakeTONfactory,
     };
   };

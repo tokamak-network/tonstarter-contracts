@@ -6,16 +6,13 @@ import "./Stake1Storage.sol";
 contract StakeTONStorage is Stake1Storage {
     address public tokamakLayer2;
 
-    // uniswap-v3
-    address internal _uniswapRouter;
-    address internal npm;
-    bytes internal routerPath;
-
     // tokamak
-    uint256 public toTokamak;
-    uint256 public fromTokamak;
-    uint256 public toUniswapTON;
+    uint256 public toTokamak;   // wei
+    uint256 public fromTokamak; // wton ray
+    uint256 public toUniswapWTON;
     uint256 public swappedAmountFLD;
+    uint256 public finalBalanceTON;
+    uint256 public finalBalanceWTON;
     uint256 public defiStatus;
 
     uint256 public requestNum;

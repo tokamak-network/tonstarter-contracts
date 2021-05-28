@@ -43,7 +43,7 @@ describe ("Upgradable Stake Contracts", function () {
     {name: "short staking", period: 50},
     {name: "long staking", period: 100}
   ];
-  
+
   before(async function () {
     this.timeout(1000000);
     contractsInitializer = new ICO20Contracts();
@@ -56,9 +56,9 @@ describe ("Upgradable Stake Contracts", function () {
 
     await contractsInitializer.initializeICO20Contracts(defaultSender);
     await contractsInitializer.initializePlasmaEvmContracts(defaultSender);
-    
+
     stakeEntry = await contractsInitializer.setEntry(defaultSender);
-  
+
     const result = await contractsInitializer.getICOContracts();
     ICO20Instances.fld = result.fld;
     ICO20Instances.stakeRegister = result.stakeregister;
@@ -66,13 +66,13 @@ describe ("Upgradable Stake Contracts", function () {
     ICO20Instances.stake1proxy = result.stake1proxy;
     ICO20Instances.stake1logic = result.stake1logic;
     ICO20Instances.stakeTONfactory = result.stakeTONfactory;
-    ICO20Instances.stakeForStableCoinFactory = result.stakeForStableCoinFactory;
+    ICO20Instances.stakeDefiFactory = result.stakeDefiFactory;
   });
 
   it("Deploy stake contracts modified", async function () {
     stakeFactoryModified = await StakeFactoyModified.new(
       ICO20Instances.stakeTONfactory.address,
-      ICO20Instances.stakeForStableCoinFactory.address,
+      ICO20Instances.stakeDefiFactory.address,
       { from: defaultSender }
     );
   });

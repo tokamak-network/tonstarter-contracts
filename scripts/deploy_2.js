@@ -54,17 +54,24 @@ console.log("wton:", wton);
 async function deployMain(defaultSender) {
   const [deployer, user1] = await ethers.getSigners();
 
-  const stake1Proxy = await ethers.getContractAt("Stake1Proxy", proxy);
-  const _logic = await stake1Proxy.implementation();
-  console.log("_logic:", _logic);
-
-  const stakeEntry = await ethers.getContractAt("Stake1Logic", proxy);
+  //const stakeEntry = await ethers.getContractAt("Stake1Logic", proxy);
   // const _logic = await stakeEntry.implementation();
   // console.log("_logic:" , _logic);
 
-  console.log("stakeEntry:", stakeEntry.address);
-  console.log("vaultfactory:", vaultfactory);
+  // console.log("stakeEntry:", stakeEntry.address);
+  // console.log("vaultfactory:", vaultfactory);
 
+  const stakeEntry = await ethers.getContractAt("Stake1Logic", proxy);
+  console.log("stakeEntry:" , stakeEntry.address);
+
+  console.log("fldtoken:", fldtoken);
+  console.log("registry:", registry);
+  console.log("factory:", factory);
+  console.log("vaultfactory:", wton);
+  console.log("ton:", ton);
+  console.log("wton:", vaultfactory);
+  console.log("depositManager:", depositManager);
+  console.log("seigManager:", seigManager);
 
   await stakeEntry.setStore(
     fldtoken,

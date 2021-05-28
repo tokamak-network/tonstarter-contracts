@@ -482,7 +482,6 @@ describe("StakeProxy ", function () {
       await stakeEntry.tokamakProcessUnStaking(
         stakeAddresses[i],
         layer2.address,
-        true,
         { from: defaultSender }
       );
 
@@ -648,7 +647,6 @@ describe("StakeProxy ", function () {
       await stakeEntry.tokamakProcessUnStaking(
         stakeAddresses[i],
         layer2.address,
-        true,
         { from: defaultSender }
       );
 

@@ -184,12 +184,10 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
     /// @dev Processes unstaking
     function tokamakProcessUnStaking(
         address _stakeContract,
-        address _layer2,
-        bool receiveTON
+        address _layer2
     ) external {
         IStakeTONTokamak(_stakeContract).tokamakProcessUnStaking(
-            _layer2,
-            receiveTON
+            _layer2
         );
     }
 

@@ -22,7 +22,6 @@ let factory = loadDeployed(process.env.NETWORK,"StakeFactory");
 let logic = loadDeployed(process.env.NETWORK,"Stake1Logic");
 let proxy = loadDeployed(process.env.NETWORK,"Stake1Proxy");
 let tonFactory = loadDeployed(process.env.NETWORK,"StakeTONFactory");
-let stablecoinFactory = loadDeployed(process.env.NETWORK,"StakeForStableCoinFactory");
 
 
 async function deployStakeTONFactory(defaultSender) {
@@ -46,7 +45,7 @@ async function deployStakeTONFactory(defaultSender) {
 async function deployStakeFactory(defaultSender) {
   const [deployer, user1] = await ethers.getSigners();
   console.log("tonFactory:", tonFactory);
-  console.log("stablecoinFactory:", stablecoinFactory);
+
   const StakeFactory = await ethers.getContractFactory("StakeFactory");
 
   const stakeFactory = await StakeFactory.deploy();

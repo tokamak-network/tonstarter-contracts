@@ -26,4 +26,6 @@ interface IWTON {
         returns (bool);
 
     function renounceTonMinter() external;
+
+    function approve(address spender, uint256 amount) external returns (bool);
 }

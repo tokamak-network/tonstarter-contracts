@@ -57,7 +57,7 @@ let StakeFactory,
   Stake1Proxy,
   StakeTON,
   IERC20;
-let StakeTONFactory, StakeForStableCoinFactory,
+let StakeTONFactory, StakeDefiFactory,
   StakeVaultFactory,
   StakeSimpleFactory;
 
@@ -110,7 +110,7 @@ class ICO20Contracts {
     this.stakeSimpleFactory = null;
 
     this.stakeTONfactory = null;
-    this.stakeForStableCoinFactory = null;
+    this.StakeDefiFactory = null;
 
     this.stakeregister = null;
     this.stakefactory = null;
@@ -179,7 +179,7 @@ class ICO20Contracts {
     this.vault_phase1_dev = null;
 
     this.stakeTONfactory = null;
-    this.stakeForStableCoinFactory = null;
+    this.StakeDefiFactory = null;
 
     this.stakeVaultFactory = null;
     this.stakeSimpleFactory = null;
@@ -203,7 +203,7 @@ class ICO20Contracts {
     Stake1Proxy = await ethers.getContractFactory("Stake1Proxy");
 
     StakeTONFactory = await ethers.getContractFactory("StakeTONFactory");
-    StakeForStableCoinFactory = await ethers.getContractFactory("StakeForStableCoinFactory");
+    StakeDefiFactory = await ethers.getContractFactory("StakeDefiFactory");
 
     this.fld = await FLD.connect(owner).deploy();
     this.sfld = await SFLD.connect(owner).deploy();
@@ -224,14 +224,14 @@ class ICO20Contracts {
       this.stakeTONLogic.address
     );
 
-    this.stakeForStableCoinFactory = await StakeForStableCoinFactory.connect(
+    this.stakeDefiFactory = await stakeDefiFactory.connect(
       owner
-    ).deploy();
+    ).deploy(this.stakeSimple.address);
 
     this.stakefactory = await StakeFactory.connect(owner).deploy(
       this.stakeSimpleFactory.address,
       this.stakeTONfactory.address,
-      this.stakeForStableCoinFactory.address
+      this.stakeDefiFactory.address
     );
     this.stake1logic = await Stake1Logic.connect(owner).deploy();
     this.stake1proxy = await Stake1Proxy.connect(owner).deploy();
