@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.7.6;
 pragma abicoder v2;
+
 import {ITON} from "../interfaces/ITON.sol";
 import {IIStake1Vault} from "../interfaces/IIStake1Vault.sol";
 import {IIDepositManager} from "../interfaces/IIDepositManager.sol";
@@ -92,7 +93,7 @@ contract TokamakStaker is StakeTONStorage, AccessControl {
         bool receiveTON
     );
     event exchangedWTONtoFLD(
-        address from,
+        address recipient,
         address caller,
         uint256 amountIn,
         uint256 amountOutMinimum,
@@ -123,6 +124,10 @@ contract TokamakStaker is StakeTONStorage, AccessControl {
         tokamakLayer2 = _layer2;
 
         emit SetTokamakLayer2(_layer2);
+    }
+
+    function getUniswapInfo() external view returns (address wethAddress, address uniswapRouter, uint256 fee) {
+        return ITokamakRegistry(stakeRegistry).getUniswap();
     }
 
     function approveUniswapRouter(uint256 amount) external {
@@ -301,7 +306,9 @@ contract TokamakStaker is StakeTONStorage, AccessControl {
     function exchangeWTONtoFLD(
         uint256 amountIn,
         uint256 amountOutMinimum,
-        uint256 deadline
+        uint256 deadline,
+        uint160 sqrtPriceLimitX96,
+        uint _type
     ) external returns (uint256 amountOut) {
         require(block.number <= endBlock, "period end");
         require(IIStake1Vault(vault).saleClosed() == true, "not closed");
@@ -316,8 +323,10 @@ contract TokamakStaker is StakeTONStorage, AccessControl {
             "tokamak zero"
         );
 
-        (address wethAddress, address uniswapRouter, uint256 fee) =
+        (address wethAddress, address uniswapRouter, uint256 _fee) =
             ITokamakRegistry(stakeRegistry).getUniswap();
+
+        uint24 fee = uint24(_fee);
 
         require(
             wethAddress != address(0) &&
@@ -326,6 +335,11 @@ contract TokamakStaker is StakeTONStorage, AccessControl {
             "uniswap zero"
         );
 
+        uint256 _amountIn = amountIn;
+        uint256 _amountOutMinimum = amountOutMinimum;
+        uint256 _deadline = deadline;
+        uint160 _sqrtPriceLimitX96 = uint160(sqrtPriceLimitX96);
+
         uint256 _amountWTON = IERC20BASE(wton).balanceOf(address(this));
         uint256 stakeOf = 0;
         if (tokamakLayer2 != address(0))
@@ -333,35 +347,79 @@ contract TokamakStaker is StakeTONStorage, AccessControl {
                 tokamakLayer2,
                 address(this)
             );
+
         uint256 holdAmount = _amountWTON;
         if (stakeOf > 0) holdAmount = stakeOf.add(_amountWTON);
 
         require(
             holdAmount > totalStakedAmount.mul(10**9) &&
-                holdAmount.sub(totalStakedAmount.mul(10**9)) >= amountIn,
-            "lack"
+                holdAmount.sub(totalStakedAmount.mul(10**9)) >= _amountIn,
+            "insufficient"
         );
+        toUniswapWTON += _amountIn;
 
-        // wton.swapFromTON(amountIn);
+        require(IERC20BASE(wton).approve(uniswapRouter, _amountIn), "can\'t approve");
 
-        toUniswapWTON += amountIn;
-        uint256 _amountIn = amountIn;
-        uint256 _deadline = deadline;
-        uint256 _amountOutMinimum = amountOutMinimum;
+        if (_type == 0) {
+            return exchangeWTONtoFLDexactInputSingle(wton, uniswapRouter, wethAddress, fee, _amountIn, _amountOutMinimum, _deadline, _sqrtPriceLimitX96);
+
+        } else if (_type == 1){
+            return exchangeWTONtoFLDexactInput(wton, uniswapRouter, wethAddress, fee, _amountIn, _amountOutMinimum, _deadline);
+        }
+    }
+
+    function exchangeWTONtoFLDexactInputSingle(
+        address wton,
+        address uniswapRouter,
+        address wethAddress,
+        uint24 fee,
+        uint256 amountIn,
+        uint256 amountOutMinimum,
+        uint256 deadline,
+        uint160 sqrtPriceLimitX96
+    ) public returns (uint256 amountOut) {
+
+        ISwapRouter.ExactInputSingleParams memory params =
+            ISwapRouter.ExactInputSingleParams({
+                tokenIn: wton,
+                tokenOut: token,
+                fee: fee,
+                recipient: address(this),
+                deadline: deadline,
+                amountIn: amountIn,
+                amountOutMinimum: amountOutMinimum,
+                sqrtPriceLimitX96: sqrtPriceLimitX96
+            });
+
+        amountOut = ISwapRouter(uniswapRouter).exactInputSingle(params);
+        emit exchangedWTONtoFLD(address(this), msg.sender, amountIn, amountOutMinimum, deadline, amountOut);
+    }
+
+    function exchangeWTONtoFLDexactInput(
+        address wton,
+        address uniswapRouter,
+        address wethAddress,
+        uint256 fee,
+        uint256 amountIn,
+        uint256 amountOutMinimum,
+        uint256 deadline
+    ) public returns (uint256 amountOut) {
+
         bytes memory path =
-            abi.encodePacked(wton, fee, wethAddress, fee, token);
+            abi.encodePacked(wton, fee, paytoken, fee, token);
 
         ISwapRouter.ExactInputParams memory params =
             ISwapRouter.ExactInputParams({
                 path: path,
                 recipient: address(this),
-                amountIn: _amountIn,
-                amountOutMinimum: _amountOutMinimum,
-                deadline: _deadline
+                amountIn: amountIn,
+                amountOutMinimum: amountOutMinimum,
+                deadline: deadline
             });
 
         amountOut = ISwapRouter(uniswapRouter).exactInput(params);
-        uint256 _amountOut = amountOut;
-        emit exchangedWTONtoFLD(address(this), msg.sender, _amountIn, _amountOutMinimum, _deadline, _amountOut);
+        emit exchangedWTONtoFLD(address(this), msg.sender, amountIn, amountOutMinimum, deadline, amountOut);
     }
+
+
 }

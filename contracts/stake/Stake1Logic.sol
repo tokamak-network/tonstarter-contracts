@@ -196,13 +196,17 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
         address _stakeContract,
         uint256 amountIn,
         uint256 amountOutMinimum,
-        uint256 deadline
+        uint256 deadline,
+        uint160 sqrtPriceLimitX96,
+        uint _type
     ) external returns (uint256 amountOut) {
         return
             IStakeTONTokamak(_stakeContract).exchangeWTONtoFLD(
                 amountIn,
                 amountOutMinimum,
-                deadline
+                deadline,
+                sqrtPriceLimitX96,
+                _type
             );
     }
 

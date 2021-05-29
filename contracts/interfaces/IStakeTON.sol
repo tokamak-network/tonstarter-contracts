@@ -69,6 +69,8 @@ interface IStakeTON {
     function exchangeWTONtoFLD(
         uint256 amountIn,
         uint256 amountOutMinimum,
-        uint256 deadline
+        uint256 deadline,
+        uint160 sqrtPriceLimitX96,
+        uint _type
     ) external returns (uint256 amountOut);
 }
