@@ -3,6 +3,8 @@ const { ethers, upgrades } = require("hardhat");
 const utils = ethers.utils;
 const save = require("./save_deployed_file");
 const loadDeployed = require("./load_deployed");
+const loadDeployedInitVariable = require("./load_deployed_init");
+
 const {
   padLeft,
   toBN,
@@ -54,12 +56,9 @@ console.log("wton:", wton);
 async function deployMain(defaultSender) {
   const [deployer, user1] = await ethers.getSigners();
 
-  //const stakeEntry = await ethers.getContractAt("Stake1Logic", proxy);
-  // const _logic = await stakeEntry.implementation();
-  // console.log("_logic:" , _logic);
-
-  // console.log("stakeEntry:", stakeEntry.address);
-  // console.log("vaultfactory:", vaultfactory);
+  let uniswapRouter = loadDeployedInitVariable(process.env.NETWORK,"UniswapRouter");
+  let uniswapFee = loadDeployedInitVariable(process.env.NETWORK,"UniswapFee");
+  let uniswapWeth = loadDeployedInitVariable(process.env.NETWORK,"WethAddress");
 
   const stakeEntry = await ethers.getContractAt("Stake1Logic", proxy);
   console.log("stakeEntry:" , stakeEntry.address);
@@ -93,6 +92,13 @@ async function deployMain(defaultSender) {
     depositManager,
     seigManager);
   console.log("stakeRegistry setTokamak:");
+
+  await stakeRegistry.setUniswap(
+    uniswapWeth,
+    uniswapRouter,
+    uniswapFee);
+  console.log("stakeRegistry setUniswap:");
+
 
   await stakeRegistry.grantRole(ADMIN_ROLE, proxy);
   console.log("stakeRegistry grantRole: proxy");
