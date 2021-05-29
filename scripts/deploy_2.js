@@ -57,6 +57,7 @@ async function deployMain(defaultSender) {
   const [deployer, user1] = await ethers.getSigners();
 
   let uniswapRouter = loadDeployedInitVariable(process.env.NETWORK,"UniswapRouter");
+  let uniswapNPM = loadDeployedInitVariable(process.env.NETWORK,"NonfungiblePositionManager");
   let uniswapFee = loadDeployedInitVariable(process.env.NETWORK,"UniswapFee");
   let uniswapWeth = loadDeployedInitVariable(process.env.NETWORK,"WethAddress");
 
@@ -93,11 +94,13 @@ async function deployMain(defaultSender) {
     seigManager);
   console.log("stakeRegistry setTokamak:");
 
-  await stakeRegistry.setUniswap(
-    uniswapWeth,
+  await stakeRegistry.addDefiInfo(
+    "UNISWAP_V3",
     uniswapRouter,
+    uniswapNPM,
+    uniswapWeth,
     uniswapFee);
-  console.log("stakeRegistry setUniswap:");
+  console.log("stakeRegistry addDefiInfo:");
 
 
   await stakeRegistry.grantRole(ADMIN_ROLE, proxy);

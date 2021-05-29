@@ -1,6 +1,7 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity ^0.7.6;
 
+import "../libraries/LibTokenStake1.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 
 /// @title Stake Registry
@@ -10,6 +11,7 @@ contract StakeRegistry is AccessControl {
 
     bytes32 public constant ZERO_HASH =
         0x0000000000000000000000000000000000000000000000000000000000000000;
+
 
     address public fld;
     // Addresses for Tokamak staking
@@ -38,6 +40,9 @@ contract StakeRegistry is AccessControl {
     // Vault address of staking contract
     mapping(address => address) public stakeContractVault;
 
+    // Defi Info
+    mapping(bytes32 => LibTokenStake1.DefiInfo) public defiInfo;
+
     modifier onlyOwner() {
         require(
             hasRole(ADMIN_ROLE, msg.sender),
@@ -65,11 +70,12 @@ contract StakeRegistry is AccessControl {
         address depositManager,
         address seigManager
     );
-    event SetUniswap(
-        address wethAddress,
-        address uniswapRouter,
-        uint256 fee
-    );
+    // event SetUniswap(
+    //     address wethAddress,
+    //     address uniswapRouter,
+    //     uint256 fee
+    // );
+    event AddedDefiInfo(bytes32 nameHash, string name, address router, address ex1, address ex2, uint256 fee);
 
     constructor(address _fld) {
         _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
@@ -100,17 +106,38 @@ contract StakeRegistry is AccessControl {
     }
 
     /// @dev Set values for Uniswap
-    function setUniswap(
-        address _wethAddress,
-        address _uniswapRouter,
-        uint256 _fee
-    ) external onlyOwner nonZero(_wethAddress) nonZero(_uniswapRouter) {
-        require(_fee > 0, "StakeRegistry: fee is zero");
-        uniswapRouter = _uniswapRouter;
-        wethAddress = _wethAddress;
-        fee = _fee;
+    // function setUniswap(
+    //     address _wethAddress,
+    //     address _uniswapRouter,
+    //     uint256 _fee
+    // ) external onlyOwner nonZero(_wethAddress) nonZero(_uniswapRouter) {
+    //     require(_fee > 0, "StakeRegistry: fee is zero");
+    //     uniswapRouter = _uniswapRouter;
+    //     wethAddress = _wethAddress;
+    //     fee = _fee;
 
-        emit SetUniswap(wethAddress, uniswapRouter, fee);
+    //     emit SetUniswap(wethAddress, uniswapRouter, fee);
+    // }
+
+    /// @dev Adds DefiInfo
+    function addDefiInfo(
+        string calldata _name,
+        address _router,
+        address _ex1,
+        address _ex2,
+        uint256 _fee
+    ) external onlyOwner nonZero(_router){
+        bytes32 nameHash = keccak256(abi.encodePacked(_name));
+        require(nameHash != ZERO_HASH, "nameHash zero");
+
+        LibTokenStake1.DefiInfo storage _defiInfo = defiInfo[nameHash];
+        _defiInfo.name = _name;
+        _defiInfo.router = _router;
+        _defiInfo.ext1 = _ex1;
+        _defiInfo.ext2 = _ex2;
+        _defiInfo.fee = _fee;
+
+        emit AddedDefiInfo(nameHash, _name, _router, _ex1, _ex2, _fee);
     }
 
     /// @dev Adds vault
@@ -167,10 +194,18 @@ contract StakeRegistry is AccessControl {
         returns (
             address,
             address,
+            address,
             uint256
         )
     {
-        return (wethAddress, uniswapRouter, fee);
+        //string _name = "UNISWAP_V3";
+        bytes32 nameHash = keccak256(abi.encodePacked("UNISWAP_V3"));
+        return (
+            defiInfo[nameHash].router,
+            defiInfo[nameHash].ext1,
+            defiInfo[nameHash].ext2,
+            defiInfo[nameHash].fee
+            ) ;
     }
 
     /// @dev Get addresses of vaults of index phase

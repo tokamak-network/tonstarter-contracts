@@ -45,6 +45,7 @@ interface ITokamakRegistry {
         returns (
             address,
             address,
+            address,
             uint256
         );
 }
@@ -126,23 +127,16 @@ contract TokamakStaker is StakeTONStorage, AccessControl {
         emit SetTokamakLayer2(_layer2);
     }
 
-    function getUniswapInfo() external view returns (address wethAddress, address uniswapRouter, uint256 fee) {
+    function getUniswapInfo() external view returns (address uniswapRouter, address npm, address ext, uint256 fee) {
         return ITokamakRegistry(stakeRegistry).getUniswap();
     }
 
     function approveUniswapRouter(uint256 amount) external {
-        (, address uniswapRouter, ) =
+        (address uniswapRouter, address npm, ,) =
             ITokamakRegistry(stakeRegistry).getUniswap();
 
-        require(
-            uniswapRouter != address(0),
-            "TokamakStaker: uniswapRouter zero"
-        );
-
-        require(
-            IERC20BASE(paytoken).approve(uniswapRouter, amount),
-            "TokamakStaker: approve fail"
-        );
+        if (uniswapRouter != address(0)) IERC20BASE(paytoken).approve(uniswapRouter, amount);
+        if (npm != address(0)) IERC20BASE(paytoken).approve(npm, amount);
     }
 
     function tokamakStaking(address _layer2)
@@ -323,15 +317,13 @@ contract TokamakStaker is StakeTONStorage, AccessControl {
             "tokamak zero"
         );
 
-        (address wethAddress, address uniswapRouter, uint256 _fee) =
+        (address uniswapRouter, address npm,  , uint256 _fee) =
             ITokamakRegistry(stakeRegistry).getUniswap();
 
         uint24 fee = uint24(_fee);
 
         require(
-            wethAddress != address(0) &&
-                uniswapRouter != address(0) &&
-                fee > 0,
+                uniswapRouter != address(0) ,
             "uniswap zero"
         );
 
@@ -356,28 +348,29 @@ contract TokamakStaker is StakeTONStorage, AccessControl {
                 holdAmount.sub(totalStakedAmount.mul(10**9)) >= _amountIn,
             "insufficient"
         );
-        toUniswapWTON += _amountIn;
 
-        require(IERC20BASE(wton).approve(uniswapRouter, _amountIn), "can\'t approve");
+        require(IERC20BASE(wton).approve(uniswapRouter, _amountIn), "can\'t approve uniswapRouter");
+        require(IERC20BASE(wton).approve(npm, _amountIn), "can\'t approve npm");
 
         if (_type == 0) {
-            return exchangeWTONtoFLDexactInputSingle(wton, uniswapRouter, wethAddress, fee, _amountIn, _amountOutMinimum, _deadline, _sqrtPriceLimitX96);
+            return exchangeWTONtoFLDexactInputSingle(wton, uniswapRouter, fee, _amountIn, _amountOutMinimum, _deadline, _sqrtPriceLimitX96);
 
         } else if (_type == 1){
-            return exchangeWTONtoFLDexactInput(wton, uniswapRouter, wethAddress, fee, _amountIn, _amountOutMinimum, _deadline);
+            return exchangeWTONtoFLDexactInput(wton, uniswapRouter,fee, _amountIn, _amountOutMinimum, _deadline);
+
         }
     }
 
     function exchangeWTONtoFLDexactInputSingle(
         address wton,
         address uniswapRouter,
-        address wethAddress,
         uint24 fee,
         uint256 amountIn,
         uint256 amountOutMinimum,
         uint256 deadline,
         uint160 sqrtPriceLimitX96
     ) public returns (uint256 amountOut) {
+        toUniswapWTON += amountIn;
 
         ISwapRouter.ExactInputSingleParams memory params =
             ISwapRouter.ExactInputSingleParams({
@@ -398,13 +391,12 @@ contract TokamakStaker is StakeTONStorage, AccessControl {
     function exchangeWTONtoFLDexactInput(
         address wton,
         address uniswapRouter,
-        address wethAddress,
         uint256 fee,
         uint256 amountIn,
         uint256 amountOutMinimum,
         uint256 deadline
     ) public returns (uint256 amountOut) {
-
+        toUniswapWTON += amountIn;
         bytes memory path =
             abi.encodePacked(wton, fee, paytoken, fee, token);
 
@@ -418,6 +410,7 @@ contract TokamakStaker is StakeTONStorage, AccessControl {
             });
 
         amountOut = ISwapRouter(uniswapRouter).exactInput(params);
+
         emit exchangedWTONtoFLD(address(this), msg.sender, amountIn, amountOutMinimum, deadline, amountOut);
     }
 

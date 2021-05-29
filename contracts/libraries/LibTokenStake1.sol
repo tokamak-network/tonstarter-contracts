@@ -11,7 +11,13 @@ library LibTokenStake1 {
         WITHDRAW,
         END
     }
-
+    struct DefiInfo {
+        string name;
+        address router;
+        address ext1;
+        address ext2;
+        uint256 fee;
+    }
     struct StakeInfo {
         string name;
         uint256 startBlock;
