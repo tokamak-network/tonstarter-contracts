@@ -11,7 +11,7 @@ require("./tasks/uniswap-v3-mint-position-task");
 require("./tasks/uniswap-v3-swap-task");
 require("./tasks/view-tasks");
 
-const { RINKEBY_UNISWAP_V3_ACCOUNT_PK1, RINKEBY_UNISWAP_V3_ACCOUNT_PK2 } = process.env;
+const { RINKEBY_UNISWAP_V3_ACCOUNT_PK1, RINKEBY_UNISWAP_V3_ACCOUNT_PK2, RINKEBY_UNISWAP_V3_ACCOUNT_PK3 } = process.env;
 task("accounts", "Prints the list of accounts", async () => {
   const accounts = await ethers.getSigners();
   // const prov = await ethers.getDefaultProvider();
@@ -43,7 +43,8 @@ module.exports = {
       url: `https://rinkeby.infura.io/v3/${process.env.InfuraKey}`,
       accounts: [
           `${RINKEBY_UNISWAP_V3_ACCOUNT_PK1}`,
-          `${RINKEBY_UNISWAP_V3_ACCOUNT_PK2}`
+          `${RINKEBY_UNISWAP_V3_ACCOUNT_PK2}`,
+          `${RINKEBY_UNISWAP_V3_ACCOUNT_PK3}`
           ],
       gasMultiplier: 1.25
     }
