@@ -4,6 +4,14 @@ pragma solidity ^0.7.6;
 import "./Stake1Storage.sol";
 
 contract StakeTONStorage is Stake1Storage {
+
+    //
+    address ton;
+    address wton;
+    address seigManager;
+    address depositManager;
+
+
     address public tokamakLayer2;
 
     // tokamak
