@@ -13,6 +13,6 @@ interface IStakeTONTokamak {
         uint256 amountOutMinimum,
         uint256 deadline,
         uint160 sqrtPriceLimitX96,
-        uint _type
+        uint256 _type
     ) external returns (uint256 amountOut);
 }

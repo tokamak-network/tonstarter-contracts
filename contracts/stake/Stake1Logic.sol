@@ -36,8 +36,7 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
     );
     event SetStakeRegistry(address stakeRegistry);
 
-    //////////////////////////////////////////////////////////////////////
-    // setters
+    /// @dev set storage
     function setStore(
         address _fld,
         address _stakeRegistry,
@@ -66,6 +65,7 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
         seigManager = _seigManager;
     }
 
+    /// @dev create vault
     function createVault(
         address _paytoken,
         uint256 _cap,
@@ -88,6 +88,7 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
         emit CreatedVault(vault, _paytoken, _cap);
     }
 
+    /// @dev create stake contract in vault
     function createStakeContract(
         uint256 _phase,
         address _vault,
@@ -182,13 +183,10 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
     }
 
     /// @dev Processes unstaking
-    function tokamakProcessUnStaking(
-        address _stakeContract,
-        address _layer2
-    ) external {
-        IStakeTONTokamak(_stakeContract).tokamakProcessUnStaking(
-            _layer2
-        );
+    function tokamakProcessUnStaking(address _stakeContract, address _layer2)
+        external
+    {
+        IStakeTONTokamak(_stakeContract).tokamakProcessUnStaking(_layer2);
     }
 
     /// @dev Swap TON to FLD
@@ -198,7 +196,7 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
         uint256 amountOutMinimum,
         uint256 deadline,
         uint160 sqrtPriceLimitX96,
-        uint _type
+        uint256 _type
     ) external returns (uint256 amountOut) {
         return
             IStakeTONTokamak(_stakeContract).exchangeWTONtoFLD(

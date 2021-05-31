@@ -128,12 +128,13 @@ contract StakeTON is TokamakStaker {
 
         if (withdrawFlag == false) {
             withdrawFlag = true;
-            if(paytoken == ton){
+            if (paytoken == ton) {
                 swappedAmountFLD = IIERC20(token).balanceOf(address(this));
                 finalBalanceWTON = IIERC20(wton).balanceOf(address(this));
                 finalBalanceTON = IIERC20(ton).balanceOf(address(this));
                 require(
-                    finalBalanceWTON.div(10**9).add(finalBalanceTON) >= totalStakedAmount,
+                    finalBalanceWTON.div(10**9).add(finalBalanceTON) >=
+                        totalStakedAmount,
                     "finalBalance is lack"
                 );
             }
@@ -148,24 +149,28 @@ contract StakeTON is TokamakStaker {
             uint256 tonAmount = 0;
             uint256 wtonAmount = 0;
             uint256 fldAmount = 0;
-            if (finalBalanceTON > 0) tonAmount = finalBalanceTON.mul(amount).div(totalStakedAmount);
-            if (finalBalanceWTON > 0) wtonAmount = finalBalanceWTON.mul(amount).div(totalStakedAmount);
-            if (swappedAmountFLD > 0) fldAmount = swappedAmountFLD.mul(amount).div(totalStakedAmount);
+            if (finalBalanceTON > 0)
+                tonAmount = finalBalanceTON.mul(amount).div(totalStakedAmount);
+            if (finalBalanceWTON > 0)
+                wtonAmount = finalBalanceWTON.mul(amount).div(
+                    totalStakedAmount
+                );
+            if (swappedAmountFLD > 0)
+                fldAmount = swappedAmountFLD.mul(amount).div(totalStakedAmount);
 
             staked.releasedFLDAmount = fldAmount;
-            if(wtonAmount > 0) staked.releasedAmount = wtonAmount.div(10**9).add(tonAmount);
+            if (wtonAmount > 0)
+                staked.releasedAmount = wtonAmount.div(10**9).add(tonAmount);
             else staked.releasedAmount = tonAmount;
 
             tonWithdraw(ton, wton, tonAmount, wtonAmount, fldAmount);
-
-        } else if (paytoken == address(0)){
+        } else if (paytoken == address(0)) {
             require(staked.releasedAmount <= staked.amount, "Amount wrong");
             staked.releasedAmount = amount;
             address payable self = address(uint160(address(this)));
             require(self.balance >= amount);
             (bool success, ) = msg.sender.call{value: amount}("");
             require(success, "withdraw failed.");
-
         } else {
             require(staked.releasedAmount <= staked.amount, "Amount wrong");
             staked.releasedAmount = amount;
@@ -175,31 +180,46 @@ contract StakeTON is TokamakStaker {
             );
         }
 
-        emit Withdrawal(msg.sender, staked.releasedAmount, staked.releasedFLDAmount);
+        emit Withdrawal(
+            msg.sender,
+            staked.releasedAmount,
+            staked.releasedFLDAmount
+        );
     }
 
-    function tonWithdraw(address ton, address wton, uint256 tonAmount, uint256 wtonAmount, uint256 fldAmount) internal {
-
-        if (tonAmount > 0){
+    function tonWithdraw(
+        address ton,
+        address wton,
+        uint256 tonAmount,
+        uint256 wtonAmount,
+        uint256 fldAmount
+    ) internal {
+        if (tonAmount > 0) {
             require(
-                IIERC20(ton).balanceOf(address(this)) >= tonAmount, "ton balance is lack");
+                IIERC20(ton).balanceOf(address(this)) >= tonAmount,
+                "ton balance is lack"
+            );
 
             require(
                 IIERC20(ton).transfer(msg.sender, tonAmount),
                 "transfer ton fail"
             );
         }
-        if (wtonAmount > 0){
+        if (wtonAmount > 0) {
             require(
-                IIERC20(wton).balanceOf(address(this)) >= wtonAmount, "wton balance is lack");
+                IIERC20(wton).balanceOf(address(this)) >= wtonAmount,
+                "wton balance is lack"
+            );
             require(
                 IWTON(wton).swapToTONAndTransfer(msg.sender, wtonAmount),
                 "transfer wton fail"
             );
         }
-        if (fldAmount > 0){
+        if (fldAmount > 0) {
             require(
-                IIERC20(token).balanceOf(address(this)) >= fldAmount, "fld balance is lack");
+                IIERC20(token).balanceOf(address(this)) >= fldAmount,
+                "fld balance is lack"
+            );
             require(
                 IIERC20(token).transfer(msg.sender, fldAmount),
                 "transfer fld fail"
@@ -366,5 +386,4 @@ contract StakeTON is TokamakStaker {
         return (reward, startR, endR, blockTotalReward);
     }
     */
-
 }

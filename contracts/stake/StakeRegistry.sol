@@ -12,35 +12,30 @@ contract StakeRegistry is AccessControl {
     bytes32 public constant ZERO_HASH =
         0x0000000000000000000000000000000000000000000000000000000000000000;
 
-
     address public fld;
-    // Addresses for Tokamak staking
+
+    /// @dev Addresses for Tokamak staking
     address public ton;
     address public wton;
     address public depositManager;
     address public seigManager;
 
-    // uniswap router
-    address public uniswapRouter;
-    address public wethAddress;
-    uint256 public fee;
-
-    // Contracts included in the phase
+    /// Contracts included in the phase
     mapping(uint256 => address[]) public phases;
 
-    // Vault address mapping with vault name hash
+    /// Vault address mapping with vault name hash
     mapping(bytes32 => address) public vaults;
 
-    // Vault name hash mapping with vault address
+    /// Vault name hash mapping with vault address
     mapping(address => bytes32) public vaultNames;
 
-    // List of staking contracts included in the vault
+    /// List of staking contracts included in the vault
     mapping(address => address[]) public stakeContractsOfVault;
 
-    // Vault address of staking contract
+    /// Vault address of staking contract
     mapping(address => address) public stakeContractVault;
 
-    // Defi Info
+    /// Defi Info
     mapping(bytes32 => LibTokenStake1.DefiInfo) public defiInfo;
 
     modifier onlyOwner() {
@@ -56,9 +51,6 @@ contract StakeRegistry is AccessControl {
         _;
     }
 
-    //////////////////////////////
-    // Events
-    //////////////////////////////
     event AddedVault(address indexed vault, uint256 phase);
     event AddedStakeContract(
         address indexed vault,
@@ -70,12 +62,15 @@ contract StakeRegistry is AccessControl {
         address depositManager,
         address seigManager
     );
-    // event SetUniswap(
-    //     address wethAddress,
-    //     address uniswapRouter,
-    //     uint256 fee
-    // );
-    event AddedDefiInfo(bytes32 nameHash, string name, address router, address ex1, address ex2, uint256 fee);
+
+    event AddedDefiInfo(
+        bytes32 nameHash,
+        string name,
+        address router,
+        address ex1,
+        address ex2,
+        uint256 fee
+    );
 
     constructor(address _fld) {
         _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
@@ -83,7 +78,11 @@ contract StakeRegistry is AccessControl {
         fld = _fld;
     }
 
-    /// @dev Set address for Tokamak integration
+    /// Set address for Tokamak integration
+    /// @param _ton TON address
+    /// @param _wton WTON address
+    /// @param _depositManager DepositManager address
+    /// @param _seigManager SeigManager address
     function setTokamak(
         address _ton,
         address _wton,
@@ -105,28 +104,19 @@ contract StakeRegistry is AccessControl {
         emit SetTokamak(ton, wton, depositManager, seigManager);
     }
 
-    /// @dev Set values for Uniswap
-    // function setUniswap(
-    //     address _wethAddress,
-    //     address _uniswapRouter,
-    //     uint256 _fee
-    // ) external onlyOwner nonZero(_wethAddress) nonZero(_uniswapRouter) {
-    //     require(_fee > 0, "StakeRegistry: fee is zero");
-    //     uniswapRouter = _uniswapRouter;
-    //     wethAddress = _wethAddress;
-    //     fee = _fee;
-
-    //     emit SetUniswap(wethAddress, uniswapRouter, fee);
-    // }
-
-    /// @dev Adds DefiInfo
+    /// Add information related to Defi
+    /// @param _name name . ex) UNISWAP_V3
+    /// @param _router entry point of defi
+    /// @param _ex1  additional variable . ex) positionManagerAddress in Uniswap V3
+    /// @param _ex2  additional variable . ex) WETH Address in Uniswap V3
+    /// @param _fee  fee
     function addDefiInfo(
         string calldata _name,
         address _router,
         address _ex1,
         address _ex2,
         uint256 _fee
-    ) external onlyOwner nonZero(_router){
+    ) external onlyOwner nonZero(_router) {
         bytes32 nameHash = keccak256(abi.encodePacked(_name));
         require(nameHash != ZERO_HASH, "nameHash zero");
 
@@ -140,7 +130,11 @@ contract StakeRegistry is AccessControl {
         emit AddedDefiInfo(nameHash, _name, _router, _ex1, _ex2, _fee);
     }
 
-    /// @dev Adds vault
+    /// Add Vault
+    /// It is excuted by proxy
+    /// @param _vault vault address
+    /// @param _phase phase ex) 1,2,3
+    /// @param _vaultName  hash of vault's name
     function addVault(
         address _vault,
         uint256 _phase,
@@ -157,7 +151,10 @@ contract StakeRegistry is AccessControl {
         emit AddedVault(_vault, _phase);
     }
 
-    /// @dev Stores vault and stake, and maps them togethers
+    /// Add StakeContract in vault
+    /// It is excuted by proxy
+    /// @param _vault vault address
+    /// @param _stakeContract  StakeContract address
     function addStakeContract(address _vault, address _stakeContract)
         external
         onlyOwner
@@ -173,7 +170,8 @@ contract StakeRegistry is AccessControl {
         emit AddedStakeContract(_vault, _stakeContract);
     }
 
-    /// @dev Get addresses for Tokamak interface
+    /// Get addresses for Tokamak interface
+    /// @return (ton, wton, depositManager, seigManager)
     function getTokamak()
         external
         view
@@ -187,7 +185,7 @@ contract StakeRegistry is AccessControl {
         return (ton, wton, depositManager, seigManager);
     }
 
-    /// @dev Get addresses for Tokamak interface
+    /// Get addresses for UNISWAP_V3 interface
     function getUniswap()
         external
         view
@@ -205,10 +203,10 @@ contract StakeRegistry is AccessControl {
             defiInfo[nameHash].ext1,
             defiInfo[nameHash].ext2,
             defiInfo[nameHash].fee
-            ) ;
+        );
     }
 
-    /// @dev Get addresses of vaults of index phase
+    /// Get addresses of vaults of index phase
     function phasesAll(uint256 _index)
         external
         view
@@ -217,7 +215,7 @@ contract StakeRegistry is AccessControl {
         return phases[_index];
     }
 
-    /// @dev Get addresses of staker of _vault
+    /// Get addresses of staker of _vault
     function stakeContractsOfVaultAll(address _vault)
         external
         view
@@ -226,7 +224,7 @@ contract StakeRegistry is AccessControl {
         return stakeContractsOfVault[_vault];
     }
 
-    /// @dev Checks if a vault is withing the given phase
+    /// Checks if a vault is withing the given phase
     function validVault(uint256 _phase, address _vault)
         external
         view
