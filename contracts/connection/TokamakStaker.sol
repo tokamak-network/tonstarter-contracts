@@ -61,7 +61,7 @@ contract TokamakStaker is StakeTONStorage, AccessControl {
     }
 
     modifier sameTokamakLayer(address _addr) {
-        require(tokamakLayer2 = _addr, "different layer");
+        require(tokamakLayer2 == _addr, "different layer");
         _;
     }
 
