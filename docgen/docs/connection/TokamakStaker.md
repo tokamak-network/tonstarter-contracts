@@ -36,47 +36,47 @@
 
 - [`exchangedWTONtoFLD(address caller, uint256 amountIn, uint256 amountOut)`](#TokamakStaker-exchangedWTONtoFLD-address-uint256-uint256-)
 
-## Function `transferOwnership(address newOwner)` {#TokamakStaker-transferOwnership-address-}
+## Function `transferOwnership(address newOwner) `
 
 No description
 
-## Function `setRegistry(address _registry)` {#TokamakStaker-setRegistry-address-}
+## Function `setRegistry(address _registry) `
 
 No description
 
-## Function `setTokamakLayer2(address _layer2)` {#TokamakStaker-setTokamakLayer2-address-}
+## Function `setTokamakLayer2(address _layer2) `
 
 No description
 
-## Function `getUniswapInfo() → address uniswapRouter, address npm, address ext, uint256 fee` {#TokamakStaker-getUniswapInfo--}
+## Function `getUniswapInfo() `
 
 No description
 
-## Function `approveUniswapRouter(uint256 amount)` {#TokamakStaker-approveUniswapRouter-uint256-}
+## Function `approveUniswapRouter(uint256 amount) `
 
 No description
 
-## Function `tokamakStaking(address _layer2)` {#TokamakStaker-tokamakStaking-address-}
+## Function `tokamakStaking(address _layer2) `
 
 No description
 
-## Function `tokamakRequestUnStaking(address _layer2, uint256 wtonAmount)` {#TokamakStaker-tokamakRequestUnStaking-address-uint256-}
+## Function `tokamakRequestUnStaking(address _layer2, uint256 wtonAmount) `
 
 No description
 
-## Function `tokamakProcessUnStaking(address _layer2)` {#TokamakStaker-tokamakProcessUnStaking-address-}
+## Function `tokamakProcessUnStaking(address _layer2) `
 
 No description
 
-## Function `exchangeWTONtoFLD(uint256 _amountIn, uint256 _amountOutMinimum, uint256 _deadline, uint160 sqrtPriceLimitX96, uint256 _kind) → uint256 amountOut` {#TokamakStaker-exchangeWTONtoFLD-uint256-uint256-uint256-uint160-uint256-}
+## Function `exchangeWTONtoFLD(uint256 _amountIn, uint256 _amountOutMinimum, uint256 _deadline, uint160 sqrtPriceLimitX96, uint256 _kind) `
 
 No description
 
-## Function `ExactInputSingleParams(address[2] addrs, address tokenIn, address tokenOut, uint24 fee, address recipient, uint256 deadline, uint256 amountIn, uint256 amountOutMinimum, uint160 sqrtPriceLimitX96) → uint256 amountOut` {#TokamakStaker-ExactInputSingleParams-address-2--address-address-uint24-address-uint256-uint256-uint256-uint160-}
+## Function `ExactInputSingleParams(address[2] addrs, address tokenIn, address tokenOut, uint24 fee, address recipient, uint256 deadline, uint256 amountIn, uint256 amountOutMinimum, uint160 sqrtPriceLimitX96) `
 
 No description
 
-## Function `exchangeWTONtoFLDexactInput(address uniswapRouter, address wton, address weth, uint256 fee, uint256 amountIn, uint256 amountOutMinimum, uint256 deadline) → uint256 amountOut` {#TokamakStaker-exchangeWTONtoFLDexactInput-address-address-address-uint256-uint256-uint256-uint256-}
+## Function `exchangeWTONtoFLDexactInput(address uniswapRouter, address wton, address weth, uint256 fee, uint256 amountIn, uint256 amountOutMinimum, uint256 deadline) `
 
 No description
 

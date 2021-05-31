@@ -20,31 +20,31 @@
 
 - [`Transfer(address from, address to, uint256 value)`](#SFLD-Transfer-address-address-uint256-)
 
-## Function `transferOwnership(address newOwner)` {#SFLD-transferOwnership-address-}
+## Function `transferOwnership(address newOwner) `
 
 No description
 
-## Function `mint(address to, uint256 amount) → bool` {#SFLD-mint-address-uint256-}
+## Function `mint(address to, uint256 amount) `
 
 No description
 
-## Function `burn(address from, uint256 amount) → bool` {#SFLD-burn-address-uint256-}
+## Function `burn(address from, uint256 amount) `
 
 No description
 
-## Function `approve(address spender, uint256 value) → bool` {#SFLD-approve-address-uint256-}
+## Function `approve(address spender, uint256 value) `
 
 No description
 
-## Function `transfer(address to, uint256 value) → bool` {#SFLD-transfer-address-uint256-}
+## Function `transfer(address to, uint256 value) `
 
 No description
 
-## Function `transferFrom(address from, address to, uint256 value) → bool` {#SFLD-transferFrom-address-address-uint256-}
+## Function `transferFrom(address from, address to, uint256 value) `
 
 No description
 
-## Function `permit(address owner, address spender, uint256 value, uint256 deadline, bytes signature)` {#SFLD-permit-address-address-uint256-uint256-bytes-}
+## Function `permit(address owner, address spender, uint256 value, uint256 deadline, bytes signature) `
 
 No description
 

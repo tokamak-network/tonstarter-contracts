@@ -18,38 +18,38 @@
 
 - [`yearnV2_claim()`](#YearnV2Staker-yearnV2_claim--)
 
-## Function `transferOwnership(address newOwner)` {#YearnV2Staker-transferOwnership-address-}
+## Function `transferOwnership(address newOwner) `
 
 No description
 
-## Function `setYearnV2(address _vault)` {#YearnV2Staker-setYearnV2-address-}
+## Function `setYearnV2(address _vault) `
 
 No description
 
-## Function `approveYearnV2Vault(uint256 amount)` {#YearnV2Staker-approveYearnV2Vault-uint256-}
+## Function `approveYearnV2Vault(uint256 amount) `
 
 No description
 
-## Function `yearnV2_calcTotalValue() → uint256 underlyingAmount` {#YearnV2Staker-yearnV2_calcTotalValue--}
+## Function `yearnV2_calcTotalValue() `
 
 No description
 
-## Function `yearnV2_deposit(uint256 amount)` {#YearnV2Staker-yearnV2_deposit-uint256-}
+## Function `yearnV2_deposit(uint256 amount) `
 
 No description
 
-## Function `yearnV2_withdraw(uint256 amount)` {#YearnV2Staker-yearnV2_withdraw-uint256-}
+## Function `yearnV2_withdraw(uint256 amount) `
 
 No description
 
-## Function `yearnV2_underlyingYield() → uint256` {#YearnV2Staker-yearnV2_underlyingYield--}
+## Function `yearnV2_underlyingYield() `
 
 No description
 
-## Function `yearnV2_unclaimedProfit(address user) → uint256` {#YearnV2Staker-yearnV2_unclaimedProfit-address-}
+## Function `yearnV2_unclaimedProfit(address user) `
 
 No description
 
-## Function `yearnV2_claim()` {#YearnV2Staker-yearnV2_claim--}
+## Function `yearnV2_claim() `
 
 No description

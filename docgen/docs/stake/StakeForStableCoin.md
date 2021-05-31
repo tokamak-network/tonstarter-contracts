@@ -18,27 +18,27 @@
 
 - [`Withdrawal(address from, address to, uint256 amount, uint256 currentBlcok)`](#StakeForStableCoin-Withdrawal-address-address-uint256-uint256-)
 
-## Function `initialize(address _token, address _paytoken, address _vault, uint256 _saleStartBlock, uint256 _startBlock, uint256 _period)` {#StakeForStableCoin-initialize-address-address-address-uint256-uint256-uint256-}
+## Function `initialize(address _token, address _paytoken, address _vault, uint256 _saleStartBlock, uint256 _startBlock, uint256 _period) `
 
 Initialize
 
-## Function `receive()` {#StakeForStableCoin-receive--}
+## Function `receive() `
 
 No description
 
-## Function `stake(uint256 _amount)` {#StakeForStableCoin-stake-uint256-}
+## Function `stake(uint256 _amount) `
 
 Stake amount
 
-## Function `withdraw()` {#StakeForStableCoin-withdraw--}
+## Function `withdraw() `
 
 To withdraw
 
-## Function `claim()` {#StakeForStableCoin-claim--}
+## Function `claim() `
 
 Claim for reward
 
-## Function `canRewardAmount(address account) → uint256` {#StakeForStableCoin-canRewardAmount-address-}
+## Function `canRewardAmount(address account) `
 
 Returns the amount that can be rewarded
 

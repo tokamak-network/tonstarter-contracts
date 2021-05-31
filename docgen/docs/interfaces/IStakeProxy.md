@@ -6,26 +6,14 @@
 
 - [`implementation()`](#IStakeProxy-implementation--)
 
-- [`grantRole(bytes32 role, address account)`](#IStakeProxy-grantRole-bytes32-address-)
-
-- [`revokeRole(bytes32 role, address account)`](#IStakeProxy-revokeRole-bytes32-address-)
-
-## Function `setProxyPause(bool _pause)` {#IStakeProxy-setProxyPause-bool-}
+## Function `setProxyPause(bool _pause) `
 
 No description
 
-## Function `upgradeTo(address impl)` {#IStakeProxy-upgradeTo-address-}
+## Function `upgradeTo(address impl) `
 
 No description
 
-## Function `implementation() → address` {#IStakeProxy-implementation--}
-
-No description
-
-## Function `grantRole(bytes32 role, address account)` {#IStakeProxy-grantRole-bytes32-address-}
-
-No description
-
-## Function `revokeRole(bytes32 role, address account)` {#IStakeProxy-revokeRole-bytes32-address-}
+## Function `implementation() `
 
 No description

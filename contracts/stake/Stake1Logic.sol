@@ -35,6 +35,7 @@ abstract contract Stake1Logic is StakeProxyStorage, AccessControl, IStake1Logic 
         address indexed stakeContract,
         uint256 phase
     );
+    event ClosedSale(address indexed vault);
     event SetStakeRegistry(address stakeRegistry);
 
 
@@ -246,6 +247,8 @@ abstract contract Stake1Logic is StakeProxyStorage, AccessControl, IStake1Logic 
 
     function closeSale(address _vault) external override {
         IStake1Vault(_vault).closeSale();
+
+        emit ClosedSale(_vault);
     }
 
     function stakeContractsOfVault(address _vault)

@@ -4,11 +4,11 @@
 
 - [`create(address[3] _addr, address _registry, uint256[3] _intdata, address owner)`](#StakeDefiFactory-create-address-3--address-uint256-3--address-)
 
-## Function `constructor(address _stakeDefiLogic)` {#StakeDefiFactory-constructor-address-}
+## Function `constructor(address _stakeDefiLogic) `
 
 No description
 
-## Function `create(address[3] _addr, address _registry, uint256[3] _intdata, address owner) → address` {#StakeDefiFactory-create-address-3--address-uint256-3--address-}
+## Function `create(address[3] _addr, address _registry, uint256[3] _intdata, address owner) `
 
 No description
 

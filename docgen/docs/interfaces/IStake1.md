@@ -20,42 +20,42 @@
 
 - [`stake(uint256 amount)`](#IStake1-stake-uint256-)
 
-## Function `token() → address` {#IStake1-token--}
+## Function `token() `
 
 No description
 
-## Function `paytoken() → address` {#IStake1-paytoken--}
+## Function `paytoken() `
 
 No description
 
-## Function `vault() → address` {#IStake1-vault--}
+## Function `vault() `
 
 No description
 
-## Function `saleStartBlock() → uint256` {#IStake1-saleStartBlock--}
+## Function `saleStartBlock() `
 
 No description
 
-## Function `startBlock() → uint256` {#IStake1-startBlock--}
+## Function `startBlock() `
 
 No description
 
-## Function `endBlock() → uint256` {#IStake1-endBlock--}
+## Function `endBlock() `
 
 No description
 
-## Function `rewardRaised() → uint256` {#IStake1-rewardRaised--}
+## Function `rewardRaised() `
 
 No description
 
-## Function `totalStakedAmount() → uint256` {#IStake1-totalStakedAmount--}
+## Function `totalStakedAmount() `
 
 No description
 
-## Function `userStaked(address account) → struct LibTokenStake1.StakedAmount` {#IStake1-userStaked-address-}
+## Function `userStaked(address account) `
 
 No description
 
-## Function `stake(uint256 amount)` {#IStake1-stake-uint256-}
+## Function `stake(uint256 amount) `
 
 No description

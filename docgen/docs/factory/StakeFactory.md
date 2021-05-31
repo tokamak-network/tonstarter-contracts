@@ -12,27 +12,27 @@
 
 - [`create(uint256 stakeType, address[4] _addr, address registry, uint256[3] _intdata)`](#StakeFactory-create-uint256-address-4--address-uint256-3--)
 
-## Function `constructor(address _stakeSimpleFactory, address _stakeTONFactory, address _stakeDefiFactory)` {#StakeFactory-constructor-address-address-address-}
+## Function `constructor(address _stakeSimpleFactory, address _stakeTONFactory, address _stakeDefiFactory) `
 
 No description
 
-## Function `transferOwnership(address newOwner)` {#StakeFactory-transferOwnership-address-}
+## Function `transferOwnership(address newOwner) `
 
 No description
 
-## Function `setStakeSimpleFactory(address _stakeSimpleFactory)` {#StakeFactory-setStakeSimpleFactory-address-}
+## Function `setStakeSimpleFactory(address _stakeSimpleFactory) `
 
 No description
 
-## Function `setStakeTONFactory(address _stakeTONFactory)` {#StakeFactory-setStakeTONFactory-address-}
+## Function `setStakeTONFactory(address _stakeTONFactory) `
 
 No description
 
-## Function `setStakeDefiFactory(address _stakeDefiFactory)` {#StakeFactory-setStakeDefiFactory-address-}
+## Function `setStakeDefiFactory(address _stakeDefiFactory) `
 
 No description
 
-## Function `create(uint256 stakeType, address[4] _addr, address registry, uint256[3] _intdata) → address` {#StakeFactory-create-uint256-address-4--address-uint256-3--}
+## Function `create(uint256 stakeType, address[4] _addr, address registry, uint256[3] _intdata) `
 
 No description
 

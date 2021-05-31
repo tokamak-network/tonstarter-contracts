@@ -32,15 +32,15 @@
 
 - [`AddedDefiInfo(bytes32 nameHash, string name, address router, address ex1, address ex2, uint256 fee)`](#StakeRegistry-AddedDefiInfo-bytes32-string-address-address-address-uint256-)
 
-## Function `constructor(address _fld)` {#StakeRegistry-constructor-address-}
+## Function `constructor(address _fld) `
 
 No description
 
-## Function `transferOwnership(address newOwner)` {#StakeRegistry-transferOwnership-address-}
+## Function `transferOwnership(address newOwner) `
 
 No description
 
-## Function `setTokamak(address _ton, address _wton, address _depositManager, address _seigManager)` {#StakeRegistry-setTokamak-address-address-address-address-}
+## Function `setTokamak(address _ton, address _wton, address _depositManager, address _seigManager) `
 
 No description
 
@@ -54,7 +54,7 @@ No description
 
 - `_seigManager`: SeigManager address
 
-## Function `addDefiInfo(string _name, address _router, address _ex1, address _ex2, uint256 _fee)` {#StakeRegistry-addDefiInfo-string-address-address-address-uint256-}
+## Function `addDefiInfo(string _name, address _router, address _ex1, address _ex2, uint256 _fee) `
 
 No description
 
@@ -70,7 +70,7 @@ No description
 
 - `_fee`:  fee
 
-## Function `addVault(address _vault, uint256 _phase, bytes32 _vaultName)` {#StakeRegistry-addVault-address-uint256-bytes32-}
+## Function `addVault(address _vault, uint256 _phase, bytes32 _vaultName) `
 
 No description
 
@@ -82,7 +82,7 @@ No description
 
 - `_vaultName`:  hash of vault's name
 
-## Function `addStakeContract(address _vault, address _stakeContract)` {#StakeRegistry-addStakeContract-address-address-}
+## Function `addStakeContract(address _vault, address _stakeContract) `
 
 No description
 
@@ -92,23 +92,23 @@ No description
 
 - `_stakeContract`:  StakeContract address
 
-## Function `getTokamak() → address, address, address, address` {#StakeRegistry-getTokamak--}
+## Function `getTokamak() `
 
 No description
 
-## Function `getUniswap() → address, address, address, uint256` {#StakeRegistry-getUniswap--}
+## Function `getUniswap() `
 
 No description
 
-## Function `phasesAll(uint256 _index) → address[]` {#StakeRegistry-phasesAll-uint256-}
+## Function `phasesAll(uint256 _index) `
 
 No description
 
-## Function `stakeContractsOfVaultAll(address _vault) → address[]` {#StakeRegistry-stakeContractsOfVaultAll-address-}
+## Function `stakeContractsOfVaultAll(address _vault) `
 
 No description
 
-## Function `validVault(uint256 _phase, address _vault) → bool valid` {#StakeRegistry-validVault-uint256-address-}
+## Function `validVault(uint256 _phase, address _vault) `
 
 No description
 

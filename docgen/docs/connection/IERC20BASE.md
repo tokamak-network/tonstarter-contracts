@@ -10,22 +10,22 @@
 
 - [`transferFrom(address from, address to, uint256 value)`](#IERC20BASE-transferFrom-address-address-uint256-)
 
-## Function `totalSupply() → uint256` {#IERC20BASE-totalSupply--}
+## Function `totalSupply() `
 
 No description
 
-## Function `balanceOf(address owner) → uint256` {#IERC20BASE-balanceOf-address-}
+## Function `balanceOf(address owner) `
 
 No description
 
-## Function `approve(address spender, uint256 value) → bool` {#IERC20BASE-approve-address-uint256-}
+## Function `approve(address spender, uint256 value) `
 
 No description
 
-## Function `transfer(address to, uint256 value) → bool` {#IERC20BASE-transfer-address-uint256-}
+## Function `transfer(address to, uint256 value) `
 
 No description
 
-## Function `transferFrom(address from, address to, uint256 value) → bool` {#IERC20BASE-transferFrom-address-address-uint256-}
+## Function `transferFrom(address from, address to, uint256 value) `
 
 No description

@@ -18,11 +18,11 @@
 
 - [`Upgraded(address implementation)`](#StakeVaultProxy-Upgraded-address-)
 
-## Function `constructor(address impl)` {#StakeVaultProxy-constructor-address-}
+## Function `constructor(address impl) `
 
 No description
 
-## Function `setProxyPause(bool _pause)` {#StakeVaultProxy-setProxyPause-bool-}
+## Function `setProxyPause(bool _pause) `
 
 No description
 
@@ -30,7 +30,7 @@ No description
 
 - `_pause`: true:pause or false:resume
 
-## Function `upgradeTo(address impl)` {#StakeVaultProxy-upgradeTo-address-}
+## Function `upgradeTo(address impl) `
 
 No description
 
@@ -38,19 +38,19 @@ No description
 
 - `impl`: New implementation contract address
 
-## Function `implementation() → address` {#StakeVaultProxy-implementation--}
+## Function `implementation() `
 
 returns the implementation
 
-## Function `receive()` {#StakeVaultProxy-receive--}
+## Function `receive() `
 
 No description
 
-## Function `fallback()` {#StakeVaultProxy-fallback--}
+## Function `fallback() `
 
 No description
 
-## Function `initialize(address _fld, address _paytoken, uint256 _cap, uint256 _saleStartBlock, uint256 _stakeStartBlock, address _stakefactory, uint256 _stakeType, address _defiAddr)` {#StakeVaultProxy-initialize-address-address-uint256-uint256-uint256-address-uint256-address-}
+## Function `initialize(address _fld, address _paytoken, uint256 _cap, uint256 _saleStartBlock, uint256 _stakeStartBlock, address _stakefactory, uint256 _stakeType, address _defiAddr) `
 
 No description
 

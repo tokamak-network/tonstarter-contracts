@@ -20,15 +20,15 @@
 
 - [`Upgraded(address implementation)`](#StakeDefiProxy-Upgraded-address-)
 
-## Function `constructor(address _logic)` {#StakeDefiProxy-constructor-address-}
+## Function `constructor(address _logic) `
 
 No description
 
-## Function `transferOwnership(address newOwner)` {#StakeDefiProxy-transferOwnership-address-}
+## Function `transferOwnership(address newOwner) `
 
 No description
 
-## Function `setProxyPause(bool _pause)` {#StakeDefiProxy-setProxyPause-bool-}
+## Function `setProxyPause(bool _pause) `
 
 No description
 
@@ -36,7 +36,7 @@ No description
 
 - `_pause`: true:pause or false:resume
 
-## Function `upgradeTo(address impl)` {#StakeDefiProxy-upgradeTo-address-}
+## Function `upgradeTo(address impl) `
 
 No description
 
@@ -44,19 +44,19 @@ No description
 
 - `impl`: New implementation contract address
 
-## Function `implementation() → address` {#StakeDefiProxy-implementation--}
+## Function `implementation() `
 
 returns the implementation
 
-## Function `receive()` {#StakeDefiProxy-receive--}
+## Function `receive() `
 
 No description
 
-## Function `fallback()` {#StakeDefiProxy-fallback--}
+## Function `fallback() `
 
 No description
 
-## Function `setInit(address[3] _addr, address _registry, uint256[3] _intdata)` {#StakeDefiProxy-setInit-address-3--address-uint256-3--}
+## Function `setInit(address[3] _addr, address _registry, uint256[3] _intdata) `
 
 No description
 

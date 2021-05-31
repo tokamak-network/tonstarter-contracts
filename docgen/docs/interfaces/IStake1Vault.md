@@ -6,8 +6,6 @@
 
 - [`changeCap(uint256 _cap)`](#IStake1Vault-changeCap-uint256-)
 
-- [`changeOrderedEndBlocks(uint256[] _ordered)`](#IStake1Vault-changeOrderedEndBlocks-uint256---)
-
 - [`addSubVaultOfStake(string _name, address stakeContract, uint256 periodBlocks)`](#IStake1Vault-addSubVaultOfStake-string-address-uint256-)
 
 - [`closeSale()`](#IStake1Vault-closeSale--)
@@ -44,90 +42,86 @@
 
 - [`stakeEndBlockTotal(uint256 endblock)`](#IStake1Vault-stakeEndBlockTotal-uint256-)
 
-## Function `initialize(address _fld, address _paytoken, uint256 _cap, uint256 _saleStartBlock, uint256 _stakeStartBlock)` {#IStake1Vault-initialize-address-address-uint256-uint256-uint256-}
+## Function `initialize(address _fld, address _paytoken, uint256 _cap, uint256 _saleStartBlock, uint256 _stakeStartBlock) `
 
 No description
 
-## Function `setFLD(address _ton)` {#IStake1Vault-setFLD-address-}
+## Function `setFLD(address _ton) `
 
 Sets the FLD address
 
-## Function `changeCap(uint256 _cap)` {#IStake1Vault-changeCap-uint256-}
+## Function `changeCap(uint256 _cap) `
 
 Changes the cap of vault.
 
-## Function `changeOrderedEndBlocks(uint256[] _ordered)` {#IStake1Vault-changeOrderedEndBlocks-uint256---}
+## Function `addSubVaultOfStake(string _name, address stakeContract, uint256 periodBlocks) `
 
 No description
 
-## Function `addSubVaultOfStake(string _name, address stakeContract, uint256 periodBlocks)` {#IStake1Vault-addSubVaultOfStake-string-address-uint256-}
+## Function `closeSale() `
 
 No description
 
-## Function `closeSale()` {#IStake1Vault-closeSale--}
+## Function `claim(address _to, uint256 _amount) `
 
 No description
 
-## Function `claim(address _to, uint256 _amount) → bool` {#IStake1Vault-claim-address-uint256-}
+## Function `canClaim(address _to, uint256 _amount) `
 
 No description
 
-## Function `canClaim(address _to, uint256 _amount) → uint256` {#IStake1Vault-canClaim-address-uint256-}
+## Function `totalRewardAmount(address _account) `
 
 No description
 
-## Function `totalRewardAmount(address _account) → uint256` {#IStake1Vault-totalRewardAmount-address-}
+## Function `stakeAddressesAll() `
 
 No description
 
-## Function `stakeAddressesAll() → address[]` {#IStake1Vault-stakeAddressesAll--}
+## Function `orderedEndBlocksAll() `
 
 No description
 
-## Function `orderedEndBlocksAll() → uint256[]` {#IStake1Vault-orderedEndBlocksAll--}
+## Function `fld() `
 
 No description
 
-## Function `fld() → address` {#IStake1Vault-fld--}
+## Function `paytoken() `
 
 No description
 
-## Function `paytoken() → address` {#IStake1Vault-paytoken--}
+## Function `cap() `
 
 No description
 
-## Function `cap() → uint256` {#IStake1Vault-cap--}
+## Function `stakeType() `
 
 No description
 
-## Function `stakeType() → uint256` {#IStake1Vault-stakeType--}
+## Function `defiAddr() `
 
 No description
 
-## Function `defiAddr() → address` {#IStake1Vault-defiAddr--}
+## Function `saleStartBlock() `
 
 No description
 
-## Function `saleStartBlock() → uint256` {#IStake1Vault-saleStartBlock--}
+## Function `stakeStartBlock() `
 
 No description
 
-## Function `stakeStartBlock() → uint256` {#IStake1Vault-stakeStartBlock--}
+## Function `stakeEndBlock() `
 
 No description
 
-## Function `stakeEndBlock() → uint256` {#IStake1Vault-stakeEndBlock--}
+## Function `blockTotalReward() `
 
 No description
 
-## Function `blockTotalReward() → uint256` {#IStake1Vault-blockTotalReward--}
+## Function `saleClosed() `
 
 No description
 
-## Function `saleClosed() → bool` {#IStake1Vault-saleClosed--}
-
-No description
-
-## Function `stakeEndBlockTotal(uint256 endblock) → uint256 totalStakedAmount` {#IStake1Vault-stakeEndBlockTotal-uint256-}
+## Function `stakeEndBlockTotal(uint256 endblock) `
 
 No description

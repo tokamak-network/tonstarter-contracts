@@ -31,7 +31,7 @@ interface IStake1Vault {
     function canClaim(address _to, uint256 _amount)
         external
         view
-        returns (uint256);
+        returns (bool);
 
     function totalRewardAmount(address _account)
         external

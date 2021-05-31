@@ -18,23 +18,23 @@
 
 - [`Withdrawal(address to, uint256 tonAmount, uint256 fldAmount)`](#StakeTON-Withdrawal-address-uint256-uint256-)
 
-## Function `receive()` {#StakeTON-receive--}
+## Function `receive() `
 
 No description
 
-## Function `stake(uint256 amount)` {#StakeTON-stake-uint256-}
+## Function `stake(uint256 amount) `
 
 Stake amount
 
-## Function `withdraw()` {#StakeTON-withdraw--}
+## Function `withdraw() `
 
 To withdraw
 
-## Function `claim()` {#StakeTON-claim--}
+## Function `claim() `
 
 Claim for reward
 
-## Function `canRewardAmount(address account, uint256 specilaBlock) → uint256` {#StakeTON-canRewardAmount-address-uint256-}
+## Function `canRewardAmount(address account, uint256 specilaBlock) `
 
 Returns the amount that can be rewarded
 

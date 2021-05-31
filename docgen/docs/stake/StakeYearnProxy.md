@@ -16,11 +16,11 @@
 
 - [`Upgraded(address implementation)`](#StakeYearnProxy-Upgraded-address-)
 
-## Function `transferOwnership(address newOwner)` {#StakeYearnProxy-transferOwnership-address-}
+## Function `transferOwnership(address newOwner) `
 
 No description
 
-## Function `setProxyPause(bool _pause)` {#StakeYearnProxy-setProxyPause-bool-}
+## Function `setProxyPause(bool _pause) `
 
 No description
 
@@ -28,7 +28,7 @@ No description
 
 - `_pause`: true:pause or false:resume
 
-## Function `upgradeTo(address impl)` {#StakeYearnProxy-upgradeTo-address-}
+## Function `upgradeTo(address impl) `
 
 No description
 
@@ -36,15 +36,15 @@ No description
 
 - `impl`: New implementation contract address
 
-## Function `implementation() → address` {#StakeYearnProxy-implementation--}
+## Function `implementation() `
 
 returns the implementation
 
-## Function `receive()` {#StakeYearnProxy-receive--}
+## Function `receive() `
 
 No description
 
-## Function `fallback()` {#StakeYearnProxy-fallback--}
+## Function `fallback() `
 
 No description
 

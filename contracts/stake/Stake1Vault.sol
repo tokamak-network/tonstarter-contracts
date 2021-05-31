@@ -19,9 +19,6 @@ contract Stake1Vault is StakeVaultStorage {
     bytes32 public constant ZERO_HASH =
         0x0000000000000000000000000000000000000000000000000000000000000000;
 
-    //////////////////////////////
-    // Events
-    //////////////////////////////
     event ClosedSale(uint256 amount);
     event ClaimedReward(address indexed from, address to, uint256 amount);
 
@@ -97,7 +94,10 @@ contract Stake1Vault is StakeVaultStorage {
         defiAddr = _defiAddr;
     }
 
-    /// @dev Add stake contract
+    /// Add stake contract
+    /// @param _name stakeContract's name
+    /// @param stakeContract stakeContract's address
+    /// @param periodBlocks the period that give rewards of stakeContract
     function addSubVaultOfStake(
         string memory _name,
         address stakeContract,
@@ -114,7 +114,7 @@ contract Stake1Vault is StakeVaultStorage {
         require(saleClosed == false, "Stake1Vault: closed sale");
         require(
             paytoken == IStake1(stakeContract).paytoken(),
-            "Different paytoken"
+            "Stake1Vault: Different paytoken"
         );
 
         LibTokenStake1.StakeInfo storage info = stakeInfos[stakeContract];
@@ -131,17 +131,17 @@ contract Stake1Vault is StakeVaultStorage {
         orderedEndBlocks.push(stakeEndBlock);
     }
 
-    /// @dev Close sale
+    /// Close the sale that can stake by user
     function closeSale() external {
-        require(saleClosed == false, "already closed");
+        require(saleClosed == false, "Stake1Vault: already closed");
         require(
             cap > 0 &&
                 stakeStartBlock > 0 &&
                 stakeStartBlock < stakeEndBlock &&
                 block.number > stakeStartBlock,
-            "closeSale init fail"
+            "Stake1Vault: closeSale init fail"
         );
-        require(stakeAddresses.length > 0, "no stakes");
+        require(stakeAddresses.length > 0, "Stake1Vault: no stakes");
 
         realEndBlock = stakeEndBlock;
 
@@ -155,11 +155,11 @@ contract Stake1Vault is StakeVaultStorage {
                 (bool success, bytes memory returnData) =
                     paytoken.call(
                         abi.encodeWithSignature(
-                            "balanceOf(address)",
+                            "Stake1Vault: balanceOf(address)",
                             stakeAddresses[i]
                         )
                     );
-                require(success, "balance call fail");
+                require(success, "Stake1Vault: balance call fail");
                 uint256 balanceAmount = abi.decode(returnData, (uint256));
                 stakeInfo.balance = balanceAmount;
             }
@@ -237,71 +237,80 @@ contract Stake1Vault is StakeVaultStorage {
         emit ClosedSale(sum);
     }
 
-    /// @dev
     /// sender is a staking contract.
     /// A function that pays the amount(_amount) to _to by the staking contract.
     /// A function that _to claim the amount(_amount) from the staking contract and gets the FLD in the vault.
+    /// @param _to a user that received reward
+    /// @param _amount the receiving amount
+    /// @return true
     function claim(address _to, uint256 _amount) external returns (bool) {
-        require(saleClosed && _amount > 0, "disclose sale");
+        require(saleClosed && _amount > 0, "Stake1Vault: disclose sale");
         uint256 fldBalance = fld.balanceOf(address(this));
-        require(fldBalance >= _amount, "not enough balance");
+        require(fldBalance >= _amount, "Stake1Vault: not enough balance");
 
         LibTokenStake1.StakeInfo storage stakeInfo = stakeInfos[msg.sender];
-        require(stakeInfo.startBlock > 0, "zero");
-        require(stakeInfo.totalRewardAmount > 0, "totalRewardAmount is zero");
+        require(stakeInfo.startBlock > 0, "Stake1Vault: startBlock zero");
+        require(stakeInfo.totalRewardAmount > 0, "Stake1Vault: totalRewardAmount is zero");
         require(
             stakeInfo.totalRewardAmount >=
                 stakeInfo.claimRewardAmount.add(_amount),
-            "claim amount exceeds"
+            "Stake1Vault: claim amount exceeds"
         );
 
         stakeInfo.claimRewardAmount = stakeInfo.claimRewardAmount.add(_amount);
 
-        require(fld.transfer(_to, _amount), "FLD transfer fail");
+        require(fld.transfer(_to, _amount), "Stake1Vault: FLD transfer fail");
 
         emit ClaimedReward(msg.sender, _to, _amount);
         return true;
     }
 
-    /// @dev How much you can claim
+    /// whether it is available to claim amount, if it is available , return the total reward amount
+    /// @param _to  a staking contract.
+    /// @param _amount the total reward amount of stakeContract
+    /// @return true
     function canClaim(address _to, uint256 _amount)
         external
         view
-        returns (uint256)
+        returns (bool)
     {
-        require(saleClosed, "disclose");
+        require(saleClosed, "Stake1Vault: disclose");
         uint256 fldBalance = fld.balanceOf(address(this));
         require(fldBalance >= _amount, "not enough");
 
         LibTokenStake1.StakeInfo storage stakeInfo = stakeInfos[_to];
-        require(stakeInfo.startBlock > 0, "startBlock is zero");
+        require(stakeInfo.startBlock > 0, "Stake1Vault: startBlock is zero");
 
-        require(stakeInfo.totalRewardAmount > 0, "amount is wrong");
+        require(stakeInfo.totalRewardAmount > 0, "Stake1Vault: amount is wrong");
         require(
             stakeInfo.totalRewardAmount >=
                 stakeInfo.claimRewardAmount.add(_amount),
-            "amount exceeds"
+            "Stake1Vault: amount exceeds"
         );
 
-        return stakeInfo.totalRewardAmount;
+        return true;
     }
 
-    /// @dev Returns the FLD balance stored in the vault
+    /// Returns Give the FLD balance stored in the vault
+    /// @return the balance of FLD in this vault.
     function balanceFLDAvailableAmount() external view returns (uint256) {
         return fld.balanceOf(address(this));
     }
 
-    /// @dev Returns all addresses
+    /// Returns Give all stakeContracts's addresses in this vault
+    /// @return all stakeContracts's addresses
     function stakeAddressesAll() external view returns (address[] memory) {
         return stakeAddresses;
     }
 
-    /// @dev Ordered end blocks
+    /// Returns Give the ordered end blocks of stakeContracts in this vault
+    /// @return the ordered end blocks
     function orderedEndBlocksAll() external view returns (uint256[] memory) {
         return orderedEndBlocks;
     }
 
-    /// @dev Total reward amount of stakeContract
+    /// Returns Give Total reward amount of stakeContract(_account)
+    /// @return Total reward amount of stakeContract(_account)
     function totalRewardAmount(address _account)
         external
         view
@@ -310,7 +319,8 @@ contract Stake1Vault is StakeVaultStorage {
         return stakeInfos[_account].totalRewardAmount;
     }
 
-    /// @dev Returns info
+    /// Returns Give the infomation of this vault
+    /// @return give paytoken, cap, saleStartBlock, stakeStartBlock, stakeEndBlock, blockTotalReward, saleClosed
     function infos()
         external
         view

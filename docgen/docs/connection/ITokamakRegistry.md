@@ -4,10 +4,10 @@
 
 - [`getUniswap()`](#ITokamakRegistry-getUniswap--)
 
-## Function `getTokamak() → address, address, address, address` {#ITokamakRegistry-getTokamak--}
+## Function `getTokamak() `
 
 No description
 
-## Function `getUniswap() → address, address, address, uint256` {#ITokamakRegistry-getUniswap--}
+## Function `getUniswap() `
 
 No description
