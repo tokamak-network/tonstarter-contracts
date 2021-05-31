@@ -1,12 +1,14 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.7.6;
 
+import "../interfaces/IStakeProxy.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "./StakeProxyStorage.sol";
 
-/// @title Proxy for Stake contracts in Phase 1
-/// @notice
-contract Stake1Proxy is StakeProxyStorage, AccessControl {
+/// @title The proxy of FLD Plaform
+/// @notice Admin can createVault, createStakeContract.
+/// User can excute the tokamak staking function of each contract through this logic.
+contract Stake1Proxy is StakeProxyStorage, AccessControl, IStakeProxy {
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
     address internal _implementation;
     bool public pauseProxy;
@@ -18,47 +20,52 @@ contract Stake1Proxy is StakeProxyStorage, AccessControl {
         _;
     }
 
+    /// constructor
     constructor() {
         _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
         _setupRole(ADMIN_ROLE, msg.sender);
         _setupRole(ADMIN_ROLE, address(this));
     }
 
-
+    /// transfer Ownership
+    /// @param newOwner the new owner address
     function transferOwnership(address newOwner) external onlyOwner {
         require(msg.sender != newOwner, "Stake1Proxy:same owner");
         grantRole(ADMIN_ROLE, newOwner);
         revokeRole(ADMIN_ROLE, msg.sender );
     }
 
-    /// @notice Set pause state
+    /// Set pause state
     /// @param _pause true:pause or false:resume
-    function setProxyPause(bool _pause) external onlyOwner {
+    function setProxyPause(bool _pause) external override onlyOwner {
         pauseProxy = _pause;
     }
 
-    /// @notice Set implementation contract
+    /// Set implementation contract
     /// @param impl New implementation contract address
-    function upgradeTo(address impl) external onlyOwner {
+    function upgradeTo(address impl) external override onlyOwner {
         require(impl != address(0), "input is zero");
         require(_implementation != impl, "same");
         _implementation = impl;
         emit Upgraded(impl);
     }
 
-    /// @dev returns the implementation
-    function implementation() public view returns (address) {
+    /// @return the logic address
+    function implementation() public override view returns (address) {
         return _implementation;
     }
 
+    /// receive ether
     receive() external payable {
         _fallback();
     }
 
+    /// fallback function , execute on undefined function call
     fallback() external payable {
         _fallback();
     }
 
+    /// fallback function , execute on undefined function call
     function _fallback() internal {
         address _impl = implementation();
         require(_impl != address(0) && !pauseProxy, "impl OR proxy is false");

@@ -33,14 +33,15 @@ contract Stake1Vault is StakeVaultStorage {
     receive() external payable {}
 
     /// Initializes all variables
-    /// @param _fld - FLD token address
-    /// @param _paytoken - Tokens staked by users, can be used as ERC20 tokens.
+    /// @param _fld  FLD token address
+    /// @param _paytoken  Tokens staked by users, can be used as ERC20 tokens.
     //                     (In case of ETH, input address(0))
-    /// @param _cap - Maximum amount of rewards issued
-    /// @param _saleStartBlock - Sales start block
-    /// @param _stakeStartBlock - Staking start block
-    /// @param _stakefactory - factory address to create stakeContract
-    /// @param _stakeType - if paytokein is stable coin, it is true.
+    /// @param _cap  Maximum amount of rewards issued, allocated reward amount.
+    /// @param _saleStartBlock  the sale start block
+    /// @param _stakeStartBlock  the staking start block
+    /// @param _stakefactory the factory address to create stakeContract
+    /// @param _stakeType  Type of staking contract, 0 TON staking, 1 basic ERC20 staking, 2 Defi linked staking
+    /// @param _defiAddr Used when an external address is required. default: address(0)
     function initialize(
         address _fld,
         address _paytoken,
@@ -72,34 +73,22 @@ contract Stake1Vault is StakeVaultStorage {
         grantRole(ADMIN_ROLE, _stakefactory);
     }
 
-    /// @dev Sets FLD address
+    /// Sets FLD address
+    /// @param _fld  FLD address
     function setFLD(address _fld) external onlyOwner {
         require(_fld != address(0), "Stake1Vault: input is zero");
         fld = IFLD(_fld);
     }
 
-    /// @dev Change cap of the vault
+    /// Change cap of the vault
+    /// @param _cap  allocated reward amount
     function changeCap(uint256 _cap) external onlyOwner {
         require(_cap > 0 && cap != _cap, "Stake1Vault: changeCap fails");
         cap = _cap;
     }
 
-    /// @dev Change orders
-    function changeOrderedEndBlocks(uint256[] memory _ordered)
-        external
-        onlyOwner
-    {
-        // solhint-disable-next-line max-line-length
-        require(
-            stakeEndBlock < block.number &&
-                orderedEndBlocks.length > 0 &&
-                orderedEndBlocks.length == _ordered.length,
-            "Stake1Vault: changeOrderedEndBlocks fails"
-        );
-        orderedEndBlocks = _ordered;
-    }
-
-    /// @dev Set Defi Address
+    /// Set Defi Address
+    /// @param _defiAddr DeFi related address
     function setDefiAddr(address _defiAddr) external onlyOwner {
         require(
             _defiAddr != address(0) && defiAddr != _defiAddr,

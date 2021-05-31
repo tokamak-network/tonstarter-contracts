@@ -7,8 +7,4 @@ interface IStakeProxy {
     function upgradeTo(address impl) external;
 
     function implementation() external view returns (address);
-
-    function grantRole(bytes32 role, address account) external;
-
-    function revokeRole(bytes32 role, address account) external;
 }

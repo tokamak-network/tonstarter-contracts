@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.7.6;
 
+import "../interfaces/IStake1Logic.sol";
 import {IProxy} from "../interfaces/IProxy.sol";
 import {IStakeFactory} from "../interfaces/IStakeFactory.sol";
 import {IStakeRegistry} from "../interfaces/IStakeRegistry.sol";
@@ -10,7 +11,10 @@ import {IStakeTONTokamak} from "../interfaces/IStakeTONTokamak.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "./StakeProxyStorage.sol";
 
-contract Stake1Logic is StakeProxyStorage, AccessControl {
+/// @title The logic of FLD Plaform
+/// @notice Admin can createVault, createStakeContract.
+/// User can excute the tokamak staking function of each contract through this logic.
+abstract contract Stake1Logic is StakeProxyStorage, AccessControl, IStake1Logic {
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
     bytes32 public constant ZERO_HASH =
         0x0000000000000000000000000000000000000000000000000000000000000000;
@@ -21,13 +25,10 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
     }
 
     modifier nonZero(address _addr) {
-        require(_addr != address(0), "zero address");
+        require(_addr != address(0), "Stake1Logic:zero address");
         _;
     }
 
-    //////////////////////////////
-    // Events
-    //////////////////////////////
     event CreatedVault(address indexed vault, address paytoken, uint256 cap);
     event CreatedStakeContract(
         address indexed vault,
@@ -36,111 +37,6 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
     );
     event SetStakeRegistry(address stakeRegistry);
 
-    /// @dev set storage
-    function setStore(
-        address _fld,
-        address _stakeRegistry,
-        address _stakeFactory,
-        address _stakeVaultFactory,
-        address _ton,
-        address _wton,
-        address _depositManager,
-        address _seigManager
-    )
-        external
-        onlyOwner
-        nonZero(_stakeVaultFactory)
-        nonZero(_ton)
-        nonZero(_wton)
-        nonZero(_depositManager)
-    {
-        setFLD(_fld);
-        setStakeRegistry(_stakeRegistry);
-        setStakeFactory(_stakeFactory);
-        stakeVaultFactory = IStakeVaultFactory(_stakeVaultFactory);
-
-        ton = _ton;
-        wton = _wton;
-        depositManager = _depositManager;
-        seigManager = _seigManager;
-    }
-
-    /// @dev create vault
-    function createVault(
-        address _paytoken,
-        uint256 _cap,
-        uint256 _saleStartBlock,
-        uint256 _stakeStartBlock,
-        uint256 _phase,
-        bytes32 _vaultName,
-        uint256 _stakeType,
-        address _defiAddr
-    ) external nonZero(address(stakeVaultFactory)) {
-        address vault =
-            stakeVaultFactory.create(
-                [fld, _paytoken, address(stakeFactory), _defiAddr],
-                [_stakeType, _cap, _saleStartBlock, _stakeStartBlock],
-                address(this)
-            );
-        require(vault != address(0), "vault is zero");
-        stakeRegistry.addVault(vault, _phase, _vaultName);
-
-        emit CreatedVault(vault, _paytoken, _cap);
-    }
-
-    /// @dev create stake contract in vault
-    function createStakeContract(
-        uint256 _phase,
-        address _vault,
-        address token,
-        address paytoken,
-        uint256 periodBlock,
-        string memory _name
-    ) external onlyOwner {
-        require(stakeRegistry.validVault(_phase, _vault), "unvalidVault");
-
-        IStake1Vault vault = IStake1Vault(_vault);
-        uint256 saleStart = vault.saleStartBlock();
-        uint256 stakeStart = vault.stakeStartBlock();
-        uint256 stakeType = vault.stakeType();
-        address defiAddr = vault.defiAddr();
-        uint256 phase = _phase;
-        uint256[3] memory iniInfo = [saleStart, stakeStart, periodBlock];
-        address[4] memory _addr = [token, paytoken, _vault, defiAddr];
-
-        // solhint-disable-next-line max-line-length
-        address _contract =
-            stakeFactory.create(
-                stakeType,
-                _addr,
-                address(stakeRegistry),
-                iniInfo
-            );
-        require(_contract != address(0), "deploy fail");
-
-        IStake1Vault(_vault).addSubVaultOfStake(_name, _contract, periodBlock);
-        stakeRegistry.addStakeContract(address(vault), _contract);
-
-        emit CreatedStakeContract(address(vault), _contract, phase);
-    }
-
-    function currentBlock() external view returns (uint256) {
-        return block.number;
-    }
-
-    function closeSale(address _vault) external {
-        IStake1Vault(_vault).closeSale();
-
-        // emit ClosedSale(_vault, msg.sender);
-    }
-
-    function addVault(
-        uint256 _phase,
-        bytes32 _vaultName,
-        address _vault
-    ) external onlyOwner {
-        stakeRegistry.addVault(_vault, _phase, _vaultName);
-    }
 
     function upgradeStakeTo(address _stakeProxy, address _implementation)
         external
@@ -149,63 +45,42 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
         IProxy(_stakeProxy).upgradeTo(_implementation);
     }
 
-    function stakeContractsOfVault(address _vault)
-        external
-        view
-        nonZero(_vault)
-        returns (address[] memory)
-    {
-        return IStake1Vault(_vault).stakeAddressesAll();
+    function transferOwnership(address newOwner) external onlyOwner {
+        require(msg.sender != newOwner, "Stake1Logic: same owner");
+        grantRole(ADMIN_ROLE, newOwner);
+        revokeRole(ADMIN_ROLE, msg.sender );
     }
 
-    function vaultsOfPhase(uint256 _phaseIndex)
-        external
-        view
-        returns (address[] memory)
-    {
-        return stakeRegistry.phasesAll(_phaseIndex);
-    }
-
-    function tokamakStaking(address _stakeContract, address _layer2) external {
-        IStakeTONTokamak(_stakeContract).tokamakStaking(_layer2);
-    }
-
-    /// @dev Requests unstaking all
-    function tokamakRequestUnStaking(
-        address _stakeContract,
-        address _layer2,
-        uint256 amount
-    ) external {
-        IStakeTONTokamak(_stakeContract).tokamakRequestUnStaking(
-            _layer2,
-            amount
-        );
-    }
-
-    /// @dev Processes unstaking
-    function tokamakProcessUnStaking(address _stakeContract, address _layer2)
-        external
-    {
-        IStakeTONTokamak(_stakeContract).tokamakProcessUnStaking(_layer2);
-    }
-
-    /// @dev Swap TON to FLD
-    function exchangeWTONtoFLD(
-        address _stakeContract,
-        uint256 amountIn,
-        uint256 amountOutMinimum,
-        uint256 deadline,
-        uint160 sqrtPriceLimitX96,
-        uint256 _type
-    ) external returns (uint256 amountOut) {
-        return
-            IStakeTONTokamak(_stakeContract).exchangeWTONtoFLD(
-                amountIn,
-                amountOutMinimum,
-                deadline,
-                sqrtPriceLimitX96,
-                _type
+    function grantRole(
+        address target,
+        bytes32 role,
+        address account
+    ) external onlyOwner {
+        (bool success, ) =
+            target.call(
+                abi.encodeWithSignature(
+                    "grantRole(bytes32,address)",
+                    role,
+                    account
+                )
             );
+        require(success, "Stake1Logic: grantRole fail");
+    }
+
+    function revokeRole(
+        address target,
+        bytes32 role,
+        address account
+    ) external onlyOwner {
+        (bool success, ) =
+            target.call(
+                abi.encodeWithSignature(
+                    "revokeRole(bytes32,address)",
+                    role,
+                    account
+                )
+            );
+        require(success, "Stake1Logic: revokeRole fail");
     }
 
     /// @dev Sets FLD address
@@ -264,8 +139,177 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
         stakeVaultFactory = IStakeVaultFactory(_stakeVaultFactory);
     }
 
+
+    /// Set initial variables
+    /// @param _fld  FLD token address
+    /// @param _stakeRegistry the registry address
+    /// @param _stakeFactory the StakeFactory address
+    /// @param _stakeVaultFactory the StakeVaultFactory address
+    /// @param _ton  TON address in Tokamak
+    /// @param _wton WTON address in Tokamak
+    /// @param _depositManager DepositManager address in Tokamak
+    /// @param _seigManager SeigManager address in Tokamak
+    function setStore(
+        address _fld,
+        address _stakeRegistry,
+        address _stakeFactory,
+        address _stakeVaultFactory,
+        address _ton,
+        address _wton,
+        address _depositManager,
+        address _seigManager
+    )
+        external override
+        onlyOwner
+        nonZero(_stakeVaultFactory)
+        nonZero(_ton)
+        nonZero(_wton)
+        nonZero(_depositManager)
+    {
+        setFLD(_fld);
+        setStakeRegistry(_stakeRegistry);
+        setStakeFactory(_stakeFactory);
+        stakeVaultFactory = IStakeVaultFactory(_stakeVaultFactory);
+
+        ton = _ton;
+        wton = _wton;
+        depositManager = _depositManager;
+        seigManager = _seigManager;
+    }
+
+    /// @dev create vault
+    function createVault(
+        address _paytoken,
+        uint256 _cap,
+        uint256 _saleStartBlock,
+        uint256 _stakeStartBlock,
+        uint256 _phase,
+        bytes32 _vaultName,
+        uint256 _stakeType,
+        address _defiAddr
+    ) external override nonZero(address(stakeVaultFactory)) {
+        address vault =
+            stakeVaultFactory.create(
+                [fld, _paytoken, address(stakeFactory), _defiAddr],
+                [_stakeType, _cap, _saleStartBlock, _stakeStartBlock],
+                address(this)
+            );
+        require(vault != address(0), "Stake1Logic: vault is zero");
+        stakeRegistry.addVault(vault, _phase, _vaultName);
+
+        emit CreatedVault(vault, _paytoken, _cap);
+    }
+
+    /// @dev create stake contract in vault
+    function createStakeContract(
+        uint256 _phase,
+        address _vault,
+        address token,
+        address paytoken,
+        uint256 periodBlock,
+        string memory _name
+    ) external override onlyOwner {
+        require(stakeRegistry.validVault(_phase, _vault), "Stake1Logic: unvalidVault");
+
+        IStake1Vault vault = IStake1Vault(_vault);
+        uint256 saleStart = vault.saleStartBlock();
+        uint256 stakeStart = vault.stakeStartBlock();
+        uint256 stakeType = vault.stakeType();
+        address defiAddr = vault.defiAddr();
+        uint256 phase = _phase;
+        uint256[3] memory iniInfo = [saleStart, stakeStart, periodBlock];
+        address[4] memory _addr = [token, paytoken, _vault, defiAddr];
+
+        // solhint-disable-next-line max-line-length
+        address _contract =
+            stakeFactory.create(
+                stakeType,
+                _addr,
+                address(stakeRegistry),
+                iniInfo
+            );
+        require(_contract != address(0), "Stake1Logic: deploy fail");
+
+        IStake1Vault(_vault).addSubVaultOfStake(_name, _contract, periodBlock);
+        stakeRegistry.addStakeContract(address(vault), _contract);
+
+        emit CreatedStakeContract(address(vault), _contract, phase);
+    }
+
+    function addVault(
+        uint256 _phase,
+        bytes32 _vaultName,
+        address _vault
+    ) external override onlyOwner {
+        stakeRegistry.addVault(_vault, _phase, _vaultName);
+    }
+
+    function closeSale(address _vault) external override {
+        IStake1Vault(_vault).closeSale();
+    }
+
+    function stakeContractsOfVault(address _vault)
+        external
+        override
+        view
+        nonZero(_vault)
+        returns (address[] memory)
+    {
+        return IStake1Vault(_vault).stakeAddressesAll();
+    }
+
+    function vaultsOfPhase(uint256 _phaseIndex)
+        external override
+        view
+        returns (address[] memory)
+    {
+        return stakeRegistry.phasesAll(_phaseIndex);
+    }
+
+    function tokamakStaking(address _stakeContract, address _layer2) external override {
+        IStakeTONTokamak(_stakeContract).tokamakStaking(_layer2);
+    }
+
+    /// @dev Requests unstaking all
+    function tokamakRequestUnStaking(
+        address _stakeContract,
+        address _layer2,
+        uint256 amount
+    ) external override {
+        IStakeTONTokamak(_stakeContract).tokamakRequestUnStaking(
+            _layer2,
+            amount
+        );
+    }
+
+    /// @dev Processes unstaking
+    function tokamakProcessUnStaking(address _stakeContract, address _layer2)
+        external override
+    {
+        IStakeTONTokamak(_stakeContract).tokamakProcessUnStaking(_layer2);
+    }
+
+    /// @dev Swap TON to FLD
+    function exchangeWTONtoFLD(
+        address _stakeContract,
+        uint256 amountIn,
+        uint256 amountOutMinimum,
+        uint256 deadline,
+        uint160 sqrtPriceLimitX96,
+        uint256 _type
+    ) external override returns (uint256 amountOut) {
+        return
+            IStakeTONTokamak(_stakeContract).exchangeWTONtoFLD(
+                amountIn,
+                amountOutMinimum,
+                deadline,
+                sqrtPriceLimitX96,
+                _type
+            );
+    }
+
     function vaultsOfPahse(uint256 _phase)
-        public
+        external override
         view
         nonZero(address(stakeRegistry))
         returns (address[] memory)
@@ -273,35 +317,4 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
         return stakeRegistry.phasesAll(_phase);
     }
 
-    function grantRole(
-        address target,
-        bytes32 role,
-        address account
-    ) external onlyOwner {
-        (bool success, ) =
-            target.call(
-                abi.encodeWithSignature(
-                    "grantRole(bytes32,address)",
-                    role,
-                    account
-                )
-            );
-        require(success, "grantRole fail");
-    }
-
-    function revokeRole(
-        address target,
-        bytes32 role,
-        address account
-    ) external onlyOwner {
-        (bool success, ) =
-            target.call(
-                abi.encodeWithSignature(
-                    "revokeRole(bytes32,address)",
-                    role,
-                    account
-                )
-            );
-        require(success, "revokeRole fail");
-    }
 }

@@ -2,24 +2,24 @@
 pragma solidity ^0.7.6;
 
 interface IStake1Logic {
+
     function setStore(
         address _fld,
         address _stakeRegistry,
         address _stakeFactory,
+        address _stakeVaultFactory,
         address _ton,
         address _wton,
         address _depositManager,
         address _seigManager
     ) external;
 
-    function setFactory(address _stakeFactory) external;
-
     function createVault(
         address _paytoken,
         uint256 _cap,
         uint256 _saleStartBlock,
         uint256 _stakeStartBlock,
-        uint256 _pahse,
+        uint256 _phase,
         bytes32 _vaultName,
         uint256 _stakeType,
         address _defiAddr
@@ -34,13 +34,13 @@ interface IStake1Logic {
         string memory _name
     ) external;
 
-    function closeSale(address _vault) external;
-
     function addVault(
-        address _vault,
-        uint256 _pahse,
-        bytes32 _vaultName
+        uint256 _phase,
+        bytes32 _vaultName,
+        address _vault
     ) external;
+
+    function closeSale(address _vault) external;
 
     function stakeContractsOfVault(address _vault)
         external
@@ -54,20 +54,27 @@ interface IStake1Logic {
 
     function tokamakStaking(address _stakeContract, address _layer2) external;
 
-    function tokamakRequestUnStakingAll(address _stakeContract, address _layer2)
-        external;
-
-    function tokamakRequestUnStakingReward(
+    function tokamakRequestUnStaking(
         address _stakeContract,
-        address _layer2
-    ) external;
+        address _layer2,
+        uint256 amount
+    ) external ;
 
     function tokamakProcessUnStaking(address _stakeContract, address _layer2)
         external;
 
-    function setFLD(address _fld) external;
+    function exchangeWTONtoFLD(
+        address _stakeContract,
+        uint256 amountIn,
+        uint256 amountOutMinimum,
+        uint256 deadline,
+        uint160 sqrtPriceLimitX96,
+        uint256 _type
+    ) external returns (uint256 amountOut);
 
-    function setStakeRegistry(address _stakeRegistry) external;
+    function vaultsOfPahse(uint256 _phase)
+        external
+        view
+        returns (address[] memory);
 
-    function setStakeFactory(address _stakeFactory) external;
 }

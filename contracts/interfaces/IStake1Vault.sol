@@ -18,8 +18,6 @@ interface IStake1Vault {
     /// @dev Changes the cap of vault.
     function changeCap(uint256 _cap) external;
 
-    function changeOrderedEndBlocks(uint256[] memory _ordered) external;
-
     function addSubVaultOfStake(
         string memory _name,
         address stakeContract,

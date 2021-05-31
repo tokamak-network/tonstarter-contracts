@@ -3,33 +3,40 @@ pragma solidity ^0.7.6;
 
 import "../libraries/LibTokenStake1.sol";
 
+/// @title The base storage of stakeContract
 contract Stake1Storage {
-    // reward token : FLD
+
+    /// reward token : FLD
     address public token;
-    // registry
+
+    /// registry
     address public stakeRegistry;
 
-    // paytoken is the token that the user stakes. ( if paytoken is ether, paytoken is address(0) )
+    /// paytoken is the token that the user stakes. ( if paytoken is ether, paytoken is address(0) )
     address public paytoken;
-    // A vault that holds fld rewards.
+
+    /// A vault that holds fld rewards.
     address public vault;
 
-    // the start block for sale.
+    /// the start block for sale.
     uint256 public saleStartBlock;
-    // the staking start block, once staking starts, users can no longer apply for staking.
+
+    /// the staking start block, once staking starts, users can no longer apply for staking.
     uint256 public startBlock;
-    // the staking end block.
+
+    /// the staking end block.
     uint256 public endBlock;
 
-    // the total amount claimed
+    /// the total amount claimed
     uint256 public rewardClaimedTotal;
-    // the total staked amount
+
+    /// the total staked amount
     uint256 public totalStakedAmount;
 
-    // information staked by user
+    /// information staked by user
     mapping(address => LibTokenStake1.StakedAmount) public userStaked;
 
-    // total stakers
+    /// total stakers
     uint256 public totalStakers;
 
     uint256 internal _lock;
