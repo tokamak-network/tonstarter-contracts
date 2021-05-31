@@ -24,6 +24,13 @@ contract Stake1Proxy is StakeProxyStorage, AccessControl {
         _setupRole(ADMIN_ROLE, address(this));
     }
 
+
+    function transferOwnership(address newOwner) external onlyOwner {
+        require(msg.sender != newOwner, "Stake1Proxy:same owner");
+        grantRole(ADMIN_ROLE, newOwner);
+        revokeRole(ADMIN_ROLE, msg.sender );
+    }
+
     /// @notice Set pause state
     /// @param _pause true:pause or false:resume
     function setProxyPause(bool _pause) external onlyOwner {

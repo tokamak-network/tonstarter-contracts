@@ -41,6 +41,12 @@ contract StakeSimple is Stake1Storage, AccessControl {
         stake(msg.value);
     }
 
+    function transferOwnership(address newOwner) external onlyOwner {
+        require(msg.sender != newOwner, "StakeSimple:same owner");
+        grantRole(ADMIN_ROLE, newOwner);
+        revokeRole(ADMIN_ROLE, msg.sender );
+    }
+
     /// @dev Initialize
     function initialize(
         address _token,

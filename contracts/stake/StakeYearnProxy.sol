@@ -28,6 +28,12 @@ contract StakeYearnProxy is StakeYearnStorage, AccessControl {
         _setupRole(ADMIN_ROLE, address(this));
     }
 
+    function transferOwnership(address newOwner) external onlyOwner {
+        require(msg.sender != newOwner, "StakeYearnProxy:same owner");
+        grantRole(ADMIN_ROLE, newOwner);
+        revokeRole(ADMIN_ROLE, msg.sender );
+    }
+
     /// @notice Set pause state
     /// @param _pause true:pause or false:resume
     function setProxyPause(bool _pause) external onlyOwner {

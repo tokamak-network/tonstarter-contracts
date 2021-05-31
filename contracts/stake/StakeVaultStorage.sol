@@ -56,4 +56,10 @@ contract StakeVaultStorage is AccessControl {
         _;
         _lock = 0;
     }
+
+    function transferOwnership(address newOwner) external onlyOwner {
+        require(msg.sender != newOwner, "StakeVaultStorage:same owner");
+        grantRole(ADMIN_ROLE, newOwner);
+        revokeRole(ADMIN_ROLE, msg.sender );
+    }
 }

@@ -36,15 +36,15 @@
 
 - [`ClaimedReward(address from, address to, uint256 amount)`](#Stake1Vault-ClaimedReward-address-address-uint256-)
 
-# Function `receive()` {#Stake1Vault-receive--}
+## Function `receive()` {#Stake1Vault-receive--}
 
 No description
 
-# Function `initialize(address _fld, address _paytoken, uint256 _cap, uint256 _saleStartBlock, uint256 _stakeStartBlock, address _stakefactory, uint256 _stakeType, address _defiAddr)` {#Stake1Vault-initialize-address-address-uint256-uint256-uint256-address-uint256-address-}
+## Function `initialize(address _fld, address _paytoken, uint256 _cap, uint256 _saleStartBlock, uint256 _stakeStartBlock, address _stakefactory, uint256 _stakeType, address _defiAddr)` {#Stake1Vault-initialize-address-address-uint256-uint256-uint256-address-uint256-address-}
 
 No description
 
-## Parameters:
+### Parameters:
 
 - `_cap`: - Maximum amount of rewards issued
 
@@ -56,62 +56,62 @@ No description
 
 - `_stakeType`: - if paytokein is stable coin, it is true.
 
-# Function `setFLD(address _fld)` {#Stake1Vault-setFLD-address-}
+## Function `setFLD(address _fld)` {#Stake1Vault-setFLD-address-}
 
 Sets FLD address
 
-# Function `changeCap(uint256 _cap)` {#Stake1Vault-changeCap-uint256-}
+## Function `changeCap(uint256 _cap)` {#Stake1Vault-changeCap-uint256-}
 
 Change cap of the vault
 
-# Function `changeOrderedEndBlocks(uint256[] _ordered)` {#Stake1Vault-changeOrderedEndBlocks-uint256---}
+## Function `changeOrderedEndBlocks(uint256[] _ordered)` {#Stake1Vault-changeOrderedEndBlocks-uint256---}
 
 Change orders
 
-# Function `setDefiAddr(address _defiAddr)` {#Stake1Vault-setDefiAddr-address-}
+## Function `setDefiAddr(address _defiAddr)` {#Stake1Vault-setDefiAddr-address-}
 
 Set Defi Address
 
-# Function `addSubVaultOfStake(string _name, address stakeContract, uint256 periodBlocks)` {#Stake1Vault-addSubVaultOfStake-string-address-uint256-}
+## Function `addSubVaultOfStake(string _name, address stakeContract, uint256 periodBlocks)` {#Stake1Vault-addSubVaultOfStake-string-address-uint256-}
 
 Add stake contract
 
-# Function `closeSale()` {#Stake1Vault-closeSale--}
+## Function `closeSale()` {#Stake1Vault-closeSale--}
 
 Close sale
 
-# Function `claim(address _to, uint256 _amount) → bool` {#Stake1Vault-claim-address-uint256-}
+## Function `claim(address _to, uint256 _amount) → bool` {#Stake1Vault-claim-address-uint256-}
 
 No description
 
-# Function `canClaim(address _to, uint256 _amount) → uint256` {#Stake1Vault-canClaim-address-uint256-}
+## Function `canClaim(address _to, uint256 _amount) → uint256` {#Stake1Vault-canClaim-address-uint256-}
 
 How much you can claim
 
-# Function `balanceFLDAvailableAmount() → uint256` {#Stake1Vault-balanceFLDAvailableAmount--}
+## Function `balanceFLDAvailableAmount() → uint256` {#Stake1Vault-balanceFLDAvailableAmount--}
 
 Returns the FLD balance stored in the vault
 
-# Function `stakeAddressesAll() → address[]` {#Stake1Vault-stakeAddressesAll--}
+## Function `stakeAddressesAll() → address[]` {#Stake1Vault-stakeAddressesAll--}
 
 Returns all addresses
 
-# Function `orderedEndBlocksAll() → uint256[]` {#Stake1Vault-orderedEndBlocksAll--}
+## Function `orderedEndBlocksAll() → uint256[]` {#Stake1Vault-orderedEndBlocksAll--}
 
 Ordered end blocks
 
-# Function `totalRewardAmount(address _account) → uint256` {#Stake1Vault-totalRewardAmount-address-}
+## Function `totalRewardAmount(address _account) → uint256` {#Stake1Vault-totalRewardAmount-address-}
 
 Total reward amount of stakeContract
 
-# Function `infos() → address, uint256, uint256, uint256, uint256, uint256, bool` {#Stake1Vault-infos--}
+## Function `infos() → address, uint256, uint256, uint256, uint256, uint256, bool` {#Stake1Vault-infos--}
 
 Returns info
 
-# Event `ClosedSale(uint256 amount)` {#Stake1Vault-ClosedSale-uint256-}
+## Event `ClosedSale(uint256 amount)` {#Stake1Vault-ClosedSale-uint256-}
 
 No description
 
-# Event `ClaimedReward(address from, address to, uint256 amount)` {#Stake1Vault-ClaimedReward-address-address-uint256-}
+## Event `ClaimedReward(address from, address to, uint256 amount)` {#Stake1Vault-ClaimedReward-address-address-uint256-}
 
 No description

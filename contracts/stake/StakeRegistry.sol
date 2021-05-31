@@ -78,6 +78,12 @@ contract StakeRegistry is AccessControl {
         fld = _fld;
     }
 
+    function transferOwnership(address newOwner) external onlyOwner {
+        require(msg.sender != newOwner, "StakeRegistry:same owner");
+        grantRole(ADMIN_ROLE, newOwner);
+        revokeRole(ADMIN_ROLE, msg.sender );
+    }
+
     /// Set address for Tokamak integration
     /// @param _ton TON address
     /// @param _wton WTON address

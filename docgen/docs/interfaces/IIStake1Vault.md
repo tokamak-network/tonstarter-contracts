@@ -14,30 +14,30 @@
 
 - [`saleClosed()`](#IIStake1Vault-saleClosed--)
 
-# Function `closeSale()` {#IIStake1Vault-closeSale--}
+## Function `closeSale()` {#IIStake1Vault-closeSale--}
 
 No description
 
-# Function `totalRewardAmount(address _account) → uint256` {#IIStake1Vault-totalRewardAmount-address-}
+## Function `totalRewardAmount(address _account) → uint256` {#IIStake1Vault-totalRewardAmount-address-}
 
 No description
 
-# Function `claim(address _to, uint256 _amount) → bool` {#IIStake1Vault-claim-address-uint256-}
+## Function `claim(address _to, uint256 _amount) → bool` {#IIStake1Vault-claim-address-uint256-}
 
 No description
 
-# Function `orderedEndBlocksAll() → uint256[]` {#IIStake1Vault-orderedEndBlocksAll--}
+## Function `orderedEndBlocksAll() → uint256[]` {#IIStake1Vault-orderedEndBlocksAll--}
 
 No description
 
-# Function `blockTotalReward() → uint256` {#IIStake1Vault-blockTotalReward--}
+## Function `blockTotalReward() → uint256` {#IIStake1Vault-blockTotalReward--}
 
 No description
 
-# Function `stakeEndBlockTotal(uint256 endblock) → uint256 totalStakedAmount` {#IIStake1Vault-stakeEndBlockTotal-uint256-}
+## Function `stakeEndBlockTotal(uint256 endblock) → uint256 totalStakedAmount` {#IIStake1Vault-stakeEndBlockTotal-uint256-}
 
 No description
 
-# Function `saleClosed() → bool` {#IIStake1Vault-saleClosed--}
+## Function `saleClosed() → bool` {#IIStake1Vault-saleClosed--}
 
 No description

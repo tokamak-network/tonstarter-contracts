@@ -24,6 +24,12 @@ contract YearnV2Staker is StakeYearnStorage, AccessControl {
         _;
     }
 
+    function transferOwnership(address newOwner) external onlyOwner {
+        require(msg.sender != newOwner, "YearnV2Staker:same owner");
+        grantRole(ADMIN_ROLE, newOwner);
+        revokeRole(ADMIN_ROLE, msg.sender );
+    }
+
     function setYearnV2(address _vault) external onlyOwner {
         require(
             block.number < saleStartBlock,

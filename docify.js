@@ -1,10 +1,10 @@
-const NODE_DIR     = "/Users/zena/ico2.0/ico20-contracts/node_modules";
-const INPUT_DIR    = "/Users/zena/ico2.0/ico20-contracts/contracts";
-const CONFIG_DIR   = "/Users/zena/ico2.0/ico20-contracts/docgen";
-const OUTPUT_DIR   = "/Users/zena/ico2.0/ico20-contracts/docgen/docs";
-const README_FILE  = "/Users/zena/ico2.0/ico20-contracts/docgen/README.md";
-const SUMMARY_FILE = "/Users/zena/ico2.0/ico20-contracts/docgen/SUMMARY.md";
-const EXCLUDE_FILE = "/Users/zena/ico2.0/ico20-contracts/docgen/exclude.txt";
+const NODE_DIR     = "./node_modules";
+const INPUT_DIR    = "./contracts";
+const CONFIG_DIR   = "./docgen";
+const OUTPUT_DIR   = "./docgen/docs";
+const README_FILE  = "./docgen/README.md";
+const SUMMARY_FILE = "./docgen/SUMMARY.md";
+const EXCLUDE_FILE = "./docgen/exclude.txt";
 
 const fs        = require("fs");
 const path      = require("path");

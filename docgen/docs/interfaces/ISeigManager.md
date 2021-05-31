@@ -46,94 +46,94 @@
 
 - [`onWithdraw(address layer2, address account, uint256 amount)`](#ISeigManager-onWithdraw-address-address-uint256-)
 
-# Function `registry() → address` {#ISeigManager-registry--}
+## Function `registry() → address` {#ISeigManager-registry--}
 
 No description
 
-# Function `depositManager() → address` {#ISeigManager-depositManager--}
+## Function `depositManager() → address` {#ISeigManager-depositManager--}
 
 No description
 
-# Function `ton() → address` {#ISeigManager-ton--}
+## Function `ton() → address` {#ISeigManager-ton--}
 
 No description
 
-# Function `wton() → address` {#ISeigManager-wton--}
+## Function `wton() → address` {#ISeigManager-wton--}
 
 No description
 
-# Function `powerton() → address` {#ISeigManager-powerton--}
+## Function `powerton() → address` {#ISeigManager-powerton--}
 
 No description
 
-# Function `tot() → address` {#ISeigManager-tot--}
+## Function `tot() → address` {#ISeigManager-tot--}
 
 No description
 
-# Function `coinages(address layer2) → address` {#ISeigManager-coinages-address-}
+## Function `coinages(address layer2) → address` {#ISeigManager-coinages-address-}
 
 No description
 
-# Function `commissionRates(address layer2) → uint256` {#ISeigManager-commissionRates-address-}
+## Function `commissionRates(address layer2) → uint256` {#ISeigManager-commissionRates-address-}
 
 No description
 
-# Function `lastCommitBlock(address layer2) → uint256` {#ISeigManager-lastCommitBlock-address-}
+## Function `lastCommitBlock(address layer2) → uint256` {#ISeigManager-lastCommitBlock-address-}
 
 No description
 
-# Function `seigPerBlock() → uint256` {#ISeigManager-seigPerBlock--}
+## Function `seigPerBlock() → uint256` {#ISeigManager-seigPerBlock--}
 
 No description
 
-# Function `lastSeigBlock() → uint256` {#ISeigManager-lastSeigBlock--}
+## Function `lastSeigBlock() → uint256` {#ISeigManager-lastSeigBlock--}
 
 No description
 
-# Function `pausedBlock() → uint256` {#ISeigManager-pausedBlock--}
+## Function `pausedBlock() → uint256` {#ISeigManager-pausedBlock--}
 
 No description
 
-# Function `unpausedBlock() → uint256` {#ISeigManager-unpausedBlock--}
+## Function `unpausedBlock() → uint256` {#ISeigManager-unpausedBlock--}
 
 No description
 
-# Function `DEFAULT_FACTOR() → uint256` {#ISeigManager-DEFAULT_FACTOR--}
+## Function `DEFAULT_FACTOR() → uint256` {#ISeigManager-DEFAULT_FACTOR--}
 
 No description
 
-# Function `deployCoinage(address layer2) → bool` {#ISeigManager-deployCoinage-address-}
+## Function `deployCoinage(address layer2) → bool` {#ISeigManager-deployCoinage-address-}
 
 No description
 
-# Function `setCommissionRate(address layer2, uint256 commission, bool isCommissionRateNegative) → bool` {#ISeigManager-setCommissionRate-address-uint256-bool-}
+## Function `setCommissionRate(address layer2, uint256 commission, bool isCommissionRateNegative) → bool` {#ISeigManager-setCommissionRate-address-uint256-bool-}
 
 No description
 
-# Function `uncomittedStakeOf(address layer2, address account) → uint256` {#ISeigManager-uncomittedStakeOf-address-address-}
+## Function `uncomittedStakeOf(address layer2, address account) → uint256` {#ISeigManager-uncomittedStakeOf-address-address-}
 
 No description
 
-# Function `stakeOf(address layer2, address account) → uint256` {#ISeigManager-stakeOf-address-address-}
+## Function `stakeOf(address layer2, address account) → uint256` {#ISeigManager-stakeOf-address-address-}
 
 No description
 
-# Function `additionalTotBurnAmount(address layer2, address account, uint256 amount) → uint256 totAmount` {#ISeigManager-additionalTotBurnAmount-address-address-uint256-}
+## Function `additionalTotBurnAmount(address layer2, address account, uint256 amount) → uint256 totAmount` {#ISeigManager-additionalTotBurnAmount-address-address-uint256-}
 
 No description
 
-# Function `onTransfer(address sender, address recipient, uint256 amount) → bool` {#ISeigManager-onTransfer-address-address-uint256-}
+## Function `onTransfer(address sender, address recipient, uint256 amount) → bool` {#ISeigManager-onTransfer-address-address-uint256-}
 
 No description
 
-# Function `updateSeigniorage() → bool` {#ISeigManager-updateSeigniorage--}
+## Function `updateSeigniorage() → bool` {#ISeigManager-updateSeigniorage--}
 
 No description
 
-# Function `onDeposit(address layer2, address account, uint256 amount) → bool` {#ISeigManager-onDeposit-address-address-uint256-}
+## Function `onDeposit(address layer2, address account, uint256 amount) → bool` {#ISeigManager-onDeposit-address-address-uint256-}
 
 No description
 
-# Function `onWithdraw(address layer2, address account, uint256 amount) → bool` {#ISeigManager-onWithdraw-address-address-uint256-}
+## Function `onWithdraw(address layer2, address account, uint256 amount) → bool` {#ISeigManager-onWithdraw-address-address-uint256-}
 
 No description

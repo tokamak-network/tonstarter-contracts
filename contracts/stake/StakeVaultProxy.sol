@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.7.6;
 
-//import "@openzeppelin/contracts/access/AccessControl.sol";
 import "./StakeVaultStorage.sol";
 
 /// @title Proxy for Stake contracts in Phase 1

@@ -99,6 +99,13 @@ contract TokamakStaker is StakeTONStorage, AccessControl {
         uint256 amountOut
     );
 
+
+    function transferOwnership(address newOwner) external onlyOwner {
+        require(msg.sender != newOwner, "TokamakStaker:same owner");
+        grantRole(ADMIN_ROLE, newOwner);
+        revokeRole(ADMIN_ROLE, msg.sender );
+    }
+
     function setRegistry(address _registry)
         external
         onlyOwner

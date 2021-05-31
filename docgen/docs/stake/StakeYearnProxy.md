@@ -14,34 +14,34 @@
 
 - [`Upgraded(address implementation)`](#StakeYearnProxy-Upgraded-address-)
 
-# Function `setProxyPause(bool _pause)` {#StakeYearnProxy-setProxyPause-bool-}
+## Function `setProxyPause(bool _pause)` {#StakeYearnProxy-setProxyPause-bool-}
 
 No description
 
-## Parameters:
+### Parameters:
 
 - `_pause`: true:pause or false:resume
 
-# Function `upgradeTo(address impl)` {#StakeYearnProxy-upgradeTo-address-}
+## Function `upgradeTo(address impl)` {#StakeYearnProxy-upgradeTo-address-}
 
 No description
 
-## Parameters:
+### Parameters:
 
 - `impl`: New implementation contract address
 
-# Function `implementation() → address` {#StakeYearnProxy-implementation--}
+## Function `implementation() → address` {#StakeYearnProxy-implementation--}
 
 returns the implementation
 
-# Function `receive()` {#StakeYearnProxy-receive--}
+## Function `receive()` {#StakeYearnProxy-receive--}
 
 No description
 
-# Function `fallback()` {#StakeYearnProxy-fallback--}
+## Function `fallback()` {#StakeYearnProxy-fallback--}
 
 No description
 
-# Event `Upgraded(address implementation)` {#StakeYearnProxy-Upgraded-address-}
+## Event `Upgraded(address implementation)` {#StakeYearnProxy-Upgraded-address-}
 
 No description

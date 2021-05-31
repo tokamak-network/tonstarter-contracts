@@ -26,6 +26,13 @@ contract StakeSimpleProxy is Stake1Storage, AccessControl {
         _implementation = _logic;
     }
 
+
+    function transferOwnership(address newOwner) external onlyOwner {
+        require(msg.sender != newOwner, "StakeSimpleProxy:same owner");
+        grantRole(ADMIN_ROLE, newOwner);
+        revokeRole(ADMIN_ROLE, msg.sender );
+    }
+
     /// @notice Set pause state
     /// @param _pause true:pause or false:resume
     function setProxyPause(bool _pause) external onlyOwner {

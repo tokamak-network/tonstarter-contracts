@@ -8,7 +8,6 @@ import "../interfaces/IStake1Vault.sol";
 import "../interfaces/IStake1.sol";
 import "../libraries/LibTokenStake1.sol";
 import {SafeMath} from "../utils/math/SafeMath.sol";
-//import "@openzeppelin/contracts/access/AccessControl.sol";
 import "./StakeVaultStorage.sol";
 
 /// @title FLD Token's Vault - stores the fld for the period of time
@@ -33,7 +32,7 @@ contract Stake1Vault is StakeVaultStorage {
 
     receive() external payable {}
 
-    /// @dev Initializes all variables
+    /// Initializes all variables
     /// @param _fld - FLD token address
     /// @param _paytoken - Tokens staked by users, can be used as ERC20 tokens.
     //                     (In case of ETH, input address(0))

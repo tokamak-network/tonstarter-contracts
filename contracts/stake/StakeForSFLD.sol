@@ -42,6 +42,12 @@ contract StakeForSFLD is AccessControl {
         _setupRole(ADMIN_ROLE, msg.sender);
     }
 
+    function transferOwnership(address newOwner) external onlyOwner {
+        require(msg.sender != newOwner, "StakeForSFLD:same owner");
+        grantRole(ADMIN_ROLE, newOwner);
+        revokeRole(ADMIN_ROLE, msg.sender );
+    }
+
     function initialize(
         address _fld,
         address _sfld,

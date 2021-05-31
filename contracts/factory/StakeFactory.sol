@@ -38,6 +38,13 @@ contract StakeFactory is AccessControl {
         _setupRole(ADMIN_ROLE, msg.sender);
     }
 
+
+    function transferOwnership(address newOwner) external onlyOwner {
+        require(msg.sender != newOwner, "StakeFactory:same owner");
+        grantRole(ADMIN_ROLE, newOwner);
+        revokeRole(ADMIN_ROLE, msg.sender );
+    }
+
     function setStakeSimpleFactory(address _stakeSimpleFactory)
         external
         onlyOwner

@@ -60,6 +60,12 @@ contract SFLD is IFLD, AccessControl, VerifySignature {
         _setupRole(MINTER_ROLE, msg.sender);
     }
 
+    function transferOwnership(address newOwner) external onlyOwner {
+        require(msg.sender != newOwner, "SFLD:same owner");
+        grantRole(ADMIN_ROLE, newOwner);
+        revokeRole(ADMIN_ROLE, msg.sender );
+    }
+
     function _mint(address to, uint256 value) internal {
         totalSupply += value;
         balanceOf[to] += value;

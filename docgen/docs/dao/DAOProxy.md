@@ -16,38 +16,38 @@
 
 - [`Upgraded(address implementation)`](#DAOProxy-Upgraded-address-)
 
-# Function `constructor(address _sfldAddress)` {#DAOProxy-constructor-address-}
+## Function `constructor(address _sfldAddress)` {#DAOProxy-constructor-address-}
 
 No description
 
-# Function `setProxyPause(bool _pause)` {#DAOProxy-setProxyPause-bool-}
+## Function `setProxyPause(bool _pause)` {#DAOProxy-setProxyPause-bool-}
 
 No description
 
-## Parameters:
+### Parameters:
 
 - `_pause`: true:pause or false:resume
 
-# Function `upgradeTo(address impl)` {#DAOProxy-upgradeTo-address-}
+## Function `upgradeTo(address impl)` {#DAOProxy-upgradeTo-address-}
 
 No description
 
-## Parameters:
+### Parameters:
 
 - `impl`: New implementation contract address
 
-# Function `implementation() → address` {#DAOProxy-implementation--}
+## Function `implementation() → address` {#DAOProxy-implementation--}
 
 returns the implementation
 
-# Function `receive()` {#DAOProxy-receive--}
+## Function `receive()` {#DAOProxy-receive--}
 
 No description
 
-# Function `fallback()` {#DAOProxy-fallback--}
+## Function `fallback()` {#DAOProxy-fallback--}
 
 No description
 
-# Event `Upgraded(address implementation)` {#DAOProxy-Upgraded-address-}
+## Event `Upgraded(address implementation)` {#DAOProxy-Upgraded-address-}
 
 No description

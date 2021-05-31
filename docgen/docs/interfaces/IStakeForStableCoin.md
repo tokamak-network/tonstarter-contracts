@@ -38,78 +38,78 @@
 
 - [`stake(uint256 amount)`](#IStakeForStableCoin-stake-uint256-)
 
-# Function `token() → address` {#IStakeForStableCoin-token--}
+## Function `token() → address` {#IStakeForStableCoin-token--}
 
 No description
 
-# Function `paytoken() → address` {#IStakeForStableCoin-paytoken--}
+## Function `paytoken() → address` {#IStakeForStableCoin-paytoken--}
 
 No description
 
-# Function `vault() → address` {#IStakeForStableCoin-vault--}
+## Function `vault() → address` {#IStakeForStableCoin-vault--}
 
 No description
 
-# Function `saleStartBlock() → uint256` {#IStakeForStableCoin-saleStartBlock--}
+## Function `saleStartBlock() → uint256` {#IStakeForStableCoin-saleStartBlock--}
 
 No description
 
-# Function `startBlock() → uint256` {#IStakeForStableCoin-startBlock--}
+## Function `startBlock() → uint256` {#IStakeForStableCoin-startBlock--}
 
 No description
 
-# Function `endBlock() → uint256` {#IStakeForStableCoin-endBlock--}
+## Function `endBlock() → uint256` {#IStakeForStableCoin-endBlock--}
 
 No description
 
-# Function `rewardRaised() → uint256` {#IStakeForStableCoin-rewardRaised--}
+## Function `rewardRaised() → uint256` {#IStakeForStableCoin-rewardRaised--}
 
 No description
 
-# Function `totalStakedAmount() → uint256` {#IStakeForStableCoin-totalStakedAmount--}
+## Function `totalStakedAmount() → uint256` {#IStakeForStableCoin-totalStakedAmount--}
 
 No description
 
-# Function `userStaked(address account) → struct LibTokenStake1.StakedAmount` {#IStakeForStableCoin-userStaked-address-}
+## Function `userStaked(address account) → struct LibTokenStake1.StakedAmount` {#IStakeForStableCoin-userStaked-address-}
 
 No description
 
-# Function `yearnV2Vault() → address` {#IStakeForStableCoin-yearnV2Vault--}
+## Function `yearnV2Vault() → address` {#IStakeForStableCoin-yearnV2Vault--}
 
 No description
 
-# Function `initialize(address _token, address _paytoken, address _vault, uint256 _saleStartBlock, uint256 _startBlock, uint256 _period)` {#IStakeForStableCoin-initialize-address-address-address-uint256-uint256-uint256-}
+## Function `initialize(address _token, address _paytoken, address _vault, uint256 _saleStartBlock, uint256 _startBlock, uint256 _period)` {#IStakeForStableCoin-initialize-address-address-address-uint256-uint256-uint256-}
 
 No description
 
-# Function `setYearnV2(address _vault)` {#IStakeForStableCoin-setYearnV2-address-}
+## Function `setYearnV2(address _vault)` {#IStakeForStableCoin-setYearnV2-address-}
 
 No description
 
-# Function `approveYearnV2Vault(uint256 amount)` {#IStakeForStableCoin-approveYearnV2Vault-uint256-}
+## Function `approveYearnV2Vault(uint256 amount)` {#IStakeForStableCoin-approveYearnV2Vault-uint256-}
 
 No description
 
-# Function `yearnV2_calcTotalValue() → uint256 underlyingAmount` {#IStakeForStableCoin-yearnV2_calcTotalValue--}
+## Function `yearnV2_calcTotalValue() → uint256 underlyingAmount` {#IStakeForStableCoin-yearnV2_calcTotalValue--}
 
 No description
 
-# Function `yearnV2_deposit(uint256 amount)` {#IStakeForStableCoin-yearnV2_deposit-uint256-}
+## Function `yearnV2_deposit(uint256 amount)` {#IStakeForStableCoin-yearnV2_deposit-uint256-}
 
 No description
 
-# Function `yearnV2_withdraw(uint256 amount)` {#IStakeForStableCoin-yearnV2_withdraw-uint256-}
+## Function `yearnV2_withdraw(uint256 amount)` {#IStakeForStableCoin-yearnV2_withdraw-uint256-}
 
 No description
 
-# Function `yearnV2_unclaimedProfit(address user)` {#IStakeForStableCoin-yearnV2_unclaimedProfit-address-}
+## Function `yearnV2_unclaimedProfit(address user)` {#IStakeForStableCoin-yearnV2_unclaimedProfit-address-}
 
 No description
 
-# Function `yearnV2_claim()` {#IStakeForStableCoin-yearnV2_claim--}
+## Function `yearnV2_claim()` {#IStakeForStableCoin-yearnV2_claim--}
 
 No description
 
-# Function `stake(uint256 amount)` {#IStakeForStableCoin-stake-uint256-}
+## Function `stake(uint256 amount)` {#IStakeForStableCoin-stake-uint256-}
 
 No description
