@@ -37,10 +37,6 @@ contract StakeForSFLD is AccessControl {
         _;
     }
 
-    //////////////////////////////
-    // Events
-    //////////////////////////////
-
     constructor() {
         _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
         _setupRole(ADMIN_ROLE, msg.sender);

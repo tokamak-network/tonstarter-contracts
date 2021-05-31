@@ -7,7 +7,7 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 //import { ERC165 } from "@openzeppelin/contracts/introspection/ERC165.sol";
 import "../stake/StakeYearnStorage.sol";
 
-/// @title The connector that integrates zkopru and tokamak
+/// @title The connector that integrates tokamak
 contract YearnV2Staker is StakeYearnStorage, AccessControl {
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
 

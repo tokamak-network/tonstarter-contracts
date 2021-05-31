@@ -50,7 +50,7 @@ interface ITokamakRegistry {
         );
 }
 
-/// @title The connector that integrates zkopru and tokamak
+/// @title The connector that integrates tokamak
 contract TokamakStaker is StakeTONStorage, AccessControl {
     using SafeMath for uint256;
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
