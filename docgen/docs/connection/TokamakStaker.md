@@ -1,5 +1,7 @@
 # Functions:
 
+- [`transferOwnership(address newOwner)`](#TokamakStaker-transferOwnership-address-)
+
 - [`setRegistry(address _registry)`](#TokamakStaker-setRegistry-address-)
 
 - [`setTokamakLayer2(address _layer2)`](#TokamakStaker-setTokamakLayer2-address-)
@@ -33,6 +35,10 @@
 - [`tokamakProcessedUnStaking(address layer2, uint256 rn, bool receiveTON)`](#TokamakStaker-tokamakProcessedUnStaking-address-uint256-bool-)
 
 - [`exchangedWTONtoFLD(address caller, uint256 amountIn, uint256 amountOut)`](#TokamakStaker-exchangedWTONtoFLD-address-uint256-uint256-)
+
+## Function `transferOwnership(address newOwner)` {#TokamakStaker-transferOwnership-address-}
+
+No description
 
 ## Function `setRegistry(address _registry)` {#TokamakStaker-setRegistry-address-}
 

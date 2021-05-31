@@ -240,12 +240,20 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
         stakeFactory.setStakeTONFactory(_stakeTONFactory);
     }
 
-    function setStakeStableCoinFactory(address _stakeStableCoinFactory)
+    function setStakeSimpleFactory(address _stakeSimpleFactory)
         public
         onlyOwner
-        nonZero(_stakeStableCoinFactory)
+        nonZero(_stakeSimpleFactory)
     {
-        stakeFactory.setStakeStableCoinFactory(_stakeStableCoinFactory);
+        stakeFactory.setStakeSimpleFactory(_stakeSimpleFactory);
+    }
+
+    function setStakeDefiFactory(address _stakeDefiFactory)
+        public
+        onlyOwner
+        nonZero(_stakeDefiFactory)
+    {
+        stakeFactory.setStakeDefiFactory(_stakeDefiFactory);
     }
 
     function setStakeVaultFactory(address _stakeVaultFactory)

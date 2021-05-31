@@ -1,5 +1,7 @@
 # Functions:
 
+- [`transferOwnership(address newOwner)`](#YearnV2Staker-transferOwnership-address-)
+
 - [`setYearnV2(address _vault)`](#YearnV2Staker-setYearnV2-address-)
 
 - [`approveYearnV2Vault(uint256 amount)`](#YearnV2Staker-approveYearnV2Vault-uint256-)
@@ -15,6 +17,10 @@
 - [`yearnV2_unclaimedProfit(address user)`](#YearnV2Staker-yearnV2_unclaimedProfit-address-)
 
 - [`yearnV2_claim()`](#YearnV2Staker-yearnV2_claim--)
+
+## Function `transferOwnership(address newOwner)` {#YearnV2Staker-transferOwnership-address-}
+
+No description
 
 ## Function `setYearnV2(address _vault)` {#YearnV2Staker-setYearnV2-address-}
 

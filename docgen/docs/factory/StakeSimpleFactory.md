@@ -11,3 +11,15 @@ No description
 ## Function `create(address[3] _addr, uint256[3] _intdata, address owner) → address` {#StakeSimpleFactory-create-address-3--uint256-3--address-}
 
 No description
+
+### Parameters:
+
+- `_addr`: array of [token, paytoken, vault]
+
+- `_intdata`: array of [saleStartBlock, startBlock, endBlock]
+
+- `owner`:  owner address
+
+### Return Values:
+
+- contract address

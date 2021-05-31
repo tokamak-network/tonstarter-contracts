@@ -34,7 +34,9 @@
 
 - [`setStakeTONFactory(address _stakeTONFactory)`](#Stake1Logic-setStakeTONFactory-address-)
 
-- [`setStakeStableCoinFactory(address _stakeStableCoinFactory)`](#Stake1Logic-setStakeStableCoinFactory-address-)
+- [`setStakeSimpleFactory(address _stakeSimpleFactory)`](#Stake1Logic-setStakeSimpleFactory-address-)
+
+- [`setStakeDefiFactory(address _stakeDefiFactory)`](#Stake1Logic-setStakeDefiFactory-address-)
 
 - [`setStakeVaultFactory(address _stakeVaultFactory)`](#Stake1Logic-setStakeVaultFactory-address-)
 
@@ -120,7 +122,11 @@ Sets Stake Factory address
 
 No description
 
-## Function `setStakeStableCoinFactory(address _stakeStableCoinFactory)` {#Stake1Logic-setStakeStableCoinFactory-address-}
+## Function `setStakeSimpleFactory(address _stakeSimpleFactory)` {#Stake1Logic-setStakeSimpleFactory-address-}
+
+No description
+
+## Function `setStakeDefiFactory(address _stakeDefiFactory)` {#Stake1Logic-setStakeDefiFactory-address-}
 
 No description
 

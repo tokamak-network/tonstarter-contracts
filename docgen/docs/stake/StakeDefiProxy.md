@@ -2,6 +2,8 @@
 
 - [`constructor(address _logic)`](#StakeDefiProxy-constructor-address-)
 
+- [`transferOwnership(address newOwner)`](#StakeDefiProxy-transferOwnership-address-)
+
 - [`setProxyPause(bool _pause)`](#StakeDefiProxy-setProxyPause-bool-)
 
 - [`upgradeTo(address impl)`](#StakeDefiProxy-upgradeTo-address-)
@@ -19,6 +21,10 @@
 - [`Upgraded(address implementation)`](#StakeDefiProxy-Upgraded-address-)
 
 ## Function `constructor(address _logic)` {#StakeDefiProxy-constructor-address-}
+
+No description
+
+## Function `transferOwnership(address newOwner)` {#StakeDefiProxy-transferOwnership-address-}
 
 No description
 

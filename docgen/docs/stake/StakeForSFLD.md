@@ -1,5 +1,7 @@
 # Functions:
 
+- [`transferOwnership(address newOwner)`](#StakeForSFLD-transferOwnership-address-)
+
 - [`initialize(address _fld, address _sfld, uint256 _startBlock)`](#StakeForSFLD-initialize-address-address-uint256-)
 
 - [`setStarted(bool _started)`](#StakeForSFLD-setStarted-bool-)
@@ -11,6 +13,10 @@
 - [`claim()`](#StakeForSFLD-claim--)
 
 - [`withdraw(uint256 amount, uint256 deadline, bytes signature)`](#StakeForSFLD-withdraw-uint256-uint256-bytes-)
+
+## Function `transferOwnership(address newOwner)` {#StakeForSFLD-transferOwnership-address-}
+
+No description
 
 ## Function `initialize(address _fld, address _sfld, uint256 _startBlock)` {#StakeForSFLD-initialize-address-address-uint256-}
 

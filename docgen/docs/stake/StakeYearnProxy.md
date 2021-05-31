@@ -1,5 +1,7 @@
 # Functions:
 
+- [`transferOwnership(address newOwner)`](#StakeYearnProxy-transferOwnership-address-)
+
 - [`setProxyPause(bool _pause)`](#StakeYearnProxy-setProxyPause-bool-)
 
 - [`upgradeTo(address impl)`](#StakeYearnProxy-upgradeTo-address-)
@@ -13,6 +15,10 @@
 # Events:
 
 - [`Upgraded(address implementation)`](#StakeYearnProxy-Upgraded-address-)
+
+## Function `transferOwnership(address newOwner)` {#StakeYearnProxy-transferOwnership-address-}
+
+No description
 
 ## Function `setProxyPause(bool _pause)` {#StakeYearnProxy-setProxyPause-bool-}
 

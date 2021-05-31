@@ -1,5 +1,7 @@
 # Functions:
 
+- [`transferOwnership(address newOwner)`](#SFLD-transferOwnership-address-)
+
 - [`mint(address to, uint256 amount)`](#SFLD-mint-address-uint256-)
 
 - [`burn(address from, uint256 amount)`](#SFLD-burn-address-uint256-)
@@ -17,6 +19,10 @@
 - [`Approval(address from, address to, uint256 value)`](#SFLD-Approval-address-address-uint256-)
 
 - [`Transfer(address from, address to, uint256 value)`](#SFLD-Transfer-address-address-uint256-)
+
+## Function `transferOwnership(address newOwner)` {#SFLD-transferOwnership-address-}
+
+No description
 
 ## Function `mint(address to, uint256 amount) → bool` {#SFLD-mint-address-uint256-}
 

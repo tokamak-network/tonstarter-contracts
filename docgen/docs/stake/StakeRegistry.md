@@ -2,6 +2,8 @@
 
 - [`constructor(address _fld)`](#StakeRegistry-constructor-address-)
 
+- [`transferOwnership(address newOwner)`](#StakeRegistry-transferOwnership-address-)
+
 - [`setTokamak(address _ton, address _wton, address _depositManager, address _seigManager)`](#StakeRegistry-setTokamak-address-address-address-address-)
 
 - [`addDefiInfo(string _name, address _router, address _ex1, address _ex2, uint256 _fee)`](#StakeRegistry-addDefiInfo-string-address-address-address-uint256-)
@@ -31,6 +33,10 @@
 - [`AddedDefiInfo(bytes32 nameHash, string name, address router, address ex1, address ex2, uint256 fee)`](#StakeRegistry-AddedDefiInfo-bytes32-string-address-address-address-uint256-)
 
 ## Function `constructor(address _fld)` {#StakeRegistry-constructor-address-}
+
+No description
+
+## Function `transferOwnership(address newOwner)` {#StakeRegistry-transferOwnership-address-}
 
 No description
 

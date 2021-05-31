@@ -11,3 +11,17 @@ No description
 ## Function `create(address[3] _addr, address _registry, uint256[3] _intdata, address owner) → address` {#StakeDefiFactory-create-address-3--address-uint256-3--address-}
 
 No description
+
+### Parameters:
+
+- `_addr`: array of [token, paytoken, vault]
+
+- `_registry`:  registry address
+
+- `_intdata`: array of [saleStartBlock, startBlock, endBlock]
+
+- `owner`:  owner address
+
+### Return Values:
+
+- contract address

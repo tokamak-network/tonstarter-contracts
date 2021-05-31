@@ -1,24 +1,30 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.7.6;
 
-//import {Stake1Vault} from "../stake/Stake1Vault.sol";
+import "../interfaces/IStakeVaultFactory.sol";
 import {StakeVaultProxy} from "../stake/StakeVaultProxy.sol";
 
-contract StakeVaultFactory {
+/// @title A factory that creates a vault that hold reward
+contract StakeVaultFactory is IStakeVaultFactory{
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
 
     address public stakeVaultLogic;
 
     constructor(address _stakeVaultLogic) {
-        require(_stakeVaultLogic != address(0), "StakeVaultFactory zero");
+        require(_stakeVaultLogic != address(0), "StakeVaultFactory: logic zero");
         stakeVaultLogic = _stakeVaultLogic;
     }
 
+    /// Create a vault that hold reward, _cap is allocated reward amount.
+    /// @param _addr the array of [token, paytoken, vault, defiAddr]
+    /// @param _intInfo array of [_stakeType, _cap, _saleStartBlock, _stakeStartBlock]
+    /// @param owner the owner adderess
+    /// @return a vault address
     function create(
-        address[4] memory _addr,
-        uint256[4] memory _intInfo,
+        address[4] calldata _addr,
+        uint256[4] calldata _intInfo,
         address owner
-    ) external returns (address) {
+    ) external override returns (address) {
         address _fld = _addr[0];
         address _paytoken = _addr[1];
         address _stakefactory = _addr[2];
@@ -28,10 +34,8 @@ contract StakeVaultFactory {
         uint256 _saleStartBlock = _intInfo[2];
         uint256 _stakeStartBlock = _intInfo[3];
 
-        // Stake1Vault vault = new Stake1Vault();
-        // require(address(vault) != address(0), "vault logic zero");
-
         StakeVaultProxy proxy = new StakeVaultProxy(stakeVaultLogic);
+        require(address(proxy) != address(0), "StakeVaultFactory: proxy zero");
 
         proxy.initialize(
             _fld,

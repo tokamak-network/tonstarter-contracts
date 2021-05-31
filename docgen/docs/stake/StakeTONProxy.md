@@ -2,6 +2,8 @@
 
 - [`constructor(address _logic)`](#StakeTONProxy-constructor-address-)
 
+- [`transferOwnership(address newOwner)`](#StakeTONProxy-transferOwnership-address-)
+
 - [`setProxyPause(bool _pause)`](#StakeTONProxy-setProxyPause-bool-)
 
 - [`upgradeTo(address impl)`](#StakeTONProxy-upgradeTo-address-)
@@ -23,6 +25,10 @@
 - [`Upgraded(address implementation)`](#StakeTONProxy-Upgraded-address-)
 
 ## Function `constructor(address _logic)` {#StakeTONProxy-constructor-address-}
+
+No description
+
+## Function `transferOwnership(address newOwner)` {#StakeTONProxy-transferOwnership-address-}
 
 No description
 

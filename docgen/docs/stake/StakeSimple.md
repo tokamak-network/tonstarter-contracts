@@ -2,6 +2,8 @@
 
 - [`receive()`](#StakeSimple-receive--)
 
+- [`transferOwnership(address newOwner)`](#StakeSimple-transferOwnership-address-)
+
 - [`initialize(address _token, address _paytoken, address _vault, uint256 _saleStartBlock, uint256 _startBlock, uint256 _period)`](#StakeSimple-initialize-address-address-address-uint256-uint256-uint256-)
 
 - [`stake(uint256 amount)`](#StakeSimple-stake-uint256-)
@@ -21,6 +23,10 @@
 - [`Withdrawal(address to, uint256 amount)`](#StakeSimple-Withdrawal-address-uint256-)
 
 ## Function `receive()` {#StakeSimple-receive--}
+
+No description
+
+## Function `transferOwnership(address newOwner)` {#StakeSimple-transferOwnership-address-}
 
 No description
 

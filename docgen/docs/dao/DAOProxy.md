@@ -2,6 +2,8 @@
 
 - [`constructor(address _sfldAddress)`](#DAOProxy-constructor-address-)
 
+- [`transferOwnership(address newOwner)`](#DAOProxy-transferOwnership-address-)
+
 - [`setProxyPause(bool _pause)`](#DAOProxy-setProxyPause-bool-)
 
 - [`upgradeTo(address impl)`](#DAOProxy-upgradeTo-address-)
@@ -17,6 +19,10 @@
 - [`Upgraded(address implementation)`](#DAOProxy-Upgraded-address-)
 
 ## Function `constructor(address _sfldAddress)` {#DAOProxy-constructor-address-}
+
+No description
+
+## Function `transferOwnership(address newOwner)` {#DAOProxy-transferOwnership-address-}
 
 No description
 
