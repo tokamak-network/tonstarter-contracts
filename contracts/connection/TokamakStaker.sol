@@ -382,7 +382,7 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
             IERC20BASE(wton).approve(uniswapRouter, _amountIn),
             "can't approve uniswapRouter"
         );
-    
+
         if (_kind == 0) {
             ISwapRouter.ExactInputSingleParams memory params =
                 ISwapRouter.ExactInputSingleParams({
@@ -411,11 +411,15 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
         emit exchangedWTONtoFLD(msg.sender, _amountIn, amountOut);
     }
 
+    /// @dev exchange holded WTON to FLD using uniswap-v2
+    /// @param _amountIn the input amount
+    /// @param _amountOutMinimum the minimun output amount
+    /// @param _deadline deadline
+    /// @param _kind the function type, if 0, use exactInputSingle function, else if, use exactInput function
     function exchangeWTONtoFLDv2(
         uint256 _amountIn,
         uint256 _amountOutMinimum,
         uint256 _deadline,
-        uint160 _sqrtPriceLimitX96,
         uint256 _kind
     ) override external returns (uint256 amountOut) {
         require(block.number <= endBlock, "period end");
@@ -469,7 +473,7 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
             path[1] = wethAddress;
             path[2] = token;
             uint[] memory amounts = IUniswapV2Router01(uniswapRouterV2).swapExactTokensForTokens(_amountIn, _amountOutMinimum, path, address(this), _deadline);
-            amountOut = amounts[amounts.length - 1];        
+            amountOut = amounts[amounts.length - 1];
         }
 
         emit exchangedWTONtoFLD(msg.sender, _amountIn, amountOut);
