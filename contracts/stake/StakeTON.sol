@@ -8,7 +8,6 @@ import {IIERC20} from "../interfaces/IIERC20.sol";
 import {IWTON} from "../interfaces/IWTON.sol";
 
 import "../libraries/LibTokenStake1.sol";
-import "../libraries/LibUniswap.sol";
 import {SafeMath} from "../utils/math/SafeMath.sol";
 import "../connection/TokamakStaker.sol";
 import {
@@ -62,7 +61,7 @@ contract StakeTON is TokamakStaker, IStakeTON {
 
     /// @dev Stake amount
     /// @param amount  the amount of staked
-    function stake(uint256 amount) public override payable {
+    function stake(uint256 amount) public payable override {
         require(
             (paytoken == address(0) && msg.value == amount) ||
                 (paytoken != address(0) && amount > 0),
@@ -268,8 +267,9 @@ contract StakeTON is TokamakStaker, IStakeTON {
     /// @param specificBlock the block that claimed reward
     /// @return reward the reward amount that can be taken
     function canRewardAmount(address account, uint256 specificBlock)
-        public override
+        public
         view
+        override
         returns (uint256)
     {
         uint256 reward = 0;

@@ -2,15 +2,15 @@
 pragma solidity ^0.7.6;
 
 import "../interfaces/IStakeVaultStorage.sol";
-import {IFLD} from "../interfaces/IFLD.sol";
 import "../libraries/LibTokenStake1.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 
+/// @title the storage of StakeVaultStorage
 contract StakeVaultStorage is AccessControl, IStakeVaultStorage {
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
 
     /// @dev reward token : FLD
-    IFLD public fld;
+    address public override fld;
 
     /// @dev paytoken is the token that the user stakes.
     address public override paytoken;
@@ -27,6 +27,7 @@ contract StakeVaultStorage is AccessControl, IStakeVaultStorage {
     /// @dev the staking end block.
     uint256 public override stakeEndBlock;
 
+    /// @dev the staking real end block.
     uint256 public override realEndBlock;
 
     /// @dev reward amount per block

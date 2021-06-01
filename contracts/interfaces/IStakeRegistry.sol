@@ -2,7 +2,6 @@
 pragma solidity ^0.7.6;
 
 interface IStakeRegistry {
-
     /// @dev Set addresses for Tokamak integration
     /// @param _ton TON address
     /// @param _wton WTON address
@@ -27,7 +26,7 @@ interface IStakeRegistry {
         address _ex1,
         address _ex2,
         uint256 _fee
-    ) external ;
+    ) external;
 
     /// @dev Add Vault
     /// @dev It is excuted by proxy
@@ -57,6 +56,7 @@ interface IStakeRegistry {
             address,
             address
         );
+
     /// @dev Get indos for UNISWAP_V3 interface
     /// @return (uniswapRouter, npm, wethAddress, fee)
     function getUniswap()

@@ -26,9 +26,6 @@ contract StakeSimple is Stake1Storage, AccessControl, IStakeSimple {
         _lock = 0;
     }
 
-    //////////////////////////////
-    // Events
-    //////////////////////////////
     event Staked(address indexed to, uint256 amount);
     event Claimed(address indexed to, uint256 amount, uint256 currentBlcok);
     event Withdrawal(address indexed to, uint256 amount);
@@ -50,7 +47,7 @@ contract StakeSimple is Stake1Storage, AccessControl, IStakeSimple {
     function transferOwnership(address newOwner) external onlyOwner {
         require(msg.sender != newOwner, "StakeSimple:same owner");
         grantRole(ADMIN_ROLE, newOwner);
-        revokeRole(ADMIN_ROLE, msg.sender );
+        revokeRole(ADMIN_ROLE, msg.sender);
     }
 
     /// @dev Initialize
@@ -85,7 +82,7 @@ contract StakeSimple is Stake1Storage, AccessControl, IStakeSimple {
 
     /// @dev Stake amount
     /// @param amount  the amount of staked
-    function stake(uint256 amount) public override payable {
+    function stake(uint256 amount) public payable override {
         require(
             (paytoken == address(0) && msg.value == amount) ||
                 (paytoken != address(0) && amount > 0),
@@ -180,8 +177,9 @@ contract StakeSimple is Stake1Storage, AccessControl, IStakeSimple {
     /// @param specificBlock the block that claimed reward
     /// @return reward the reward amount that can be taken
     function canRewardAmount(address account, uint256 specificBlock)
-        public override
+        public
         view
+        override
         returns (uint256)
     {
         uint256 reward = 0;

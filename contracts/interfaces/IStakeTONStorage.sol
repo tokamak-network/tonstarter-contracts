@@ -2,7 +2,6 @@
 pragma solidity ^0.7.6;
 
 interface IStakeTONStorage {
-
     /// @dev TON address
     function ton() external view returns (address);
 

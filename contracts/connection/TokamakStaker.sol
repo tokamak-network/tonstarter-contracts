@@ -51,7 +51,7 @@ interface ITokamakRegistry {
 }
 
 /// @title The connector that integrates tokamak
-contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker{
+contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
     using SafeMath for uint256;
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
 
@@ -118,7 +118,6 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker{
     /// @dev set the tokamak Layer2 address
     /// @param _layer2 new the tokamak Layer2 address
     function setTokamakLayer2(address _layer2) external override onlyOwner {
-
         require(
             _layer2 != address(0) && tokamakLayer2 != _layer2,
             "tokamakLayer2 zero "
@@ -134,8 +133,9 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker{
     /// @return ext the address of ext
     /// @return fee the amount of fee
     function getUniswapInfo()
-        external override
+        external
         view
+        override
         returns (
             address uniswapRouter,
             address npm,
@@ -160,7 +160,8 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker{
     /// @dev  staking the staked TON in layer2 in tokamak
     /// @param _layer2 the layer2 address in tokamak
     function tokamakStaking(address _layer2)
-        external override
+        external
+        override
         lock
         nonZero(stakeRegistry)
         nonZero(_layer2)
@@ -245,7 +246,8 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker{
     /// @param _layer2 the layer2 address in tokamak
     /// @param wtonAmount the amount requested to unstaking
     function tokamakRequestUnStaking(address _layer2, uint256 wtonAmount)
-        public override
+        public
+        override
         lock
         nonZero(stakeRegistry)
         sameTokamakLayer(_layer2)
@@ -281,7 +283,8 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker{
     /// @dev process unstaking in layer2 in tokamak
     /// @param _layer2 the layer2 address in tokamak
     function tokamakProcessUnStaking(address _layer2)
-        public override
+        public
+        override
         lock
         nonZero(stakeRegistry)
         sameTokamakLayer(_layer2)
@@ -332,6 +335,7 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker{
     /// @param _deadline deadline
     /// @param sqrtPriceLimitX96 sqrtPriceLimitX96
     /// @param _kind the function type, if 0, use exactInputSingle function, else if, use exactInput function
+    /// @return amountOut the amount of exchanged out token
     function exchangeWTONtoFLD(
         uint256 _amountIn,
         uint256 _amountOutMinimum,

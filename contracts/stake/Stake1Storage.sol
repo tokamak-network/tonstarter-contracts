@@ -5,8 +5,7 @@ import "../interfaces/IStake1Storage.sol";
 import "../libraries/LibTokenStake1.sol";
 
 /// @title The base storage of stakeContract
-contract Stake1Storage is IStake1Storage{
-
+contract Stake1Storage is IStake1Storage {
     /// @dev reward token : FLD
     address public override token;
 
@@ -44,16 +43,18 @@ contract Stake1Storage is IStake1Storage{
 
     /// @dev user's staked information
     function getUserStaked(address user)
-        external override view
+        external
+        view
+        override
         returns (
-            uint256 ,
-            uint256 ,
-            uint256 ,
-            uint256 ,
-            uint256 ,
-            uint256 ,
+            uint256,
+            uint256,
+            uint256,
+            uint256,
+            uint256,
+            uint256,
             bool
-         )
+        )
     {
         return (
             userStaked[user].amount,

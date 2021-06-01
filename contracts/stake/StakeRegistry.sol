@@ -107,7 +107,8 @@ contract StakeRegistry is AccessControl, IStakeRegistry {
         address _depositManager,
         address _seigManager
     )
-        external override
+        external
+        override
         onlyOwner
         nonZero(_ton)
         nonZero(_wton)
@@ -174,7 +175,8 @@ contract StakeRegistry is AccessControl, IStakeRegistry {
     /// @param _vault vault address
     /// @param _stakeContract  StakeContract address
     function addStakeContract(address _vault, address _stakeContract)
-        external override
+        external
+        override
         onlyOwner
     {
         require(
@@ -191,8 +193,9 @@ contract StakeRegistry is AccessControl, IStakeRegistry {
     /// @dev Get addresses for Tokamak interface
     /// @return (ton, wton, depositManager, seigManager)
     function getTokamak()
-        external override
+        external
         view
+        override
         returns (
             address,
             address,
@@ -206,8 +209,9 @@ contract StakeRegistry is AccessControl, IStakeRegistry {
     /// @dev Get indos for UNISWAP_V3 interface
     /// @return (uniswapRouter, npm, wethAddress, fee)
     function getUniswap()
-        external override
+        external
         view
+        override
         returns (
             address,
             address,
@@ -229,8 +233,9 @@ contract StakeRegistry is AccessControl, IStakeRegistry {
     /// @param _index the phase number
     /// @return the list of vaults of phase[_index]
     function phasesAll(uint256 _index)
-        external override
+        external
         view
+        override
         returns (address[] memory)
     {
         return phases[_index];
@@ -240,8 +245,9 @@ contract StakeRegistry is AccessControl, IStakeRegistry {
     /// @param _vault the vault's address
     /// @return the list of stakeContracts of vault
     function stakeContractsOfVaultAll(address _vault)
-        external override
+        external
         view
+        override
         returns (address[] memory)
     {
         return stakeContractsOfVault[_vault];
@@ -252,8 +258,9 @@ contract StakeRegistry is AccessControl, IStakeRegistry {
     /// @param _vault the vault's address
     /// @return valid true or false
     function validVault(uint256 _phase, address _vault)
-        external override
+        external
         view
+        override
         returns (bool valid)
     {
         require(phases[_phase].length > 0, "StakeRegistry: validVault is fail");

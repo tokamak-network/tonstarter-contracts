@@ -7,7 +7,6 @@ import "./StakeVaultStorage.sol";
 /// @title Proxy for StakeVault
 /// @notice
 contract StakeVaultProxy is StakeVaultStorage, IStakeVaultProxy {
-
     address internal _implementation;
     bool public pauseProxy;
 
@@ -38,7 +37,7 @@ contract StakeVaultProxy is StakeVaultStorage, IStakeVaultProxy {
     }
 
     /// @dev returns the implementation
-    function implementation() public override view returns (address) {
+    function implementation() public view override returns (address) {
         return _implementation;
     }
 
@@ -55,7 +54,10 @@ contract StakeVaultProxy is StakeVaultStorage, IStakeVaultProxy {
     /// @dev fallback function , execute on undefined function call
     function _fallback() internal {
         address _impl = implementation();
-        require(_impl != address(0) && !pauseProxy, "Stake1Vault: impl OR proxy is false");
+        require(
+            _impl != address(0) && !pauseProxy,
+            "Stake1Vault: impl OR proxy is false"
+        );
 
         assembly {
             // Copy msg.data. We take full control of memory in this inline assembly
@@ -111,7 +113,7 @@ contract StakeVaultProxy is StakeVaultStorage, IStakeVaultProxy {
             "Stake1Vault: startBlock is unavailable"
         );
 
-        fld = IFLD(_fld);
+        fld = _fld;
         cap = _cap;
         paytoken = _paytoken;
         saleStartBlock = _saleStartBlock;

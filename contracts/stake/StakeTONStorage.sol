@@ -4,8 +4,8 @@ pragma solidity ^0.7.6;
 import "../interfaces/IStakeTONStorage.sol";
 import "./Stake1Storage.sol";
 
+/// @title the storage of StakeTONStorage
 contract StakeTONStorage is Stake1Storage, IStakeTONStorage {
-
     /// @dev TON address
     address public override ton;
 

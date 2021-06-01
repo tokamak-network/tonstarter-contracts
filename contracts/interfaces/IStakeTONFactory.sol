@@ -2,6 +2,13 @@
 pragma solidity ^0.7.6;
 
 interface IStakeTONFactory {
+
+    /// @dev Create a stake contract that can stake TON.
+    /// @param _addr the array of [token, paytoken, vault, defiAddr]
+    /// @param _registry  the registry address
+    /// @param _intdata the array of [saleStartBlock, startBlock, endBlock]
+    /// @param owner  owner address
+    /// @return contract address
     function create(
         address[4] calldata _addr,
         address _registry,

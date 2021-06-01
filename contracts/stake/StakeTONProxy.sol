@@ -64,14 +64,17 @@ contract StakeTONProxy is StakeTONStorage, AccessControl, OnApprove {
         return _implementation;
     }
 
+    /// @dev receive ether
     receive() external payable {
         _fallback();
     }
 
+    /// @dev fallback function , execute on undefined function call
     fallback() external payable {
         _fallback();
     }
 
+    /// @dev fallback function , execute on undefined function call
     function _fallback() internal {
         address _impl = implementation();
         require(
@@ -103,7 +106,12 @@ contract StakeTONProxy is StakeTONStorage, AccessControl, OnApprove {
         }
     }
 
-    /// @dev Approves
+    /// @dev Approves function
+    /// @dev call by WTON
+    /// @param owner  who actually calls
+    /// @param spender  Who gives permission to use
+    /// @param tonAmount  how much will be available
+    /// @param data  Amount data to use with users
     function onApprove(
         address owner,
         address spender,
@@ -130,7 +138,11 @@ contract StakeTONProxy is StakeTONStorage, AccessControl, OnApprove {
         (spender, amount) = abi.decode(input, (address, uint256));
     }
 
-    /// @dev stake with ton
+    /// @dev stake with WTON
+    /// @param from  WTON
+    /// @param _owner  who actually calls
+    /// @param _spender  Who gives permission to use
+    /// @param _amount  how much will be available
     function stakeOnApprove(
         address from,
         address _owner,
@@ -146,8 +158,14 @@ contract StakeTONProxy is StakeTONStorage, AccessControl, OnApprove {
             "StakeTONProxy: period is unavailable"
         );
 
-        require(!IStakeVaultStorage(vault).saleClosed(), "StakeTONProxy: not end");
-        require(IIERC20(paytoken).balanceOf(_owner) >= _amount, "StakeTONProxy: insuffient");
+        require(
+            !IStakeVaultStorage(vault).saleClosed(),
+            "StakeTONProxy: not end"
+        );
+        require(
+            IIERC20(paytoken).balanceOf(_owner) >= _amount,
+            "StakeTONProxy: insuffient"
+        );
 
         LibTokenStake1.StakedAmount storage staked = userStaked[_owner];
         if (staked.amount == 0) totalStakers = totalStakers.add(1);
@@ -160,6 +178,10 @@ contract StakeTONProxy is StakeTONStorage, AccessControl, OnApprove {
         return true;
     }
 
+    /// @dev set initial storage
+    /// @param _addr the array addresses of token, paytoken, vault, defiAddress
+    /// @param _registry the registry address
+    /// @param _intdata the array valued of saleStartBlock, stakeStartBlock, stakeEndBlock
     function setInit(
         address[4] memory _addr,
         address _registry,

@@ -7,8 +7,7 @@ import {IStakeRegistry} from "../interfaces/IStakeRegistry.sol";
 import {IStakeVaultFactory} from "../interfaces/IStakeVaultFactory.sol";
 
 /// @title The storage of StakeProxy
-contract StakeProxyStorage is IStakeProxyStorage{
-
+contract StakeProxyStorage is IStakeProxyStorage {
     /// @dev stakeRegistry
     IStakeRegistry public stakeRegistry;
 

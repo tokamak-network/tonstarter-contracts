@@ -5,8 +5,7 @@ pragma abicoder v2;
 import "../interfaces/IStake1Vault.sol";
 import {IFLD} from "../interfaces/IFLD.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "../interfaces/IStake1Vault.sol";
-import "../interfaces/IStake1.sol";
+import "../interfaces/IStake1Storage.sol";
 import "../libraries/LibTokenStake1.sol";
 import {SafeMath} from "../utils/math/SafeMath.sol";
 import "./StakeVaultStorage.sol";
@@ -62,7 +61,7 @@ contract Stake1Vault is StakeVaultStorage, IStake1Vault {
             "Stake1Vault: startBlock is unavailable"
         );
 
-        fld = IFLD(_fld);
+        fld = _fld;
         cap = _cap;
         paytoken = _paytoken;
         saleStartBlock = _saleStartBlock;
@@ -77,7 +76,7 @@ contract Stake1Vault is StakeVaultStorage, IStake1Vault {
     /// @param _fld  FLD address
     function setFLD(address _fld) external override onlyOwner {
         require(_fld != address(0), "Stake1Vault: input is zero");
-        fld = IFLD(_fld);
+        fld = _fld;
     }
 
     /// @dev Change cap of the vault
@@ -116,7 +115,7 @@ contract Stake1Vault is StakeVaultStorage, IStake1Vault {
         );
         require(saleClosed == false, "Stake1Vault: closed sale");
         require(
-            paytoken == IStake1(stakeContract).paytoken(),
+            paytoken == IStake1Storage(stakeContract).paytoken(),
             "Stake1Vault: Different paytoken"
         );
 
@@ -253,7 +252,7 @@ contract Stake1Vault is StakeVaultStorage, IStake1Vault {
         returns (bool)
     {
         require(saleClosed && _amount > 0, "Stake1Vault: disclose sale");
-        uint256 fldBalance = fld.balanceOf(address(this));
+        uint256 fldBalance = IERC20(fld).balanceOf(address(this));
         require(fldBalance >= _amount, "Stake1Vault: not enough balance");
 
         LibTokenStake1.StakeInfo storage stakeInfo = stakeInfos[msg.sender];
@@ -270,7 +269,7 @@ contract Stake1Vault is StakeVaultStorage, IStake1Vault {
 
         stakeInfo.claimRewardAmount = stakeInfo.claimRewardAmount.add(_amount);
 
-        require(fld.transfer(_to, _amount), "Stake1Vault: FLD transfer fail");
+        require(IERC20(fld).transfer(_to, _amount), "Stake1Vault: FLD transfer fail");
 
         emit ClaimedReward(msg.sender, _to, _amount);
         return true;
@@ -287,7 +286,7 @@ contract Stake1Vault is StakeVaultStorage, IStake1Vault {
         returns (bool)
     {
         require(saleClosed, "Stake1Vault: disclose");
-        uint256 fldBalance = fld.balanceOf(address(this));
+        uint256 fldBalance = IERC20(fld).balanceOf(address(this));
         require(fldBalance >= _amount, "not enough");
 
         LibTokenStake1.StakeInfo storage stakeInfo = stakeInfos[_to];
@@ -314,7 +313,7 @@ contract Stake1Vault is StakeVaultStorage, IStake1Vault {
         override
         returns (uint256)
     {
-        return fld.balanceOf(address(this));
+        return IERC20(fld).balanceOf(address(this));
     }
 
     /// @dev Give all stakeContracts's addresses in this vault

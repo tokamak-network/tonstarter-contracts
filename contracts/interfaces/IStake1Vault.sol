@@ -4,7 +4,6 @@ pragma abicoder v2;
 import "../libraries/LibTokenStake1.sol";
 
 interface IStake1Vault {
-
     /// @dev Initializes all variables
     /// @param _fld  FLD token address
     /// @param _paytoken  Tokens staked by users, can be used as ERC20 tokens.
@@ -101,5 +100,4 @@ interface IStake1Vault {
     /// @dev Give the ordered end blocks of stakeContracts in this vault
     /// @return the ordered end blocks
     function orderedEndBlocksAll() external view returns (uint256[] memory);
-
 }

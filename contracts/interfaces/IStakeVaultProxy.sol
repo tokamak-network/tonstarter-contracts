@@ -2,7 +2,6 @@
 pragma solidity ^0.7.6;
 
 interface IStakeVaultProxy {
-
     /// @dev Set pause state
     /// @param _pause true:pause or false:resume
     function setProxyPause(bool _pause) external;
@@ -34,6 +33,5 @@ interface IStakeVaultProxy {
         address _stakefactory,
         uint256 _stakeType,
         address _defiAddr
-    ) external ;
-
+    ) external;
 }
