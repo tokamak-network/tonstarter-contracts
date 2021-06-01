@@ -38,17 +38,17 @@ const CLAIMER_ROLE = keccak256("CLAIMER");
 const PHASE2_VAULT_HASH = keccak256("PHASE2_VAULT");
 const EVENT_VAULT_HASH = keccak256("EVENT_VAULT");
 
-let fldtoken = loadDeployed(process.env.NETWORK,"FLD");
-let registry = loadDeployed(process.env.NETWORK,"StakeRegistry");
-let factory = loadDeployed(process.env.NETWORK,"StakeFactory");
-let vaultfactory = loadDeployed(process.env.NETWORK,"StakeVaultFactory");
-let logic = loadDeployed(process.env.NETWORK,"Stake1Logic");
-let proxy = loadDeployed(process.env.NETWORK,"Stake1Proxy");
+const fldtoken = loadDeployed(process.env.NETWORK, "FLD");
+const registry = loadDeployed(process.env.NETWORK, "StakeRegistry");
+const factory = loadDeployed(process.env.NETWORK, "StakeFactory");
+const vaultfactory = loadDeployed(process.env.NETWORK, "StakeVaultFactory");
+const logic = loadDeployed(process.env.NETWORK, "Stake1Logic");
+const proxy = loadDeployed(process.env.NETWORK, "Stake1Proxy");
 
-let ton = loadDeployed(process.env.NETWORK,"TON");
-let wton = loadDeployed(process.env.NETWORK,"WTON");
-let depositManager = loadDeployed(process.env.NETWORK,"DepositManager");
-let seigManager = loadDeployed(process.env.NETWORK,"SeigManager");
+const ton = loadDeployed(process.env.NETWORK, "TON");
+const wton = loadDeployed(process.env.NETWORK, "WTON");
+const depositManager = loadDeployed(process.env.NETWORK, "DepositManager");
+const seigManager = loadDeployed(process.env.NETWORK, "SeigManager");
 console.log("proxy:", proxy);
 console.log("ton:", ton);
 console.log("wton:", wton);
@@ -56,13 +56,25 @@ console.log("wton:", wton);
 async function deployMain(defaultSender) {
   const [deployer, user1] = await ethers.getSigners();
 
-  let uniswapRouter = loadDeployedInitVariable(process.env.NETWORK,"UniswapRouter");
-  let uniswapNPM = loadDeployedInitVariable(process.env.NETWORK,"NonfungiblePositionManager");
-  let uniswapFee = loadDeployedInitVariable(process.env.NETWORK,"UniswapFee");
-  let uniswapWeth = loadDeployedInitVariable(process.env.NETWORK,"WethAddress");
+  const uniswapRouter = loadDeployedInitVariable(
+    process.env.NETWORK,
+    "UniswapRouter"
+  );
+  const uniswapNPM = loadDeployedInitVariable(
+    process.env.NETWORK,
+    "NonfungiblePositionManager"
+  );
+  const uniswapFee = loadDeployedInitVariable(
+    process.env.NETWORK,
+    "UniswapFee"
+  );
+  const uniswapWeth = loadDeployedInitVariable(
+    process.env.NETWORK,
+    "WethAddress"
+  );
 
   const stakeEntry = await ethers.getContractAt("Stake1Logic", proxy);
-  console.log("stakeEntry:" , stakeEntry.address);
+  console.log("stakeEntry:", stakeEntry.address);
 
   console.log("fldtoken:", fldtoken);
   console.log("registry:", registry);
@@ -87,11 +99,7 @@ async function deployMain(defaultSender) {
 
   const stakeRegistry = await ethers.getContractAt("StakeRegistry", registry);
 
-  await stakeRegistry.setTokamak(
-    ton,
-    wton,
-    depositManager,
-    seigManager);
+  await stakeRegistry.setTokamak(ton, wton, depositManager, seigManager);
   console.log("stakeRegistry setTokamak:");
 
   await stakeRegistry.addDefiInfo(
@@ -99,9 +107,9 @@ async function deployMain(defaultSender) {
     uniswapRouter,
     uniswapNPM,
     uniswapWeth,
-    uniswapFee);
+    uniswapFee
+  );
   console.log("stakeRegistry addDefiInfo:");
-
 
   await stakeRegistry.grantRole(ADMIN_ROLE, proxy);
   console.log("stakeRegistry grantRole: proxy");
@@ -119,7 +127,7 @@ async function deployMain(defaultSender) {
   console.log("fld:", fld.address);
   console.log("deployer:", deployer.address);
 
-  //await fld.grantRole(MINTER_ROLE, deployer.address);
+  // await fld.grantRole(MINTER_ROLE, deployer.address);
   await fld.mint(deployer.address, utils.parseUnits(initialTotal, 18));
   console.log("fld mint:", fld.address);
 
@@ -134,7 +142,6 @@ async function main() {
   console.log("Account balance:", (await deployer.getBalance()).toString());
 
   const contracts = await deployMain(deployer);
-
 }
 
 main()
