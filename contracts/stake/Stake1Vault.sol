@@ -27,9 +27,10 @@ contract Stake1Vault is StakeVaultStorage {
         _setupRole(ADMIN_ROLE, msg.sender);
     }
 
+    /// @dev receive function
     receive() external payable {}
 
-    /// Initializes all variables
+    /// @dev Initializes all variables
     /// @param _fld  FLD token address
     /// @param _paytoken  Tokens staked by users, can be used as ERC20 tokens.
     //                     (In case of ETH, input address(0))
@@ -70,21 +71,21 @@ contract Stake1Vault is StakeVaultStorage {
         grantRole(ADMIN_ROLE, _stakefactory);
     }
 
-    /// Sets FLD address
+    /// @dev Sets FLD address
     /// @param _fld  FLD address
     function setFLD(address _fld) external onlyOwner {
         require(_fld != address(0), "Stake1Vault: input is zero");
         fld = IFLD(_fld);
     }
 
-    /// Change cap of the vault
+    /// @dev Change cap of the vault
     /// @param _cap  allocated reward amount
     function changeCap(uint256 _cap) external onlyOwner {
         require(_cap > 0 && cap != _cap, "Stake1Vault: changeCap fails");
         cap = _cap;
     }
 
-    /// Set Defi Address
+    /// @dev Set Defi Address
     /// @param _defiAddr DeFi related address
     function setDefiAddr(address _defiAddr) external onlyOwner {
         require(
@@ -94,7 +95,7 @@ contract Stake1Vault is StakeVaultStorage {
         defiAddr = _defiAddr;
     }
 
-    /// Add stake contract
+    /// @dev  Add stake contract
     /// @param _name stakeContract's name
     /// @param stakeContract stakeContract's address
     /// @param periodBlocks the period that give rewards of stakeContract
@@ -131,7 +132,7 @@ contract Stake1Vault is StakeVaultStorage {
         orderedEndBlocks.push(stakeEndBlock);
     }
 
-    /// Close the sale that can stake by user
+    /// @dev  Close the sale that can stake by user
     function closeSale() external {
         require(saleClosed == false, "Stake1Vault: already closed");
         require(
@@ -237,7 +238,8 @@ contract Stake1Vault is StakeVaultStorage {
         emit ClosedSale(sum);
     }
 
-    /// sender is a staking contract.
+    /// @dev claim function.
+    /// @notice sender is a staking contract.
     /// A function that pays the amount(_amount) to _to by the staking contract.
     /// A function that _to claim the amount(_amount) from the staking contract and gets the FLD in the vault.
     /// @param _to a user that received reward
@@ -265,7 +267,7 @@ contract Stake1Vault is StakeVaultStorage {
         return true;
     }
 
-    /// whether it is available to claim amount, if it is available , return the total reward amount
+    /// @dev whether it is available to claim amount, if it is available , return the total reward amount
     /// @param _to  a staking contract.
     /// @param _amount the total reward amount of stakeContract
     /// @return true
@@ -291,25 +293,25 @@ contract Stake1Vault is StakeVaultStorage {
         return true;
     }
 
-    /// Returns Give the FLD balance stored in the vault
+    /// @dev Returns Give the FLD balance stored in the vault
     /// @return the balance of FLD in this vault.
     function balanceFLDAvailableAmount() external view returns (uint256) {
         return fld.balanceOf(address(this));
     }
 
-    /// Returns Give all stakeContracts's addresses in this vault
+    /// @dev Returns Give all stakeContracts's addresses in this vault
     /// @return all stakeContracts's addresses
     function stakeAddressesAll() external view returns (address[] memory) {
         return stakeAddresses;
     }
 
-    /// Returns Give the ordered end blocks of stakeContracts in this vault
+    /// @dev Returns Give the ordered end blocks of stakeContracts in this vault
     /// @return the ordered end blocks
     function orderedEndBlocksAll() external view returns (uint256[] memory) {
         return orderedEndBlocks;
     }
 
-    /// Returns Give Total reward amount of stakeContract(_account)
+    /// @dev Returns Give Total reward amount of stakeContract(_account)
     /// @return Total reward amount of stakeContract(_account)
     function totalRewardAmount(address _account)
         external
@@ -319,7 +321,7 @@ contract Stake1Vault is StakeVaultStorage {
         return stakeInfos[_account].totalRewardAmount;
     }
 
-    /// Returns Give the infomation of this vault
+    /// @dev Returns Give the infomation of this vault
     /// @return give paytoken, cap, saleStartBlock, stakeStartBlock, stakeEndBlock, blockTotalReward, saleClosed
     function infos()
         external

@@ -58,7 +58,7 @@ No description
 
 ## Function `setFLD(address _fld) `
 
-No description
+Sets FLD address
 
 ### Parameters:
 
@@ -66,7 +66,7 @@ No description
 
 ## Function `changeCap(uint256 _cap) `
 
-No description
+Change cap of the vault
 
 ### Parameters:
 
@@ -74,7 +74,7 @@ No description
 
 ## Function `setDefiAddr(address _defiAddr) `
 
-No description
+Set Defi Address
 
 ### Parameters:
 
@@ -82,7 +82,7 @@ No description
 
 ## Function `addSubVaultOfStake(string _name, address stakeContract, uint256 periodBlocks) `
 
-No description
+ Add stake contract
 
 ### Parameters:
 
@@ -94,11 +94,11 @@ No description
 
 ## Function `closeSale() `
 
-No description
+ Close the sale that can stake by user
 
 ## Function `claim(address _to, uint256 _amount) `
 
-No description
+claim function.
 
 ### Parameters:
 
@@ -108,7 +108,7 @@ No description
 
 ## Function `canClaim(address _to, uint256 _amount) `
 
-No description
+whether it is available to claim amount, if it is available , return the total reward amount
 
 ### Parameters:
 
@@ -118,7 +118,7 @@ No description
 
 ## Function `balanceFLDAvailableAmount() `
 
-No description
+Returns Give the FLD balance stored in the vault
 
 ### Return Values:
 
@@ -126,7 +126,7 @@ No description
 
 ## Function `stakeAddressesAll() `
 
-No description
+Returns Give all stakeContracts's addresses in this vault
 
 ### Return Values:
 
@@ -134,7 +134,7 @@ No description
 
 ## Function `orderedEndBlocksAll() `
 
-No description
+Returns Give the ordered end blocks of stakeContracts in this vault
 
 ### Return Values:
 
@@ -142,7 +142,7 @@ No description
 
 ## Function `totalRewardAmount(address _account) `
 
-No description
+Returns Give Total reward amount of stakeContract(_account)
 
 ### Return Values:
 
@@ -150,7 +150,7 @@ No description
 
 ## Function `infos() `
 
-No description
+Returns Give the infomation of this vault
 
 ### Return Values:
 
