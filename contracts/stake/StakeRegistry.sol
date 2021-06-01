@@ -77,7 +77,8 @@ contract StakeRegistry is AccessControl, IStakeRegistry {
         address router,
         address ex1,
         address ex2,
-        uint256 fee
+        uint256 fee,
+        address routerV2
     );
 
     /// @dev constructor of StakeRegistry
@@ -133,7 +134,8 @@ contract StakeRegistry is AccessControl, IStakeRegistry {
         address _router,
         address _ex1,
         address _ex2,
-        uint256 _fee
+        uint256 _fee,
+        address _routerV2
     ) external override onlyOwner nonZero(_router) {
         bytes32 nameHash = keccak256(abi.encodePacked(_name));
         require(nameHash != ZERO_HASH, "nameHash zero");
@@ -144,8 +146,9 @@ contract StakeRegistry is AccessControl, IStakeRegistry {
         _defiInfo.ext1 = _ex1;
         _defiInfo.ext2 = _ex2;
         _defiInfo.fee = _fee;
+        _defiInfo.routerV2 = _routerV2;
 
-        emit AddedDefiInfo(nameHash, _name, _router, _ex1, _ex2, _fee);
+        emit AddedDefiInfo(nameHash, _name, _router, _ex1, _ex2, _fee, _routerV2);
     }
 
     /// @dev Add Vault
@@ -212,7 +215,8 @@ contract StakeRegistry is AccessControl, IStakeRegistry {
             address,
             address,
             address,
-            uint256
+            uint256,
+            address
         )
     {
         //string _name = "UNISWAP_V3";
@@ -221,7 +225,8 @@ contract StakeRegistry is AccessControl, IStakeRegistry {
             defiInfo[nameHash].router,
             defiInfo[nameHash].ext1,
             defiInfo[nameHash].ext2,
-            defiInfo[nameHash].fee
+            defiInfo[nameHash].fee,
+            defiInfo[nameHash].routerV2
         );
     }
 

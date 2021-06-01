@@ -391,6 +391,73 @@ abstract contract Stake1Logic is
             );
     }
 
+    /// @dev Swap TON to FLD
+    function exchangeWTONtoFLDv2(
+        address _stakeContract,
+        uint256 amountIn,
+        uint256 amountOutMinimum,
+        uint256 deadline,
+        uint160 sqrtPriceLimitX96,
+        uint256 _type
+    ) external returns (uint256 amountOut) {
+        return
+            IStakeTONTokamak(_stakeContract).exchangeWTONtoFLDv2(
+                amountIn,
+                amountOutMinimum,
+                deadline,
+                sqrtPriceLimitX96,
+                _type
+            );
+    }
+
+    /// @dev Sets FLD address
+    function setFLD(address _fld) public onlyOwner nonZero(_fld) {
+        fld = _fld;
+    }
+
+    /// @dev Sets Stake Registry address
+    function setStakeRegistry(address _stakeRegistry)
+        public
+        onlyOwner
+        nonZero(_stakeRegistry)
+    {
+        stakeRegistry = IStakeRegistry(_stakeRegistry);
+        emit SetStakeRegistry(_stakeRegistry);
+    }
+
+    /// @dev Sets Stake Factory address
+    function setStakeFactory(address _stakeFactory)
+        public
+        onlyOwner
+        nonZero(_stakeFactory)
+    {
+        stakeFactory = IStakeFactory(_stakeFactory);
+    }
+
+    function setStakeTONFactory(address _stakeTONFactory)
+        public
+        onlyOwner
+        nonZero(_stakeTONFactory)
+    {
+        stakeFactory.setStakeTONFactory(_stakeTONFactory);
+    }
+
+    function setStakeStableCoinFactory(address _stakeStableCoinFactory)
+        public
+        onlyOwner
+        nonZero(_stakeStableCoinFactory)
+    {
+        stakeFactory.setStakeStableCoinFactory(_stakeStableCoinFactory);
+    }
+
+    function setStakeVaultFactory(address _stakeVaultFactory)
+        public
+        onlyOwner
+        nonZero(_stakeVaultFactory)
+    {
+        stakeVaultFactory = IStakeVaultFactory(_stakeVaultFactory);
+    }
+
     /// @dev Get addresses of vaults of index phase
     /// @param _phase the pahse number
     function vaultsOfPahse(uint256 _phase)
