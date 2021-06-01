@@ -410,54 +410,6 @@ abstract contract Stake1Logic is
             );
     }
 
-    /// @dev Sets FLD address
-    function setFLD(address _fld) public onlyOwner nonZero(_fld) {
-        fld = _fld;
-    }
-
-    /// @dev Sets Stake Registry address
-    function setStakeRegistry(address _stakeRegistry)
-        public
-        onlyOwner
-        nonZero(_stakeRegistry)
-    {
-        stakeRegistry = IStakeRegistry(_stakeRegistry);
-        emit SetStakeRegistry(_stakeRegistry);
-    }
-
-    /// @dev Sets Stake Factory address
-    function setStakeFactory(address _stakeFactory)
-        public
-        onlyOwner
-        nonZero(_stakeFactory)
-    {
-        stakeFactory = IStakeFactory(_stakeFactory);
-    }
-
-    function setStakeTONFactory(address _stakeTONFactory)
-        public
-        onlyOwner
-        nonZero(_stakeTONFactory)
-    {
-        stakeFactory.setStakeTONFactory(_stakeTONFactory);
-    }
-
-    function setStakeStableCoinFactory(address _stakeStableCoinFactory)
-        public
-        onlyOwner
-        nonZero(_stakeStableCoinFactory)
-    {
-        stakeFactory.setStakeStableCoinFactory(_stakeStableCoinFactory);
-    }
-
-    function setStakeVaultFactory(address _stakeVaultFactory)
-        public
-        onlyOwner
-        nonZero(_stakeVaultFactory)
-    {
-        stakeVaultFactory = IStakeVaultFactory(_stakeVaultFactory);
-    }
-
     /// @dev Get addresses of vaults of index phase
     /// @param _phase the pahse number
     function vaultsOfPahse(uint256 _phase)
