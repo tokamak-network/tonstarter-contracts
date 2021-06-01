@@ -54,7 +54,10 @@ contract DeveloperVault is AccessControl, IDeveloperVault {
         uint256[] memory _claimAmounts
     ) external override onlyAdmin {
         require(_fld != address(0), "DeveloperVault: fld is zero");
-        require(_claimAmounts.length == _developers.length, "DeveloperVault: length is different");
+        require(
+            _claimAmounts.length == _developers.length,
+            "DeveloperVault: length is different"
+        );
         fld = _fld;
         cap = _cap;
         rewardPeriod = _rewardPeriod;
@@ -112,7 +115,7 @@ contract DeveloperVault is AccessControl, IDeveloperVault {
     }
 
     /// @dev Returns current reward block for sender
-    function currentRewardBlock() external override view returns (uint256) {
+    function currentRewardBlock() external view override returns (uint256) {
         DeveloperInfo memory devInfo = developersInfo[msg.sender];
         require(
             devInfo.registered == true,

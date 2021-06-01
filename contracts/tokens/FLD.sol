@@ -72,7 +72,11 @@ contract FLD is ERC20, AccessControl, VerifySignature, IFLD {
     /// @dev burn a token.
     /// @param from Whose tokens are burned
     /// @param amount the amount to burn
-    function burn(address from, uint256 amount) external override returns (bool) {
+    function burn(address from, uint256 amount)
+        external
+        override
+        returns (bool)
+    {
         require(
             hasRole(BURNER_ROLE, msg.sender),
             "FLD: Caller is not a burner"
@@ -129,7 +133,7 @@ contract FLD is ERC20, AccessControl, VerifySignature, IFLD {
         uint256 _period,
         uint256 _nonce,
         bytes memory signature
-    ) public override pure returns (bool) {
+    ) public pure override returns (bool) {
         bytes32 messageHash =
             getPermitMessageHash(_signer, _to, _amount, _nonce, _period);
 

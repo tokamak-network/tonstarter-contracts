@@ -52,7 +52,7 @@ interface ITokamakStaker {
         uint256 _deadline,
         uint160 _sqrtPriceLimitX96,
         uint256 _kind
-        ) external returns (uint256 amountOut);
+    ) external returns (uint256 amountOut);
 
     /// @dev exchange holded WTON to FLD using uniswap-v2
     /// @param _amountIn the input amount

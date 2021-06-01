@@ -2,7 +2,6 @@
 pragma solidity ^0.7.6;
 
 interface IFLD {
-
     /// @dev Issue a token.
     /// @param to  who takes the issue
     /// @param amount the amount to issue

@@ -3,7 +3,6 @@ pragma solidity ^0.7.6;
 pragma abicoder v2;
 
 interface IStakeVaultStorage {
-
     /// @dev reward token : FLD
     function fld() external view returns (address);
 

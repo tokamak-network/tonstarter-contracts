@@ -149,7 +149,15 @@ contract StakeRegistry is AccessControl, IStakeRegistry {
         _defiInfo.fee = _fee;
         _defiInfo.routerV2 = _routerV2;
 
-        emit AddedDefiInfo(nameHash, _name, _router, _ex1, _ex2, _fee, _routerV2);
+        emit AddedDefiInfo(
+            nameHash,
+            _name,
+            _router,
+            _ex1,
+            _ex2,
+            _fee,
+            _routerV2
+        );
     }
 
     /// @dev Add Vault

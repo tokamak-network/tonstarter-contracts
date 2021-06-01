@@ -2,7 +2,6 @@
 pragma solidity ^0.7.6;
 
 interface IStakeTONProxyFactory {
-
     /// @dev Create a StakeTONProxy that can stake TON.
     /// @param _logic the logic contract address used in proxy
     /// @param _addr the array of [token, paytoken, vault, defiAddr]

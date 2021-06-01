@@ -2,7 +2,6 @@
 pragma solidity ^0.7.6;
 
 interface IDeveloperVault {
-
     /// @dev set initial storage
     /// @param _fld the FLD address
     /// @param _cap the allocated FLD amount to devs
@@ -19,12 +18,11 @@ interface IDeveloperVault {
         uint256 _claimsNumberMax,
         address[] memory _developers,
         uint256[] memory _claimAmounts
-    ) external ;
+    ) external;
 
     /// @dev Developers can receive their FLDs
-    function claimReward() external ;
+    function claimReward() external;
 
     /// @dev Returns current reward block for sender
     function currentRewardBlock() external view returns (uint256);
-
 }

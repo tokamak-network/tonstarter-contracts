@@ -269,7 +269,10 @@ contract Stake1Vault is StakeVaultStorage, IStake1Vault {
 
         stakeInfo.claimRewardAmount = stakeInfo.claimRewardAmount.add(_amount);
 
-        require(IERC20(fld).transfer(_to, _amount), "Stake1Vault: FLD transfer fail");
+        require(
+            IERC20(fld).transfer(_to, _amount),
+            "Stake1Vault: FLD transfer fail"
+        );
 
         emit ClaimedReward(msg.sender, _to, _amount);
         return true;

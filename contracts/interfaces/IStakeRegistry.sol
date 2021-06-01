@@ -27,7 +27,7 @@ interface IStakeRegistry {
         address _ex2,
         uint256 _fee,
         address _routerV2
-    ) external ;
+    ) external;
 
     /// @dev Add Vault
     /// @dev It is excuted by proxy

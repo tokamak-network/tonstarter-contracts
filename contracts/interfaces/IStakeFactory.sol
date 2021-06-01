@@ -2,7 +2,6 @@
 pragma solidity ^0.7.6;
 
 interface IStakeFactory {
-
     /// @dev Create a stake contract that calls the desired stake factory according to stakeType
     /// @param stakeType if 0, stakeTONFactory, else if 1 , stakeSimpleFactory , else if 2, stakeDefiFactory
     /// @param _addr array of [token, paytoken, vault, _defiAddr]

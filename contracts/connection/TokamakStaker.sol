@@ -150,7 +150,7 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
     }
 
     function approveUniswapRouter(uint256 amount) external override {
-        (address uniswapRouter, address npm, , ,) =
+        (address uniswapRouter, address npm, , , ) =
             ITokamakRegistry(stakeRegistry).getUniswap();
 
         if (uniswapRouter != address(0))
@@ -375,7 +375,7 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
         }
 
         toUniswapWTON += _amountIn;
-        (address uniswapRouter, , address wethAddress, uint256 _fee,) =
+        (address uniswapRouter, , address wethAddress, uint256 _fee, ) =
             ITokamakRegistry(stakeRegistry).getUniswap();
         require(uniswapRouter != address(0), "uniswap zero");
         require(
@@ -399,7 +399,13 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
         } else if (_kind == 1) {
             ISwapRouter.ExactInputParams memory params =
                 ISwapRouter.ExactInputParams({
-                    path: abi.encodePacked(wton, uint24(_fee), wethAddress, uint24(_fee), token),
+                    path: abi.encodePacked(
+                        wton,
+                        uint24(_fee),
+                        wethAddress,
+                        uint24(_fee),
+                        token
+                    ),
                     recipient: address(this),
                     amountIn: _amountIn,
                     amountOutMinimum: _amountOutMinimum,
@@ -421,7 +427,7 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
         uint256 _amountOutMinimum,
         uint256 _deadline,
         uint256 _kind
-    ) override external returns (uint256 amountOut) {
+    ) external override returns (uint256 amountOut) {
         require(block.number <= endBlock, "period end");
         require(IIStake1Vault(vault).saleClosed() == true, "not closed");
         require(_kind < 2, "no kind");
@@ -450,9 +456,8 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
             );
         }
 
-
         toUniswapWTON += _amountIn;
-        (,,address wethAddress,,address uniswapRouterV2) =
+        (, , address wethAddress, , address uniswapRouterV2) =
             ITokamakRegistry(stakeRegistry).getUniswap();
 
         require(uniswapRouterV2 != address(0), "uniswap zero");
@@ -465,14 +470,28 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
             address[] memory path = new address[](2);
             path[0] = wton;
             path[1] = token;
-            uint[] memory amounts = IUniswapV2Router01(uniswapRouterV2).swapExactTokensForTokens(_amountIn, _amountOutMinimum, path, address(this), _deadline);
+            uint256[] memory amounts =
+                IUniswapV2Router01(uniswapRouterV2).swapExactTokensForTokens(
+                    _amountIn,
+                    _amountOutMinimum,
+                    path,
+                    address(this),
+                    _deadline
+                );
             amountOut = amounts[amounts.length - 1];
         } else {
             address[] memory path = new address[](3);
             path[0] = wton;
             path[1] = wethAddress;
             path[2] = token;
-            uint[] memory amounts = IUniswapV2Router01(uniswapRouterV2).swapExactTokensForTokens(_amountIn, _amountOutMinimum, path, address(this), _deadline);
+            uint256[] memory amounts =
+                IUniswapV2Router01(uniswapRouterV2).swapExactTokensForTokens(
+                    _amountIn,
+                    _amountOutMinimum,
+                    path,
+                    address(this),
+                    _deadline
+                );
             amountOut = amounts[amounts.length - 1];
         }
 
