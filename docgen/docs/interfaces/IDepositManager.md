@@ -46,94 +46,140 @@
 
 - [`numPendingRequests(address layer2, address account)`](#IDepositManager-numPendingRequests-address-address-)
 
-## Function `owner() → address` {#IDepositManager-owner--}
+### IDepositManager-owner--
+
+## Function `owner()`
 
 No description
 
-## Function `wton() → address` {#IDepositManager-wton--}
+### IDepositManager-wton--
+
+## Function `wton()`
 
 No description
 
-## Function `registry() → address` {#IDepositManager-registry--}
+### IDepositManager-registry--
+
+## Function `registry()`
 
 No description
 
-## Function `seigManager() → address` {#IDepositManager-seigManager--}
+### IDepositManager-seigManager--
+
+## Function `seigManager()`
 
 No description
 
-## Function `accStaked(address layer2, address account) → uint256 wtonAmount` {#IDepositManager-accStaked-address-address-}
+### IDepositManager-accStaked-address-address-
+
+## Function `accStaked(address layer2, address account)`
 
 No description
 
-## Function `accStakedLayer2(address layer2) → uint256 wtonAmount` {#IDepositManager-accStakedLayer2-address-}
+### IDepositManager-accStakedLayer2-address-
+
+## Function `accStakedLayer2(address layer2)`
 
 No description
 
-## Function `accStakedAccount(address account) → uint256 wtonAmount` {#IDepositManager-accStakedAccount-address-}
+### IDepositManager-accStakedAccount-address-
+
+## Function `accStakedAccount(address account)`
 
 No description
 
-## Function `pendingUnstaked(address layer2, address account) → uint256 wtonAmount` {#IDepositManager-pendingUnstaked-address-address-}
+### IDepositManager-pendingUnstaked-address-address-
+
+## Function `pendingUnstaked(address layer2, address account)`
 
 No description
 
-## Function `pendingUnstakedLayer2(address layer2) → uint256 wtonAmount` {#IDepositManager-pendingUnstakedLayer2-address-}
+### IDepositManager-pendingUnstakedLayer2-address-
+
+## Function `pendingUnstakedLayer2(address layer2)`
 
 No description
 
-## Function `pendingUnstakedAccount(address account) → uint256 wtonAmount` {#IDepositManager-pendingUnstakedAccount-address-}
+### IDepositManager-pendingUnstakedAccount-address-
+
+## Function `pendingUnstakedAccount(address account)`
 
 No description
 
-## Function `accUnstaked(address layer2, address account) → uint256 wtonAmount` {#IDepositManager-accUnstaked-address-address-}
+### IDepositManager-accUnstaked-address-address-
+
+## Function `accUnstaked(address layer2, address account)`
 
 No description
 
-## Function `accUnstakedLayer2(address layer2) → uint256 wtonAmount` {#IDepositManager-accUnstakedLayer2-address-}
+### IDepositManager-accUnstakedLayer2-address-
+
+## Function `accUnstakedLayer2(address layer2)`
 
 No description
 
-## Function `accUnstakedAccount(address account) → uint256 wtonAmount` {#IDepositManager-accUnstakedAccount-address-}
+### IDepositManager-accUnstakedAccount-address-
+
+## Function `accUnstakedAccount(address account)`
 
 No description
 
-## Function `withdrawalRequestIndex(address layer2, address account) → uint256 index` {#IDepositManager-withdrawalRequestIndex-address-address-}
+### IDepositManager-withdrawalRequestIndex-address-address-
+
+## Function `withdrawalRequestIndex(address layer2, address account)`
 
 No description
 
-## Function `withdrawalRequest(address layer2, address account, uint256 index) → uint128 withdrawableBlockNumber, uint128 amount, bool processed` {#IDepositManager-withdrawalRequest-address-address-uint256-}
+### IDepositManager-withdrawalRequest-address-address-uint256-
+
+## Function `withdrawalRequest(address layer2, address account, uint256 index)`
 
 No description
 
-## Function `WITHDRAWAL_DELAY() → uint256` {#IDepositManager-WITHDRAWAL_DELAY--}
+### IDepositManager-WITHDRAWAL_DELAY--
+
+## Function `WITHDRAWAL_DELAY()`
 
 No description
 
-## Function `deposit(address layer2, uint256 amount) → bool` {#IDepositManager-deposit-address-uint256-}
+### IDepositManager-deposit-address-uint256-
+
+## Function `deposit(address layer2, uint256 amount)`
 
 No description
 
-## Function `requestWithdrawal(address layer2, uint256 amount) → bool` {#IDepositManager-requestWithdrawal-address-uint256-}
+### IDepositManager-requestWithdrawal-address-uint256-
+
+## Function `requestWithdrawal(address layer2, uint256 amount)`
 
 No description
 
-## Function `processRequest(address layer2, bool receiveTON) → bool` {#IDepositManager-processRequest-address-bool-}
+### IDepositManager-processRequest-address-bool-
+
+## Function `processRequest(address layer2, bool receiveTON)`
 
 No description
 
-## Function `requestWithdrawalAll(address layer2) → bool` {#IDepositManager-requestWithdrawalAll-address-}
+### IDepositManager-requestWithdrawalAll-address-
+
+## Function `requestWithdrawalAll(address layer2)`
 
 No description
 
-## Function `processRequests(address layer2, uint256 n) → bool` {#IDepositManager-processRequests-address-uint256-}
+### IDepositManager-processRequests-address-uint256-
+
+## Function `processRequests(address layer2, uint256 n)`
 
 No description
 
-## Function `numRequests(address layer2, address account) → uint256` {#IDepositManager-numRequests-address-address-}
+### IDepositManager-numRequests-address-address-
+
+## Function `numRequests(address layer2, address account)`
 
 No description
 
-## Function `numPendingRequests(address layer2, address account) → uint256` {#IDepositManager-numPendingRequests-address-address-}
+### IDepositManager-numPendingRequests-address-address-
+
+## Function `numPendingRequests(address layer2, address account)`
 
 No description

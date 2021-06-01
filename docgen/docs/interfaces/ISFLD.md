@@ -28,58 +28,86 @@
 
 - [`permit(address owner, address spender, uint256 value, uint256 deadline, bytes signature)`](#ISFLD-permit-address-address-uint256-uint256-bytes-)
 
-## Function `name() → string` {#ISFLD-name--}
+### ISFLD-name--
+
+## Function `name()`
 
 No description
 
-## Function `symbol() → string` {#ISFLD-symbol--}
+### ISFLD-symbol--
+
+## Function `symbol()`
 
 No description
 
-## Function `decimals() → uint8` {#ISFLD-decimals--}
+### ISFLD-decimals--
+
+## Function `decimals()`
 
 No description
 
-## Function `totalSupply() → uint256` {#ISFLD-totalSupply--}
+### ISFLD-totalSupply--
+
+## Function `totalSupply()`
 
 No description
 
-## Function `balanceOf(address owner) → uint256` {#ISFLD-balanceOf-address-}
+### ISFLD-balanceOf-address-
+
+## Function `balanceOf(address owner)`
 
 No description
 
-## Function `allowance(address owner, address spender) → uint256` {#ISFLD-allowance-address-address-}
+### ISFLD-allowance-address-address-
+
+## Function `allowance(address owner, address spender)`
 
 No description
 
-## Function `mint(address to, uint256 amount) → bool` {#ISFLD-mint-address-uint256-}
+### ISFLD-mint-address-uint256-
+
+## Function `mint(address to, uint256 amount)`
 
 No description
 
-## Function `burn(address from, uint256 amount) → bool` {#ISFLD-burn-address-uint256-}
+### ISFLD-burn-address-uint256-
+
+## Function `burn(address from, uint256 amount)`
 
 No description
 
-## Function `approve(address spender, uint256 value) → bool` {#ISFLD-approve-address-uint256-}
+### ISFLD-approve-address-uint256-
+
+## Function `approve(address spender, uint256 value)`
 
 No description
 
-## Function `transfer(address to, uint256 value) → bool` {#ISFLD-transfer-address-uint256-}
+### ISFLD-transfer-address-uint256-
+
+## Function `transfer(address to, uint256 value)`
 
 No description
 
-## Function `transferFrom(address from, address to, uint256 value) → bool` {#ISFLD-transferFrom-address-address-uint256-}
+### ISFLD-transferFrom-address-address-uint256-
+
+## Function `transferFrom(address from, address to, uint256 value)`
 
 No description
 
-## Function `DOMAIN_SEPARATOR() → bytes32` {#ISFLD-DOMAIN_SEPARATOR--}
+### ISFLD-DOMAIN_SEPARATOR--
+
+## Function `DOMAIN_SEPARATOR()`
 
 No description
 
-## Function `nonces(address owner) → uint256` {#ISFLD-nonces-address-}
+### ISFLD-nonces-address-
+
+## Function `nonces(address owner)`
 
 No description
 
-## Function `permit(address owner, address spender, uint256 value, uint256 deadline, bytes signature)` {#ISFLD-permit-address-address-uint256-uint256-bytes-}
+### ISFLD-permit-address-address-uint256-uint256-bytes-
+
+## Function `permit(address owner, address spender, uint256 value, uint256 deadline, bytes signature)`
 
 No description

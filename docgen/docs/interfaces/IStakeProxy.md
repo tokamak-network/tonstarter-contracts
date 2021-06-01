@@ -6,26 +6,32 @@
 
 - [`implementation()`](#IStakeProxy-implementation--)
 
-- [`grantRole(bytes32 role, address account)`](#IStakeProxy-grantRole-bytes32-address-)
+### IStakeProxy-setProxyPause-bool-
 
-- [`revokeRole(bytes32 role, address account)`](#IStakeProxy-revokeRole-bytes32-address-)
+## Function `setProxyPause(bool _pause)`
 
-## Function `setProxyPause(bool _pause)` {#IStakeProxy-setProxyPause-bool-}
+Set pause state
 
-No description
+### Parameters:
 
-## Function `upgradeTo(address impl)` {#IStakeProxy-upgradeTo-address-}
+- `_pause`: true:pause or false:resume
 
-No description
+### IStakeProxy-upgradeTo-address-
 
-## Function `implementation() → address` {#IStakeProxy-implementation--}
+## Function `upgradeTo(address impl)`
 
-No description
+Set implementation contract
 
-## Function `grantRole(bytes32 role, address account)` {#IStakeProxy-grantRole-bytes32-address-}
+### Parameters:
 
-No description
+- `impl`: New implementation contract address
 
-## Function `revokeRole(bytes32 role, address account)` {#IStakeProxy-revokeRole-bytes32-address-}
+### IStakeProxy-implementation--
 
-No description
+## Function `implementation()`
+
+view implementation address
+
+### Return Values:
+
+- the logic address

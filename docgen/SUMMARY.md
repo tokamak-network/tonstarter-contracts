@@ -2,7 +2,6 @@
 * contracts
   * connection
     * [TokamakStaker](docs/connection/TokamakStaker.md)
-    * [YearnV2Staker](docs/connection/YearnV2Staker.md)
     * artifacts
   * dao
     * [DAO](docs/dao/DAO.md)
@@ -16,7 +15,6 @@
     * [StakeFactory](docs/factory/StakeFactory.md)
     * [StakeSimpleFactory](docs/factory/StakeSimpleFactory.md)
     * [StakeTONFactory](docs/factory/StakeTONFactory.md)
-    * [StakeTONLogicFactory](docs/factory/StakeTONLogicFactory.md)
     * [StakeTONProxyFactory](docs/factory/StakeTONProxyFactory.md)
     * [StakeVaultFactory](docs/factory/StakeVaultFactory.md)
     * artifacts
@@ -35,15 +33,15 @@
     * [IStake1Vault](docs/interfaces/IStake1Vault.md)
     * [IStakeDefiFactory](docs/interfaces/IStakeDefiFactory.md)
     * [IStakeFactory](docs/interfaces/IStakeFactory.md)
-    * [IStakeForStableCoin](docs/interfaces/IStakeForStableCoin.md)
     * [IStakeProxy](docs/interfaces/IStakeProxy.md)
     * [IStakeRegistry](docs/interfaces/IStakeRegistry.md)
     * [IStakeSimpleFactory](docs/interfaces/IStakeSimpleFactory.md)
     * [IStakeTON](docs/interfaces/IStakeTON.md)
     * [IStakeTONFactory](docs/interfaces/IStakeTONFactory.md)
-    * [IStakeTONFactory1](docs/interfaces/IStakeTONFactory1.md)
+    * [IStakeTONProxyFactory](docs/interfaces/IStakeTONProxyFactory.md)
     * [IStakeTONTokamak](docs/interfaces/IStakeTONTokamak.md)
     * [IStakeVaultFactory](docs/interfaces/IStakeVaultFactory.md)
+    * [IStakeVaultStorage](docs/interfaces/IStakeVaultStorage.md)
     * [ITON](docs/interfaces/ITON.md)
     * [IUniswapActor](docs/interfaces/IUniswapActor.md)
     * [IUniswapV2Router01](docs/interfaces/IUniswapV2Router01.md)
@@ -63,7 +61,6 @@
     * [Stake1Vault](docs/stake/Stake1Vault.md)
     * [StakeDefiProxy](docs/stake/StakeDefiProxy.md)
     * [StakeForSFLD](docs/stake/StakeForSFLD.md)
-    * [StakeForStableCoin](docs/stake/StakeForStableCoin.md)
     * [StakeProxyStorage](docs/stake/StakeProxyStorage.md)
     * [StakeRegistry](docs/stake/StakeRegistry.md)
     * [StakeSimple](docs/stake/StakeSimple.md)
@@ -73,8 +70,6 @@
     * [StakeTONStorage](docs/stake/StakeTONStorage.md)
     * [StakeVaultProxy](docs/stake/StakeVaultProxy.md)
     * [StakeVaultStorage](docs/stake/StakeVaultStorage.md)
-    * [StakeYearnProxy](docs/stake/StakeYearnProxy.md)
-    * [StakeYearnStorage](docs/stake/StakeYearnStorage.md)
     * artifacts
   * tokens
     * [FLD](docs/tokens/FLD.md)

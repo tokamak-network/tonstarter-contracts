@@ -8,18 +8,26 @@
 
 - [`currentRewardBlock()`](#DeveloperVault-currentRewardBlock--)
 
-## Function `constructor(address admin)` {#DeveloperVault-constructor-address-}
+### DeveloperVault-constructor-address-
+
+## Function `constructor(address admin)`
 
 No description
 
-## Function `initialize(address _fld, uint256 _cap, uint256 _rewardPeriod, uint256 _startRewardBlock, uint256 _claimsNumberMax, address[] _developers, uint256[] _claimAmounts)` {#DeveloperVault-initialize-address-uint256-uint256-uint256-uint256-address---uint256---}
+### DeveloperVault-initialize-address-uint256-uint256-uint256-uint256-address---uint256---
+
+## Function `initialize(address _fld, uint256 _cap, uint256 _rewardPeriod, uint256 _startRewardBlock, uint256 _claimsNumberMax, address[] _developers, uint256[] _claimAmounts)`
 
 Initialize
 
-## Function `claimReward()` {#DeveloperVault-claimReward--}
+### DeveloperVault-claimReward--
+
+## Function `claimReward()`
 
 Developers can receive their FLDs
 
-## Function `currentRewardBlock() → uint256` {#DeveloperVault-currentRewardBlock--}
+### DeveloperVault-currentRewardBlock--
+
+## Function `currentRewardBlock()`
 
 Returns current reward block for sender

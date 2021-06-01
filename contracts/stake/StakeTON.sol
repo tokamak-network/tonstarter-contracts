@@ -2,6 +2,7 @@
 pragma solidity ^0.7.0;
 pragma abicoder v2;
 
+import "../interfaces/IStakeTON.sol";
 import {IIStake1Vault} from "../interfaces/IIStake1Vault.sol";
 import {IIERC20} from "../interfaces/IIERC20.sol";
 import {IWTON} from "../interfaces/IWTON.sol";
@@ -18,21 +19,21 @@ import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 /// @title Stake Contract
 /// @notice It can be staked in Tokamak. Can be swapped using Uniswap.
 /// Stake contracts can interact with the vault to claim fld tokens
-contract StakeTON is TokamakStaker {
+contract StakeTON is TokamakStaker, IStakeTON {
     using SafeMath for uint256;
 
-    //////////////////////////////
-    // Events
-    //////////////////////////////
     event Staked(address indexed to, uint256 amount);
     event Claimed(address indexed to, uint256 amount, uint256 currentBlcok);
     event Withdrawal(address indexed to, uint256 tonAmount, uint256 fldAmount);
 
+    /// @dev constructor of StakeTON
     constructor() {
         _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
         _setupRole(ADMIN_ROLE, msg.sender);
     }
 
+    /// @dev receive ether
+    /// @dev call stake function with msg.value
     receive() external payable {
         stake(msg.value);
     }
@@ -60,7 +61,8 @@ contract StakeTON is TokamakStaker {
     // }
 
     /// @dev Stake amount
-    function stake(uint256 amount) public payable {
+    /// @param amount  the amount of staked
+    function stake(uint256 amount) public override payable {
         require(
             (paytoken == address(0) && msg.value == amount) ||
                 (paytoken != address(0) && amount > 0),
@@ -92,8 +94,8 @@ contract StakeTON is TokamakStaker {
         emit Staked(msg.sender, amount);
     }
 
-    /// @dev To withdraw
-    function withdraw() external {
+    /// @dev withdraw
+    function withdraw() external override {
         require(endBlock > 0 && endBlock < block.number, "not end");
         (
             address ton,
@@ -187,6 +189,12 @@ contract StakeTON is TokamakStaker {
         );
     }
 
+    /// @dev withdraw TON
+    /// @param ton  TON address
+    /// @param wton  WTON address
+    /// @param tonAmount  the amount of TON to be withdrawn to msg.sender
+    /// @param wtonAmount  the amount of WTON to be withdrawn to msg.sender
+    /// @param fldAmount  the amount of FLD to be withdrawn to msg.sender
     function tonWithdraw(
         address ton,
         address wton,
@@ -228,7 +236,7 @@ contract StakeTON is TokamakStaker {
     }
 
     /// @dev Claim for reward
-    function claim() external lock {
+    function claim() external override lock {
         require(IIStake1Vault(vault).saleClosed() == true, "not closed");
         uint256 rewardClaim = 0;
 
@@ -256,20 +264,22 @@ contract StakeTON is TokamakStaker {
     }
 
     /// @dev Returns the amount that can be rewarded
-    //function canRewardAmount(address account) public view returns (uint256) {
-    function canRewardAmount(address account, uint256 specilaBlock)
-        public
+    /// @param account  the account that claimed reward
+    /// @param specificBlock the block that claimed reward
+    /// @return reward the reward amount that can be taken
+    function canRewardAmount(address account, uint256 specificBlock)
+        public override
         view
         returns (uint256)
     {
         uint256 reward = 0;
-        if (specilaBlock > endBlock) specilaBlock = endBlock;
+        if (specificBlock > endBlock) specificBlock = endBlock;
 
         if (
-            specilaBlock < startBlock ||
+            specificBlock < startBlock ||
             userStaked[account].amount == 0 ||
             userStaked[account].claimedBlock > endBlock ||
-            userStaked[account].claimedBlock > specilaBlock
+            userStaked[account].claimedBlock > specificBlock
         ) {
             reward = 0;
         } else {
@@ -277,7 +287,7 @@ contract StakeTON is TokamakStaker {
             uint256 endR = endBlock;
             if (startR < userStaked[account].claimedBlock)
                 startR = userStaked[account].claimedBlock;
-            if (specilaBlock < endR) endR = specilaBlock;
+            if (specificBlock < endR) endR = specificBlock;
 
             uint256[] memory orderedEndBlocks =
                 IIStake1Vault(vault).orderedEndBlocksAll();
@@ -323,7 +333,7 @@ contract StakeTON is TokamakStaker {
         return reward;
     }
     /*
-    function canRewardAmountTest(address account, uint256 specilaBlock)
+    function canRewardAmountTest(address account, uint256 specificBlock)
         public view
         returns (uint256, uint256, uint256, uint256)
     {
@@ -331,13 +341,13 @@ contract StakeTON is TokamakStaker {
         uint256 startR = 0;
         uint256 endR = 0;
         uint256 blockTotalReward = 0;
-        if(specilaBlock > endBlock ) specilaBlock = endBlock;
+        if(specificBlock > endBlock ) specificBlock = endBlock;
 
         if (
-            specilaBlock < startBlock ||
+            specificBlock < startBlock ||
             userStaked[account].amount == 0 ||
             userStaked[account].claimedBlock > endBlock ||
-            userStaked[account].claimedBlock > specilaBlock
+            userStaked[account].claimedBlock > specificBlock
         ) {
             reward = 0;
         } else {
@@ -345,7 +355,7 @@ contract StakeTON is TokamakStaker {
             endR = endBlock;
             if (startR < userStaked[account].claimedBlock)
                 startR = userStaked[account].claimedBlock;
-            if (specilaBlock < endR) endR = specilaBlock;
+            if (specificBlock < endR) endR = specificBlock;
 
             uint256[] memory orderedEndBlocks =
                 IIStake1Vault(vault).orderedEndBlocksAll();

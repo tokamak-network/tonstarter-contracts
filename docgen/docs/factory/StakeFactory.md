@@ -2,6 +2,8 @@
 
 - [`constructor(address _stakeSimpleFactory, address _stakeTONFactory, address _stakeDefiFactory)`](#StakeFactory-constructor-address-address-address-)
 
+- [`transferOwnership(address newOwner)`](#StakeFactory-transferOwnership-address-)
+
 - [`setStakeSimpleFactory(address _stakeSimpleFactory)`](#StakeFactory-setStakeSimpleFactory-address-)
 
 - [`setStakeTONFactory(address _stakeTONFactory)`](#StakeFactory-setStakeTONFactory-address-)
@@ -10,22 +12,76 @@
 
 - [`create(uint256 stakeType, address[4] _addr, address registry, uint256[3] _intdata)`](#StakeFactory-create-uint256-address-4--address-uint256-3--)
 
-## Function `constructor(address _stakeSimpleFactory, address _stakeTONFactory, address _stakeDefiFactory)` {#StakeFactory-constructor-address-address-address-}
+### StakeFactory-constructor-address-address-address-
 
-No description
+## Function `constructor(address _stakeSimpleFactory, address _stakeTONFactory, address _stakeDefiFactory)`
 
-## Function `setStakeSimpleFactory(address _stakeSimpleFactory)` {#StakeFactory-setStakeSimpleFactory-address-}
+constructor of StakeFactory
 
-No description
+### Parameters:
 
-## Function `setStakeTONFactory(address _stakeTONFactory)` {#StakeFactory-setStakeTONFactory-address-}
+- `_stakeSimpleFactory`: the logic address used in StakeSimpleFactory
 
-No description
+- `_stakeTONFactory`: the logic address used in StakeTONFactory
 
-## Function `setStakeDefiFactory(address _stakeDefiFactory)` {#StakeFactory-setStakeDefiFactory-address-}
+- `_stakeTONFactory`: the logic address used in StakeTONFactory
 
-No description
+### StakeFactory-transferOwnership-address-
 
-## Function `create(uint256 stakeType, address[4] _addr, address registry, uint256[3] _intdata) → address` {#StakeFactory-create-uint256-address-4--address-uint256-3--}
+## Function `transferOwnership(address newOwner)`
 
-No description
+transfer Ownership
+
+### Parameters:
+
+- `newOwner`: new owner address
+
+### StakeFactory-setStakeSimpleFactory-address-
+
+## Function `setStakeSimpleFactory(address _stakeSimpleFactory)`
+
+Set StakeSimpleFactory address
+
+### Parameters:
+
+- `_stakeSimpleFactory`: new StakeSimpleFactory address
+
+### StakeFactory-setStakeTONFactory-address-
+
+## Function `setStakeTONFactory(address _stakeTONFactory)`
+
+Set StakeTONFactory address
+
+### Parameters:
+
+- `_stakeTONFactory`: new StakeTONFactory address
+
+### StakeFactory-setStakeDefiFactory-address-
+
+## Function `setStakeDefiFactory(address _stakeDefiFactory)`
+
+Set StakeDefiFactory address
+
+### Parameters:
+
+- `_stakeDefiFactory`: new StakeDefiFactory address
+
+### StakeFactory-create-uint256-address-4--address-uint256-3--
+
+## Function `create(uint256 stakeType, address[4] _addr, address registry, uint256[3] _intdata)`
+
+Create a stake contract that calls the desired stake factory according to stakeType
+
+### Parameters:
+
+- `stakeType`: if 0, stakeTONFactory, else if 1 , stakeSimpleFactory , else if 2, stakeDefiFactory
+
+- `_addr`: array of [token, paytoken, vault, _defiAddr]
+
+- `registry`:  registry address
+
+- `_intdata`: array of [saleStartBlock, startBlock, endBlock]
+
+### Return Values:
+
+- contract address

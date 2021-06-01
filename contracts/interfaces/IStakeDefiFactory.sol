@@ -3,9 +3,9 @@ pragma solidity ^0.7.6;
 
 interface IStakeDefiFactory {
     function create(
-        address[4] memory _addr,
+        address[3] calldata _addr,
         address _registry,
-        uint256[3] memory _intdata,
+        uint256[3] calldata _intdata,
         address owner
     ) external returns (address);
 }

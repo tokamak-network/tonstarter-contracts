@@ -2,6 +2,8 @@
 
 - [`constructor(address _logic)`](#StakeDefiProxy-constructor-address-)
 
+- [`transferOwnership(address newOwner)`](#StakeDefiProxy-transferOwnership-address-)
+
 - [`setProxyPause(bool _pause)`](#StakeDefiProxy-setProxyPause-bool-)
 
 - [`upgradeTo(address impl)`](#StakeDefiProxy-upgradeTo-address-)
@@ -18,42 +20,68 @@
 
 - [`Upgraded(address implementation)`](#StakeDefiProxy-Upgraded-address-)
 
-## Function `constructor(address _logic)` {#StakeDefiProxy-constructor-address-}
+### StakeDefiProxy-constructor-address-
+
+## Function `constructor(address _logic)`
 
 No description
 
-## Function `setProxyPause(bool _pause)` {#StakeDefiProxy-setProxyPause-bool-}
+### StakeDefiProxy-transferOwnership-address-
 
-No description
+## Function `transferOwnership(address newOwner)`
+
+transfer Ownership
+
+### Parameters:
+
+- `newOwner`: new owner address
+
+### StakeDefiProxy-setProxyPause-bool-
+
+## Function `setProxyPause(bool _pause)`
+
+Set pause state
 
 ### Parameters:
 
 - `_pause`: true:pause or false:resume
 
-## Function `upgradeTo(address impl)` {#StakeDefiProxy-upgradeTo-address-}
+### StakeDefiProxy-upgradeTo-address-
 
-No description
+## Function `upgradeTo(address impl)`
+
+Set implementation contract
 
 ### Parameters:
 
 - `impl`: New implementation contract address
 
-## Function `implementation() → address` {#StakeDefiProxy-implementation--}
+### StakeDefiProxy-implementation--
+
+## Function `implementation()`
 
 returns the implementation
 
-## Function `receive()` {#StakeDefiProxy-receive--}
+### StakeDefiProxy-receive--
+
+## Function `receive()`
 
 No description
 
-## Function `fallback()` {#StakeDefiProxy-fallback--}
+### StakeDefiProxy-fallback--
+
+## Function `fallback()`
 
 No description
 
-## Function `setInit(address[3] _addr, address _registry, uint256[3] _intdata)` {#StakeDefiProxy-setInit-address-3--address-uint256-3--}
+### StakeDefiProxy-setInit-address-3--address-uint256-3--
+
+## Function `setInit(address[3] _addr, address _registry, uint256[3] _intdata)`
 
 No description
 
-## Event `Upgraded(address implementation)` {#StakeDefiProxy-Upgraded-address-}
+### StakeDefiProxy-Upgraded-address-
+
+## Event `Upgraded(address implementation)`
 
 No description

@@ -1,5 +1,9 @@
 # Functions:
 
+- [`constructor()`](#Stake1Proxy-constructor--)
+
+- [`transferOwnership(address newOwner)`](#Stake1Proxy-transferOwnership-address-)
+
 - [`setProxyPause(bool _pause)`](#Stake1Proxy-setProxyPause-bool-)
 
 - [`upgradeTo(address impl)`](#Stake1Proxy-upgradeTo-address-)
@@ -14,34 +18,66 @@
 
 - [`Upgraded(address implementation)`](#Stake1Proxy-Upgraded-address-)
 
-## Function `setProxyPause(bool _pause)` {#Stake1Proxy-setProxyPause-bool-}
+### Stake1Proxy-constructor--
 
-No description
+## Function `constructor()`
+
+constructor of Stake1Proxy
+
+### Stake1Proxy-transferOwnership-address-
+
+## Function `transferOwnership(address newOwner)`
+
+transfer Ownership
+
+### Parameters:
+
+- `newOwner`: the new owner address
+
+### Stake1Proxy-setProxyPause-bool-
+
+## Function `setProxyPause(bool _pause)`
+
+Set pause state
 
 ### Parameters:
 
 - `_pause`: true:pause or false:resume
 
-## Function `upgradeTo(address impl)` {#Stake1Proxy-upgradeTo-address-}
+### Stake1Proxy-upgradeTo-address-
 
-No description
+## Function `upgradeTo(address impl)`
+
+Set implementation contract
 
 ### Parameters:
 
 - `impl`: New implementation contract address
 
-## Function `implementation() → address` {#Stake1Proxy-implementation--}
+### Stake1Proxy-implementation--
 
-returns the implementation
+## Function `implementation()`
 
-## Function `receive()` {#Stake1Proxy-receive--}
+view implementation address
 
-No description
+### Return Values:
 
-## Function `fallback()` {#Stake1Proxy-fallback--}
+- the logic address
 
-No description
+### Stake1Proxy-receive--
 
-## Event `Upgraded(address implementation)` {#Stake1Proxy-Upgraded-address-}
+## Function `receive()`
+
+receive ether
+
+### Stake1Proxy-fallback--
+
+## Function `fallback()`
+
+fallback function , execute on undefined function call
+
+### Stake1Proxy-Upgraded-address-
+
+## Event `Upgraded(address implementation)`
 
 No description

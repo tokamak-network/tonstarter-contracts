@@ -2,6 +2,8 @@
 
 - [`receive()`](#StakeSimple-receive--)
 
+- [`transferOwnership(address newOwner)`](#StakeSimple-transferOwnership-address-)
+
 - [`initialize(address _token, address _paytoken, address _vault, uint256 _saleStartBlock, uint256 _startBlock, uint256 _period)`](#StakeSimple-initialize-address-address-address-uint256-uint256-uint256-)
 
 - [`stake(uint256 amount)`](#StakeSimple-stake-uint256-)
@@ -20,38 +22,66 @@
 
 - [`Withdrawal(address to, uint256 amount)`](#StakeSimple-Withdrawal-address-uint256-)
 
-## Function `receive()` {#StakeSimple-receive--}
+### StakeSimple-receive--
+
+## Function `receive()`
 
 No description
 
-## Function `initialize(address _token, address _paytoken, address _vault, uint256 _saleStartBlock, uint256 _startBlock, uint256 _period)` {#StakeSimple-initialize-address-address-address-uint256-uint256-uint256-}
+### StakeSimple-transferOwnership-address-
+
+## Function `transferOwnership(address newOwner)`
+
+transfer Ownership
+
+### Parameters:
+
+- `newOwner`: new owner address
+
+### StakeSimple-initialize-address-address-address-uint256-uint256-uint256-
+
+## Function `initialize(address _token, address _paytoken, address _vault, uint256 _saleStartBlock, uint256 _startBlock, uint256 _period)`
 
 Initialize
 
-## Function `stake(uint256 amount)` {#StakeSimple-stake-uint256-}
+### StakeSimple-stake-uint256-
+
+## Function `stake(uint256 amount)`
 
 Stake amount
 
-## Function `withdraw()` {#StakeSimple-withdraw--}
+### StakeSimple-withdraw--
+
+## Function `withdraw()`
 
 To withdraw
 
-## Function `claim()` {#StakeSimple-claim--}
+### StakeSimple-claim--
+
+## Function `claim()`
 
 Claim for reward
 
-## Function `canRewardAmount(address account, uint256 specilaBlock) → uint256` {#StakeSimple-canRewardAmount-address-uint256-}
+### StakeSimple-canRewardAmount-address-uint256-
+
+## Function `canRewardAmount(address account, uint256 specilaBlock)`
 
 Returns the amount that can be rewarded
 
-## Event `Staked(address to, uint256 amount)` {#StakeSimple-Staked-address-uint256-}
+### StakeSimple-Staked-address-uint256-
+
+## Event `Staked(address to, uint256 amount)`
 
 No description
 
-## Event `Claimed(address to, uint256 amount, uint256 currentBlcok)` {#StakeSimple-Claimed-address-uint256-uint256-}
+### StakeSimple-Claimed-address-uint256-uint256-
+
+## Event `Claimed(address to, uint256 amount, uint256 currentBlcok)`
 
 No description
 
-## Event `Withdrawal(address to, uint256 amount)` {#StakeSimple-Withdrawal-address-uint256-}
+### StakeSimple-Withdrawal-address-uint256-
+
+## Event `Withdrawal(address to, uint256 amount)`
 
 No description

@@ -4,16 +4,30 @@
 
 - [`setStakeTONFactory(address _stakeTONFactory)`](#IStakeFactory-setStakeTONFactory-address-)
 
-- [`setStakeStableCoinFactory(address _stakeStableCoinFactory)`](#IStakeFactory-setStakeStableCoinFactory-address-)
+- [`setStakeDefiFactory(address _stakeDefiFactory)`](#IStakeFactory-setStakeDefiFactory-address-)
 
-## Function `create(uint256 stakeType, address[4] _addr, address registry, uint256[3] _intdata) → address` {#IStakeFactory-create-uint256-address-4--address-uint256-3--}
+- [`setStakeSimpleFactory(address _stakeSimpleFactory)`](#IStakeFactory-setStakeSimpleFactory-address-)
+
+### IStakeFactory-create-uint256-address-4--address-uint256-3--
+
+## Function `create(uint256 stakeType, address[4] _addr, address registry, uint256[3] _intdata)`
 
 No description
 
-## Function `setStakeTONFactory(address _stakeTONFactory)` {#IStakeFactory-setStakeTONFactory-address-}
+### IStakeFactory-setStakeTONFactory-address-
+
+## Function `setStakeTONFactory(address _stakeTONFactory)`
 
 No description
 
-## Function `setStakeStableCoinFactory(address _stakeStableCoinFactory)` {#IStakeFactory-setStakeStableCoinFactory-address-}
+### IStakeFactory-setStakeDefiFactory-address-
+
+## Function `setStakeDefiFactory(address _stakeDefiFactory)`
+
+No description
+
+### IStakeFactory-setStakeSimpleFactory-address-
+
+## Function `setStakeSimpleFactory(address _stakeSimpleFactory)`
 
 No description

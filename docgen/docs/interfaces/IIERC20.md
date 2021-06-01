@@ -24,46 +24,68 @@
 
 - [`Transfer(address from, address to, uint256 value)`](#IIERC20-Transfer-address-address-uint256-)
 
-## Function `name() → string` {#IIERC20-name--}
+### IIERC20-name--
+
+## Function `name()`
 
 No description
 
-## Function `symbol() → string` {#IIERC20-symbol--}
+### IIERC20-symbol--
+
+## Function `symbol()`
 
 No description
 
-## Function `decimals() → uint8` {#IIERC20-decimals--}
+### IIERC20-decimals--
+
+## Function `decimals()`
 
 No description
 
-## Function `totalSupply() → uint256` {#IIERC20-totalSupply--}
+### IIERC20-totalSupply--
+
+## Function `totalSupply()`
 
 No description
 
-## Function `balanceOf(address owner) → uint256` {#IIERC20-balanceOf-address-}
+### IIERC20-balanceOf-address-
+
+## Function `balanceOf(address owner)`
 
 No description
 
-## Function `allowance(address owner, address spender) → uint256` {#IIERC20-allowance-address-address-}
+### IIERC20-allowance-address-address-
+
+## Function `allowance(address owner, address spender)`
 
 No description
 
-## Function `approve(address spender, uint256 value) → bool` {#IIERC20-approve-address-uint256-}
+### IIERC20-approve-address-uint256-
+
+## Function `approve(address spender, uint256 value)`
 
 No description
 
-## Function `transfer(address to, uint256 value) → bool` {#IIERC20-transfer-address-uint256-}
+### IIERC20-transfer-address-uint256-
+
+## Function `transfer(address to, uint256 value)`
 
 No description
 
-## Function `transferFrom(address from, address to, uint256 value) → bool` {#IIERC20-transferFrom-address-address-uint256-}
+### IIERC20-transferFrom-address-address-uint256-
+
+## Function `transferFrom(address from, address to, uint256 value)`
 
 No description
 
-## Event `Approval(address owner, address spender, uint256 value)` {#IIERC20-Approval-address-address-uint256-}
+### IIERC20-Approval-address-address-uint256-
+
+## Event `Approval(address owner, address spender, uint256 value)`
 
 No description
 
-## Event `Transfer(address from, address to, uint256 value)` {#IIERC20-Transfer-address-address-uint256-}
+### IIERC20-Transfer-address-address-uint256-
+
+## Event `Transfer(address from, address to, uint256 value)`
 
 No description

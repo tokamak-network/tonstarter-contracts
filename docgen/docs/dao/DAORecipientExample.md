@@ -6,14 +6,20 @@
 
 - [`getFib()`](#DAORecipientExample-getFib--)
 
-## Function `constructor(address _DAOAddress)` {#DAORecipientExample-constructor-address-}
+### DAORecipientExample-constructor-address-
+
+## Function `constructor(address _DAOAddress)`
 
 No description
 
-## Function `generateNextFib()` {#DAORecipientExample-generateNextFib--}
+### DAORecipientExample-generateNextFib--
+
+## Function `generateNextFib()`
 
 No description
 
-## Function `getFib() → uint256` {#DAORecipientExample-getFib--}
+### DAORecipientExample-getFib--
+
+## Function `getFib()`
 
 No description

@@ -1,7 +1,9 @@
 # Functions:
 
-- [`deploy(uint256 _pahse, address _vault, address _token, address _paytoken, uint256 _period, address[4] tokamakAddr, address _owner)`](#IStakeTONFactory-deploy-uint256-address-address-address-uint256-address-4--address-)
+- [`create(address[4] _addr, address _registry, uint256[3] _intdata, address owner)`](#IStakeTONFactory-create-address-4--address-uint256-3--address-)
 
-## Function `deploy(uint256 _pahse, address _vault, address _token, address _paytoken, uint256 _period, address[4] tokamakAddr, address _owner) → address` {#IStakeTONFactory-deploy-uint256-address-address-address-uint256-address-4--address-}
+### IStakeTONFactory-create-address-4--address-uint256-3--address-
+
+## Function `create(address[4] _addr, address _registry, uint256[3] _intdata, address owner)`
 
 No description

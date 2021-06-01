@@ -1,21 +1,33 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.7.6;
 
+import "../interfaces/IStakeTONProxyFactory.sol";
 import {StakeTONProxy} from "../stake/StakeTONProxy.sol";
 
-contract StakeTONProxyFactory {
+/// @title A factory that creates a stakeTONProxy
+contract StakeTONProxyFactory is IStakeTONProxyFactory {
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
 
+    /// @dev Create a StakeTONProxy that can stake TON.
+    /// @param _logic the logic contract address used in proxy
+    /// @param _addr the array of [token, paytoken, vault, defiAddr]
+    /// @param _registry the registry address
+    /// @param _intdata the array of [saleStartBlock, startBlock, endBlock]
+    /// @param owner  owner address
+    /// @return contract address
     function deploy(
         address _logic,
-        address[4] memory _addr,
+        address[4] calldata _addr,
         address _registry,
-        uint256[3] memory _intdata,
+        uint256[3] calldata _intdata,
         address owner
-    ) external returns (address) {
+    ) external override returns (address) {
         StakeTONProxy proxy = new StakeTONProxy(_logic);
 
-        require(address(proxy) != address(0), "StakeTONProxy zero");
+        require(
+            address(proxy) != address(0),
+            "StakeTONProxyFactory: proxy zero"
+        );
 
         proxy.setInit(_addr, _registry, _intdata);
 
