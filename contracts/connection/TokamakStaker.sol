@@ -221,7 +221,7 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
             ) {
                 require(tokamakLayer2 == _layer2, "different layer");
             } else {
-                if (tokamakLayer2 != _layer2) tokamakLayer2 == _layer2;
+                if (tokamakLayer2 != _layer2) tokamakLayer2 = _layer2;
             }
         }
         if (_amount > 0) {
