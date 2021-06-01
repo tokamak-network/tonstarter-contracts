@@ -4,13 +4,21 @@
 
 - [`create(address[3] _addr, uint256[3] _intdata, address owner)`](#StakeSimpleFactory-create-address-3--uint256-3--address-)
 
-## Function `constructor(address _stakeSimpleLogic) `
+### StakeSimpleFactory-constructor-address-
 
-No description
+## Function `constructor(address _stakeSimpleLogic)`
 
-## Function `create(address[3] _addr, uint256[3] _intdata, address owner) `
+constructor of StakeSimpleFactory
 
-No description
+### Parameters:
+
+- `_stakeSimpleLogic`: the logic address used in StakeSimpleFactory
+
+### StakeSimpleFactory-create-address-3--uint256-3--address-
+
+## Function `create(address[3] _addr, uint256[3] _intdata, address owner)`
+
+Create a stake contract that can operate the staked amount as a DeFi project.
 
 ### Parameters:
 

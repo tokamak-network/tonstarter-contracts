@@ -4,13 +4,21 @@
 
 - [`create(address[3] _addr, address _registry, uint256[3] _intdata, address owner)`](#StakeDefiFactory-create-address-3--address-uint256-3--address-)
 
-## Function `constructor(address _stakeDefiLogic) `
+### StakeDefiFactory-constructor-address-
 
-No description
+## Function `constructor(address _stakeDefiLogic)`
 
-## Function `create(address[3] _addr, address _registry, uint256[3] _intdata, address owner) `
+constructor of StakeDefiFactory
 
-No description
+### Parameters:
+
+- `_stakeDefiLogic`: the logic address used in StakeDefiFactory
+
+### StakeDefiFactory-create-address-3--address-uint256-3--address-
+
+## Function `create(address[3] _addr, address _registry, uint256[3] _intdata, address owner)`
+
+Create a stake contract that can operate the staked amount as a DeFi project.
 
 ### Parameters:
 

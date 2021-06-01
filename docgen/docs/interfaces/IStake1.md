@@ -20,42 +20,62 @@
 
 - [`stake(uint256 amount)`](#IStake1-stake-uint256-)
 
-## Function `token() `
+### IStake1-token--
+
+## Function `token()`
 
 No description
 
-## Function `paytoken() `
+### IStake1-paytoken--
+
+## Function `paytoken()`
 
 No description
 
-## Function `vault() `
+### IStake1-vault--
+
+## Function `vault()`
 
 No description
 
-## Function `saleStartBlock() `
+### IStake1-saleStartBlock--
+
+## Function `saleStartBlock()`
 
 No description
 
-## Function `startBlock() `
+### IStake1-startBlock--
+
+## Function `startBlock()`
 
 No description
 
-## Function `endBlock() `
+### IStake1-endBlock--
+
+## Function `endBlock()`
 
 No description
 
-## Function `rewardRaised() `
+### IStake1-rewardRaised--
+
+## Function `rewardRaised()`
 
 No description
 
-## Function `totalStakedAmount() `
+### IStake1-totalStakedAmount--
+
+## Function `totalStakedAmount()`
 
 No description
 
-## Function `userStaked(address account) `
+### IStake1-userStaked-address-
+
+## Function `userStaked(address account)`
 
 No description
 
-## Function `stake(uint256 amount) `
+### IStake1-stake-uint256-
+
+## Function `stake(uint256 amount)`
 
 No description

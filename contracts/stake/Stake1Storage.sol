@@ -1,43 +1,68 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity ^0.7.6;
 
+import "../interfaces/IStake1Storage.sol";
 import "../libraries/LibTokenStake1.sol";
 
 /// @title The base storage of stakeContract
-contract Stake1Storage {
+contract Stake1Storage is IStake1Storage{
 
-    /// reward token : FLD
-    address public token;
+    /// @dev reward token : FLD
+    address public override token;
 
-    /// registry
-    address public stakeRegistry;
+    /// @dev registry
+    address public override stakeRegistry;
 
-    /// paytoken is the token that the user stakes. ( if paytoken is ether, paytoken is address(0) )
-    address public paytoken;
+    /// @dev paytoken is the token that the user stakes. ( if paytoken is ether, paytoken is address(0) )
+    address public override paytoken;
 
-    /// A vault that holds fld rewards.
-    address public vault;
+    /// @dev A vault that holds fld rewards.
+    address public override vault;
 
-    /// the start block for sale.
-    uint256 public saleStartBlock;
+    /// @dev the start block for sale.
+    uint256 public override saleStartBlock;
 
-    /// the staking start block, once staking starts, users can no longer apply for staking.
-    uint256 public startBlock;
+    /// @dev the staking start block, once staking starts, users can no longer apply for staking.
+    uint256 public override startBlock;
 
-    /// the staking end block.
-    uint256 public endBlock;
+    /// @dev the staking end block.
+    uint256 public override endBlock;
 
-    /// the total amount claimed
-    uint256 public rewardClaimedTotal;
+    /// @dev the total amount claimed
+    uint256 public override rewardClaimedTotal;
 
-    /// the total staked amount
-    uint256 public totalStakedAmount;
+    /// @dev the total staked amount
+    uint256 public override totalStakedAmount;
 
-    /// information staked by user
+    /// @dev information staked by user
     mapping(address => LibTokenStake1.StakedAmount) public userStaked;
 
-    /// total stakers
-    uint256 public totalStakers;
+    /// @dev total stakers
+    uint256 public override totalStakers;
 
     uint256 internal _lock;
+
+    /// @dev user's staked information
+    function getUserStaked(address user)
+        external override view
+        returns (
+            uint256 ,
+            uint256 ,
+            uint256 ,
+            uint256 ,
+            uint256 ,
+            uint256 ,
+            bool
+         )
+    {
+        return (
+            userStaked[user].amount,
+            userStaked[user].claimedBlock,
+            userStaked[user].claimedAmount,
+            userStaked[user].releasedBlock,
+            userStaked[user].releasedAmount,
+            userStaked[user].releasedFLDAmount,
+            userStaked[user].released
+        );
+    }
 }

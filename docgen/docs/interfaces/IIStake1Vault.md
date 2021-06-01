@@ -14,30 +14,44 @@
 
 - [`saleClosed()`](#IIStake1Vault-saleClosed--)
 
-## Function `closeSale() `
+### IIStake1Vault-closeSale--
+
+## Function `closeSale()`
 
 No description
 
-## Function `totalRewardAmount(address _account) `
+### IIStake1Vault-totalRewardAmount-address-
+
+## Function `totalRewardAmount(address _account)`
 
 No description
 
-## Function `claim(address _to, uint256 _amount) `
+### IIStake1Vault-claim-address-uint256-
+
+## Function `claim(address _to, uint256 _amount)`
 
 No description
 
-## Function `orderedEndBlocksAll() `
+### IIStake1Vault-orderedEndBlocksAll--
+
+## Function `orderedEndBlocksAll()`
 
 No description
 
-## Function `blockTotalReward() `
+### IIStake1Vault-blockTotalReward--
+
+## Function `blockTotalReward()`
 
 No description
 
-## Function `stakeEndBlockTotal(uint256 endblock) `
+### IIStake1Vault-stakeEndBlockTotal-uint256-
+
+## Function `stakeEndBlockTotal(uint256 endblock)`
 
 No description
 
-## Function `saleClosed() `
+### IIStake1Vault-saleClosed--
+
+## Function `saleClosed()`
 
 No description

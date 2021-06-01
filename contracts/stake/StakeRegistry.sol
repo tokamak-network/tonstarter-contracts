@@ -1,23 +1,31 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity ^0.7.6;
 
+import "../interfaces/IStakeRegistry.sol";
 import "../libraries/LibTokenStake1.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 
 /// @title Stake Registry
 /// @notice Manage the vault list by phase. Manage the list of staking contracts in the vault.
-contract StakeRegistry is AccessControl {
+contract StakeRegistry is AccessControl, IStakeRegistry {
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
 
     bytes32 public constant ZERO_HASH =
         0x0000000000000000000000000000000000000000000000000000000000000000;
 
+    /// @dev FLD address
     address public fld;
 
-    /// @dev Addresses for Tokamak staking
+    /// @dev TON address in Tokamak
     address public ton;
+
+    /// @dev WTON address in Tokamak
     address public wton;
+
+    /// @dev Depositmanager address in Tokamak
     address public depositManager;
+
+    /// @dev SeigManager address in Tokamak
     address public seigManager;
 
     /// Contracts included in the phase
@@ -72,19 +80,23 @@ contract StakeRegistry is AccessControl {
         uint256 fee
     );
 
+    /// @dev constructor of StakeRegistry
+    /// @param _fld FLD address
     constructor(address _fld) {
         _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
         _setupRole(ADMIN_ROLE, msg.sender);
         fld = _fld;
     }
 
+    /// @dev transfer Ownership
+    /// @param newOwner new owner address
     function transferOwnership(address newOwner) external onlyOwner {
         require(msg.sender != newOwner, "StakeRegistry:same owner");
         grantRole(ADMIN_ROLE, newOwner);
-        revokeRole(ADMIN_ROLE, msg.sender );
+        revokeRole(ADMIN_ROLE, msg.sender);
     }
 
-    /// Set address for Tokamak integration
+    /// @dev Set addresses for Tokamak integration
     /// @param _ton TON address
     /// @param _wton WTON address
     /// @param _depositManager DepositManager address
@@ -95,7 +107,7 @@ contract StakeRegistry is AccessControl {
         address _depositManager,
         address _seigManager
     )
-        external
+        external override
         onlyOwner
         nonZero(_ton)
         nonZero(_wton)
@@ -110,7 +122,7 @@ contract StakeRegistry is AccessControl {
         emit SetTokamak(ton, wton, depositManager, seigManager);
     }
 
-    /// Add information related to Defi
+    /// @dev Add information related to Defi
     /// @param _name name . ex) UNISWAP_V3
     /// @param _router entry point of defi
     /// @param _ex1  additional variable . ex) positionManagerAddress in Uniswap V3
@@ -122,7 +134,7 @@ contract StakeRegistry is AccessControl {
         address _ex1,
         address _ex2,
         uint256 _fee
-    ) external onlyOwner nonZero(_router) {
+    ) external override onlyOwner nonZero(_router) {
         bytes32 nameHash = keccak256(abi.encodePacked(_name));
         require(nameHash != ZERO_HASH, "nameHash zero");
 
@@ -136,8 +148,8 @@ contract StakeRegistry is AccessControl {
         emit AddedDefiInfo(nameHash, _name, _router, _ex1, _ex2, _fee);
     }
 
-    /// Add Vault
-    /// It is excuted by proxy
+    /// @dev Add Vault
+    /// @dev It is excuted by proxy
     /// @param _vault vault address
     /// @param _phase phase ex) 1,2,3
     /// @param _vaultName  hash of vault's name
@@ -145,7 +157,7 @@ contract StakeRegistry is AccessControl {
         address _vault,
         uint256 _phase,
         bytes32 _vaultName
-    ) external onlyOwner {
+    ) external override onlyOwner {
         require(
             vaultNames[_vault] == ZERO_HASH || vaults[_vaultName] == address(0),
             "StakeRegistry: addVault input value is not zero"
@@ -157,12 +169,12 @@ contract StakeRegistry is AccessControl {
         emit AddedVault(_vault, _phase);
     }
 
-    /// Add StakeContract in vault
-    /// It is excuted by proxy
+    /// @dev Add StakeContract in vault
+    /// @dev It is excuted by proxy
     /// @param _vault vault address
     /// @param _stakeContract  StakeContract address
     function addStakeContract(address _vault, address _stakeContract)
-        external
+        external override
         onlyOwner
     {
         require(
@@ -176,10 +188,10 @@ contract StakeRegistry is AccessControl {
         emit AddedStakeContract(_vault, _stakeContract);
     }
 
-    /// Get addresses for Tokamak interface
+    /// @dev Get addresses for Tokamak interface
     /// @return (ton, wton, depositManager, seigManager)
     function getTokamak()
-        external
+        external override
         view
         returns (
             address,
@@ -191,9 +203,10 @@ contract StakeRegistry is AccessControl {
         return (ton, wton, depositManager, seigManager);
     }
 
-    /// Get addresses for UNISWAP_V3 interface
+    /// @dev Get indos for UNISWAP_V3 interface
+    /// @return (uniswapRouter, npm, wethAddress, fee)
     function getUniswap()
-        external
+        external override
         view
         returns (
             address,
@@ -212,27 +225,34 @@ contract StakeRegistry is AccessControl {
         );
     }
 
-    /// Get addresses of vaults of index phase
+    /// @dev Get addresses of vaults of index phase
+    /// @param _index the phase number
+    /// @return the list of vaults of phase[_index]
     function phasesAll(uint256 _index)
-        external
+        external override
         view
         returns (address[] memory)
     {
         return phases[_index];
     }
 
-    /// Get addresses of staker of _vault
+    /// @dev Get addresses of staker of _vault
+    /// @param _vault the vault's address
+    /// @return the list of stakeContracts of vault
     function stakeContractsOfVaultAll(address _vault)
-        external
+        external override
         view
         returns (address[] memory)
     {
         return stakeContractsOfVault[_vault];
     }
 
-    /// Checks if a vault is withing the given phase
+    /// @dev Checks if a vault is withing the given phase
+    /// @param _phase the phase number
+    /// @param _vault the vault's address
+    /// @return valid true or false
     function validVault(uint256 _phase, address _vault)
-        external
+        external override
         view
         returns (bool valid)
     {

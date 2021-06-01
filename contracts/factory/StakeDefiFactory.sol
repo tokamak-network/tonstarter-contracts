@@ -5,16 +5,18 @@ import "../interfaces/IStakeDefiFactory.sol";
 import {StakeDefiProxy} from "../stake/StakeDefiProxy.sol";
 
 /// @title A factory that creates a stake contract that can function as a DeFi function
-contract StakeDefiFactory is IStakeDefiFactory{
+contract StakeDefiFactory is IStakeDefiFactory {
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
     address public stakeDefiLogic;
 
+    /// @dev constructor of StakeDefiFactory
+    /// @param _stakeDefiLogic the logic address used in StakeDefiFactory
     constructor(address _stakeDefiLogic) {
         require(_stakeDefiLogic != address(0), "StakeDefiFactory: logic zero");
         stakeDefiLogic = _stakeDefiLogic;
     }
 
-    /// Create a stake contract that can operate the staked amount as a DeFi project.
+    /// @dev Create a stake contract that can operate the staked amount as a DeFi project.
     /// @param _addr array of [token, paytoken, vault]
     /// @param _registry  registry address
     /// @param _intdata array of [saleStartBlock, startBlock, endBlock]
@@ -25,7 +27,7 @@ contract StakeDefiFactory is IStakeDefiFactory{
         address _registry,
         uint256[3] calldata _intdata,
         address owner
-    ) external override  returns (address) {
+    ) external override returns (address) {
         StakeDefiProxy proxy = new StakeDefiProxy(stakeDefiLogic);
         require(address(proxy) != address(0), "StakeDefiFactory: proxy zero");
 

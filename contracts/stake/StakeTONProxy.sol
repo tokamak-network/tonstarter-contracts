@@ -2,7 +2,7 @@
 pragma solidity ^0.7.6;
 pragma abicoder v2;
 
-import {IStake1Vault} from "../interfaces/IStake1Vault.sol";
+import {IStakeVaultStorage} from "../interfaces/IStakeVaultStorage.sol";
 import {IIERC20} from "../interfaces/IIERC20.sol";
 import {SafeMath} from "../utils/math/SafeMath.sol";
 import "./StakeTONStorage.sol";
@@ -20,10 +20,12 @@ contract StakeTONProxy is StakeTONStorage, AccessControl, OnApprove {
     event Upgraded(address indexed implementation);
 
     modifier onlyOwner() {
-        require(hasRole(ADMIN_ROLE, msg.sender), "not an admin");
+        require(hasRole(ADMIN_ROLE, msg.sender), "StakeTONProxy: not an admin");
         _;
     }
 
+    /// @dev the constructor of StakeTONProxy
+    /// @param _logic the logic address of StakeTONProxy
     constructor(address _logic) {
         _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
         _setupRole(ADMIN_ROLE, msg.sender);
@@ -31,10 +33,12 @@ contract StakeTONProxy is StakeTONStorage, AccessControl, OnApprove {
         _implementation = _logic;
     }
 
+    /// @dev transfer Ownership
+    /// @param newOwner new owner address
     function transferOwnership(address newOwner) external onlyOwner {
         require(msg.sender != newOwner, "StakeTONProxy:same owner");
         grantRole(ADMIN_ROLE, newOwner);
-        revokeRole(ADMIN_ROLE, msg.sender );
+        revokeRole(ADMIN_ROLE, msg.sender);
     }
 
     /// @notice Set pause state
@@ -109,11 +113,11 @@ contract StakeTONProxy is StakeTONStorage, AccessControl, OnApprove {
         (address _spender, uint256 _amount) = _decodeStakeData(data);
         require(
             tonAmount == _amount && spender == _spender,
-            "TokamakStaker: tonAmount != stakingAmount "
+            "StakeTONProxy: tonAmount != stakingAmount "
         );
         require(
             stakeOnApprove(msg.sender, owner, _spender, _amount),
-            "TokamakStaker: stakeOnApprove fails "
+            "StakeTONProxy: stakeOnApprove fails "
         );
         return true;
     }
@@ -135,15 +139,15 @@ contract StakeTONProxy is StakeTONStorage, AccessControl, OnApprove {
     ) public returns (bool) {
         require(
             (paytoken == from && _amount > 0 && _spender == address(this)),
-            "stakeOnApprove init fail"
+            "StakeTONProxy: stakeOnApprove init fail"
         );
         require(
             block.number >= saleStartBlock && block.number < startBlock,
-            "period is unavailable"
+            "StakeTONProxy: period is unavailable"
         );
 
-        require(!IStake1Vault(vault).saleClosed(), "not end");
-        require(IIERC20(paytoken).balanceOf(_owner) >= _amount, "lack");
+        require(!IStakeVaultStorage(vault).saleClosed(), "StakeTONProxy: not end");
+        require(IIERC20(paytoken).balanceOf(_owner) >= _amount, "StakeTONProxy: insuffient");
 
         LibTokenStake1.StakedAmount storage staked = userStaked[_owner];
         if (staked.amount == 0) totalStakers = totalStakers.add(1);

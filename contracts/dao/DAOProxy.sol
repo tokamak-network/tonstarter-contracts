@@ -31,11 +31,12 @@ contract DAOProxy is DAOProxyStorage, AccessControl {
         _setupRole(ADMIN_ROLE, address(this));
     }
 
-
+    /// @dev transfer Ownership
+    /// @param newOwner new owner address
     function transferOwnership(address newOwner) external onlyOwner {
         require(msg.sender != newOwner, "DAOProxy:same owner");
         grantRole(ADMIN_ROLE, newOwner);
-        revokeRole(ADMIN_ROLE, msg.sender );
+        revokeRole(ADMIN_ROLE, msg.sender);
     }
 
     /// @notice Set pause state

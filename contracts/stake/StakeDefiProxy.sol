@@ -1,13 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.7.6;
-//pragma abicoder v2;
 
+import "../interfaces/IStakeDefiProxy.sol";
 import "./Stake1Storage.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 
-/// @title Proxy for Simple Stake contracts
-/// @notice
-contract StakeDefiProxy is Stake1Storage, AccessControl {
+/// @title Proxy for stake defi contract
+contract StakeDefiProxy is Stake1Storage, AccessControl, IStakeDefiProxy {
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
     address internal _implementation;
     bool public pauseProxy;
@@ -19,6 +18,8 @@ contract StakeDefiProxy is Stake1Storage, AccessControl {
         _;
     }
 
+    /// @dev constructor of Stake1Proxy
+    /// @param _logic the logic address that used in proxy
     constructor(address _logic) {
         _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
         _setupRole(ADMIN_ROLE, msg.sender);
@@ -26,45 +27,50 @@ contract StakeDefiProxy is Stake1Storage, AccessControl {
         _implementation = _logic;
     }
 
+    /// @dev transfer Ownership
+    /// @param newOwner new owner address
     function transferOwnership(address newOwner) external onlyOwner {
         require(msg.sender != newOwner, "StakeDefiProxy:same owner");
         grantRole(ADMIN_ROLE, newOwner);
-        revokeRole(ADMIN_ROLE, msg.sender );
+        revokeRole(ADMIN_ROLE, msg.sender);
     }
 
-    /// @notice Set pause state
+    /// @dev Set pause state
     /// @param _pause true:pause or false:resume
-    function setProxyPause(bool _pause) external onlyOwner {
+    function setProxyPause(bool _pause) external override onlyOwner {
         pauseProxy = _pause;
     }
 
-    /// @notice Set implementation contract
+    /// @dev Set implementation contract
     /// @param impl New implementation contract address
-    function upgradeTo(address impl) external onlyOwner {
-        require(impl != address(0), "input is zero");
+    function upgradeTo(address impl) external override onlyOwner {
+        require(impl != address(0), "StakeDefiProxy: input is zero");
         require(_implementation != impl, "same");
         _implementation = impl;
         emit Upgraded(impl);
     }
 
     /// @dev returns the implementation
-    function implementation() public view returns (address) {
+    function implementation() public override view returns (address) {
         return _implementation;
     }
 
+    /// @dev receive ether
     receive() external payable {
         _fallback();
     }
 
+    /// @dev fallback function , execute on undefined function call
     fallback() external payable {
         _fallback();
     }
 
+    /// @dev fallback function , execute on undefined function call
     function _fallback() internal {
         address _impl = implementation();
         require(
             _impl != address(0) && !pauseProxy,
-            "StakeYearnProxy: impl is zero OR proxy is false"
+            "StakeDefiProxy: impl is zero OR proxy is false"
         );
 
         assembly {
@@ -91,6 +97,11 @@ contract StakeDefiProxy is Stake1Storage, AccessControl {
         }
     }
 
+
+    /// @dev set initial storage
+    /// @param _addr the array addresses of token, paytoken, vault
+    /// @param _registry teh registry address
+    /// @param _intdata the array valued of saleStartBlock, stakeStartBlock, stakeEndBlock
     function setInit(
         address[3] memory _addr,
         address _registry,

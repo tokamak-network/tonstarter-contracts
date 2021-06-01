@@ -2,6 +2,7 @@
 pragma solidity ^0.7.6;
 pragma abicoder v2;
 
+import "../interfaces/ITokamakStaker.sol";
 import {ITON} from "../interfaces/ITON.sol";
 import {IIStake1Vault} from "../interfaces/IIStake1Vault.sol";
 import {IIDepositManager} from "../interfaces/IIDepositManager.sol";
@@ -16,7 +17,6 @@ interface IERC20BASE {
 
     function balanceOf(address owner) external view returns (uint256);
 
-    //function allowance(address owner, address spender) external view returns (uint);
     function approve(address spender, uint256 value) external returns (bool);
 
     function transfer(address to, uint256 value) external returns (bool);
@@ -51,7 +51,7 @@ interface ITokamakRegistry {
 }
 
 /// @title The connector that integrates tokamak
-contract TokamakStaker is StakeTONStorage, AccessControl {
+contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker{
     using SafeMath for uint256;
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
 
@@ -79,13 +79,9 @@ contract TokamakStaker is StakeTONStorage, AccessControl {
         _;
         _lock = 0;
     }
-    //////////////////////////////
-    // Events
-    //////////////////////////////
 
     event SetRegistry(address registry);
     event SetTokamakLayer2(address layer2);
-
     event tokamakStaked(address layer2, uint256 amount);
     event tokamakRequestedUnStaking(address layer2, uint256 amount);
     event tokamakProcessedUnStaking(
@@ -99,13 +95,16 @@ contract TokamakStaker is StakeTONStorage, AccessControl {
         uint256 amountOut
     );
 
-
+    /// @dev transfer Ownership
+    /// @param newOwner new owner address
     function transferOwnership(address newOwner) external onlyOwner {
         require(msg.sender != newOwner, "TokamakStaker:same owner");
         grantRole(ADMIN_ROLE, newOwner);
-        revokeRole(ADMIN_ROLE, msg.sender );
+        revokeRole(ADMIN_ROLE, msg.sender);
     }
 
+    /// @dev set registry address
+    /// @param _registry new registry address
     function setRegistry(address _registry)
         external
         onlyOwner
@@ -116,12 +115,10 @@ contract TokamakStaker is StakeTONStorage, AccessControl {
         emit SetRegistry(stakeRegistry);
     }
 
-    function setTokamakLayer2(address _layer2) external onlyOwner {
-        // TODO: check!!
-        // require(
-        //     block.number < saleStartBlock,
-        //     "TokamakStaker: Already started"
-        // );
+    /// @dev set the tokamak Layer2 address
+    /// @param _layer2 new the tokamak Layer2 address
+    function setTokamakLayer2(address _layer2) external override onlyOwner {
+
         require(
             _layer2 != address(0) && tokamakLayer2 != _layer2,
             "tokamakLayer2 zero "
@@ -131,8 +128,13 @@ contract TokamakStaker is StakeTONStorage, AccessControl {
         emit SetTokamakLayer2(_layer2);
     }
 
+    /// @dev get the addresses that used in uniswap interfaces
+    /// @return uniswapRouter the address of uniswapRouter
+    /// @return npm the address of positionManagerAddress
+    /// @return ext the address of ext
+    /// @return fee the amount of fee
     function getUniswapInfo()
-        external
+        external override
         view
         returns (
             address uniswapRouter,
@@ -144,7 +146,9 @@ contract TokamakStaker is StakeTONStorage, AccessControl {
         return ITokamakRegistry(stakeRegistry).getUniswap();
     }
 
-    function approveUniswapRouter(uint256 amount) external {
+    /// @dev Amount approve for use with UniswapRouter
+    /// @param amount the amount requested to aprove
+    function approveUniswapRouter(uint256 amount) external override {
         (address uniswapRouter, address npm, , ) =
             ITokamakRegistry(stakeRegistry).getUniswap();
 
@@ -153,8 +157,10 @@ contract TokamakStaker is StakeTONStorage, AccessControl {
         if (npm != address(0)) IERC20BASE(paytoken).approve(npm, amount);
     }
 
+    /// @dev  staking the staked TON in layer2 in tokamak
+    /// @param _layer2 the layer2 address in tokamak
     function tokamakStaking(address _layer2)
-        external
+        external override
         lock
         nonZero(stakeRegistry)
         nonZero(_layer2)
@@ -235,8 +241,11 @@ contract TokamakStaker is StakeTONStorage, AccessControl {
         emit tokamakStaked(_layer2, _amount);
     }
 
+    /// @dev  request unstaking the wtonAmount in layer2 in tokamak
+    /// @param _layer2 the layer2 address in tokamak
+    /// @param wtonAmount the amount requested to unstaking
     function tokamakRequestUnStaking(address _layer2, uint256 wtonAmount)
-        public
+        public override
         lock
         nonZero(stakeRegistry)
         sameTokamakLayer(_layer2)
@@ -269,8 +278,10 @@ contract TokamakStaker is StakeTONStorage, AccessControl {
         emit tokamakRequestedUnStaking(_layer2, wtonAmount);
     }
 
+    /// @dev process unstaking in layer2 in tokamak
+    /// @param _layer2 the layer2 address in tokamak
     function tokamakProcessUnStaking(address _layer2)
-        public
+        public override
         lock
         nonZero(stakeRegistry)
         sameTokamakLayer(_layer2)
@@ -315,13 +326,19 @@ contract TokamakStaker is StakeTONStorage, AccessControl {
         emit tokamakProcessedUnStaking(_layer2, rn, false);
     }
 
+    /// @dev exchange holded WTON to FLD using uniswap
+    /// @param _amountIn the input amount
+    /// @param _amountOutMinimum the minimun output amount
+    /// @param _deadline deadline
+    /// @param sqrtPriceLimitX96 sqrtPriceLimitX96
+    /// @param _kind the function type, if 0, use exactInputSingle function, else if, use exactInput function
     function exchangeWTONtoFLD(
         uint256 _amountIn,
         uint256 _amountOutMinimum,
         uint256 _deadline,
         uint160 sqrtPriceLimitX96,
         uint256 _kind
-    ) external returns (uint256 amountOut) {
+    ) external override returns (uint256 amountOut) {
         require(block.number <= endBlock, "period end");
         require(IIStake1Vault(vault).saleClosed() == true, "not closed");
         require(_kind < 2, "no kind");
@@ -365,8 +382,6 @@ contract TokamakStaker is StakeTONStorage, AccessControl {
             "can't approve uniswapRouter"
         );
 
-        //uint256 amountOut = 0;
-
         if (kind == 0) {
             ISwapRouter.ExactInputSingleParams memory params =
                 ISwapRouter.ExactInputSingleParams({
@@ -399,8 +414,8 @@ contract TokamakStaker is StakeTONStorage, AccessControl {
 
         emit exchangedWTONtoFLD(msg.sender, amountIn, amountOut);
     }
-
-    function ExactInputSingleParams(
+    /*
+    function exactInputSingleParams(
         address[2] memory addrs,
         address tokenIn,
         address tokenOut,
@@ -410,7 +425,7 @@ contract TokamakStaker is StakeTONStorage, AccessControl {
         uint256 amountIn,
         uint256 amountOutMinimum,
         uint160 sqrtPriceLimitX96
-    ) public returns (uint256 amountOut) {
+    ) public override returns (uint256 amountOut) {
         require(
             IERC20BASE(tokenIn).approve(addrs[0], amountIn),
             "can't approve uniswapRouter"
@@ -439,7 +454,7 @@ contract TokamakStaker is StakeTONStorage, AccessControl {
         uint256 amountIn,
         uint256 amountOutMinimum,
         uint256 deadline
-    ) public returns (uint256 amountOut) {
+    ) public override returns (uint256 amountOut) {
         toUniswapWTON += amountIn;
         bytes memory path = abi.encodePacked(wton, fee, weth, fee, token);
 
@@ -456,4 +471,5 @@ contract TokamakStaker is StakeTONStorage, AccessControl {
 
         emit exchangedWTONtoFLD(msg.sender, amountIn, amountOut);
     }
+    */
 }

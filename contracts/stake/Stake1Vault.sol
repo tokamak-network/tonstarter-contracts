@@ -2,6 +2,7 @@
 pragma solidity ^0.7.6;
 pragma abicoder v2;
 
+import "../interfaces/IStake1Vault.sol";
 import {IFLD} from "../interfaces/IFLD.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "../interfaces/IStake1Vault.sol";
@@ -13,7 +14,7 @@ import "./StakeVaultStorage.sol";
 /// @title FLD Token's Vault - stores the fld for the period of time
 /// @notice A vault is associated with the set of stake contracts.
 /// Stake contracts can interact with the vault to claim fld tokens
-contract Stake1Vault is StakeVaultStorage {
+contract Stake1Vault is StakeVaultStorage, IStake1Vault {
     using SafeMath for uint256;
 
     bytes32 public constant ZERO_HASH =
@@ -22,6 +23,7 @@ contract Stake1Vault is StakeVaultStorage {
     event ClosedSale(uint256 amount);
     event ClaimedReward(address indexed from, address to, uint256 amount);
 
+    /// @dev constructor of Stake1Vault
     constructor() {
         _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
         _setupRole(ADMIN_ROLE, msg.sender);
@@ -49,7 +51,7 @@ contract Stake1Vault is StakeVaultStorage {
         address _stakefactory,
         uint256 _stakeType,
         address _defiAddr
-    ) external onlyOwner {
+    ) external override onlyOwner {
         require(
             _fld != address(0) && _stakefactory != address(0),
             "Stake1Vault: input is zero"
@@ -73,21 +75,21 @@ contract Stake1Vault is StakeVaultStorage {
 
     /// @dev Sets FLD address
     /// @param _fld  FLD address
-    function setFLD(address _fld) external onlyOwner {
+    function setFLD(address _fld) external override onlyOwner {
         require(_fld != address(0), "Stake1Vault: input is zero");
         fld = IFLD(_fld);
     }
 
     /// @dev Change cap of the vault
     /// @param _cap  allocated reward amount
-    function changeCap(uint256 _cap) external onlyOwner {
+    function changeCap(uint256 _cap) external override onlyOwner {
         require(_cap > 0 && cap != _cap, "Stake1Vault: changeCap fails");
         cap = _cap;
     }
 
     /// @dev Set Defi Address
     /// @param _defiAddr DeFi related address
-    function setDefiAddr(address _defiAddr) external onlyOwner {
+    function setDefiAddr(address _defiAddr) external override onlyOwner {
         require(
             _defiAddr != address(0) && defiAddr != _defiAddr,
             "Stake1Vault: _defiAddr is zero"
@@ -103,7 +105,7 @@ contract Stake1Vault is StakeVaultStorage {
         string memory _name,
         address stakeContract,
         uint256 periodBlocks
-    ) external onlyOwner {
+    ) external override onlyOwner {
         require(
             stakeContract != address(0) && cap > 0 && periodBlocks > 0,
             "Stake1Vault: addStakerInVault init fails"
@@ -133,7 +135,7 @@ contract Stake1Vault is StakeVaultStorage {
     }
 
     /// @dev  Close the sale that can stake by user
-    function closeSale() external {
+    function closeSale() external override {
         require(saleClosed == false, "Stake1Vault: already closed");
         require(
             cap > 0 &&
@@ -239,20 +241,27 @@ contract Stake1Vault is StakeVaultStorage {
     }
 
     /// @dev claim function.
-    /// @notice sender is a staking contract.
-    /// A function that pays the amount(_amount) to _to by the staking contract.
-    /// A function that _to claim the amount(_amount) from the staking contract and gets the FLD in the vault.
+    /// @dev sender is a staking contract.
+    /// @dev A function that pays the amount(_amount) to _to by the staking contract.
+    /// @dev A function that _to claim the amount(_amount) from the staking contract and gets the FLD in the vault.
     /// @param _to a user that received reward
     /// @param _amount the receiving amount
     /// @return true
-    function claim(address _to, uint256 _amount) external returns (bool) {
+    function claim(address _to, uint256 _amount)
+        external
+        override
+        returns (bool)
+    {
         require(saleClosed && _amount > 0, "Stake1Vault: disclose sale");
         uint256 fldBalance = fld.balanceOf(address(this));
         require(fldBalance >= _amount, "Stake1Vault: not enough balance");
 
         LibTokenStake1.StakeInfo storage stakeInfo = stakeInfos[msg.sender];
         require(stakeInfo.startBlock > 0, "Stake1Vault: startBlock zero");
-        require(stakeInfo.totalRewardAmount > 0, "Stake1Vault: totalRewardAmount is zero");
+        require(
+            stakeInfo.totalRewardAmount > 0,
+            "Stake1Vault: totalRewardAmount is zero"
+        );
         require(
             stakeInfo.totalRewardAmount >=
                 stakeInfo.claimRewardAmount.add(_amount),
@@ -274,6 +283,7 @@ contract Stake1Vault is StakeVaultStorage {
     function canClaim(address _to, uint256 _amount)
         external
         view
+        override
         returns (bool)
     {
         require(saleClosed, "Stake1Vault: disclose");
@@ -283,7 +293,10 @@ contract Stake1Vault is StakeVaultStorage {
         LibTokenStake1.StakeInfo storage stakeInfo = stakeInfos[_to];
         require(stakeInfo.startBlock > 0, "Stake1Vault: startBlock is zero");
 
-        require(stakeInfo.totalRewardAmount > 0, "Stake1Vault: amount is wrong");
+        require(
+            stakeInfo.totalRewardAmount > 0,
+            "Stake1Vault: amount is wrong"
+        );
         require(
             stakeInfo.totalRewardAmount >=
                 stakeInfo.claimRewardAmount.add(_amount),
@@ -295,53 +308,68 @@ contract Stake1Vault is StakeVaultStorage {
 
     /// @dev Returns Give the FLD balance stored in the vault
     /// @return the balance of FLD in this vault.
-    function balanceFLDAvailableAmount() external view returns (uint256) {
+    function balanceFLDAvailableAmount()
+        external
+        view
+        override
+        returns (uint256)
+    {
         return fld.balanceOf(address(this));
     }
 
-    /// @dev Returns Give all stakeContracts's addresses in this vault
+    /// @dev Give all stakeContracts's addresses in this vault
     /// @return all stakeContracts's addresses
-    function stakeAddressesAll() external view returns (address[] memory) {
+    function stakeAddressesAll()
+        external
+        view
+        override
+        returns (address[] memory)
+    {
         return stakeAddresses;
     }
 
-    /// @dev Returns Give the ordered end blocks of stakeContracts in this vault
+    /// @dev Give the ordered end blocks of stakeContracts in this vault
     /// @return the ordered end blocks
-    function orderedEndBlocksAll() external view returns (uint256[] memory) {
+    function orderedEndBlocksAll()
+        external
+        view
+        override
+        returns (uint256[] memory)
+    {
         return orderedEndBlocks;
     }
 
-    /// @dev Returns Give Total reward amount of stakeContract(_account)
+    /// @dev Give Total reward amount of stakeContract(_account)
     /// @return Total reward amount of stakeContract(_account)
     function totalRewardAmount(address _account)
         external
         view
+        override
         returns (uint256)
     {
         return stakeInfos[_account].totalRewardAmount;
     }
 
-    /// @dev Returns Give the infomation of this vault
-    /// @return give paytoken, cap, saleStartBlock, stakeStartBlock, stakeEndBlock, blockTotalReward, saleClosed
+    /// @dev Give the infomation of this vault
+    /// @return [paytoken,defiAddr], cap, stakeType, [saleStartBlock, stakeStartBlock, stakeEndBlock], blockTotalReward, saleClosed
     function infos()
         external
         view
+        override
         returns (
-            address,
+            address[2] memory,
             uint256,
             uint256,
-            uint256,
-            uint256,
+            uint256[3] memory,
             uint256,
             bool
         )
     {
         return (
-            paytoken,
+            [paytoken, defiAddr],
             cap,
-            saleStartBlock,
-            stakeStartBlock,
-            stakeEndBlock,
+            stakeType,
+            [saleStartBlock, stakeStartBlock, stakeEndBlock],
             blockTotalReward,
             saleClosed
         );

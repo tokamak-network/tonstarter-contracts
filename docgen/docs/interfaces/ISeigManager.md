@@ -46,94 +46,140 @@
 
 - [`onWithdraw(address layer2, address account, uint256 amount)`](#ISeigManager-onWithdraw-address-address-uint256-)
 
-## Function `registry() `
+### ISeigManager-registry--
+
+## Function `registry()`
 
 No description
 
-## Function `depositManager() `
+### ISeigManager-depositManager--
+
+## Function `depositManager()`
 
 No description
 
-## Function `ton() `
+### ISeigManager-ton--
+
+## Function `ton()`
 
 No description
 
-## Function `wton() `
+### ISeigManager-wton--
+
+## Function `wton()`
 
 No description
 
-## Function `powerton() `
+### ISeigManager-powerton--
+
+## Function `powerton()`
 
 No description
 
-## Function `tot() `
+### ISeigManager-tot--
+
+## Function `tot()`
 
 No description
 
-## Function `coinages(address layer2) `
+### ISeigManager-coinages-address-
+
+## Function `coinages(address layer2)`
 
 No description
 
-## Function `commissionRates(address layer2) `
+### ISeigManager-commissionRates-address-
+
+## Function `commissionRates(address layer2)`
 
 No description
 
-## Function `lastCommitBlock(address layer2) `
+### ISeigManager-lastCommitBlock-address-
+
+## Function `lastCommitBlock(address layer2)`
 
 No description
 
-## Function `seigPerBlock() `
+### ISeigManager-seigPerBlock--
+
+## Function `seigPerBlock()`
 
 No description
 
-## Function `lastSeigBlock() `
+### ISeigManager-lastSeigBlock--
+
+## Function `lastSeigBlock()`
 
 No description
 
-## Function `pausedBlock() `
+### ISeigManager-pausedBlock--
+
+## Function `pausedBlock()`
 
 No description
 
-## Function `unpausedBlock() `
+### ISeigManager-unpausedBlock--
+
+## Function `unpausedBlock()`
 
 No description
 
-## Function `DEFAULT_FACTOR() `
+### ISeigManager-DEFAULT_FACTOR--
+
+## Function `DEFAULT_FACTOR()`
 
 No description
 
-## Function `deployCoinage(address layer2) `
+### ISeigManager-deployCoinage-address-
+
+## Function `deployCoinage(address layer2)`
 
 No description
 
-## Function `setCommissionRate(address layer2, uint256 commission, bool isCommissionRateNegative) `
+### ISeigManager-setCommissionRate-address-uint256-bool-
+
+## Function `setCommissionRate(address layer2, uint256 commission, bool isCommissionRateNegative)`
 
 No description
 
-## Function `uncomittedStakeOf(address layer2, address account) `
+### ISeigManager-uncomittedStakeOf-address-address-
+
+## Function `uncomittedStakeOf(address layer2, address account)`
 
 No description
 
-## Function `stakeOf(address layer2, address account) `
+### ISeigManager-stakeOf-address-address-
+
+## Function `stakeOf(address layer2, address account)`
 
 No description
 
-## Function `additionalTotBurnAmount(address layer2, address account, uint256 amount) `
+### ISeigManager-additionalTotBurnAmount-address-address-uint256-
+
+## Function `additionalTotBurnAmount(address layer2, address account, uint256 amount)`
 
 No description
 
-## Function `onTransfer(address sender, address recipient, uint256 amount) `
+### ISeigManager-onTransfer-address-address-uint256-
+
+## Function `onTransfer(address sender, address recipient, uint256 amount)`
 
 No description
 
-## Function `updateSeigniorage() `
+### ISeigManager-updateSeigniorage--
+
+## Function `updateSeigniorage()`
 
 No description
 
-## Function `onDeposit(address layer2, address account, uint256 amount) `
+### ISeigManager-onDeposit-address-address-uint256-
+
+## Function `onDeposit(address layer2, address account, uint256 amount)`
 
 No description
 
-## Function `onWithdraw(address layer2, address account, uint256 amount) `
+### ISeigManager-onWithdraw-address-address-uint256-
+
+## Function `onWithdraw(address layer2, address account, uint256 amount)`
 
 No description

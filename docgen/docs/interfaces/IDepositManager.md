@@ -46,94 +46,140 @@
 
 - [`numPendingRequests(address layer2, address account)`](#IDepositManager-numPendingRequests-address-address-)
 
-## Function `owner() `
+### IDepositManager-owner--
+
+## Function `owner()`
 
 No description
 
-## Function `wton() `
+### IDepositManager-wton--
+
+## Function `wton()`
 
 No description
 
-## Function `registry() `
+### IDepositManager-registry--
+
+## Function `registry()`
 
 No description
 
-## Function `seigManager() `
+### IDepositManager-seigManager--
+
+## Function `seigManager()`
 
 No description
 
-## Function `accStaked(address layer2, address account) `
+### IDepositManager-accStaked-address-address-
+
+## Function `accStaked(address layer2, address account)`
 
 No description
 
-## Function `accStakedLayer2(address layer2) `
+### IDepositManager-accStakedLayer2-address-
+
+## Function `accStakedLayer2(address layer2)`
 
 No description
 
-## Function `accStakedAccount(address account) `
+### IDepositManager-accStakedAccount-address-
+
+## Function `accStakedAccount(address account)`
 
 No description
 
-## Function `pendingUnstaked(address layer2, address account) `
+### IDepositManager-pendingUnstaked-address-address-
+
+## Function `pendingUnstaked(address layer2, address account)`
 
 No description
 
-## Function `pendingUnstakedLayer2(address layer2) `
+### IDepositManager-pendingUnstakedLayer2-address-
+
+## Function `pendingUnstakedLayer2(address layer2)`
 
 No description
 
-## Function `pendingUnstakedAccount(address account) `
+### IDepositManager-pendingUnstakedAccount-address-
+
+## Function `pendingUnstakedAccount(address account)`
 
 No description
 
-## Function `accUnstaked(address layer2, address account) `
+### IDepositManager-accUnstaked-address-address-
+
+## Function `accUnstaked(address layer2, address account)`
 
 No description
 
-## Function `accUnstakedLayer2(address layer2) `
+### IDepositManager-accUnstakedLayer2-address-
+
+## Function `accUnstakedLayer2(address layer2)`
 
 No description
 
-## Function `accUnstakedAccount(address account) `
+### IDepositManager-accUnstakedAccount-address-
+
+## Function `accUnstakedAccount(address account)`
 
 No description
 
-## Function `withdrawalRequestIndex(address layer2, address account) `
+### IDepositManager-withdrawalRequestIndex-address-address-
+
+## Function `withdrawalRequestIndex(address layer2, address account)`
 
 No description
 
-## Function `withdrawalRequest(address layer2, address account, uint256 index) `
+### IDepositManager-withdrawalRequest-address-address-uint256-
+
+## Function `withdrawalRequest(address layer2, address account, uint256 index)`
 
 No description
 
-## Function `WITHDRAWAL_DELAY() `
+### IDepositManager-WITHDRAWAL_DELAY--
+
+## Function `WITHDRAWAL_DELAY()`
 
 No description
 
-## Function `deposit(address layer2, uint256 amount) `
+### IDepositManager-deposit-address-uint256-
+
+## Function `deposit(address layer2, uint256 amount)`
 
 No description
 
-## Function `requestWithdrawal(address layer2, uint256 amount) `
+### IDepositManager-requestWithdrawal-address-uint256-
+
+## Function `requestWithdrawal(address layer2, uint256 amount)`
 
 No description
 
-## Function `processRequest(address layer2, bool receiveTON) `
+### IDepositManager-processRequest-address-bool-
+
+## Function `processRequest(address layer2, bool receiveTON)`
 
 No description
 
-## Function `requestWithdrawalAll(address layer2) `
+### IDepositManager-requestWithdrawalAll-address-
+
+## Function `requestWithdrawalAll(address layer2)`
 
 No description
 
-## Function `processRequests(address layer2, uint256 n) `
+### IDepositManager-processRequests-address-uint256-
+
+## Function `processRequests(address layer2, uint256 n)`
 
 No description
 
-## Function `numRequests(address layer2, address account) `
+### IDepositManager-numRequests-address-address-
+
+## Function `numRequests(address layer2, address account)`
 
 No description
 
-## Function `numPendingRequests(address layer2, address account) `
+### IDepositManager-numPendingRequests-address-address-
+
+## Function `numPendingRequests(address layer2, address account)`
 
 No description

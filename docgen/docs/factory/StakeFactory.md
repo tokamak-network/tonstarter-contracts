@@ -12,29 +12,65 @@
 
 - [`create(uint256 stakeType, address[4] _addr, address registry, uint256[3] _intdata)`](#StakeFactory-create-uint256-address-4--address-uint256-3--)
 
-## Function `constructor(address _stakeSimpleFactory, address _stakeTONFactory, address _stakeDefiFactory) `
+### StakeFactory-constructor-address-address-address-
 
-No description
+## Function `constructor(address _stakeSimpleFactory, address _stakeTONFactory, address _stakeDefiFactory)`
 
-## Function `transferOwnership(address newOwner) `
+constructor of StakeFactory
 
-No description
+### Parameters:
 
-## Function `setStakeSimpleFactory(address _stakeSimpleFactory) `
+- `_stakeSimpleFactory`: the logic address used in StakeSimpleFactory
 
-No description
+- `_stakeTONFactory`: the logic address used in StakeTONFactory
 
-## Function `setStakeTONFactory(address _stakeTONFactory) `
+- `_stakeTONFactory`: the logic address used in StakeTONFactory
 
-No description
+### StakeFactory-transferOwnership-address-
 
-## Function `setStakeDefiFactory(address _stakeDefiFactory) `
+## Function `transferOwnership(address newOwner)`
 
-No description
+transfer Ownership
 
-## Function `create(uint256 stakeType, address[4] _addr, address registry, uint256[3] _intdata) `
+### Parameters:
 
-No description
+- `newOwner`: new owner address
+
+### StakeFactory-setStakeSimpleFactory-address-
+
+## Function `setStakeSimpleFactory(address _stakeSimpleFactory)`
+
+Set StakeSimpleFactory address
+
+### Parameters:
+
+- `_stakeSimpleFactory`: new StakeSimpleFactory address
+
+### StakeFactory-setStakeTONFactory-address-
+
+## Function `setStakeTONFactory(address _stakeTONFactory)`
+
+Set StakeTONFactory address
+
+### Parameters:
+
+- `_stakeTONFactory`: new StakeTONFactory address
+
+### StakeFactory-setStakeDefiFactory-address-
+
+## Function `setStakeDefiFactory(address _stakeDefiFactory)`
+
+Set StakeDefiFactory address
+
+### Parameters:
+
+- `_stakeDefiFactory`: new StakeDefiFactory address
+
+### StakeFactory-create-uint256-address-4--address-uint256-3--
+
+## Function `create(uint256 stakeType, address[4] _addr, address registry, uint256[3] _intdata)`
+
+Create a stake contract that calls the desired stake factory according to stakeType
 
 ### Parameters:
 

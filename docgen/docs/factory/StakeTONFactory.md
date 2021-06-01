@@ -4,13 +4,23 @@
 
 - [`create(address[4] _addr, address _registry, uint256[3] _intdata, address owner)`](#StakeTONFactory-create-address-4--address-uint256-3--address-)
 
-## Function `constructor(address _stakeTONProxyFactory, address _stakeTONLogic) `
+### StakeTONFactory-constructor-address-address-
 
-No description
+## Function `constructor(address _stakeTONProxyFactory, address _stakeTONLogic)`
 
-## Function `create(address[4] _addr, address _registry, uint256[3] _intdata, address owner) `
+constructor of StakeTONFactory
 
-No description
+### Parameters:
+
+- `_stakeTONProxyFactory`: the StakeTONProxyFactory address used in StakeTONFactory
+
+- `_stakeTONLogic`: the StakeTONLogic address used in StakeTONFactory
+
+### StakeTONFactory-create-address-4--address-uint256-3--address-
+
+## Function `create(address[4] _addr, address _registry, uint256[3] _intdata, address owner)`
+
+Create a stake contract that can stake TON.
 
 ### Parameters:
 

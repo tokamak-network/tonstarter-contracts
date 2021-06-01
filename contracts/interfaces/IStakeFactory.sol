@@ -11,8 +11,7 @@ interface IStakeFactory {
 
     function setStakeTONFactory(address _stakeTONFactory) external;
 
-    function setStakeDefiFactory(address _stakeDefiFactory)
-        external;
+    function setStakeDefiFactory(address _stakeDefiFactory) external;
 
     function setStakeSimpleFactory(address _stakeSimpleFactory) external;
 }

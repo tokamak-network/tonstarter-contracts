@@ -5,17 +5,22 @@ import "../interfaces/IStakeVaultFactory.sol";
 import {StakeVaultProxy} from "../stake/StakeVaultProxy.sol";
 
 /// @title A factory that creates a vault that hold reward
-contract StakeVaultFactory is IStakeVaultFactory{
+contract StakeVaultFactory is IStakeVaultFactory {
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
 
     address public stakeVaultLogic;
 
+    /// @dev constructor of StakeVaultFactory
+    /// @param _stakeVaultLogic the logic address used in StakeVaultFactory
     constructor(address _stakeVaultLogic) {
-        require(_stakeVaultLogic != address(0), "StakeVaultFactory: logic zero");
+        require(
+            _stakeVaultLogic != address(0),
+            "StakeVaultFactory: logic zero"
+        );
         stakeVaultLogic = _stakeVaultLogic;
     }
 
-    /// Create a vault that hold reward, _cap is allocated reward amount.
+    /// @dev Create a vault that hold reward, _cap is allocated reward amount.
     /// @param _addr the array of [token, paytoken, vault, defiAddr]
     /// @param _intInfo array of [_stakeType, _cap, _saleStartBlock, _stakeStartBlock]
     /// @param owner the owner adderess

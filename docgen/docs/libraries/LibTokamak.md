@@ -4,10 +4,14 @@
 
 - [`tokamakRequestUnStaking(address depositManager, address _layer2, uint256 _amount)`](#LibTokamak-tokamakRequestUnStaking-address-address-uint256-)
 
-## Function `tokamakRequestUnStakingAll(address depositManager, address _layer2) `
+### LibTokamak-tokamakRequestUnStakingAll-address-address-
+
+## Function `tokamakRequestUnStakingAll(address depositManager, address _layer2)`
 
 No description
 
-## Function `tokamakRequestUnStaking(address depositManager, address _layer2, uint256 _amount) `
+### LibTokamak-tokamakRequestUnStaking-address-address-uint256-
+
+## Function `tokamakRequestUnStaking(address depositManager, address _layer2, uint256 _amount)`
 
 No description

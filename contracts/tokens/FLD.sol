@@ -48,11 +48,12 @@ contract FLD is ERC20, AccessControl, VerifySignature {
         _setupRole(BURNER_ROLE, msg.sender);
         _setupRole(MINTER_ROLE, msg.sender);
     }
-
+    /// @dev transfer Ownership
+    /// @param newOwner new owner address
     function transferOwnership(address newOwner) external onlyOwner {
         require(msg.sender != newOwner, "FLD:same owner");
         grantRole(ADMIN_ROLE, newOwner);
-        revokeRole(ADMIN_ROLE, msg.sender );
+        revokeRole(ADMIN_ROLE, msg.sender);
     }
 
     /**

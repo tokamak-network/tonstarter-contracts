@@ -1,127 +1,173 @@
 # Functions:
 
-- [`initialize(address _fld, address _paytoken, uint256 _cap, uint256 _saleStartBlock, uint256 _stakeStartBlock)`](###IStake1Vault-initialize-address-address-uint256-uint256-uint256-)
+- [`initialize(address _fld, address _paytoken, uint256 _cap, uint256 _saleStartBlock, uint256 _stakeStartBlock, address _stakefactory, uint256 _stakeType, address _defiAddr)`](#IStake1Vault-initialize-address-address-uint256-uint256-uint256-address-uint256-address-)
 
-- [`setFLD(address _ton)`](###IStake1Vault-setFLD-address-)
+- [`setFLD(address _fld)`](#IStake1Vault-setFLD-address-)
 
-- [`changeCap(uint256 _cap)`](###IStake1Vault-changeCap-uint256-)
+- [`changeCap(uint256 _cap)`](#IStake1Vault-changeCap-uint256-)
 
-- [`addSubVaultOfStake(string _name, address stakeContract, uint256 periodBlocks)`](###IStake1Vault-addSubVaultOfStake-string-address-uint256-)
+- [`setDefiAddr(address _defiAddr)`](#IStake1Vault-setDefiAddr-address-)
 
-- [`closeSale()`](###IStake1Vault-closeSale--)
+- [`addSubVaultOfStake(string _name, address stakeContract, uint256 periodBlocks)`](#IStake1Vault-addSubVaultOfStake-string-address-uint256-)
 
-- [`claim(address _to, uint256 _amount)`](###IStake1Vault-claim-address-uint256-)
+- [`closeSale()`](#IStake1Vault-closeSale--)
 
-- [`canClaim(address _to, uint256 _amount)`](###IStake1Vault-canClaim-address-uint256-)
+- [`claim(address _to, uint256 _amount)`](#IStake1Vault-claim-address-uint256-)
 
-- [`totalRewardAmount(address _account)`](###IStake1Vault-totalRewardAmount-address-)
+- [`canClaim(address _to, uint256 _amount)`](#IStake1Vault-canClaim-address-uint256-)
 
-- [`stakeAddressesAll()`](###IStake1Vault-stakeAddressesAll--)
+- [`infos()`](#IStake1Vault-infos--)
 
-- [`orderedEndBlocksAll()`](###IStake1Vault-orderedEndBlocksAll--)
+- [`balanceFLDAvailableAmount()`](#IStake1Vault-balanceFLDAvailableAmount--)
 
-- [`fld()`](###IStake1Vault-fld--)
+- [`totalRewardAmount(address _account)`](#IStake1Vault-totalRewardAmount-address-)
 
-- [`paytoken()`](###IStake1Vault-paytoken--)
+- [`stakeAddressesAll()`](#IStake1Vault-stakeAddressesAll--)
 
-- [`cap()`](###IStake1Vault-cap--)
+- [`orderedEndBlocksAll()`](#IStake1Vault-orderedEndBlocksAll--)
 
-- [`stakeType()`](###IStake1Vault-stakeType--)
+### IStake1Vault-initialize-address-address-uint256-uint256-uint256-address-uint256-address-
 
-- [`defiAddr()`](###IStake1Vault-defiAddr--)
-
-- [`saleStartBlock()`](###IStake1Vault-saleStartBlock--)
-
-- [`stakeStartBlock()`](###IStake1Vault-stakeStartBlock--)
-
-- [`stakeEndBlock()`](###IStake1Vault-stakeEndBlock--)
-
-- [`blockTotalReward()`](###IStake1Vault-blockTotalReward--)
-
-- [`saleClosed()`](###IStake1Vault-saleClosed--)
-
-- [`stakeEndBlockTotal(uint256 endblock)`](###IStake1Vault-stakeEndBlockTotal-uint256-)
-
-## Function `initialize(address _fld, address _paytoken, uint256 _cap, uint256 _saleStartBlock, uint256 _stakeStartBlock)` (###IStake1Vault-initialize-address-address-uint256-uint256-uint256-)
+## Function `initialize(address _fld, address _paytoken, uint256 _cap, uint256 _saleStartBlock, uint256 _stakeStartBlock, address _stakefactory, uint256 _stakeType, address _defiAddr)`
 
 No description
 
-## Function `setFLD(address _ton)` (###IStake1Vault-setFLD-address-)
+### Parameters:
 
-Sets the FLD address
+- `_cap`:  Maximum amount of rewards issued, allocated reward amount.
 
-## Function `changeCap(uint256 _cap)` (###IStake1Vault-changeCap-uint256-)
+- `_saleStartBlock`:  the sale start block
 
-Changes the cap of vault.
+- `_stakeStartBlock`:  the staking start block
 
-## Function `addSubVaultOfStake(string _name, address stakeContract, uint256 periodBlocks)` (###IStake1Vault-addSubVaultOfStake-string-address-uint256-)
+- `_stakefactory`: the factory address to create stakeContract
 
-No description
+- `_stakeType`:  Type of staking contract, 0 TON staking, 1 basic ERC20 staking, 2 Defi linked staking
 
-## Function `closeSale()` (###IStake1Vault-closeSale--)
+- `_defiAddr`: Used when an external address is required. default: address(0)
 
-No description
+### IStake1Vault-setFLD-address-
 
-## Function `claim(address _to, uint256 _amount)` (###IStake1Vault-claim-address-uint256-)
+## Function `setFLD(address _fld)`
 
-No description
+Sets FLD address
 
-## Function `canClaim(address _to, uint256 _amount)` (###IStake1Vault-canClaim-address-uint256-)
+### Parameters:
 
-No description
+- `_fld`:  FLD address
 
-## Function `totalRewardAmount(address _account)` (###IStake1Vault-totalRewardAmount-address-)
+### IStake1Vault-changeCap-uint256-
 
-No description
+## Function `changeCap(uint256 _cap)`
 
-## Function `stakeAddressesAll()` (###IStake1Vault-stakeAddressesAll--)
+Change cap of the vault
 
-No description
+### Parameters:
 
-## Function `orderedEndBlocksAll()` (###IStake1Vault-orderedEndBlocksAll--)
+- `_cap`:  allocated reward amount
 
-No description
+### IStake1Vault-setDefiAddr-address-
 
-## Function `fld()` (###IStake1Vault-fld--)
+## Function `setDefiAddr(address _defiAddr)`
 
-No description
+Set Defi Address
 
-## Function `paytoken()` (###IStake1Vault-paytoken--)
+### Parameters:
 
-No description
+- `_defiAddr`: DeFi related address
 
-## Function `cap()` (###IStake1Vault-cap--)
+### IStake1Vault-addSubVaultOfStake-string-address-uint256-
 
-No description
+## Function `addSubVaultOfStake(string _name, address stakeContract, uint256 periodBlocks)`
 
-## Function `stakeType()` (###IStake1Vault-stakeType--)
+ Add stake contract
 
-No description
+### Parameters:
 
-## Function `defiAddr()` (###IStake1Vault-defiAddr--)
+- `_name`: stakeContract's name
 
-No description
+- `stakeContract`: stakeContract's address
 
-## Function `saleStartBlock()` (###IStake1Vault-saleStartBlock--)
+- `periodBlocks`: the period that give rewards of stakeContract
 
-No description
+### IStake1Vault-closeSale--
 
-## Function `stakeStartBlock()` (###IStake1Vault-stakeStartBlock--)
+## Function `closeSale()`
 
-No description
+ Close the sale that can stake by user
 
-## Function `stakeEndBlock()` (###IStake1Vault-stakeEndBlock--)
+### IStake1Vault-claim-address-uint256-
 
-No description
+## Function `claim(address _to, uint256 _amount)`
 
-## Function `blockTotalReward()` (###IStake1Vault-blockTotalReward--)
+claim function.
 
-No description
+sender is a staking contract.
 
-## Function `saleClosed()` (###IStake1Vault-saleClosed--)
+A function that pays the amount(_amount) to _to by the staking contract.
 
-No description
+A function that _to claim the amount(_amount) from the staking contract and gets the FLD in the vault.
 
-## Function `stakeEndBlockTotal(uint256 endblock)` (###IStake1Vault-stakeEndBlockTotal-uint256-)
+### Parameters:
 
-No description
+- `_to`: a user that received reward
+
+- `_amount`: the receiving amount
+
+### IStake1Vault-canClaim-address-uint256-
+
+## Function `canClaim(address _to, uint256 _amount)`
+
+whether it is available to claim amount, if it is available , return the total reward amount
+
+### Parameters:
+
+- `_to`:  a staking contract.
+
+- `_amount`: the total reward amount of stakeContract
+
+### IStake1Vault-infos--
+
+## Function `infos()`
+
+Give the infomation of this vault
+
+### IStake1Vault-balanceFLDAvailableAmount--
+
+## Function `balanceFLDAvailableAmount()`
+
+Returns Give the FLD balance stored in the vault
+
+### Return Values:
+
+- the balance of FLD in this vault.
+
+### IStake1Vault-totalRewardAmount-address-
+
+## Function `totalRewardAmount(address _account)`
+
+Give Total reward amount of stakeContract(_account)
+
+### Return Values:
+
+- Total reward amount of stakeContract(_account)
+
+### IStake1Vault-stakeAddressesAll--
+
+## Function `stakeAddressesAll()`
+
+Give all stakeContracts's addresses in this vault
+
+### Return Values:
+
+- all stakeContracts's addresses
+
+### IStake1Vault-orderedEndBlocksAll--
+
+## Function `orderedEndBlocksAll()`
+
+Give the ordered end blocks of stakeContracts in this vault
+
+### Return Values:
+
+- the ordered end blocks

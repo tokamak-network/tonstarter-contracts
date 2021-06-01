@@ -24,6 +24,10 @@ contract StakeFactory is IStakeFactory, AccessControl {
         _;
     }
 
+    /// @dev constructor of StakeFactory
+    /// @param _stakeSimpleFactory the logic address used in StakeSimpleFactory
+    /// @param _stakeTONFactory the logic address used in StakeTONFactory
+    /// @param _stakeTONFactory the logic address used in StakeTONFactory
     constructor(
         address _stakeSimpleFactory,
         address _stakeTONFactory,
@@ -40,38 +44,48 @@ contract StakeFactory is IStakeFactory, AccessControl {
         _setupRole(ADMIN_ROLE, msg.sender);
     }
 
-
+    /// @dev transfer Ownership
+    /// @param newOwner new owner address
     function transferOwnership(address newOwner) external onlyOwner {
         require(msg.sender != newOwner, "StakeFactory:same owner");
         grantRole(ADMIN_ROLE, newOwner);
-        revokeRole(ADMIN_ROLE, msg.sender );
+        revokeRole(ADMIN_ROLE, msg.sender);
     }
 
+    /// @dev Set StakeSimpleFactory address
+    /// @param _stakeSimpleFactory new StakeSimpleFactory address
     function setStakeSimpleFactory(address _stakeSimpleFactory)
         external
-        onlyOwner override
+        override
+        onlyOwner
         nonZero(_stakeSimpleFactory)
     {
         stakeSimpleFactory = _stakeSimpleFactory;
     }
 
+    /// @dev Set StakeTONFactory address
+    /// @param _stakeTONFactory new StakeTONFactory address
     function setStakeTONFactory(address _stakeTONFactory)
         external
-        onlyOwner override
+        override
+        onlyOwner
         nonZero(_stakeTONFactory)
     {
         stakeTONFactory = _stakeTONFactory;
     }
 
+    /// @dev Set StakeDefiFactory address
+    /// @param _stakeDefiFactory new StakeDefiFactory address
     function setStakeDefiFactory(address _stakeDefiFactory)
         external
-        onlyOwner override
+        override
+        onlyOwner
         nonZero(_stakeDefiFactory)
     {
         stakeDefiFactory = _stakeDefiFactory;
     }
 
-    /// Create a stake contract that calls the desired stake factory according to stakeType
+    /// @dev Create a stake contract that calls the desired stake factory according to stakeType
     /// @param stakeType if 0, stakeTONFactory, else if 1 , stakeSimpleFactory , else if 2, stakeDefiFactory
     /// @param _addr array of [token, paytoken, vault, _defiAddr]
     /// @param registry  registry address
@@ -82,13 +96,15 @@ contract StakeFactory is IStakeFactory, AccessControl {
         address[4] calldata _addr,
         address registry,
         uint256[3] calldata _intdata
-    ) external onlyOwner override returns (address) {
-
+    ) external override onlyOwner returns (address) {
         require(_addr[2] != address(0), "StakeFactory: vault zero");
 
         if (stakeType == 0) {
             // TON Staking
-            require(stakeTONFactory != address(0), "StakeFactory: stakeTONFactory zero");
+            require(
+                stakeTONFactory != address(0),
+                "StakeFactory: stakeTONFactory zero"
+            );
 
             address proxy =
                 IStakeTONFactory(stakeTONFactory).create(
@@ -99,7 +115,6 @@ contract StakeFactory is IStakeFactory, AccessControl {
                 );
 
             return proxy;
-
         } else if (stakeType == 1) {
             // ERC20 Simple Staking
             require(
@@ -115,7 +130,6 @@ contract StakeFactory is IStakeFactory, AccessControl {
                 );
 
             return proxy;
-
         } else if (stakeType == 2) {
             require(
                 stakeDefiFactory != address(0),

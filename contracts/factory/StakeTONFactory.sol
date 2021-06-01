@@ -5,10 +5,13 @@ import "../interfaces/IStakeTONFactory.sol";
 import "../interfaces/IStakeTONProxyFactory.sol";
 
 /// @title A factory that creates a stake contract that can stake TON
-contract StakeTONFactory is IStakeTONFactory{
+contract StakeTONFactory is IStakeTONFactory {
     address public stakeTONProxyFactory;
     address public stakeTONLogic;
 
+    /// @dev constructor of StakeTONFactory
+    /// @param _stakeTONProxyFactory the StakeTONProxyFactory address used in StakeTONFactory
+    /// @param _stakeTONLogic the StakeTONLogic address used in StakeTONFactory
     constructor(address _stakeTONProxyFactory, address _stakeTONLogic) {
         require(
             _stakeTONProxyFactory != address(0) && _stakeTONLogic != address(0),
@@ -18,7 +21,7 @@ contract StakeTONFactory is IStakeTONFactory{
         stakeTONLogic = _stakeTONLogic;
     }
 
-    /// Create a stake contract that can stake TON.
+    /// @dev Create a stake contract that can stake TON.
     /// @param _addr the array of [token, paytoken, vault, defiAddr]
     /// @param _registry  the registry address
     /// @param _intdata the array of [saleStartBlock, startBlock, endBlock]

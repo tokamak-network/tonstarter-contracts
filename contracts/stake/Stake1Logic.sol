@@ -14,7 +14,11 @@ import "./StakeProxyStorage.sol";
 /// @title The logic of FLD Plaform
 /// @notice Admin can createVault, createStakeContract.
 /// User can excute the tokamak staking function of each contract through this logic.
-abstract contract Stake1Logic is StakeProxyStorage, AccessControl, IStake1Logic {
+abstract contract Stake1Logic is
+    StakeProxyStorage,
+    AccessControl,
+    IStake1Logic
+{
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
     bytes32 public constant ZERO_HASH =
         0x0000000000000000000000000000000000000000000000000000000000000000;
@@ -38,7 +42,9 @@ abstract contract Stake1Logic is StakeProxyStorage, AccessControl, IStake1Logic 
     event ClosedSale(address indexed vault);
     event SetStakeRegistry(address stakeRegistry);
 
-
+    /// @dev upgrade to the logic of _stakeProxy
+    /// @param _stakeProxy the StakeProxy address
+    /// @param _implementation new logic address
     function upgradeStakeTo(address _stakeProxy, address _implementation)
         external
         onlyOwner
@@ -46,12 +52,18 @@ abstract contract Stake1Logic is StakeProxyStorage, AccessControl, IStake1Logic 
         IProxy(_stakeProxy).upgradeTo(_implementation);
     }
 
+    /// @dev transfer Ownership
+    /// @param newOwner new owner address
     function transferOwnership(address newOwner) external onlyOwner {
         require(msg.sender != newOwner, "Stake1Logic: same owner");
         grantRole(ADMIN_ROLE, newOwner);
-        revokeRole(ADMIN_ROLE, msg.sender );
+        revokeRole(ADMIN_ROLE, msg.sender);
     }
 
+    /// @dev grant the role to account in target
+    /// @param target target address
+    /// @param role  byte32 of role
+    /// @param account account address
     function grantRole(
         address target,
         bytes32 role,
@@ -68,6 +80,10 @@ abstract contract Stake1Logic is StakeProxyStorage, AccessControl, IStake1Logic 
         require(success, "Stake1Logic: grantRole fail");
     }
 
+    /// @dev revoke the role to account in target
+    /// @param target target address
+    /// @param role  byte32 of role
+    /// @param account account address
     function revokeRole(
         address target,
         bytes32 role,
@@ -85,11 +101,13 @@ abstract contract Stake1Logic is StakeProxyStorage, AccessControl, IStake1Logic 
     }
 
     /// @dev Sets FLD address
+    /// @param _fld new FLD address
     function setFLD(address _fld) public onlyOwner nonZero(_fld) {
         fld = _fld;
     }
 
     /// @dev Sets Stake Registry address
+    /// @param _stakeRegistry new StakeRegistry address
     function setStakeRegistry(address _stakeRegistry)
         public
         onlyOwner
@@ -99,7 +117,8 @@ abstract contract Stake1Logic is StakeProxyStorage, AccessControl, IStake1Logic 
         emit SetStakeRegistry(_stakeRegistry);
     }
 
-    /// @dev Sets Stake Factory address
+    /// @dev Sets StakeFactory address
+    /// @param _stakeFactory new StakeFactory address
     function setStakeFactory(address _stakeFactory)
         public
         onlyOwner
@@ -108,6 +127,8 @@ abstract contract Stake1Logic is StakeProxyStorage, AccessControl, IStake1Logic 
         stakeFactory = IStakeFactory(_stakeFactory);
     }
 
+    /// @dev Sets StakeTONFactory address
+    /// @param _stakeTONFactory new StakeTONFactory address
     function setStakeTONFactory(address _stakeTONFactory)
         public
         onlyOwner
@@ -116,6 +137,8 @@ abstract contract Stake1Logic is StakeProxyStorage, AccessControl, IStake1Logic 
         stakeFactory.setStakeTONFactory(_stakeTONFactory);
     }
 
+    /// @dev Sets StakeSimpleFactory address
+    /// @param _stakeSimpleFactory new StakeSimpleFactory address
     function setStakeSimpleFactory(address _stakeSimpleFactory)
         public
         onlyOwner
@@ -124,6 +147,8 @@ abstract contract Stake1Logic is StakeProxyStorage, AccessControl, IStake1Logic 
         stakeFactory.setStakeSimpleFactory(_stakeSimpleFactory);
     }
 
+    /// @dev Sets StakeDefiFactory address
+    /// @param _stakeDefiFactory new StakeDefiFactory address
     function setStakeDefiFactory(address _stakeDefiFactory)
         public
         onlyOwner
@@ -132,6 +157,8 @@ abstract contract Stake1Logic is StakeProxyStorage, AccessControl, IStake1Logic 
         stakeFactory.setStakeDefiFactory(_stakeDefiFactory);
     }
 
+    /// @dev Sets StakeVaultFactory address
+    /// @param _stakeVaultFactory new StakeVaultFactory address
     function setStakeVaultFactory(address _stakeVaultFactory)
         public
         onlyOwner
@@ -139,7 +166,6 @@ abstract contract Stake1Logic is StakeProxyStorage, AccessControl, IStake1Logic 
     {
         stakeVaultFactory = IStakeVaultFactory(_stakeVaultFactory);
     }
-
 
     /// Set initial variables
     /// @param _fld  FLD token address
@@ -160,7 +186,8 @@ abstract contract Stake1Logic is StakeProxyStorage, AccessControl, IStake1Logic 
         address _depositManager,
         address _seigManager
     )
-        external override
+        external
+        override
         onlyOwner
         nonZero(_stakeVaultFactory)
         nonZero(_ton)
@@ -179,6 +206,14 @@ abstract contract Stake1Logic is StakeProxyStorage, AccessControl, IStake1Logic 
     }
 
     /// @dev create vault
+    /// @param _paytoken the token used for staking by user
+    /// @param _cap  allocated reward amount
+    /// @param _saleStartBlock  the start block that can stake by user
+    /// @param _stakeStartBlock the start block that end staking by user and start that can claim reward by user
+    /// @param _phase  phase of FLD platform
+    /// @param _vaultName  vault's name's hash
+    /// @param _stakeType  stakeContract's type, if 0, StakeTON, else if 1 , StakeSimple , else if 2, StakeDefi
+    /// @param _defiAddr  extra defi address , default is zero address
     function createVault(
         address _paytoken,
         uint256 _cap,
@@ -202,6 +237,12 @@ abstract contract Stake1Logic is StakeProxyStorage, AccessControl, IStake1Logic 
     }
 
     /// @dev create stake contract in vault
+    /// @param _phase the phase of FLD platform
+    /// @param _vault  vault's address
+    /// @param token  the reward token's address
+    /// @param paytoken  the token used for staking by user
+    /// @param periodBlock  the period that generate reward
+    /// @param _name  the stake contract's name
     function createStakeContract(
         uint256 _phase,
         address _vault,
@@ -210,16 +251,25 @@ abstract contract Stake1Logic is StakeProxyStorage, AccessControl, IStake1Logic 
         uint256 periodBlock,
         string memory _name
     ) external override onlyOwner {
-        require(stakeRegistry.validVault(_phase, _vault), "Stake1Logic: unvalidVault");
+        require(
+            stakeRegistry.validVault(_phase, _vault),
+            "Stake1Logic: unvalidVault"
+        );
 
         IStake1Vault vault = IStake1Vault(_vault);
-        uint256 saleStart = vault.saleStartBlock();
-        uint256 stakeStart = vault.stakeStartBlock();
-        uint256 stakeType = vault.stakeType();
-        address defiAddr = vault.defiAddr();
+
+        (
+            address[2] memory addrInfos,
+            ,
+            uint256 stakeType,
+            uint256[3] memory iniInfo,
+            ,
+
+        ) = vault.infos();
+
+        require(paytoken == addrInfos[0], "Stake1Logic: differrent paytoken");
         uint256 phase = _phase;
-        uint256[3] memory iniInfo = [saleStart, stakeStart, periodBlock];
-        address[4] memory _addr = [token, paytoken, _vault, defiAddr];
+        address[4] memory _addr = [token, addrInfos[0], _vault, addrInfos[1]];
 
         // solhint-disable-next-line max-line-length
         address _contract =
@@ -237,6 +287,10 @@ abstract contract Stake1Logic is StakeProxyStorage, AccessControl, IStake1Logic 
         emit CreatedStakeContract(address(vault), _contract, phase);
     }
 
+    /// @dev create stake contract in vault
+    /// @param _phase phase of FLD platform
+    /// @param _vaultName vault's name's hash
+    /// @param _vault vault's address
     function addVault(
         uint256 _phase,
         bytes32 _vaultName,
@@ -245,35 +299,51 @@ abstract contract Stake1Logic is StakeProxyStorage, AccessControl, IStake1Logic 
         stakeRegistry.addVault(_vault, _phase, _vaultName);
     }
 
+    /// @dev end to staking by user
+    /// @param _vault vault's address
     function closeSale(address _vault) external override {
         IStake1Vault(_vault).closeSale();
 
         emit ClosedSale(_vault);
     }
 
+    /// @dev list of stakeContracts in vault
+    /// @param _vault vault's address
     function stakeContractsOfVault(address _vault)
         external
-        override
         view
+        override
         nonZero(_vault)
         returns (address[] memory)
     {
         return IStake1Vault(_vault).stakeAddressesAll();
     }
 
+    /// @dev list of vaults in _phaseIndex phase
+    /// @param _phaseIndex the phase number
     function vaultsOfPhase(uint256 _phaseIndex)
-        external override
+        external
         view
+        override
         returns (address[] memory)
     {
         return stakeRegistry.phasesAll(_phaseIndex);
     }
 
-    function tokamakStaking(address _stakeContract, address _layer2) external override {
+    /// @dev stake in tokamak's layer2
+    /// @param _stakeContract the stakeContract's address
+    /// @param _layer2 the layer2 address in Tokamak
+    function tokamakStaking(address _stakeContract, address _layer2)
+        external
+        override
+    {
         IStakeTONTokamak(_stakeContract).tokamakStaking(_layer2);
     }
 
-    /// @dev Requests unstaking all
+    /// @dev Requests unstaking in tokamak's layer2
+    /// @param _stakeContract the stakeContract's address
+    /// @param _layer2 the layer2 address in Tokamak
+    /// @param amount the amount of unstaking
     function tokamakRequestUnStaking(
         address _stakeContract,
         address _layer2,
@@ -285,14 +355,24 @@ abstract contract Stake1Logic is StakeProxyStorage, AccessControl, IStake1Logic 
         );
     }
 
-    /// @dev Processes unstaking
+    /// @dev Processes unstaking the requested unstaking amount in tokamak's layer2
+    /// @param _stakeContract the stakeContract's address
+    /// @param _layer2 the layer2 address in Tokamak
     function tokamakProcessUnStaking(address _stakeContract, address _layer2)
-        external override
+        external
+        override
     {
         IStakeTONTokamak(_stakeContract).tokamakProcessUnStaking(_layer2);
     }
 
-    /// @dev Swap TON to FLD
+    /// @dev Swap TON to FLD using uniswap v3
+    /// @dev this function used in StakeTON ( stakeType=0 )
+    /// @param _stakeContract the stakeContract's address
+    /// @param amountIn the input amount
+    /// @param amountOutMinimum the minimun output amount
+    /// @param deadline deadline
+    /// @param sqrtPriceLimitX96 sqrtPriceLimitX96
+    /// @param _type the function type, if 0, use exactInputSingle function, else if, use exactInput function
     function exchangeWTONtoFLD(
         address _stakeContract,
         uint256 amountIn,
@@ -311,13 +391,15 @@ abstract contract Stake1Logic is StakeProxyStorage, AccessControl, IStake1Logic 
             );
     }
 
+    /// @dev Get addresses of vaults of index phase
+    /// @param _phase the pahse number
     function vaultsOfPahse(uint256 _phase)
-        external override
+        external
         view
+        override
         nonZero(address(stakeRegistry))
         returns (address[] memory)
     {
         return stakeRegistry.phasesAll(_phase);
     }
-
 }

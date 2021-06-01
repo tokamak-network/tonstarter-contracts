@@ -5,10 +5,10 @@ import "../interfaces/IStakeTONProxyFactory.sol";
 import {StakeTONProxy} from "../stake/StakeTONProxy.sol";
 
 /// @title A factory that creates a stakeTONProxy
-contract StakeTONProxyFactory is IStakeTONProxyFactory{
+contract StakeTONProxyFactory is IStakeTONProxyFactory {
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
 
-    /// Create a StakeTONProxy that can stake TON.
+    /// @dev Create a StakeTONProxy that can stake TON.
     /// @param _logic the logic contract address used in proxy
     /// @param _addr the array of [token, paytoken, vault, defiAddr]
     /// @param _registry the registry address
@@ -24,7 +24,10 @@ contract StakeTONProxyFactory is IStakeTONProxyFactory{
     ) external override returns (address) {
         StakeTONProxy proxy = new StakeTONProxy(_logic);
 
-        require(address(proxy) != address(0), "StakeTONProxyFactory: proxy zero");
+        require(
+            address(proxy) != address(0),
+            "StakeTONProxyFactory: proxy zero"
+        );
 
         proxy.setInit(_addr, _registry, _intdata);
 

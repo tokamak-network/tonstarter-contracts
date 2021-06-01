@@ -24,15 +24,25 @@
 
 - [`Upgraded(address implementation)`](#StakeTONProxy-Upgraded-address-)
 
-## Function `constructor(address _logic) `
+### StakeTONProxy-constructor-address-
+
+## Function `constructor(address _logic)`
 
 No description
 
-## Function `transferOwnership(address newOwner) `
+### StakeTONProxy-transferOwnership-address-
 
-No description
+## Function `transferOwnership(address newOwner)`
 
-## Function `setProxyPause(bool _pause) `
+transfer Ownership
+
+### Parameters:
+
+- `newOwner`: new owner address
+
+### StakeTONProxy-setProxyPause-bool-
+
+## Function `setProxyPause(bool _pause)`
 
 No description
 
@@ -40,7 +50,9 @@ No description
 
 - `_pause`: true:pause or false:resume
 
-## Function `upgradeTo(address impl) `
+### StakeTONProxy-upgradeTo-address-
+
+## Function `upgradeTo(address impl)`
 
 No description
 
@@ -48,30 +60,44 @@ No description
 
 - `impl`: New implementation contract address
 
-## Function `implementation() `
+### StakeTONProxy-implementation--
+
+## Function `implementation()`
 
 returns the implementation
 
-## Function `receive() `
+### StakeTONProxy-receive--
+
+## Function `receive()`
 
 No description
 
-## Function `fallback() `
+### StakeTONProxy-fallback--
+
+## Function `fallback()`
 
 No description
 
-## Function `onApprove(address owner, address spender, uint256 tonAmount, bytes data) `
+### StakeTONProxy-onApprove-address-address-uint256-bytes-
+
+## Function `onApprove(address owner, address spender, uint256 tonAmount, bytes data)`
 
 Approves
 
-## Function `stakeOnApprove(address from, address _owner, address _spender, uint256 _amount) `
+### StakeTONProxy-stakeOnApprove-address-address-address-uint256-
+
+## Function `stakeOnApprove(address from, address _owner, address _spender, uint256 _amount)`
 
 stake with ton
 
-## Function `setInit(address[4] _addr, address _registry, uint256[3] _intdata) `
+### StakeTONProxy-setInit-address-4--address-uint256-3--
+
+## Function `setInit(address[4] _addr, address _registry, uint256[3] _intdata)`
 
 No description
 
-## Event `Upgraded(address implementation)` {#StakeTONProxy-Upgraded-address-}
+### StakeTONProxy-Upgraded-address-
+
+## Event `Upgraded(address implementation)`
 
 No description

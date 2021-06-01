@@ -42,86 +42,128 @@
 
 - [`exchangeWTONtoFLD(uint256 amountIn, uint256 amountOutMinimum, uint256 deadline, uint160 sqrtPriceLimitX96, uint256 _type)`](#IStakeTON-exchangeWTONtoFLD-uint256-uint256-uint256-uint160-uint256-)
 
-## Function `token() `
+### IStakeTON-token--
+
+## Function `token()`
 
 No description
 
-## Function `paytoken() `
+### IStakeTON-paytoken--
+
+## Function `paytoken()`
 
 No description
 
-## Function `vault() `
+### IStakeTON-vault--
+
+## Function `vault()`
 
 No description
 
-## Function `saleStartBlock() `
+### IStakeTON-saleStartBlock--
+
+## Function `saleStartBlock()`
 
 No description
 
-## Function `startBlock() `
+### IStakeTON-startBlock--
+
+## Function `startBlock()`
 
 No description
 
-## Function `endBlock() `
+### IStakeTON-endBlock--
+
+## Function `endBlock()`
 
 No description
 
-## Function `rewardClaimedTotal() `
+### IStakeTON-rewardClaimedTotal--
+
+## Function `rewardClaimedTotal()`
 
 No description
 
-## Function `totalStakedAmount() `
+### IStakeTON-totalStakedAmount--
+
+## Function `totalStakedAmount()`
 
 No description
 
-## Function `totalStakers() `
+### IStakeTON-totalStakers--
+
+## Function `totalStakers()`
 
 No description
 
-## Function `userStaked(address account) `
+### IStakeTON-userStaked-address-
+
+## Function `userStaked(address account)`
 
 No description
 
-## Function `initialize(address _token, address _paytoken, address _vault, uint256 _saleStartBlock, uint256 _startBlock, uint256 _period) `
+### IStakeTON-initialize-address-address-address-uint256-uint256-uint256-
+
+## Function `initialize(address _token, address _paytoken, address _vault, uint256 _saleStartBlock, uint256 _startBlock, uint256 _period)`
 
 No description
 
-## Function `stake(uint256 amount) `
+### IStakeTON-stake-uint256-
+
+## Function `stake(uint256 amount)`
 
 No description
 
-## Function `claim() `
+### IStakeTON-claim--
+
+## Function `claim()`
 
 No description
 
-## Function `withdraw() `
+### IStakeTON-withdraw--
+
+## Function `withdraw()`
 
 No description
 
-## Function `canRewardAmount(address account, uint256 claimBlock) `
+### IStakeTON-canRewardAmount-address-uint256-
+
+## Function `canRewardAmount(address account, uint256 claimBlock)`
 
 No description
 
-## Function `onApprove(address owner, address spender, uint256 tonAmount, bytes data) `
+### IStakeTON-onApprove-address-address-uint256-bytes-
+
+## Function `onApprove(address owner, address spender, uint256 tonAmount, bytes data)`
 
 No description
 
-## Function `stakeOnApprove(address _owner, address _spender, uint256 _amount) `
+### IStakeTON-stakeOnApprove-address-address-uint256-
+
+## Function `stakeOnApprove(address _owner, address _spender, uint256 _amount)`
 
 No description
 
-## Function `tokamakStaking(address _layer2) `
+### IStakeTON-tokamakStaking-address-
+
+## Function `tokamakStaking(address _layer2)`
 
 No description
 
-## Function `tokamakRequestUnStaking(address _layer2, uint256 amount) `
+### IStakeTON-tokamakRequestUnStaking-address-uint256-
+
+## Function `tokamakRequestUnStaking(address _layer2, uint256 amount)`
 
 No description
 
-## Function `tokamakProcessUnStaking(address _layer2) `
+### IStakeTON-tokamakProcessUnStaking-address-
+
+## Function `tokamakProcessUnStaking(address _layer2)`
 
 No description
 
-## Function `exchangeWTONtoFLD(uint256 amountIn, uint256 amountOutMinimum, uint256 deadline, uint160 sqrtPriceLimitX96, uint256 _type) `
+### IStakeTON-exchangeWTONtoFLD-uint256-uint256-uint256-uint160-uint256-
+
+## Function `exchangeWTONtoFLD(uint256 amountIn, uint256 amountOutMinimum, uint256 deadline, uint160 sqrtPriceLimitX96, uint256 _type)`
 
 No description

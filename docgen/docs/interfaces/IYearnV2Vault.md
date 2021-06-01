@@ -12,26 +12,38 @@
 
 - [`claim()`](#IYearnV2Vault-claim--)
 
-## Function `calcTotalValue() `
+### IYearnV2Vault-calcTotalValue--
+
+## Function `calcTotalValue()`
 
 No description
 
-## Function `deposit(uint256 amount) `
+### IYearnV2Vault-deposit-uint256-
+
+## Function `deposit(uint256 amount)`
 
 No description
 
-## Function `withdraw(uint256 amount) `
+### IYearnV2Vault-withdraw-uint256-
+
+## Function `withdraw(uint256 amount)`
 
 No description
 
-## Function `underlyingYield() `
+### IYearnV2Vault-underlyingYield--
+
+## Function `underlyingYield()`
 
 No description
 
-## Function `unclaimedProfit(address user) `
+### IYearnV2Vault-unclaimedProfit-address-
+
+## Function `unclaimedProfit(address user)`
 
 No description
 
-## Function `claim() `
+### IYearnV2Vault-claim--
+
+## Function `claim()`
 
 No description

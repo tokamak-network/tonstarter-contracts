@@ -22,42 +22,66 @@
 
 - [`Withdrawal(address to, uint256 amount)`](#StakeSimple-Withdrawal-address-uint256-)
 
-## Function `receive() `
+### StakeSimple-receive--
+
+## Function `receive()`
 
 No description
 
-## Function `transferOwnership(address newOwner) `
+### StakeSimple-transferOwnership-address-
 
-No description
+## Function `transferOwnership(address newOwner)`
 
-## Function `initialize(address _token, address _paytoken, address _vault, uint256 _saleStartBlock, uint256 _startBlock, uint256 _period) `
+transfer Ownership
+
+### Parameters:
+
+- `newOwner`: new owner address
+
+### StakeSimple-initialize-address-address-address-uint256-uint256-uint256-
+
+## Function `initialize(address _token, address _paytoken, address _vault, uint256 _saleStartBlock, uint256 _startBlock, uint256 _period)`
 
 Initialize
 
-## Function `stake(uint256 amount) `
+### StakeSimple-stake-uint256-
+
+## Function `stake(uint256 amount)`
 
 Stake amount
 
-## Function `withdraw() `
+### StakeSimple-withdraw--
+
+## Function `withdraw()`
 
 To withdraw
 
-## Function `claim() `
+### StakeSimple-claim--
+
+## Function `claim()`
 
 Claim for reward
 
-## Function `canRewardAmount(address account, uint256 specilaBlock) `
+### StakeSimple-canRewardAmount-address-uint256-
+
+## Function `canRewardAmount(address account, uint256 specilaBlock)`
 
 Returns the amount that can be rewarded
 
-## Event `Staked(address to, uint256 amount)` {#StakeSimple-Staked-address-uint256-}
+### StakeSimple-Staked-address-uint256-
+
+## Event `Staked(address to, uint256 amount)`
 
 No description
 
-## Event `Claimed(address to, uint256 amount, uint256 currentBlcok)` {#StakeSimple-Claimed-address-uint256-uint256-}
+### StakeSimple-Claimed-address-uint256-uint256-
+
+## Event `Claimed(address to, uint256 amount, uint256 currentBlcok)`
 
 No description
 
-## Event `Withdrawal(address to, uint256 amount)` {#StakeSimple-Withdrawal-address-uint256-}
+### StakeSimple-Withdrawal-address-uint256-
+
+## Event `Withdrawal(address to, uint256 amount)`
 
 No description

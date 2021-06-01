@@ -72,8 +72,7 @@ interface IUniswapV2Router01 {
         bytes32 s
     ) external returns (uint256 amountA, uint256 amountB);
 
-    function removeLiquidityETHWith
-    (
+    function removeLiquidityETHWith(
         address token,
         uint256 liquidity,
         uint256 amountTokenMin,

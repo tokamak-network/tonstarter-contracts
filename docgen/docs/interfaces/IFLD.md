@@ -28,58 +28,86 @@
 
 - [`permit(address owner, address spender, uint256 value, uint256 deadline, bytes signature)`](#IFLD-permit-address-address-uint256-uint256-bytes-)
 
-## Function `name() `
+### IFLD-name--
+
+## Function `name()`
 
 No description
 
-## Function `symbol() `
+### IFLD-symbol--
+
+## Function `symbol()`
 
 No description
 
-## Function `decimals() `
+### IFLD-decimals--
+
+## Function `decimals()`
 
 No description
 
-## Function `totalSupply() `
+### IFLD-totalSupply--
+
+## Function `totalSupply()`
 
 No description
 
-## Function `balanceOf(address owner) `
+### IFLD-balanceOf-address-
+
+## Function `balanceOf(address owner)`
 
 No description
 
-## Function `allowance(address owner, address spender) `
+### IFLD-allowance-address-address-
+
+## Function `allowance(address owner, address spender)`
 
 No description
 
-## Function `mint(address to, uint256 amount) `
+### IFLD-mint-address-uint256-
+
+## Function `mint(address to, uint256 amount)`
 
 No description
 
-## Function `burn(address from, uint256 amount) `
+### IFLD-burn-address-uint256-
+
+## Function `burn(address from, uint256 amount)`
 
 No description
 
-## Function `approve(address spender, uint256 value) `
+### IFLD-approve-address-uint256-
+
+## Function `approve(address spender, uint256 value)`
 
 No description
 
-## Function `transfer(address to, uint256 value) `
+### IFLD-transfer-address-uint256-
+
+## Function `transfer(address to, uint256 value)`
 
 No description
 
-## Function `transferFrom(address from, address to, uint256 value) `
+### IFLD-transferFrom-address-address-uint256-
+
+## Function `transferFrom(address from, address to, uint256 value)`
 
 No description
 
-## Function `DOMAIN_SEPARATOR() `
+### IFLD-DOMAIN_SEPARATOR--
+
+## Function `DOMAIN_SEPARATOR()`
 
 No description
 
-## Function `nonces(address owner) `
+### IFLD-nonces-address-
+
+## Function `nonces(address owner)`
 
 No description
 
-## Function `permit(address owner, address spender, uint256 value, uint256 deadline, bytes signature) `
+### IFLD-permit-address-address-uint256-uint256-bytes-
+
+## Function `permit(address owner, address spender, uint256 value, uint256 deadline, bytes signature)`
 
 No description

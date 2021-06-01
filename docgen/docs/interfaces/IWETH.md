@@ -28,58 +28,86 @@
 
 - [`permit(address owner, address spender, uint256 value, uint256 deadline, bytes signature)`](#IWETH-permit-address-address-uint256-uint256-bytes-)
 
-## Function `name() `
+### IWETH-name--
+
+## Function `name()`
 
 No description
 
-## Function `symbol() `
+### IWETH-symbol--
+
+## Function `symbol()`
 
 No description
 
-## Function `decimals() `
+### IWETH-decimals--
+
+## Function `decimals()`
 
 No description
 
-## Function `totalSupply() `
+### IWETH-totalSupply--
+
+## Function `totalSupply()`
 
 No description
 
-## Function `balanceOf(address owner) `
+### IWETH-balanceOf-address-
+
+## Function `balanceOf(address owner)`
 
 No description
 
-## Function `allowance(address owner, address spender) `
+### IWETH-allowance-address-address-
+
+## Function `allowance(address owner, address spender)`
 
 No description
 
-## Function `mint(address to, uint256 amount) `
+### IWETH-mint-address-uint256-
+
+## Function `mint(address to, uint256 amount)`
 
 No description
 
-## Function `burn(address from, uint256 amount) `
+### IWETH-burn-address-uint256-
+
+## Function `burn(address from, uint256 amount)`
 
 No description
 
-## Function `approve(address spender, uint256 value) `
+### IWETH-approve-address-uint256-
+
+## Function `approve(address spender, uint256 value)`
 
 No description
 
-## Function `transfer(address to, uint256 value) `
+### IWETH-transfer-address-uint256-
+
+## Function `transfer(address to, uint256 value)`
 
 No description
 
-## Function `transferFrom(address from, address to, uint256 value) `
+### IWETH-transferFrom-address-address-uint256-
+
+## Function `transferFrom(address from, address to, uint256 value)`
 
 No description
 
-## Function `DOMAIN_SEPARATOR() `
+### IWETH-DOMAIN_SEPARATOR--
+
+## Function `DOMAIN_SEPARATOR()`
 
 No description
 
-## Function `nonces(address owner) `
+### IWETH-nonces-address-
+
+## Function `nonces(address owner)`
 
 No description
 
-## Function `permit(address owner, address spender, uint256 value, uint256 deadline, bytes signature) `
+### IWETH-permit-address-address-uint256-uint256-bytes-
+
+## Function `permit(address owner, address spender, uint256 value, uint256 deadline, bytes signature)`
 
 No description

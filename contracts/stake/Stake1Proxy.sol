@@ -20,28 +20,28 @@ contract Stake1Proxy is StakeProxyStorage, AccessControl, IStakeProxy {
         _;
     }
 
-    /// constructor
+    /// @dev constructor of Stake1Proxy
     constructor() {
         _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
         _setupRole(ADMIN_ROLE, msg.sender);
         _setupRole(ADMIN_ROLE, address(this));
     }
 
-    /// transfer Ownership
+    /// @dev transfer Ownership
     /// @param newOwner the new owner address
     function transferOwnership(address newOwner) external onlyOwner {
         require(msg.sender != newOwner, "Stake1Proxy:same owner");
         grantRole(ADMIN_ROLE, newOwner);
-        revokeRole(ADMIN_ROLE, msg.sender );
+        revokeRole(ADMIN_ROLE, msg.sender);
     }
 
-    /// Set pause state
+    /// @dev Set pause state
     /// @param _pause true:pause or false:resume
     function setProxyPause(bool _pause) external override onlyOwner {
         pauseProxy = _pause;
     }
 
-    /// Set implementation contract
+    /// @dev Set implementation contract
     /// @param impl New implementation contract address
     function upgradeTo(address impl) external override onlyOwner {
         require(impl != address(0), "input is zero");
@@ -50,22 +50,23 @@ contract Stake1Proxy is StakeProxyStorage, AccessControl, IStakeProxy {
         emit Upgraded(impl);
     }
 
+    /// @dev view implementation address
     /// @return the logic address
-    function implementation() public override view returns (address) {
+    function implementation() public view override returns (address) {
         return _implementation;
     }
 
-    /// receive ether
+    /// @dev receive ether
     receive() external payable {
         _fallback();
     }
 
-    /// fallback function , execute on undefined function call
+    /// @dev fallback function , execute on undefined function call
     fallback() external payable {
         _fallback();
     }
 
-    /// fallback function , execute on undefined function call
+    /// @dev fallback function , execute on undefined function call
     function _fallback() internal {
         address _impl = implementation();
         require(_impl != address(0) && !pauseProxy, "impl OR proxy is false");

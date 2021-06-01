@@ -5,17 +5,22 @@ import "../interfaces/IStakeSimpleFactory.sol";
 import {StakeSimpleProxy} from "../stake/StakeSimpleProxy.sol";
 
 /// @title A factory that creates a stake contract
-contract StakeSimpleFactory is IStakeSimpleFactory{
+contract StakeSimpleFactory is IStakeSimpleFactory {
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
 
     address public stakeSimpleLogic;
 
+    /// @dev constructor of StakeSimpleFactory
+    /// @param _stakeSimpleLogic the logic address used in StakeSimpleFactory
     constructor(address _stakeSimpleLogic) {
-        require(_stakeSimpleLogic != address(0), "StakeSimpleFactory: logic zero");
+        require(
+            _stakeSimpleLogic != address(0),
+            "StakeSimpleFactory: logic zero"
+        );
         stakeSimpleLogic = _stakeSimpleLogic;
     }
 
-    /// Create a stake contract that can operate the staked amount as a DeFi project.
+    /// @dev Create a stake contract that can operate the staked amount as a DeFi project.
     /// @param _addr array of [token, paytoken, vault]
     /// @param _intdata array of [saleStartBlock, startBlock, endBlock]
     /// @param owner  owner address

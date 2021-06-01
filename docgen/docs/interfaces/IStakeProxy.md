@@ -6,14 +6,32 @@
 
 - [`implementation()`](#IStakeProxy-implementation--)
 
-## Function `setProxyPause(bool _pause) `
+### IStakeProxy-setProxyPause-bool-
 
-No description
+## Function `setProxyPause(bool _pause)`
 
-## Function `upgradeTo(address impl) `
+Set pause state
 
-No description
+### Parameters:
 
-## Function `implementation() `
+- `_pause`: true:pause or false:resume
 
-No description
+### IStakeProxy-upgradeTo-address-
+
+## Function `upgradeTo(address impl)`
+
+Set implementation contract
+
+### Parameters:
+
+- `impl`: New implementation contract address
+
+### IStakeProxy-implementation--
+
+## Function `implementation()`
+
+view implementation address
+
+### Return Values:
+
+- the logic address
