@@ -391,6 +391,25 @@ abstract contract Stake1Logic is
             );
     }
 
+    /// @dev Swap TON to FLD
+    function exchangeWTONtoFLDv2(
+        address _stakeContract,
+        uint256 amountIn,
+        uint256 amountOutMinimum,
+        uint256 deadline,
+        uint160 sqrtPriceLimitX96,
+        uint256 _type
+    ) external returns (uint256 amountOut) {
+        return
+            IStakeTONTokamak(_stakeContract).exchangeWTONtoFLDv2(
+                amountIn,
+                amountOutMinimum,
+                deadline,
+                sqrtPriceLimitX96,
+                _type
+            );
+    }
+
     /// @dev Get addresses of vaults of index phase
     /// @param _phase the pahse number
     function vaultsOfPahse(uint256 _phase)
