@@ -1,7 +1,13 @@
-const { getMinTick, getMaxTick, FeeAmount, TICK_SPACINGS, findAccount } = require("./utils");
+const {
+  getMinTick,
+  getMaxTick,
+  FeeAmount,
+  TICK_SPACINGS,
+  findAccount,
+} = require("./utils");
 const {
   abi: NPM_ABI,
-} = require('@uniswap/v3-periphery/artifacts/contracts/NonfungiblePositionManager.sol/NonfungiblePositionManager.json');
+} = require("@uniswap/v3-periphery/artifacts/contracts/NonfungiblePositionManager.sol/NonfungiblePositionManager.json");
 
 task("mint-position", "Mint position")
   .addParam("minterAddress", "Minter address")
@@ -14,22 +20,11 @@ task("mint-position", "Mint position")
   .addParam("amount1Min", " ")
   .addParam("deadline", " ")
   .addParam("recipient", " ")
-  .setAction(async ({
-    minterAddress,
-    npmAddress,
-    
-    token0,
-    token1,
-    amount0Desired,
-    amount1Desired,
-    amount0Min,
-    amount1Min,
-    deadline,
-    recipient,
-  }) => {
-    const minter = await findAccount(minterAddress);
-    const npm = new ethers.Contract(npmAddress, NPM_ABI);
-    const mintParams = {
+  .setAction(
+    async ({
+      minterAddress,
+      npmAddress,
+
       token0,
       token1,
       amount0Desired,
@@ -38,24 +33,36 @@ task("mint-position", "Mint position")
       amount1Min,
       deadline,
       recipient,
+    }) => {
+      const minter = await findAccount(minterAddress);
+      const npm = new ethers.Contract(npmAddress, NPM_ABI);
+      const mintParams = {
+        token0,
+        token1,
+        amount0Desired,
+        amount1Desired,
+        amount0Min,
+        amount1Min,
+        deadline,
+        recipient,
 
-      fee: FeeAmount.MEDIUM,
-      tickLower: getMinTick(TICK_SPACINGS[FeeAmount.MEDIUM]),
-      tickUpper: getMaxTick(TICK_SPACINGS[FeeAmount.MEDIUM]),
-    };
+        fee: FeeAmount.MEDIUM,
+        tickLower: getMinTick(TICK_SPACINGS[FeeAmount.MEDIUM]),
+        tickUpper: getMaxTick(TICK_SPACINGS[FeeAmount.MEDIUM]),
+      };
 
-    console.log({ mintParams });
+      console.log({ mintParams });
 
-    const tx = await npm.connect(minter).mint(mintParams, {
-      gasLimit: 10000000, gasPrice: 5000000000
-    });
-    await tx.wait();
-  });
+      const tx = await npm.connect(minter).mint(mintParams, {
+        gasLimit: 10000000,
+        gasPrice: 5000000000,
+      });
+      await tx.wait();
+    }
+  );
 
-
-
-task("rinkeby-mint-position-wton-weth", "Mint position on rinkeby")
-  .setAction(async ({ amount0Desired, amount1Desired }) => {
+task("rinkeby-mint-position-wton-weth", "Mint position on rinkeby").setAction(
+  async ({ amount0Desired, amount1Desired }) => {
     const {
       RINKEBY_NONFUNGIBLE_POSITION_MANAGER_ADDRESS: npmAddress,
       RINKEBY_UNISWAP_V3_ACCOUNT: minterAddress,
@@ -79,11 +86,10 @@ task("rinkeby-mint-position-wton-weth", "Mint position on rinkeby")
       amount1Min: 0,
 
       deadline,
-      recipient
+      recipient,
     });
-  });
-
-
+  }
+);
 
 task("rinkeby-mint-position-fld-weth", "Mint FLD-WETH position on rinkeby")
   .addParam("amount0", "amount0 desired")
@@ -112,6 +118,6 @@ task("rinkeby-mint-position-fld-weth", "Mint FLD-WETH position on rinkeby")
       amount1Min: "0",
 
       deadline,
-      recipient
+      recipient,
     });
   });
