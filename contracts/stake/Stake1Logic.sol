@@ -208,6 +208,25 @@ contract Stake1Logic is StakeProxyStorage, AccessControl {
             );
     }
 
+    /// @dev Swap TON to FLD
+    function exchangeWTONtoFLDv2(
+        address _stakeContract,
+        uint256 amountIn,
+        uint256 amountOutMinimum,
+        uint256 deadline,
+        uint160 sqrtPriceLimitX96,
+        uint256 _type
+    ) external returns (uint256 amountOut) {
+        return
+            IStakeTONTokamak(_stakeContract).exchangeWTONtoFLDv2(
+                amountIn,
+                amountOutMinimum,
+                deadline,
+                sqrtPriceLimitX96,
+                _type
+            );
+    }
+
     /// @dev Sets FLD address
     function setFLD(address _fld) public onlyOwner nonZero(_fld) {
         fld = _fld;

@@ -17,6 +17,7 @@ library LibTokenStake1 {
         address ext1;
         address ext2;
         uint256 fee;
+        address routerV2;
     }
     struct StakeInfo {
         string name;
