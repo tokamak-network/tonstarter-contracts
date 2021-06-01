@@ -173,7 +173,7 @@ contract StakeTONProxy is StakeTONStorage, AccessControl, OnApprove {
         totalStakedAmount = totalStakedAmount.add(_amount);
         require(
             IIERC20(from).transferFrom(_owner, _spender, _amount),
-            "transfer fail"
+            "StakeTONProxy: transfer fail"
         );
         return true;
     }
@@ -191,7 +191,7 @@ contract StakeTONProxy is StakeTONStorage, AccessControl, OnApprove {
             _registry != address(0) &&
                 _addr[2] != address(0) &&
                 _intdata[0] < _intdata[1],
-            "setInit fail"
+            "StakeTONProxy: setInit fail"
         );
         token = _addr[0];
         paytoken = _addr[1];

@@ -14,11 +14,7 @@ import "./StakeProxyStorage.sol";
 /// @title The logic of FLD Plaform
 /// @notice Admin can createVault, createStakeContract.
 /// User can excute the tokamak staking function of each contract through this logic.
-abstract contract Stake1Logic is
-    StakeProxyStorage,
-    AccessControl,
-    IStake1Logic
-{
+contract Stake1Logic is StakeProxyStorage, AccessControl, IStake1Logic {
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
     bytes32 public constant ZERO_HASH =
         0x0000000000000000000000000000000000000000000000000000000000000000;
@@ -41,6 +37,11 @@ abstract contract Stake1Logic is
     );
     event ClosedSale(address indexed vault);
     event SetStakeRegistry(address stakeRegistry);
+
+    constructor() {
+        _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
+        _setupRole(ADMIN_ROLE, msg.sender);
+    }
 
     /// @dev upgrade to the logic of _stakeProxy
     /// @param _stakeProxy the StakeProxy address

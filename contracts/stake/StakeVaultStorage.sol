@@ -59,7 +59,7 @@ contract StakeVaultStorage is AccessControl, IStakeVaultStorage {
     modifier onlyOwner() {
         require(
             hasRole(ADMIN_ROLE, msg.sender),
-            "Stake1Vault: Caller is not an admin"
+            "StakeVaultStorage: Caller is not an admin"
         );
         _;
     }
@@ -74,7 +74,7 @@ contract StakeVaultStorage is AccessControl, IStakeVaultStorage {
     /// @dev transfer Ownership
     /// @param newOwner new owner address
     function transferOwnership(address newOwner) external onlyOwner {
-        require(msg.sender != newOwner, "StakeVaultStorage:same owner");
+        require(msg.sender != newOwner, "StakeVaultStorage: same owner");
         grantRole(ADMIN_ROLE, newOwner);
         revokeRole(ADMIN_ROLE, msg.sender);
     }

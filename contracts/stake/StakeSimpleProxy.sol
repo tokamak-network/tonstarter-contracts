@@ -15,7 +15,10 @@ contract StakeSimpleProxy is Stake1Storage, AccessControl {
     event Upgraded(address indexed implementation);
 
     modifier onlyOwner() {
-        require(hasRole(ADMIN_ROLE, msg.sender), "not an admin");
+        require(
+            hasRole(ADMIN_ROLE, msg.sender),
+            "StakeSimpleProxy:not an admin"
+        );
         _;
     }
 

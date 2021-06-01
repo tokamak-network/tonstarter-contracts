@@ -55,7 +55,7 @@ contract StakeRegistry is AccessControl, IStakeRegistry {
     }
 
     modifier nonZero(address _addr) {
-        require(_addr != address(0), "zero address");
+        require(_addr != address(0), "StakeRegistry: zero address");
         _;
     }
 
@@ -139,7 +139,7 @@ contract StakeRegistry is AccessControl, IStakeRegistry {
         address _routerV2
     ) external override onlyOwner nonZero(_router) {
         bytes32 nameHash = keccak256(abi.encodePacked(_name));
-        require(nameHash != ZERO_HASH, "nameHash zero");
+        require(nameHash != ZERO_HASH, "StakeRegistry: nameHash zero");
 
         LibTokenStake1.DefiInfo storage _defiInfo = defiInfo[nameHash];
         _defiInfo.name = _name;
