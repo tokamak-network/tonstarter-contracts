@@ -72,6 +72,10 @@ async function deployMain(defaultSender) {
     process.env.NETWORK,
     "WethAddress"
   );
+  const uniswapRouter2 = loadDeployedInitVariable(
+    process.env.NETWORK,
+    "UniswapRouter2"
+  );
 
   const stakeEntry = await ethers.getContractAt("Stake1Logic", proxy);
   console.log("stakeEntry:", stakeEntry.address);
@@ -107,7 +111,8 @@ async function deployMain(defaultSender) {
     uniswapRouter,
     uniswapNPM,
     uniswapWeth,
-    uniswapFee
+    uniswapFee,
+    uniswapRouter2
   );
   console.log("stakeRegistry addDefiInfo:");
 
