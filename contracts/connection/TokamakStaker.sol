@@ -331,7 +331,7 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker{
     /// @param _amountIn the input amount
     /// @param _amountOutMinimum the minimun output amount
     /// @param _deadline deadline
-    /// @param sqrtPriceLimitX96 sqrtPriceLimitX96
+    /// @param _sqrtPriceLimitX96 sqrtPriceLimitX96
     /// @param _kind the function type, if 0, use exactInputSingle function, else if, use exactInput function
     function exchangeWTONtoFLD(
         uint256 _amountIn,
@@ -413,7 +413,7 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker{
         uint256 _deadline,
         uint160 _sqrtPriceLimitX96,
         uint256 _kind
-    ) external returns (uint256 amountOut) {
+    ) override external returns (uint256 amountOut) {
         require(block.number <= endBlock, "period end");
         require(IIStake1Vault(vault).saleClosed() == true, "not closed");
         require(_kind < 2, "no kind");

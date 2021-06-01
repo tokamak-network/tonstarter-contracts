@@ -26,7 +26,8 @@ interface IStakeRegistry {
         address _router,
         address _ex1,
         address _ex2,
-        uint256 _fee
+        uint256 _fee,
+        address _routerV2
     ) external ;
 
     /// @dev Add Vault
@@ -66,7 +67,8 @@ interface IStakeRegistry {
             address,
             address,
             address,
-            uint256
+            uint256,
+            address
         );
 
     /// @dev Checks if a vault is withing the given phase
