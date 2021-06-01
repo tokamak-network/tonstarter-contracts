@@ -14,7 +14,7 @@ import "./StakeProxyStorage.sol";
 /// @title The logic of FLD Plaform
 /// @notice Admin can createVault, createStakeContract.
 /// User can excute the tokamak staking function of each contract through this logic.
-abstract contract Stake1Logic is
+contract Stake1Logic is
     StakeProxyStorage,
     AccessControl,
     IStake1Logic

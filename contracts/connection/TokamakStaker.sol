@@ -341,6 +341,13 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker{
         uint256 _kind
     ) external override returns (uint256 amountOut) {
         require(block.number <= endBlock, "period end");
+        (
+            address ton,
+            address wton,
+            ,
+            address seigManager
+        ) = ITokamakRegistry(stakeRegistry).getTokamak();
+
         require(IIStake1Vault(vault).saleClosed() == true, "not closed");
         require(_kind < 2, "no kind");
         require(
