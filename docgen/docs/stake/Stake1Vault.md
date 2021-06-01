@@ -1,38 +1,38 @@
 # Functions:
 
-- [`receive()`](###Stake1Vault-receive--)
+- [`receive()`](#Stake1Vault-receive--)
 
-- [`initialize(address _fld, address _paytoken, uint256 _cap, uint256 _saleStartBlock, uint256 _stakeStartBlock, address _stakefactory, uint256 _stakeType, address _defiAddr)`](###Stake1Vault-initialize-address-address-uint256-uint256-uint256-address-uint256-address-)
+- [`initialize(address _fld, address _paytoken, uint256 _cap, uint256 _saleStartBlock, uint256 _stakeStartBlock, address _stakefactory, uint256 _stakeType, address _defiAddr)`](#Stake1Vault-initialize-address-address-uint256-uint256-uint256-address-uint256-address-)
 
-- [`setFLD(address _fld)`](###Stake1Vault-setFLD-address-)
+- [`setFLD(address _fld)`](#Stake1Vault-setFLD-address-)
 
-- [`changeCap(uint256 _cap)`](###Stake1Vault-changeCap-uint256-)
+- [`changeCap(uint256 _cap)`](#Stake1Vault-changeCap-uint256-)
 
-- [`setDefiAddr(address _defiAddr)`](###Stake1Vault-setDefiAddr-address-)
+- [`setDefiAddr(address _defiAddr)`](#Stake1Vault-setDefiAddr-address-)
 
-- [`addSubVaultOfStake(string _name, address stakeContract, uint256 periodBlocks)`](###Stake1Vault-addSubVaultOfStake-string-address-uint256-)
+- [`addSubVaultOfStake(string _name, address stakeContract, uint256 periodBlocks)`](#Stake1Vault-addSubVaultOfStake-string-address-uint256-)
 
-- [`closeSale()`](###Stake1Vault-closeSale--)
+- [`closeSale()`](#Stake1Vault-closeSale--)
 
-- [`claim(address _to, uint256 _amount)`](###Stake1Vault-claim-address-uint256-)
+- [`claim(address _to, uint256 _amount)`](#Stake1Vault-claim-address-uint256-)
 
-- [`canClaim(address _to, uint256 _amount)`](###Stake1Vault-canClaim-address-uint256-)
+- [`canClaim(address _to, uint256 _amount)`](#Stake1Vault-canClaim-address-uint256-)
 
-- [`balanceFLDAvailableAmount()`](###Stake1Vault-balanceFLDAvailableAmount--)
+- [`balanceFLDAvailableAmount()`](#Stake1Vault-balanceFLDAvailableAmount--)
 
-- [`stakeAddressesAll()`](###Stake1Vault-stakeAddressesAll--)
+- [`stakeAddressesAll()`](#Stake1Vault-stakeAddressesAll--)
 
-- [`orderedEndBlocksAll()`](###Stake1Vault-orderedEndBlocksAll--)
+- [`orderedEndBlocksAll()`](#Stake1Vault-orderedEndBlocksAll--)
 
-- [`totalRewardAmount(address _account)`](###Stake1Vault-totalRewardAmount-address-)
+- [`totalRewardAmount(address _account)`](#Stake1Vault-totalRewardAmount-address-)
 
-- [`infos()`](###Stake1Vault-infos--)
+- [`infos()`](#Stake1Vault-infos--)
 
 # Events:
 
-- [`ClosedSale(uint256 amount)`](###Stake1Vault-ClosedSale-uint256-)
+- [`ClosedSale(uint256 amount)`](#Stake1Vault-ClosedSale-uint256-)
 
-- [`ClaimedReward(address from, address to, uint256 amount)`](###Stake1Vault-ClaimedReward-address-address-uint256-)
+- [`ClaimedReward(address from, address to, uint256 amount)`](#Stake1Vault-ClaimedReward-address-address-uint256-)
 
 ## Function `receive()`
 
