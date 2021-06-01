@@ -1,107 +1,143 @@
-const { BigNumber } = require('ethers');
-const { ethers, upgrades } = require('hardhat');
+const { BigNumber } = require("ethers");
+const { ethers, upgrades } = require("hardhat");
 const utils = ethers.utils;
-const save = require('./save_deployed_file');
+const save = require("./save_deployed_file");
 
-const { padLeft, toBN, toWei, fromWei, keccak256, soliditySha3, solidityKeccak256 } = require('web3-utils');
+const {
+  padLeft,
+  toBN,
+  toWei,
+  fromWei,
+  keccak256,
+  soliditySha3,
+  solidityKeccak256,
+} = require("web3-utils");
 
-require('dotenv').config();
+require("dotenv").config();
 
-const initialTotal = process.env.initialTotal + '.' + '0'.repeat(18);
+const initialTotal = process.env.initialTotal + "." + "0".repeat(18);
 
-const Pharse1_TOTAL = process.env.Pharse1_TOTAL + '.' + '0'.repeat(18);
-const Pharse1_TON_Staking = process.env.Pharse1_TON_Staking + '.' + '0'.repeat(18);
-const Pharse1_ETH_Staking = process.env.Pharse1_ETH_Staking + '.' + '0'.repeat(18);
-const Pharse1_FLDETHLP_Staking = process.env.Pharse1_FLDETHLP_Staking + '.' + '0'.repeat(18);
-const Pharse1_DEV_Mining = process.env.Pharse1_DEV_Mining + '.' + '0'.repeat(18);
+const Pharse1_TOTAL = process.env.Pharse1_TOTAL + "." + "0".repeat(18);
+const Pharse1_TON_Staking =
+  process.env.Pharse1_TON_Staking + "." + "0".repeat(18);
+const Pharse1_ETH_Staking =
+  process.env.Pharse1_ETH_Staking + "." + "0".repeat(18);
+const Pharse1_FLDETHLP_Staking =
+  process.env.Pharse1_FLDETHLP_Staking + "." + "0".repeat(18);
+const Pharse1_DEV_Mining =
+  process.env.Pharse1_DEV_Mining + "." + "0".repeat(18);
 
-const Pharse2_TOTAL = process.env.Pharse2_TOTAL + '.' + '0'.repeat(18);
-const Pharse2_FLDETH_Staking = process.env.Pharse2_FLDETH_Staking + '.' + '0'.repeat(18);
-const Pharse2_FLD_Staking = process.env.Pharse2_FLD_Staking + '.' + '0'.repeat(18);
-const Pharse2_DEV_Mining = process.env.Pharse2_DEV_Mining + '.' + '0'.repeat(18);
+const Pharse2_TOTAL = process.env.Pharse2_TOTAL + "." + "0".repeat(18);
+const Pharse2_FLDETH_Staking =
+  process.env.Pharse2_FLDETH_Staking + "." + "0".repeat(18);
+const Pharse2_FLD_Staking =
+  process.env.Pharse2_FLD_Staking + "." + "0".repeat(18);
+const Pharse2_DEV_Mining =
+  process.env.Pharse2_DEV_Mining + "." + "0".repeat(18);
 
-const Pharse3_TOTAL = process.env.Pharse3_TOTAL + '.' + '0'.repeat(18);
-const Pharse3_FLDETH_Staking = process.env.Pharse3_FLDETH_Staking + '.' + '0'.repeat(18);
-const Pharse3_FLD_Staking = process.env.Pharse3_FLD_Staking + '.' + '0'.repeat(18);
-const Pharse3_DEV_Mining = process.env.Pharse3_DEV_Mining + '.' + '0'.repeat(18);
+const Pharse3_TOTAL = process.env.Pharse3_TOTAL + "." + "0".repeat(18);
+const Pharse3_FLDETH_Staking =
+  process.env.Pharse3_FLDETH_Staking + "." + "0".repeat(18);
+const Pharse3_FLD_Staking =
+  process.env.Pharse3_FLD_Staking + "." + "0".repeat(18);
+const Pharse3_DEV_Mining =
+  process.env.Pharse3_DEV_Mining + "." + "0".repeat(18);
 
-const zeroAddress = '0x0000000000000000000000000000000000000000';
-const sendAmountForTest = '10000';
+const zeroAddress = "0x0000000000000000000000000000000000000000";
+const sendAmountForTest = "10000";
 
-const ADMIN_ROLE = keccak256('ADMIN');
-const MINTER_ROLE = keccak256('MINTER');
-const BURNER_ROLE = keccak256('BURNER');
-const CLAIMER_ROLE = keccak256('CLAIMER');
-const PHASE2_VAULT_HASH = keccak256('PHASE2_VAULT');
-const EVENT_VAULT_HASH = keccak256('EVENT_VAULT');
+const ADMIN_ROLE = keccak256("ADMIN");
+const MINTER_ROLE = keccak256("MINTER");
+const BURNER_ROLE = keccak256("BURNER");
+const CLAIMER_ROLE = keccak256("CLAIMER");
+const PHASE2_VAULT_HASH = keccak256("PHASE2_VAULT");
+const EVENT_VAULT_HASH = keccak256("EVENT_VAULT");
 
-async function deployMain (defaultSender) {
+async function deployMain(defaultSender) {
   const [deployer, user1] = await ethers.getSigners();
 
-  //const FLD = await ethers.getContractFactory('FLD');
-  //const fld = await FLD.deploy();
+  // const FLD = await ethers.getContractFactory('FLD');
+  // const fld = await FLD.deploy();
 
-  const FLD_Address = '0xd1e1C3995695650ABc3Ea3c68ae5d365b35174ED';
+  const FLD_Address = "0xd1e1C3995695650ABc3Ea3c68ae5d365b35174ED";
   const fld = await ethers.getContractAt("FLD", FLD_Address);
-  console.log('fld:', fld.address);
+  console.log("fld:", fld.address);
 
-  const StakeSimple = await ethers.getContractFactory('StakeSimple');
-  const StakeSimpleFactory = await ethers.getContractFactory('StakeSimpleFactory');
+  const StakeSimple = await ethers.getContractFactory("StakeSimple");
+  const StakeSimpleFactory = await ethers.getContractFactory(
+    "StakeSimpleFactory"
+  );
 
-  //const StakeTONLogicFactory = await ethers.getContractFactory('StakeTONLogicFactory');
-  const StakeTONLogic = await ethers.getContractFactory('StakeTON');
-  const StakeTONProxyFactory = await ethers.getContractFactory('StakeTONProxyFactory');
+  // const StakeTONLogicFactory = await ethers.getContractFactory('StakeTONLogicFactory');
+  const StakeTONLogic = await ethers.getContractFactory("StakeTON");
+  const StakeTONProxyFactory = await ethers.getContractFactory(
+    "StakeTONProxyFactory"
+  );
 
-  const Stake1Vault = await ethers.getContractFactory('Stake1Vault');
-  const StakeVaultFactory = await ethers.getContractFactory('StakeVaultFactory');
-  const StakeRegistry = await ethers.getContractFactory('StakeRegistry');
-  const Stake1Logic = await ethers.getContractFactory('Stake1Logic');
-  const Stake1Proxy = await ethers.getContractFactory('Stake1Proxy');
-  const StakeFactory = await ethers.getContractFactory('StakeFactory');
+  const Stake1Vault = await ethers.getContractFactory("Stake1Vault");
+  const StakeVaultFactory = await ethers.getContractFactory(
+    "StakeVaultFactory"
+  );
+  const StakeRegistry = await ethers.getContractFactory("StakeRegistry");
+  const Stake1Logic = await ethers.getContractFactory("Stake1Logic");
+  const Stake1Proxy = await ethers.getContractFactory("Stake1Proxy");
+  const StakeFactory = await ethers.getContractFactory("StakeFactory");
   const StakeTONFactory = await ethers.getContractFactory("StakeTONFactory");
   const StakeDefiFactory = await ethers.getContractFactory("StakeDefiFactory");
 
   const stakeSimple = await StakeSimple.deploy();
-  const stakeSimpleFactory = await StakeSimpleFactory.deploy(stakeSimple.address);
-  console.log('StakeSimpleFactory:', stakeSimpleFactory.address);
+  const stakeSimpleFactory = await StakeSimpleFactory.deploy(
+    stakeSimple.address
+  );
+  console.log("StakeSimpleFactory:", stakeSimpleFactory.address);
 
   // const stakeTONLogicFactory = await StakeTONLogicFactory.deploy();
   // console.log('StakeTONLogicFactory:', stakeTONLogicFactory.address);
   const stakeTONLogic = await StakeTONLogic.deploy();
-  console.log('StakeTONLogic:', stakeTONLogic.address);
+  console.log("StakeTONLogic:", stakeTONLogic.address);
 
   const stakeTONProxyFactory = await StakeTONProxyFactory.deploy();
-  console.log('StakeTONProxyFactory:', stakeTONProxyFactory.address);
+  console.log("StakeTONProxyFactory:", stakeTONProxyFactory.address);
 
-  const stakeTONFactory = await StakeTONFactory.deploy(stakeTONProxyFactory.address, stakeTONLogic.address);
-  console.log('stakeTONFactory:', stakeTONFactory.address);
+  const stakeTONFactory = await StakeTONFactory.deploy(
+    stakeTONProxyFactory.address,
+    stakeTONLogic.address
+  );
+  console.log("stakeTONFactory:", stakeTONFactory.address);
 
   const stakeDefiFactory = await StakeDefiFactory.deploy(stakeSimple.address);
-  console.log('stakeDefiFactory:', stakeDefiFactory.address);
+  console.log("stakeDefiFactory:", stakeDefiFactory.address);
 
-  const stakeFactory = await StakeFactory.deploy(stakeSimpleFactory.address, stakeTONFactory.address, stakeDefiFactory.address);
-  console.log('stakeFactory:', stakeFactory.address);
+  const stakeFactory = await StakeFactory.deploy(
+    stakeSimpleFactory.address,
+    stakeTONFactory.address,
+    stakeDefiFactory.address
+  );
+  console.log("stakeFactory:", stakeFactory.address);
 
   const stakeRegistry = await StakeRegistry.deploy(fld.address);
-  console.log('stakeRegistry:', stakeRegistry.address);
+  console.log("stakeRegistry:", stakeRegistry.address);
 
   const stake1Vault = await Stake1Vault.deploy();
-  console.log('Stake1Vault:', stake1Vault.address);
+  console.log("Stake1Vault:", stake1Vault.address);
 
   const stakeVaultFactory = await StakeVaultFactory.deploy(stake1Vault.address);
-  console.log('stakeVaultFactory:', stakeVaultFactory.address);
+  console.log("stakeVaultFactory:", stakeVaultFactory.address);
 
   const stake1Logic = await Stake1Logic.deploy();
-  console.log('stake1Logic:', stake1Logic.address);
+  console.log("stake1Logic:", stake1Logic.address);
 
   const stake1Proxy = await Stake1Proxy.deploy();
-  console.log('stake1Proxy:', stake1Proxy.address);
+  console.log("stake1Proxy:", stake1Proxy.address);
 
   await stake1Proxy.upgradeTo(stake1Logic.address);
-  console.log('stake1Proxy upgradeTo:', stake1Logic.address);
+  console.log("stake1Proxy upgradeTo:", stake1Logic.address);
 
-  const stakeEntry = await ethers.getContractAt("Stake1Logic", stake1Proxy.address);
-  console.log("stakeEntry:" , stakeEntry.address);
+  const stakeEntry = await ethers.getContractAt(
+    "Stake1Logic",
+    stake1Proxy.address
+  );
+  console.log("stakeEntry:", stakeEntry.address);
 
   const out = {};
   out.FLD = fld.address;
@@ -121,22 +157,19 @@ async function deployMain (defaultSender) {
   return out;
 }
 
-async function main () {
+async function main() {
   const [deployer, user1] = await ethers.getSigners();
   const users = await ethers.getSigners();
-  console.log(
-    'Deploying contracts with the account:',
-    deployer.address
-  );
+  console.log("Deploying contracts with the account:", deployer.address);
 
-  console.log('Account balance:', (await deployer.getBalance()).toString());
+  console.log("Account balance:", (await deployer.getBalance()).toString());
 
-  let contracts = await deployMain(deployer);
-  console.log('contracts:', process.env.NETWORK, contracts);
+  const contracts = await deployMain(deployer);
+  console.log("contracts:", process.env.NETWORK, contracts);
 
   // The address the Contract WILL have once mined
 
-  let out = {};
+  const out = {};
   out.FLD = contracts.FLD;
   out.StakeSimple = contracts.StakeSimple;
   out.StakeSimpleFactory = contracts.StakeSimpleFactory;
@@ -156,9 +189,7 @@ async function main () {
   out.DepositManager = "0x57F5CD759A5652A697D539F1D9333ba38C615FC2";
   out.SeigManager = "0x957DaC3D3C4B82088A4939BE9A8063e20cB2efBE";
 
-  save(
-    process.env.NETWORK, out
-  );
+  save(process.env.NETWORK, out);
 }
 
 main()
