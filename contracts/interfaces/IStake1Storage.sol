@@ -2,7 +2,6 @@
 pragma solidity ^0.7.6;
 
 interface IStake1Storage {
-
     /// @dev reward token : FLD
     function token() external view returns (address);
 
@@ -35,7 +34,8 @@ interface IStake1Storage {
 
     /// @dev user's staked information
     function getUserStaked(address user)
-        external view
+        external
+        view
         returns (
             uint256 amount,
             uint256 claimedBlock,
@@ -44,6 +44,5 @@ interface IStake1Storage {
             uint256 releasedAmount,
             uint256 releasedFLDAmount,
             bool released
-         );
-
+        );
 }

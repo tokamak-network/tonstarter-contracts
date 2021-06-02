@@ -211,14 +211,14 @@ describe("Phase1. StakeContract with TON", function () {
         ton.approveAndCall(stakeAddresses[0], tonAmount, param, {
           from: account,
         })
-      ).to.be.revertedWith("unavailable");
+      ).to.be.revertedWith("StakeTONProxy: period is unavailable");
 
     });
 
     it("2. If the sales period does not start, the sales closing function fails.", async function () {
       await expect(
         stakeEntry.closeSale(vault_phase1_ton.address, { from: user1 })
-      ).to.be.revertedWith("closeSale init fail");
+      ).to.be.revertedWith("Stake1Vault: closeSale init fail");
     });
 
   });
@@ -259,7 +259,7 @@ describe("Phase1. StakeContract with TON", function () {
     it("2. If the sales period is not over, the sales closing function will fail.", async function () {
       await expect(
         stakeEntry.closeSale(vault_phase1_ton.address, { from: user1 })
-      ).to.be.revertedWith("closeSale init fail");
+      ).to.be.revertedWith("Stake1Vault: closeSale init fail");
     });
 
     it("3. Ether staking is not allowed after the sale period is over.", async function () {
@@ -279,7 +279,7 @@ describe("Phase1. StakeContract with TON", function () {
         ton.approveAndCall(stakeAddresses[0], tonAmount, param, {
           from: account,
         })
-      ).to.be.revertedWith("unavailable");
+      ).to.be.revertedWith("StakeTONProxy: period is unavailable");
 
     });
 
@@ -287,7 +287,7 @@ describe("Phase1. StakeContract with TON", function () {
       const stakeContract = await StakeTON.at(stakeAddresses[0]);
       await expect(
         stakeContract.claim({ from: testStakingUsers[0] })
-      ).to.be.revertedWith("not closed");
+      ).to.be.revertedWith("StakeTON: not closed");
     });
 
   });
@@ -306,7 +306,7 @@ describe("Phase1. StakeContract with TON", function () {
             layer2.address,
             { from: user1 }
           )
-      ).to.be.revertedWith("not closed");
+      ).to.be.revertedWith("TokamakStaker:not closed");
 
     });
 
@@ -319,7 +319,7 @@ describe("Phase1. StakeContract with TON", function () {
           wtonAmount,
           { from: user1 }
         )
-      ).to.be.revertedWith("different layer");
+      ).to.be.revertedWith("TokamakStaker:different layer");
     });
 
     it("4. If the sales closing function is not performed, cannot processWithdraw to Tokamak.", async function () {
@@ -329,7 +329,7 @@ describe("Phase1. StakeContract with TON", function () {
           layer2.address,
           { from: user1 }
         )
-      ).to.be.revertedWith("different layer");
+      ).to.be.revertedWith("TokamakStaker:different layer");
     });
   });
 
@@ -344,7 +344,7 @@ describe("Phase1. StakeContract with TON", function () {
     it("2. The sales closing function can be performed only once.", async function () {
       await expect(
         stakeEntry.closeSale(vault_phase1_ton.address, { from: user1 })
-      ).to.be.revertedWith("already closed");
+      ).to.be.revertedWith("Stake1Vault: already closed");
     });
 
   });
@@ -357,7 +357,7 @@ describe("Phase1. StakeContract with TON", function () {
       const stakeContract1 = await StakeTON.at(stakeAddresses[i]);
       await expect(
         stakeContract1.withdraw({ from: user1 })
-      ).to.be.revertedWith("not end");
+      ).to.be.revertedWith("StakeTON: not end");
     });
   });
 
@@ -675,7 +675,7 @@ describe("Phase1. StakeContract with TON", function () {
       const stakeContract1 = await StakeTON.at(stakeAddresses[i]);
       await expect(
         stakeContract1.withdraw({ from: user1 })
-      ).to.be.revertedWith("remain amount in tokamak");
+      ).to.be.revertedWith("StakeTON: remain amount in tokamak");
     });
 
     it('2. unstaking a whole amount in tokamak.', async function () {

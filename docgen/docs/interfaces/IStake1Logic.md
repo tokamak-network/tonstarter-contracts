@@ -24,7 +24,7 @@
 
 - [`vaultsOfPahse(uint256 _phase)`](#IStake1Logic-vaultsOfPahse-uint256-)
 
-### IStake1Logic-setStore-address-address-address-address-address-address-address-address-
+###### IStake1Logic-setStore-address-address-address-address-address-address-address-address-
 
 ## Function `setStore(address _fld, address _stakeRegistry, address _stakeFactory, address _stakeVaultFactory, address _ton, address _wton, address _depositManager, address _seigManager)`
 
@@ -48,7 +48,7 @@ No description
 
 - `_seigManager`: SeigManager address in Tokamak
 
-### IStake1Logic-createVault-address-uint256-uint256-uint256-uint256-bytes32-uint256-address-
+###### IStake1Logic-createVault-address-uint256-uint256-uint256-uint256-bytes32-uint256-address-
 
 ## Function `createVault(address _paytoken, uint256 _cap, uint256 _saleStartBlock, uint256 _stakeStartBlock, uint256 _phase, bytes32 _vaultName, uint256 _stakeType, address _defiAddr)`
 
@@ -72,7 +72,7 @@ create vault
 
 - `_defiAddr`:  extra defi address , default is zero address
 
-### IStake1Logic-createStakeContract-uint256-address-address-address-uint256-string-
+###### IStake1Logic-createStakeContract-uint256-address-address-address-uint256-string-
 
 ## Function `createStakeContract(uint256 _phase, address _vault, address token, address paytoken, uint256 periodBlock, string _name)`
 
@@ -92,7 +92,7 @@ create stake contract in vault
 
 - `_name`:  the stake contract's name
 
-### IStake1Logic-addVault-uint256-bytes32-address-
+###### IStake1Logic-addVault-uint256-bytes32-address-
 
 ## Function `addVault(uint256 _phase, bytes32 _vaultName, address _vault)`
 
@@ -106,7 +106,7 @@ create stake contract in vault
 
 - `_vault`: vault's address
 
-### IStake1Logic-closeSale-address-
+###### IStake1Logic-closeSale-address-
 
 ## Function `closeSale(address _vault)`
 
@@ -116,7 +116,7 @@ end to staking by user
 
 - `_vault`: vault's address
 
-### IStake1Logic-stakeContractsOfVault-address-
+###### IStake1Logic-stakeContractsOfVault-address-
 
 ## Function `stakeContractsOfVault(address _vault)`
 
@@ -126,7 +126,7 @@ list of stakeContracts in vault
 
 - `_vault`: vault's address
 
-### IStake1Logic-vaultsOfPhase-uint256-
+###### IStake1Logic-vaultsOfPhase-uint256-
 
 ## Function `vaultsOfPhase(uint256 _phaseIndex)`
 
@@ -136,7 +136,7 @@ list of vaults in _phaseIndex phase
 
 - `_phaseIndex`: the phase number
 
-### IStake1Logic-tokamakStaking-address-address-
+###### IStake1Logic-tokamakStaking-address-address-
 
 ## Function `tokamakStaking(address _stakeContract, address _layer2)`
 
@@ -148,7 +148,7 @@ stake in tokamak's layer2
 
 - `_layer2`: the layer2 address in Tokamak
 
-### IStake1Logic-tokamakRequestUnStaking-address-address-uint256-
+###### IStake1Logic-tokamakRequestUnStaking-address-address-uint256-
 
 ## Function `tokamakRequestUnStaking(address _stakeContract, address _layer2, uint256 amount)`
 
@@ -162,7 +162,7 @@ Requests unstaking in tokamak's layer2
 
 - `amount`: the amount of unstaking
 
-### IStake1Logic-tokamakProcessUnStaking-address-address-
+###### IStake1Logic-tokamakProcessUnStaking-address-address-
 
 ## Function `tokamakProcessUnStaking(address _stakeContract, address _layer2)`
 
@@ -174,7 +174,7 @@ Processes unstaking the requested unstaking amount in tokamak's layer2
 
 - `_layer2`: the layer2 address in Tokamak
 
-### IStake1Logic-exchangeWTONtoFLD-address-uint256-uint256-uint256-uint160-uint256-
+###### IStake1Logic-exchangeWTONtoFLD-address-uint256-uint256-uint256-uint160-uint256-
 
 ## Function `exchangeWTONtoFLD(address _stakeContract, uint256 amountIn, uint256 amountOutMinimum, uint256 deadline, uint160 sqrtPriceLimitX96, uint256 _type)`
 
@@ -196,8 +196,12 @@ this function used in StakeTON ( stakeType=0 )
 
 - `_type`: the function type, if 0, use exactInputSingle function, else if, use exactInput function
 
-### IStake1Logic-vaultsOfPahse-uint256-
+###### IStake1Logic-vaultsOfPahse-uint256-
 
 ## Function `vaultsOfPahse(uint256 _phase)`
 
-No description
+Get addresses of vaults of index phase
+
+### Parameters:
+
+- `_phase`: the pahse number

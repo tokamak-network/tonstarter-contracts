@@ -2,7 +2,6 @@
 pragma solidity ^0.7.6;
 
 interface IStake1Logic {
-
     /// Set initial variables
     /// @param _fld  FLD token address
     /// @param _stakeRegistry the registry address

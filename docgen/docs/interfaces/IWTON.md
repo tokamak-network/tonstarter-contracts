@@ -18,55 +18,55 @@
 
 - [`approve(address spender, uint256 amount)`](#IWTON-approve-address-uint256-)
 
-### IWTON-balanceOf-address-
+###### IWTON-balanceOf-address-
 
 ## Function `balanceOf(address account)`
 
 No description
 
-### IWTON-onApprove-address-address-uint256-bytes-
+###### IWTON-onApprove-address-address-uint256-bytes-
 
 ## Function `onApprove(address owner, address spender, uint256 tonAmount, bytes data)`
 
 No description
 
-### IWTON-burnFrom-address-uint256-
+###### IWTON-burnFrom-address-uint256-
 
 ## Function `burnFrom(address account, uint256 amount)`
 
 No description
 
-### IWTON-swapToTON-uint256-
+###### IWTON-swapToTON-uint256-
 
 ## Function `swapToTON(uint256 wtonAmount)`
 
 No description
 
-### IWTON-swapFromTON-uint256-
+###### IWTON-swapFromTON-uint256-
 
 ## Function `swapFromTON(uint256 tonAmount)`
 
 No description
 
-### IWTON-swapToTONAndTransfer-address-uint256-
+###### IWTON-swapToTONAndTransfer-address-uint256-
 
 ## Function `swapToTONAndTransfer(address to, uint256 wtonAmount)`
 
 No description
 
-### IWTON-swapFromTONAndTransfer-address-uint256-
+###### IWTON-swapFromTONAndTransfer-address-uint256-
 
 ## Function `swapFromTONAndTransfer(address to, uint256 tonAmount)`
 
 No description
 
-### IWTON-renounceTonMinter--
+###### IWTON-renounceTonMinter--
 
 ## Function `renounceTonMinter()`
 
 No description
 
-### IWTON-approve-address-uint256-
+###### IWTON-approve-address-uint256-
 
 ## Function `approve(address spender, uint256 amount)`
 

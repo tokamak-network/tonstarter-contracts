@@ -18,55 +18,55 @@
 
 - [`processRequests(address layer2, uint256 n, bool receiveTON)`](#IIDepositManager-processRequests-address-uint256-bool-)
 
-### IIDepositManager-globalWithdrawalDelay--
+###### IIDepositManager-globalWithdrawalDelay--
 
 ## Function `globalWithdrawalDelay()`
 
 No description
 
-### IIDepositManager-accStaked-address-address-
+###### IIDepositManager-accStaked-address-address-
 
 ## Function `accStaked(address layer2, address account)`
 
 No description
 
-### IIDepositManager-pendingUnstaked-address-address-
+###### IIDepositManager-pendingUnstaked-address-address-
 
 ## Function `pendingUnstaked(address layer2, address account)`
 
 No description
 
-### IIDepositManager-accUnstaked-address-address-
+###### IIDepositManager-accUnstaked-address-address-
 
 ## Function `accUnstaked(address layer2, address account)`
 
 No description
 
-### IIDepositManager-deposit-address-uint256-
+###### IIDepositManager-deposit-address-uint256-
 
 ## Function `deposit(address layer2, uint256 amount)`
 
 No description
 
-### IIDepositManager-requestWithdrawal-address-uint256-
+###### IIDepositManager-requestWithdrawal-address-uint256-
 
 ## Function `requestWithdrawal(address layer2, uint256 amount)`
 
 No description
 
-### IIDepositManager-processRequest-address-bool-
+###### IIDepositManager-processRequest-address-bool-
 
 ## Function `processRequest(address layer2, bool receiveTON)`
 
 No description
 
-### IIDepositManager-requestWithdrawalAll-address-
+###### IIDepositManager-requestWithdrawalAll-address-
 
 ## Function `requestWithdrawalAll(address layer2)`
 
 No description
 
-### IIDepositManager-processRequests-address-uint256-bool-
+###### IIDepositManager-processRequests-address-uint256-bool-
 
 ## Function `processRequests(address layer2, uint256 n, bool receiveTON)`
 

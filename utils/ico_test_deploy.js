@@ -215,6 +215,8 @@ class ICO20Contracts {
     };
   }
 
+
+
   initializeICO20Contracts = async function (owner) {
     // this = self;
     // console.log(' initializeICO20Contracts owner:',owner );
@@ -450,6 +452,13 @@ class ICO20Contracts {
   };
 
   setEntry = async function (owner) {
+
+    const uniswapRouter = "0xe592427a0aece92de3edee1f18e0157c05861564";
+    const uniswapNPM ="0xd1e1C3995695650ABc3Ea3c68ae5d365b35174ED";
+    const uniswapWeth ="0xe592427a0aece92de3edee1f18e0157c05861564";
+    const uniswapFee ="3000";
+    const uniswapRouter2 ="0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D";
+
     await this.stakeEntry.setStore(
       this.fld.address,
       this.stakeregister.address,
@@ -467,6 +476,15 @@ class ICO20Contracts {
       this.wton.address,
       this.depositManager.address,
       this.seigManager.address
+      );
+
+    await this.stakeregister.addDefiInfo(
+        "UNISWAP_V3",
+        uniswapRouter,
+        uniswapNPM,
+        uniswapWeth,
+        uniswapFee,
+        uniswapRouter2
       );
 
     await this.stakeregister.grantRole(ADMIN_ROLE, this.stake1proxy.address, {

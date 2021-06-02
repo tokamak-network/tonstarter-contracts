@@ -55,7 +55,7 @@ contract StakeRegistry is AccessControl, IStakeRegistry {
     }
 
     modifier nonZero(address _addr) {
-        require(_addr != address(0), "zero address");
+        require(_addr != address(0), "StakeRegistry: zero address");
         _;
     }
 
@@ -108,7 +108,8 @@ contract StakeRegistry is AccessControl, IStakeRegistry {
         address _depositManager,
         address _seigManager
     )
-        external override
+        external
+        override
         onlyOwner
         nonZero(_ton)
         nonZero(_wton)
@@ -138,7 +139,7 @@ contract StakeRegistry is AccessControl, IStakeRegistry {
         address _routerV2
     ) external override onlyOwner nonZero(_router) {
         bytes32 nameHash = keccak256(abi.encodePacked(_name));
-        require(nameHash != ZERO_HASH, "nameHash zero");
+        require(nameHash != ZERO_HASH, "StakeRegistry: nameHash zero");
 
         LibTokenStake1.DefiInfo storage _defiInfo = defiInfo[nameHash];
         _defiInfo.name = _name;
@@ -148,7 +149,15 @@ contract StakeRegistry is AccessControl, IStakeRegistry {
         _defiInfo.fee = _fee;
         _defiInfo.routerV2 = _routerV2;
 
-        emit AddedDefiInfo(nameHash, _name, _router, _ex1, _ex2, _fee, _routerV2);
+        emit AddedDefiInfo(
+            nameHash,
+            _name,
+            _router,
+            _ex1,
+            _ex2,
+            _fee,
+            _routerV2
+        );
     }
 
     /// @dev Add Vault
@@ -177,7 +186,8 @@ contract StakeRegistry is AccessControl, IStakeRegistry {
     /// @param _vault vault address
     /// @param _stakeContract  StakeContract address
     function addStakeContract(address _vault, address _stakeContract)
-        external override
+        external
+        override
         onlyOwner
     {
         require(
@@ -194,8 +204,9 @@ contract StakeRegistry is AccessControl, IStakeRegistry {
     /// @dev Get addresses for Tokamak interface
     /// @return (ton, wton, depositManager, seigManager)
     function getTokamak()
-        external override
+        external
         view
+        override
         returns (
             address,
             address,
@@ -209,8 +220,9 @@ contract StakeRegistry is AccessControl, IStakeRegistry {
     /// @dev Get indos for UNISWAP_V3 interface
     /// @return (uniswapRouter, npm, wethAddress, fee)
     function getUniswap()
-        external override
+        external
         view
+        override
         returns (
             address,
             address,
@@ -234,8 +246,9 @@ contract StakeRegistry is AccessControl, IStakeRegistry {
     /// @param _index the phase number
     /// @return the list of vaults of phase[_index]
     function phasesAll(uint256 _index)
-        external override
+        external
         view
+        override
         returns (address[] memory)
     {
         return phases[_index];
@@ -245,8 +258,9 @@ contract StakeRegistry is AccessControl, IStakeRegistry {
     /// @param _vault the vault's address
     /// @return the list of stakeContracts of vault
     function stakeContractsOfVaultAll(address _vault)
-        external override
+        external
         view
+        override
         returns (address[] memory)
     {
         return stakeContractsOfVault[_vault];
@@ -257,8 +271,9 @@ contract StakeRegistry is AccessControl, IStakeRegistry {
     /// @param _vault the vault's address
     /// @return valid true or false
     function validVault(uint256 _phase, address _vault)
-        external override
+        external
         view
+        override
         returns (bool valid)
     {
         require(phases[_phase].length > 0, "StakeRegistry: validVault is fail");

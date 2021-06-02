@@ -12,7 +12,7 @@
 
 - [`create(uint256 stakeType, address[4] _addr, address registry, uint256[3] _intdata)`](#StakeFactory-create-uint256-address-4--address-uint256-3--)
 
-### StakeFactory-constructor-address-address-address-
+###### StakeFactory-constructor-address-address-address-
 
 ## Function `constructor(address _stakeSimpleFactory, address _stakeTONFactory, address _stakeDefiFactory)`
 
@@ -26,7 +26,7 @@ constructor of StakeFactory
 
 - `_stakeTONFactory`: the logic address used in StakeTONFactory
 
-### StakeFactory-transferOwnership-address-
+###### StakeFactory-transferOwnership-address-
 
 ## Function `transferOwnership(address newOwner)`
 
@@ -36,7 +36,7 @@ transfer Ownership
 
 - `newOwner`: new owner address
 
-### StakeFactory-setStakeSimpleFactory-address-
+###### StakeFactory-setStakeSimpleFactory-address-
 
 ## Function `setStakeSimpleFactory(address _stakeSimpleFactory)`
 
@@ -46,7 +46,7 @@ Set StakeSimpleFactory address
 
 - `_stakeSimpleFactory`: new StakeSimpleFactory address
 
-### StakeFactory-setStakeTONFactory-address-
+###### StakeFactory-setStakeTONFactory-address-
 
 ## Function `setStakeTONFactory(address _stakeTONFactory)`
 
@@ -56,7 +56,7 @@ Set StakeTONFactory address
 
 - `_stakeTONFactory`: new StakeTONFactory address
 
-### StakeFactory-setStakeDefiFactory-address-
+###### StakeFactory-setStakeDefiFactory-address-
 
 ## Function `setStakeDefiFactory(address _stakeDefiFactory)`
 
@@ -66,7 +66,7 @@ Set StakeDefiFactory address
 
 - `_stakeDefiFactory`: new StakeDefiFactory address
 
-### StakeFactory-create-uint256-address-4--address-uint256-3--
+###### StakeFactory-create-uint256-address-4--address-uint256-3--
 
 ## Function `create(uint256 stakeType, address[4] _addr, address registry, uint256[3] _intdata)`
 

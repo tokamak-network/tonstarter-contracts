@@ -4,13 +4,13 @@
 
 - [`getUniswap()`](#ITokamakRegistry-getUniswap--)
 
-### ITokamakRegistry-getTokamak--
+###### ITokamakRegistry-getTokamak--
 
 ## Function `getTokamak()`
 
 No description
 
-### ITokamakRegistry-getUniswap--
+###### ITokamakRegistry-getUniswap--
 
 ## Function `getUniswap()`
 

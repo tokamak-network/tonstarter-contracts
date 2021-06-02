@@ -20,13 +20,17 @@
 
 - [`Upgraded(address implementation)`](#StakeDefiProxy-Upgraded-address-)
 
-### StakeDefiProxy-constructor-address-
+###### StakeDefiProxy-constructor-address-
 
 ## Function `constructor(address _logic)`
 
-No description
+constructor of Stake1Proxy
 
-### StakeDefiProxy-transferOwnership-address-
+### Parameters:
+
+- `_logic`: the logic address that used in proxy
+
+###### StakeDefiProxy-transferOwnership-address-
 
 ## Function `transferOwnership(address newOwner)`
 
@@ -36,7 +40,7 @@ transfer Ownership
 
 - `newOwner`: new owner address
 
-### StakeDefiProxy-setProxyPause-bool-
+###### StakeDefiProxy-setProxyPause-bool-
 
 ## Function `setProxyPause(bool _pause)`
 
@@ -46,7 +50,7 @@ Set pause state
 
 - `_pause`: true:pause or false:resume
 
-### StakeDefiProxy-upgradeTo-address-
+###### StakeDefiProxy-upgradeTo-address-
 
 ## Function `upgradeTo(address impl)`
 
@@ -56,31 +60,39 @@ Set implementation contract
 
 - `impl`: New implementation contract address
 
-### StakeDefiProxy-implementation--
+###### StakeDefiProxy-implementation--
 
 ## Function `implementation()`
 
 returns the implementation
 
-### StakeDefiProxy-receive--
+###### StakeDefiProxy-receive--
 
 ## Function `receive()`
 
-No description
+receive ether
 
-### StakeDefiProxy-fallback--
+###### StakeDefiProxy-fallback--
 
 ## Function `fallback()`
 
-No description
+fallback function , execute on undefined function call
 
-### StakeDefiProxy-setInit-address-3--address-uint256-3--
+###### StakeDefiProxy-setInit-address-3--address-uint256-3--
 
 ## Function `setInit(address[3] _addr, address _registry, uint256[3] _intdata)`
 
-No description
+set initial storage
 
-### StakeDefiProxy-Upgraded-address-
+### Parameters:
+
+- `_addr`: the array addresses of token, paytoken, vault
+
+- `_registry`: teh registry address
+
+- `_intdata`: the array valued of saleStartBlock, stakeStartBlock, stakeEndBlock
+
+###### StakeDefiProxy-Upgraded-address-
 
 ## Event `Upgraded(address implementation)`
 

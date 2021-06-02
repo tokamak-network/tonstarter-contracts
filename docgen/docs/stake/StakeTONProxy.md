@@ -24,13 +24,17 @@
 
 - [`Upgraded(address implementation)`](#StakeTONProxy-Upgraded-address-)
 
-### StakeTONProxy-constructor-address-
+###### StakeTONProxy-constructor-address-
 
 ## Function `constructor(address _logic)`
 
-No description
+the constructor of StakeTONProxy
 
-### StakeTONProxy-transferOwnership-address-
+### Parameters:
+
+- `_logic`: the logic address of StakeTONProxy
+
+###### StakeTONProxy-transferOwnership-address-
 
 ## Function `transferOwnership(address newOwner)`
 
@@ -40,7 +44,7 @@ transfer Ownership
 
 - `newOwner`: new owner address
 
-### StakeTONProxy-setProxyPause-bool-
+###### StakeTONProxy-setProxyPause-bool-
 
 ## Function `setProxyPause(bool _pause)`
 
@@ -50,7 +54,7 @@ No description
 
 - `_pause`: true:pause or false:resume
 
-### StakeTONProxy-upgradeTo-address-
+###### StakeTONProxy-upgradeTo-address-
 
 ## Function `upgradeTo(address impl)`
 
@@ -60,43 +64,73 @@ No description
 
 - `impl`: New implementation contract address
 
-### StakeTONProxy-implementation--
+###### StakeTONProxy-implementation--
 
 ## Function `implementation()`
 
 returns the implementation
 
-### StakeTONProxy-receive--
+###### StakeTONProxy-receive--
 
 ## Function `receive()`
 
-No description
+receive ether
 
-### StakeTONProxy-fallback--
+###### StakeTONProxy-fallback--
 
 ## Function `fallback()`
 
-No description
+fallback function , execute on undefined function call
 
-### StakeTONProxy-onApprove-address-address-uint256-bytes-
+###### StakeTONProxy-onApprove-address-address-uint256-bytes-
 
 ## Function `onApprove(address owner, address spender, uint256 tonAmount, bytes data)`
 
-Approves
+Approves function
 
-### StakeTONProxy-stakeOnApprove-address-address-address-uint256-
+call by WTON
+
+### Parameters:
+
+- `owner`:  who actually calls
+
+- `spender`:  Who gives permission to use
+
+- `tonAmount`:  how much will be available
+
+- `data`:  Amount data to use with users
+
+###### StakeTONProxy-stakeOnApprove-address-address-address-uint256-
 
 ## Function `stakeOnApprove(address from, address _owner, address _spender, uint256 _amount)`
 
-stake with ton
+stake with WTON
 
-### StakeTONProxy-setInit-address-4--address-uint256-3--
+### Parameters:
+
+- `from`:  WTON
+
+- `_owner`:  who actually calls
+
+- `_spender`:  Who gives permission to use
+
+- `_amount`:  how much will be available
+
+###### StakeTONProxy-setInit-address-4--address-uint256-3--
 
 ## Function `setInit(address[4] _addr, address _registry, uint256[3] _intdata)`
 
-No description
+set initial storage
 
-### StakeTONProxy-Upgraded-address-
+### Parameters:
+
+- `_addr`: the array addresses of token, paytoken, vault, defiAddress
+
+- `_registry`: the registry address
+
+- `_intdata`: the array valued of saleStartBlock, stakeStartBlock, stakeEndBlock
+
+###### StakeTONProxy-Upgraded-address-
 
 ## Event `Upgraded(address implementation)`
 

@@ -1,5 +1,7 @@
 # Functions:
 
+- [`constructor()`](#Stake1Vault-constructor--)
+
 - [`receive()`](#Stake1Vault-receive--)
 
 - [`initialize(address _fld, address _paytoken, uint256 _cap, uint256 _saleStartBlock, uint256 _stakeStartBlock, address _stakefactory, uint256 _stakeType, address _defiAddr)`](#Stake1Vault-initialize-address-address-uint256-uint256-uint256-address-uint256-address-)
@@ -34,13 +36,19 @@
 
 - [`ClaimedReward(address from, address to, uint256 amount)`](#Stake1Vault-ClaimedReward-address-address-uint256-)
 
-### Stake1Vault-receive--
+###### Stake1Vault-constructor--
+
+## Function `constructor()`
+
+constructor of Stake1Vault
+
+###### Stake1Vault-receive--
 
 ## Function `receive()`
 
 receive function
 
-### Stake1Vault-initialize-address-address-uint256-uint256-uint256-address-uint256-address-
+###### Stake1Vault-initialize-address-address-uint256-uint256-uint256-address-uint256-address-
 
 ## Function `initialize(address _fld, address _paytoken, uint256 _cap, uint256 _saleStartBlock, uint256 _stakeStartBlock, address _stakefactory, uint256 _stakeType, address _defiAddr)`
 
@@ -60,7 +68,7 @@ No description
 
 - `_defiAddr`: Used when an external address is required. default: address(0)
 
-### Stake1Vault-setFLD-address-
+###### Stake1Vault-setFLD-address-
 
 ## Function `setFLD(address _fld)`
 
@@ -70,7 +78,7 @@ Sets FLD address
 
 - `_fld`:  FLD address
 
-### Stake1Vault-changeCap-uint256-
+###### Stake1Vault-changeCap-uint256-
 
 ## Function `changeCap(uint256 _cap)`
 
@@ -80,7 +88,7 @@ Change cap of the vault
 
 - `_cap`:  allocated reward amount
 
-### Stake1Vault-setDefiAddr-address-
+###### Stake1Vault-setDefiAddr-address-
 
 ## Function `setDefiAddr(address _defiAddr)`
 
@@ -90,7 +98,7 @@ Set Defi Address
 
 - `_defiAddr`: DeFi related address
 
-### Stake1Vault-addSubVaultOfStake-string-address-uint256-
+###### Stake1Vault-addSubVaultOfStake-string-address-uint256-
 
 ## Function `addSubVaultOfStake(string _name, address stakeContract, uint256 periodBlocks)`
 
@@ -104,13 +112,13 @@ Set Defi Address
 
 - `periodBlocks`: the period that give rewards of stakeContract
 
-### Stake1Vault-closeSale--
+###### Stake1Vault-closeSale--
 
 ## Function `closeSale()`
 
  Close the sale that can stake by user
 
-### Stake1Vault-claim-address-uint256-
+###### Stake1Vault-claim-address-uint256-
 
 ## Function `claim(address _to, uint256 _amount)`
 
@@ -128,7 +136,7 @@ A function that _to claim the amount(_amount) from the staking contract and gets
 
 - `_amount`: the receiving amount
 
-### Stake1Vault-canClaim-address-uint256-
+###### Stake1Vault-canClaim-address-uint256-
 
 ## Function `canClaim(address _to, uint256 _amount)`
 
@@ -140,7 +148,7 @@ whether it is available to claim amount, if it is available , return the total r
 
 - `_amount`: the total reward amount of stakeContract
 
-### Stake1Vault-balanceFLDAvailableAmount--
+###### Stake1Vault-balanceFLDAvailableAmount--
 
 ## Function `balanceFLDAvailableAmount()`
 
@@ -150,7 +158,7 @@ Returns Give the FLD balance stored in the vault
 
 - the balance of FLD in this vault.
 
-### Stake1Vault-stakeAddressesAll--
+###### Stake1Vault-stakeAddressesAll--
 
 ## Function `stakeAddressesAll()`
 
@@ -160,7 +168,7 @@ Give all stakeContracts's addresses in this vault
 
 - all stakeContracts's addresses
 
-### Stake1Vault-orderedEndBlocksAll--
+###### Stake1Vault-orderedEndBlocksAll--
 
 ## Function `orderedEndBlocksAll()`
 
@@ -170,7 +178,7 @@ Give the ordered end blocks of stakeContracts in this vault
 
 - the ordered end blocks
 
-### Stake1Vault-totalRewardAmount-address-
+###### Stake1Vault-totalRewardAmount-address-
 
 ## Function `totalRewardAmount(address _account)`
 
@@ -180,19 +188,19 @@ Give Total reward amount of stakeContract(_account)
 
 - Total reward amount of stakeContract(_account)
 
-### Stake1Vault-infos--
+###### Stake1Vault-infos--
 
 ## Function `infos()`
 
 Give the infomation of this vault
 
-### Stake1Vault-ClosedSale-uint256-
+###### Stake1Vault-ClosedSale-uint256-
 
 ## Event `ClosedSale(uint256 amount)`
 
 No description
 
-### Stake1Vault-ClaimedReward-address-address-uint256-
+###### Stake1Vault-ClaimedReward-address-address-uint256-
 
 ## Event `ClaimedReward(address from, address to, uint256 amount)`
 

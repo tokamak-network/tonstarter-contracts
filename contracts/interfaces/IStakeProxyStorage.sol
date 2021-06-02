@@ -2,7 +2,6 @@
 pragma solidity ^0.7.6;
 
 interface IStakeProxyStorage {
-
     /// @dev FLD address
     function fld() external view returns (address);
 
@@ -17,5 +16,4 @@ interface IStakeProxyStorage {
 
     /// @dev SeigManager address in Tokamak
     function seigManager() external view returns (address);
-
 }

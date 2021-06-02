@@ -20,13 +20,13 @@
 
 - [`Upgraded(address implementation)`](#StakeSimpleProxy-Upgraded-address-)
 
-### StakeSimpleProxy-constructor-address-
+###### StakeSimpleProxy-constructor-address-
 
 ## Function `constructor(address _logic)`
 
 No description
 
-### StakeSimpleProxy-transferOwnership-address-
+###### StakeSimpleProxy-transferOwnership-address-
 
 ## Function `transferOwnership(address newOwner)`
 
@@ -36,7 +36,7 @@ transfer Ownership
 
 - `newOwner`: new owner address
 
-### StakeSimpleProxy-setProxyPause-bool-
+###### StakeSimpleProxy-setProxyPause-bool-
 
 ## Function `setProxyPause(bool _pause)`
 
@@ -46,7 +46,7 @@ No description
 
 - `_pause`: true:pause or false:resume
 
-### StakeSimpleProxy-upgradeTo-address-
+###### StakeSimpleProxy-upgradeTo-address-
 
 ## Function `upgradeTo(address impl)`
 
@@ -56,31 +56,37 @@ No description
 
 - `impl`: New implementation contract address
 
-### StakeSimpleProxy-implementation--
+###### StakeSimpleProxy-implementation--
 
 ## Function `implementation()`
 
 returns the implementation
 
-### StakeSimpleProxy-receive--
+###### StakeSimpleProxy-receive--
 
 ## Function `receive()`
 
 No description
 
-### StakeSimpleProxy-fallback--
+###### StakeSimpleProxy-fallback--
 
 ## Function `fallback()`
 
 No description
 
-### StakeSimpleProxy-setInit-address-3--uint256-3--
+###### StakeSimpleProxy-setInit-address-3--uint256-3--
 
 ## Function `setInit(address[3] _addr, uint256[3] _intdata)`
 
-No description
+set initial storage
 
-### StakeSimpleProxy-Upgraded-address-
+### Parameters:
+
+- `_addr`: the array addresses of token, paytoken, vault
+
+- `_intdata`: the array valued of saleStartBlock, stakeStartBlock, stakeEndBlock
+
+###### StakeSimpleProxy-Upgraded-address-
 
 ## Event `Upgraded(address implementation)`
 

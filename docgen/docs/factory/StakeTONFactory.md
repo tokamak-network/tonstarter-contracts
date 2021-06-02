@@ -4,7 +4,7 @@
 
 - [`create(address[4] _addr, address _registry, uint256[3] _intdata, address owner)`](#StakeTONFactory-create-address-4--address-uint256-3--address-)
 
-### StakeTONFactory-constructor-address-address-
+###### StakeTONFactory-constructor-address-address-
 
 ## Function `constructor(address _stakeTONProxyFactory, address _stakeTONLogic)`
 
@@ -16,7 +16,7 @@ constructor of StakeTONFactory
 
 - `_stakeTONLogic`: the StakeTONLogic address used in StakeTONFactory
 
-### StakeTONFactory-create-address-4--address-uint256-3--address-
+###### StakeTONFactory-create-address-4--address-uint256-3--address-
 
 ## Function `create(address[4] _addr, address _registry, uint256[3] _intdata, address owner)`
 

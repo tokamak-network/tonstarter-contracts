@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.7.6;
 
+import "../interfaces/IDeveloperVault.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
-import {IFLD} from "../interfaces/IFLD.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-// import "hardhat/console";
-
-contract DeveloperVault is AccessControl {
-    IFLD public fld;
+/// @title DeveloperVault
+contract DeveloperVault is AccessControl, IDeveloperVault {
+    address public fld;
     uint256 public cap;
     uint256 public rewardPeriod;
     uint256 public startRewardBlock;
@@ -16,6 +16,8 @@ contract DeveloperVault is AccessControl {
     mapping(address => DeveloperInfo) public developersInfo;
     address[] public developers;
 
+    /// @dev constructor of DeveloperVault
+    /// @param admin the admin address
     constructor(address admin) {
         _setupRole(DEFAULT_ADMIN_ROLE, admin);
     }
@@ -34,7 +36,14 @@ contract DeveloperVault is AccessControl {
         _;
     }
 
-    /// @dev Initialize
+    /// @dev set initial storage
+    /// @param _fld the FLD address
+    /// @param _cap the allocated FLD amount to devs
+    /// @param _rewardPeriod given only once per _rewardPeriod.
+    /// @param _startRewardBlock the start block to give .
+    /// @param _claimsNumberMax Total number of payments
+    /// @param _developers the developer list
+    /// @param _claimAmounts How much do you pay at one time?
     function initialize(
         address _fld,
         uint256 _cap,
@@ -43,9 +52,13 @@ contract DeveloperVault is AccessControl {
         uint256 _claimsNumberMax,
         address[] memory _developers,
         uint256[] memory _claimAmounts
-    ) external onlyAdmin {
-        require(_claimAmounts.length == _developers.length, "DeveloperVault");
-        fld = IFLD(_fld);
+    ) external override onlyAdmin {
+        require(_fld != address(0), "DeveloperVault: fld is zero");
+        require(
+            _claimAmounts.length == _developers.length,
+            "DeveloperVault: length is different"
+        );
+        fld = _fld;
         cap = _cap;
         rewardPeriod = _rewardPeriod;
         startRewardBlock = _startRewardBlock;
@@ -68,7 +81,7 @@ contract DeveloperVault is AccessControl {
     }
 
     /// @dev Developers can receive their FLDs
-    function claimReward() external {
+    function claimReward() external override {
         DeveloperInfo storage devInfo = developersInfo[msg.sender];
         require(
             devInfo.registered == true,
@@ -83,7 +96,7 @@ contract DeveloperVault is AccessControl {
             startRewardBlock + devInfo.claimsNumber * rewardPeriod;
         require(
             currentBlockRewardNumber <= block.number,
-            "Period for reward has not been reached"
+            "DeveloperVault: Period for reward has not been reached"
         );
 
         uint256 allPastRewards = 0;
@@ -96,13 +109,13 @@ contract DeveloperVault is AccessControl {
                 rewardPeriod;
         }
         require(
-            fld.transfer(msg.sender, allPastRewards),
-            "Stake1Vault: FLD transfer fail"
+            IERC20(fld).transfer(msg.sender, allPastRewards),
+            "DeveloperVault: FLD transfer fail"
         );
     }
 
     /// @dev Returns current reward block for sender
-    function currentRewardBlock() external view returns (uint256) {
+    function currentRewardBlock() external view override returns (uint256) {
         DeveloperInfo memory devInfo = developersInfo[msg.sender];
         require(
             devInfo.registered == true,

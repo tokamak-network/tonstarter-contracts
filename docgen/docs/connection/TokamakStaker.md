@@ -16,11 +16,9 @@
 
 - [`tokamakProcessUnStaking(address _layer2)`](#TokamakStaker-tokamakProcessUnStaking-address-)
 
-- [`exchangeWTONtoFLD(uint256 _amountIn, uint256 _amountOutMinimum, uint256 _deadline, uint160 sqrtPriceLimitX96, uint256 _kind)`](#TokamakStaker-exchangeWTONtoFLD-uint256-uint256-uint256-uint160-uint256-)
+- [`exchangeWTONtoFLD(uint256 _amountIn, uint256 _amountOutMinimum, uint256 _deadline, uint160 _sqrtPriceLimitX96, uint256 _kind)`](#TokamakStaker-exchangeWTONtoFLD-uint256-uint256-uint256-uint160-uint256-)
 
-- [`ExactInputSingleParams(address[2] addrs, address tokenIn, address tokenOut, uint24 fee, address recipient, uint256 deadline, uint256 amountIn, uint256 amountOutMinimum, uint160 sqrtPriceLimitX96)`](#TokamakStaker-ExactInputSingleParams-address-2--address-address-uint24-address-uint256-uint256-uint256-uint160-)
-
-- [`exchangeWTONtoFLDexactInput(address uniswapRouter, address wton, address weth, uint256 fee, uint256 amountIn, uint256 amountOutMinimum, uint256 deadline)`](#TokamakStaker-exchangeWTONtoFLDexactInput-address-address-address-uint256-uint256-uint256-uint256-)
+- [`exchangeWTONtoFLDv2(uint256 _amountIn, uint256 _amountOutMinimum, uint256 _deadline, uint256 _kind)`](#TokamakStaker-exchangeWTONtoFLDv2-uint256-uint256-uint256-uint256-)
 
 # Events:
 
@@ -36,7 +34,7 @@
 
 - [`exchangedWTONtoFLD(address caller, uint256 amountIn, uint256 amountOut)`](#TokamakStaker-exchangedWTONtoFLD-address-uint256-uint256-)
 
-### TokamakStaker-transferOwnership-address-
+###### TokamakStaker-transferOwnership-address-
 
 ## Function `transferOwnership(address newOwner)`
 
@@ -46,97 +44,149 @@ transfer Ownership
 
 - `newOwner`: new owner address
 
-### TokamakStaker-setRegistry-address-
+###### TokamakStaker-setRegistry-address-
 
 ## Function `setRegistry(address _registry)`
 
-No description
+set registry address
 
-### TokamakStaker-setTokamakLayer2-address-
+### Parameters:
+
+- `_registry`: new registry address
+
+###### TokamakStaker-setTokamakLayer2-address-
 
 ## Function `setTokamakLayer2(address _layer2)`
 
-No description
+set the tokamak Layer2 address
 
-### TokamakStaker-getUniswapInfo--
+### Parameters:
+
+- `_layer2`: new the tokamak Layer2 address
+
+###### TokamakStaker-getUniswapInfo--
 
 ## Function `getUniswapInfo()`
 
-No description
+get the addresses that used in uniswap interfaces
 
-### TokamakStaker-approveUniswapRouter-uint256-
+### Return Values:
+
+- uniswapRouter the address of uniswapRouter
+
+- npm the address of positionManagerAddress
+
+- ext the address of ext
+
+- fee the amount of fee
+
+###### TokamakStaker-approveUniswapRouter-uint256-
 
 ## Function `approveUniswapRouter(uint256 amount)`
 
 No description
 
-### TokamakStaker-tokamakStaking-address-
+###### TokamakStaker-tokamakStaking-address-
 
 ## Function `tokamakStaking(address _layer2)`
 
-No description
+ staking the staked TON in layer2 in tokamak
 
-### TokamakStaker-tokamakRequestUnStaking-address-uint256-
+### Parameters:
+
+- `_layer2`: the layer2 address in tokamak
+
+###### TokamakStaker-tokamakRequestUnStaking-address-uint256-
 
 ## Function `tokamakRequestUnStaking(address _layer2, uint256 wtonAmount)`
 
-No description
+ request unstaking the wtonAmount in layer2 in tokamak
 
-### TokamakStaker-tokamakProcessUnStaking-address-
+### Parameters:
+
+- `_layer2`: the layer2 address in tokamak
+
+- `wtonAmount`: the amount requested to unstaking
+
+###### TokamakStaker-tokamakProcessUnStaking-address-
 
 ## Function `tokamakProcessUnStaking(address _layer2)`
 
-No description
+process unstaking in layer2 in tokamak
 
-### TokamakStaker-exchangeWTONtoFLD-uint256-uint256-uint256-uint160-uint256-
+### Parameters:
 
-## Function `exchangeWTONtoFLD(uint256 _amountIn, uint256 _amountOutMinimum, uint256 _deadline, uint160 sqrtPriceLimitX96, uint256 _kind)`
+- `_layer2`: the layer2 address in tokamak
 
-No description
+###### TokamakStaker-exchangeWTONtoFLD-uint256-uint256-uint256-uint160-uint256-
 
-### TokamakStaker-ExactInputSingleParams-address-2--address-address-uint24-address-uint256-uint256-uint256-uint160-
+## Function `exchangeWTONtoFLD(uint256 _amountIn, uint256 _amountOutMinimum, uint256 _deadline, uint160 _sqrtPriceLimitX96, uint256 _kind)`
 
-## Function `ExactInputSingleParams(address[2] addrs, address tokenIn, address tokenOut, uint24 fee, address recipient, uint256 deadline, uint256 amountIn, uint256 amountOutMinimum, uint160 sqrtPriceLimitX96)`
+exchange holded WTON to FLD using uniswap
 
-No description
+### Parameters:
 
-### TokamakStaker-exchangeWTONtoFLDexactInput-address-address-address-uint256-uint256-uint256-uint256-
+- `_amountIn`: the input amount
 
-## Function `exchangeWTONtoFLDexactInput(address uniswapRouter, address wton, address weth, uint256 fee, uint256 amountIn, uint256 amountOutMinimum, uint256 deadline)`
+- `_amountOutMinimum`: the minimun output amount
 
-No description
+- `_deadline`: deadline
 
-### TokamakStaker-SetRegistry-address-
+- `_sqrtPriceLimitX96`: sqrtPriceLimitX96
+
+- `_kind`: the function type, if 0, use exactInputSingle function, else if, use exactInput function
+
+### Return Values:
+
+- amountOut the amount of exchanged out token
+
+###### TokamakStaker-exchangeWTONtoFLDv2-uint256-uint256-uint256-uint256-
+
+## Function `exchangeWTONtoFLDv2(uint256 _amountIn, uint256 _amountOutMinimum, uint256 _deadline, uint256 _kind)`
+
+exchange holded WTON to FLD using uniswap-v2
+
+### Parameters:
+
+- `_amountIn`: the input amount
+
+- `_amountOutMinimum`: the minimun output amount
+
+- `_deadline`: deadline
+
+- `_kind`: the function type, if 0, use exactInputSingle function, else if, use exactInput function
+
+###### TokamakStaker-SetRegistry-address-
 
 ## Event `SetRegistry(address registry)`
 
 No description
 
-### TokamakStaker-SetTokamakLayer2-address-
+###### TokamakStaker-SetTokamakLayer2-address-
 
 ## Event `SetTokamakLayer2(address layer2)`
 
 No description
 
-### TokamakStaker-tokamakStaked-address-uint256-
+###### TokamakStaker-tokamakStaked-address-uint256-
 
 ## Event `tokamakStaked(address layer2, uint256 amount)`
 
 No description
 
-### TokamakStaker-tokamakRequestedUnStaking-address-uint256-
+###### TokamakStaker-tokamakRequestedUnStaking-address-uint256-
 
 ## Event `tokamakRequestedUnStaking(address layer2, uint256 amount)`
 
 No description
 
-### TokamakStaker-tokamakProcessedUnStaking-address-uint256-bool-
+###### TokamakStaker-tokamakProcessedUnStaking-address-uint256-bool-
 
 ## Event `tokamakProcessedUnStaking(address layer2, uint256 rn, bool receiveTON)`
 
 No description
 
-### TokamakStaker-exchangedWTONtoFLD-address-uint256-uint256-
+###### TokamakStaker-exchangedWTONtoFLD-address-uint256-uint256-
 
 ## Event `exchangedWTONtoFLD(address caller, uint256 amountIn, uint256 amountOut)`
 

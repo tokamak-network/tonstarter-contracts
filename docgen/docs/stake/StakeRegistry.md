@@ -6,7 +6,7 @@
 
 - [`setTokamak(address _ton, address _wton, address _depositManager, address _seigManager)`](#StakeRegistry-setTokamak-address-address-address-address-)
 
-- [`addDefiInfo(string _name, address _router, address _ex1, address _ex2, uint256 _fee)`](#StakeRegistry-addDefiInfo-string-address-address-address-uint256-)
+- [`addDefiInfo(string _name, address _router, address _ex1, address _ex2, uint256 _fee, address _routerV2)`](#StakeRegistry-addDefiInfo-string-address-address-address-uint256-address-)
 
 - [`addVault(address _vault, uint256 _phase, bytes32 _vaultName)`](#StakeRegistry-addVault-address-uint256-bytes32-)
 
@@ -30,15 +30,19 @@
 
 - [`SetTokamak(address ton, address wton, address depositManager, address seigManager)`](#StakeRegistry-SetTokamak-address-address-address-address-)
 
-- [`AddedDefiInfo(bytes32 nameHash, string name, address router, address ex1, address ex2, uint256 fee)`](#StakeRegistry-AddedDefiInfo-bytes32-string-address-address-address-uint256-)
+- [`AddedDefiInfo(bytes32 nameHash, string name, address router, address ex1, address ex2, uint256 fee, address routerV2)`](#StakeRegistry-AddedDefiInfo-bytes32-string-address-address-address-uint256-address-)
 
-### StakeRegistry-constructor-address-
+###### StakeRegistry-constructor-address-
 
 ## Function `constructor(address _fld)`
 
-No description
+constructor of StakeRegistry
 
-### StakeRegistry-transferOwnership-address-
+### Parameters:
+
+- `_fld`: FLD address
+
+###### StakeRegistry-transferOwnership-address-
 
 ## Function `transferOwnership(address newOwner)`
 
@@ -48,11 +52,11 @@ transfer Ownership
 
 - `newOwner`: new owner address
 
-### StakeRegistry-setTokamak-address-address-address-address-
+###### StakeRegistry-setTokamak-address-address-address-address-
 
 ## Function `setTokamak(address _ton, address _wton, address _depositManager, address _seigManager)`
 
-No description
+Set addresses for Tokamak integration
 
 ### Parameters:
 
@@ -64,11 +68,11 @@ No description
 
 - `_seigManager`: SeigManager address
 
-### StakeRegistry-addDefiInfo-string-address-address-address-uint256-
+###### StakeRegistry-addDefiInfo-string-address-address-address-uint256-address-
 
-## Function `addDefiInfo(string _name, address _router, address _ex1, address _ex2, uint256 _fee)`
+## Function `addDefiInfo(string _name, address _router, address _ex1, address _ex2, uint256 _fee, address _routerV2)`
 
-No description
+Add information related to Defi
 
 ### Parameters:
 
@@ -82,11 +86,13 @@ No description
 
 - `_fee`:  fee
 
-### StakeRegistry-addVault-address-uint256-bytes32-
+###### StakeRegistry-addVault-address-uint256-bytes32-
 
 ## Function `addVault(address _vault, uint256 _phase, bytes32 _vaultName)`
 
-No description
+Add Vault
+
+It is excuted by proxy
 
 ### Parameters:
 
@@ -96,11 +102,13 @@ No description
 
 - `_vaultName`:  hash of vault's name
 
-### StakeRegistry-addStakeContract-address-address-
+###### StakeRegistry-addStakeContract-address-address-
 
 ## Function `addStakeContract(address _vault, address _stakeContract)`
 
-No description
+Add StakeContract in vault
+
+It is excuted by proxy
 
 ### Parameters:
 
@@ -108,56 +116,82 @@ No description
 
 - `_stakeContract`:  StakeContract address
 
-### StakeRegistry-getTokamak--
+###### StakeRegistry-getTokamak--
 
 ## Function `getTokamak()`
 
-No description
+Get addresses for Tokamak interface
 
-### StakeRegistry-getUniswap--
+###### StakeRegistry-getUniswap--
 
 ## Function `getUniswap()`
 
-No description
+Get indos for UNISWAP_V3 interface
 
-### StakeRegistry-phasesAll-uint256-
+###### StakeRegistry-phasesAll-uint256-
 
 ## Function `phasesAll(uint256 _index)`
 
-No description
+Get addresses of vaults of index phase
 
-### StakeRegistry-stakeContractsOfVaultAll-address-
+### Parameters:
+
+- `_index`: the phase number
+
+### Return Values:
+
+- the list of vaults of phase[_index]
+
+###### StakeRegistry-stakeContractsOfVaultAll-address-
 
 ## Function `stakeContractsOfVaultAll(address _vault)`
 
-No description
+Get addresses of staker of _vault
 
-### StakeRegistry-validVault-uint256-address-
+### Parameters:
+
+- `_vault`: the vault's address
+
+### Return Values:
+
+- the list of stakeContracts of vault
+
+###### StakeRegistry-validVault-uint256-address-
 
 ## Function `validVault(uint256 _phase, address _vault)`
 
-No description
+Checks if a vault is withing the given phase
 
-### StakeRegistry-AddedVault-address-uint256-
+### Parameters:
+
+- `_phase`: the phase number
+
+- `_vault`: the vault's address
+
+### Return Values:
+
+- valid true or false
+
+###### StakeRegistry-AddedVault-address-uint256-
 
 ## Event `AddedVault(address vault, uint256 phase)`
 
 No description
 
-### StakeRegistry-AddedStakeContract-address-address-
+###### StakeRegistry-AddedStakeContract-address-address-
 
 ## Event `AddedStakeContract(address vault, address stakeContract)`
 
 No description
 
-### StakeRegistry-SetTokamak-address-address-address-address-
+###### StakeRegistry-SetTokamak-address-address-address-address-
 
 ## Event `SetTokamak(address ton, address wton, address depositManager, address seigManager)`
 
 No description
 
-### StakeRegistry-AddedDefiInfo-bytes32-string-address-address-address-uint256-
+###### StakeRegistry-AddedDefiInfo-bytes32-string-address-address-address-uint256-address-
 
-## Event `AddedDefiInfo(bytes32 nameHash, string name, address router, address ex1, address ex2, uint256 fee)`
+## Event `AddedDefiInfo(bytes32 nameHash, string name, address router, address ex1, address ex2, uint256 fee, address routerV2)`
 
 No description

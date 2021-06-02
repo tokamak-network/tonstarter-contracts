@@ -4,7 +4,7 @@
 
 - [`create(address[4] _addr, uint256[4] _intInfo, address owner)`](#StakeVaultFactory-create-address-4--uint256-4--address-)
 
-### StakeVaultFactory-constructor-address-
+###### StakeVaultFactory-constructor-address-
 
 ## Function `constructor(address _stakeVaultLogic)`
 
@@ -14,7 +14,7 @@ constructor of StakeVaultFactory
 
 - `_stakeVaultLogic`: the logic address used in StakeVaultFactory
 
-### StakeVaultFactory-create-address-4--uint256-4--address-
+###### StakeVaultFactory-create-address-4--uint256-4--address-
 
 ## Function `create(address[4] _addr, uint256[4] _intInfo, address owner)`
 

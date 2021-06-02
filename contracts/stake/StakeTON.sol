@@ -8,7 +8,6 @@ import {IIERC20} from "../interfaces/IIERC20.sol";
 import {IWTON} from "../interfaces/IWTON.sol";
 
 import "../libraries/LibTokenStake1.sol";
-// import "../libraries/LibUniswap.sol";
 import {SafeMath} from "../utils/math/SafeMath.sol";
 import "../connection/TokamakStaker.sol";
 import {
@@ -62,21 +61,25 @@ contract StakeTON is TokamakStaker, IStakeTON {
 
     /// @dev Stake amount
     /// @param amount  the amount of staked
-    function stake(uint256 amount) public override payable {
+    function stake(uint256 amount) public payable override {
         require(
             (paytoken == address(0) && msg.value == amount) ||
                 (paytoken != address(0) && amount > 0),
-            "zero"
+            "StakeTON: zero"
         );
         require(
             block.number >= saleStartBlock && block.number < startBlock,
-            "unavailable"
+            "StakeTON: unavailable"
         );
 
-        require(!IIStake1Vault(vault).saleClosed(), "not end");
+        require(!IIStake1Vault(vault).saleClosed(), "StakeTON: not end");
 
         if (paytoken == address(0)) amount = msg.value;
-        else require(IIERC20(paytoken).balanceOf(msg.sender) >= amount, "lack");
+        else
+            require(
+                IIERC20(paytoken).balanceOf(msg.sender) >= amount,
+                "StakeTON: insuffient"
+            );
 
         LibTokenStake1.StakedAmount storage staked = userStaked[msg.sender];
         if (staked.amount == 0) totalStakers = totalStakers.add(1);
@@ -96,7 +99,7 @@ contract StakeTON is TokamakStaker, IStakeTON {
 
     /// @dev withdraw
     function withdraw() external override {
-        require(endBlock > 0 && endBlock < block.number, "not end");
+        require(endBlock > 0 && endBlock < block.number, "StakeTON: not end");
         (
             address ton,
             address wton,
@@ -108,7 +111,7 @@ contract StakeTON is TokamakStaker, IStakeTON {
                 wton != address(0) &&
                 depositManager != address(0) &&
                 seigManager != address(0),
-            "ITokamakRegistry zero"
+            "StakeTON: ITokamakRegistry zero"
         );
         if (tokamakLayer2 != address(0)) {
             require(
@@ -122,11 +125,11 @@ contract StakeTON is TokamakStaker, IStakeTON {
                         address(this)
                     ) ==
                     0,
-                "remain amount in tokamak"
+                "StakeTON: remain amount in tokamak"
             );
         }
         LibTokenStake1.StakedAmount storage staked = userStaked[msg.sender];
-        require(staked.released == false, "Already withdraw");
+        require(staked.released == false, "StakeTON: Already withdraw");
 
         if (withdrawFlag == false) {
             withdrawFlag = true;
@@ -137,13 +140,13 @@ contract StakeTON is TokamakStaker, IStakeTON {
                 require(
                     finalBalanceWTON.div(10**9).add(finalBalanceTON) >=
                         totalStakedAmount,
-                    "finalBalance is lack"
+                    "StakeTON: finalBalance is lack"
                 );
             }
         }
 
         uint256 amount = staked.amount;
-        require(amount > 0, "Amount wrong");
+        require(amount > 0, "StakeTON: Amount wrong");
         staked.releasedBlock = block.number;
         staked.released = true;
 
@@ -167,18 +170,24 @@ contract StakeTON is TokamakStaker, IStakeTON {
 
             tonWithdraw(ton, wton, tonAmount, wtonAmount, fldAmount);
         } else if (paytoken == address(0)) {
-            require(staked.releasedAmount <= staked.amount, "Amount wrong");
+            require(
+                staked.releasedAmount <= staked.amount,
+                "StakeTON: Amount wrong"
+            );
             staked.releasedAmount = amount;
             address payable self = address(uint160(address(this)));
             require(self.balance >= amount);
             (bool success, ) = msg.sender.call{value: amount}("");
-            require(success, "withdraw failed.");
+            require(success, "StakeTON: withdraw failed.");
         } else {
-            require(staked.releasedAmount <= staked.amount, "Amount wrong");
+            require(
+                staked.releasedAmount <= staked.amount,
+                "StakeTON: Amount wrong"
+            );
             staked.releasedAmount = amount;
             require(
                 IIERC20(paytoken).transfer(msg.sender, amount),
-                "transfer fail"
+                "StakeTON: transfer fail"
             );
         }
 
@@ -205,53 +214,56 @@ contract StakeTON is TokamakStaker, IStakeTON {
         if (tonAmount > 0) {
             require(
                 IIERC20(ton).balanceOf(address(this)) >= tonAmount,
-                "ton balance is lack"
+                "StakeTON: ton balance is lack"
             );
 
             require(
                 IIERC20(ton).transfer(msg.sender, tonAmount),
-                "transfer ton fail"
+                "StakeTON: transfer ton fail"
             );
         }
         if (wtonAmount > 0) {
             require(
                 IIERC20(wton).balanceOf(address(this)) >= wtonAmount,
-                "wton balance is lack"
+                "StakeTON: wton balance is lack"
             );
             require(
                 IWTON(wton).swapToTONAndTransfer(msg.sender, wtonAmount),
-                "transfer wton fail"
+                "StakeTON: transfer wton fail"
             );
         }
         if (fldAmount > 0) {
             require(
                 IIERC20(token).balanceOf(address(this)) >= fldAmount,
-                "fld balance is lack"
+                "StakeTON: fld balance is lack"
             );
             require(
                 IIERC20(token).transfer(msg.sender, fldAmount),
-                "transfer fld fail"
+                "StakeTON: transfer fld fail"
             );
         }
     }
 
     /// @dev Claim for reward
     function claim() external override lock {
-        require(IIStake1Vault(vault).saleClosed() == true, "not closed");
+        require(
+            IIStake1Vault(vault).saleClosed() == true,
+            "StakeTON: not closed"
+        );
         uint256 rewardClaim = 0;
 
         LibTokenStake1.StakedAmount storage staked = userStaked[msg.sender];
-        require(staked.claimedBlock < endBlock, "claimed");
+        require(staked.claimedBlock < endBlock, "StakeTON: claimed");
 
         rewardClaim = canRewardAmount(msg.sender, block.number);
 
-        require(rewardClaim > 0, "reward is zero");
+        require(rewardClaim > 0, "StakeTON: reward is zero");
 
         uint256 rewardTotal =
             IIStake1Vault(vault).totalRewardAmount(address(this));
         require(
             rewardClaimedTotal.add(rewardClaim) <= rewardTotal,
-            "total reward exceeds"
+            "StakeTON: total reward exceeds"
         );
 
         staked.claimedBlock = block.number;
@@ -268,8 +280,9 @@ contract StakeTON is TokamakStaker, IStakeTON {
     /// @param specificBlock the block that claimed reward
     /// @return reward the reward amount that can be taken
     function canRewardAmount(address account, uint256 specificBlock)
-        public override
+        public
         view
+        override
         returns (uint256)
     {
         uint256 reward = 0;

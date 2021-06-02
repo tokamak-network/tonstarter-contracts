@@ -26,7 +26,7 @@
 
 - [`orderedEndBlocksAll()`](#IStake1Vault-orderedEndBlocksAll--)
 
-### IStake1Vault-initialize-address-address-uint256-uint256-uint256-address-uint256-address-
+###### IStake1Vault-initialize-address-address-uint256-uint256-uint256-address-uint256-address-
 
 ## Function `initialize(address _fld, address _paytoken, uint256 _cap, uint256 _saleStartBlock, uint256 _stakeStartBlock, address _stakefactory, uint256 _stakeType, address _defiAddr)`
 
@@ -46,7 +46,7 @@ No description
 
 - `_defiAddr`: Used when an external address is required. default: address(0)
 
-### IStake1Vault-setFLD-address-
+###### IStake1Vault-setFLD-address-
 
 ## Function `setFLD(address _fld)`
 
@@ -56,7 +56,7 @@ Sets FLD address
 
 - `_fld`:  FLD address
 
-### IStake1Vault-changeCap-uint256-
+###### IStake1Vault-changeCap-uint256-
 
 ## Function `changeCap(uint256 _cap)`
 
@@ -66,7 +66,7 @@ Change cap of the vault
 
 - `_cap`:  allocated reward amount
 
-### IStake1Vault-setDefiAddr-address-
+###### IStake1Vault-setDefiAddr-address-
 
 ## Function `setDefiAddr(address _defiAddr)`
 
@@ -76,7 +76,7 @@ Set Defi Address
 
 - `_defiAddr`: DeFi related address
 
-### IStake1Vault-addSubVaultOfStake-string-address-uint256-
+###### IStake1Vault-addSubVaultOfStake-string-address-uint256-
 
 ## Function `addSubVaultOfStake(string _name, address stakeContract, uint256 periodBlocks)`
 
@@ -90,13 +90,13 @@ Set Defi Address
 
 - `periodBlocks`: the period that give rewards of stakeContract
 
-### IStake1Vault-closeSale--
+###### IStake1Vault-closeSale--
 
 ## Function `closeSale()`
 
  Close the sale that can stake by user
 
-### IStake1Vault-claim-address-uint256-
+###### IStake1Vault-claim-address-uint256-
 
 ## Function `claim(address _to, uint256 _amount)`
 
@@ -114,7 +114,7 @@ A function that _to claim the amount(_amount) from the staking contract and gets
 
 - `_amount`: the receiving amount
 
-### IStake1Vault-canClaim-address-uint256-
+###### IStake1Vault-canClaim-address-uint256-
 
 ## Function `canClaim(address _to, uint256 _amount)`
 
@@ -126,13 +126,13 @@ whether it is available to claim amount, if it is available , return the total r
 
 - `_amount`: the total reward amount of stakeContract
 
-### IStake1Vault-infos--
+###### IStake1Vault-infos--
 
 ## Function `infos()`
 
 Give the infomation of this vault
 
-### IStake1Vault-balanceFLDAvailableAmount--
+###### IStake1Vault-balanceFLDAvailableAmount--
 
 ## Function `balanceFLDAvailableAmount()`
 
@@ -142,7 +142,7 @@ Returns Give the FLD balance stored in the vault
 
 - the balance of FLD in this vault.
 
-### IStake1Vault-totalRewardAmount-address-
+###### IStake1Vault-totalRewardAmount-address-
 
 ## Function `totalRewardAmount(address _account)`
 
@@ -152,7 +152,7 @@ Give Total reward amount of stakeContract(_account)
 
 - Total reward amount of stakeContract(_account)
 
-### IStake1Vault-stakeAddressesAll--
+###### IStake1Vault-stakeAddressesAll--
 
 ## Function `stakeAddressesAll()`
 
@@ -162,7 +162,7 @@ Give all stakeContracts's addresses in this vault
 
 - all stakeContracts's addresses
 
-### IStake1Vault-orderedEndBlocksAll--
+###### IStake1Vault-orderedEndBlocksAll--
 
 ## Function `orderedEndBlocksAll()`
 

@@ -51,7 +51,7 @@ contract StakeDefiProxy is Stake1Storage, AccessControl, IStakeDefiProxy {
     }
 
     /// @dev returns the implementation
-    function implementation() public override view returns (address) {
+    function implementation() public view override returns (address) {
         return _implementation;
     }
 
@@ -97,11 +97,10 @@ contract StakeDefiProxy is Stake1Storage, AccessControl, IStakeDefiProxy {
         }
     }
 
-
     /// @dev set initial storage
     /// @param _addr the array addresses of token, paytoken, vault
     /// @param _registry teh registry address
-    /// @param _intdata the array valued of saleStartBlock, stakeStartBlock, stakeEndBlock
+    /// @param _intdata the array valued of saleStartBlock, stakeStartBlock, periodBlocks
     function setInit(
         address[3] memory _addr,
         address _registry,

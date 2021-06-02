@@ -6,7 +6,7 @@
 
 - [`implementation()`](#IStakeProxy-implementation--)
 
-### IStakeProxy-setProxyPause-bool-
+###### IStakeProxy-setProxyPause-bool-
 
 ## Function `setProxyPause(bool _pause)`
 
@@ -16,7 +16,7 @@ Set pause state
 
 - `_pause`: true:pause or false:resume
 
-### IStakeProxy-upgradeTo-address-
+###### IStakeProxy-upgradeTo-address-
 
 ## Function `upgradeTo(address impl)`
 
@@ -26,7 +26,7 @@ Set implementation contract
 
 - `impl`: New implementation contract address
 
-### IStakeProxy-implementation--
+###### IStakeProxy-implementation--
 
 ## Function `implementation()`
 

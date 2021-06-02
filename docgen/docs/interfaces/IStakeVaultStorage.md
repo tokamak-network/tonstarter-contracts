@@ -1,5 +1,7 @@
 # Functions:
 
+- [`fld()`](#IStakeVaultStorage-fld--)
+
 - [`paytoken()`](#IStakeVaultStorage-paytoken--)
 
 - [`cap()`](#IStakeVaultStorage-cap--)
@@ -22,68 +24,74 @@
 
 - [`stakeEndBlockTotal(uint256 endblock)`](#IStakeVaultStorage-stakeEndBlockTotal-uint256-)
 
-### IStakeVaultStorage-paytoken--
+###### IStakeVaultStorage-fld--
+
+## Function `fld()`
+
+reward token : FLD
+
+###### IStakeVaultStorage-paytoken--
 
 ## Function `paytoken()`
 
-No description
+paytoken is the token that the user stakes.
 
-### IStakeVaultStorage-cap--
+###### IStakeVaultStorage-cap--
 
 ## Function `cap()`
 
-No description
+allocated amount of fld
 
-### IStakeVaultStorage-stakeType--
+###### IStakeVaultStorage-stakeType--
 
 ## Function `stakeType()`
 
-No description
+Operation type of staking amount
 
-### IStakeVaultStorage-defiAddr--
+###### IStakeVaultStorage-defiAddr--
 
 ## Function `defiAddr()`
 
-No description
+External contract address used when operating the staking amount
 
-### IStakeVaultStorage-saleStartBlock--
+###### IStakeVaultStorage-saleStartBlock--
 
 ## Function `saleStartBlock()`
 
-No description
+the start block for sale.
 
-### IStakeVaultStorage-stakeStartBlock--
+###### IStakeVaultStorage-stakeStartBlock--
 
 ## Function `stakeStartBlock()`
 
-No description
+the staking start block
 
-### IStakeVaultStorage-stakeEndBlock--
+###### IStakeVaultStorage-stakeEndBlock--
 
 ## Function `stakeEndBlock()`
 
-No description
+the staking end block.
 
-### IStakeVaultStorage-realEndBlock--
+###### IStakeVaultStorage-realEndBlock--
 
 ## Function `realEndBlock()`
 
-No description
+the staking real end block.
 
-### IStakeVaultStorage-blockTotalReward--
+###### IStakeVaultStorage-blockTotalReward--
 
 ## Function `blockTotalReward()`
 
-No description
+reward amount per block
 
-### IStakeVaultStorage-saleClosed--
+###### IStakeVaultStorage-saleClosed--
 
 ## Function `saleClosed()`
 
-No description
+sale closed flag
 
-### IStakeVaultStorage-stakeEndBlockTotal-uint256-
+###### IStakeVaultStorage-stakeEndBlockTotal-uint256-
 
 ## Function `stakeEndBlockTotal(uint256 endblock)`
 
-No description
+the total staked amount stored at orderedEndBlock’s end block time

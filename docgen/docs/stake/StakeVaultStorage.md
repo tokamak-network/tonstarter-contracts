@@ -2,7 +2,7 @@
 
 - [`transferOwnership(address newOwner)`](#StakeVaultStorage-transferOwnership-address-)
 
-### StakeVaultStorage-transferOwnership-address-
+###### StakeVaultStorage-transferOwnership-address-
 
 ## Function `transferOwnership(address newOwner)`
 

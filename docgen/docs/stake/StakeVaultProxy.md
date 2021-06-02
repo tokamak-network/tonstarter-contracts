@@ -18,13 +18,17 @@
 
 - [`Upgraded(address implementation)`](#StakeVaultProxy-Upgraded-address-)
 
-### StakeVaultProxy-constructor-address-
+###### StakeVaultProxy-constructor-address-
 
 ## Function `constructor(address impl)`
 
-No description
+constructor of StakeVaultProxy
 
-### StakeVaultProxy-setProxyPause-bool-
+### Parameters:
+
+- `impl`: the logic address of StakeVaultProxy
+
+###### StakeVaultProxy-setProxyPause-bool-
 
 ## Function `setProxyPause(bool _pause)`
 
@@ -34,7 +38,7 @@ No description
 
 - `_pause`: true:pause or false:resume
 
-### StakeVaultProxy-upgradeTo-address-
+###### StakeVaultProxy-upgradeTo-address-
 
 ## Function `upgradeTo(address impl)`
 
@@ -44,31 +48,45 @@ No description
 
 - `impl`: New implementation contract address
 
-### StakeVaultProxy-implementation--
+###### StakeVaultProxy-implementation--
 
 ## Function `implementation()`
 
 returns the implementation
 
-### StakeVaultProxy-receive--
+###### StakeVaultProxy-receive--
 
 ## Function `receive()`
 
-No description
+receive ether
 
-### StakeVaultProxy-fallback--
+###### StakeVaultProxy-fallback--
 
 ## Function `fallback()`
 
-No description
+fallback function , execute on undefined function call
 
-### StakeVaultProxy-initialize-address-address-uint256-uint256-uint256-address-uint256-address-
+###### StakeVaultProxy-initialize-address-address-uint256-uint256-uint256-address-uint256-address-
 
 ## Function `initialize(address _fld, address _paytoken, uint256 _cap, uint256 _saleStartBlock, uint256 _stakeStartBlock, address _stakefactory, uint256 _stakeType, address _defiAddr)`
 
 No description
 
-### StakeVaultProxy-Upgraded-address-
+### Parameters:
+
+- `_cap`:  Maximum amount of rewards issued, allocated reward amount.
+
+- `_saleStartBlock`:  the sale start block
+
+- `_stakeStartBlock`:  the staking start block
+
+- `_stakefactory`: the factory address to create stakeContract
+
+- `_stakeType`:  Type of staking contract, 0 TON staking, 1 basic ERC20 staking, 2 Defi linked staking
+
+- `_defiAddr`: Used when an external address is required. default: address(0)
+
+###### StakeVaultProxy-Upgraded-address-
 
 ## Event `Upgraded(address implementation)`
 

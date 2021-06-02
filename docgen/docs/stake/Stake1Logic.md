@@ -44,6 +44,8 @@
 
 - [`exchangeWTONtoFLD(address _stakeContract, uint256 amountIn, uint256 amountOutMinimum, uint256 deadline, uint160 sqrtPriceLimitX96, uint256 _type)`](#Stake1Logic-exchangeWTONtoFLD-address-uint256-uint256-uint256-uint160-uint256-)
 
+- [`exchangeWTONtoFLDv2(address _stakeContract, uint256 amountIn, uint256 amountOutMinimum, uint256 deadline, uint160 sqrtPriceLimitX96, uint256 _type)`](#Stake1Logic-exchangeWTONtoFLDv2-address-uint256-uint256-uint256-uint160-uint256-)
+
 - [`vaultsOfPahse(uint256 _phase)`](#Stake1Logic-vaultsOfPahse-uint256-)
 
 # Events:
@@ -56,7 +58,7 @@
 
 - [`SetStakeRegistry(address stakeRegistry)`](#Stake1Logic-SetStakeRegistry-address-)
 
-### Stake1Logic-upgradeStakeTo-address-address-
+###### Stake1Logic-upgradeStakeTo-address-address-
 
 ## Function `upgradeStakeTo(address _stakeProxy, address _implementation)`
 
@@ -68,7 +70,7 @@ upgrade to the logic of _stakeProxy
 
 - `_implementation`: new logic address
 
-### Stake1Logic-transferOwnership-address-
+###### Stake1Logic-transferOwnership-address-
 
 ## Function `transferOwnership(address newOwner)`
 
@@ -78,7 +80,7 @@ transfer Ownership
 
 - `newOwner`: new owner address
 
-### Stake1Logic-grantRole-address-bytes32-address-
+###### Stake1Logic-grantRole-address-bytes32-address-
 
 ## Function `grantRole(address target, bytes32 role, address account)`
 
@@ -92,7 +94,7 @@ grant the role to account in target
 
 - `account`: account address
 
-### Stake1Logic-revokeRole-address-bytes32-address-
+###### Stake1Logic-revokeRole-address-bytes32-address-
 
 ## Function `revokeRole(address target, bytes32 role, address account)`
 
@@ -106,7 +108,7 @@ revoke the role to account in target
 
 - `account`: account address
 
-### Stake1Logic-setFLD-address-
+###### Stake1Logic-setFLD-address-
 
 ## Function `setFLD(address _fld)`
 
@@ -116,7 +118,7 @@ Sets FLD address
 
 - `_fld`: new FLD address
 
-### Stake1Logic-setStakeRegistry-address-
+###### Stake1Logic-setStakeRegistry-address-
 
 ## Function `setStakeRegistry(address _stakeRegistry)`
 
@@ -126,7 +128,7 @@ Sets Stake Registry address
 
 - `_stakeRegistry`: new StakeRegistry address
 
-### Stake1Logic-setStakeFactory-address-
+###### Stake1Logic-setStakeFactory-address-
 
 ## Function `setStakeFactory(address _stakeFactory)`
 
@@ -136,7 +138,7 @@ Sets StakeFactory address
 
 - `_stakeFactory`: new StakeFactory address
 
-### Stake1Logic-setStakeTONFactory-address-
+###### Stake1Logic-setStakeTONFactory-address-
 
 ## Function `setStakeTONFactory(address _stakeTONFactory)`
 
@@ -146,7 +148,7 @@ Sets StakeTONFactory address
 
 - `_stakeTONFactory`: new StakeTONFactory address
 
-### Stake1Logic-setStakeSimpleFactory-address-
+###### Stake1Logic-setStakeSimpleFactory-address-
 
 ## Function `setStakeSimpleFactory(address _stakeSimpleFactory)`
 
@@ -156,7 +158,7 @@ Sets StakeSimpleFactory address
 
 - `_stakeSimpleFactory`: new StakeSimpleFactory address
 
-### Stake1Logic-setStakeDefiFactory-address-
+###### Stake1Logic-setStakeDefiFactory-address-
 
 ## Function `setStakeDefiFactory(address _stakeDefiFactory)`
 
@@ -166,7 +168,7 @@ Sets StakeDefiFactory address
 
 - `_stakeDefiFactory`: new StakeDefiFactory address
 
-### Stake1Logic-setStakeVaultFactory-address-
+###### Stake1Logic-setStakeVaultFactory-address-
 
 ## Function `setStakeVaultFactory(address _stakeVaultFactory)`
 
@@ -176,7 +178,7 @@ Sets StakeVaultFactory address
 
 - `_stakeVaultFactory`: new StakeVaultFactory address
 
-### Stake1Logic-setStore-address-address-address-address-address-address-address-address-
+###### Stake1Logic-setStore-address-address-address-address-address-address-address-address-
 
 ## Function `setStore(address _fld, address _stakeRegistry, address _stakeFactory, address _stakeVaultFactory, address _ton, address _wton, address _depositManager, address _seigManager)`
 
@@ -200,7 +202,7 @@ No description
 
 - `_seigManager`: SeigManager address in Tokamak
 
-### Stake1Logic-createVault-address-uint256-uint256-uint256-uint256-bytes32-uint256-address-
+###### Stake1Logic-createVault-address-uint256-uint256-uint256-uint256-bytes32-uint256-address-
 
 ## Function `createVault(address _paytoken, uint256 _cap, uint256 _saleStartBlock, uint256 _stakeStartBlock, uint256 _phase, bytes32 _vaultName, uint256 _stakeType, address _defiAddr)`
 
@@ -224,7 +226,7 @@ create vault
 
 - `_defiAddr`:  extra defi address , default is zero address
 
-### Stake1Logic-createStakeContract-uint256-address-address-address-uint256-string-
+###### Stake1Logic-createStakeContract-uint256-address-address-address-uint256-string-
 
 ## Function `createStakeContract(uint256 _phase, address _vault, address token, address paytoken, uint256 periodBlock, string _name)`
 
@@ -244,7 +246,7 @@ create stake contract in vault
 
 - `_name`:  the stake contract's name
 
-### Stake1Logic-addVault-uint256-bytes32-address-
+###### Stake1Logic-addVault-uint256-bytes32-address-
 
 ## Function `addVault(uint256 _phase, bytes32 _vaultName, address _vault)`
 
@@ -258,7 +260,7 @@ create stake contract in vault
 
 - `_vault`: vault's address
 
-### Stake1Logic-closeSale-address-
+###### Stake1Logic-closeSale-address-
 
 ## Function `closeSale(address _vault)`
 
@@ -268,7 +270,7 @@ end to staking by user
 
 - `_vault`: vault's address
 
-### Stake1Logic-stakeContractsOfVault-address-
+###### Stake1Logic-stakeContractsOfVault-address-
 
 ## Function `stakeContractsOfVault(address _vault)`
 
@@ -278,7 +280,7 @@ list of stakeContracts in vault
 
 - `_vault`: vault's address
 
-### Stake1Logic-vaultsOfPhase-uint256-
+###### Stake1Logic-vaultsOfPhase-uint256-
 
 ## Function `vaultsOfPhase(uint256 _phaseIndex)`
 
@@ -288,7 +290,7 @@ list of vaults in _phaseIndex phase
 
 - `_phaseIndex`: the phase number
 
-### Stake1Logic-tokamakStaking-address-address-
+###### Stake1Logic-tokamakStaking-address-address-
 
 ## Function `tokamakStaking(address _stakeContract, address _layer2)`
 
@@ -300,7 +302,7 @@ stake in tokamak's layer2
 
 - `_layer2`: the layer2 address in Tokamak
 
-### Stake1Logic-tokamakRequestUnStaking-address-address-uint256-
+###### Stake1Logic-tokamakRequestUnStaking-address-address-uint256-
 
 ## Function `tokamakRequestUnStaking(address _stakeContract, address _layer2, uint256 amount)`
 
@@ -314,7 +316,7 @@ Requests unstaking in tokamak's layer2
 
 - `amount`: the amount of unstaking
 
-### Stake1Logic-tokamakProcessUnStaking-address-address-
+###### Stake1Logic-tokamakProcessUnStaking-address-address-
 
 ## Function `tokamakProcessUnStaking(address _stakeContract, address _layer2)`
 
@@ -326,7 +328,7 @@ Processes unstaking the requested unstaking amount in tokamak's layer2
 
 - `_layer2`: the layer2 address in Tokamak
 
-### Stake1Logic-exchangeWTONtoFLD-address-uint256-uint256-uint256-uint160-uint256-
+###### Stake1Logic-exchangeWTONtoFLD-address-uint256-uint256-uint256-uint160-uint256-
 
 ## Function `exchangeWTONtoFLD(address _stakeContract, uint256 amountIn, uint256 amountOutMinimum, uint256 deadline, uint160 sqrtPriceLimitX96, uint256 _type)`
 
@@ -348,7 +350,13 @@ this function used in StakeTON ( stakeType=0 )
 
 - `_type`: the function type, if 0, use exactInputSingle function, else if, use exactInput function
 
-### Stake1Logic-vaultsOfPahse-uint256-
+###### Stake1Logic-exchangeWTONtoFLDv2-address-uint256-uint256-uint256-uint160-uint256-
+
+## Function `exchangeWTONtoFLDv2(address _stakeContract, uint256 amountIn, uint256 amountOutMinimum, uint256 deadline, uint160 sqrtPriceLimitX96, uint256 _type)`
+
+Swap TON to FLD
+
+###### Stake1Logic-vaultsOfPahse-uint256-
 
 ## Function `vaultsOfPahse(uint256 _phase)`
 
@@ -358,25 +366,25 @@ Get addresses of vaults of index phase
 
 - `_phase`: the pahse number
 
-### Stake1Logic-CreatedVault-address-address-uint256-
+###### Stake1Logic-CreatedVault-address-address-uint256-
 
 ## Event `CreatedVault(address vault, address paytoken, uint256 cap)`
 
 No description
 
-### Stake1Logic-CreatedStakeContract-address-address-uint256-
+###### Stake1Logic-CreatedStakeContract-address-address-uint256-
 
 ## Event `CreatedStakeContract(address vault, address stakeContract, uint256 phase)`
 
 No description
 
-### Stake1Logic-ClosedSale-address-
+###### Stake1Logic-ClosedSale-address-
 
 ## Event `ClosedSale(address vault)`
 
 No description
 
-### Stake1Logic-SetStakeRegistry-address-
+###### Stake1Logic-SetStakeRegistry-address-
 
 ## Event `SetStakeRegistry(address stakeRegistry)`
 

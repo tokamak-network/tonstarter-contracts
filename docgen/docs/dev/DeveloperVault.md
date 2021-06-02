@@ -8,25 +8,45 @@
 
 - [`currentRewardBlock()`](#DeveloperVault-currentRewardBlock--)
 
-### DeveloperVault-constructor-address-
+###### DeveloperVault-constructor-address-
 
 ## Function `constructor(address admin)`
 
-No description
+constructor of DeveloperVault
 
-### DeveloperVault-initialize-address-uint256-uint256-uint256-uint256-address---uint256---
+### Parameters:
+
+- `admin`: the admin address
+
+###### DeveloperVault-initialize-address-uint256-uint256-uint256-uint256-address---uint256---
 
 ## Function `initialize(address _fld, uint256 _cap, uint256 _rewardPeriod, uint256 _startRewardBlock, uint256 _claimsNumberMax, address[] _developers, uint256[] _claimAmounts)`
 
-Initialize
+set initial storage
 
-### DeveloperVault-claimReward--
+### Parameters:
+
+- `_fld`: the FLD address
+
+- `_cap`: the allocated FLD amount to devs
+
+- `_rewardPeriod`: given only once per _rewardPeriod.
+
+- `_startRewardBlock`: the start block to give .
+
+- `_claimsNumberMax`: Total number of payments
+
+- `_developers`: the developer list
+
+- `_claimAmounts`: How much do you pay at one time?
+
+###### DeveloperVault-claimReward--
 
 ## Function `claimReward()`
 
 Developers can receive their FLDs
 
-### DeveloperVault-currentRewardBlock--
+###### DeveloperVault-currentRewardBlock--
 
 ## Function `currentRewardBlock()`
 

@@ -2,7 +2,6 @@
 pragma solidity ^0.7.6;
 
 interface IStakeProxy {
-
     /// @dev Set pause state
     /// @param _pause true:pause or false:resume
     function setProxyPause(bool _pause) external;
