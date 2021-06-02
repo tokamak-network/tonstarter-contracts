@@ -163,7 +163,6 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
     //     if (npm != address(0)) IERC20BASE(paytoken).approve(npm, amount);
     // }
 
-    /**
     function swapTONtoWTON(uint256 amount, bool toWTON)
         public
         lock
@@ -194,7 +193,6 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
             );
         }
     }
-    */
 
     function checkTokamak() public {
         if (ton == address(0)) {
@@ -407,6 +405,7 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
             ton != address(0) &&
                 wton != address(0) &&
                 seigManager != address(0) &&
+                depositManager != address(0) &&
                 swapProxy != address(0),
             "TokamakStaker:tokamak zero"
         );
@@ -420,14 +419,17 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
                     tokamakLayer2,
                     address(this)
                 );
+                stakeOf = stakeOf.add(IIDepositManager(depositManager).pendingUnstaked(
+                    tokamakLayer2,
+                    address(this)
+                ));
             }
             uint256 holdAmount = _amountWTON;
             if (_amountTON > 0) holdAmount = holdAmount.add(_amountTON.mul(10**9));
             require(holdAmount >= _amountIn, "TokamakStaker: wton insufficient");
 
-            if (stakeOf > 0) {
-                holdAmount = holdAmount.add(stakeOf);
-            }
+            if (stakeOf > 0) holdAmount = holdAmount.add(stakeOf);
+
             require(
                 holdAmount > totalStakedAmount.mul(10**9) &&
                     holdAmount.sub(totalStakedAmount.mul(10**9)) >= _amountIn,
@@ -435,8 +437,9 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
             );
             if (_amountWTON < _amountIn) {
                 bytes memory data = abi.encode(swapProxy, swapProxy);
+                uint256 swapTON = _amountIn.sub(_amountWTON).div(10**9);
                 require(
-                    ITON(ton).approveAndCall(wton, _amountIn.sub(_amountWTON), data),
+                    ITON(ton).approveAndCall(wton, swapTON, data),
                     "TokamakStaker:exchangeWTONtoFLD approveAndCall fail"
                 );
             }
@@ -506,7 +509,9 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
         require(
             ton != address(0) &&
                 wton != address(0) &&
-                seigManager != address(0),
+                seigManager != address(0) &&
+                depositManager != address(0) &&
+                swapProxy != address(0),
             "TokamakStaker:tokamak zero"
         );
 
@@ -519,6 +524,10 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
                     tokamakLayer2,
                     address(this)
                 );
+                stakeOf = stakeOf.add(IIDepositManager(depositManager).pendingUnstaked(
+                    tokamakLayer2,
+                    address(this)
+                ));
             }
             uint256 holdAmount = _amountWTON;
             if (_amountTON > 0) holdAmount = holdAmount.add(_amountTON.mul(10**9));
@@ -532,8 +541,9 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
             );
             if (_amountWTON < _amountIn) {
                 bytes memory data = abi.encode(swapProxy, swapProxy);
+                uint256 swapTON = _amountIn.sub(_amountWTON).div(10**9);
                 require(
-                    ITON(ton).approveAndCall(wton, _amountIn.sub(_amountWTON), data),
+                    ITON(ton).approveAndCall(wton, swapTON, data),
                     "TokamakStaker:exchangeWTONtoFLD approveAndCall fail"
                 );
             }
