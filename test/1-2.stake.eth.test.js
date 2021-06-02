@@ -131,11 +131,11 @@ describe("Phase1. StakeContract with ETH", function () {
     saleStartBlock = parseInt(saleStartBlock.toString());
     stakeStartBlock = saleStartBlock + 20;
 
-    if (logFlag) {
+    //if (logFlag) {
       console.log(`\n\nCurrent block: ${current} `);
       console.log(' saleStartBlock ', saleStartBlock);
       console.log(' stakeStartBlock ', stakeStartBlock);
-    }
+    //}
 
     const tx = await stakeEntry.createVault(
       zeroAddress,
@@ -193,6 +193,8 @@ describe("Phase1. StakeContract with ETH", function () {
 
     it("2. createStakeContract ", async function () {
       for (let i = 0; i < testStakingPeriodBlocks.length; i++) {
+        console.log('createStakeContract period ',i,testStakingPeriodBlocks[i]);
+
         await stakeEntry.createStakeContract(
           toBN("1"),
           vault_phase1_eth.address,
@@ -217,13 +219,13 @@ describe("Phase1. StakeContract with ETH", function () {
           from: user1,
           value: toWei(testUser1StakingAmount[0], "ether"),
         })
-      ).to.be.revertedWith("unavailable");
+      ).to.be.revertedWith("StakeTON: unavailable");
     });
 
     it("2. If the sales period does not start, the sales closing function fails.", async function () {
       await expect(
         stakeEntry.closeSale(vault_phase1_eth.address, { from: user1 })
-      ).to.be.revertedWith("closeSale init fail");
+      ).to.be.revertedWith("Stake1Vault: closeSale init fail");
     });
 
   });
@@ -239,11 +241,11 @@ describe("Phase1. StakeContract with ETH", function () {
         stakeContractAddress = stakeAddresses[i];
         if (stakeContractAddress != null) {
           const stakeContract = await StakeTON.at(stakeContractAddress);
-          if (logFlag) {
+          //if (logFlag) {
             console.log('\n ---- Stake ETH ',i );
             console.log('Stake',i,' User1 :', testUser1StakingAmount[i] );
             console.log('Stake',i,' User2 :', testUser2StakingAmount[i] );
-          }
+          //}
 
           await stakeContract.sendTransaction({
             from: user1,
@@ -255,7 +257,8 @@ describe("Phase1. StakeContract with ETH", function () {
             value: toWei(testUser2StakingAmount[i], "ether"),
           });
 
-          if (logFlag) await ico20Contracts.logStake(stakeContractAddress, user1, user2);
+         // if (logFlag)
+          await ico20Contracts.logStake(stakeContractAddress, user1, user2);
         }
       }
     });
@@ -263,7 +266,7 @@ describe("Phase1. StakeContract with ETH", function () {
     it("2. If the sales period is not over, the sales closing function will fail.", async function () {
       await expect(
         stakeEntry.closeSale(vault_phase1_eth.address, { from: user1 })
-      ).to.be.revertedWith("closeSale init fail");
+      ).to.be.revertedWith("Stake1Vault: closeSale init fail");
     });
 
     it("3. Ether staking is not allowed after the sale period is over.", async function () {
@@ -276,14 +279,14 @@ describe("Phase1. StakeContract with ETH", function () {
           from: user1,
           value: toWei(testUser1StakingAmount[0], "ether"),
         })
-      ).to.be.revertedWith("unavailable");
+      ).to.be.revertedWith("StakeTON: unavailable");
     });
 
     it("4. If the sales closing function is not performed, the reward claim will fail.", async function () {
       const stakeContract = await StakeTON.at(stakeAddresses[0]);
       await expect(
         stakeContract.claim({ from: testStakingUsers[0] })
-      ).to.be.revertedWith("not closed");
+      ).to.be.revertedWith("StakeTON: not closed");
     });
 
     it("5. When the sales period is over, the sales closing function can be performed.", async function () {
@@ -298,19 +301,20 @@ describe("Phase1. StakeContract with ETH", function () {
     it("6. The sales closing function can be performed only once.", async function () {
       await expect(
         stakeEntry.closeSale(vault_phase1_eth.address, { from: user1 })
-      ).to.be.revertedWith("already closed");
+      ).to.be.revertedWith("Stake1Vault: already closed");
     });
   });
 
   describe('# 5. Function Test1 For Withdraw ', async function () {
     it("1. cannot withdraw unless the staking deadline has passed.", async function () {
       let current = await time.latestBlock();
-      if (logFlag) console.log(`\n\n Current block: ${current} `);
+      //if (logFlag)
+      console.log(`\n\n Current block: ${current} `);
       let i = 0;
       const stakeContract1 = await StakeTON.at(stakeAddresses[i]);
       await expect(
         stakeContract1.withdraw({ from: user1 })
-      ).to.be.revertedWith("not end");
+      ).to.be.revertedWith("StakeTON: not end");
     });
   });
 

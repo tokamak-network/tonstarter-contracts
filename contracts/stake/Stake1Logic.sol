@@ -278,7 +278,7 @@ contract Stake1Logic is StakeProxyStorage, AccessControl, IStake1Logic {
                 stakeType,
                 _addr,
                 address(stakeRegistry),
-                iniInfo
+                [iniInfo[0], iniInfo[1], periodBlock]
             );
         require(_contract != address(0), "Stake1Logic: deploy fail");
 

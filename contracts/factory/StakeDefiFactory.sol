@@ -19,7 +19,7 @@ contract StakeDefiFactory is IStakeDefiFactory {
     /// @dev Create a stake contract that can operate the staked amount as a DeFi project.
     /// @param _addr array of [token, paytoken, vault]
     /// @param _registry  registry address
-    /// @param _intdata array of [saleStartBlock, startBlock, endBlock]
+    /// @param _intdata array of [saleStartBlock, startBlock, periodBlocks]
     /// @param owner  owner address
     /// @return contract address
     function create(

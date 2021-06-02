@@ -1,46 +1,46 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity ^0.7.6;
 
-import "../interfaces/IStakeVaultStorage.sol";
+//import "../interfaces/IStakeVaultStorage.sol";
 import "../libraries/LibTokenStake1.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 
 /// @title the storage of StakeVaultStorage
-contract StakeVaultStorage is AccessControl, IStakeVaultStorage {
+contract StakeVaultStorage is AccessControl {
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
 
     /// @dev reward token : FLD
-    address public override fld;
+    address public fld;
 
     /// @dev paytoken is the token that the user stakes.
-    address public override paytoken;
+    address public paytoken;
 
     /// @dev allocated amount of fld
-    uint256 public override cap;
+    uint256 public cap;
 
     /// @dev the start block for sale.
-    uint256 public override saleStartBlock;
+    uint256 public saleStartBlock;
 
     /// @dev the staking start block
-    uint256 public override stakeStartBlock;
+    uint256 public stakeStartBlock;
 
     /// @dev the staking end block.
-    uint256 public override stakeEndBlock;
+    uint256 public stakeEndBlock;
 
     /// @dev the staking real end block.
-    uint256 public override realEndBlock;
+    uint256 public realEndBlock;
 
     /// @dev reward amount per block
-    uint256 public override blockTotalReward;
+    uint256 public blockTotalReward;
 
     /// @dev sale closed flag
-    bool public override saleClosed;
+    bool public saleClosed;
 
     /// @dev Operation type of staking amount
-    uint256 public override stakeType;
+    uint256 public stakeType;
 
     /// @dev External contract address used when operating the staking amount
-    address public override defiAddr;
+    address public defiAddr;
 
     /// @dev a list of stakeContracts maintained by the vault
     address[] public stakeAddresses;
@@ -52,7 +52,7 @@ contract StakeVaultStorage is AccessControl, IStakeVaultStorage {
     uint256[] public orderedEndBlocks;
 
     /// @dev the total staked amount stored at orderedEndBlock’s end block time
-    mapping(uint256 => uint256) public override stakeEndBlockTotal;
+    mapping(uint256 => uint256) public stakeEndBlockTotal;
 
     uint256 private _lock;
 

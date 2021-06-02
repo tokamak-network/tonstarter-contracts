@@ -98,7 +98,7 @@ contract StakeSimpleProxy is Stake1Storage, AccessControl {
 
     /// @dev set initial storage
     /// @param _addr the array addresses of token, paytoken, vault
-    /// @param _intdata the array valued of saleStartBlock, stakeStartBlock, stakeEndBlock
+    /// @param _intdata the array valued of saleStartBlock, stakeStartBlock, periodBlocks
     function setInit(address[3] memory _addr, uint256[3] memory _intdata)
         external
         onlyOwner

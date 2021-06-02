@@ -6,7 +6,7 @@ interface IStakeFactory {
     /// @param stakeType if 0, stakeTONFactory, else if 1 , stakeSimpleFactory , else if 2, stakeDefiFactory
     /// @param _addr array of [token, paytoken, vault, _defiAddr]
     /// @param registry  registry address
-    /// @param _intdata array of [saleStartBlock, startBlock, endBlock]
+    /// @param _intdata array of [saleStartBlock, startBlock, periodBlocks]
     /// @return contract address
     function create(
         uint256 stakeType,
