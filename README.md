@@ -43,7 +43,10 @@ Using the [hardhat-etherscan plugin](https://hardhat.org/plugins/nomiclabs-hardh
 ### lint
 `npm run lint`
 
-### To generate documents
+### To generate documents by solidity-docgen
 `npm run docify`
-Generate documents in /docgen/SUMMARY.md
+
+
+### To generate UML by sol2uml
+`sol2uml ./contracts`
 
