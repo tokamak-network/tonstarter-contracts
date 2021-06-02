@@ -155,7 +155,7 @@ contract StakeTONProxy is StakeTONStorage, AccessControl, OnApprove {
         );
         require(
             block.number >= saleStartBlock && block.number < startBlock,
-            "StakeTONProxy: period is unavailable"
+            "StakeTONProxy: period not allowed"
         );
 
         require(

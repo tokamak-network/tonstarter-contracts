@@ -195,6 +195,25 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
         }
     }
     */
+
+    function checkTokamak() public {
+        if (ton == address(0)) {
+            (
+                address _ton,
+                address _wton,
+                address _depositManager,
+                address _seigManager,
+                address _swapProxy
+            ) = ITokamakRegistry(stakeRegistry).getTokamak();
+
+            ton = _ton;
+            wton = _wton;
+            depositManager = _depositManager;
+            seigManager = _seigManager;
+            swapProxy = _swapProxy;
+        }
+    }
+
     /// @dev  staking the staked TON in layer2 in tokamak
     /// @param _layer2 the layer2 address in tokamak
     /// @param stakeAmount the amount that stake to layer2
@@ -212,22 +231,7 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
         );
         defiStatus = uint256(LibTokenStake1.DefiStatus.DEPOSITED);
 
-        if (ton == address(0)) {
-            (
-                address _ton,
-                address _wton,
-                address _depositManager,
-                address _seigManager,
-                address _swapProxy
-            ) = ITokamakRegistry(stakeRegistry).getTokamak();
-
-            ton = _ton;
-            wton = _wton;
-            depositManager = _depositManager;
-            seigManager = _seigManager;
-            swapProxy = _swapProxy;
-        }
-
+        checkTokamak();
         require(
             ton != address(0) &&
                 wton != address(0) &&
@@ -312,13 +316,7 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
         );
         defiStatus = uint256(LibTokenStake1.DefiStatus.REQUESTWITHDRAW);
         requestNum = requestNum.add(1);
-
-        (
-            address ton,
-            address wton,
-            address depositManager,
-            address seigManager,
-        ) = ITokamakRegistry(stakeRegistry).getTokamak();
+        checkTokamak();
         require(
             ton != address(0) &&
                 wton != address(0) &&
@@ -357,14 +355,7 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
         defiStatus = uint256(LibTokenStake1.DefiStatus.WITHDRAW);
         uint256 rn = requestNum;
         requestNum = 0;
-
-        (
-            address ton,
-            address wton,
-            address depositManager,
-            address seigManager,
-        ) = ITokamakRegistry(stakeRegistry).getTokamak();
-
+        checkTokamak();
         require(
             ton != address(0) &&
                 wton != address(0) &&
@@ -390,6 +381,7 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
     }
 
     /// @dev exchange holded WTON to FLD using uniswap
+    /// @notice
     /// @param _amountIn the input amount
     /// @param _amountOutMinimum the minimun output amount
     /// @param _deadline deadline
@@ -402,21 +394,20 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
         uint256 _deadline,
         uint160 _sqrtPriceLimitX96,
         uint256 _kind
-    ) external override returns (uint256 amountOut) {
+    ) external override
+        returns (uint256 amountOut)
+    {
         require(block.number <= endBlock, "TokamakStaker: period end");
-        (
-            address ton,
-            address wton,
-            ,
-            address seigManager
-        ) = ITokamakRegistry(stakeRegistry).getTokamak();
-
         require(IIStake1Vault(vault).saleClosed() == true, "TokamakStaker: not closed");
         require(_kind < 2, "TokamakStaker: no kind");
+
+        checkTokamak();
+
         require(
             ton != address(0) &&
                 wton != address(0) &&
-                seigManager != address(0),
+                seigManager != address(0) &&
+                swapProxy != address(0),
             "TokamakStaker:tokamak zero"
         );
 
@@ -435,7 +426,7 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
             require(holdAmount >= _amountIn, "TokamakStaker: wton insufficient");
 
             if (stakeOf > 0) {
-                holdAmount = stakeOf.add(_amountWTON);
+                holdAmount = holdAmount.add(stakeOf);
             }
             require(
                 holdAmount > totalStakedAmount.mul(10**9) &&
@@ -511,6 +502,7 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
             "TokamakStaker:not closed"
         );
         require(_kind < 2, "no kind");
+        checkTokamak();
         require(
             ton != address(0) &&
                 wton != address(0) &&
@@ -532,7 +524,7 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
             if (_amountTON > 0) holdAmount = holdAmount.add(_amountTON.mul(10**9));
             require(holdAmount >= _amountIn, "TokamakStaker: wton insufficient");
 
-            if (stakeOf > 0) holdAmount = stakeOf.add(_amountWTON);
+            if (stakeOf > 0) holdAmount = holdAmount.add(stakeOf);
             require(
                 holdAmount > totalStakedAmount.mul(10**9) &&
                     holdAmount.sub(totalStakedAmount.mul(10**9)) >= _amountIn,
