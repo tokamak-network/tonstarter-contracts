@@ -118,7 +118,11 @@ async function deployMain(defaultSender) {
     uniswapNPM,
     uniswapWeth,
     uniswapFee,
+<<<<<<< HEAD
+    uniswapRouter
+=======
     uniswapRouter2
+>>>>>>> 2de2622f95ca779d66f924d452715138b38ee8eb
   );
   console.log("stakeRegistry addDefiInfo:");
 

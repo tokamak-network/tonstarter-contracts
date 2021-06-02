@@ -15,44 +15,73 @@ const {
 
 require("dotenv").config();
 
-const zeroAddress = '0x0000000000000000000000000000000000000000';
+const zeroAddress = "0x0000000000000000000000000000000000000000";
 const ADMIN_ROLE = keccak256("ADMIN");
 
-let fldtoken = loadDeployed(process.env.NETWORK,"FLD");
-let registry = loadDeployed(process.env.NETWORK,"StakeRegistry");
-let factory = loadDeployed(process.env.NETWORK,"StakeFactory");
-let logic = loadDeployed(process.env.NETWORK,"Stake1Logic");
-let proxy = loadDeployed(process.env.NETWORK,"Stake1Proxy");
-let tonFactory = loadDeployed(process.env.NETWORK,"StakeTONFactory");
+const fldtoken = loadDeployed(process.env.NETWORK, "FLD");
+const registry = loadDeployed(process.env.NETWORK, "StakeRegistry");
+const factory = loadDeployed(process.env.NETWORK, "StakeFactory");
+const logic = loadDeployed(process.env.NETWORK, "Stake1Logic");
+const proxy = loadDeployed(process.env.NETWORK, "Stake1Proxy");
+const tonFactory = loadDeployed(process.env.NETWORK, "StakeTONFactory");
 
-let ton = loadDeployed(process.env.NETWORK,"TON");
+const ton = loadDeployed(process.env.NETWORK, "TON");
 
+async function changeStakeTONFactory() {
+  const StakeTONLogic = await ethers.getContractFactory("StakeTON");
+  const StakeTONProxyFactory = await ethers.getContractFactory(
+    "StakeTONProxyFactory"
+  );
+  const StakeTONFactory = await ethers.getContractFactory("StakeTONFactory");
+  const StakeFactory = await ethers.getContractFactory("StakeFactory");
+
+  const stakeTONLogic = await StakeTONLogic.deploy();
+  await stakeTONLogic.deployed();
+
+  const stakeTONProxyFactory = await StakeTONProxyFactory.deploy();
+  await stakeTONProxyFactory.deployed();
+
+  const stakeTONFactory = await StakeTONFactory.deploy(
+    stakeTONProxyFactory.address,
+    stakeTONLogic.address
+  );
+  await stakeTONFactory.deployed();
+
+  const stakeFactory = await StakeFactory.attach(factory);
+  const tx = await stakeFactory.setStakeTONFactory(stakeTONFactory.address);
+  await tx.wait();
+}
 async function createValue(tonVault, paytoken) {
+  // const [deployer, user1] = await ethers.getSigners();
+  // const stakeProxy = await ethers.getContractAt("Stake1Proxy", proxy);
+  // const newImplementation = await (
+  //   await ethers.getContractFactory("Stake1Logic")
+  // )
+  //   .connect(deployer)
+  //   .deploy();
+  // await newImplementation.deployed();
+  // await stakeProxy.upgradeTo(newImplementation.address);
 
-  const [deployer, user1] = await ethers.getSigners();
   const stakeEntry = await ethers.getContractAt("Stake1Logic", proxy);
 
-  let tx = await stakeEntry.createVault(
-      paytoken,
-      toWei(tonVault.allocatedFLD, 'ether'),
-      tonVault.saleStartBlock,
-      tonVault.stakeStartBlock,
-      tonVault.phase,
-      tonVault.hashName,
-      0,
-      zeroAddress
-    );
-
+  const tx = await stakeEntry.createVault(
+    paytoken,
+    toWei(tonVault.allocatedFLD, "ether"),
+    tonVault.saleStartBlock,
+    tonVault.stakeStartBlock,
+    tonVault.phase,
+    tonVault.hashName,
+    0,
+    zeroAddress
+  );
+  await tx.wait();
   console.log("createValue tx:", tx.hash);
-
-  return;
 }
 
-async function createStakeContract(vaultAddress, periodBlock, name, paytoken ) {
-
+async function createStakeContract(vaultAddress, periodBlock, name, paytoken) {
   const [deployer, user1] = await ethers.getSigners();
   const stakeEntry = await ethers.getContractAt("Stake1Logic", proxy);
-  var overrideOptions = {}
+  let overrideOptions = {};
   try {
     const estimateGas = await stakeEntry.estimateGas.createStakeContract(
       1,
@@ -63,30 +92,27 @@ async function createStakeContract(vaultAddress, periodBlock, name, paytoken ) {
       name
     );
 
-    let gasInt = estimateGas * 1.5 ;
+    let gasInt = estimateGas * 1.5;
     gasInt = parseInt(gasInt);
     overrideOptions = {
-      gasLimit: gasInt
-    }
-  } catch(error) {
+      gasLimit: gasInt,
+    };
+  } catch (error) {
     console.error(error);
   }
 
-  let tx = await stakeEntry.createStakeContract(
-      1,
-      vaultAddress,
-      fldtoken,
-      paytoken,
-      periodBlock,
-      name,
-      overrideOptions
-    );
-
-  console.log("createStakeContract ",name,",tx:", tx.hash);
-
-  return;
+  const tx = await stakeEntry.createStakeContract(
+    1,
+    vaultAddress,
+    fldtoken,
+    paytoken,
+    periodBlock,
+    name,
+    overrideOptions
+  );
+  await tx.wait();
+  console.log("createStakeContract ", name, ",tx:", tx.hash);
 }
-
 
 function timeout(sec) {
   return new Promise((resolve) => {
@@ -127,23 +153,15 @@ async function main() {
 
   console.log("Account balance:", (await deployer.getBalance()).toString());
   const provider = await ethers.getDefaultProvider("rinkeby");
-  console.log('ADMIN_ROLE',ADMIN_ROLE);
-  let curBlock = await provider.getBlockNumber();
-  console.log('curBlock',curBlock);
+  console.log("ADMIN_ROLE", ADMIN_ROLE);
+  const curBlock = await provider.getBlockNumber();
+  console.log("curBlock", curBlock);
 
-  let saleStartBlock = parseInt(curBlock)+ (60*10/13);
+  let saleStartBlock = parseInt(curBlock) + (60 * 5) / 13;
   saleStartBlock = parseInt(saleStartBlock);
 
-  let stakeStartBlock = parseInt(saleStartBlock)+ (60*10/13);
+  let stakeStartBlock = parseInt(saleStartBlock) + (60 * 5) / 13;
   stakeStartBlock = parseInt(stakeStartBlock);
-
-  let ton_vault = {
-    allocatedFLD : '100000',
-    saleStartBlock : saleStartBlock,
-    stakeStartBlock : stakeStartBlock,
-    phase: 1,
-    hashName : keccak256("ETH_TEST_20210521_09"),
-  }
 
   let VaultName = "TON #1";
   let periodsMins = [
@@ -191,6 +209,13 @@ async function main() {
     }
   ]
 
+  const ton_vault = {
+    allocatedFLD: "100000",
+    saleStartBlock: saleStartBlock,
+    stakeStartBlock: stakeStartBlock,
+    phase: 1,
+    hashName : keccak256(VaultName),
+  }
 
  // console.log('vault',ton_vault);
 
@@ -202,32 +227,32 @@ async function main() {
 // 3. Uncomment and execute createStakeContract creation for the desired period.
 // Note: If you want to enter multiple createStakeContracts, you must create a contract with a shorter period.
 
-
   ton.saleStartBlock = parseInt(curBlock) + parseInt(60*5/13);
   ton.stakeStartBlock = ton.saleStartBlock + parseInt(60*6/13);
   ////////////////////////////////////////////////////////
   // For TON Vault : hashName must be specified as a unique value.
-  // ton_vault.hashName = keccak256(VaultName);
-  // await createValue(ton_vault, ton);
+  ton_vault.hashName = keccak256(VaultName);
+  await createValue(ton_vault, ton);
 
-  ////////////////////////////////////////////////////////
+  /// /////////////////////////////////////////////////////
   // For TON StakeContract of Vault
-  // write your vault .
-  let vaultAddress ='0xA96b5688B8F6fB7fB4950aA0785AA38422A63fff';
-  console.log('vaultAddress',vaultAddress);
-  let periods = periodsMins;
-  console.log('periods',periods);
-  for (let i =0; i< periods.length ; i++){
-    await createStakeContract(vaultAddress, periods[i].period.blocks, periods[i].name, ton );
-    timeout(10000);
-  }
+  // write your vault
+  // let vaultAddress ='0xA96b5688B8F6fB7fB4950aA0785AA38422A63fff';
+  // console.log('vaultAddress',vaultAddress);
+  // let periods = periodsMins;
+  // console.log('periods',periods);
+  // for (let i =0; i< periods.length ; i++){
+  //   await createStakeContract(vaultAddress, periods[i].period.blocks, periods[i].name, ton );
+  //   timeout(10000);
+  // }
 
   ////////////////////////////////////////////////////////
+
   // For Ether Vault
   // ton_vault.hashName = keccak256("ETH_TEST_20210527_1650");
   // await createValue(ton_vault, zeroAddress);
 
-  ////////////////////////////////////////////////////////
+  /// /////////////////////////////////////////////////////
   // For Ether StakeContract of Vault
   // write your vault .
   // let vaultAddress ='0x23B49bc68632A5cd5d6aeB9CB3ab8b4C2e8DB4BF';
@@ -239,7 +264,6 @@ async function main() {
   // await createStakeContract(vaultAddress, periodBlockDay3, 'ETH_3_DAY', zeroAddress );
   // timeout(10000);
   // await createStakeContract(vaultAddress, periodBlockDay4, 'ETH_4_DAY', zeroAddress );
-
 }
 
 main()
