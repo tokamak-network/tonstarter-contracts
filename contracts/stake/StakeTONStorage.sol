@@ -18,6 +18,9 @@ contract StakeTONStorage is Stake1Storage {
     /// @dev DepositManager address
     address public depositManager;
 
+    /// @dev swapProxy address
+    address public swapProxy;
+
     /// @dev the layer2 address in Tokamak
     address public tokamakLayer2;
 

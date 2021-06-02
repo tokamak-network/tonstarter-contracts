@@ -14,6 +14,7 @@ const {
 } = require("web3-utils");
 
 require("dotenv").config();
+const loadDeployedInitVariable = require("./load_deployed_init");
 
 const initialTotal = process.env.initialTotal + "." + "0".repeat(18);
 
@@ -53,15 +54,17 @@ const CLAIMER_ROLE = keccak256("CLAIMER");
 const PHASE2_VAULT_HASH = keccak256("PHASE2_VAULT");
 const EVENT_VAULT_HASH = keccak256("EVENT_VAULT");
 
+const fldtoken = loadDeployedInitVariable(process.env.NETWORK, "FLD");
+
 async function deployMain(defaultSender) {
   const [deployer, user1] = await ethers.getSigners();
 
-  const FLD = await ethers.getContractFactory("FLD");
-  const fld = await FLD.deploy();
-  await fld.deployed();
+  // const FLD = await ethers.getContractFactory("FLD");
+  // const fld = await FLD.deploy();
+  // await fld.deployed();
 
-  // const FLD_Address = "0xd1e1C3995695650ABc3Ea3c68ae5d365b35174ED";
-  // const fld = await ethers.getContractAt("FLD", FLD_Address);
+  const FLD_Address = fldtoken;
+  const fld = await ethers.getContractAt("FLD", FLD_Address);
   console.log("fld:", fld.address);
 
   const StakeSimple = await ethers.getContractFactory("StakeSimple");
@@ -200,6 +203,7 @@ async function main() {
   out.WTON = "0x709bef48982Bbfd6F2D4Be24660832665F53406C";
   out.DepositManager = "0x57F5CD759A5652A697D539F1D9333ba38C615FC2";
   out.SeigManager = "0x957DaC3D3C4B82088A4939BE9A8063e20cB2efBE";
+  out.SwapProxy = "0x8032d21F59CDB42C9c94a3A41524D4CCF0Cae96c";
 
   save(process.env.NETWORK, out);
 }

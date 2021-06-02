@@ -207,7 +207,7 @@ describe("Phase1. StakeContract with ETH", function () {
           from: user1,
           value: toWei(testUser1StakingAmount[0], "ether"),
         })
-      ).to.be.revertedWith("StakeTON: period is unavailable");
+      ).to.be.revertedWith("StakeTON: period not allowed");
     });
 
     it("2. If the sales period does not start, the sales closing function fails.", async function () {
@@ -266,7 +266,7 @@ describe("Phase1. StakeContract with ETH", function () {
           from: user1,
           value: toWei(testUser1StakingAmount[0], "ether"),
         })
-      ).to.be.revertedWith("StakeTON: period is unavailable");
+      ).to.be.revertedWith("StakeTON: period not allowed");
     });
 
     it("4. If the sales closing function is not performed, the reward claim will fail.", async function () {

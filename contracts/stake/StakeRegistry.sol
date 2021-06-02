@@ -28,6 +28,9 @@ contract StakeRegistry is AccessControl, IStakeRegistry {
     /// @dev SeigManager address in Tokamak
     address public seigManager;
 
+    /// @dev swapProxy address in Tokamak
+    address public swapProxy;
+
     /// Contracts included in the phase
     mapping(uint256 => address[]) public phases;
 
@@ -124,6 +127,10 @@ contract StakeRegistry is AccessControl, IStakeRegistry {
         emit SetTokamak(ton, wton, depositManager, seigManager);
     }
 
+    function setSwapProxy(address _swapProxy) external nonZero(_swapProxy) {
+        swapProxy = _swapProxy;
+    }
+
     /// @dev Add information related to Defi
     /// @param _name name . ex) UNISWAP_V3
     /// @param _router entry point of defi
@@ -211,10 +218,11 @@ contract StakeRegistry is AccessControl, IStakeRegistry {
             address,
             address,
             address,
+            address,
             address
         )
     {
-        return (ton, wton, depositManager, seigManager);
+        return (ton, wton, depositManager, seigManager, swapProxy);
     }
 
     /// @dev Get indos for UNISWAP_V3 interface

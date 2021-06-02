@@ -49,9 +49,12 @@ const ton = loadDeployed(process.env.NETWORK, "TON");
 const wton = loadDeployed(process.env.NETWORK, "WTON");
 const depositManager = loadDeployed(process.env.NETWORK, "DepositManager");
 const seigManager = loadDeployed(process.env.NETWORK, "SeigManager");
+const swapProxy = loadDeployed(process.env.NETWORK, "SwapProxy");
+
 console.log("proxy:", proxy);
 console.log("ton:", ton);
 console.log("wton:", wton);
+console.log("swapProxy:", swapProxy);
 
 async function deployMain(defaultSender) {
   const [deployer, user1] = await ethers.getSigners();
@@ -106,17 +109,16 @@ async function deployMain(defaultSender) {
   await stakeRegistry.setTokamak(ton, wton, depositManager, seigManager);
   console.log("stakeRegistry setTokamak:");
 
+  await stakeRegistry.setSwapProxy(swapProxy);
+  console.log("stakeRegistry setSwapProxy:");
+
   await stakeRegistry.addDefiInfo(
     "UNISWAP_V3",
     uniswapRouter,
     uniswapNPM,
     uniswapWeth,
     uniswapFee,
-<<<<<<< HEAD
-    uniswapRouter
-=======
     uniswapRouter2
->>>>>>> 2de2622f95ca779d66f924d452715138b38ee8eb
   );
   console.log("stakeRegistry addDefiInfo:");
 

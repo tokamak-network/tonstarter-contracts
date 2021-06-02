@@ -29,11 +29,16 @@ interface IERC20BASE {
     ) external returns (bool);
 }
 
+interface IIWTON {
+    function swapToTON(uint256 wtonAmount) external returns (bool);
+}
+
 interface ITokamakRegistry {
     function getTokamak()
         external
         view
         returns (
+            address,
             address,
             address,
             address,
@@ -84,7 +89,7 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
 
     event SetRegistry(address registry);
     event SetTokamakLayer2(address layer2);
-    event tokamakStaked(address layer2, uint256 amount);
+    event tokamakStaked(address layer2, uint256 amount, bool isTON);
     event tokamakRequestedUnStaking(address layer2, uint256 amount);
     event tokamakProcessedUnStaking(
         address layer2,
@@ -149,45 +154,84 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
         return ITokamakRegistry(stakeRegistry).getUniswap();
     }
 
-    function approveUniswapRouter(uint256 amount) external override {
-        (address uniswapRouter, address npm, , , ) =
-            ITokamakRegistry(stakeRegistry).getUniswap();
+    // function approveUniswapRouter(uint256 amount) external override {
+    //     (address uniswapRouter, address npm, , , ) =
+    //         ITokamakRegistry(stakeRegistry).getUniswap();
 
-        if (uniswapRouter != address(0))
-            IERC20BASE(paytoken).approve(uniswapRouter, amount);
-        if (npm != address(0)) IERC20BASE(paytoken).approve(npm, amount);
-    }
+    //     if (uniswapRouter != address(0))
+    //         IERC20BASE(paytoken).approve(uniswapRouter, amount);
+    //     if (npm != address(0)) IERC20BASE(paytoken).approve(npm, amount);
+    // }
 
-    /// @dev  staking the staked TON in layer2 in tokamak
-    /// @param _layer2 the layer2 address in tokamak
-    function tokamakStaking(address _layer2)
-        external
-        override
+    /**
+    function swapTONtoWTON(uint256 amount, bool toWTON)
+        public
         lock
-        nonZero(stakeRegistry)
-        nonZero(_layer2)
+        nonZero(swapProxy)
     {
-        require(block.number <= endBlock, "TokamakStaker:period end");
-        require(
-            IIStake1Vault(vault).saleClosed() == true,
-            "TokamakStaker:not closed"
-        );
-        defiStatus = uint256(LibTokenStake1.DefiStatus.DEPOSITED);
+        uint256 balance = 0;
 
+        if (toWTON) {
+            balance = IERC20BASE(ton).balanceOf(address(this));
+            require(
+                balance >= amount,
+                "TokamakStaker: swapTONtoWTON ton balance is insufficient"
+            );
+            bytes memory data = abi.encode(swapProxy, swapProxy);
+            require(
+                ITON(ton).approveAndCall(wton, amount, data),
+                "TokamakStaker:swapTONtoWTON approveAndCall fail"
+            );
+        } else {
+            balance = IERC20BASE(wton).balanceOf(address(this));
+            require(
+                balance >= amount,
+                "TokamakStaker: swapTONtoWTON wton balance is insufficient"
+            );
+            require(
+                IIWTON(wton).swapToTON(amount),
+                "TokamakStaker:swapToTON fail"
+            );
+        }
+    }
+    */
+
+    function checkTokamak() public {
         if (ton == address(0)) {
             (
                 address _ton,
                 address _wton,
                 address _depositManager,
-                address _seigManager
+                address _seigManager,
+                address _swapProxy
             ) = ITokamakRegistry(stakeRegistry).getTokamak();
 
             ton = _ton;
             wton = _wton;
             depositManager = _depositManager;
             seigManager = _seigManager;
+            swapProxy = _swapProxy;
         }
+    }
 
+    /// @dev  staking the staked TON in layer2 in tokamak
+    /// @param _layer2 the layer2 address in tokamak
+    /// @param stakeAmount the amount that stake to layer2
+    /// @param isTON TON is true, WTON is false
+    function tokamakStaking(
+        address _layer2,
+        uint256 stakeAmount,
+        bool isTON
+    ) external override lock nonZero(stakeRegistry) nonZero(_layer2) {
+        require(block.number <= endBlock, "TokamakStaker:period end");
+        require(stakeAmount > 0, "TokamakStaker:stakeAmount is zero");
+        require(
+            IIStake1Vault(vault).saleClosed() == true,
+            "TokamakStaker:not closed"
+        );
+        defiStatus = uint256(LibTokenStake1.DefiStatus.DEPOSITED);
+
+        checkTokamak();
         require(
             ton != address(0) &&
                 wton != address(0) &&
@@ -202,11 +246,6 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
             block.number < endBlock - globalWithdrawalDelay,
             "TokamakStaker:period(withdrawalDelay) end"
         );
-
-        uint256 _amount = IERC20BASE(ton).balanceOf(address(this));
-        uint256 _amountWTON = IERC20BASE(wton).balanceOf(address(this));
-
-        require(_amount > 0 || _amountWTON > 0, "TokamakStaker:amount is zero");
 
         if (tokamakLayer2 == address(0)) tokamakLayer2 = _layer2;
         else {
@@ -230,23 +269,35 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
                 if (tokamakLayer2 != _layer2) tokamakLayer2 = _layer2;
             }
         }
-        if (_amount > 0) {
-            toTokamak = toTokamak.add(_amount);
+
+        uint256 balance = 0;
+        if (isTON) {
+            balance = IERC20BASE(ton).balanceOf(address(this));
+            require(
+                balance >= stakeAmount,
+                "TokamakStaker: ton balance is zero"
+            );
+            toTokamak = toTokamak.add(stakeAmount);
             bytes memory data = abi.encode(depositManager, _layer2);
             require(
-                ITON(ton).approveAndCall(wton, _amount, data),
+                ITON(ton).approveAndCall(wton, stakeAmount, data),
                 "TokamakStaker:approveAndCall fail"
             );
-        }
-        if (_amountWTON > 0) {
-            toTokamak = toTokamak.add(_amountWTON.div(10**9));
-            IERC20BASE(wton).approve(depositManager, _amountWTON);
+        } else {
+            balance = IERC20BASE(wton).balanceOf(address(this));
             require(
-                IIDepositManager(depositManager).deposit(_layer2, _amountWTON),
+                balance >= stakeAmount,
+                "TokamakStaker: wton balance is zero"
+            );
+            toTokamak = toTokamak.add(stakeAmount.div(10**9));
+            IERC20BASE(wton).approve(depositManager, stakeAmount);
+            require(
+                IIDepositManager(depositManager).deposit(_layer2, stakeAmount),
                 "TokamakStaker:deposit fail"
             );
         }
-        emit tokamakStaked(_layer2, _amount);
+
+        emit tokamakStaked(_layer2, stakeAmount, isTON);
     }
 
     /// @dev  request unstaking the wtonAmount in layer2 in tokamak
@@ -265,13 +316,7 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
         );
         defiStatus = uint256(LibTokenStake1.DefiStatus.REQUESTWITHDRAW);
         requestNum = requestNum.add(1);
-
-        (
-            address ton,
-            address wton,
-            address depositManager,
-            address seigManager
-        ) = ITokamakRegistry(stakeRegistry).getTokamak();
+        checkTokamak();
         require(
             ton != address(0) &&
                 wton != address(0) &&
@@ -310,14 +355,7 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
         defiStatus = uint256(LibTokenStake1.DefiStatus.WITHDRAW);
         uint256 rn = requestNum;
         requestNum = 0;
-
-        (
-            address ton,
-            address wton,
-            address depositManager,
-            address seigManager
-        ) = ITokamakRegistry(stakeRegistry).getTokamak();
-
+        checkTokamak();
         require(
             ton != address(0) &&
                 wton != address(0) &&
@@ -337,12 +375,13 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
         );
 
         // receiveTON = false . to WTON
-        IIDepositManager(depositManager).processRequests(_layer2, rn, false);
+        IIDepositManager(depositManager).processRequests(_layer2, rn, true);
 
-        emit tokamakProcessedUnStaking(_layer2, rn, false);
+        emit tokamakProcessedUnStaking(_layer2, rn, true);
     }
 
     /// @dev exchange holded WTON to FLD using uniswap
+    /// @notice
     /// @param _amountIn the input amount
     /// @param _amountOutMinimum the minimun output amount
     /// @param _deadline deadline
@@ -355,26 +394,26 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
         uint256 _deadline,
         uint160 _sqrtPriceLimitX96,
         uint256 _kind
-    ) external override returns (uint256 amountOut) {
+    ) external override
+        returns (uint256 amountOut)
+    {
         require(block.number <= endBlock, "TokamakStaker: period end");
         require(IIStake1Vault(vault).saleClosed() == true, "TokamakStaker: not closed");
         require(_kind < 2, "TokamakStaker: no kind");
 
-        (
-            address ton,
-            address wton,
-            ,
-            address seigManager
-        ) = ITokamakRegistry(stakeRegistry).getTokamak();
+        checkTokamak();
+
         require(
             ton != address(0) &&
                 wton != address(0) &&
-                seigManager != address(0),
+                seigManager != address(0) &&
+                swapProxy != address(0),
             "TokamakStaker:tokamak zero"
         );
 
         {
             uint256 _amountWTON = IERC20BASE(wton).balanceOf(address(this));
+            uint256 _amountTON = IERC20BASE(ton).balanceOf(address(this));
             uint256 stakeOf = 0;
             if (tokamakLayer2 != address(0)) {
                 stakeOf = IISeigManager(seigManager).stakeOf(
@@ -383,14 +422,24 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
                 );
             }
             uint256 holdAmount = _amountWTON;
+            if (_amountTON > 0) holdAmount = holdAmount.add(_amountTON.mul(10**9));
+            require(holdAmount >= _amountIn, "TokamakStaker: wton insufficient");
+
             if (stakeOf > 0) {
-                holdAmount = stakeOf.add(_amountWTON);
+                holdAmount = holdAmount.add(stakeOf);
             }
             require(
                 holdAmount > totalStakedAmount.mul(10**9) &&
                     holdAmount.sub(totalStakedAmount.mul(10**9)) >= _amountIn,
                 "TokamakStaker:insufficient"
             );
+            if (_amountWTON < _amountIn) {
+                bytes memory data = abi.encode(swapProxy, swapProxy);
+                require(
+                    ITON(ton).approveAndCall(wton, _amountIn.sub(_amountWTON), data),
+                    "TokamakStaker:exchangeWTONtoFLD approveAndCall fail"
+                );
+            }
         }
 
         toUniswapWTON += _amountIn;
@@ -453,13 +502,7 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
             "TokamakStaker:not closed"
         );
         require(_kind < 2, "no kind");
-
-        (
-            address ton,
-            address wton,
-            ,
-            address seigManager
-        ) = ITokamakRegistry(stakeRegistry).getTokamak();
+        checkTokamak();
         require(
             ton != address(0) &&
                 wton != address(0) &&
@@ -469,6 +512,7 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
 
         {
             uint256 _amountWTON = IERC20BASE(wton).balanceOf(address(this));
+            uint256 _amountTON = IERC20BASE(ton).balanceOf(address(this));
             uint256 stakeOf = 0;
             if (tokamakLayer2 != address(0)) {
                 stakeOf = IISeigManager(seigManager).stakeOf(
@@ -477,12 +521,22 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
                 );
             }
             uint256 holdAmount = _amountWTON;
-            if (stakeOf > 0) holdAmount = stakeOf.add(_amountWTON);
+            if (_amountTON > 0) holdAmount = holdAmount.add(_amountTON.mul(10**9));
+            require(holdAmount >= _amountIn, "TokamakStaker: wton insufficient");
+
+            if (stakeOf > 0) holdAmount = holdAmount.add(stakeOf);
             require(
                 holdAmount > totalStakedAmount.mul(10**9) &&
                     holdAmount.sub(totalStakedAmount.mul(10**9)) >= _amountIn,
                 "TokamakStaker:insufficient"
             );
+            if (_amountWTON < _amountIn) {
+                bytes memory data = abi.encode(swapProxy, swapProxy);
+                require(
+                    ITON(ton).approveAndCall(wton, _amountIn.sub(_amountWTON), data),
+                    "TokamakStaker:exchangeWTONtoFLD approveAndCall fail"
+                );
+            }
         }
 
         toUniswapWTON += _amountIn;
@@ -526,62 +580,5 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
 
         emit exchangedWTONtoFLD(msg.sender, _amountIn, amountOut);
     }
-    /*
-    function exactInputSingleParams(
-        address[2] memory addrs,
-        address tokenIn,
-        address tokenOut,
-        uint24 fee,
-        address recipient,
-        uint256 deadline,
-        uint256 amountIn,
-        uint256 amountOutMinimum,
-        uint160 sqrtPriceLimitX96
-    ) public override returns (uint256 amountOut) {
-        require(
-            IERC20BASE(tokenIn).approve(addrs[0], amountIn),
-            "can't approve uniswapRouter"
-        );
 
-        ISwapRouter.ExactInputSingleParams memory params =
-            ISwapRouter.ExactInputSingleParams({
-                tokenIn: tokenIn,
-                tokenOut: tokenOut,
-                fee: fee,
-                recipient: recipient,
-                deadline: deadline,
-                amountIn: amountIn,
-                amountOutMinimum: amountOutMinimum,
-                sqrtPriceLimitX96: sqrtPriceLimitX96
-            });
-
-        amountOut = ISwapRouter(addrs[0]).exactInputSingle(params);
-    }
-
-    function exchangeWTONtoFLDexactInput(
-        address uniswapRouter,
-        address wton, // wton, wether
-        address weth,
-        uint256 fee,
-        uint256 amountIn,
-        uint256 amountOutMinimum,
-        uint256 deadline
-    ) public override returns (uint256 amountOut) {
-        toUniswapWTON += amountIn;
-        bytes memory path = abi.encodePacked(wton, fee, weth, fee, token);
-
-        ISwapRouter.ExactInputParams memory params =
-            ISwapRouter.ExactInputParams({
-                path: path,
-                recipient: address(this),
-                amountIn: amountIn,
-                amountOutMinimum: amountOutMinimum,
-                deadline: deadline
-            });
-
-        amountOut = ISwapRouter(uniswapRouter).exactInput(params);
-
-        emit exchangedWTONtoFLD(msg.sender, amountIn, amountOut);
-    }
-    */
 }
