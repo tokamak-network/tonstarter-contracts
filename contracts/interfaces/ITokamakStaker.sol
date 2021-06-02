@@ -22,9 +22,11 @@ interface ITokamakStaker {
             address uniswapRouterV2
         );
 
-    /// @dev Amount approve for use with UniswapRouter
-    /// @param amount the amount requested to aprove
-    /// function approveUniswapRouter(uint256 amount) external;
+    /// @dev Change the TON holded in contract have to WTON, or change WTON to TON.
+    /// @param amount the amount to be changed
+    /// @param toWTON if it's true, TON->WTON , else WTON->TON
+    function swapTONtoWTON(uint256 amount, bool toWTON)
+        external;
 
     /// @dev  staking the staked TON in layer2 in tokamak
     /// @param _layer2 the layer2 address in tokamak

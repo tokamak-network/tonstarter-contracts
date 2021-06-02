@@ -154,8 +154,11 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
         return ITokamakRegistry(stakeRegistry).getUniswap();
     }
 
+    /// @dev Change the TON holded in contract have to WTON, or change WTON to TON.
+    /// @param amount the amount to be changed
+    /// @param toWTON if it's true, TON->WTON , else WTON->TON
     function swapTONtoWTON(uint256 amount, bool toWTON)
-        public
+        public override
         lock
         nonZero(swapProxy)
     {
