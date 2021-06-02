@@ -154,15 +154,6 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
         return ITokamakRegistry(stakeRegistry).getUniswap();
     }
 
-    // function approveUniswapRouter(uint256 amount) external override {
-    //     (address uniswapRouter, address npm, , , ) =
-    //         ITokamakRegistry(stakeRegistry).getUniswap();
-
-    //     if (uniswapRouter != address(0))
-    //         IERC20BASE(paytoken).approve(uniswapRouter, amount);
-    //     if (npm != address(0)) IERC20BASE(paytoken).approve(npm, amount);
-    // }
-
     function swapTONtoWTON(uint256 amount, bool toWTON)
         public
         lock
@@ -194,6 +185,7 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
         }
     }
 
+    /// @dev If the tokamak addresses is not set, set the addresses.
     function checkTokamak() public {
         if (ton == address(0)) {
             (
