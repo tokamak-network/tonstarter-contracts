@@ -157,7 +157,7 @@ contract Stake1Vault is StakeVaultStorage, IStake1Vault {
                 (bool success, bytes memory returnData) =
                     paytoken.call(
                         abi.encodeWithSignature(
-                            "Stake1Vault: balanceOf(address)",
+                            "balanceOf(address)",
                             stakeAddresses[i]
                         )
                     );
