@@ -56,11 +56,12 @@ const EVENT_VAULT_HASH = keccak256("EVENT_VAULT");
 async function deployMain(defaultSender) {
   const [deployer, user1] = await ethers.getSigners();
 
-  // const FLD = await ethers.getContractFactory('FLD');
-  // const fld = await FLD.deploy();
+  const FLD = await ethers.getContractFactory("FLD");
+  const fld = await FLD.deploy();
+  await fld.deployed();
 
-  const FLD_Address = "0xd1e1C3995695650ABc3Ea3c68ae5d365b35174ED";
-  const fld = await ethers.getContractAt("FLD", FLD_Address);
+  // const FLD_Address = "0xd1e1C3995695650ABc3Ea3c68ae5d365b35174ED";
+  // const fld = await ethers.getContractAt("FLD", FLD_Address);
   console.log("fld:", fld.address);
 
   const StakeSimple = await ethers.getContractFactory("StakeSimple");
@@ -89,23 +90,28 @@ async function deployMain(defaultSender) {
   const stakeSimpleFactory = await StakeSimpleFactory.deploy(
     stakeSimple.address
   );
+  await stakeSimpleFactory.deployed();
   console.log("StakeSimpleFactory:", stakeSimpleFactory.address);
 
   // const stakeTONLogicFactory = await StakeTONLogicFactory.deploy();
   // console.log('StakeTONLogicFactory:', stakeTONLogicFactory.address);
   const stakeTONLogic = await StakeTONLogic.deploy();
+  await stakeTONLogic.deployed();
   console.log("StakeTONLogic:", stakeTONLogic.address);
 
   const stakeTONProxyFactory = await StakeTONProxyFactory.deploy();
+  await stakeTONProxyFactory.deployed();
   console.log("StakeTONProxyFactory:", stakeTONProxyFactory.address);
 
   const stakeTONFactory = await StakeTONFactory.deploy(
     stakeTONProxyFactory.address,
     stakeTONLogic.address
   );
+  await stakeTONFactory.deployed();
   console.log("stakeTONFactory:", stakeTONFactory.address);
 
   const stakeDefiFactory = await StakeDefiFactory.deploy(stakeSimple.address);
+  await stakeDefiFactory.deployed();
   console.log("stakeDefiFactory:", stakeDefiFactory.address);
 
   const stakeFactory = await StakeFactory.deploy(
@@ -113,21 +119,27 @@ async function deployMain(defaultSender) {
     stakeTONFactory.address,
     stakeDefiFactory.address
   );
+  await stakeFactory.deployed();
   console.log("stakeFactory:", stakeFactory.address);
 
   const stakeRegistry = await StakeRegistry.deploy(fld.address);
+  await stakeRegistry.deployed();
   console.log("stakeRegistry:", stakeRegistry.address);
 
   const stake1Vault = await Stake1Vault.deploy();
+  await stake1Vault.deployed();
   console.log("Stake1Vault:", stake1Vault.address);
 
   const stakeVaultFactory = await StakeVaultFactory.deploy(stake1Vault.address);
+  await stakeVaultFactory.deployed();
   console.log("stakeVaultFactory:", stakeVaultFactory.address);
 
   const stake1Logic = await Stake1Logic.deploy();
+  await stake1Logic.deployed();
   console.log("stake1Logic:", stake1Logic.address);
 
   const stake1Proxy = await Stake1Proxy.deploy();
+  await stake1Proxy.deployed();
   console.log("stake1Proxy:", stake1Proxy.address);
 
   await stake1Proxy.upgradeTo(stake1Logic.address);
