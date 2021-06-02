@@ -104,7 +104,7 @@ contract StakeTON is TokamakStaker, IStakeTON {
             address ton,
             address wton,
             address depositManager,
-            address seigManager
+            address seigManager,
         ) = ITokamakRegistry(stakeRegistry).getTokamak();
         require(
             ton != address(0) &&

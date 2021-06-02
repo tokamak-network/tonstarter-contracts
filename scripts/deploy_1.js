@@ -188,6 +188,7 @@ async function main() {
   out.WTON = "0x709bef48982Bbfd6F2D4Be24660832665F53406C";
   out.DepositManager = "0x57F5CD759A5652A697D539F1D9333ba38C615FC2";
   out.SeigManager = "0x957DaC3D3C4B82088A4939BE9A8063e20cB2efBE";
+  out.SwapProxy = "0x8032d21F59CDB42C9c94a3A41524D4CCF0Cae96c";
 
   save(process.env.NETWORK, out);
 }

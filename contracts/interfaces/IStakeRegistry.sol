@@ -55,8 +55,10 @@ interface IStakeRegistry {
             address,
             address,
             address,
+            address,
             address
         );
+
 
     /// @dev Get indos for UNISWAP_V3 interface
     /// @return (uniswapRouter, npm, wethAddress, fee)

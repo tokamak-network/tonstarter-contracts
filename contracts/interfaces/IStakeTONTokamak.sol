@@ -2,9 +2,16 @@
 pragma solidity ^0.7.6;
 
 interface IStakeTONTokamak {
+
     /// @dev  staking the staked TON in layer2 in tokamak
     /// @param _layer2 the layer2 address in tokamak
-    function tokamakStaking(address _layer2) external;
+    /// @param stakeAmount the amount that stake to layer2
+    /// @param isTON TON is true, WTON is false
+    function tokamakStaking(
+        address _layer2,
+        uint256 stakeAmount,
+        bool isTON
+    ) external;
 
     /// @dev  request unstaking the wtonAmount in layer2 in tokamak
     /// @param _layer2 the layer2 address in tokamak
