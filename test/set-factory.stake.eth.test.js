@@ -90,7 +90,7 @@ describe ("Upgradable Stake Contracts", function () {
       toBN(stakeStartBlock),
       toBN('1'),
       HASH_Pharse1_ETH_Staking,
-      toBN('0'),
+      toBN('1'),
       zeroAddress
       , { from: defaultSender });
 

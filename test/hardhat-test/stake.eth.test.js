@@ -72,7 +72,7 @@ describe("Stake", function () {
       stakeStartBlock,
       "1",
       HASH_Pharse1_ETH_Staking,
-      "0",
+      "1",
       zeroAddress
     );
     await tx.wait();
