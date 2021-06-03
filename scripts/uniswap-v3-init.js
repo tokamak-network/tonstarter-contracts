@@ -35,6 +35,7 @@ const {
 
 const loadDeployed = require("./load_deployed");
 const loadDeployedInitVariable = require("./load_deployed_init");
+const { increase } = require("@openzeppelin/test-helpers/src/time");
 
 const fldAddress = loadDeployed(process.env.NETWORK, "FLD");
 const wtonAddress = loadDeployed(process.env.NETWORK, "WTON");
@@ -47,6 +48,16 @@ const npmAddress = loadDeployedInitVariable(
   "NonfungiblePositionManager"
 );
 const exchangeFee = loadDeployedInitVariable(process.env.NETWORK, "UniswapFee");
+
+async function approve(token, amount) {
+  const [signer] = await ethers.getSigners();
+  const tokenContract = new ethers.Contract(token, approveABI);
+  const tx = await tokenContract.connect(signer).approve(npmAddress, amount, {
+    gasLimit: 10000000,
+    gasPrice: 6000000000,
+  });
+  await tx.wait();
+}
 
 async function createPool(token0, token1) {
   const [signer] = await ethers.getSigners();
@@ -66,23 +77,8 @@ async function mintPosition(token0, token1, amount0, amount1) {
   const [signer] = await ethers.getSigners();
   const npm = new ethers.Contract(npmAddress, NPM_ABI);
 
-  const token0Contract = new ethers.Contract(token0, approveABI);
-  const txToken0 = await token0Contract
-    .connect(signer)
-    .approve(npmAddress, amount0, {
-      gasLimit: 10000000,
-      gasPrice: 6000000000,
-    });
-  await txToken0.wait();
-
-  const token1Contract = new ethers.Contract(token1, approveABI);
-  const txToken1 = await token1Contract
-    .connect(signer)
-    .approve(npmAddress, amount1, {
-      gasLimit: 10000000,
-      gasPrice: 6000000000,
-    });
-  await txToken1.wait();
+  await approve(token0, amount0);
+  await approve(token1, amount1);
 
   const mintParams = {
     token0,
@@ -107,21 +103,61 @@ async function mintPosition(token0, token1, amount0, amount1) {
   await tx.wait();
 }
 
-async function main() {
-  await createPool(wethAddress, fldAddress);
-  await createPool(wtonAddress, wethAddress);
+async function increaseLiquidity(tokenId, token0, token1, amount0, amount1) {
+  const [signer] = await ethers.getSigners();
+  const npm = new ethers.Contract(npmAddress, NPM_ABI);
 
-  await mintPosition(
+  await approve(token0, amount0);
+  await approve(token1, amount1);
+
+  const params = {
+    tokenId,
+    amount0Desired: amount0,
+    amount1Desired: amount1,
+    amount0Min: 0,
+    amount1Min: 0,
+    deadline: "1000000000000000000",
+  };
+  console.log({ params });
+
+  const tx = await npm.connect(signer).increaseLiquidity(params, {
+    gasLimit: 10000000,
+    gasPrice: 10000000000,
+  });
+  await tx.wait();
+}
+
+async function main() {
+  // await createPool(wethAddress, fldAddress);
+  // await createPool(wtonAddress, wethAddress);
+
+  // await mintPosition(
+  //   wethAddress,
+  //   fldAddress,
+  //   toWei("0.01", "ether").toString(),
+  //   toWei("100000", "ether").toString()
+  // );
+  // await mintPosition(
+  //   wtonAddress,
+  //   wethAddress,
+  //   toWei("100", "ether").toString(),
+  //   toWei("0.01", "ether").toString()
+  // );
+
+  await increaseLiquidity(
+    1048,
     wethAddress,
     fldAddress,
-    toWei("0.01", "ether").toString(),
-    toWei(toBN("100000"), "ether").toString()
+    toWei("0.1", "ether").toString(),
+    toWei("100", "ether").toString()
   );
-  await mintPosition(
+
+  await increaseLiquidity(
+    1049,
     wtonAddress,
     wethAddress,
-    toWei(toBN("100"), "ether").toString(),
-    toWei("0.01", "ether").toString()
+    toWei("0.1", "ether").toString(),
+    toWei("10000000000", "ether").toString()
   );
 }
 
