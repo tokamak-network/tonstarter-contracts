@@ -58,11 +58,6 @@ saleStartBlock = 100;
 let salePeriod = 50;
 let stakingPeriod = 100;
 
-//let salePeriod = (60 * 60 * 24 * 14) / 13;
-//let stakePeriod = (60 * 60 * 24 * 30) / 13;
-//salePeriod = parseInt(salePeriod);
-//stakePeriod = parseInt(stakePeriod);
-
 const zeroAddress = "0x0000000000000000000000000000000000000000";
 
 let logFlag = false;
