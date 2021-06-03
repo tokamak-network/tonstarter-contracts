@@ -595,24 +595,50 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
         emit exchangedWTONtoFLD(msg.sender, _amountIn, amountOut);
     }
 
-    function exactInput(uint256 _amountIn, uint256 _amountOutMinimum, uint256 _deadline, address recipient)
-        external returns (uint256 amountOut)
+    /*
+    function exactInputSingle(uint256 _amountIn, uint256 _amountOutMinimum, uint256 _deadline, uint256 _sqrtPriceLimitX96)
+        external onlyOwner returns (uint256 amountOut)
     {
         checkTokamak();
-        
-        // (address uniswapRouter, , address wethAddress, uint256 _fee, ) =
-        //     ITokamakRegistry(stakeRegistry).getUniswap();
-        
-        //ISwapRouter public constant uniswapRouter = ISwapRouter(0xE592427A0AEce92De3Edee1F18E0157C05861564);
-        address uniswapRouter = 0xE592427A0AEce92De3Edee1F18E0157C05861564;
-        address wethAddress = 0xd0A1E359811322d97991E03f863a0C30C2cF029C;
-        uint256 _fee = 500;
-        
+
+        (address uniswapRouter, , address wethAddress, uint256 _fee, ) =
+            ITokamakRegistry(stakeRegistry).getUniswap();
+
+        // address uniswapRouter = 0xE592427A0AEce92De3Edee1F18E0157C05861564;
+        // address wethAddress = 0xc778417E063141139Fce010982780140Aa0cD5Ab;
+        // uint256 _fee = 500;
+
         require(
             IERC20BASE(wton).approve(uniswapRouter, _amountIn),
             "TokamakStaker:can't approve uniswapRouter"
-        );  
-        
+        );
+
+        ISwapRouter.ExactInputSingleParams memory params = ISwapRouter.ExactInputSingleParams(
+            wton,
+            token,
+            uint24(_fee),
+            address(this),
+            _deadline,
+            _amountIn,
+            _amountOutMinimum,
+            uint160(_sqrtPriceLimitX96)
+        );
+        amountOut = ISwapRouter(uniswapRouter).exactInputSingle(params);
+    }
+
+    function exactInput(uint256 _amountIn, uint256 _amountOutMinimum, uint256 _deadline)
+        external onlyOwner returns (uint256 amountOut)
+    {
+        checkTokamak();
+
+        (address uniswapRouter, , address wethAddress, uint256 _fee, ) =
+            ITokamakRegistry(stakeRegistry).getUniswap();
+
+        require(
+            IERC20BASE(wton).approve(uniswapRouter, _amountIn),
+            "TokamakStaker:can't approve uniswapRouter"
+        );
+
         ISwapRouter.ExactInputParams memory params = ISwapRouter.ExactInputParams(
             abi.encodePacked(
                         wton,
@@ -621,12 +647,12 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
                         uint24(_fee),
                         token
                     ),
-            recipient,
+            address(this),
             _deadline,
             _amountIn,
             _amountOutMinimum
         );
-        
-        ISwapRouter(uniswapRouter).exactInput(params);
+        amountOut = ISwapRouter(uniswapRouter).exactInput(params);
     }
+    */
 }
