@@ -158,7 +158,8 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
     /// @param amount the amount to be changed
     /// @param toWTON if it's true, TON->WTON , else WTON->TON
     function swapTONtoWTON(uint256 amount, bool toWTON)
-        public override
+        public
+        override
         lock
         nonZero(swapProxy)
     {
@@ -263,11 +264,9 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
             }
         }
 
-        uint256 balance = 0;
         if (isTON) {
-            balance = IERC20BASE(ton).balanceOf(address(this));
             require(
-                balance >= stakeAmount,
+                IERC20BASE(ton).balanceOf(address(this)) >= stakeAmount,
                 "TokamakStaker: ton balance is zero"
             );
             toTokamak = toTokamak.add(stakeAmount);
@@ -277,9 +276,8 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
                 "TokamakStaker:approveAndCall fail"
             );
         } else {
-            balance = IERC20BASE(wton).balanceOf(address(this));
             require(
-                balance >= stakeAmount,
+                IERC20BASE(wton).balanceOf(address(this)) >= stakeAmount,
                 "TokamakStaker: wton balance is zero"
             );
             toTokamak = toTokamak.add(stakeAmount.div(10**9));
@@ -387,11 +385,12 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
         uint256 _deadline,
         uint160 _sqrtPriceLimitX96,
         uint256 _kind
-    ) external override
-        returns (uint256 amountOut)
-    {
+    ) external override returns (uint256 amountOut) {
         require(block.number <= endBlock, "TokamakStaker: period end");
-        require(IIStake1Vault(vault).saleClosed() == true, "TokamakStaker: not closed");
+        require(
+            IIStake1Vault(vault).saleClosed() == true,
+            "TokamakStaker: not closed"
+        );
         require(_kind < 2, "TokamakStaker: no kind");
 
         checkTokamak();
@@ -414,14 +413,20 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
                     tokamakLayer2,
                     address(this)
                 );
-                stakeOf = stakeOf.add(IIDepositManager(depositManager).pendingUnstaked(
-                    tokamakLayer2,
-                    address(this)
-                ));
+                stakeOf = stakeOf.add(
+                    IIDepositManager(depositManager).pendingUnstaked(
+                        tokamakLayer2,
+                        address(this)
+                    )
+                );
             }
             uint256 holdAmount = _amountWTON;
-            if (_amountTON > 0) holdAmount = holdAmount.add(_amountTON.mul(10**9));
-            require(holdAmount >= _amountIn, "TokamakStaker: wton insufficient");
+            if (_amountTON > 0)
+                holdAmount = holdAmount.add(_amountTON.mul(10**9));
+            require(
+                holdAmount >= _amountIn,
+                "TokamakStaker: wton insufficient"
+            );
 
             if (stakeOf > 0) holdAmount = holdAmount.add(stakeOf);
 
@@ -519,14 +524,20 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
                     tokamakLayer2,
                     address(this)
                 );
-                stakeOf = stakeOf.add(IIDepositManager(depositManager).pendingUnstaked(
-                    tokamakLayer2,
-                    address(this)
-                ));
+                stakeOf = stakeOf.add(
+                    IIDepositManager(depositManager).pendingUnstaked(
+                        tokamakLayer2,
+                        address(this)
+                    )
+                );
             }
             uint256 holdAmount = _amountWTON;
-            if (_amountTON > 0) holdAmount = holdAmount.add(_amountTON.mul(10**9));
-            require(holdAmount >= _amountIn, "TokamakStaker: wton insufficient");
+            if (_amountTON > 0)
+                holdAmount = holdAmount.add(_amountTON.mul(10**9));
+            require(
+                holdAmount >= _amountIn,
+                "TokamakStaker: wton insufficient"
+            );
 
             if (stakeOf > 0) holdAmount = holdAmount.add(stakeOf);
             require(
@@ -585,5 +596,4 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
 
         emit exchangedWTONtoFLD(msg.sender, _amountIn, amountOut);
     }
-
 }

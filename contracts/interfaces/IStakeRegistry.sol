@@ -59,7 +59,6 @@ interface IStakeRegistry {
             address
         );
 
-
     /// @dev Get indos for UNISWAP_V3 interface
     /// @return (uniswapRouter, npm, wethAddress, fee)
     function getUniswap()

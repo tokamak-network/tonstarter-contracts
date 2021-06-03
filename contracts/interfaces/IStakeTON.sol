@@ -7,7 +7,7 @@ import "../libraries/LibTokenStake1.sol";
 interface IStakeTON {
     /// @dev Stake amount
     /// @param amount  the amount of staked
-    function stake(uint256 amount) external payable;
+    //function stake(uint256 amount) external payable;
 
     /// @dev Claim for reward
     function claim() external;

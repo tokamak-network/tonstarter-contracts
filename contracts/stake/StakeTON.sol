@@ -34,7 +34,7 @@ contract StakeTON is TokamakStaker, IStakeTON {
     /// @dev receive ether
     /// @dev call stake function with msg.value
     receive() external payable {
-        stake(msg.value);
+        // stake(msg.value);
     }
 
     /// @dev Initialize
@@ -61,7 +61,7 @@ contract StakeTON is TokamakStaker, IStakeTON {
 
     /// @dev Stake amount
     /// @param amount  the amount of staked
-    function stake(uint256 amount) public payable override {
+    /* function stake(uint256 amount) public payable override {
         require(
             (paytoken == address(0) && msg.value == amount) ||
                 (paytoken != address(0) && amount > 0),
@@ -82,7 +82,8 @@ contract StakeTON is TokamakStaker, IStakeTON {
             );
 
         LibTokenStake1.StakedAmount storage staked = userStaked[msg.sender];
-        if (staked.amount == 0) totalStakers = totalStakers.add(1);
+        if (staked.amount == 0)  totalStakers = totalStakers.add(1);
+
         staked.amount = staked.amount.add(amount);
         totalStakedAmount = totalStakedAmount.add(amount);
         if (paytoken != address(0))
@@ -96,6 +97,7 @@ contract StakeTON is TokamakStaker, IStakeTON {
 
         emit Staked(msg.sender, amount);
     }
+    */
 
     /// @dev withdraw
     function withdraw() external override {
@@ -105,6 +107,7 @@ contract StakeTON is TokamakStaker, IStakeTON {
             address wton,
             address depositManager,
             address seigManager,
+
         ) = ITokamakRegistry(stakeRegistry).getTokamak();
         require(
             ton != address(0) &&

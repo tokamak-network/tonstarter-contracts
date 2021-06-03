@@ -2,7 +2,6 @@
 pragma solidity ^0.7.6;
 
 interface IStakeTONTokamak {
-
     /// @dev  staking the staked TON in layer2 in tokamak
     /// @param _layer2 the layer2 address in tokamak
     /// @param stakeAmount the amount that stake to layer2

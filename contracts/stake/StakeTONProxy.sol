@@ -18,6 +18,7 @@ contract StakeTONProxy is StakeTONStorage, AccessControl, OnApprove {
     bool public pauseProxy;
 
     event Upgraded(address indexed implementation);
+    event Staked(address indexed to, uint256 amount);
 
     modifier onlyOwner() {
         require(hasRole(ADMIN_ROLE, msg.sender), "StakeTONProxy: not an admin");
@@ -169,12 +170,15 @@ contract StakeTONProxy is StakeTONStorage, AccessControl, OnApprove {
 
         LibTokenStake1.StakedAmount storage staked = userStaked[_owner];
         if (staked.amount == 0) totalStakers = totalStakers.add(1);
+
         staked.amount = staked.amount.add(_amount);
         totalStakedAmount = totalStakedAmount.add(_amount);
         require(
             IIERC20(from).transferFrom(_owner, _spender, _amount),
             "StakeTONProxy: transfer fail"
         );
+
+        emit Staked(_owner, _amount);
         return true;
     }
 
