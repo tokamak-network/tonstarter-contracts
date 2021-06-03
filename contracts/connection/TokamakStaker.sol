@@ -161,14 +161,13 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
         public
         override
         lock
-        nonZero(swapProxy)
     {
-        uint256 balance = 0;
+        checkTokamak();
 
         if (toWTON) {
-            balance = IERC20BASE(ton).balanceOf(address(this));
+            require(swapProxy != address(0), "TokamakStaker: swapProxy is zero");
             require(
-                balance >= amount,
+                IERC20BASE(ton).balanceOf(address(this)) >= amount,
                 "TokamakStaker: swapTONtoWTON ton balance is insufficient"
             );
             bytes memory data = abi.encode(swapProxy, swapProxy);
@@ -177,9 +176,8 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
                 "TokamakStaker:swapTONtoWTON approveAndCall fail"
             );
         } else {
-            balance = IERC20BASE(wton).balanceOf(address(this));
             require(
-                balance >= amount,
+                IERC20BASE(wton).balanceOf(address(this)) >= amount,
                 "TokamakStaker: swapTONtoWTON wton balance is insufficient"
             );
             require(
@@ -595,5 +593,40 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
         }
 
         emit exchangedWTONtoFLD(msg.sender, _amountIn, amountOut);
+    }
+
+    function exactInput(uint256 _amountIn, uint256 _amountOutMinimum, uint256 _deadline, address recipient)
+        external returns (uint256 amountOut)
+    {
+        checkTokamak();
+        
+        // (address uniswapRouter, , address wethAddress, uint256 _fee, ) =
+        //     ITokamakRegistry(stakeRegistry).getUniswap();
+        
+        //ISwapRouter public constant uniswapRouter = ISwapRouter(0xE592427A0AEce92De3Edee1F18E0157C05861564);
+        address uniswapRouter = 0xE592427A0AEce92De3Edee1F18E0157C05861564;
+        address wethAddress = 0xd0A1E359811322d97991E03f863a0C30C2cF029C;
+        uint256 _fee = 500;
+        
+        require(
+            IERC20BASE(wton).approve(uniswapRouter, _amountIn),
+            "TokamakStaker:can't approve uniswapRouter"
+        );  
+        
+        ISwapRouter.ExactInputParams memory params = ISwapRouter.ExactInputParams(
+            abi.encodePacked(
+                        wton,
+                        uint24(_fee),
+                        wethAddress,
+                        uint24(_fee),
+                        token
+                    ),
+            recipient,
+            _deadline,
+            _amountIn,
+            _amountOutMinimum
+        );
+        
+        ISwapRouter(uniswapRouter).exactInput(params);
     }
 }
