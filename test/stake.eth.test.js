@@ -252,12 +252,19 @@ describe("Phase1. StakeContract with ETH", function () {
             value: toWei(testUser1StakingAmount[i], "ether"),
           });
 
+          let stakedInfo = await stakeContract.getUserStaked(user1);
+
+          await expect(toBN(stakedInfo.amount)).to.be.bignumber.equal(toBN(testUser1StakingAmount[i]).mul(toBN(10**18)));
+
           await stakeContract.sendTransaction({
             from: user2,
             value: toWei(testUser2StakingAmount[i], "ether"),
           });
+          stakedInfo = await stakeContract.getUserStaked(user2);
 
-         if (logFlag)
+          await expect(toBN(stakedInfo.amount)).to.be.bignumber.equal(toBN(testUser2StakingAmount[i]).mul(toBN(10**18)));
+
+          if (logFlag)
           await ico20Contracts.logStake(stakeContractAddress, user1, user2);
         }
       }
@@ -303,6 +310,7 @@ describe("Phase1. StakeContract with ETH", function () {
         stakeEntry.closeSale(vault_phase1_eth.address, { from: user1 })
       ).to.be.revertedWith("Stake1Vault: already closed");
     });
+
   });
 
   describe('# 5. Function Test1 For Withdraw ', async function () {
@@ -319,26 +327,28 @@ describe("Phase1. StakeContract with ETH", function () {
   });
 
   describe('# 6. Function Test For Claim ', async function () {
-    it("2. You can claim a reward after the sales closing function is performed", async function () {
+    it("1. You can claim a reward after the sales closing function is performed", async function () {
       this.timeout(1000000);
       for (let i = 0; i < 2; i++) {
-        let testBlcok = stakeStartBlock + testClaimBlock[i] ;
-        await time.advanceBlockTo(testBlcok-1);
+        let block = stakeStartBlock + testClaimBlock[i] ;
+        await time.advanceBlockTo(block-1);
 
         if (logFlag) console.log(`\n ====== delay blocks for test :`);
         if (stakeAddresses.length > 0) {
           for (let j = 0; j < stakeAddresses.length; j++) {
             if (logFlag) console.log(`\n ----  StakeContract:`, j);
             let stakeContract = await StakeTON.at(stakeAddresses[j]);
+            const prevRewardClaimedTotal = await stakeContract.rewardClaimedTotal();
+            let sum = toBN(prevRewardClaimedTotal.toString());
+
             for (let u = 0; u < 2; u++) {
               if (logFlag){
-                console.log(`\n ------- ClaimBlcok:`, testBlcok);
+                console.log(`\n ------- ClaimBlcok:`, block);
                 console.log("\n testStakingUsers : ", u, testStakingUsers[u]);
               }
-              let curBlock = await time.latestBlock();
 
               let reward = await stakeContract.canRewardAmount(
-                testStakingUsers[u], curBlock
+                testStakingUsers[u], block
               );
 
               if (reward.gt(toBN("0"))) {
@@ -350,7 +360,8 @@ describe("Phase1. StakeContract with ETH", function () {
                   );
 
                 let tx = await stakeContract.claim({ from: testStakingUsers[u] });
-                testBlcok++;
+                block++;
+                sum = sum.add(toBN(reward.toString()));
 
                 if (logFlag)
                   console.log(
@@ -367,15 +378,19 @@ describe("Phase1. StakeContract with ETH", function () {
                     ` after claim -> fldBalance2 :  `,
                     fromWei(fldBalance2.toString(), "ether")
                   );
+                await expect(reward.add(fldBalance1)).to.be.bignumber.equal(fldBalance2);
 
-                await expect(fldBalance2).to.be.bignumber.above(fldBalance1);
+                //await expect(fldBalance2).to.be.bignumber.above(fldBalance1);
 
-                let rewardClaimedTotal2 =
+                let rewardClaimedTotal =
                   await stakeContract.rewardClaimedTotal();
+
+                await expect(sum.toString()).to.be.bignumber.equal(toBN(rewardClaimedTotal).toString());
+
                 if (logFlag)
                   console.log(
-                    `after claim -> stakeContract rewardClaimedTotal2 :  `,
-                    fromWei(rewardClaimedTotal2.toString(), "ether")
+                    `after claim -> stakeContract rewardClaimedTotal :  `,
+                    fromWei(rewardClaimedTotal.toString(), "ether")
                   );
                 if (logFlag)
                   await ico20Contracts.logUserStaked(
@@ -400,7 +415,7 @@ describe("Phase1. StakeContract with ETH", function () {
       if(logFlag) console.log(`\n Withdrawal block: ${stakeEndBlock} `);
 
       for (let i = 0; i < stakeAddresses.length; i++) {
-        if (logFlag) console.log('\n  ************* withdraw : ', i, stakeAddresses[i]);
+        //if (logFlag) console.log('\n  ************* withdraw : ', i, stakeAddresses[i]);
         const stakeContract1 = await StakeTON.at(stakeAddresses[i]);
         let payTokenBalance1 = await web3.eth.getBalance(user1);
         if (logFlag){
@@ -412,12 +427,15 @@ describe("Phase1. StakeContract with ETH", function () {
         stakeEndBlock++;
 
         const payTokenBalance2 = await web3.eth.getBalance(user1);
+
+        let userStaked = await stakeContract1.getUserStaked(user1);
+        await expect(toBN(userStaked.amount).add(toBN(payTokenBalance1))).to.be.bignumber.above(toBN(payTokenBalance2));
+        await expect(payTokenBalance2).to.be.bignumber.above(payTokenBalance1);
+
         if (logFlag){
           console.log('\n user1\'s payTokenBalance2:', fromWei(payTokenBalance2.toString(), 'ether'));
           await ico20Contracts.logUserStaked(stakeAddresses[i], user1, 'user1 after withdraw');
         }
-
-        await expect(payTokenBalance2).to.be.bignumber.above(payTokenBalance1);
 
       }
     });

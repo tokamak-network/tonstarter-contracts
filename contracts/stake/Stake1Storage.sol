@@ -46,13 +46,13 @@ contract Stake1Storage {
         external
         view
         returns (
-            uint256,
-            uint256,
-            uint256,
-            uint256,
-            uint256,
-            uint256,
-            bool
+            uint256 amount,
+            uint256 claimedBlock,
+            uint256 claimedAmount,
+            uint256 releasedBlock,
+            uint256 releasedAmount,
+            uint256 releasedFLDAmount,
+            bool released
         )
     {
         return (
