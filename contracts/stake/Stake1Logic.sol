@@ -29,13 +29,28 @@ contract Stake1Logic is StakeProxyStorage, AccessControl, IStake1Logic {
         _;
     }
 
+    /// @dev event on create vault
+    /// @param vault the vault address created
+    /// @param paytoken the token used for staking by user
+    /// @param cap  allocated reward amount
     event CreatedVault(address indexed vault, address paytoken, uint256 cap);
+
+    /// @dev event on create stake contract in vault
+    /// @param vault the vault address
+    /// @param stakeContract the stake contract address created
+    /// @param phase the phase of FLD platform
     event CreatedStakeContract(
         address indexed vault,
         address indexed stakeContract,
         uint256 phase
     );
+
+    /// @dev event on sale-closed
+    /// @param vault the vault address
     event ClosedSale(address indexed vault);
+
+    /// @dev event on setting stake registry
+    /// @param stakeRegistry the stakeRegistry address
     event SetStakeRegistry(address stakeRegistry);
 
     constructor() {

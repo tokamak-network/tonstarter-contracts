@@ -26,8 +26,20 @@ contract StakeSimple is Stake1Storage, AccessControl, IStakeSimple {
         _lock = 0;
     }
 
+    /// @dev event on staking
+    /// @param to the sender
+    /// @param amount the amount of staking
     event Staked(address indexed to, uint256 amount);
+
+    /// @dev event on claim
+    /// @param to the sender
+    /// @param amount the amount of claim
+    /// @param currentBlcok the block of claim
     event Claimed(address indexed to, uint256 amount, uint256 currentBlcok);
+
+    /// @dev event on withdrawal
+    /// @param to the sender
+    /// @param amount the amount of withdrawal
     event Withdrawal(address indexed to, uint256 amount);
 
     /// @dev constructor of StakeSimple

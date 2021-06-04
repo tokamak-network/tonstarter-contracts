@@ -87,21 +87,52 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
         _lock = 0;
     }
 
+    /// @dev event on set the registry address
+    /// @param registry the registry address
     event SetRegistry(address registry);
+
+    /// @dev event on set the tokamak Layer2 address
+    /// @param layer2 the tokamak Layer2 address
     event SetTokamakLayer2(address layer2);
+
+    /// @dev event on staking the staked TON in layer2 in tokamak
+    /// @param layer2 the layer2 address in tokamak
+    /// @param amount the amount that stake to layer2
     event tokamakStaked(address layer2, uint256 amount);
+
+    /// @dev event on request unstaking the wtonAmount in layer2 in tokamak
+    /// @param layer2 the layer2 address in tokamak
+    /// @param amount the amount requested to unstaking
     event tokamakRequestedUnStaking(address layer2, uint256 amount);
+
+    /// @dev event on process unstaking in layer2 in tokamak
+    /// @param layer2 the layer2 address in tokamak
+    /// @param rn the number of requested unstaking
+    /// @param receiveTON if is true ,TON , else is WTON
     event tokamakProcessedUnStaking(
         address layer2,
         uint256 rn,
         bool receiveTON
     );
+
+    /// @dev event on request unstaking the amount of all in layer2 in tokamak
+    /// @param layer2 the layer2 address in tokamak
     event tokamakRequestedUnStakingAll(address layer2);
+
+    /// @dev exchange WTON to FLD using uniswap v3
+    /// @param caller the sender
+    /// @param amountIn the input amount
+    /// @return amountOut the amount of exchanged out token
     event exchangedWTONtoFLD(
         address caller,
         uint256 amountIn,
         uint256 amountOut
     );
+
+    /// @dev exchange WTON to FLD using uniswap v2
+    /// @param caller the sender
+    /// @param amountIn the input amount
+    /// @return amountOut the amount of exchanged out token
     event exchangedWTONtoFLD2(
         address caller,
         uint256 amountIn,

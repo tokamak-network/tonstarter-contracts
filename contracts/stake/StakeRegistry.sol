@@ -62,11 +62,25 @@ contract StakeRegistry is AccessControl, IStakeRegistry {
         _;
     }
 
+    /// @dev event on add the vault
+    /// @param vault the vault address
+    /// @param phase the phase of FLD platform
     event AddedVault(address indexed vault, uint256 phase);
+
+    /// @dev event on add the stake contract in vault
+    /// @param vault the vault address
+    /// @param stakeContract the stake contract address created
     event AddedStakeContract(
         address indexed vault,
         address indexed stakeContract
     );
+
+    /// @dev event on set the addresses related to tokamak
+    /// @param ton the TON address
+    /// @param wton the WTON address
+    /// @param depositManager the DepositManager address
+    /// @param seigManager the SeigManager address
+    /// @param swapProxy the SwapProxy address
     event SetTokamak(
         address ton,
         address wton,
@@ -75,6 +89,14 @@ contract StakeRegistry is AccessControl, IStakeRegistry {
         address swapProxy
     );
 
+    /// @dev event on add the information related to defi.
+    /// @param nameHash the name hash
+    /// @param name the name of defi identify
+    /// @param router the entry address
+    /// @param ex1 the extra 1 addres
+    /// @param ex2 the extra 2 addres
+    /// @param fee fee
+    /// @param routerV2 the uniswap2 router address
     event AddedDefiInfo(
         bytes32 nameHash,
         string name,

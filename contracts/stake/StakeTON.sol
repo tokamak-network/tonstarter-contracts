@@ -21,8 +21,21 @@ import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 contract StakeTON is TokamakStaker, IStakeTON {
     using SafeMath for uint256;
 
+    /// @dev event on staking
+    /// @param to the sender
+    /// @param amount the amount of staking
     event Staked(address indexed to, uint256 amount);
+
+    /// @dev event on claim
+    /// @param to the sender
+    /// @param amount the amount of claim
+    /// @param currentBlcok the block of claim
     event Claimed(address indexed to, uint256 amount, uint256 currentBlcok);
+
+    /// @dev event on withdrawal
+    /// @param to the sender
+    /// @param tonAmount the amount of TON withdrawal
+    /// @param fldAmount the amount of FLD withdrawal
     event Withdrawal(address indexed to, uint256 tonAmount, uint256 fldAmount);
 
     /// @dev constructor of StakeTON

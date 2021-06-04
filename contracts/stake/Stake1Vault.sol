@@ -19,7 +19,13 @@ contract Stake1Vault is StakeVaultStorage, IStake1Vault {
     bytes32 public constant ZERO_HASH =
         0x0000000000000000000000000000000000000000000000000000000000000000;
 
-    event ClosedSale(uint256 amount);
+    /// @dev event on sale-closed
+    event ClosedSale();
+
+    /// @dev event on sale-closed
+    /// @param from the stakeContract address that call claim
+    /// @param to the address that will receive the reward
+    /// @param amount the amount of reward
     event ClaimedReward(address indexed from, address to, uint256 amount);
 
     /// @dev constructor of Stake1Vault
@@ -236,7 +242,7 @@ contract Stake1Vault is StakeVaultStorage, IStake1Vault {
         }
 
         saleClosed = true;
-        emit ClosedSale(sum);
+        emit ClosedSale();
     }
 
     /// @dev claim function.

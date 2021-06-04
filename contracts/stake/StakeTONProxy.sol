@@ -18,6 +18,10 @@ contract StakeTONProxy is StakeTONStorage, AccessControl, OnApprove {
     bool public pauseProxy;
 
     event Upgraded(address indexed implementation);
+
+    /// @dev event on staking TON
+    /// @param to the sender
+    /// @param amount the amount of staking
     event Staked(address indexed to, uint256 amount);
 
     modifier onlyOwner() {

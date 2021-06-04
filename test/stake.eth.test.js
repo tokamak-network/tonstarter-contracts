@@ -100,57 +100,32 @@ describe("StakeSimple : Stake with ETH", function () {
     ico20Contracts = new ICO20Contracts();
   });
 
-  it("ico20Contracts init  ", async function () {
-    this.timeout(1000000);
-    ICOContractsDeployed = await ico20Contracts.initializeICO20Contracts(
-      defaultSender
-    );
-  });
-  it("tokamakContracts init  ", async function () {
-    this.timeout(1000000);
-    TokamakContractsDeployed =
-      await ico20Contracts.initializePlasmaEvmContracts(defaultSender);
-  });
+  describe('# 1. Pre-requisite Setting', async function () {
+    it("ico20Contracts init  ", async function () {
+      this.timeout(1000000);
+      ICOContractsDeployed = await ico20Contracts.initializeICO20Contracts(
+        defaultSender
+      );
+    });
+    it("tokamakContracts init  ", async function () {
+      this.timeout(1000000);
+      TokamakContractsDeployed =
+        await ico20Contracts.initializePlasmaEvmContracts(defaultSender);
+    });
 
-  it('Set StakeProxy  ', async function () {
-    this.timeout(1000000);
-    stakeEntry = await ico20Contracts.setEntry(defaultSender);
-    if (logFlag) console.log('StakeProxy', stakeEntry.address);
+    it('Set StakeProxy  ', async function () {
+      this.timeout(1000000);
+      stakeEntry = await ico20Contracts.setEntry(defaultSender);
+      if (logFlag) console.log('StakeProxy', stakeEntry.address);
 
-    const cons = await ico20Contracts.getICOContracts();
-    fld = cons.fld;
-    stakeregister = cons.stakeregister;
-    stakefactory = cons.stakefactory;
-    stake1proxy = cons.stake1proxy;
-    stake1logic = cons.stake1logic;
-  });
+      const cons = await ico20Contracts.getICOContracts();
+      fld = cons.fld;
+      stakeregister = cons.stakeregister;
+      stakefactory = cons.stakefactory;
+      stake1proxy = cons.stake1proxy;
+      stake1logic = cons.stake1logic;
+    });
 
-  it('Create Vault', async function () {
-    const current = await time.latestBlock();
-    saleStartBlock = current + 4 ;
-    saleStartBlock = parseInt(saleStartBlock.toString());
-    stakeStartBlock = saleStartBlock + 20;
-
-    if (logFlag) {
-      console.log(`\n\nCurrent block: ${current} `);
-      console.log(' saleStartBlock ', saleStartBlock);
-      console.log(' stakeStartBlock ', stakeStartBlock);
-    }
-
-    const tx = await stakeEntry.createVault(
-      zeroAddress,
-      utils.parseUnits(Pharse1_ETH_Staking, 18),
-      toBN(saleStartBlock),
-      toBN(stakeStartBlock),
-      toBN('1'),
-      HASH_Pharse1_ETH_Staking,
-      toBN('1'),
-      zeroAddress
-      , { from: defaultSender });
-
-    const vaultAddress = tx.receipt.logs[tx.receipt.logs.length - 1].args.vault;
-    vault_phase1_eth = await Stake1Vault.at(vaultAddress, { from: defaultSender });
-    await fld.mint(vault_phase1_eth.address, utils.parseUnits(Pharse1_ETH_Staking, 18), { from: defaultSender });
   });
 
   describe('# 2. Vault & StakeContract Setting', async function () {
