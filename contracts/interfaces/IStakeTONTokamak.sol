@@ -13,6 +13,12 @@ interface IStakeTONTokamak {
     function tokamakRequestUnStaking(address _layer2, uint256 wtonAmount)
         external;
 
+    /// @dev Requests unstaking the amount of all  in tokamak's layer2
+    /// @param _layer2 the layer2 address in Tokamak
+    function tokamakRequestUnStakingAll(
+        address _layer2
+    ) external;
+
     /// @dev process unstaking in layer2 in tokamak
     /// @param _layer2 the layer2 address in tokamak
     function tokamakProcessUnStaking(address _layer2) external;
@@ -32,11 +38,16 @@ interface IStakeTONTokamak {
         uint256 _kind
     ) external returns (uint256 amountOut);
 
+    /// @dev exchange holded WTON to FLD using uniswap
+    /// @param _amountIn the input amount
+    /// @param _amountOutMinimum the minimun output amount
+    /// @param _deadline deadline
+    /// @param _kind the function type, if 0, use exactInputSingle function, else if, use exactInput function
+    /// @return amountOut the amount of exchanged out token
     function exchangeWTONtoFLDv2(
-        uint256 amountIn,
-        uint256 amountOutMinimum,
-        uint256 deadline,
-        uint160 _sqrtPriceLimitX96,
-        uint256 _type
+        uint256 _amountIn,
+        uint256 _amountOutMinimum,
+        uint256 _deadline,
+        uint256 _kind
     ) external returns (uint256 amountOut);
 }

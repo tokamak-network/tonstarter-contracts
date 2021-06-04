@@ -106,6 +106,14 @@ interface IStake1Logic {
         uint256 amount
     ) external;
 
+    /// @dev Requests unstaking the amount of all  in tokamak's layer2
+    /// @param _stakeContract the stakeContract's address
+    /// @param _layer2 the layer2 address in Tokamak
+    function tokamakRequestUnStakingAll(
+        address _stakeContract,
+        address _layer2
+    ) external;
+
     /// @dev Processes unstaking the requested unstaking amount in tokamak's layer2
     /// @param _stakeContract the stakeContract's address
     /// @param _layer2 the layer2 address in Tokamak

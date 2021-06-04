@@ -343,7 +343,7 @@ contract Stake1Logic is StakeProxyStorage, AccessControl, IStake1Logic {
         IStakeTONTokamak(_stakeContract).tokamakStaking(_layer2, stakeAmount);
     }
 
-    /// @dev Requests unstaking in tokamak's layer2
+    /// @dev Requests unstaking the amount WTON in tokamak's layer2
     /// @param _stakeContract the stakeContract's address
     /// @param _layer2 the layer2 address in Tokamak
     /// @param amount the amount of unstaking
@@ -355,6 +355,18 @@ contract Stake1Logic is StakeProxyStorage, AccessControl, IStake1Logic {
         IStakeTONTokamak(_stakeContract).tokamakRequestUnStaking(
             _layer2,
             amount
+        );
+    }
+
+    /// @dev Requests unstaking the amount of all  in tokamak's layer2
+    /// @param _stakeContract the stakeContract's address
+    /// @param _layer2 the layer2 address in Tokamak
+    function tokamakRequestUnStakingAll(
+        address _stakeContract,
+        address _layer2
+    ) external override {
+        IStakeTONTokamak(_stakeContract).tokamakRequestUnStakingAll(
+            _layer2
         );
     }
 
@@ -394,13 +406,18 @@ contract Stake1Logic is StakeProxyStorage, AccessControl, IStake1Logic {
             );
     }
 
-    /// @dev Swap TON to FLD
+    /// @dev Swap TON to FLD using uniswap v2
+    /// @dev this function used in StakeTON ( stakeType=0 )
+    /// @param _stakeContract the stakeContract's address
+    /// @param amountIn the input amount
+    /// @param amountOutMinimum the minimun output amount
+    /// @param deadline deadline
+    /// @param _type the function type, if 0, use exactInputSingle function, else if, use exactInput function
     function exchangeWTONtoFLDv2(
         address _stakeContract,
         uint256 amountIn,
         uint256 amountOutMinimum,
         uint256 deadline,
-        uint160 sqrtPriceLimitX96,
         uint256 _type
     ) external returns (uint256 amountOut) {
         return
@@ -408,7 +425,6 @@ contract Stake1Logic is StakeProxyStorage, AccessControl, IStake1Logic {
                 amountIn,
                 amountOutMinimum,
                 deadline,
-                sqrtPriceLimitX96,
                 _type
             );
     }
