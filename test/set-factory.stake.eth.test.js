@@ -17,8 +17,9 @@ const Stake1Vault = contract.fromArtifact("Stake1Vault");
 const StakeTON = contract.fromArtifact("StakeTON");
 const StakeTONProxy = contract.fromArtifact("StakeTONProxy");
 const StakeSimpleFactoryModified = contract.fromArtifact("StakeFactory");
+const StakeSimpleLogicModified = contract.fromArtifact("StakeSimple");
 
-describe ("Upgradable Stake Contracts", function () {
+describe ("Stake1Logic : Upgradable Stake Contracts", function () {
   const usersInfo = [
     {
       name: "Bob",
@@ -82,7 +83,7 @@ describe ("Upgradable Stake Contracts", function () {
     );
   });
 
-  it('3. should create a vault', async function () {
+  it('3. createVault', async function () {
 
     const HASH_Pharse1_ETH_Staking = keccak256("PHASE1_ETH_STAKING");
 
@@ -103,7 +104,7 @@ describe ("Upgradable Stake Contracts", function () {
   });
 
 
-  it("4. should create stake contracts", async function () {
+  it("4. createStakeContract", async function () {
     this.timeout(10000000);
 
     await stakeEntry.setStakeFactory(stakeFactoryModified.address,
@@ -146,7 +147,19 @@ describe ("Upgradable Stake Contracts", function () {
 
   });
 
-  it("5. should set new factory stake to invalid contract", async function () {
+  it("5. upgradeStakeTo ", async function () {
+    this.timeout(10000000);
+
+    let stakeSimpleLogicModified = await StakeSimpleLogicModified.new({ from: defaultSender });
+
+    await stakeEntry.upgradeStakeTo(
+      stakingContractInfo[0].address,
+      stakeSimpleLogicModified.address,
+      { from: defaultSender });
+
+  });
+
+  it("6. should set new factory stake to invalid contract", async function () {
     this.timeout(10000000);
     const currentBlockTime = parseInt(saleStartBlock);
     await time.advanceBlockTo(currentBlockTime);
@@ -163,13 +176,13 @@ describe ("Upgradable Stake Contracts", function () {
     }
   });
 
-  it("6. should close sale", async function () {
+  it("7. should close sale", async function () {
     const current = parseInt(stakeStartBlock);
     await time.advanceBlockTo(current);
     await stakeEntry.closeSale(Vault.address, { from: defaultSender });
   });
 
-  it("7. should claim rewards", async function () {
+  it("8. should claim rewards", async function () {
     this.timeout(10000000);
     const fld = ICO20Instances.fld;
 

@@ -44,7 +44,7 @@ contract Stake1Logic is StakeProxyStorage, AccessControl, IStake1Logic {
     }
 
     /// @dev upgrade to the logic of _stakeProxy
-    /// @param _stakeProxy the StakeProxy address
+    /// @param _stakeProxy the StakeProxy address, it is stakeContract address in vault.
     /// @param _implementation new logic address
     function upgradeStakeTo(address _stakeProxy, address _implementation)
         external
