@@ -96,6 +96,7 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
         uint256 rn,
         bool receiveTON
     );
+    event tokamakRequestedUnStakingAll(address layer2);
     event exchangedWTONtoFLD(
         address caller,
         uint256 amountIn,
@@ -208,6 +209,14 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
             seigManager = _seigManager;
             swapProxy = _swapProxy;
         }
+        require(
+            ton != address(0) &&
+                wton != address(0) &&
+                seigManager != address(0) &&
+                depositManager != address(0) &&
+                swapProxy != address(0),
+            "TokamakStaker:tokamak zero"
+        );
     }
 
     /// @dev  staking the staked TON in layer2 in tokamak
@@ -229,13 +238,6 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
         defiStatus = uint256(LibTokenStake1.DefiStatus.DEPOSITED);
 
         checkTokamak();
-        require(
-            ton != address(0) &&
-                wton != address(0) &&
-                depositManager != address(0) &&
-                seigManager != address(0),
-            "TokamakStaker:ITokamakRegistry zero"
-        );
 
         uint256 globalWithdrawalDelay =
             IIDepositManager(depositManager).globalWithdrawalDelay();
@@ -298,13 +300,6 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
         defiStatus = uint256(LibTokenStake1.DefiStatus.REQUESTWITHDRAW);
         requestNum = requestNum.add(1);
         checkTokamak();
-        require(
-            ton != address(0) &&
-                wton != address(0) &&
-                depositManager != address(0) &&
-                seigManager != address(0),
-            "TokamakStaker:ITokamakRegistry zero"
-        );
 
         uint256 stakeOf =
             IISeigManager(seigManager).stakeOf(_layer2, address(this));
@@ -314,6 +309,28 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
         IIDepositManager(depositManager).requestWithdrawal(_layer2, wtonAmount);
 
         emit tokamakRequestedUnStaking(_layer2, wtonAmount);
+    }
+
+    /// @dev  request unstaking the amount of all in layer2 in tokamak
+    /// @param _layer2 the layer2 address in tokamak
+    function tokamakRequestUnStakingAll(address _layer2)
+        public
+        override
+        lock
+        nonZero(stakeRegistry)
+        sameTokamakLayer(_layer2)
+    {
+        require(
+            IIStake1Vault(vault).saleClosed() == true,
+            "TokamakStaker:not closed"
+        );
+        defiStatus = uint256(LibTokenStake1.DefiStatus.REQUESTWITHDRAW);
+        requestNum = requestNum.add(1);
+        checkTokamak();
+
+        IIDepositManager(depositManager).requestWithdrawalAll(_layer2);
+
+        emit tokamakRequestedUnStakingAll(_layer2);
     }
 
     /// @dev process unstaking in layer2 in tokamak
@@ -337,13 +354,6 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
         uint256 rn = requestNum;
         requestNum = 0;
         checkTokamak();
-        require(
-            ton != address(0) &&
-                wton != address(0) &&
-                depositManager != address(0) &&
-                seigManager != address(0),
-            "TokamakStaker:ITokamakRegistry zero"
-        );
 
         if (
             IISeigManager(seigManager).stakeOf(tokamakLayer2, address(this)) ==
@@ -384,15 +394,6 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
         require(_kind < 2, "TokamakStaker: no kind");
 
         checkTokamak();
-
-        require(
-            ton != address(0) &&
-                wton != address(0) &&
-                seigManager != address(0) &&
-                depositManager != address(0) &&
-                swapProxy != address(0),
-            "TokamakStaker:tokamak zero"
-        );
 
         {
             uint256 _amountWTON = IERC20BASE(wton).balanceOf(address(this));
@@ -496,14 +497,6 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
         );
         require(_kind < 2, "no kind");
         checkTokamak();
-        require(
-            ton != address(0) &&
-                wton != address(0) &&
-                seigManager != address(0) &&
-                depositManager != address(0) &&
-                swapProxy != address(0),
-            "TokamakStaker:tokamak zero"
-        );
 
         {
             uint256 _amountWTON = IERC20BASE(wton).balanceOf(address(this));
