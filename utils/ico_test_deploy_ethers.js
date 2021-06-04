@@ -239,9 +239,9 @@ class ICO20Contracts {
       this.stakeDefiFactory.address
     );
     this.stake1logic = await Stake1Logic.connect(owner).deploy();
-    this.stake1proxy = await Stake1Proxy.connect(owner).deploy();
+    this.stake1proxy = await Stake1Proxy.connect(owner).deploy(this.stake1logic.address);
 
-    await this.stake1proxy.connect(owner).upgradeTo(this.stake1logic.address);
+    // await this.stake1proxy.connect(owner).upgradeTo(this.stake1logic.address);
 
     this.stakeEntry = await ethers.getContractAt(
       "Stake1Logic",

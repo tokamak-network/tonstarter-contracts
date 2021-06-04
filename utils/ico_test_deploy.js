@@ -276,9 +276,9 @@ class ICO20Contracts {
       { from: owner }
     );
     this.stake1logic = await Stake1Logic.new({ from: owner });
-    this.stake1proxy = await Stake1Proxy.new({ from: owner });
+    this.stake1proxy = await Stake1Proxy.new(this.stake1logic.address, { from: owner });
 
-    await this.stake1proxy.upgradeTo(this.stake1logic.address, { from: owner });
+    // await this.stake1proxy.upgradeTo(this.stake1logic.address, { from: owner });
 
     this.stakeEntry = await Stake1Logic.at(this.stake1proxy.address, {
       from: owner,

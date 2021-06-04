@@ -141,12 +141,12 @@ async function deployMain(defaultSender) {
   await stake1Logic.deployed();
   console.log("stake1Logic:", stake1Logic.address);
 
-  const stake1Proxy = await Stake1Proxy.deploy();
+  const stake1Proxy = await Stake1Proxy.deploy(stake1Logic.address);
   await stake1Proxy.deployed();
   console.log("stake1Proxy:", stake1Proxy.address);
 
-  await stake1Proxy.upgradeTo(stake1Logic.address);
-  console.log("stake1Proxy upgradeTo:", stake1Logic.address);
+  let _implementation = await stake1Proxy.implementation();
+  console.log("stake1Proxy implementation:", _implementation);
 
   const stakeEntry = await ethers.getContractAt(
     "Stake1Logic",

@@ -154,10 +154,12 @@ async function setupContracts(account) {
 
   const stake1Proxy = await (await ethers.getContractFactory("Stake1Proxy"))
     .connect(deployer)
-    .deploy();
+    .deploy(
+      stake1Logic.address
+    );
   await stake1Proxy.deployed();
 
-  await stake1Proxy.connect(deployer).upgradeTo(stake1Logic.address);
+  //await stake1Proxy.connect(deployer).upgradeTo(stake1Logic.address);
 
   const stakeEntry = await (
     await ethers.getContractFactory("Stake1Logic")

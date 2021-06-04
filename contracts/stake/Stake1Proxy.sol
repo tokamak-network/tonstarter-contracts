@@ -16,12 +16,14 @@ contract Stake1Proxy is StakeProxyStorage, AccessControl, IStakeProxy {
     event Upgraded(address indexed implementation);
 
     modifier onlyOwner() {
-        require(hasRole(ADMIN_ROLE, msg.sender), "no admin");
+        require(hasRole(ADMIN_ROLE, msg.sender), "Stake1Proxy: no admin");
         _;
     }
 
     /// @dev constructor of Stake1Proxy
-    constructor() {
+    constructor(address _logic) {
+        require(_logic != address(0), "Stake1Proxy: logic is zero");
+        _implementation = _logic;
         _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
         _setupRole(ADMIN_ROLE, msg.sender);
         _setupRole(ADMIN_ROLE, address(this));
@@ -30,7 +32,7 @@ contract Stake1Proxy is StakeProxyStorage, AccessControl, IStakeProxy {
     /// @dev transfer Ownership
     /// @param newOwner the new owner address
     function transferOwnership(address newOwner) external onlyOwner {
-        require(msg.sender != newOwner, "Stake1Proxy:same owner");
+        require(msg.sender != newOwner, "Stake1Proxy: same owner");
         grantRole(ADMIN_ROLE, newOwner);
         revokeRole(ADMIN_ROLE, msg.sender);
     }
