@@ -224,7 +224,7 @@ contract Stake1Logic is StakeProxyStorage, AccessControl, IStake1Logic {
         bytes32 _vaultName,
         uint256 _stakeType,
         address _defiAddr
-    ) external override nonZero(address(stakeVaultFactory)) {
+    ) external override onlyOwner nonZero(address(stakeVaultFactory)) {
         address vault =
             stakeVaultFactory.create(
                 [fld, _paytoken, address(stakeFactory), _defiAddr],
