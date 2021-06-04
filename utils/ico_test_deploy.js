@@ -90,6 +90,7 @@ const AutoRefactorCoinage = contract.fromArtifact("AutoRefactorCoinage");
 const PowerTON = contract.fromArtifact("PowerTON");
 // const OldDAOVaultMock = contract.fromArtifact('OldDAOVaultMock');
 const DAOVault = contract.fromArtifact("DAOVault");
+const SwapProxy = contract.fromArtifact("SwapProxy");
 
 const EtherToken = contract.fromArtifact("EtherToken");
 const EpochHandler = contract.fromArtifact("EpochHandler");
@@ -168,6 +169,7 @@ class ICO20Contracts {
     // this.oldDaoVault = null;
     this.seigManager = null;
     this.powerton = null;
+    this.swapProxy = null;
 
     this.layer2s = [];
     this.coinages = [];
@@ -237,6 +239,7 @@ class ICO20Contracts {
     this.vault_phase1_ton = null;
     this.vault_phase1_fldethlp = null;
     this.vault_phase1_dev = null;
+    this.swapProxy = await SwapProxy.new({ from: owner });
 
     this.fld = await FLD.new({ from: owner });
     this.sfld = await SFLD.new({ from: owner });
@@ -475,7 +478,8 @@ class ICO20Contracts {
       this.ton.address,
       this.wton.address,
       this.depositManager.address,
-      this.seigManager.address
+      this.seigManager.address,
+      this.swapProxy.address
       );
 
     await this.stakeregister.addDefiInfo(

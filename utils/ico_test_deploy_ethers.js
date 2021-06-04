@@ -70,7 +70,8 @@ let TON,
   Layer2Registry,
   AutoRefactorCoinage,
   PowerTON,
-  DAOVault;
+  DAOVault,
+  SwapProxy;
 let EtherToken, EpochHandler, SubmitHandler, Layer2;
 
 let o;
@@ -92,6 +93,7 @@ class ICO20Contracts {
     // this.oldDaoVault = null;
     this.seigManager = null;
     this.powerton = null;
+    this.swapProxy = null;
 
     this.layer2s = [];
     this.coinages = [];
@@ -204,6 +206,9 @@ class ICO20Contracts {
 
     StakeTONFactory = await ethers.getContractFactory("StakeTONFactory");
     StakeDefiFactory = await ethers.getContractFactory("StakeDefiFactory");
+    SwapProxy = await ethers.getContractFactory("SwapProxy");
+
+    this.swapProxy = await SwapProxy.connect(owner).deploy();
 
     this.fld = await FLD.connect(owner).deploy();
     this.sfld = await SFLD.connect(owner).deploy();
@@ -252,6 +257,7 @@ class ICO20Contracts {
       stake1logic: this.stake1logic,
       stake1proxy: this.stake1proxy,
       stakeEntry: this.stakeEntry,
+      swapProxy: this.swapProxy,
     };
     // console.log(' initializeICO20Contracts  :',returnData );
 
@@ -269,6 +275,7 @@ class ICO20Contracts {
     DAOVault = await ethers.getContractFactory("DAOVault");
     SeigManager = await ethers.getContractFactory("SeigManager");
     PowerTON = await ethers.getContractFactory("PowerTON");
+
     console.log("HI1");
 
     this.ton = await TON.connect(owner).deploy();
@@ -303,6 +310,7 @@ class ICO20Contracts {
       this.wton.address,
       ROUND_DURATION
     );
+
     await this.powerton.connect(owner).init();
 
     await this.seigManager.connect(owner).setPowerTON(this.powerton.address);
@@ -367,7 +375,7 @@ class ICO20Contracts {
       coinageFactory: this.factory,
       daoVault: this.daoVault,
       seigManager: this.seigManager,
-      powerton: this.powerton,
+      powerton: this.powerton
     };
     return returnData;
   };
@@ -386,6 +394,13 @@ class ICO20Contracts {
   };
 
   setEntry = async function (owner) {
+    const uniswapRouter = "0xe592427a0aece92de3edee1f18e0157c05861564";
+    const uniswapNPM ="0xd1e1C3995695650ABc3Ea3c68ae5d365b35174ED";
+    const uniswapWeth ="0xe592427a0aece92de3edee1f18e0157c05861564";
+    const uniswapFee ="3000";
+    const uniswapRouter2 ="0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D";
+
+
     await this.stakeEntry.connect(owner).setStore(
       this.fld.address,
       this.stakeregister.address,
@@ -404,7 +419,19 @@ class ICO20Contracts {
         this.ton.address,
         this.wton.address,
         this.depositManager.address,
-        this.seigManager.address
+        this.seigManager.address,
+        this.swapProxy.address
+      );
+
+    await this.stakeregister
+      .connect(owner)
+      .addDefiInfo(
+        "UNISWAP_V3",
+        uniswapRouter,
+        uniswapNPM,
+        uniswapWeth,
+        uniswapFee,
+        uniswapRouter2
       );
 
     await this.stakeregister

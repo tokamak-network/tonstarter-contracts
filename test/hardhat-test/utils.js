@@ -289,6 +289,13 @@ async function setupContracts(account) {
     );
   console.log("hello4");
 
+
+  const swapProxy = await (
+    await ethers.getContractFactory("SwapProxy")
+  )
+    .connect(deployer)
+    .deploy();
+
   return {
     fld,
     sfld,
@@ -305,6 +312,7 @@ async function setupContracts(account) {
     stake1Logic,
     stake1Proxy,
     stakeEntry,
+    swapProxy,
     initEntry: async () => {
       await stakeEntry
         .connect(deployer)
@@ -325,7 +333,8 @@ async function setupContracts(account) {
           ton.address,
           wton.address,
           depositManager.address,
-          seigManager.address
+          seigManager.address,
+          swapProxy.address
         );
 
       await stakeRegistry

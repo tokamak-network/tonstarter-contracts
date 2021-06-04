@@ -71,7 +71,8 @@ contract StakeRegistry is AccessControl, IStakeRegistry {
         address ton,
         address wton,
         address depositManager,
-        address seigManager
+        address seigManager,
+        address swapProxy
     );
 
     event AddedDefiInfo(
@@ -109,7 +110,8 @@ contract StakeRegistry is AccessControl, IStakeRegistry {
         address _ton,
         address _wton,
         address _depositManager,
-        address _seigManager
+        address _seigManager,
+        address _swapProxy
     )
         external
         override
@@ -118,17 +120,15 @@ contract StakeRegistry is AccessControl, IStakeRegistry {
         nonZero(_wton)
         nonZero(_depositManager)
         nonZero(_seigManager)
+        nonZero(_swapProxy)
     {
         ton = _ton;
         wton = _wton;
         depositManager = _depositManager;
         seigManager = _seigManager;
-
-        emit SetTokamak(ton, wton, depositManager, seigManager);
-    }
-
-    function setSwapProxy(address _swapProxy) external nonZero(_swapProxy) {
         swapProxy = _swapProxy;
+
+        emit SetTokamak(ton, wton, depositManager, seigManager, swapProxy);
     }
 
     /// @dev Add information related to Defi

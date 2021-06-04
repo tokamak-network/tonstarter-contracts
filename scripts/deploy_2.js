@@ -106,11 +106,8 @@ async function deployMain(defaultSender) {
 
   const stakeRegistry = await ethers.getContractAt("StakeRegistry", registry);
 
-  await stakeRegistry.setTokamak(ton, wton, depositManager, seigManager);
+  await stakeRegistry.setTokamak(ton, wton, depositManager, seigManager, swapProxy);
   console.log("stakeRegistry setTokamak:");
-
-  await stakeRegistry.setSwapProxy(swapProxy);
-  console.log("stakeRegistry setSwapProxy:");
 
   await stakeRegistry.addDefiInfo(
     "UNISWAP_V3",

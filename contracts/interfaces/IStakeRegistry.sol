@@ -11,7 +11,8 @@ interface IStakeRegistry {
         address _ton,
         address _wton,
         address _depositManager,
-        address _seigManager
+        address _seigManager,
+        address _swapProxy
     ) external;
 
     /// @dev Add information related to Defi
