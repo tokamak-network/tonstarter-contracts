@@ -147,19 +147,7 @@ describe ("Stake1Logic : Upgradable Stake Contracts", function () {
 
   });
 
-  it("5. upgradeStakeTo ", async function () {
-    this.timeout(10000000);
-
-    let stakeSimpleLogicModified = await StakeSimpleLogicModified.new({ from: defaultSender });
-
-    await stakeEntry.upgradeStakeTo(
-      stakingContractInfo[0].address,
-      stakeSimpleLogicModified.address,
-      { from: defaultSender });
-
-  });
-
-  it("6. should set new factory stake to invalid contract", async function () {
+  it("5. should set new factory stake to invalid contract", async function () {
     this.timeout(10000000);
     const currentBlockTime = parseInt(saleStartBlock);
     await time.advanceBlockTo(currentBlockTime);
@@ -176,10 +164,22 @@ describe ("Stake1Logic : Upgradable Stake Contracts", function () {
     }
   });
 
-  it("7. should close sale", async function () {
+  it("6. should close sale", async function () {
     const current = parseInt(stakeStartBlock);
     await time.advanceBlockTo(current);
     await stakeEntry.closeSale(Vault.address, { from: defaultSender });
+  });
+
+   it("7. upgradeStakeTo ", async function () {
+    this.timeout(10000000);
+
+    let stakeSimpleLogicModified = await StakeSimpleLogicModified.new({ from: defaultSender });
+
+    await stakeEntry.upgradeStakeTo(
+      stakingContractInfo[0].address,
+      stakeSimpleLogicModified.address,
+      { from: defaultSender });
+
   });
 
   it("8. should claim rewards", async function () {
