@@ -287,7 +287,7 @@ class ICO20Contracts {
     const returnData = {
       fld: this.fld,
       sfld: this.sfld,
-      // stakeForSFLD: this.stakeForSFLD,
+      stakeSimpleFactory: this.stakeSimpleFactory,
       stakeDefiFactory: this.stakeDefiFactory,
       stakeTONfactory: this.stakeTONfactory,
       stakeregister: this.stakeregister,
@@ -451,6 +451,7 @@ class ICO20Contracts {
       stakeEntry: this.stakeEntry,
       stakeDefiFactory: this.stakeDefiFactory,
       stakeTONfactory: this.stakeTONfactory,
+      stakeSimpleFactory: this.stakeSimpleFactory
     };
   };
 

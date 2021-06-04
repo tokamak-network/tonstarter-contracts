@@ -67,7 +67,6 @@ describe ("Upgradable Stake Contracts", function () {
   });
 
   it('2. should create a vault', async function () {
-    const current = await time.latestBlock();
 
     const HASH_Pharse1_ETH_Staking = keccak256("PHASE1_ETH_STAKING");
 
