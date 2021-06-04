@@ -213,7 +213,7 @@ describe("Phase1. StakeContract with TON", function () {
     it("2. If the sales period does not start, the sales closing function fails.", async function () {
       await expect(
         stakeEntry.closeSale(vault_phase1_ton.address, { from: user1 })
-      ).to.be.revertedWith("Stake1Vault: closeSale init fail");
+      ).to.be.revertedWith("Stake1Vault: Before stakeStartBlock");
     });
 
   });
@@ -254,7 +254,7 @@ describe("Phase1. StakeContract with TON", function () {
     it("2. If the sales period is not over, the sales closing function will fail.", async function () {
       await expect(
         stakeEntry.closeSale(vault_phase1_ton.address, { from: user1 })
-      ).to.be.revertedWith("Stake1Vault: closeSale init fail");
+      ).to.be.revertedWith("Stake1Vault: Before stakeStartBlock");
     });
 
     it("3. Ether staking is not allowed after the sale period is over.", async function () {

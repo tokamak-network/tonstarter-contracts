@@ -141,7 +141,7 @@ contract Stake1Vault is StakeVaultStorage, IStake1Vault {
                 stakeStartBlock > 0 &&
                 stakeStartBlock < stakeEndBlock &&
                 block.number > stakeStartBlock,
-            "Stake1Vault: closeSale init fail"
+            "Stake1Vault: Before stakeStartBlock"
         );
         require(stakeAddresses.length > 0, "Stake1Vault: no stakes");
 

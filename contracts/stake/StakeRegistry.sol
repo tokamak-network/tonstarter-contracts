@@ -239,7 +239,6 @@ contract StakeRegistry is AccessControl, IStakeRegistry {
             address
         )
     {
-        //string _name = "UNISWAP_V3";
         bytes32 nameHash = keccak256(abi.encodePacked("UNISWAP_V3"));
         return (
             defiInfo[nameHash].router,
