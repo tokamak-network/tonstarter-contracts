@@ -361,13 +361,11 @@ contract Stake1Logic is StakeProxyStorage, AccessControl, IStake1Logic {
     /// @dev Requests unstaking the amount of all  in tokamak's layer2
     /// @param _stakeContract the stakeContract's address
     /// @param _layer2 the layer2 address in Tokamak
-    function tokamakRequestUnStakingAll(
-        address _stakeContract,
-        address _layer2
-    ) external override {
-        IStakeTONTokamak(_stakeContract).tokamakRequestUnStakingAll(
-            _layer2
-        );
+    function tokamakRequestUnStakingAll(address _stakeContract, address _layer2)
+        external
+        override
+    {
+        IStakeTONTokamak(_stakeContract).tokamakRequestUnStakingAll(_layer2);
     }
 
     /// @dev Processes unstaking the requested unstaking amount in tokamak's layer2

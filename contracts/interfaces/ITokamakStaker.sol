@@ -38,10 +38,9 @@ interface ITokamakStaker {
     function tokamakRequestUnStaking(address _layer2, uint256 wtonAmount)
         external;
 
-     /// @dev  request unstaking the wtonAmount in layer2 in tokamak
+    /// @dev  request unstaking the wtonAmount in layer2 in tokamak
     /// @param _layer2 the layer2 address in tokamak
-    function tokamakRequestUnStakingAll(address _layer2)
-        external;
+    function tokamakRequestUnStakingAll(address _layer2) external;
 
     /// @dev process unstaking in layer2 in tokamak
     /// @param _layer2 the layer2 address in tokamak

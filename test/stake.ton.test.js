@@ -62,7 +62,7 @@ const zeroAddress = "0x0000000000000000000000000000000000000000";
 
 let logFlag = false;
 
-describe("Phase1. StakeContract with TON", function () {
+describe("StakeTON: Stake with TON", function () {
   let weth, fld, stakeregister, stakefactory, stake1proxy, stake1logic;
   let vault_phase1_eth,
     vault_phase1_ton,
@@ -96,6 +96,15 @@ describe("Phase1. StakeContract with TON", function () {
   let stakeAddresses;
   let requestBlock = 0;
   let globalWithdrawalDelay = 0;
+
+let tokamakStakedInfo = {
+  stakedTotal:0,
+  tonBalance:0,
+  stakeOf:0,
+  pendingOf:0
+};
+
+let stakeContractTokamak = [];
 
   before(async function () {
     this.timeout(1000000);
@@ -189,6 +198,11 @@ describe("Phase1. StakeContract with TON", function () {
       stakeAddresses = await stakeEntry.stakeContractsOfVault(
         vault_phase1_ton.address
       );
+
+      for(let i = 0; i< stakeAddresses.length; i++){
+        stakeContractTokamak.push(tokamakStakedInfo);
+      }
+
     });
   });
 
@@ -240,11 +254,20 @@ describe("Phase1. StakeContract with TON", function () {
             user1,
             toWei(testUser1StakingAmount[i], "ether")
           );
+
+          let stakedInfo = await stakeContract.getUserStaked(user1);
+
+          await expect(toBN(stakedInfo.amount)).to.be.bignumber.equal(toBN(testUser1StakingAmount[i]).mul(toBN(10**18)));
+
           await ico20Contracts.stake(
             stakeContractAddress,
             user2,
             toWei(testUser2StakingAmount[i], "ether")
           );
+
+          stakedInfo = await stakeContract.getUserStaked(user2);
+
+          await expect(toBN(stakedInfo.amount)).to.be.bignumber.equal(toBN(testUser2StakingAmount[i]).mul(toBN(10**18)));
 
           if (logFlag) await ico20Contracts.logStake(stakeContractAddress, user1, user2);
         }
@@ -361,21 +384,32 @@ describe("Phase1. StakeContract with TON", function () {
   describe('# 8. Function Test2 For Tokamak Interface ', async function () {
 
     it("1. can staking total staked amount in Tokamak after the staking closeSale is performed.", async function () {
-       let stakeAmount = toWei('5','ether');
-      for (let i = 0; i < 2; i++) {
-        await stakeEntry.tokamakStaking(
-            stakeAddresses[i],
-            layer2.address,
-            stakeAmount,
-            { from: user1 }
-          );
 
-          if (logFlag) {
-            await ico20Contracts.logTokamakLayerBalance(layer2.address, stakeAddresses[i]);
-            let stakeContract = await StakeTON.at(stakeAddresses[i]);
-            let totalStakedAmount = await stakeContract.totalStakedAmount();
-            console.log('totalStakedAmount',i,utils.formatUnits(totalStakedAmount.toString(), 18) ,' TON');
-          }
+      let stakeAmount = toWei('5','ether');
+      for (let i = 0; i < 2; i++) {
+
+        await stakeEntry.tokamakStaking(
+          stakeAddresses[i],
+          layer2.address,
+          stakeAmount,
+          { from: user1 }
+        );
+
+        stakeContractTokamak[i].stakeOf = await seigManager.stakeOf(
+          layer2.address,
+          stakeAddresses[i]
+        );
+
+        await expect(toBN(stakeContractTokamak[i].stakeOf).div(toBN(10**9)).toString())
+            .to.be.bignumber.equal(
+              toBN(stakeAmount));
+
+        if (logFlag) {
+          await ico20Contracts.logTokamakLayerBalance(layer2.address, stakeAddresses[i]);
+          let stakeContract = await StakeTON.at(stakeAddresses[i]);
+          let totalStakedAmount = await stakeContract.totalStakedAmount();
+          console.log('totalStakedAmount',i,utils.formatUnits(totalStakedAmount.toString(), 18) ,' TON');
+        }
       }
 
     });
@@ -401,14 +435,17 @@ describe("Phase1. StakeContract with TON", function () {
           for (let j = 0; j < stakeAddresses.length; j++) {
             if (logFlag) console.log(`\n ----  StakeContract:`, j);
             let stakeContract = await StakeTON.at(stakeAddresses[j]);
+            const prevRewardClaimedTotal = await stakeContract.rewardClaimedTotal();
+            let sum = toBN(prevRewardClaimedTotal.toString());
+
             for (let u = 0; u < 2; u++) {
               if (logFlag){
                 console.log(`\n ------- ClaimBlcok:`, testBlcok);
                 console.log("\n testStakingUsers : ", u, testStakingUsers[u]);
               }
-              let curBlock = await time.latestBlock();
+
               let reward = await stakeContract.canRewardAmount(
-                testStakingUsers[u], curBlock
+                testStakingUsers[u], testBlcok
               );
               if (reward.gt(toBN("0"))) {
                 let fldBalance1 = await fld.balanceOf(testStakingUsers[u]);
@@ -420,6 +457,7 @@ describe("Phase1. StakeContract with TON", function () {
 
                 let tx = await stakeContract.claim({ from: testStakingUsers[u] });
                 testBlcok++;
+                sum = sum.add(toBN(reward.toString()));
 
                 if (logFlag)
                   console.log(
@@ -431,20 +469,24 @@ describe("Phase1. StakeContract with TON", function () {
                   );
 
                 let fldBalance2 = await fld.balanceOf(testStakingUsers[u]);
+                await expect(reward.add(fldBalance1)).to.be.bignumber.equal(fldBalance2);
+
                 if (logFlag)
                   console.log(
                     ` after claim -> fldBalance2 :  `,
                     fromWei(fldBalance2.toString(), "ether")
                   );
 
-                await expect(fldBalance2).to.be.bignumber.above(fldBalance1);
+                //await expect(fldBalance2).to.be.bignumber.above(fldBalance1);
 
-                let rewardClaimedTotal2 =
+                let rewardClaimedTotal =
                   await stakeContract.rewardClaimedTotal();
+                await expect(sum.toString()).to.be.bignumber.equal(toBN(rewardClaimedTotal).toString());
+
                 if (logFlag)
                   console.log(
-                    `after claim -> stakeContract rewardClaimedTotal2 :  `,
-                    fromWei(rewardClaimedTotal2.toString(), "ether")
+                    `after claim -> stakeContract rewardClaimedTotal :  `,
+                    fromWei(rewardClaimedTotal.toString(), "ether")
                   );
                 if (logFlag)
                   await ico20Contracts.logUserStaked(
@@ -463,12 +505,25 @@ describe("Phase1. StakeContract with TON", function () {
   describe('# 10. Function Test3 For Tokamak Interface ', async function () {
 
     it("1. updateReward ", async function () {
+      this.timeout(1000000);
+
       await ico20Contracts.updateRewardTokamak(layer2, operator1);
+      for (let i = 0; i < stakeAddresses.length; i++) {
+        let stakeOf = await seigManager.stakeOf(
+            layer2.address,
+            stakeAddresses[i]
+          );
+
+        await expect(toBN(stakeOf).toString())
+            .to.be.bignumber.above(
+              toBN(stakeContractTokamak[i].stakeOf.toString()));
+      }
+
     });
 
     it("2. can request withdrawal of a reward TON in tokamak.", async function () {
       let i = 0;
-      let wtonAmount = utils.parseUnits('1', 27);
+      let wtonAmount = '1'+'0'.repeat(27);
       requestBlock = await time.latestBlock();
       requestBlock = parseInt(requestBlock)+1;
       const pendingUnstaked1 = await depositManager.pendingUnstaked(
@@ -478,14 +533,17 @@ describe("Phase1. StakeContract with TON", function () {
       await stakeEntry.tokamakRequestUnStaking(
             stakeAddresses[i],
             layer2.address,
-            wtonAmount,
+            toBN(wtonAmount),
             { from: user1 }
         );
       const pendingUnstaked2 = await depositManager.pendingUnstaked(
         layer2.address,
         stakeAddresses[i]
       );
-      await expect(pendingUnstaked2.toString()).to.be.bignumber.above(pendingUnstaked1.toString());
+
+      await expect(toBN(pendingUnstaked2)).to.be.bignumber.equal(
+        toBN(pendingUnstaked1).add(toBN(wtonAmount)));
+
       if (logFlag) await ico20Contracts.logTokamakLayerBalance(layer2.address, stakeAddresses[i]);
 
     });
@@ -508,7 +566,13 @@ describe("Phase1. StakeContract with TON", function () {
       await time.advanceBlockTo(delayBlocks-1);
 
       let i = 0;
-      const tonBalance1 = await ton.balanceOf(stakeAddresses[i] );
+      stakeContractTokamak[i].tonBalance = await ton.balanceOf(stakeAddresses[i] );
+      stakeContractTokamak[i].pendingOf = await depositManager.pendingUnstaked(
+          layer2.address,
+          stakeAddresses[i]
+      );
+      stakeContractTokamak[i].tonBalance = toBN(stakeContractTokamak[i].tonBalance).add(toBN(stakeContractTokamak[i].pendingOf).div(toBN(10**9)));
+
       if (logFlag) {
         console.log(i, ',Prev tokamakProcessUnStaking ' );
         await ico20Contracts.logTONBalance(layer2.address, stakeAddresses[i], true);
@@ -518,8 +582,10 @@ describe("Phase1. StakeContract with TON", function () {
             layer2.address,
             { from: user1 }
         );
-      const tonBalance2 = await ton.balanceOf(stakeAddresses[i] );
-      await expect(tonBalance2.toString()).to.be.bignumber.above(tonBalance1.toString());
+      const currentTONAmount = await ton.balanceOf(stakeAddresses[i] );
+      await expect(stakeContractTokamak[i].tonBalance.toString())
+            .to.be.bignumber.equal(toBN(currentTONAmount).toString());
+
       if (logFlag) {
         console.log(i, ',After tokamakProcessUnStaking ' );
         await ico20Contracts.logTONBalance(layer2.address, stakeAddresses[i], true);
@@ -557,7 +623,8 @@ describe("Phase1. StakeContract with TON", function () {
         layer2.address,
         stakeAddresses[i]
       );
-      await expect(pendingUnstaked2.toString()).to.be.bignumber.above(pendingUnstaked1.toString());
+      await expect(toBN(pendingUnstaked2).toString()).to.be.bignumber.equal(toBN(pendingUnstaked1).add(toBN(wtonAmount)).toString());
+
       if (logFlag) {
         console.log(i, ',After tokamakRequestUnStakingAll ' );
         await ico20Contracts.logTokamakLayerBalance(layer2.address, stakeAddresses[i]);
@@ -572,13 +639,21 @@ describe("Phase1. StakeContract with TON", function () {
         console.log(i, ',Prev tokamakProcessUnStaking ' );
         await ico20Contracts.logTONBalance(layer2.address, stakeAddresses[i], true);
       }
+
+      stakeContractTokamak[i].pendingOf = await depositManager.pendingUnstaked(
+          layer2.address,
+          stakeAddresses[i]
+        );
+
       await stakeEntry.tokamakProcessUnStaking(
             stakeAddresses[i],
             layer2.address,
             { from: user1 }
         );
       const tonBalance2 = await ton.balanceOf(stakeAddresses[i] );
-      await expect(tonBalance2.toString()).to.be.bignumber.above(tonBalance1.toString());
+      await expect(toBN(tonBalance2).toString())
+        .to.be.bignumber.equal(toBN(tonBalance1).add(toBN(stakeContractTokamak[i].pendingOf).div(toBN(10**9))).toString());
+
       if (logFlag) {
         console.log(i, ',After tokamakProcessUnStaking ' );
         await ico20Contracts.logTONBalance(layer2.address, stakeAddresses[i], true);
@@ -605,16 +680,19 @@ describe("Phase1. StakeContract with TON", function () {
           for (let j = 0; j < stakeAddresses.length; j++) {
             if (logFlag) console.log(`\n ----  StakeContract:`, j);
             let stakeContract = await StakeTON.at(stakeAddresses[j]);
+            const prevRewardClaimedTotal = await stakeContract.rewardClaimedTotal();
+            let sum = toBN(prevRewardClaimedTotal.toString());
+
             for (let u = 0; u < 2; u++) {
               if (logFlag){
                 console.log(`\n ------- ClaimBlcok:`, testBlcok);
                 console.log("\n testStakingUsers : ", u, testStakingUsers[u]);
               }
 
-              let curBlock = await time.latestBlock();
               let reward = await stakeContract.canRewardAmount(
-                testStakingUsers[u], curBlock
+                testStakingUsers[u], testBlcok
               );
+
               if (reward.gt(toBN("0"))) {
                 let fldBalance1 = await fld.balanceOf(testStakingUsers[u]);
                 if (logFlag)
@@ -625,6 +703,7 @@ describe("Phase1. StakeContract with TON", function () {
 
                 let tx = await stakeContract.claim({ from: testStakingUsers[u] });
                 testBlcok++;
+                sum = sum.add(toBN(reward.toString()));
 
                 if (logFlag)
                   console.log(
@@ -636,21 +715,26 @@ describe("Phase1. StakeContract with TON", function () {
                   );
 
                 let fldBalance2 = await fld.balanceOf(testStakingUsers[u]);
+                await expect(reward.add(fldBalance1)).to.be.bignumber.equal(fldBalance2);
+
+
                 if (logFlag)
                   console.log(
                     ` after claim -> fldBalance2 :  `,
                     fromWei(fldBalance2.toString(), "ether")
                   );
 
-                await expect(fldBalance2).to.be.bignumber.above(fldBalance1);
-
-                let rewardClaimedTotal2 =
+                let rewardClaimedTotal =
                   await stakeContract.rewardClaimedTotal();
+
+                await expect(sum.toString()).to.be.bignumber.equal(toBN(rewardClaimedTotal).toString());
+
                 if (logFlag)
                   console.log(
-                    `after claim -> stakeContract rewardClaimedTotal2 :  `,
-                    fromWei(rewardClaimedTotal2.toString(), "ether")
+                    `after claim -> stakeContract rewardClaimedTotal :  `,
+                    fromWei(rewardClaimedTotal.toString(), "ether")
                   );
+
                 if (logFlag)
                   await ico20Contracts.logUserStaked(
                     stakeAddresses[j],
@@ -696,6 +780,15 @@ describe("Phase1. StakeContract with TON", function () {
               stakeOf,
               { from: user1 }
           );
+
+          const pendingOf = await depositManager.pendingUnstaked(
+            layer2.address,
+            stakeAddresses[i]
+          );
+          stakeContractTokamak[i].pendingOf = pendingOf;
+
+          await expect(toBN(pendingOf).toString())
+              .to.be.bignumber.equal(toBN(stakeOf).toString());
         }
       }
 
@@ -704,16 +797,26 @@ describe("Phase1. StakeContract with TON", function () {
       await time.advanceBlockTo(delayBlocks);
 
       for (let i = 0; i < stakeAddresses.length; i++) {
+
+        stakeContractTokamak[i].tonBalance = await ton.balanceOf(stakeAddresses[i]);
         let pendingUnstaked = await depositManager.pendingUnstaked(
           layer2.address,
           stakeAddresses[i]
         );
+        stakeContractTokamak[i].tonBalance = toBN(stakeContractTokamak[i].tonBalance).add(toBN(stakeContractTokamak[i].pendingOf).div(toBN(10**9)));
+
         if(pendingUnstaked.gt(toBN(0))){
           await stakeEntry.tokamakProcessUnStaking(
             stakeAddresses[i],
             layer2.address,
             { from: user1 }
           );
+
+          let currentTONAmount = await ton.balanceOf(stakeAddresses[i]);
+
+          await expect(stakeContractTokamak[i].tonBalance.toString())
+              .to.be.bignumber.equal(toBN(currentTONAmount).toString());
+
         }
       }
 
@@ -739,13 +842,10 @@ describe("Phase1. StakeContract with TON", function () {
         if (logFlag)
           console.log('\n  ************* withdraw : ', i, stakeAddresses[i]);
         const stakeContract1 = await StakeTON.at(stakeAddresses[i]);
-        let payTokenBalanceContract1 =  await ton.balanceOf(stakeAddresses[i]);
-        //console.log('payTokenBalanceContract1', payTokenBalanceContract1.toString(), fromWei(payTokenBalanceContract1.toString(), 'ether') ,'TON');
-
-        let payTokenBalanceContractWTON =  await wton.balanceOf(stakeAddresses[i]);
-        //console.log('payTokenBalanceContractWTON', payTokenBalanceContractWTON.toString(), utils.formatUnits(payTokenBalanceContractWTON.toString(), 27) ,'WTON');
-
+        let payTokenBalanceContract1 = await ton.balanceOf(stakeAddresses[i]);
         let payTokenBalance1 = await ton.balanceOf(user1);
+        let userStakedInfo1 = await stakeContract1.getUserStaked(user1);
+
 
         let fromTokamak = await stakeContract1.fromTokamak();
         let toTokamak = await stakeContract1.toTokamak();
@@ -755,33 +855,32 @@ describe("Phase1. StakeContract with TON", function () {
         const userStaked = await stakeContract1.userStaked(user1);
         let userAmount = userStaked.amount;
         let amount = withdrawStakedAmount.mul(userAmount).div(totalStakedAmount);
-        // console.log('amount', amount.toString(), fromWei(amount.toString(), 'ether') ,'TON');
 
-        if (logFlag){
+       if (logFlag){
           console.log('\n stakeContract\'s payTokenBalance1:', fromWei(payTokenBalanceContract1.toString(), 'ether'));
           console.log('\n user1\'s payTokenBalance1:', fromWei(payTokenBalance1.toString(), 'ether'));
           await ico20Contracts.logTokamakLayerBalance(layer2.address, stakeAddresses[i]);
           await ico20Contracts.logUserStaked(stakeAddresses[i], user1, 'user1 pre withdraw');
-        }
+       }
 
         await stakeContract1.withdraw({ from: user1 });
         stakeEndBlock++;
 
-        let payTokenBalanceContract2 =  await ton.balanceOf(stakeAddresses[i]);
-        //console.log('payTokenBalanceContract2', payTokenBalanceContract2.toString(), fromWei(payTokenBalanceContract2.toString(), 'ether') ,'TON');
-
-        let payTokenBalanceContractWTON2 =  await wton.balanceOf(stakeAddresses[i]);
-        //console.log('payTokenBalanceContractWTON2', payTokenBalanceContractWTON2.toString(), utils.formatUnits(payTokenBalanceContractWTON2.toString(), 27) ,'WTON');
-
+        let userStakedInfo2 = await stakeContract1.getUserStaked(user1);
+        let expectedWithdrawAmount = toBN(userStakedInfo2.releasedAmount);
 
         let payTokenBalance2 = await ton.balanceOf(user1);
+        await expect(expectedWithdrawAmount.add(toBN(payTokenBalance1))).to.be.bignumber.equal(toBN(payTokenBalance2));
+
+        let payTokenBalanceContract2 =  await ton.balanceOf(stakeAddresses[i]);
+        await expect(toBN(payTokenBalanceContract1).sub(expectedWithdrawAmount))
+          .to.be.bignumber.equal(toBN(payTokenBalanceContract2));
+
         if (logFlag){
           console.log('\n stakeContract\'s payTokenBalance1:', fromWei(payTokenBalanceContract2.toString(), 'ether'));
           console.log('\n user1\'s payTokenBalance2:', fromWei(payTokenBalance2.toString(), 'ether'));
           await ico20Contracts.logUserStaked(stakeAddresses[i], user1, 'user1 after withdraw');
         }
-
-        await expect(payTokenBalance2).to.be.bignumber.above(payTokenBalance1);
 
       }
     });

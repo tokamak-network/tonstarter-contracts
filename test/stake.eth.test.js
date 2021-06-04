@@ -65,7 +65,7 @@ const zeroAddress = "0x0000000000000000000000000000000000000000";
 
 const logFlag = 0;
 
-describe("Phase1. StakeContract with ETH", function () {
+describe("StakeSimple : Stake with ETH", function () {
   let weth, fld, stakeregister, stakefactory, stake1proxy, stake1logic;
   let vault_phase1_eth,
     vault_phase1_ton,
@@ -379,8 +379,6 @@ describe("Phase1. StakeContract with ETH", function () {
                     fromWei(fldBalance2.toString(), "ether")
                   );
                 await expect(reward.add(fldBalance1)).to.be.bignumber.equal(fldBalance2);
-
-                //await expect(fldBalance2).to.be.bignumber.above(fldBalance1);
 
                 let rewardClaimedTotal =
                   await stakeContract.rewardClaimedTotal();
