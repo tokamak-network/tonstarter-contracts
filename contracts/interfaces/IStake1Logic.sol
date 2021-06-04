@@ -90,12 +90,10 @@ interface IStake1Logic {
     /// @param _stakeContract the stakeContract's address
     /// @param _layer2 the layer2 address in Tokamak
     /// @param stakeAmount the amount that stake to layer2
-    /// @param isTON TON is true, WTON is false
     function tokamakStaking(
         address _stakeContract,
         address _layer2,
-        uint256 stakeAmount,
-        bool isTON
+        uint256 stakeAmount
     ) external;
 
     /// @dev Requests unstaking in tokamak's layer2

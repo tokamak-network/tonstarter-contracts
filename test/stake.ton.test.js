@@ -301,7 +301,6 @@ describe("Phase1. StakeContract with TON", function () {
             stakeAddresses[i],
             layer2.address,
             stakeAmount,
-            true,
             { from: user1 }
           )
       ).to.be.revertedWith("TokamakStaker:not closed");
@@ -368,7 +367,6 @@ describe("Phase1. StakeContract with TON", function () {
             stakeAddresses[i],
             layer2.address,
             stakeAmount,
-            true,
             { from: user1 }
           );
 

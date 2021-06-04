@@ -37,9 +37,6 @@ contract Stake1Logic is StakeProxyStorage, AccessControl, IStake1Logic {
     );
     event ClosedSale(address indexed vault);
     event SetStakeRegistry(address stakeRegistry);
-    event tokamakStaked(address stakeContract, address layer2);
-    event tokamakRequestedUnStaking(address stakeContract, address layer2);
-    event tokamakProcessedUnStaking(address stakeContract, address layer2);
 
     constructor() {
         _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
@@ -338,19 +335,12 @@ contract Stake1Logic is StakeProxyStorage, AccessControl, IStake1Logic {
     /// @param _stakeContract the stakeContract's address
     /// @param _layer2 the layer2 address in Tokamak
     /// @param stakeAmount the amount that stake to layer2
-    /// @param isTON TON is true, WTON is false
     function tokamakStaking(
         address _stakeContract,
         address _layer2,
-        uint256 stakeAmount,
-        bool isTON
+        uint256 stakeAmount
     ) external override {
-        IStakeTONTokamak(_stakeContract).tokamakStaking(
-            _layer2,
-            stakeAmount,
-            isTON
-        );
-        emit tokamakStaked(_stakeContract, _layer2);
+        IStakeTONTokamak(_stakeContract).tokamakStaking(_layer2, stakeAmount);
     }
 
     /// @dev Requests unstaking in tokamak's layer2
@@ -366,7 +356,6 @@ contract Stake1Logic is StakeProxyStorage, AccessControl, IStake1Logic {
             _layer2,
             amount
         );
-        emit tokamakRequestedUnStaking(_stakeContract, _layer2);
     }
 
     /// @dev Processes unstaking the requested unstaking amount in tokamak's layer2
@@ -377,7 +366,6 @@ contract Stake1Logic is StakeProxyStorage, AccessControl, IStake1Logic {
         override
     {
         IStakeTONTokamak(_stakeContract).tokamakProcessUnStaking(_layer2);
-        emit tokamakProcessedUnStaking(_stakeContract, _layer2);
     }
 
     /// @dev Swap TON to FLD using uniswap v3
