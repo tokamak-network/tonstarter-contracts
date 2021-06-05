@@ -2,6 +2,7 @@
 pragma solidity ^0.7.6;
 
 import "../interfaces/IFLD.sol";
+import '../libraries/ChainId.sol';
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "./VerifySignature.sol";
@@ -92,12 +93,14 @@ contract FLD is ERC20, AccessControl, VerifySignature, IFLD {
     /// @param value the amount to be approve to spend
     /// @param deadline the deadline that vaild the owner's signature
     /// @param signature the owner's signature
+    /// @param hashKind if it is true , use getEthSignedMessageHash, else use getEthSignedMessageHash2
     function permit(
         address owner,
         address spender,
         uint256 value,
         uint256 deadline,
-        bytes memory signature
+        bytes memory signature,
+        bool hashKind
     ) external override {
         require(deadline >= block.timestamp, "FLD: EXPIRED");
         bytes32 messageHash =
@@ -108,7 +111,10 @@ contract FLD is ERC20, AccessControl, VerifySignature, IFLD {
                 nonces[owner]++,
                 deadline
             );
+
         bytes32 ethSignedMessageHash = getEthSignedMessageHash(messageHash);
+        if(!hashKind) ethSignedMessageHash = getEthSignedMessageHash2(messageHash);
+
         address recoveredAddress =
             recoverSigner(ethSignedMessageHash, signature);
         require(
@@ -125,6 +131,7 @@ contract FLD is ERC20, AccessControl, VerifySignature, IFLD {
     /// @param _period the deadline that vaild the owner's signature
     /// @param _nonce the account's nonce
     /// @param signature the owner's signature
+    /// @param hashKind if it is true , use getEthSignedMessageHash, else use getEthSignedMessageHash2
     /// @return bool
     function permitVerify(
         address _signer,
@@ -132,12 +139,14 @@ contract FLD is ERC20, AccessControl, VerifySignature, IFLD {
         uint256 _amount,
         uint256 _period,
         uint256 _nonce,
-        bytes memory signature
+        bytes memory signature,
+        bool hashKind
     ) public pure override returns (bool) {
         bytes32 messageHash =
             getPermitMessageHash(_signer, _to, _amount, _nonce, _period);
 
         bytes32 ethSignedMessageHash = getEthSignedMessageHash(messageHash);
+        if(!hashKind) ethSignedMessageHash = getEthSignedMessageHash2(messageHash);
 
         address _addr = recoverSigner(ethSignedMessageHash, signature);
 

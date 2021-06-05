@@ -23,12 +23,14 @@ interface IFLD {
     /// @param value the amount to be approve to spend
     /// @param deadline the deadline that vaild the owner's signature
     /// @param signature the owner's signature
+    /// @param hashKind if it is true , use getEthSignedMessageHash, else use getEthSignedMessageHash2
     function permit(
         address owner,
         address spender,
         uint256 value,
         uint256 deadline,
-        bytes memory signature
+        bytes memory signature,
+        bool hashKind
     ) external;
 
     /// @dev Check sure the signature is correct.
@@ -38,6 +40,7 @@ interface IFLD {
     /// @param _period the deadline that vaild the owner's signature
     /// @param _nonce the account's nonce
     /// @param signature the owner's signature
+    /// @param hashKind if it is true , use getEthSignedMessageHash, else use getEthSignedMessageHash2
     /// @return bool
     function permitVerify(
         address _signer,
@@ -45,6 +48,7 @@ interface IFLD {
         uint256 _amount,
         uint256 _period,
         uint256 _nonce,
-        bytes memory signature
+        bytes memory signature,
+        bool hashKind
     ) external returns (bool);
 }

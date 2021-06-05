@@ -416,7 +416,7 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
         uint256 _deadline,
         uint160 _sqrtPriceLimitX96,
         uint256 _kind
-    ) external override returns (uint256 amountOut) {
+    ) external override lock returns (uint256 amountOut) {
         require(block.number <= endBlock, "TokamakStaker: period end");
         require(
             IIStake1Vault(vault).saleClosed() == true,
@@ -520,7 +520,7 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
         uint256 _amountOutMinimum,
         uint256 _deadline,
         uint256 _kind
-    ) external override returns (uint256 amountOut) {
+    ) external override lock returns (uint256 amountOut) {
         require(block.number <= endBlock, "TokamakStaker:period end");
         require(
             IIStake1Vault(vault).saleClosed() == true,
@@ -613,7 +613,7 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
 
     /*
     function exactInputSingle(uint256 _amountIn, uint256 _amountOutMinimum, uint256 _deadline, uint256 _sqrtPriceLimitX96)
-        external onlyOwner returns (uint256 amountOut)
+        external onlyOwner lock returns (uint256 amountOut)
     {
         checkTokamak();
 
@@ -643,7 +643,7 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
     }
 
     function exactInput(uint256 _amountIn, uint256 _amountOutMinimum, uint256 _deadline)
-        external onlyOwner returns (uint256 amountOut)
+        external onlyOwner lock returns (uint256 amountOut)
     {
         checkTokamak();
 

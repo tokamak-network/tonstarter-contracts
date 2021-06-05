@@ -48,6 +48,20 @@ contract VerifySignature {
             );
     }
 
+    function getEthSignedMessageHash2(bytes32 _messageHash)
+        public
+        pure
+        returns (bytes32)
+    {
+        return
+            keccak256(
+                abi.encodePacked(
+                    '\x19\x01',
+                    _messageHash
+                )
+            );
+    }
+
     function verify(
         address _signer,
         address _to,
