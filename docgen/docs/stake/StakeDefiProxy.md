@@ -90,7 +90,7 @@ set initial storage
 
 - `_registry`: teh registry address
 
-- `_intdata`: the array valued of saleStartBlock, stakeStartBlock, stakeEndBlock
+- `_intdata`: the array valued of saleStartBlock, stakeStartBlock, periodBlocks
 
 ###### StakeDefiProxy-Upgraded-address-
 

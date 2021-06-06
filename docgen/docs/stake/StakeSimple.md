@@ -106,16 +106,36 @@ Returns the amount that can be rewarded
 
 ## Event `Staked(address to, uint256 amount)`
 
-No description
+event on staking
+
+### Parameters:
+
+- `to`: the sender
+
+- `amount`: the amount of staking
 
 ###### StakeSimple-Claimed-address-uint256-uint256-
 
 ## Event `Claimed(address to, uint256 amount, uint256 currentBlcok)`
 
-No description
+event on claim
+
+### Parameters:
+
+- `to`: the sender
+
+- `amount`: the amount of claim
+
+- `currentBlcok`: the block of claim
 
 ###### StakeSimple-Withdrawal-address-uint256-
 
 ## Event `Withdrawal(address to, uint256 amount)`
 
-No description
+event on withdrawal
+
+### Parameters:
+
+- `to`: the sender
+
+- `amount`: the amount of withdrawal

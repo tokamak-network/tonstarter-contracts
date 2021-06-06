@@ -14,9 +14,11 @@
 
 - [`vaultsOfPhase(uint256 _phaseIndex)`](#IStake1Logic-vaultsOfPhase-uint256-)
 
-- [`tokamakStaking(address _stakeContract, address _layer2)`](#IStake1Logic-tokamakStaking-address-address-)
+- [`tokamakStaking(address _stakeContract, address _layer2, uint256 stakeAmount)`](#IStake1Logic-tokamakStaking-address-address-uint256-)
 
 - [`tokamakRequestUnStaking(address _stakeContract, address _layer2, uint256 amount)`](#IStake1Logic-tokamakRequestUnStaking-address-address-uint256-)
+
+- [`tokamakRequestUnStakingAll(address _stakeContract, address _layer2)`](#IStake1Logic-tokamakRequestUnStakingAll-address-address-)
 
 - [`tokamakProcessUnStaking(address _stakeContract, address _layer2)`](#IStake1Logic-tokamakProcessUnStaking-address-address-)
 
@@ -136,9 +138,9 @@ list of vaults in _phaseIndex phase
 
 - `_phaseIndex`: the phase number
 
-###### IStake1Logic-tokamakStaking-address-address-
+###### IStake1Logic-tokamakStaking-address-address-uint256-
 
-## Function `tokamakStaking(address _stakeContract, address _layer2)`
+## Function `tokamakStaking(address _stakeContract, address _layer2, uint256 stakeAmount)`
 
 stake in tokamak's layer2
 
@@ -147,6 +149,8 @@ stake in tokamak's layer2
 - `_stakeContract`: the stakeContract's address
 
 - `_layer2`: the layer2 address in Tokamak
+
+- `stakeAmount`: the amount that stake to layer2
 
 ###### IStake1Logic-tokamakRequestUnStaking-address-address-uint256-
 
@@ -161,6 +165,18 @@ Requests unstaking in tokamak's layer2
 - `_layer2`: the layer2 address in Tokamak
 
 - `amount`: the amount of unstaking
+
+###### IStake1Logic-tokamakRequestUnStakingAll-address-address-
+
+## Function `tokamakRequestUnStakingAll(address _stakeContract, address _layer2)`
+
+Requests unstaking the amount of all  in tokamak's layer2
+
+### Parameters:
+
+- `_stakeContract`: the stakeContract's address
+
+- `_layer2`: the layer2 address in Tokamak
 
 ###### IStake1Logic-tokamakProcessUnStaking-address-address-
 

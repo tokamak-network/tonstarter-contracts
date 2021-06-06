@@ -4,7 +4,7 @@
 
 - [`transferOwnership(address newOwner)`](#StakeRegistry-transferOwnership-address-)
 
-- [`setTokamak(address _ton, address _wton, address _depositManager, address _seigManager)`](#StakeRegistry-setTokamak-address-address-address-address-)
+- [`setTokamak(address _ton, address _wton, address _depositManager, address _seigManager, address _swapProxy)`](#StakeRegistry-setTokamak-address-address-address-address-address-)
 
 - [`addDefiInfo(string _name, address _router, address _ex1, address _ex2, uint256 _fee, address _routerV2)`](#StakeRegistry-addDefiInfo-string-address-address-address-uint256-address-)
 
@@ -28,7 +28,7 @@
 
 - [`AddedStakeContract(address vault, address stakeContract)`](#StakeRegistry-AddedStakeContract-address-address-)
 
-- [`SetTokamak(address ton, address wton, address depositManager, address seigManager)`](#StakeRegistry-SetTokamak-address-address-address-address-)
+- [`SetTokamak(address ton, address wton, address depositManager, address seigManager, address swapProxy)`](#StakeRegistry-SetTokamak-address-address-address-address-address-)
 
 - [`AddedDefiInfo(bytes32 nameHash, string name, address router, address ex1, address ex2, uint256 fee, address routerV2)`](#StakeRegistry-AddedDefiInfo-bytes32-string-address-address-address-uint256-address-)
 
@@ -52,9 +52,9 @@ transfer Ownership
 
 - `newOwner`: new owner address
 
-###### StakeRegistry-setTokamak-address-address-address-address-
+###### StakeRegistry-setTokamak-address-address-address-address-address-
 
-## Function `setTokamak(address _ton, address _wton, address _depositManager, address _seigManager)`
+## Function `setTokamak(address _ton, address _wton, address _depositManager, address _seigManager, address _swapProxy)`
 
 Set addresses for Tokamak integration
 
@@ -176,22 +176,62 @@ Checks if a vault is withing the given phase
 
 ## Event `AddedVault(address vault, uint256 phase)`
 
-No description
+event on add the vault
+
+### Parameters:
+
+- `vault`: the vault address
+
+- `phase`: the phase of FLD platform
 
 ###### StakeRegistry-AddedStakeContract-address-address-
 
 ## Event `AddedStakeContract(address vault, address stakeContract)`
 
-No description
+event on add the stake contract in vault
 
-###### StakeRegistry-SetTokamak-address-address-address-address-
+### Parameters:
 
-## Event `SetTokamak(address ton, address wton, address depositManager, address seigManager)`
+- `vault`: the vault address
 
-No description
+- `stakeContract`: the stake contract address created
+
+###### StakeRegistry-SetTokamak-address-address-address-address-address-
+
+## Event `SetTokamak(address ton, address wton, address depositManager, address seigManager, address swapProxy)`
+
+event on set the addresses related to tokamak
+
+### Parameters:
+
+- `ton`: the TON address
+
+- `wton`: the WTON address
+
+- `depositManager`: the DepositManager address
+
+- `seigManager`: the SeigManager address
+
+- `swapProxy`: the SwapProxy address
 
 ###### StakeRegistry-AddedDefiInfo-bytes32-string-address-address-address-uint256-address-
 
 ## Event `AddedDefiInfo(bytes32 nameHash, string name, address router, address ex1, address ex2, uint256 fee, address routerV2)`
 
-No description
+event on add the information related to defi.
+
+### Parameters:
+
+- `nameHash`: the name hash
+
+- `name`: the name of defi identify
+
+- `router`: the entry address
+
+- `ex1`: the extra 1 addres
+
+- `ex2`: the extra 2 addres
+
+- `fee`: fee
+
+- `routerV2`: the uniswap2 router address

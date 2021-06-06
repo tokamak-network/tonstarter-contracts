@@ -2,6 +2,7 @@
 * contracts
   * connection
     * [TokamakStaker](docs/connection/TokamakStaker.md)
+    * artifacts
   * dev
     * [DeveloperVault](docs/dev/DeveloperVault.md)
   * factory
@@ -11,6 +12,7 @@
     * [StakeTONFactory](docs/factory/StakeTONFactory.md)
     * [StakeTONProxyFactory](docs/factory/StakeTONProxyFactory.md)
     * [StakeVaultFactory](docs/factory/StakeVaultFactory.md)
+    * artifacts
   * interfaces
     * [IDepositManager](docs/interfaces/IDepositManager.md)
     * [IDeveloperVault](docs/interfaces/IDeveloperVault.md)
@@ -44,6 +46,7 @@
     * [ITokamakStaker](docs/interfaces/ITokamakStaker.md)
     * [IWTON](docs/interfaces/IWTON.md)
   * libraries
+    * [ChainId](docs/libraries/ChainId.md)
     * [LibTokenStake1](docs/libraries/LibTokenStake1.md)
   * stake
     * [Stake1Logic](docs/stake/Stake1Logic.md)
@@ -60,10 +63,10 @@
     * [StakeTONStorage](docs/stake/StakeTONStorage.md)
     * [StakeVaultProxy](docs/stake/StakeVaultProxy.md)
     * [StakeVaultStorage](docs/stake/StakeVaultStorage.md)
+    * artifacts
   * tokens
     * [FLD](docs/tokens/FLD.md)
     * [OnApprove](docs/tokens/OnApprove.md)
-    * [VerifySignature](docs/tokens/VerifySignature.md)
   * utils
     * math
       * [Math](docs/utils/math/Math.md)

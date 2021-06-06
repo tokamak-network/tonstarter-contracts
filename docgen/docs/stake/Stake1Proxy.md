@@ -1,6 +1,6 @@
 # Functions:
 
-- [`constructor()`](#Stake1Proxy-constructor--)
+- [`constructor(address _logic)`](#Stake1Proxy-constructor-address-)
 
 - [`transferOwnership(address newOwner)`](#Stake1Proxy-transferOwnership-address-)
 
@@ -18,9 +18,9 @@
 
 - [`Upgraded(address implementation)`](#Stake1Proxy-Upgraded-address-)
 
-###### Stake1Proxy-constructor--
+###### Stake1Proxy-constructor-address-
 
-## Function `constructor()`
+## Function `constructor(address _logic)`
 
 constructor of Stake1Proxy
 

@@ -84,7 +84,7 @@ set initial storage
 
 - `_addr`: the array addresses of token, paytoken, vault
 
-- `_intdata`: the array valued of saleStartBlock, stakeStartBlock, stakeEndBlock
+- `_intdata`: the array valued of saleStartBlock, stakeStartBlock, periodBlocks
 
 ###### StakeSimpleProxy-Upgraded-address-
 

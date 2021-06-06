@@ -24,6 +24,8 @@
 
 - [`Upgraded(address implementation)`](#StakeTONProxy-Upgraded-address-)
 
+- [`Staked(address to, uint256 amount)`](#StakeTONProxy-Staked-address-uint256-)
+
 ###### StakeTONProxy-constructor-address-
 
 ## Function `constructor(address _logic)`
@@ -128,10 +130,22 @@ set initial storage
 
 - `_registry`: the registry address
 
-- `_intdata`: the array valued of saleStartBlock, stakeStartBlock, stakeEndBlock
+- `_intdata`: the array valued of saleStartBlock, stakeStartBlock, periodBlocks
 
 ###### StakeTONProxy-Upgraded-address-
 
 ## Event `Upgraded(address implementation)`
 
 No description
+
+###### StakeTONProxy-Staked-address-uint256-
+
+## Event `Staked(address to, uint256 amount)`
+
+event on staking TON
+
+### Parameters:
+
+- `to`: the sender
+
+- `amount`: the amount of staking

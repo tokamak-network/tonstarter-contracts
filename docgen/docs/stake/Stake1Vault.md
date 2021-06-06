@@ -32,7 +32,7 @@
 
 # Events:
 
-- [`ClosedSale(uint256 amount)`](#Stake1Vault-ClosedSale-uint256-)
+- [`ClosedSale()`](#Stake1Vault-ClosedSale--)
 
 - [`ClaimedReward(address from, address to, uint256 amount)`](#Stake1Vault-ClaimedReward-address-address-uint256-)
 
@@ -194,14 +194,22 @@ Give Total reward amount of stakeContract(_account)
 
 Give the infomation of this vault
 
-###### Stake1Vault-ClosedSale-uint256-
+###### Stake1Vault-ClosedSale--
 
-## Event `ClosedSale(uint256 amount)`
+## Event `ClosedSale()`
 
-No description
+event on sale-closed
 
 ###### Stake1Vault-ClaimedReward-address-address-uint256-
 
 ## Event `ClaimedReward(address from, address to, uint256 amount)`
 
-No description
+event on sale-closed
+
+### Parameters:
+
+- `from`: the stakeContract address that call claim
+
+- `to`: the address that will receive the reward
+
+- `amount`: the amount of reward

@@ -22,7 +22,7 @@ Create a stake contract that calls the desired stake factory according to stakeT
 
 - `registry`:  registry address
 
-- `_intdata`: array of [saleStartBlock, startBlock, endBlock]
+- `_intdata`: array of [saleStartBlock, startBlock, periodBlocks]
 
 ### Return Values:
 

@@ -4,11 +4,13 @@
 
 - [`getUniswapInfo()`](#ITokamakStaker-getUniswapInfo--)
 
-- [`approveUniswapRouter(uint256 amount)`](#ITokamakStaker-approveUniswapRouter-uint256-)
+- [`swapTONtoWTON(uint256 amount, bool toWTON)`](#ITokamakStaker-swapTONtoWTON-uint256-bool-)
 
-- [`tokamakStaking(address _layer2)`](#ITokamakStaker-tokamakStaking-address-)
+- [`tokamakStaking(address _layer2, uint256 stakeAmount)`](#ITokamakStaker-tokamakStaking-address-uint256-)
 
 - [`tokamakRequestUnStaking(address _layer2, uint256 wtonAmount)`](#ITokamakStaker-tokamakRequestUnStaking-address-uint256-)
+
+- [`tokamakRequestUnStakingAll(address _layer2)`](#ITokamakStaker-tokamakRequestUnStakingAll-address-)
 
 - [`tokamakProcessUnStaking(address _layer2)`](#ITokamakStaker-tokamakProcessUnStaking-address-)
 
@@ -42,25 +44,29 @@ get the addresses yhat used in uniswap interfaces
 
 - fee the amount of fee
 
-###### ITokamakStaker-approveUniswapRouter-uint256-
+###### ITokamakStaker-swapTONtoWTON-uint256-bool-
 
-## Function `approveUniswapRouter(uint256 amount)`
+## Function `swapTONtoWTON(uint256 amount, bool toWTON)`
 
-Amount approve for use with UniswapRouter
+Change the TON holded in contract have to WTON, or change WTON to TON.
 
 ### Parameters:
 
-- `amount`: the amount requested to aprove
+- `amount`: the amount to be changed
 
-###### ITokamakStaker-tokamakStaking-address-
+- `toWTON`: if it's true, TON->WTON , else WTON->TON
 
-## Function `tokamakStaking(address _layer2)`
+###### ITokamakStaker-tokamakStaking-address-uint256-
+
+## Function `tokamakStaking(address _layer2, uint256 stakeAmount)`
 
  staking the staked TON in layer2 in tokamak
 
 ### Parameters:
 
 - `_layer2`: the layer2 address in tokamak
+
+- `stakeAmount`: the amount that stake to layer2
 
 ###### ITokamakStaker-tokamakRequestUnStaking-address-uint256-
 
@@ -73,6 +79,16 @@ Amount approve for use with UniswapRouter
 - `_layer2`: the layer2 address in tokamak
 
 - `wtonAmount`: the amount requested to unstaking
+
+###### ITokamakStaker-tokamakRequestUnStakingAll-address-
+
+## Function `tokamakRequestUnStakingAll(address _layer2)`
+
+ request unstaking the wtonAmount in layer2 in tokamak
+
+### Parameters:
+
+- `_layer2`: the layer2 address in tokamak
 
 ###### ITokamakStaker-tokamakProcessUnStaking-address-
 

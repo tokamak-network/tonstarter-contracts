@@ -8,9 +8,11 @@
 
 - [`nonces(address owner)`](#IFLD-nonces-address-)
 
-- [`permit(address owner, address spender, uint256 value, uint256 deadline, bytes signature)`](#IFLD-permit-address-address-uint256-uint256-bytes-)
+- [`permit(address owner, address spender, uint256 value, uint256 deadline, uint8 v, bytes32 r, bytes32 s)`](#IFLD-permit-address-address-uint256-uint256-uint8-bytes32-bytes32-)
 
-- [`permitVerify(address _signer, address _to, uint256 _amount, uint256 _period, uint256 _nonce, bytes signature)`](#IFLD-permitVerify-address-address-uint256-uint256-uint256-bytes-)
+- [`verify(address signer, address owner, address spender, uint256 value, uint256 deadline, uint256 _nounce, bytes32 sigR, bytes32 sigS, uint8 sigV)`](#IFLD-verify-address-address-address-uint256-uint256-uint256-bytes32-bytes32-uint8-)
+
+- [`hashPermit(address owner, address spender, uint256 value, uint256 deadline, uint256 _nounce)`](#IFLD-hashPermit-address-address-uint256-uint256-uint256-)
 
 ###### IFLD-mint-address-uint256-
 
@@ -48,9 +50,9 @@ No description
 
 No description
 
-###### IFLD-permit-address-address-uint256-uint256-bytes-
+###### IFLD-permit-address-address-uint256-uint256-uint8-bytes32-bytes32-
 
-## Function `permit(address owner, address spender, uint256 value, uint256 deadline, bytes signature)`
+## Function `permit(address owner, address spender, uint256 value, uint256 deadline, uint8 v, bytes32 r, bytes32 s)`
 
 Authorizes the owner's token to be used by the spender as much as the value.
 
@@ -66,24 +68,52 @@ The signature must have the owner's signature.
 
 - `deadline`: the deadline that vaild the owner's signature
 
-- `signature`: the owner's signature
+- `v`: the owner's signature - v
 
-###### IFLD-permitVerify-address-address-uint256-uint256-uint256-bytes-
+- `r`: the owner's signature - r
 
-## Function `permitVerify(address _signer, address _to, uint256 _amount, uint256 _period, uint256 _nonce, bytes signature)`
+- `s`: the owner's signature - s
 
-Check sure the signature is correct.
+###### IFLD-verify-address-address-address-uint256-uint256-uint256-bytes32-bytes32-uint8-
+
+## Function `verify(address signer, address owner, address spender, uint256 value, uint256 deadline, uint256 _nounce, bytes32 sigR, bytes32 sigS, uint8 sigV)`
+
+verify the signature
 
 ### Parameters:
 
-- `_signer`: the token's owner
+- `signer`: the signer address
 
-- `_to`: the account that spend owner's token
+- `owner`: the token's owner
 
-- `_amount`: the amount to be approve to spend
+- `spender`: the account that spend owner's token
 
-- `_period`: the deadline that vaild the owner's signature
+- `value`: the amount to be approve to spend
 
-- `_nonce`: the account's nonce
+- `deadline`: the deadline that vaild the owner's signature
 
-- `signature`: the owner's signature
+- `_nounce`: the _nounce
+
+- `sigR`: the owner's signature - r
+
+- `sigS`: the owner's signature - s
+
+- `sigV`: the owner's signature - v
+
+###### IFLD-hashPermit-address-address-uint256-uint256-uint256-
+
+## Function `hashPermit(address owner, address spender, uint256 value, uint256 deadline, uint256 _nounce)`
+
+the hash of Permit
+
+### Parameters:
+
+- `owner`: the token's owner
+
+- `spender`: the account that spend owner's token
+
+- `value`: the amount to be approve to spend
+
+- `deadline`: the deadline that vaild the owner's signature
+
+- `_nounce`: the _nounce

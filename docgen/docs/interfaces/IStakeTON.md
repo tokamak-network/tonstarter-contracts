@@ -1,22 +1,10 @@
 # Functions:
 
-- [`stake(uint256 amount)`](#IStakeTON-stake-uint256-)
-
 - [`claim()`](#IStakeTON-claim--)
 
 - [`withdraw()`](#IStakeTON-withdraw--)
 
 - [`canRewardAmount(address account, uint256 specificBlock)`](#IStakeTON-canRewardAmount-address-uint256-)
-
-###### IStakeTON-stake-uint256-
-
-## Function `stake(uint256 amount)`
-
-Stake amount
-
-### Parameters:
-
-- `amount`:  the amount of staked
 
 ###### IStakeTON-claim--
 

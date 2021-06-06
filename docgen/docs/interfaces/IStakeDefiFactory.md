@@ -14,7 +14,7 @@ Create a stake contract that can operate the staked amount as a DeFi project.
 
 - `_registry`:  registry address
 
-- `_intdata`: array of [saleStartBlock, startBlock, endBlock]
+- `_intdata`: array of [saleStartBlock, startBlock, periodBlocks]
 
 - `owner`:  owner address
 

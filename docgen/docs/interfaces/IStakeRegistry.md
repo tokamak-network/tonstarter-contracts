@@ -1,6 +1,6 @@
 # Functions:
 
-- [`setTokamak(address _ton, address _wton, address _depositManager, address _seigManager)`](#IStakeRegistry-setTokamak-address-address-address-address-)
+- [`setTokamak(address _ton, address _wton, address _depositManager, address _seigManager, address _swapProxy)`](#IStakeRegistry-setTokamak-address-address-address-address-address-)
 
 - [`addDefiInfo(string _name, address _router, address _ex1, address _ex2, uint256 _fee, address _routerV2)`](#IStakeRegistry-addDefiInfo-string-address-address-address-uint256-address-)
 
@@ -18,9 +18,9 @@
 
 - [`stakeContractsOfVaultAll(address _vault)`](#IStakeRegistry-stakeContractsOfVaultAll-address-)
 
-###### IStakeRegistry-setTokamak-address-address-address-address-
+###### IStakeRegistry-setTokamak-address-address-address-address-address-
 
-## Function `setTokamak(address _ton, address _wton, address _depositManager, address _seigManager)`
+## Function `setTokamak(address _ton, address _wton, address _depositManager, address _seigManager, address _swapProxy)`
 
 Set addresses for Tokamak integration
 

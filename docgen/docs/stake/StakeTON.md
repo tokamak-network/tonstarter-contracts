@@ -4,8 +4,6 @@
 
 - [`receive()`](#StakeTON-receive--)
 
-- [`stake(uint256 amount)`](#StakeTON-stake-uint256-)
-
 - [`withdraw()`](#StakeTON-withdraw--)
 
 - [`claim()`](#StakeTON-claim--)
@@ -33,16 +31,6 @@ constructor of StakeTON
 receive ether
 
 call stake function with msg.value
-
-###### StakeTON-stake-uint256-
-
-## Function `stake(uint256 amount)`
-
-Stake amount
-
-### Parameters:
-
-- `amount`:  the amount of staked
 
 ###### StakeTON-withdraw--
 
@@ -76,16 +64,38 @@ Returns the amount that can be rewarded
 
 ## Event `Staked(address to, uint256 amount)`
 
-No description
+event on staking
+
+### Parameters:
+
+- `to`: the sender
+
+- `amount`: the amount of staking
 
 ###### StakeTON-Claimed-address-uint256-uint256-
 
 ## Event `Claimed(address to, uint256 amount, uint256 currentBlcok)`
 
-No description
+event on claim
+
+### Parameters:
+
+- `to`: the sender
+
+- `amount`: the amount of claim
+
+- `currentBlcok`: the block of claim
 
 ###### StakeTON-Withdrawal-address-uint256-uint256-
 
 ## Event `Withdrawal(address to, uint256 tonAmount, uint256 fldAmount)`
 
-No description
+event on withdrawal
+
+### Parameters:
+
+- `to`: the sender
+
+- `tonAmount`: the amount of TON withdrawal
+
+- `fldAmount`: the amount of FLD withdrawal

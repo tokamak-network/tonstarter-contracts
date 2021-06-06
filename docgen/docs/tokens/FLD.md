@@ -1,6 +1,8 @@
 # Functions:
 
-- [`constructor()`](#FLD-constructor--)
+- [`constructor(string name_, string symbol_, string version_)`](#FLD-constructor-string-string-string-)
+
+- [`DOMAIN_SEPARATOR()`](#FLD-DOMAIN_SEPARATOR--)
 
 - [`transferOwnership(address newOwner)`](#FLD-transferOwnership-address-)
 
@@ -8,15 +10,23 @@
 
 - [`burn(address from, uint256 amount)`](#FLD-burn-address-uint256-)
 
-- [`permit(address owner, address spender, uint256 value, uint256 deadline, bytes signature)`](#FLD-permit-address-address-uint256-uint256-bytes-)
+- [`permit(address owner, address spender, uint256 value, uint256 deadline, uint8 v, bytes32 r, bytes32 s)`](#FLD-permit-address-address-uint256-uint256-uint8-bytes32-bytes32-)
 
-- [`permitVerify(address _signer, address _to, uint256 _amount, uint256 _period, uint256 _nonce, bytes signature)`](#FLD-permitVerify-address-address-uint256-uint256-uint256-bytes-)
+- [`verify(address signer, address owner, address spender, uint256 value, uint256 deadline, uint256 _nounce, bytes32 sigR, bytes32 sigS, uint8 sigV)`](#FLD-verify-address-address-address-uint256-uint256-uint256-bytes32-bytes32-uint8-)
 
-###### FLD-constructor--
+- [`hashPermit(address owner, address spender, uint256 value, uint256 deadline, uint256 _nounce)`](#FLD-hashPermit-address-address-uint256-uint256-uint256-)
 
-## Function `constructor()`
+###### FLD-constructor-string-string-string-
+
+## Function `constructor(string name_, string symbol_, string version_)`
 
 constructor of FLD, ERC20 Token
+
+###### FLD-DOMAIN_SEPARATOR--
+
+## Function `DOMAIN_SEPARATOR()`
+
+No description
 
 ###### FLD-transferOwnership-address-
 
@@ -52,9 +62,9 @@ burn a token.
 
 - `amount`: the amount to burn
 
-###### FLD-permit-address-address-uint256-uint256-bytes-
+###### FLD-permit-address-address-uint256-uint256-uint8-bytes32-bytes32-
 
-## Function `permit(address owner, address spender, uint256 value, uint256 deadline, bytes signature)`
+## Function `permit(address owner, address spender, uint256 value, uint256 deadline, uint8 v, bytes32 r, bytes32 s)`
 
 Authorizes the owner's token to be used by the spender as much as the value.
 
@@ -70,24 +80,52 @@ The signature must have the owner's signature.
 
 - `deadline`: the deadline that vaild the owner's signature
 
-- `signature`: the owner's signature
+- `v`: the owner's signature - v
 
-###### FLD-permitVerify-address-address-uint256-uint256-uint256-bytes-
+- `r`: the owner's signature - r
 
-## Function `permitVerify(address _signer, address _to, uint256 _amount, uint256 _period, uint256 _nonce, bytes signature)`
+- `s`: the owner's signature - s
 
-Check sure the signature is correct.
+###### FLD-verify-address-address-address-uint256-uint256-uint256-bytes32-bytes32-uint8-
+
+## Function `verify(address signer, address owner, address spender, uint256 value, uint256 deadline, uint256 _nounce, bytes32 sigR, bytes32 sigS, uint8 sigV)`
+
+verify the signature
 
 ### Parameters:
 
-- `_signer`: the token's owner
+- `signer`: the signer address
 
-- `_to`: the account that spend owner's token
+- `owner`: the token's owner
 
-- `_amount`: the amount to be approve to spend
+- `spender`: the account that spend owner's token
 
-- `_period`: the deadline that vaild the owner's signature
+- `value`: the amount to be approve to spend
 
-- `_nonce`: the account's nonce
+- `deadline`: the deadline that vaild the owner's signature
 
-- `signature`: the owner's signature
+- `_nounce`: the _nounce
+
+- `sigR`: the owner's signature - r
+
+- `sigS`: the owner's signature - s
+
+- `sigV`: the owner's signature - v
+
+###### FLD-hashPermit-address-address-uint256-uint256-uint256-
+
+## Function `hashPermit(address owner, address spender, uint256 value, uint256 deadline, uint256 _nounce)`
+
+the hash of Permit
+
+### Parameters:
+
+- `owner`: the token's owner
+
+- `spender`: the account that spend owner's token
+
+- `value`: the amount to be approve to spend
+
+- `deadline`: the deadline that vaild the owner's signature
+
+- `_nounce`: the _nounce

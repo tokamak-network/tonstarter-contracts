@@ -28,7 +28,7 @@ Create a stake contract that can stake TON.
 
 - `_registry`:  the registry address
 
-- `_intdata`: the array of [saleStartBlock, startBlock, endBlock]
+- `_intdata`: the array of [saleStartBlock, startBlock, periodBlocks]
 
 - `owner`:  owner address
 

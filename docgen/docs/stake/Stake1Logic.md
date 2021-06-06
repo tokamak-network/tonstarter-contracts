@@ -36,15 +36,17 @@
 
 - [`vaultsOfPhase(uint256 _phaseIndex)`](#Stake1Logic-vaultsOfPhase-uint256-)
 
-- [`tokamakStaking(address _stakeContract, address _layer2)`](#Stake1Logic-tokamakStaking-address-address-)
+- [`tokamakStaking(address _stakeContract, address _layer2, uint256 stakeAmount)`](#Stake1Logic-tokamakStaking-address-address-uint256-)
 
 - [`tokamakRequestUnStaking(address _stakeContract, address _layer2, uint256 amount)`](#Stake1Logic-tokamakRequestUnStaking-address-address-uint256-)
+
+- [`tokamakRequestUnStakingAll(address _stakeContract, address _layer2)`](#Stake1Logic-tokamakRequestUnStakingAll-address-address-)
 
 - [`tokamakProcessUnStaking(address _stakeContract, address _layer2)`](#Stake1Logic-tokamakProcessUnStaking-address-address-)
 
 - [`exchangeWTONtoFLD(address _stakeContract, uint256 amountIn, uint256 amountOutMinimum, uint256 deadline, uint160 sqrtPriceLimitX96, uint256 _type)`](#Stake1Logic-exchangeWTONtoFLD-address-uint256-uint256-uint256-uint160-uint256-)
 
-- [`exchangeWTONtoFLDv2(address _stakeContract, uint256 amountIn, uint256 amountOutMinimum, uint256 deadline, uint160 sqrtPriceLimitX96, uint256 _type)`](#Stake1Logic-exchangeWTONtoFLDv2-address-uint256-uint256-uint256-uint160-uint256-)
+- [`exchangeWTONtoFLDv2(address _stakeContract, uint256 amountIn, uint256 amountOutMinimum, uint256 deadline, uint256 _type)`](#Stake1Logic-exchangeWTONtoFLDv2-address-uint256-uint256-uint256-uint256-)
 
 - [`vaultsOfPahse(uint256 _phase)`](#Stake1Logic-vaultsOfPahse-uint256-)
 
@@ -66,7 +68,7 @@ upgrade to the logic of _stakeProxy
 
 ### Parameters:
 
-- `_stakeProxy`: the StakeProxy address
+- `_stakeProxy`: the StakeProxy address, it is stakeContract address in vault.
 
 - `_implementation`: new logic address
 
@@ -290,9 +292,9 @@ list of vaults in _phaseIndex phase
 
 - `_phaseIndex`: the phase number
 
-###### Stake1Logic-tokamakStaking-address-address-
+###### Stake1Logic-tokamakStaking-address-address-uint256-
 
-## Function `tokamakStaking(address _stakeContract, address _layer2)`
+## Function `tokamakStaking(address _stakeContract, address _layer2, uint256 stakeAmount)`
 
 stake in tokamak's layer2
 
@@ -302,11 +304,13 @@ stake in tokamak's layer2
 
 - `_layer2`: the layer2 address in Tokamak
 
+- `stakeAmount`: the amount that stake to layer2
+
 ###### Stake1Logic-tokamakRequestUnStaking-address-address-uint256-
 
 ## Function `tokamakRequestUnStaking(address _stakeContract, address _layer2, uint256 amount)`
 
-Requests unstaking in tokamak's layer2
+Requests unstaking the amount WTON in tokamak's layer2
 
 ### Parameters:
 
@@ -315,6 +319,18 @@ Requests unstaking in tokamak's layer2
 - `_layer2`: the layer2 address in Tokamak
 
 - `amount`: the amount of unstaking
+
+###### Stake1Logic-tokamakRequestUnStakingAll-address-address-
+
+## Function `tokamakRequestUnStakingAll(address _stakeContract, address _layer2)`
+
+Requests unstaking the amount of all  in tokamak's layer2
+
+### Parameters:
+
+- `_stakeContract`: the stakeContract's address
+
+- `_layer2`: the layer2 address in Tokamak
 
 ###### Stake1Logic-tokamakProcessUnStaking-address-address-
 
@@ -350,11 +366,25 @@ this function used in StakeTON ( stakeType=0 )
 
 - `_type`: the function type, if 0, use exactInputSingle function, else if, use exactInput function
 
-###### Stake1Logic-exchangeWTONtoFLDv2-address-uint256-uint256-uint256-uint160-uint256-
+###### Stake1Logic-exchangeWTONtoFLDv2-address-uint256-uint256-uint256-uint256-
 
-## Function `exchangeWTONtoFLDv2(address _stakeContract, uint256 amountIn, uint256 amountOutMinimum, uint256 deadline, uint160 sqrtPriceLimitX96, uint256 _type)`
+## Function `exchangeWTONtoFLDv2(address _stakeContract, uint256 amountIn, uint256 amountOutMinimum, uint256 deadline, uint256 _type)`
 
-Swap TON to FLD
+Swap TON to FLD using uniswap v2
+
+this function used in StakeTON ( stakeType=0 )
+
+### Parameters:
+
+- `_stakeContract`: the stakeContract's address
+
+- `amountIn`: the input amount
+
+- `amountOutMinimum`: the minimun output amount
+
+- `deadline`: deadline
+
+- `_type`: the function type, if 0, use exactInputSingle function, else if, use exactInput function
 
 ###### Stake1Logic-vaultsOfPahse-uint256-
 
@@ -370,22 +400,46 @@ Get addresses of vaults of index phase
 
 ## Event `CreatedVault(address vault, address paytoken, uint256 cap)`
 
-No description
+event on create vault
+
+### Parameters:
+
+- `vault`: the vault address created
+
+- `paytoken`: the token used for staking by user
+
+- `cap`:  allocated reward amount
 
 ###### Stake1Logic-CreatedStakeContract-address-address-uint256-
 
 ## Event `CreatedStakeContract(address vault, address stakeContract, uint256 phase)`
 
-No description
+event on create stake contract in vault
+
+### Parameters:
+
+- `vault`: the vault address
+
+- `stakeContract`: the stake contract address created
+
+- `phase`: the phase of FLD platform
 
 ###### Stake1Logic-ClosedSale-address-
 
 ## Event `ClosedSale(address vault)`
 
-No description
+event on sale-closed
+
+### Parameters:
+
+- `vault`: the vault address
 
 ###### Stake1Logic-SetStakeRegistry-address-
 
 ## Event `SetStakeRegistry(address stakeRegistry)`
 
-No description
+event on setting stake registry
+
+### Parameters:
+
+- `stakeRegistry`: the stakeRegistry address
