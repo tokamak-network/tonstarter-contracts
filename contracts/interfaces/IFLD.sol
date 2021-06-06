@@ -22,33 +22,53 @@ interface IFLD {
     /// @param spender the account that spend owner's token
     /// @param value the amount to be approve to spend
     /// @param deadline the deadline that vaild the owner's signature
-    /// @param signature the owner's signature
-    /// @param hashKind if it is true , use getEthSignedMessageHash, else use getEthSignedMessageHash2
+    /// @param v the owner's signature - v
+    /// @param r the owner's signature - r
+    /// @param s the owner's signature - s
     function permit(
         address owner,
         address spender,
         uint256 value,
         uint256 deadline,
-        bytes memory signature,
-        bool hashKind
+        uint8 v,
+        bytes32 r,
+        bytes32 s
     ) external;
 
-    /// @dev Check sure the signature is correct.
-    /// @param _signer the token's owner
-    /// @param _to the account that spend owner's token
-    /// @param _amount the amount to be approve to spend
-    /// @param _period the deadline that vaild the owner's signature
-    /// @param _nonce the account's nonce
-    /// @param signature the owner's signature
-    /// @param hashKind if it is true , use getEthSignedMessageHash, else use getEthSignedMessageHash2
-    /// @return bool
-    function permitVerify(
-        address _signer,
-        address _to,
-        uint256 _amount,
-        uint256 _period,
-        uint256 _nonce,
-        bytes memory signature,
-        bool hashKind
-    ) external returns (bool);
+    /// @dev verify the signature
+    /// @param signer the signer address
+    /// @param owner the token's owner
+    /// @param spender the account that spend owner's token
+    /// @param value the amount to be approve to spend
+    /// @param deadline the deadline that vaild the owner's signature
+    /// @param _nounce the _nounce
+    /// @param sigR the owner's signature - r
+    /// @param sigS the owner's signature - s
+    /// @param sigV the owner's signature - v
+    function verify(
+        address signer,
+        address owner,
+        address spender,
+        uint256 value,
+        uint256 deadline,
+        uint256 _nounce,
+        bytes32 sigR,
+        bytes32 sigS,
+        uint8 sigV
+    ) external view returns (bool) ;
+
+    /// @dev the hash of Permit
+    /// @param owner the token's owner
+    /// @param spender the account that spend owner's token
+    /// @param value the amount to be approve to spend
+    /// @param deadline the deadline that vaild the owner's signature
+    /// @param _nounce the _nounce
+    function hashPermit(
+        address owner,
+        address spender,
+        uint256 value,
+        uint256 deadline,
+        uint256 _nounce
+    ) external view returns (bytes32) ;
+
 }

@@ -2,22 +2,38 @@
 pragma solidity ^0.7.6;
 
 import "../interfaces/IFLD.sol";
-import '../libraries/ChainId.sol';
+import "../libraries/ChainId.sol";
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
-import "./VerifySignature.sol";
 
 /// @title the platform token. FLD token
-contract FLD is ERC20, AccessControl, VerifySignature, IFLD {
+contract FLD is ERC20, AccessControl, IFLD {
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
     bytes32 public constant MINTER_ROLE = keccak256("MINTER");
     bytes32 public constant BURNER_ROLE = keccak256("BURNER");
 
-    string public constant name1 = "FLD";
-    string public constant symbol1 = "FLD";
+    // string public constant name1 = "FLD";
+    // string public constant symbol1 = "FLD";
+    /// @dev The hash of the name used in the permit signature verification
+    bytes32 private immutable nameHash;
 
-    bytes32 public override DOMAIN_SEPARATOR;
+    /// @dev The hash of the version string used in the permit signature verification
+    bytes32 private immutable versionHash;
+
+    //bytes32 public override DOMAIN_SEPARATOR;
     mapping(address => uint256) public override nonces;
+
+    /// @dev Value is equal to keccak256("Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)");
+    bytes32 public constant PERMIT_TYPEHASH =
+        0x6e71edae12b1b97f4d1f60370fef10105fa2faae0126114a169c64845d6126c9;
+
+    struct Permit {
+        address owner;
+        address spender;
+        address value;
+        address nonce;
+        address deadline;
+    }
 
     modifier onlyOwner() {
         require(hasRole(ADMIN_ROLE, msg.sender), "FLD: Caller is not an admin");
@@ -25,22 +41,14 @@ contract FLD is ERC20, AccessControl, VerifySignature, IFLD {
     }
 
     /// @dev constructor of FLD, ERC20 Token
-    constructor() ERC20(name1, symbol1) {
-        uint256 chainId;
-        assembly {
-            chainId := chainid()
-        }
-        DOMAIN_SEPARATOR = keccak256(
-            abi.encode(
-                keccak256(
-                    "EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"
-                ),
-                keccak256(bytes(name1)),
-                keccak256(bytes("1")),
-                chainId,
-                address(this)
-            )
-        );
+    constructor(
+        string memory name_,
+        string memory symbol_,
+        string memory version_
+    ) ERC20(name_, symbol_) {
+        nameHash = keccak256(bytes(name_));
+        versionHash = keccak256(bytes(version_));
+
         _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
         _setRoleAdmin(BURNER_ROLE, ADMIN_ROLE);
         _setRoleAdmin(MINTER_ROLE, ADMIN_ROLE);
@@ -48,6 +56,25 @@ contract FLD is ERC20, AccessControl, VerifySignature, IFLD {
         _setupRole(ADMIN_ROLE, msg.sender);
         _setupRole(BURNER_ROLE, msg.sender);
         _setupRole(MINTER_ROLE, msg.sender);
+    }
+
+    function DOMAIN_SEPARATOR() public view override returns (bytes32) {
+        uint256 chainId;
+        assembly {
+            chainId := chainid()
+        }
+
+        return
+            keccak256(
+                abi.encode(
+                    // keccak256('EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)')
+                    0x8b73c3c69bb8fe3d512ecc4cf759cc79239f7b179b0ffacaa9a75d522b39400f,
+                    nameHash,
+                    versionHash,
+                    chainId,
+                    address(this)
+                )
+            );
     }
 
     /// @dev transfer Ownership
@@ -92,64 +119,111 @@ contract FLD is ERC20, AccessControl, VerifySignature, IFLD {
     /// @param spender the account that spend owner's token
     /// @param value the amount to be approve to spend
     /// @param deadline the deadline that vaild the owner's signature
-    /// @param signature the owner's signature
-    /// @param hashKind if it is true , use getEthSignedMessageHash, else use getEthSignedMessageHash2
+    /// @param v the owner's signature - v
+    /// @param r the owner's signature - r
+    /// @param s the owner's signature - s
     function permit(
         address owner,
         address spender,
         uint256 value,
         uint256 deadline,
-        bytes memory signature,
-        bool hashKind
+        uint8 v,
+        bytes32 r,
+        bytes32 s
     ) external override {
-        require(deadline >= block.timestamp, "FLD: EXPIRED");
-        bytes32 messageHash =
-            getPermitMessageHash(
-                owner,
-                spender,
-                value,
-                nonces[owner]++,
-                deadline
+        require(deadline >= block.timestamp, "FLD: permit EXPIRED");
+
+        bytes32 digest =
+            keccak256(
+                abi.encodePacked(
+                    "\x19\x01",
+                    DOMAIN_SEPARATOR(),
+                    keccak256(
+                        abi.encode(
+                            PERMIT_TYPEHASH,
+                            owner,
+                            spender,
+                            value,
+                            nonces[owner]++,
+                            deadline
+                        )
+                    )
+                )
             );
 
-        bytes32 ethSignedMessageHash = getEthSignedMessageHash(messageHash);
-        if(!hashKind) ethSignedMessageHash = getEthSignedMessageHash2(messageHash);
+        require(owner != spender, "FLD: approval to current owner");
 
-        address recoveredAddress =
-            recoverSigner(ethSignedMessageHash, signature);
-        require(
-            recoveredAddress != address(0) && recoveredAddress == owner,
-            "FLD: INVALID_SIGNATURE"
-        );
+        // if (Address.isContract(owner)) {
+        //     require(IERC1271(owner).isValidSignature(digest, abi.encodePacked(r, s, v)) == 0x1626ba7e, 'Unauthorized');
+        // } else {
+        address recoveredAddress = ecrecover(digest, v, r, s);
+        require(recoveredAddress != address(0), "FLD: Invalid signature");
+        require(recoveredAddress == owner, "FLD: Unauthorized");
+        // }
         _approve(owner, spender, value);
     }
 
-    /// @dev Check sure the signature is correct.
-    /// @param _signer the token's owner
-    /// @param _to the account that spend owner's token
-    /// @param _amount the amount to be approve to spend
-    /// @param _period the deadline that vaild the owner's signature
-    /// @param _nonce the account's nonce
-    /// @param signature the owner's signature
-    /// @param hashKind if it is true , use getEthSignedMessageHash, else use getEthSignedMessageHash2
-    /// @return bool
-    function permitVerify(
-        address _signer,
-        address _to,
-        uint256 _amount,
-        uint256 _period,
-        uint256 _nonce,
-        bytes memory signature,
-        bool hashKind
-    ) public pure override returns (bool) {
-        bytes32 messageHash =
-            getPermitMessageHash(_signer, _to, _amount, _nonce, _period);
-
-        bytes32 ethSignedMessageHash = getEthSignedMessageHash(messageHash);
-        if(!hashKind) ethSignedMessageHash = getEthSignedMessageHash2(messageHash);
-
-        address _addr = recoverSigner(ethSignedMessageHash, signature);
-
-        return (_addr == _signer);
+    /// @dev verify the signature
+    /// @param signer the signer address
+    /// @param owner the token's owner
+    /// @param spender the account that spend owner's token
+    /// @param value the amount to be approve to spend
+    /// @param deadline the deadline that vaild the owner's signature
+    /// @param _nounce the _nounce
+    /// @param sigR the owner's signature - r
+    /// @param sigS the owner's signature - s
+    /// @param sigV the owner's signature - v
+    function verify(
+        address signer,
+        address owner,
+        address spender,
+        uint256 value,
+        uint256 deadline,
+        uint256 _nounce,
+        bytes32 sigR,
+        bytes32 sigS,
+        uint8 sigV
+    ) public override view returns (bool) {
+        return
+            signer ==
+            ecrecover(
+                hashPermit(owner, spender, value, deadline, _nounce),
+                sigV,
+                sigR,
+                sigS
+            );
     }
+
+    /// @dev the hash of Permit
+    /// @param owner the token's owner
+    /// @param spender the account that spend owner's token
+    /// @param value the amount to be approve to spend
+    /// @param deadline the deadline that vaild the owner's signature
+    /// @param _nounce the _nounce
+    function hashPermit(
+        address owner,
+        address spender,
+        uint256 value,
+        uint256 deadline,
+        uint256 _nounce
+    ) public override view returns (bytes32) {
+        return
+            keccak256(
+                abi.encodePacked(
+                    "\x19\x01",
+                    DOMAIN_SEPARATOR(),
+                    keccak256(
+                        abi.encode(
+                            PERMIT_TYPEHASH,
+                            owner,
+                            spender,
+                            value,
+                            _nounce,
+                            deadline
+                        )
+                    )
+                )
+            );
+    }
+
 }
