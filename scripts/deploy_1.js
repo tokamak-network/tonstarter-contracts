@@ -59,13 +59,13 @@ const fldtoken = loadDeployedInitVariable(process.env.NETWORK, "FLD");
 async function deployMain(defaultSender) {
   const [deployer, user1] = await ethers.getSigners();
 
-  // const FLD = await ethers.getContractFactory("FLD");
-  // const fld = await FLD.deploy();
-  // await fld.deployed();
+  const FLD = await ethers.getContractFactory("FLD");
+  const fld = await FLD.deploy();
+  await fld.deployed();
 
-  const FLD_Address = fldtoken;
-  const fld = await ethers.getContractAt("FLD", FLD_Address);
-  console.log("fld:", fld.address);
+  // const FLD_Address = fldtoken;
+  // const fld = await ethers.getContractAt("FLD", FLD_Address);
+  // console.log("fld:", fld.address);
 
   const StakeSimple = await ethers.getContractFactory("StakeSimple");
   const StakeSimpleFactory = await ethers.getContractFactory(
