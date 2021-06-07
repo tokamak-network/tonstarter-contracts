@@ -155,7 +155,7 @@ async function main() {
   stakeStartBlock = parseInt(stakeStartBlock);
 
 // change vault name
-  let VaultName = "ETH #4";
+  let VaultName = "ETH #1";
   let periodsMins = [
       {
         name: VaultName + " 10 MINs",
@@ -188,16 +188,16 @@ async function main() {
 
   let periodsDays = [
     {
-      name: VaultName + " 2 Day",
+      name: VaultName + " 1 Day",
+      period: getPeriodBlockByTimes(1, 0, 0)
+    },
+    {
+      name: VaultName + " 2 Days",
       period: getPeriodBlockByTimes(2, 0, 0)
     },
     {
       name: VaultName + " 3 Days",
       period: getPeriodBlockByTimes(3, 0, 0)
-    },
-    {
-      name: VaultName + " 7 Days",
-      period: getPeriodBlockByTimes(7, 0, 0)
     }
   ]
 
@@ -230,31 +230,33 @@ async function main() {
 // 3. Uncomment and execute createStakeContract creation for the desired period.
 // Note: If you want to enter multiple createStakeContracts, you must create a contract with a shorter period.
 
-  ton.saleStartBlock = parseInt(curBlock) + parseInt(60*5/13);
-  ton.stakeStartBlock = ton.saleStartBlock + parseInt(60*60*2/13);
+
   ////////////////////////////////////////////////////////
   // For TON Vault : hashName must be specified as a unique value.
   // ton_vault.hashName = keccak256(VaultName);
+  // ton_vault.saleStartBlock = parseInt(curBlock) + parseInt(60*30/13);
+  // ton_vault.stakeStartBlock = ton_vault.saleStartBlock + parseInt(60*60*4/13);
   // await createValue(ton_vault, ton);
-
 
   ////////////////////////////////////////////////////////
   // For Ether Vault
+  // ether_vault.saleStartBlock = parseInt(curBlock) + parseInt(60*30/13);
+  // ether_vault.stakeStartBlock = ether_vault.saleStartBlock + parseInt(60*60*4/13);
   // await createValue(ether_vault, zeroAddress);
 
   /// /////////////////////////////////////////////////////
   // For StakeContract of Vault
   // write your vault
   // let token = ton;
-  // let token = zeroAddress;
-  // let vaultAddress ='0xfC37E8a11d5F195000fE57B902c4E76622ebaA5B';
-  // console.log('vaultAddress',vaultAddress);
-  // let periods = periodsDays;
-  // console.log('periods',periods);
-  // for (let i =0; i< periods.length ; i++){
-  //   await createStakeContract(vaultAddress, periods[i].period.blocks, periods[i].name, token );
-  //   timeout(10000);
-  // }
+  let token = zeroAddress;
+  let vaultAddress ='0x75F194a509180D86bB9869da45BbEAC68b278c11';
+  console.log('vaultAddress',vaultAddress);
+  let periods = periodsDays;
+  console.log('periods',periods);
+  for (let i =0; i< periods.length ; i++){
+    await createStakeContract(vaultAddress, periods[i].period.blocks, periods[i].name, token );
+    timeout(10000);
+  }
 
 }
 
