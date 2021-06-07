@@ -8,12 +8,6 @@
 
 `npm run compile`
 
-### Run Contract Tests & Get Callstacks
-
-In one terminal run `npx hardhat node`
-
-Then in another run `npm run test` or `npm run test:mocha`
-
 ### Deploy to Ethereum
 
 Create/modify network config in `hardhat.config.ts` and add API key and private key, then run:
@@ -25,10 +19,10 @@ To set init storage,
 `npx hardhat run --network rinkeby scripts/deploy_2.js`
 
 To create vault,
-
+`npx hardhat run --network rinkeby scripts/deploy_createvault_1.js`
 
 To create stakeContract in vault,
-
+Modify the vault address in deploy_createvault_1
 
 ### Verify on Etherscan
 
