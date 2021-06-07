@@ -55,6 +55,10 @@ async function setupContracts(account) {
 
   const TON_MINIMUM_STAKE_AMOUNT = _TON("1000");
 
+  const name = "FLD";
+  const symbol = "FLD";
+  const version = "1";
+
   const addresses = await getAddresses();
   const [
     candidate1,
@@ -76,7 +80,7 @@ async function setupContracts(account) {
 
   const fld = await (await ethers.getContractFactory("FLD"))
     .connect(deployer)
-    .deploy();
+    .deploy(name, symbol, version);
   await fld.deployed();
 
   const sfld = await (await ethers.getContractFactory("SFLD"))

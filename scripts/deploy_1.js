@@ -56,11 +56,15 @@ const EVENT_VAULT_HASH = keccak256("EVENT_VAULT");
 
 const fldtoken = loadDeployedInitVariable(process.env.NETWORK, "FLD");
 
+const name = "FLD";
+const symbol = "FLD";
+const version = "1";
+
 async function deployMain(defaultSender) {
   const [deployer, user1] = await ethers.getSigners();
 
   const FLD = await ethers.getContractFactory("FLD");
-  const fld = await FLD.deploy();
+  const fld = await FLD.deploy(name, symbol, version);
   await fld.deployed();
 
   // const FLD_Address = fldtoken;

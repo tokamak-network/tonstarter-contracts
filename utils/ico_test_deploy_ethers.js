@@ -45,6 +45,9 @@ const PSEIG_RATE = _WTON("0.4");
 
 const TON_MINIMUM_STAKE_AMOUNT = _TON("1000");
 
+const name = "Fair Launchpad Dao";
+const symbol = "FLD";
+const version = "1";
 
 // ico2.0 contracts
 let StakeFactory,
@@ -210,8 +213,8 @@ class ICO20Contracts {
 
     this.swapProxy = await SwapProxy.connect(owner).deploy();
 
-    this.fld = await FLD.connect(owner).deploy();
-    this.sfld = await SFLD.connect(owner).deploy();
+    this.fld = await FLD.connect(owner).deploy(name, symbol, version);
+    //this.sfld = await SFLD.connect(owner).deploy();
 
     this.stakeregister = await StakeRegistry.connect(owner).deploy(this.fld.address);
 

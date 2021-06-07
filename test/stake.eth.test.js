@@ -344,7 +344,7 @@ describe("StakeSimple : Stake with ETH", function () {
                     tx.receipt.logs[0].event,
                     //tx.receipt.logs[0].args.from,
                     fromWei(tx.receipt.logs[0].args.amount.toString(),'ether'),
-                    tx.receipt.logs[0].args.currentBlcok.toString()
+                    tx.receipt.logs[0].args.claimBlock.toString()
                   );
 
                 let fldBalance2 = await fld.balanceOf(testStakingUsers[u]);

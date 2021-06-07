@@ -29,8 +29,8 @@ contract StakeTON is TokamakStaker, IStakeTON {
     /// @dev event on claim
     /// @param to the sender
     /// @param amount the amount of claim
-    /// @param currentBlcok the block of claim
-    event Claimed(address indexed to, uint256 amount, uint256 currentBlcok);
+    /// @param claimBlock the block of claim
+    event Claimed(address indexed to, uint256 amount, uint256 claimBlock);
 
     /// @dev event on withdrawal
     /// @param to the sender

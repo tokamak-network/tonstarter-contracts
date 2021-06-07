@@ -31,18 +31,11 @@ const {
 const chai = require("chai");
 const { expect } = chai;
 chai.use(require("chai-bn")(BN)).should();
-/*
-const StakeFactoryAbi = require("../build/contracts/StakeFactory.json").abi;
-const StakeRegistryAbi = require("../build/contracts/StakeRegistry.json").abi;
-const FLDAbi = require("../build/contracts/FLD.json").abi;
-const SFLDAbi = require("../build/contracts/SFLD.json").abi;
-const StakeForSFLDAbi = require("../build/contracts/StakeForSFLD.json").abi;
-const Stake1VaultAbi = require("../build/contracts/Stake1Vault.json").abi;
-const Stake1LogicAbi = require("../build/contracts/Stake1Logic.json").abi;
-const Stake1ProxyAbi = require("../build/contracts/Stake1Proxy.json").abi;
-const StakeTONAbi = require("../build/contracts/StakeTON.json").abi;
-const IERC20Abi = require("../build/contracts/IERC20.json").abi;
-*/
+
+const name = "Fair Launchpad Dao";
+const symbol = "FLD";
+const version = "1";
+
 // ico2.0 contracts
 const StakeTONFactory = contract.fromArtifact("StakeTONFactory");
 const StakeDefiFactory = contract.fromArtifact(
@@ -241,9 +234,7 @@ class ICO20Contracts {
     this.vault_phase1_dev = null;
     this.swapProxy = await SwapProxy.new({ from: owner });
 
-    this.fld = await FLD.new({ from: owner });
-    this.sfld = await SFLD.new({ from: owner });
-    //this.stakeForSFLD = await StakeForSFLD.new({ from: owner });
+    this.fld = await FLD.new(name, symbol, version, { from: owner });
     this.stakeregister = await StakeRegistry.new(this.fld.address,  { from: owner });
 
     this.stakeSimple = await StakeSimple.new({ from: owner });
@@ -301,20 +292,20 @@ class ICO20Contracts {
     return returnData;
   };
 
-  createStaekForSFLD = async function (startB, owner) {
-    let stakeForSFLD = await StakeForSFLD.new({ from: owner });
+  // createStaekForSFLD = async function (startB, owner) {
+  //   let stakeForSFLD = await StakeForSFLD.new({ from: owner });
 
-    await stakeForSFLD.initialize(this.fld.address, this.sfld.address, startB, {
-      from: owner,
-    });
+  //   await stakeForSFLD.initialize(this.fld.address, this.sfld.address, startB, {
+  //     from: owner,
+  //   });
 
-    this.fld.grantRole(MINTER_ROLE, stakeForSFLD.address, { from: owner });
-    this.fld.grantRole(BURNER_ROLE, stakeForSFLD.address, { from: owner });
-    this.sfld.grantRole(MINTER_ROLE, stakeForSFLD.address, { from: owner });
-    this.sfld.grantRole(BURNER_ROLE, stakeForSFLD.address, { from: owner });
+  //   this.fld.grantRole(MINTER_ROLE, stakeForSFLD.address, { from: owner });
+  //   this.fld.grantRole(BURNER_ROLE, stakeForSFLD.address, { from: owner });
+  //   this.sfld.grantRole(MINTER_ROLE, stakeForSFLD.address, { from: owner });
+  //   this.sfld.grantRole(BURNER_ROLE, stakeForSFLD.address, { from: owner });
 
-    return stakeForSFLD;
-  };
+  //   return stakeForSFLD;
+  // };
 
   initializePlasmaEvmContracts = async function (owner) {
     // this = self;

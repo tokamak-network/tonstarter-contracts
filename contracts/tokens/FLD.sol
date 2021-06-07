@@ -183,7 +183,7 @@ contract FLD is ERC20, AccessControl, IFLD {
         bytes32 sigR,
         bytes32 sigS,
         uint8 sigV
-    ) public override view returns (bool) {
+    ) public view override returns (bool) {
         return
             signer ==
             ecrecover(
@@ -206,7 +206,7 @@ contract FLD is ERC20, AccessControl, IFLD {
         uint256 value,
         uint256 deadline,
         uint256 _nounce
-    ) public override view returns (bytes32) {
+    ) public view override returns (bytes32) {
         return
             keccak256(
                 abi.encodePacked(
@@ -225,5 +225,4 @@ contract FLD is ERC20, AccessControl, IFLD {
                 )
             );
     }
-
 }

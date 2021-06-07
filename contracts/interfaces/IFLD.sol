@@ -55,7 +55,7 @@ interface IFLD {
         bytes32 sigR,
         bytes32 sigS,
         uint8 sigV
-    ) external view returns (bool) ;
+    ) external view returns (bool);
 
     /// @dev the hash of Permit
     /// @param owner the token's owner
@@ -69,6 +69,5 @@ interface IFLD {
         uint256 value,
         uint256 deadline,
         uint256 _nounce
-    ) external view returns (bytes32) ;
-
+    ) external view returns (bytes32);
 }
