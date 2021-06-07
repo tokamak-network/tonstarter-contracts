@@ -2,7 +2,6 @@
 * contracts
   * connection
     * [TokamakStaker](docs/connection/TokamakStaker.md)
-    * artifacts
   * dev
     * [DeveloperVault](docs/dev/DeveloperVault.md)
   * factory
@@ -12,7 +11,6 @@
     * [StakeTONFactory](docs/factory/StakeTONFactory.md)
     * [StakeTONProxyFactory](docs/factory/StakeTONProxyFactory.md)
     * [StakeVaultFactory](docs/factory/StakeVaultFactory.md)
-    * artifacts
   * interfaces
     * [IDepositManager](docs/interfaces/IDepositManager.md)
     * [IDeveloperVault](docs/interfaces/IDeveloperVault.md)
@@ -63,7 +61,6 @@
     * [StakeTONStorage](docs/stake/StakeTONStorage.md)
     * [StakeVaultProxy](docs/stake/StakeVaultProxy.md)
     * [StakeVaultStorage](docs/stake/StakeVaultStorage.md)
-    * artifacts
   * tokens
     * [FLD](docs/tokens/FLD.md)
     * [OnApprove](docs/tokens/OnApprove.md)

@@ -20,7 +20,7 @@
 
 - [`Staked(address to, uint256 amount)`](#StakeSimple-Staked-address-uint256-)
 
-- [`Claimed(address to, uint256 amount, uint256 currentBlcok)`](#StakeSimple-Claimed-address-uint256-uint256-)
+- [`Claimed(address to, uint256 amount, uint256 claimBlock)`](#StakeSimple-Claimed-address-uint256-uint256-)
 
 - [`Withdrawal(address to, uint256 amount)`](#StakeSimple-Withdrawal-address-uint256-)
 
@@ -116,7 +116,7 @@ event on staking
 
 ###### StakeSimple-Claimed-address-uint256-uint256-
 
-## Event `Claimed(address to, uint256 amount, uint256 currentBlcok)`
+## Event `Claimed(address to, uint256 amount, uint256 claimBlock)`
 
 event on claim
 
@@ -126,7 +126,7 @@ event on claim
 
 - `amount`: the amount of claim
 
-- `currentBlcok`: the block of claim
+- `claimBlock`: the block of claim
 
 ###### StakeSimple-Withdrawal-address-uint256-
 
