@@ -1,0 +1,3772 @@
+{
+  "contractName": "StakeVaultStorage",
+  "abi": [
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "role",
+          "type": "bytes32"
+        },
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "previousAdminRole",
+          "type": "bytes32"
+        },
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "newAdminRole",
+          "type": "bytes32"
+        }
+      ],
+      "name": "RoleAdminChanged",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "role",
+          "type": "bytes32"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "sender",
+          "type": "address"
+        }
+      ],
+      "name": "RoleGranted",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "role",
+          "type": "bytes32"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "sender",
+          "type": "address"
+        }
+      ],
+      "name": "RoleRevoked",
+      "type": "event"
+    },
+    {
+      "inputs": [],
+      "name": "ADMIN_ROLE",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "DEFAULT_ADMIN_ROLE",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "blockTotalReward",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "cap",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "defiAddr",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "fld",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "role",
+          "type": "bytes32"
+        }
+      ],
+      "name": "getRoleAdmin",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "role",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "uint256",
+          "name": "index",
+          "type": "uint256"
+        }
+      ],
+      "name": "getRoleMember",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "role",
+          "type": "bytes32"
+        }
+      ],
+      "name": "getRoleMemberCount",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "role",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        }
+      ],
+      "name": "grantRole",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "role",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        }
+      ],
+      "name": "hasRole",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "orderedEndBlocks",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "paytoken",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "realEndBlock",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "role",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        }
+      ],
+      "name": "renounceRole",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "role",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        }
+      ],
+      "name": "revokeRole",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "saleClosed",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "saleStartBlock",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "stakeAddresses",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "stakeEndBlock",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "stakeEndBlockTotal",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "name": "stakeInfos",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "name",
+          "type": "string"
+        },
+        {
+          "internalType": "uint256",
+          "name": "startBlock",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "endBlock",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "balance",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "totalRewardAmount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "claimRewardAmount",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "stakeStartBlock",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "stakeType",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "newOwner",
+          "type": "address"
+        }
+      ],
+      "name": "transferOwnership",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "metadata": "{\"compiler\":{\"version\":\"0.7.6+commit.7338295f\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"role\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"previousAdminRole\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"newAdminRole\",\"type\":\"bytes32\"}],\"name\":\"RoleAdminChanged\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"role\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"sender\",\"type\":\"address\"}],\"name\":\"RoleGranted\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"role\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"sender\",\"type\":\"address\"}],\"name\":\"RoleRevoked\",\"type\":\"event\"},{\"inputs\":[],\"name\":\"ADMIN_ROLE\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"DEFAULT_ADMIN_ROLE\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"blockTotalReward\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"cap\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"defiAddr\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"fld\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"role\",\"type\":\"bytes32\"}],\"name\":\"getRoleAdmin\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"role\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"index\",\"type\":\"uint256\"}],\"name\":\"getRoleMember\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"role\",\"type\":\"bytes32\"}],\"name\":\"getRoleMemberCount\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"role\",\"type\":\"bytes32\"},{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"}],\"name\":\"grantRole\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"role\",\"type\":\"bytes32\"},{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"}],\"name\":\"hasRole\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"orderedEndBlocks\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"paytoken\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"realEndBlock\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"role\",\"type\":\"bytes32\"},{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"}],\"name\":\"renounceRole\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"role\",\"type\":\"bytes32\"},{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"}],\"name\":\"revokeRole\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"saleClosed\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"saleStartBlock\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"stakeAddresses\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"stakeEndBlock\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"stakeEndBlockTotal\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"name\":\"stakeInfos\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"name\",\"type\":\"string\"},{\"internalType\":\"uint256\",\"name\":\"startBlock\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"endBlock\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"balance\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"totalRewardAmount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"claimRewardAmount\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"stakeStartBlock\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"stakeType\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"transferOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{\"getRoleAdmin(bytes32)\":{\"details\":\"Returns the admin role that controls `role`. See {grantRole} and {revokeRole}. To change a role's admin, use {_setRoleAdmin}.\"},\"getRoleMember(bytes32,uint256)\":{\"details\":\"Returns one of the accounts that have `role`. `index` must be a value between 0 and {getRoleMemberCount}, non-inclusive. Role bearers are not sorted in any particular way, and their ordering may change at any point. WARNING: When using {getRoleMember} and {getRoleMemberCount}, make sure you perform all queries on the same block. See the following https://forum.openzeppelin.com/t/iterating-over-elements-on-enumerableset-in-openzeppelin-contracts/2296[forum post] for more information.\"},\"getRoleMemberCount(bytes32)\":{\"details\":\"Returns the number of accounts that have `role`. Can be used together with {getRoleMember} to enumerate all bearers of a role.\"},\"grantRole(bytes32,address)\":{\"details\":\"Grants `role` to `account`. If `account` had not been already granted `role`, emits a {RoleGranted} event. Requirements: - the caller must have ``role``'s admin role.\"},\"hasRole(bytes32,address)\":{\"details\":\"Returns `true` if `account` has been granted `role`.\"},\"renounceRole(bytes32,address)\":{\"details\":\"Revokes `role` from the calling account. Roles are often managed via {grantRole} and {revokeRole}: this function's purpose is to provide a mechanism for accounts to lose their privileges if they are compromised (such as when a trusted device is misplaced). If the calling account had been granted `role`, emits a {RoleRevoked} event. Requirements: - the caller must be `account`.\"},\"revokeRole(bytes32,address)\":{\"details\":\"Revokes `role` from `account`. If `account` had been granted `role`, emits a {RoleRevoked} event. Requirements: - the caller must have ``role``'s admin role.\"},\"transferOwnership(address)\":{\"details\":\"transfer Ownership\",\"params\":{\"newOwner\":\"new owner address\"}}},\"stateVariables\":{\"blockTotalReward\":{\"details\":\"reward amount per block\"},\"cap\":{\"details\":\"allocated amount of fld\"},\"defiAddr\":{\"details\":\"External contract address used when operating the staking amount\"},\"fld\":{\"details\":\"reward token : FLD\"},\"orderedEndBlocks\":{\"details\":\"the end blocks of the stake contracts, which must be in ascending order\"},\"paytoken\":{\"details\":\"paytoken is the token that the user stakes.\"},\"realEndBlock\":{\"details\":\"the staking real end block.\"},\"saleClosed\":{\"details\":\"sale closed flag\"},\"saleStartBlock\":{\"details\":\"the start block for sale.\"},\"stakeAddresses\":{\"details\":\"a list of stakeContracts maintained by the vault\"},\"stakeEndBlock\":{\"details\":\"the staking end block.\"},\"stakeEndBlockTotal\":{\"details\":\"the total staked amount stored at orderedEndBlock\\u2019s end block time\"},\"stakeInfos\":{\"details\":\"the information of the stake contract\"},\"stakeStartBlock\":{\"details\":\"the staking start block\"},\"stakeType\":{\"details\":\"Operation type of staking amount\"}},\"title\":\"the storage of StakeVaultStorage\",\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"/Users/zena/ico2.0/ico20-contracts/contracts/stake/StakeVaultStorage.sol\":\"StakeVaultStorage\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":100},\"remappings\":[]},\"sources\":{\"/Users/zena/ico2.0/ico20-contracts/contracts/libraries/LibTokenStake1.sol\":{\"keccak256\":\"0xbc6246e6ad6d62d38fdf96f2ff1f844dac6a4d65a657f8dbff5d9ab02de3f674\",\"license\":\"Unlicense\",\"urls\":[\"bzz-raw://c1a1538c6e5480a36b5f752dbf4ef230b3b3d5773d6ecfffe361bc75d5984d3f\",\"dweb:/ipfs/QmaKtLReNV7xfg6vbsjqSj5iHrrFeYexJiW1W66m2wAGH4\"]},\"/Users/zena/ico2.0/ico20-contracts/contracts/stake/StakeVaultStorage.sol\":{\"keccak256\":\"0x41605722cb631af674dc8aa8820a0458aea077e741f7251af3dffc201925b47b\",\"license\":\"Unlicense\",\"urls\":[\"bzz-raw://c05a827a6de05264c26b8f7721fadff65c1d9b563b56ed40fd07a9462bd6a22d\",\"dweb:/ipfs/QmPQBQQpN7uuLemreQFLV34cmv4JbxsJ5JoNgRYJnCUnG7\"]},\"@openzeppelin/contracts/GSN/Context.sol\":{\"keccak256\":\"0x8d3cb350f04ff49cfb10aef08d87f19dcbaecc8027b0bed12f3275cd12f38cf0\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://ded47ec7c96750f9bd04bbbc84f659992d4ba901cb7b532a52cd468272cf378f\",\"dweb:/ipfs/QmfBrGtQP7rZEqEg6Wz6jh2N2Kukpj1z5v3CGWmAqrzm96\"]},\"@openzeppelin/contracts/access/AccessControl.sol\":{\"keccak256\":\"0x37ff88aa5ca8f533e31b9e1cb5354816b15bb7d41c904ea1c8f5dd5a78d6da25\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://f3731db435ced7084f2cb3947e708371c10a2e3f654dcfe2a237fc8fbdafbe5f\",\"dweb:/ipfs/QmUyiwkuiP2fYBVaTwwY82sJKxJyPQaBqAtS4uG6iaUSP7\"]},\"@openzeppelin/contracts/utils/Address.sol\":{\"keccak256\":\"0xa6a15ddddcbf29d2922a1e0d4151b5d2d33da24b93cc9ebc12390e0d855532f8\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://7c119bcaecfa853d564ac88d312777f75fa1126a3bca88a3371adb0ad9f35cb0\",\"dweb:/ipfs/QmY9UPuXeSKq86Zh38fE43VGQPhKMN34mkuFSFqPcr6nvZ\"]},\"@openzeppelin/contracts/utils/EnumerableSet.sol\":{\"keccak256\":\"0xae0992eb1ec30fd1ecdf2e04a6036decfc9797bf11dc1ec84b546b74318d5ec2\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://3b61f99a64e999682ad7bfbb3a1c762a20a0a5b30f9f2011693fa857969af61f\",\"dweb:/ipfs/QmZystFY76wkWCf7V3yKh3buZuKVKbswiE7y6yU62kk3zi\"]}},\"version\":1}",
+  "bytecode": "0x608060405234801561001057600080fd5b50610c4c806100206000396000f3fe608060405234801561001057600080fd5b50600436106101635760003560e01c806375b238fc116100ce578063b8c766b811610087578063b8c766b814610317578063b97af0db1461031f578063ca15c87314610327578063d105bf8514610344578063d547741f1461034c578063dfbf9def14610378578063f2fde38b1461043957610163565b806375b238fc146102945780639010d07c1461029c57806391d14854146102bf5780639d84ca35146102ff578063a217fddf14610307578063b03dc5141461030f57610163565b8063355274ea11610120578063355274ea1461022b57806336568abe146102335780633a76eb371461025f57806343b0934a146102675780634b5e7cd51461026f5780635f1bd62a1461027757610163565b8063153099d0146101685780632002727514610197578063248a9ca31461019f578063294f5fa3146101bc5780632f2ff15d146101f557806333bd2a4914610223575b600080fd5b6101856004803603602081101561017e57600080fd5b503561045f565b60408051918252519081900360200190f35b610185610480565b610185600480360360208110156101b557600080fd5b5035610486565b6101d9600480360360208110156101d257600080fd5b503561049b565b604080516001600160a01b039092168252519081900360200190f35b6102216004803603604081101561020b57600080fd5b50803590602001356001600160a01b03166104c5565b005b6101d9610531565b610185610540565b6102216004803603604081101561024957600080fd5b50803590602001356001600160a01b0316610546565b6101856105a7565b6101d96105ad565b6101856105bc565b6101856004803603602081101561028d57600080fd5b50356105c2565b6101856105d4565b6101d9600480360360408110156102b257600080fd5b50803590602001356105e6565b6102eb600480360360408110156102d557600080fd5b50803590602001356001600160a01b0316610607565b604080519115158252519081900360200190f35b6101d961061f565b61018561062e565b610185610633565b6102eb610639565b610185610642565b6101856004803603602081101561033d57600080fd5b5035610648565b61018561065f565b6102216004803603604081101561036257600080fd5b50803590602001356001600160a01b0316610665565b61039e6004803603602081101561038e57600080fd5b50356001600160a01b03166106be565b6040518080602001878152602001868152602001858152602001848152602001838152602001828103825288818151815260200191508051906020019080838360005b838110156103f95781810151838201526020016103e1565b50505050905090810190601f1680156104265780820380516001836020036101000a031916815260200191505b5097505050505050505060405180910390f35b6102216004803603602081101561044f57600080fd5b50356001600160a01b031661077d565b600e818154811061046f57600080fd5b600091825260209091200154905081565b60045481565b60009081526020819052604090206002015490565b600c81815481106104ab57600080fd5b6000918252602090912001546001600160a01b0316905081565b6000828152602081905260409020600201546104e8906104e3610861565b610607565b6105235760405162461bcd60e51b815260040180806020018281038252602f815260200180610b69602f913960400191505060405180910390fd5b61052d8282610865565b5050565b6001546001600160a01b031681565b60035481565b61054e610861565b6001600160a01b0316816001600160a01b03161461059d5760405162461bcd60e51b815260040180806020018281038252602f815260200180610be8602f913960400191505060405180910390fd5b61052d82826108ce565b60065481565b6002546001600160a01b031681565b60055481565b600f6020526000908152604090205481565b600080516020610bc883398151915281565b60008281526020819052604081206105fe9083610937565b90505b92915050565b60008281526020819052604081206105fe9083610943565b600b546001600160a01b031681565b600081565b60075481565b60095460ff1681565b600a5481565b600081815260208190526040812061060190610958565b60085481565b600082815260208190526040902060020154610683906104e3610861565b61059d5760405162461bcd60e51b8152600401808060200182810382526030815260200180610b986030913960400191505060405180910390fd5b600d6020908152600091825260409182902080548351601f600260001961010060018616150201909316929092049182018490048402810184019094528084529092918391908301828280156107555780601f1061072a57610100808354040283529160200191610755565b820191906000526020600020905b81548152906001019060200180831161073857829003601f168201915b5050505050908060010154908060020154908060030154908060040154908060050154905086565b610795600080516020610bc883398151915233610607565b6107d05760405162461bcd60e51b8152600401808060200182810382526029815260200180610b1e6029913960400191505060405180910390fd5b336001600160a01b038216141561082e576040805162461bcd60e51b815260206004820152601d60248201527f5374616b655661756c7453746f726167653a2073616d65206f776e6572000000604482015290519081900360640190fd5b610846600080516020610bc8833981519152826104c5565b61085e600080516020610bc883398151915233610665565b50565b3390565b600082815260208190526040902061087d9082610963565b1561052d5761088a610861565b6001600160a01b0316816001600160a01b0316837f2f8788117e7eff1d82e926ec794901d17c78024a50270940304540a733656f0d60405160405180910390a45050565b60008281526020819052604090206108e69082610978565b1561052d576108f3610861565b6001600160a01b0316816001600160a01b0316837ff6391f5c32d9c69d2a47ea670b442974b53935d1edc7fd64eb21e047a839171b60405160405180910390a45050565b60006105fe838361098d565b60006105fe836001600160a01b0384166109f1565b600061060182610a09565b60006105fe836001600160a01b038416610a0d565b60006105fe836001600160a01b038416610a57565b815460009082106109cf5760405162461bcd60e51b8152600401808060200182810382526022815260200180610b476022913960400191505060405180910390fd5b8260000182815481106109de57fe5b9060005260206000200154905092915050565b60009081526001919091016020526040902054151590565b5490565b6000610a1983836109f1565b610a4f57508154600181810184556000848152602080822090930184905584548482528286019093526040902091909155610601565b506000610601565b60008181526001830160205260408120548015610b135783546000198083019190810190600090879083908110610a8a57fe5b9060005260206000200154905080876000018481548110610aa757fe5b600091825260208083209091019290925582815260018981019092526040902090840190558654879080610ad757fe5b60019003818190600052602060002001600090559055866001016000878152602001908152602001600020600090556001945050505050610601565b600091505061060156fe5374616b655661756c7453746f726167653a2043616c6c6572206973206e6f7420616e2061646d696e456e756d657261626c655365743a20696e646578206f7574206f6620626f756e6473416363657373436f6e74726f6c3a2073656e646572206d75737420626520616e2061646d696e20746f206772616e74416363657373436f6e74726f6c3a2073656e646572206d75737420626520616e2061646d696e20746f207265766f6b65df8b4c520ffe197c5343c6f5aec59570151ef9a492f2c624fd45ddde6135ec42416363657373436f6e74726f6c3a2063616e206f6e6c792072656e6f756e636520726f6c657320666f722073656c66a2646970667358221220d4b826798de5334e23f0e85993d115b2b36fa3d023d5591e9322611b8a80501264736f6c63430007060033",
+  "deployedBytecode": "0x608060405234801561001057600080fd5b50600436106101635760003560e01c806375b238fc116100ce578063b8c766b811610087578063b8c766b814610317578063b97af0db1461031f578063ca15c87314610327578063d105bf8514610344578063d547741f1461034c578063dfbf9def14610378578063f2fde38b1461043957610163565b806375b238fc146102945780639010d07c1461029c57806391d14854146102bf5780639d84ca35146102ff578063a217fddf14610307578063b03dc5141461030f57610163565b8063355274ea11610120578063355274ea1461022b57806336568abe146102335780633a76eb371461025f57806343b0934a146102675780634b5e7cd51461026f5780635f1bd62a1461027757610163565b8063153099d0146101685780632002727514610197578063248a9ca31461019f578063294f5fa3146101bc5780632f2ff15d146101f557806333bd2a4914610223575b600080fd5b6101856004803603602081101561017e57600080fd5b503561045f565b60408051918252519081900360200190f35b610185610480565b610185600480360360208110156101b557600080fd5b5035610486565b6101d9600480360360208110156101d257600080fd5b503561049b565b604080516001600160a01b039092168252519081900360200190f35b6102216004803603604081101561020b57600080fd5b50803590602001356001600160a01b03166104c5565b005b6101d9610531565b610185610540565b6102216004803603604081101561024957600080fd5b50803590602001356001600160a01b0316610546565b6101856105a7565b6101d96105ad565b6101856105bc565b6101856004803603602081101561028d57600080fd5b50356105c2565b6101856105d4565b6101d9600480360360408110156102b257600080fd5b50803590602001356105e6565b6102eb600480360360408110156102d557600080fd5b50803590602001356001600160a01b0316610607565b604080519115158252519081900360200190f35b6101d961061f565b61018561062e565b610185610633565b6102eb610639565b610185610642565b6101856004803603602081101561033d57600080fd5b5035610648565b61018561065f565b6102216004803603604081101561036257600080fd5b50803590602001356001600160a01b0316610665565b61039e6004803603602081101561038e57600080fd5b50356001600160a01b03166106be565b6040518080602001878152602001868152602001858152602001848152602001838152602001828103825288818151815260200191508051906020019080838360005b838110156103f95781810151838201526020016103e1565b50505050905090810190601f1680156104265780820380516001836020036101000a031916815260200191505b5097505050505050505060405180910390f35b6102216004803603602081101561044f57600080fd5b50356001600160a01b031661077d565b600e818154811061046f57600080fd5b600091825260209091200154905081565b60045481565b60009081526020819052604090206002015490565b600c81815481106104ab57600080fd5b6000918252602090912001546001600160a01b0316905081565b6000828152602081905260409020600201546104e8906104e3610861565b610607565b6105235760405162461bcd60e51b815260040180806020018281038252602f815260200180610b69602f913960400191505060405180910390fd5b61052d8282610865565b5050565b6001546001600160a01b031681565b60035481565b61054e610861565b6001600160a01b0316816001600160a01b03161461059d5760405162461bcd60e51b815260040180806020018281038252602f815260200180610be8602f913960400191505060405180910390fd5b61052d82826108ce565b60065481565b6002546001600160a01b031681565b60055481565b600f6020526000908152604090205481565b600080516020610bc883398151915281565b60008281526020819052604081206105fe9083610937565b90505b92915050565b60008281526020819052604081206105fe9083610943565b600b546001600160a01b031681565b600081565b60075481565b60095460ff1681565b600a5481565b600081815260208190526040812061060190610958565b60085481565b600082815260208190526040902060020154610683906104e3610861565b61059d5760405162461bcd60e51b8152600401808060200182810382526030815260200180610b986030913960400191505060405180910390fd5b600d6020908152600091825260409182902080548351601f600260001961010060018616150201909316929092049182018490048402810184019094528084529092918391908301828280156107555780601f1061072a57610100808354040283529160200191610755565b820191906000526020600020905b81548152906001019060200180831161073857829003601f168201915b5050505050908060010154908060020154908060030154908060040154908060050154905086565b610795600080516020610bc883398151915233610607565b6107d05760405162461bcd60e51b8152600401808060200182810382526029815260200180610b1e6029913960400191505060405180910390fd5b336001600160a01b038216141561082e576040805162461bcd60e51b815260206004820152601d60248201527f5374616b655661756c7453746f726167653a2073616d65206f776e6572000000604482015290519081900360640190fd5b610846600080516020610bc8833981519152826104c5565b61085e600080516020610bc883398151915233610665565b50565b3390565b600082815260208190526040902061087d9082610963565b1561052d5761088a610861565b6001600160a01b0316816001600160a01b0316837f2f8788117e7eff1d82e926ec794901d17c78024a50270940304540a733656f0d60405160405180910390a45050565b60008281526020819052604090206108e69082610978565b1561052d576108f3610861565b6001600160a01b0316816001600160a01b0316837ff6391f5c32d9c69d2a47ea670b442974b53935d1edc7fd64eb21e047a839171b60405160405180910390a45050565b60006105fe838361098d565b60006105fe836001600160a01b0384166109f1565b600061060182610a09565b60006105fe836001600160a01b038416610a0d565b60006105fe836001600160a01b038416610a57565b815460009082106109cf5760405162461bcd60e51b8152600401808060200182810382526022815260200180610b476022913960400191505060405180910390fd5b8260000182815481106109de57fe5b9060005260206000200154905092915050565b60009081526001919091016020526040902054151590565b5490565b6000610a1983836109f1565b610a4f57508154600181810184556000848152602080822090930184905584548482528286019093526040902091909155610601565b506000610601565b60008181526001830160205260408120548015610b135783546000198083019190810190600090879083908110610a8a57fe5b9060005260206000200154905080876000018481548110610aa757fe5b600091825260208083209091019290925582815260018981019092526040902090840190558654879080610ad757fe5b60019003818190600052602060002001600090559055866001016000878152602001908152602001600020600090556001945050505050610601565b600091505061060156fe5374616b655661756c7453746f726167653a2043616c6c6572206973206e6f7420616e2061646d696e456e756d657261626c655365743a20696e646578206f7574206f6620626f756e6473416363657373436f6e74726f6c3a2073656e646572206d75737420626520616e2061646d696e20746f206772616e74416363657373436f6e74726f6c3a2073656e646572206d75737420626520616e2061646d696e20746f207265766f6b65df8b4c520ffe197c5343c6f5aec59570151ef9a492f2c624fd45ddde6135ec42416363657373436f6e74726f6c3a2063616e206f6e6c792072656e6f756e636520726f6c657320666f722073656c66a2646970667358221220d4b826798de5334e23f0e85993d115b2b36fa3d023d5591e9322611b8a80501264736f6c63430007060033",
+  "immutableReferences": {},
+  "generatedSources": [],
+  "deployedGeneratedSources": [],
+  "sourceMap": "257:2057:39:-:0;;;;;;;;;;;;;;;;;;;",
+  "deployedSourceMap": "257:2057:39:-:0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;1494:33;;;;;;;;;;;;;;;;-1:-1:-1;1494:33:39;;:::i;:::-;;;;;;;;;;;;;;;;614:29;;;:::i;4280:112:61:-;;;;;;;;;;;;;;;;-1:-1:-1;4280:112:61;;:::i;1251:31:39:-;;;;;;;;;;;;;;;;-1:-1:-1;1251:31:39;;:::i;:::-;;;;-1:-1:-1;;;;;1251:31:39;;;;;;;;;;;;;;4642:223:61;;;;;;;;;;;;;;;;-1:-1:-1;4642:223:61;;;;;;-1:-1:-1;;;;;4642:223:61;;:::i;:::-;;401:18:39;;;:::i;550:::-;;;:::i;5816:205:61:-;;;;;;;;;;;;;;;;-1:-1:-1;5816:205:61;;;;;;-1:-1:-1;;;;;5816:205:61;;:::i;760:28:39:-;;;:::i;483:23::-;;;:::i;687:30::-;;;:::i;1616:53::-;;;;;;;;;;;;;;;;-1:-1:-1;1616:53:39;;:::i;307:55::-;;;:::i;3963:136:61:-;;;;;;;;;;;;;;;;-1:-1:-1;3963:136:61;;;;;;;:::i;2948:137::-;;;;;;;;;;;;;;;;-1:-1:-1;2948:137:61;;;;;;-1:-1:-1;;;;;2948:137:61;;:::i;:::-;;;;;;;;;;;;;;;;;;1159:23:39;;;:::i;1725:49:61:-;;;:::i;836:27:39:-;;;:::i;975:22::-;;;:::i;1050:24::-;;;:::i;3253:125:61:-;;;;;;;;;;;;;;;;-1:-1:-1;3253:125:61;;:::i;907:31:39:-;;;:::i;5099:226:61:-;;;;;;;;;;;;;;;;-1:-1:-1;5099:226:61;;;;;;-1:-1:-1;;;;;5099:226:61;;:::i;1340:62:39:-;;;;;;;;;;;;;;;;-1:-1:-1;1340:62:39;-1:-1:-1;;;;;1340:62:39;;:::i;:::-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;2082:230;;;;;;;;;;;;;;;;-1:-1:-1;2082:230:39;-1:-1:-1;;;;;2082:230:39;;:::i;1494:33::-;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;1494:33:39;:::o;614:29::-;;;;:::o;4280:112:61:-;4337:7;4363:12;;;;;;;;;;:22;;;;4280:112::o;1251:31:39:-;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;;;;;1251:31:39;;-1:-1:-1;1251:31:39;:::o;4642:223:61:-;4733:6;:12;;;;;;;;;;:22;;;4725:45;;4757:12;:10;:12::i;:::-;4725:7;:45::i;:::-;4717:105;;;;-1:-1:-1;;;4717:105:61;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;4833:25;4844:4;4850:7;4833:10;:25::i;:::-;4642:223;;:::o;401:18:39:-;;;-1:-1:-1;;;;;401:18:39;;:::o;550:::-;;;;:::o;5816:205:61:-;5913:12;:10;:12::i;:::-;-1:-1:-1;;;;;5902:23:61;:7;-1:-1:-1;;;;;5902:23:61;;5894:83;;;;-1:-1:-1;;;5894:83:61;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;5988:26;6000:4;6006:7;5988:11;:26::i;760:28:39:-;;;;:::o;483:23::-;;;-1:-1:-1;;;;;483:23:39;;:::o;687:30::-;;;;:::o;1616:53::-;;;;;;;;;;;;;:::o;307:55::-;-1:-1:-1;;;;;;;;;;;307:55:39;:::o;3963:136:61:-;4036:7;4062:12;;;;;;;;;;:30;;4086:5;4062:23;:30::i;:::-;4055:37;;3963:136;;;;;:::o;2948:137::-;3017:4;3040:12;;;;;;;;;;:38;;3070:7;3040:29;:38::i;1159:23:39:-;;;-1:-1:-1;;;;;1159:23:39;;:::o;1725:49:61:-;1770:4;1725:49;:::o;836:27:39:-;;;;:::o;975:22::-;;;;;;:::o;1050:24::-;;;;:::o;3253:125:61:-;3316:7;3342:12;;;;;;;;;;:29;;:27;:29::i;907:31:39:-;;;;:::o;5099:226:61:-;5191:6;:12;;;;;;;;;;:22;;;5183:45;;5215:12;:10;:12::i;5183:45::-;5175:106;;;;-1:-1:-1;;;5175:106:61;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;1340:62:39;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;;1340:62:39;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;:::o;2082:230::-;1756:31;-1:-1:-1;;;;;;;;;;;1776:10:39;1756:7;:31::i;:::-;1735:119;;;;-1:-1:-1;;;1735:119:39;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;2164:10:::1;-1:-1:-1::0;;;;;2164:22:39;::::1;;;2156:64;;;::::0;;-1:-1:-1;;;2156:64:39;;::::1;;::::0;::::1;::::0;::::1;::::0;;;;::::1;::::0;;;;;;;;;;;;;::::1;;2230:31;-1:-1:-1::0;;;;;;;;;;;2252:8:39::1;2230:9;:31::i;:::-;2271:34;-1:-1:-1::0;;;;;;;;;;;2294:10:39::1;2271;:34::i;:::-;2082:230:::0;:::o;598:104:60:-;685:10;598:104;:::o;7023:184:61:-;7096:6;:12;;;;;;;;;;:33;;7121:7;7096:24;:33::i;:::-;7092:109;;;7177:12;:10;:12::i;:::-;-1:-1:-1;;;;;7150:40:61;7168:7;-1:-1:-1;;;;;7150:40:61;7162:4;7150:40;;;;;;;;;;7023:184;;:::o;7213:188::-;7287:6;:12;;;;;;;;;;:36;;7315:7;7287:27;:36::i;:::-;7283:112;;;7371:12;:10;:12::i;:::-;-1:-1:-1;;;;;7344:40:61;7362:7;-1:-1:-1;;;;;7344:40:61;7356:4;7344:40;;;;;;;;;;7213:188;;:::o;7650:147:69:-;7724:7;7766:22;7770:3;7782:5;7766:3;:22::i;6966:156::-;7046:4;7069:46;7079:3;-1:-1:-1;;;;;7099:14:69;;7069:9;:46::i;7203:115::-;7266:7;7292:19;7300:3;7292:7;:19::i;6429:141::-;6499:4;6522:41;6527:3;-1:-1:-1;;;;;6547:14:69;;6522:4;:41::i;6738:147::-;6811:4;6834:44;6842:3;-1:-1:-1;;;;;6862:14:69;;6834:7;:44::i;4452:201::-;4546:18;;4519:7;;4546:26;-1:-1:-1;4538:73:69;;;;-1:-1:-1;;;4538:73:69;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;4628:3;:11;;4640:5;4628:18;;;;;;;;;;;;;;;;4621:25;;4452:201;;;;:::o;3805:127::-;3878:4;3901:19;;;:12;;;;;:19;;;;;;:24;;;3805:127::o;4013:107::-;4095:18;;4013:107::o;1640:404::-;1703:4;1724:21;1734:3;1739:5;1724:9;:21::i;:::-;1719:319;;-1:-1:-1;1761:23:69;;;;;;;;:11;:23;;;;;;;;;;;;;1941:18;;1919:19;;;:12;;;:19;;;;;;:40;;;;1973:11;;1719:319;-1:-1:-1;2022:5:69;2015:12;;2212:1512;2278:4;2415:19;;;:12;;;:19;;;;;;2449:15;;2445:1273;;2878:18;;-1:-1:-1;;2830:14:69;;;;2878:22;;;;2806:21;;2878:3;;:22;;3160;;;;;;;;;;;;;;3140:42;;3303:9;3274:3;:11;;3286:13;3274:26;;;;;;;;;;;;;;;;;;;:38;;;;3378:23;;;3420:1;3378:12;;;:23;;;;;;3404:17;;;3378:43;;3527:17;;3378:3;;3527:17;;;;;;;;;;;;;;;;;;;;;;3619:3;:12;;:19;3632:5;3619:19;;;;;;;;;;;3612:26;;;3660:4;3653:11;;;;;;;;2445:1273;3702:5;3695:12;;;;",
+  "source": "//SPDX-License-Identifier: Unlicense\npragma solidity ^0.7.6;\n\n//import \"../interfaces/IStakeVaultStorage.sol\";\nimport \"../libraries/LibTokenStake1.sol\";\nimport \"@openzeppelin/contracts/access/AccessControl.sol\";\n\n/// @title the storage of StakeVaultStorage\ncontract StakeVaultStorage is AccessControl {\n    bytes32 public constant ADMIN_ROLE = keccak256(\"ADMIN\");\n\n    /// @dev reward token : FLD\n    address public fld;\n\n    /// @dev paytoken is the token that the user stakes.\n    address public paytoken;\n\n    /// @dev allocated amount of fld\n    uint256 public cap;\n\n    /// @dev the start block for sale.\n    uint256 public saleStartBlock;\n\n    /// @dev the staking start block\n    uint256 public stakeStartBlock;\n\n    /// @dev the staking end block.\n    uint256 public stakeEndBlock;\n\n    /// @dev the staking real end block.\n    uint256 public realEndBlock;\n\n    /// @dev reward amount per block\n    uint256 public blockTotalReward;\n\n    /// @dev sale closed flag\n    bool public saleClosed;\n\n    /// @dev Operation type of staking amount\n    uint256 public stakeType;\n\n    /// @dev External contract address used when operating the staking amount\n    address public defiAddr;\n\n    /// @dev a list of stakeContracts maintained by the vault\n    address[] public stakeAddresses;\n\n    /// @dev the information of the stake contract\n    mapping(address => LibTokenStake1.StakeInfo) public stakeInfos;\n\n    /// @dev the end blocks of the stake contracts, which must be in ascending order\n    uint256[] public orderedEndBlocks;\n\n    /// @dev the total staked amount stored at orderedEndBlock’s end block time\n    mapping(uint256 => uint256) public stakeEndBlockTotal;\n\n    uint256 private _lock;\n\n    modifier onlyOwner() {\n        require(\n            hasRole(ADMIN_ROLE, msg.sender),\n            \"StakeVaultStorage: Caller is not an admin\"\n        );\n        _;\n    }\n\n    modifier lock() {\n        require(_lock == 0, \"Stake1Vault: LOCKED\");\n        _lock = 1;\n        _;\n        _lock = 0;\n    }\n\n    /// @dev transfer Ownership\n    /// @param newOwner new owner address\n    function transferOwnership(address newOwner) external onlyOwner {\n        require(msg.sender != newOwner, \"StakeVaultStorage: same owner\");\n        grantRole(ADMIN_ROLE, newOwner);\n        revokeRole(ADMIN_ROLE, msg.sender);\n    }\n}\n",
+  "sourcePath": "/Users/zena/ico2.0/ico20-contracts/contracts/stake/StakeVaultStorage.sol",
+  "ast": {
+    "absolutePath": "/Users/zena/ico2.0/ico20-contracts/contracts/stake/StakeVaultStorage.sol",
+    "exportedSymbols": {
+      "AccessControl": [
+        7243
+      ],
+      "Address": [
+        8215
+      ],
+      "Context": [
+        6960
+      ],
+      "EnumerableSet": [
+        8695
+      ],
+      "LibTokenStake1": [
+        2928
+      ],
+      "StakeVaultStorage": [
+        6714
+      ]
+    },
+    "id": 6715,
+    "license": "Unlicense",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 6590,
+        "literals": [
+          "solidity",
+          "^",
+          "0.7",
+          ".6"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "37:23:39"
+      },
+      {
+        "absolutePath": "/Users/zena/ico2.0/ico20-contracts/contracts/libraries/LibTokenStake1.sol",
+        "file": "../libraries/LibTokenStake1.sol",
+        "id": 6591,
+        "nodeType": "ImportDirective",
+        "scope": 6715,
+        "sourceUnit": 2929,
+        "src": "111:41:39",
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "absolutePath": "@openzeppelin/contracts/access/AccessControl.sol",
+        "file": "@openzeppelin/contracts/access/AccessControl.sol",
+        "id": 6592,
+        "nodeType": "ImportDirective",
+        "scope": 6715,
+        "sourceUnit": 7244,
+        "src": "153:58:39",
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "abstract": false,
+        "baseContracts": [
+          {
+            "baseName": {
+              "id": 6594,
+              "name": "AccessControl",
+              "nodeType": "UserDefinedTypeName",
+              "referencedDeclaration": 7243,
+              "src": "287:13:39",
+              "typeDescriptions": {
+                "typeIdentifier": "t_contract$_AccessControl_$7243",
+                "typeString": "contract AccessControl"
+              }
+            },
+            "id": 6595,
+            "nodeType": "InheritanceSpecifier",
+            "src": "287:13:39"
+          }
+        ],
+        "contractDependencies": [
+          6960,
+          7243
+        ],
+        "contractKind": "contract",
+        "documentation": {
+          "id": 6593,
+          "nodeType": "StructuredDocumentation",
+          "src": "213:44:39",
+          "text": "@title the storage of StakeVaultStorage"
+        },
+        "fullyImplemented": true,
+        "id": 6714,
+        "linearizedBaseContracts": [
+          6714,
+          7243,
+          6960
+        ],
+        "name": "StakeVaultStorage",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "constant": true,
+            "functionSelector": "75b238fc",
+            "id": 6600,
+            "mutability": "constant",
+            "name": "ADMIN_ROLE",
+            "nodeType": "VariableDeclaration",
+            "scope": 6714,
+            "src": "307:55:39",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_bytes32",
+              "typeString": "bytes32"
+            },
+            "typeName": {
+              "id": 6596,
+              "name": "bytes32",
+              "nodeType": "ElementaryTypeName",
+              "src": "307:7:39",
+              "typeDescriptions": {
+                "typeIdentifier": "t_bytes32",
+                "typeString": "bytes32"
+              }
+            },
+            "value": {
+              "arguments": [
+                {
+                  "hexValue": "41444d494e",
+                  "id": 6598,
+                  "isConstant": false,
+                  "isLValue": false,
+                  "isPure": true,
+                  "kind": "string",
+                  "lValueRequested": false,
+                  "nodeType": "Literal",
+                  "src": "354:7:39",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_stringliteral_df8b4c520ffe197c5343c6f5aec59570151ef9a492f2c624fd45ddde6135ec42",
+                    "typeString": "literal_string \"ADMIN\""
+                  },
+                  "value": "ADMIN"
+                }
+              ],
+              "expression": {
+                "argumentTypes": [
+                  {
+                    "typeIdentifier": "t_stringliteral_df8b4c520ffe197c5343c6f5aec59570151ef9a492f2c624fd45ddde6135ec42",
+                    "typeString": "literal_string \"ADMIN\""
+                  }
+                ],
+                "id": 6597,
+                "name": "keccak256",
+                "nodeType": "Identifier",
+                "overloadedDeclarations": [],
+                "referencedDeclaration": 4294967288,
+                "src": "344:9:39",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_function_keccak256_pure$_t_bytes_memory_ptr_$returns$_t_bytes32_$",
+                  "typeString": "function (bytes memory) pure returns (bytes32)"
+                }
+              },
+              "id": 6599,
+              "isConstant": false,
+              "isLValue": false,
+              "isPure": true,
+              "kind": "functionCall",
+              "lValueRequested": false,
+              "names": [],
+              "nodeType": "FunctionCall",
+              "src": "344:18:39",
+              "tryCall": false,
+              "typeDescriptions": {
+                "typeIdentifier": "t_bytes32",
+                "typeString": "bytes32"
+              }
+            },
+            "visibility": "public"
+          },
+          {
+            "constant": false,
+            "documentation": {
+              "id": 6601,
+              "nodeType": "StructuredDocumentation",
+              "src": "369:27:39",
+              "text": "@dev reward token : FLD"
+            },
+            "functionSelector": "33bd2a49",
+            "id": 6603,
+            "mutability": "mutable",
+            "name": "fld",
+            "nodeType": "VariableDeclaration",
+            "scope": 6714,
+            "src": "401:18:39",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_address",
+              "typeString": "address"
+            },
+            "typeName": {
+              "id": 6602,
+              "name": "address",
+              "nodeType": "ElementaryTypeName",
+              "src": "401:7:39",
+              "stateMutability": "nonpayable",
+              "typeDescriptions": {
+                "typeIdentifier": "t_address",
+                "typeString": "address"
+              }
+            },
+            "visibility": "public"
+          },
+          {
+            "constant": false,
+            "documentation": {
+              "id": 6604,
+              "nodeType": "StructuredDocumentation",
+              "src": "426:52:39",
+              "text": "@dev paytoken is the token that the user stakes."
+            },
+            "functionSelector": "43b0934a",
+            "id": 6606,
+            "mutability": "mutable",
+            "name": "paytoken",
+            "nodeType": "VariableDeclaration",
+            "scope": 6714,
+            "src": "483:23:39",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_address",
+              "typeString": "address"
+            },
+            "typeName": {
+              "id": 6605,
+              "name": "address",
+              "nodeType": "ElementaryTypeName",
+              "src": "483:7:39",
+              "stateMutability": "nonpayable",
+              "typeDescriptions": {
+                "typeIdentifier": "t_address",
+                "typeString": "address"
+              }
+            },
+            "visibility": "public"
+          },
+          {
+            "constant": false,
+            "documentation": {
+              "id": 6607,
+              "nodeType": "StructuredDocumentation",
+              "src": "513:32:39",
+              "text": "@dev allocated amount of fld"
+            },
+            "functionSelector": "355274ea",
+            "id": 6609,
+            "mutability": "mutable",
+            "name": "cap",
+            "nodeType": "VariableDeclaration",
+            "scope": 6714,
+            "src": "550:18:39",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_uint256",
+              "typeString": "uint256"
+            },
+            "typeName": {
+              "id": 6608,
+              "name": "uint256",
+              "nodeType": "ElementaryTypeName",
+              "src": "550:7:39",
+              "typeDescriptions": {
+                "typeIdentifier": "t_uint256",
+                "typeString": "uint256"
+              }
+            },
+            "visibility": "public"
+          },
+          {
+            "constant": false,
+            "documentation": {
+              "id": 6610,
+              "nodeType": "StructuredDocumentation",
+              "src": "575:34:39",
+              "text": "@dev the start block for sale."
+            },
+            "functionSelector": "20027275",
+            "id": 6612,
+            "mutability": "mutable",
+            "name": "saleStartBlock",
+            "nodeType": "VariableDeclaration",
+            "scope": 6714,
+            "src": "614:29:39",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_uint256",
+              "typeString": "uint256"
+            },
+            "typeName": {
+              "id": 6611,
+              "name": "uint256",
+              "nodeType": "ElementaryTypeName",
+              "src": "614:7:39",
+              "typeDescriptions": {
+                "typeIdentifier": "t_uint256",
+                "typeString": "uint256"
+              }
+            },
+            "visibility": "public"
+          },
+          {
+            "constant": false,
+            "documentation": {
+              "id": 6613,
+              "nodeType": "StructuredDocumentation",
+              "src": "650:32:39",
+              "text": "@dev the staking start block"
+            },
+            "functionSelector": "4b5e7cd5",
+            "id": 6615,
+            "mutability": "mutable",
+            "name": "stakeStartBlock",
+            "nodeType": "VariableDeclaration",
+            "scope": 6714,
+            "src": "687:30:39",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_uint256",
+              "typeString": "uint256"
+            },
+            "typeName": {
+              "id": 6614,
+              "name": "uint256",
+              "nodeType": "ElementaryTypeName",
+              "src": "687:7:39",
+              "typeDescriptions": {
+                "typeIdentifier": "t_uint256",
+                "typeString": "uint256"
+              }
+            },
+            "visibility": "public"
+          },
+          {
+            "constant": false,
+            "documentation": {
+              "id": 6616,
+              "nodeType": "StructuredDocumentation",
+              "src": "724:31:39",
+              "text": "@dev the staking end block."
+            },
+            "functionSelector": "3a76eb37",
+            "id": 6618,
+            "mutability": "mutable",
+            "name": "stakeEndBlock",
+            "nodeType": "VariableDeclaration",
+            "scope": 6714,
+            "src": "760:28:39",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_uint256",
+              "typeString": "uint256"
+            },
+            "typeName": {
+              "id": 6617,
+              "name": "uint256",
+              "nodeType": "ElementaryTypeName",
+              "src": "760:7:39",
+              "typeDescriptions": {
+                "typeIdentifier": "t_uint256",
+                "typeString": "uint256"
+              }
+            },
+            "visibility": "public"
+          },
+          {
+            "constant": false,
+            "documentation": {
+              "id": 6619,
+              "nodeType": "StructuredDocumentation",
+              "src": "795:36:39",
+              "text": "@dev the staking real end block."
+            },
+            "functionSelector": "b03dc514",
+            "id": 6621,
+            "mutability": "mutable",
+            "name": "realEndBlock",
+            "nodeType": "VariableDeclaration",
+            "scope": 6714,
+            "src": "836:27:39",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_uint256",
+              "typeString": "uint256"
+            },
+            "typeName": {
+              "id": 6620,
+              "name": "uint256",
+              "nodeType": "ElementaryTypeName",
+              "src": "836:7:39",
+              "typeDescriptions": {
+                "typeIdentifier": "t_uint256",
+                "typeString": "uint256"
+              }
+            },
+            "visibility": "public"
+          },
+          {
+            "constant": false,
+            "documentation": {
+              "id": 6622,
+              "nodeType": "StructuredDocumentation",
+              "src": "870:32:39",
+              "text": "@dev reward amount per block"
+            },
+            "functionSelector": "d105bf85",
+            "id": 6624,
+            "mutability": "mutable",
+            "name": "blockTotalReward",
+            "nodeType": "VariableDeclaration",
+            "scope": 6714,
+            "src": "907:31:39",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_uint256",
+              "typeString": "uint256"
+            },
+            "typeName": {
+              "id": 6623,
+              "name": "uint256",
+              "nodeType": "ElementaryTypeName",
+              "src": "907:7:39",
+              "typeDescriptions": {
+                "typeIdentifier": "t_uint256",
+                "typeString": "uint256"
+              }
+            },
+            "visibility": "public"
+          },
+          {
+            "constant": false,
+            "documentation": {
+              "id": 6625,
+              "nodeType": "StructuredDocumentation",
+              "src": "945:25:39",
+              "text": "@dev sale closed flag"
+            },
+            "functionSelector": "b8c766b8",
+            "id": 6627,
+            "mutability": "mutable",
+            "name": "saleClosed",
+            "nodeType": "VariableDeclaration",
+            "scope": 6714,
+            "src": "975:22:39",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_bool",
+              "typeString": "bool"
+            },
+            "typeName": {
+              "id": 6626,
+              "name": "bool",
+              "nodeType": "ElementaryTypeName",
+              "src": "975:4:39",
+              "typeDescriptions": {
+                "typeIdentifier": "t_bool",
+                "typeString": "bool"
+              }
+            },
+            "visibility": "public"
+          },
+          {
+            "constant": false,
+            "documentation": {
+              "id": 6628,
+              "nodeType": "StructuredDocumentation",
+              "src": "1004:41:39",
+              "text": "@dev Operation type of staking amount"
+            },
+            "functionSelector": "b97af0db",
+            "id": 6630,
+            "mutability": "mutable",
+            "name": "stakeType",
+            "nodeType": "VariableDeclaration",
+            "scope": 6714,
+            "src": "1050:24:39",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_uint256",
+              "typeString": "uint256"
+            },
+            "typeName": {
+              "id": 6629,
+              "name": "uint256",
+              "nodeType": "ElementaryTypeName",
+              "src": "1050:7:39",
+              "typeDescriptions": {
+                "typeIdentifier": "t_uint256",
+                "typeString": "uint256"
+              }
+            },
+            "visibility": "public"
+          },
+          {
+            "constant": false,
+            "documentation": {
+              "id": 6631,
+              "nodeType": "StructuredDocumentation",
+              "src": "1081:73:39",
+              "text": "@dev External contract address used when operating the staking amount"
+            },
+            "functionSelector": "9d84ca35",
+            "id": 6633,
+            "mutability": "mutable",
+            "name": "defiAddr",
+            "nodeType": "VariableDeclaration",
+            "scope": 6714,
+            "src": "1159:23:39",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_address",
+              "typeString": "address"
+            },
+            "typeName": {
+              "id": 6632,
+              "name": "address",
+              "nodeType": "ElementaryTypeName",
+              "src": "1159:7:39",
+              "stateMutability": "nonpayable",
+              "typeDescriptions": {
+                "typeIdentifier": "t_address",
+                "typeString": "address"
+              }
+            },
+            "visibility": "public"
+          },
+          {
+            "constant": false,
+            "documentation": {
+              "id": 6634,
+              "nodeType": "StructuredDocumentation",
+              "src": "1189:57:39",
+              "text": "@dev a list of stakeContracts maintained by the vault"
+            },
+            "functionSelector": "294f5fa3",
+            "id": 6637,
+            "mutability": "mutable",
+            "name": "stakeAddresses",
+            "nodeType": "VariableDeclaration",
+            "scope": 6714,
+            "src": "1251:31:39",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_array$_t_address_$dyn_storage",
+              "typeString": "address[]"
+            },
+            "typeName": {
+              "baseType": {
+                "id": 6635,
+                "name": "address",
+                "nodeType": "ElementaryTypeName",
+                "src": "1251:7:39",
+                "stateMutability": "nonpayable",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_address",
+                  "typeString": "address"
+                }
+              },
+              "id": 6636,
+              "nodeType": "ArrayTypeName",
+              "src": "1251:9:39",
+              "typeDescriptions": {
+                "typeIdentifier": "t_array$_t_address_$dyn_storage_ptr",
+                "typeString": "address[]"
+              }
+            },
+            "visibility": "public"
+          },
+          {
+            "constant": false,
+            "documentation": {
+              "id": 6638,
+              "nodeType": "StructuredDocumentation",
+              "src": "1289:46:39",
+              "text": "@dev the information of the stake contract"
+            },
+            "functionSelector": "dfbf9def",
+            "id": 6642,
+            "mutability": "mutable",
+            "name": "stakeInfos",
+            "nodeType": "VariableDeclaration",
+            "scope": 6714,
+            "src": "1340:62:39",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_mapping$_t_address_$_t_struct$_StakeInfo_$2895_storage_$",
+              "typeString": "mapping(address => struct LibTokenStake1.StakeInfo)"
+            },
+            "typeName": {
+              "id": 6641,
+              "keyType": {
+                "id": 6639,
+                "name": "address",
+                "nodeType": "ElementaryTypeName",
+                "src": "1348:7:39",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_address",
+                  "typeString": "address"
+                }
+              },
+              "nodeType": "Mapping",
+              "src": "1340:44:39",
+              "typeDescriptions": {
+                "typeIdentifier": "t_mapping$_t_address_$_t_struct$_StakeInfo_$2895_storage_$",
+                "typeString": "mapping(address => struct LibTokenStake1.StakeInfo)"
+              },
+              "valueType": {
+                "id": 6640,
+                "name": "LibTokenStake1.StakeInfo",
+                "nodeType": "UserDefinedTypeName",
+                "referencedDeclaration": 2895,
+                "src": "1359:24:39",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_struct$_StakeInfo_$2895_storage_ptr",
+                  "typeString": "struct LibTokenStake1.StakeInfo"
+                }
+              }
+            },
+            "visibility": "public"
+          },
+          {
+            "constant": false,
+            "documentation": {
+              "id": 6643,
+              "nodeType": "StructuredDocumentation",
+              "src": "1409:80:39",
+              "text": "@dev the end blocks of the stake contracts, which must be in ascending order"
+            },
+            "functionSelector": "153099d0",
+            "id": 6646,
+            "mutability": "mutable",
+            "name": "orderedEndBlocks",
+            "nodeType": "VariableDeclaration",
+            "scope": 6714,
+            "src": "1494:33:39",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_array$_t_uint256_$dyn_storage",
+              "typeString": "uint256[]"
+            },
+            "typeName": {
+              "baseType": {
+                "id": 6644,
+                "name": "uint256",
+                "nodeType": "ElementaryTypeName",
+                "src": "1494:7:39",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                }
+              },
+              "id": 6645,
+              "nodeType": "ArrayTypeName",
+              "src": "1494:9:39",
+              "typeDescriptions": {
+                "typeIdentifier": "t_array$_t_uint256_$dyn_storage_ptr",
+                "typeString": "uint256[]"
+              }
+            },
+            "visibility": "public"
+          },
+          {
+            "constant": false,
+            "documentation": {
+              "id": 6647,
+              "nodeType": "StructuredDocumentation",
+              "src": "1534:77:39",
+              "text": "@dev the total staked amount stored at orderedEndBlock’s end block time"
+            },
+            "functionSelector": "5f1bd62a",
+            "id": 6651,
+            "mutability": "mutable",
+            "name": "stakeEndBlockTotal",
+            "nodeType": "VariableDeclaration",
+            "scope": 6714,
+            "src": "1616:53:39",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_mapping$_t_uint256_$_t_uint256_$",
+              "typeString": "mapping(uint256 => uint256)"
+            },
+            "typeName": {
+              "id": 6650,
+              "keyType": {
+                "id": 6648,
+                "name": "uint256",
+                "nodeType": "ElementaryTypeName",
+                "src": "1624:7:39",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                }
+              },
+              "nodeType": "Mapping",
+              "src": "1616:27:39",
+              "typeDescriptions": {
+                "typeIdentifier": "t_mapping$_t_uint256_$_t_uint256_$",
+                "typeString": "mapping(uint256 => uint256)"
+              },
+              "valueType": {
+                "id": 6649,
+                "name": "uint256",
+                "nodeType": "ElementaryTypeName",
+                "src": "1635:7:39",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                }
+              }
+            },
+            "visibility": "public"
+          },
+          {
+            "constant": false,
+            "id": 6653,
+            "mutability": "mutable",
+            "name": "_lock",
+            "nodeType": "VariableDeclaration",
+            "scope": 6714,
+            "src": "1676:21:39",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_uint256",
+              "typeString": "uint256"
+            },
+            "typeName": {
+              "id": 6652,
+              "name": "uint256",
+              "nodeType": "ElementaryTypeName",
+              "src": "1676:7:39",
+              "typeDescriptions": {
+                "typeIdentifier": "t_uint256",
+                "typeString": "uint256"
+              }
+            },
+            "visibility": "private"
+          },
+          {
+            "body": {
+              "id": 6665,
+              "nodeType": "Block",
+              "src": "1725:147:39",
+              "statements": [
+                {
+                  "expression": {
+                    "arguments": [
+                      {
+                        "arguments": [
+                          {
+                            "id": 6657,
+                            "name": "ADMIN_ROLE",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 6600,
+                            "src": "1764:10:39",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_bytes32",
+                              "typeString": "bytes32"
+                            }
+                          },
+                          {
+                            "expression": {
+                              "id": 6658,
+                              "name": "msg",
+                              "nodeType": "Identifier",
+                              "overloadedDeclarations": [],
+                              "referencedDeclaration": 4294967281,
+                              "src": "1776:3:39",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_magic_message",
+                                "typeString": "msg"
+                              }
+                            },
+                            "id": 6659,
+                            "isConstant": false,
+                            "isLValue": false,
+                            "isPure": false,
+                            "lValueRequested": false,
+                            "memberName": "sender",
+                            "nodeType": "MemberAccess",
+                            "src": "1776:10:39",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_address_payable",
+                              "typeString": "address payable"
+                            }
+                          }
+                        ],
+                        "expression": {
+                          "argumentTypes": [
+                            {
+                              "typeIdentifier": "t_bytes32",
+                              "typeString": "bytes32"
+                            },
+                            {
+                              "typeIdentifier": "t_address_payable",
+                              "typeString": "address payable"
+                            }
+                          ],
+                          "id": 6656,
+                          "name": "hasRole",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 7032,
+                          "src": "1756:7:39",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_function_internal_view$_t_bytes32_$_t_address_$returns$_t_bool_$",
+                            "typeString": "function (bytes32,address) view returns (bool)"
+                          }
+                        },
+                        "id": 6660,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "kind": "functionCall",
+                        "lValueRequested": false,
+                        "names": [],
+                        "nodeType": "FunctionCall",
+                        "src": "1756:31:39",
+                        "tryCall": false,
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        }
+                      },
+                      {
+                        "hexValue": "5374616b655661756c7453746f726167653a2043616c6c6572206973206e6f7420616e2061646d696e",
+                        "id": 6661,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": true,
+                        "kind": "string",
+                        "lValueRequested": false,
+                        "nodeType": "Literal",
+                        "src": "1801:43:39",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_stringliteral_021ca121587b88ebc25bfc126f50336cf11b939e4022014351a7071623318f10",
+                          "typeString": "literal_string \"StakeVaultStorage: Caller is not an admin\""
+                        },
+                        "value": "StakeVaultStorage: Caller is not an admin"
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        },
+                        {
+                          "typeIdentifier": "t_stringliteral_021ca121587b88ebc25bfc126f50336cf11b939e4022014351a7071623318f10",
+                          "typeString": "literal_string \"StakeVaultStorage: Caller is not an admin\""
+                        }
+                      ],
+                      "id": 6655,
+                      "name": "require",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [
+                        4294967278,
+                        4294967278
+                      ],
+                      "referencedDeclaration": 4294967278,
+                      "src": "1735:7:39",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_require_pure$_t_bool_$_t_string_memory_ptr_$returns$__$",
+                        "typeString": "function (bool,string memory) pure"
+                      }
+                    },
+                    "id": 6662,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "1735:119:39",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 6663,
+                  "nodeType": "ExpressionStatement",
+                  "src": "1735:119:39"
+                },
+                {
+                  "id": 6664,
+                  "nodeType": "PlaceholderStatement",
+                  "src": "1864:1:39"
+                }
+              ]
+            },
+            "id": 6666,
+            "name": "onlyOwner",
+            "nodeType": "ModifierDefinition",
+            "parameters": {
+              "id": 6654,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1722:2:39"
+            },
+            "src": "1704:168:39",
+            "virtual": false,
+            "visibility": "internal"
+          },
+          {
+            "body": {
+              "id": 6684,
+              "nodeType": "Block",
+              "src": "1894:108:39",
+              "statements": [
+                {
+                  "expression": {
+                    "arguments": [
+                      {
+                        "commonType": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        },
+                        "id": 6671,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "leftExpression": {
+                          "id": 6669,
+                          "name": "_lock",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 6653,
+                          "src": "1912:5:39",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_uint256",
+                            "typeString": "uint256"
+                          }
+                        },
+                        "nodeType": "BinaryOperation",
+                        "operator": "==",
+                        "rightExpression": {
+                          "hexValue": "30",
+                          "id": 6670,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": true,
+                          "kind": "number",
+                          "lValueRequested": false,
+                          "nodeType": "Literal",
+                          "src": "1921:1:39",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_rational_0_by_1",
+                            "typeString": "int_const 0"
+                          },
+                          "value": "0"
+                        },
+                        "src": "1912:10:39",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        }
+                      },
+                      {
+                        "hexValue": "5374616b65315661756c743a204c4f434b4544",
+                        "id": 6672,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": true,
+                        "kind": "string",
+                        "lValueRequested": false,
+                        "nodeType": "Literal",
+                        "src": "1924:21:39",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_stringliteral_a952b2657fd79b201839de8a36d65ea13d6329a6de3f4dbcd1ab033219682fa7",
+                          "typeString": "literal_string \"Stake1Vault: LOCKED\""
+                        },
+                        "value": "Stake1Vault: LOCKED"
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        },
+                        {
+                          "typeIdentifier": "t_stringliteral_a952b2657fd79b201839de8a36d65ea13d6329a6de3f4dbcd1ab033219682fa7",
+                          "typeString": "literal_string \"Stake1Vault: LOCKED\""
+                        }
+                      ],
+                      "id": 6668,
+                      "name": "require",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [
+                        4294967278,
+                        4294967278
+                      ],
+                      "referencedDeclaration": 4294967278,
+                      "src": "1904:7:39",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_require_pure$_t_bool_$_t_string_memory_ptr_$returns$__$",
+                        "typeString": "function (bool,string memory) pure"
+                      }
+                    },
+                    "id": 6673,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "1904:42:39",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 6674,
+                  "nodeType": "ExpressionStatement",
+                  "src": "1904:42:39"
+                },
+                {
+                  "expression": {
+                    "id": 6677,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "id": 6675,
+                      "name": "_lock",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 6653,
+                      "src": "1956:5:39",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "=",
+                    "rightHandSide": {
+                      "hexValue": "31",
+                      "id": 6676,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": true,
+                      "kind": "number",
+                      "lValueRequested": false,
+                      "nodeType": "Literal",
+                      "src": "1964:1:39",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_rational_1_by_1",
+                        "typeString": "int_const 1"
+                      },
+                      "value": "1"
+                    },
+                    "src": "1956:9:39",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "id": 6678,
+                  "nodeType": "ExpressionStatement",
+                  "src": "1956:9:39"
+                },
+                {
+                  "id": 6679,
+                  "nodeType": "PlaceholderStatement",
+                  "src": "1975:1:39"
+                },
+                {
+                  "expression": {
+                    "id": 6682,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "id": 6680,
+                      "name": "_lock",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 6653,
+                      "src": "1986:5:39",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "=",
+                    "rightHandSide": {
+                      "hexValue": "30",
+                      "id": 6681,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": true,
+                      "kind": "number",
+                      "lValueRequested": false,
+                      "nodeType": "Literal",
+                      "src": "1994:1:39",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_rational_0_by_1",
+                        "typeString": "int_const 0"
+                      },
+                      "value": "0"
+                    },
+                    "src": "1986:9:39",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "id": 6683,
+                  "nodeType": "ExpressionStatement",
+                  "src": "1986:9:39"
+                }
+              ]
+            },
+            "id": 6685,
+            "name": "lock",
+            "nodeType": "ModifierDefinition",
+            "parameters": {
+              "id": 6667,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1891:2:39"
+            },
+            "src": "1878:124:39",
+            "virtual": false,
+            "visibility": "internal"
+          },
+          {
+            "body": {
+              "id": 6712,
+              "nodeType": "Block",
+              "src": "2146:166:39",
+              "statements": [
+                {
+                  "expression": {
+                    "arguments": [
+                      {
+                        "commonType": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        },
+                        "id": 6697,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "leftExpression": {
+                          "expression": {
+                            "id": 6694,
+                            "name": "msg",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 4294967281,
+                            "src": "2164:3:39",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_magic_message",
+                              "typeString": "msg"
+                            }
+                          },
+                          "id": 6695,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "lValueRequested": false,
+                          "memberName": "sender",
+                          "nodeType": "MemberAccess",
+                          "src": "2164:10:39",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_address_payable",
+                            "typeString": "address payable"
+                          }
+                        },
+                        "nodeType": "BinaryOperation",
+                        "operator": "!=",
+                        "rightExpression": {
+                          "id": 6696,
+                          "name": "newOwner",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 6688,
+                          "src": "2178:8:39",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_address",
+                            "typeString": "address"
+                          }
+                        },
+                        "src": "2164:22:39",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        }
+                      },
+                      {
+                        "hexValue": "5374616b655661756c7453746f726167653a2073616d65206f776e6572",
+                        "id": 6698,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": true,
+                        "kind": "string",
+                        "lValueRequested": false,
+                        "nodeType": "Literal",
+                        "src": "2188:31:39",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_stringliteral_aabf681a6f707af910c8b303634ea853f9b551aa429ab25ab7741894cf9447a3",
+                          "typeString": "literal_string \"StakeVaultStorage: same owner\""
+                        },
+                        "value": "StakeVaultStorage: same owner"
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        },
+                        {
+                          "typeIdentifier": "t_stringliteral_aabf681a6f707af910c8b303634ea853f9b551aa429ab25ab7741894cf9447a3",
+                          "typeString": "literal_string \"StakeVaultStorage: same owner\""
+                        }
+                      ],
+                      "id": 6693,
+                      "name": "require",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [
+                        4294967278,
+                        4294967278
+                      ],
+                      "referencedDeclaration": 4294967278,
+                      "src": "2156:7:39",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_require_pure$_t_bool_$_t_string_memory_ptr_$returns$__$",
+                        "typeString": "function (bool,string memory) pure"
+                      }
+                    },
+                    "id": 6699,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "2156:64:39",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 6700,
+                  "nodeType": "ExpressionStatement",
+                  "src": "2156:64:39"
+                },
+                {
+                  "expression": {
+                    "arguments": [
+                      {
+                        "id": 6702,
+                        "name": "ADMIN_ROLE",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 6600,
+                        "src": "2240:10:39",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_bytes32",
+                          "typeString": "bytes32"
+                        }
+                      },
+                      {
+                        "id": 6703,
+                        "name": "newOwner",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 6688,
+                        "src": "2252:8:39",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_bytes32",
+                          "typeString": "bytes32"
+                        },
+                        {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      ],
+                      "id": 6701,
+                      "name": "grantRole",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 7107,
+                      "src": "2230:9:39",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_internal_nonpayable$_t_bytes32_$_t_address_$returns$__$",
+                        "typeString": "function (bytes32,address)"
+                      }
+                    },
+                    "id": 6704,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "2230:31:39",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 6705,
+                  "nodeType": "ExpressionStatement",
+                  "src": "2230:31:39"
+                },
+                {
+                  "expression": {
+                    "arguments": [
+                      {
+                        "id": 6707,
+                        "name": "ADMIN_ROLE",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 6600,
+                        "src": "2282:10:39",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_bytes32",
+                          "typeString": "bytes32"
+                        }
+                      },
+                      {
+                        "expression": {
+                          "id": 6708,
+                          "name": "msg",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 4294967281,
+                          "src": "2294:3:39",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_magic_message",
+                            "typeString": "msg"
+                          }
+                        },
+                        "id": 6709,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "memberName": "sender",
+                        "nodeType": "MemberAccess",
+                        "src": "2294:10:39",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address_payable",
+                          "typeString": "address payable"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_bytes32",
+                          "typeString": "bytes32"
+                        },
+                        {
+                          "typeIdentifier": "t_address_payable",
+                          "typeString": "address payable"
+                        }
+                      ],
+                      "id": 6706,
+                      "name": "revokeRole",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 7133,
+                      "src": "2271:10:39",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_internal_nonpayable$_t_bytes32_$_t_address_$returns$__$",
+                        "typeString": "function (bytes32,address)"
+                      }
+                    },
+                    "id": 6710,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "2271:34:39",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 6711,
+                  "nodeType": "ExpressionStatement",
+                  "src": "2271:34:39"
+                }
+              ]
+            },
+            "documentation": {
+              "id": 6686,
+              "nodeType": "StructuredDocumentation",
+              "src": "2008:69:39",
+              "text": "@dev transfer Ownership\n @param newOwner new owner address"
+            },
+            "functionSelector": "f2fde38b",
+            "id": 6713,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [
+              {
+                "id": 6691,
+                "modifierName": {
+                  "id": 6690,
+                  "name": "onlyOwner",
+                  "nodeType": "Identifier",
+                  "overloadedDeclarations": [],
+                  "referencedDeclaration": 6666,
+                  "src": "2136:9:39",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_modifier$__$",
+                    "typeString": "modifier ()"
+                  }
+                },
+                "nodeType": "ModifierInvocation",
+                "src": "2136:9:39"
+              }
+            ],
+            "name": "transferOwnership",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 6689,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 6688,
+                  "mutability": "mutable",
+                  "name": "newOwner",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 6713,
+                  "src": "2109:16:39",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 6687,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2109:7:39",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2108:18:39"
+            },
+            "returnParameters": {
+              "id": 6692,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "2146:0:39"
+            },
+            "scope": 6714,
+            "src": "2082:230:39",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 6715,
+        "src": "257:2057:39"
+      }
+    ],
+    "src": "37:2278:39"
+  },
+  "legacyAST": {
+    "attributes": {
+      "absolutePath": "/Users/zena/ico2.0/ico20-contracts/contracts/stake/StakeVaultStorage.sol",
+      "exportedSymbols": {
+        "AccessControl": [
+          7243
+        ],
+        "Address": [
+          8215
+        ],
+        "Context": [
+          6960
+        ],
+        "EnumerableSet": [
+          8695
+        ],
+        "LibTokenStake1": [
+          2928
+        ],
+        "StakeVaultStorage": [
+          6714
+        ]
+      },
+      "license": "Unlicense"
+    },
+    "children": [
+      {
+        "attributes": {
+          "literals": [
+            "solidity",
+            "^",
+            "0.7",
+            ".6"
+          ]
+        },
+        "id": 6590,
+        "name": "PragmaDirective",
+        "src": "37:23:39"
+      },
+      {
+        "attributes": {
+          "SourceUnit": 2929,
+          "absolutePath": "/Users/zena/ico2.0/ico20-contracts/contracts/libraries/LibTokenStake1.sol",
+          "file": "../libraries/LibTokenStake1.sol",
+          "scope": 6715,
+          "symbolAliases": [
+            null
+          ],
+          "unitAlias": ""
+        },
+        "id": 6591,
+        "name": "ImportDirective",
+        "src": "111:41:39"
+      },
+      {
+        "attributes": {
+          "SourceUnit": 7244,
+          "absolutePath": "@openzeppelin/contracts/access/AccessControl.sol",
+          "file": "@openzeppelin/contracts/access/AccessControl.sol",
+          "scope": 6715,
+          "symbolAliases": [
+            null
+          ],
+          "unitAlias": ""
+        },
+        "id": 6592,
+        "name": "ImportDirective",
+        "src": "153:58:39"
+      },
+      {
+        "attributes": {
+          "abstract": false,
+          "contractDependencies": [
+            6960,
+            7243
+          ],
+          "contractKind": "contract",
+          "fullyImplemented": true,
+          "linearizedBaseContracts": [
+            6714,
+            7243,
+            6960
+          ],
+          "name": "StakeVaultStorage",
+          "scope": 6715
+        },
+        "children": [
+          {
+            "attributes": {
+              "text": "@title the storage of StakeVaultStorage"
+            },
+            "id": 6593,
+            "name": "StructuredDocumentation",
+            "src": "213:44:39"
+          },
+          {
+            "attributes": {},
+            "children": [
+              {
+                "attributes": {
+                  "name": "AccessControl",
+                  "referencedDeclaration": 7243,
+                  "type": "contract AccessControl"
+                },
+                "id": 6594,
+                "name": "UserDefinedTypeName",
+                "src": "287:13:39"
+              }
+            ],
+            "id": 6595,
+            "name": "InheritanceSpecifier",
+            "src": "287:13:39"
+          },
+          {
+            "attributes": {
+              "constant": true,
+              "functionSelector": "75b238fc",
+              "mutability": "constant",
+              "name": "ADMIN_ROLE",
+              "scope": 6714,
+              "stateVariable": true,
+              "storageLocation": "default",
+              "type": "bytes32",
+              "visibility": "public"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "name": "bytes32",
+                  "type": "bytes32"
+                },
+                "id": 6596,
+                "name": "ElementaryTypeName",
+                "src": "307:7:39"
+              },
+              {
+                "attributes": {
+                  "isConstant": false,
+                  "isLValue": false,
+                  "isPure": true,
+                  "isStructConstructorCall": false,
+                  "lValueRequested": false,
+                  "names": [
+                    null
+                  ],
+                  "tryCall": false,
+                  "type": "bytes32",
+                  "type_conversion": false
+                },
+                "children": [
+                  {
+                    "attributes": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_stringliteral_df8b4c520ffe197c5343c6f5aec59570151ef9a492f2c624fd45ddde6135ec42",
+                          "typeString": "literal_string \"ADMIN\""
+                        }
+                      ],
+                      "overloadedDeclarations": [
+                        null
+                      ],
+                      "referencedDeclaration": 4294967288,
+                      "type": "function (bytes memory) pure returns (bytes32)",
+                      "value": "keccak256"
+                    },
+                    "id": 6597,
+                    "name": "Identifier",
+                    "src": "344:9:39"
+                  },
+                  {
+                    "attributes": {
+                      "hexvalue": "41444d494e",
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": true,
+                      "lValueRequested": false,
+                      "token": "string",
+                      "type": "literal_string \"ADMIN\"",
+                      "value": "ADMIN"
+                    },
+                    "id": 6598,
+                    "name": "Literal",
+                    "src": "354:7:39"
+                  }
+                ],
+                "id": 6599,
+                "name": "FunctionCall",
+                "src": "344:18:39"
+              }
+            ],
+            "id": 6600,
+            "name": "VariableDeclaration",
+            "src": "307:55:39"
+          },
+          {
+            "attributes": {
+              "constant": false,
+              "functionSelector": "33bd2a49",
+              "mutability": "mutable",
+              "name": "fld",
+              "scope": 6714,
+              "stateVariable": true,
+              "storageLocation": "default",
+              "type": "address",
+              "visibility": "public"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "name": "address",
+                  "stateMutability": "nonpayable",
+                  "type": "address"
+                },
+                "id": 6602,
+                "name": "ElementaryTypeName",
+                "src": "401:7:39"
+              },
+              {
+                "attributes": {
+                  "text": "@dev reward token : FLD"
+                },
+                "id": 6601,
+                "name": "StructuredDocumentation",
+                "src": "369:27:39"
+              }
+            ],
+            "id": 6603,
+            "name": "VariableDeclaration",
+            "src": "401:18:39"
+          },
+          {
+            "attributes": {
+              "constant": false,
+              "functionSelector": "43b0934a",
+              "mutability": "mutable",
+              "name": "paytoken",
+              "scope": 6714,
+              "stateVariable": true,
+              "storageLocation": "default",
+              "type": "address",
+              "visibility": "public"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "name": "address",
+                  "stateMutability": "nonpayable",
+                  "type": "address"
+                },
+                "id": 6605,
+                "name": "ElementaryTypeName",
+                "src": "483:7:39"
+              },
+              {
+                "attributes": {
+                  "text": "@dev paytoken is the token that the user stakes."
+                },
+                "id": 6604,
+                "name": "StructuredDocumentation",
+                "src": "426:52:39"
+              }
+            ],
+            "id": 6606,
+            "name": "VariableDeclaration",
+            "src": "483:23:39"
+          },
+          {
+            "attributes": {
+              "constant": false,
+              "functionSelector": "355274ea",
+              "mutability": "mutable",
+              "name": "cap",
+              "scope": 6714,
+              "stateVariable": true,
+              "storageLocation": "default",
+              "type": "uint256",
+              "visibility": "public"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "name": "uint256",
+                  "type": "uint256"
+                },
+                "id": 6608,
+                "name": "ElementaryTypeName",
+                "src": "550:7:39"
+              },
+              {
+                "attributes": {
+                  "text": "@dev allocated amount of fld"
+                },
+                "id": 6607,
+                "name": "StructuredDocumentation",
+                "src": "513:32:39"
+              }
+            ],
+            "id": 6609,
+            "name": "VariableDeclaration",
+            "src": "550:18:39"
+          },
+          {
+            "attributes": {
+              "constant": false,
+              "functionSelector": "20027275",
+              "mutability": "mutable",
+              "name": "saleStartBlock",
+              "scope": 6714,
+              "stateVariable": true,
+              "storageLocation": "default",
+              "type": "uint256",
+              "visibility": "public"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "name": "uint256",
+                  "type": "uint256"
+                },
+                "id": 6611,
+                "name": "ElementaryTypeName",
+                "src": "614:7:39"
+              },
+              {
+                "attributes": {
+                  "text": "@dev the start block for sale."
+                },
+                "id": 6610,
+                "name": "StructuredDocumentation",
+                "src": "575:34:39"
+              }
+            ],
+            "id": 6612,
+            "name": "VariableDeclaration",
+            "src": "614:29:39"
+          },
+          {
+            "attributes": {
+              "constant": false,
+              "functionSelector": "4b5e7cd5",
+              "mutability": "mutable",
+              "name": "stakeStartBlock",
+              "scope": 6714,
+              "stateVariable": true,
+              "storageLocation": "default",
+              "type": "uint256",
+              "visibility": "public"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "name": "uint256",
+                  "type": "uint256"
+                },
+                "id": 6614,
+                "name": "ElementaryTypeName",
+                "src": "687:7:39"
+              },
+              {
+                "attributes": {
+                  "text": "@dev the staking start block"
+                },
+                "id": 6613,
+                "name": "StructuredDocumentation",
+                "src": "650:32:39"
+              }
+            ],
+            "id": 6615,
+            "name": "VariableDeclaration",
+            "src": "687:30:39"
+          },
+          {
+            "attributes": {
+              "constant": false,
+              "functionSelector": "3a76eb37",
+              "mutability": "mutable",
+              "name": "stakeEndBlock",
+              "scope": 6714,
+              "stateVariable": true,
+              "storageLocation": "default",
+              "type": "uint256",
+              "visibility": "public"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "name": "uint256",
+                  "type": "uint256"
+                },
+                "id": 6617,
+                "name": "ElementaryTypeName",
+                "src": "760:7:39"
+              },
+              {
+                "attributes": {
+                  "text": "@dev the staking end block."
+                },
+                "id": 6616,
+                "name": "StructuredDocumentation",
+                "src": "724:31:39"
+              }
+            ],
+            "id": 6618,
+            "name": "VariableDeclaration",
+            "src": "760:28:39"
+          },
+          {
+            "attributes": {
+              "constant": false,
+              "functionSelector": "b03dc514",
+              "mutability": "mutable",
+              "name": "realEndBlock",
+              "scope": 6714,
+              "stateVariable": true,
+              "storageLocation": "default",
+              "type": "uint256",
+              "visibility": "public"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "name": "uint256",
+                  "type": "uint256"
+                },
+                "id": 6620,
+                "name": "ElementaryTypeName",
+                "src": "836:7:39"
+              },
+              {
+                "attributes": {
+                  "text": "@dev the staking real end block."
+                },
+                "id": 6619,
+                "name": "StructuredDocumentation",
+                "src": "795:36:39"
+              }
+            ],
+            "id": 6621,
+            "name": "VariableDeclaration",
+            "src": "836:27:39"
+          },
+          {
+            "attributes": {
+              "constant": false,
+              "functionSelector": "d105bf85",
+              "mutability": "mutable",
+              "name": "blockTotalReward",
+              "scope": 6714,
+              "stateVariable": true,
+              "storageLocation": "default",
+              "type": "uint256",
+              "visibility": "public"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "name": "uint256",
+                  "type": "uint256"
+                },
+                "id": 6623,
+                "name": "ElementaryTypeName",
+                "src": "907:7:39"
+              },
+              {
+                "attributes": {
+                  "text": "@dev reward amount per block"
+                },
+                "id": 6622,
+                "name": "StructuredDocumentation",
+                "src": "870:32:39"
+              }
+            ],
+            "id": 6624,
+            "name": "VariableDeclaration",
+            "src": "907:31:39"
+          },
+          {
+            "attributes": {
+              "constant": false,
+              "functionSelector": "b8c766b8",
+              "mutability": "mutable",
+              "name": "saleClosed",
+              "scope": 6714,
+              "stateVariable": true,
+              "storageLocation": "default",
+              "type": "bool",
+              "visibility": "public"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "name": "bool",
+                  "type": "bool"
+                },
+                "id": 6626,
+                "name": "ElementaryTypeName",
+                "src": "975:4:39"
+              },
+              {
+                "attributes": {
+                  "text": "@dev sale closed flag"
+                },
+                "id": 6625,
+                "name": "StructuredDocumentation",
+                "src": "945:25:39"
+              }
+            ],
+            "id": 6627,
+            "name": "VariableDeclaration",
+            "src": "975:22:39"
+          },
+          {
+            "attributes": {
+              "constant": false,
+              "functionSelector": "b97af0db",
+              "mutability": "mutable",
+              "name": "stakeType",
+              "scope": 6714,
+              "stateVariable": true,
+              "storageLocation": "default",
+              "type": "uint256",
+              "visibility": "public"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "name": "uint256",
+                  "type": "uint256"
+                },
+                "id": 6629,
+                "name": "ElementaryTypeName",
+                "src": "1050:7:39"
+              },
+              {
+                "attributes": {
+                  "text": "@dev Operation type of staking amount"
+                },
+                "id": 6628,
+                "name": "StructuredDocumentation",
+                "src": "1004:41:39"
+              }
+            ],
+            "id": 6630,
+            "name": "VariableDeclaration",
+            "src": "1050:24:39"
+          },
+          {
+            "attributes": {
+              "constant": false,
+              "functionSelector": "9d84ca35",
+              "mutability": "mutable",
+              "name": "defiAddr",
+              "scope": 6714,
+              "stateVariable": true,
+              "storageLocation": "default",
+              "type": "address",
+              "visibility": "public"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "name": "address",
+                  "stateMutability": "nonpayable",
+                  "type": "address"
+                },
+                "id": 6632,
+                "name": "ElementaryTypeName",
+                "src": "1159:7:39"
+              },
+              {
+                "attributes": {
+                  "text": "@dev External contract address used when operating the staking amount"
+                },
+                "id": 6631,
+                "name": "StructuredDocumentation",
+                "src": "1081:73:39"
+              }
+            ],
+            "id": 6633,
+            "name": "VariableDeclaration",
+            "src": "1159:23:39"
+          },
+          {
+            "attributes": {
+              "constant": false,
+              "functionSelector": "294f5fa3",
+              "mutability": "mutable",
+              "name": "stakeAddresses",
+              "scope": 6714,
+              "stateVariable": true,
+              "storageLocation": "default",
+              "type": "address[]",
+              "visibility": "public"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "type": "address[]"
+                },
+                "children": [
+                  {
+                    "attributes": {
+                      "name": "address",
+                      "stateMutability": "nonpayable",
+                      "type": "address"
+                    },
+                    "id": 6635,
+                    "name": "ElementaryTypeName",
+                    "src": "1251:7:39"
+                  }
+                ],
+                "id": 6636,
+                "name": "ArrayTypeName",
+                "src": "1251:9:39"
+              },
+              {
+                "attributes": {
+                  "text": "@dev a list of stakeContracts maintained by the vault"
+                },
+                "id": 6634,
+                "name": "StructuredDocumentation",
+                "src": "1189:57:39"
+              }
+            ],
+            "id": 6637,
+            "name": "VariableDeclaration",
+            "src": "1251:31:39"
+          },
+          {
+            "attributes": {
+              "constant": false,
+              "functionSelector": "dfbf9def",
+              "mutability": "mutable",
+              "name": "stakeInfos",
+              "scope": 6714,
+              "stateVariable": true,
+              "storageLocation": "default",
+              "type": "mapping(address => struct LibTokenStake1.StakeInfo)",
+              "visibility": "public"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "type": "mapping(address => struct LibTokenStake1.StakeInfo)"
+                },
+                "children": [
+                  {
+                    "attributes": {
+                      "name": "address",
+                      "type": "address"
+                    },
+                    "id": 6639,
+                    "name": "ElementaryTypeName",
+                    "src": "1348:7:39"
+                  },
+                  {
+                    "attributes": {
+                      "name": "LibTokenStake1.StakeInfo",
+                      "referencedDeclaration": 2895,
+                      "type": "struct LibTokenStake1.StakeInfo"
+                    },
+                    "id": 6640,
+                    "name": "UserDefinedTypeName",
+                    "src": "1359:24:39"
+                  }
+                ],
+                "id": 6641,
+                "name": "Mapping",
+                "src": "1340:44:39"
+              },
+              {
+                "attributes": {
+                  "text": "@dev the information of the stake contract"
+                },
+                "id": 6638,
+                "name": "StructuredDocumentation",
+                "src": "1289:46:39"
+              }
+            ],
+            "id": 6642,
+            "name": "VariableDeclaration",
+            "src": "1340:62:39"
+          },
+          {
+            "attributes": {
+              "constant": false,
+              "functionSelector": "153099d0",
+              "mutability": "mutable",
+              "name": "orderedEndBlocks",
+              "scope": 6714,
+              "stateVariable": true,
+              "storageLocation": "default",
+              "type": "uint256[]",
+              "visibility": "public"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "type": "uint256[]"
+                },
+                "children": [
+                  {
+                    "attributes": {
+                      "name": "uint256",
+                      "type": "uint256"
+                    },
+                    "id": 6644,
+                    "name": "ElementaryTypeName",
+                    "src": "1494:7:39"
+                  }
+                ],
+                "id": 6645,
+                "name": "ArrayTypeName",
+                "src": "1494:9:39"
+              },
+              {
+                "attributes": {
+                  "text": "@dev the end blocks of the stake contracts, which must be in ascending order"
+                },
+                "id": 6643,
+                "name": "StructuredDocumentation",
+                "src": "1409:80:39"
+              }
+            ],
+            "id": 6646,
+            "name": "VariableDeclaration",
+            "src": "1494:33:39"
+          },
+          {
+            "attributes": {
+              "constant": false,
+              "functionSelector": "5f1bd62a",
+              "mutability": "mutable",
+              "name": "stakeEndBlockTotal",
+              "scope": 6714,
+              "stateVariable": true,
+              "storageLocation": "default",
+              "type": "mapping(uint256 => uint256)",
+              "visibility": "public"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "type": "mapping(uint256 => uint256)"
+                },
+                "children": [
+                  {
+                    "attributes": {
+                      "name": "uint256",
+                      "type": "uint256"
+                    },
+                    "id": 6648,
+                    "name": "ElementaryTypeName",
+                    "src": "1624:7:39"
+                  },
+                  {
+                    "attributes": {
+                      "name": "uint256",
+                      "type": "uint256"
+                    },
+                    "id": 6649,
+                    "name": "ElementaryTypeName",
+                    "src": "1635:7:39"
+                  }
+                ],
+                "id": 6650,
+                "name": "Mapping",
+                "src": "1616:27:39"
+              },
+              {
+                "attributes": {
+                  "text": "@dev the total staked amount stored at orderedEndBlock’s end block time"
+                },
+                "id": 6647,
+                "name": "StructuredDocumentation",
+                "src": "1534:77:39"
+              }
+            ],
+            "id": 6651,
+            "name": "VariableDeclaration",
+            "src": "1616:53:39"
+          },
+          {
+            "attributes": {
+              "constant": false,
+              "mutability": "mutable",
+              "name": "_lock",
+              "scope": 6714,
+              "stateVariable": true,
+              "storageLocation": "default",
+              "type": "uint256",
+              "visibility": "private"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "name": "uint256",
+                  "type": "uint256"
+                },
+                "id": 6652,
+                "name": "ElementaryTypeName",
+                "src": "1676:7:39"
+              }
+            ],
+            "id": 6653,
+            "name": "VariableDeclaration",
+            "src": "1676:21:39"
+          },
+          {
+            "attributes": {
+              "name": "onlyOwner",
+              "virtual": false,
+              "visibility": "internal"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 6654,
+                "name": "ParameterList",
+                "src": "1722:2:39"
+              },
+              {
+                "children": [
+                  {
+                    "children": [
+                      {
+                        "attributes": {
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "isStructConstructorCall": false,
+                          "lValueRequested": false,
+                          "names": [
+                            null
+                          ],
+                          "tryCall": false,
+                          "type": "tuple()",
+                          "type_conversion": false
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "argumentTypes": [
+                                {
+                                  "typeIdentifier": "t_bool",
+                                  "typeString": "bool"
+                                },
+                                {
+                                  "typeIdentifier": "t_stringliteral_021ca121587b88ebc25bfc126f50336cf11b939e4022014351a7071623318f10",
+                                  "typeString": "literal_string \"StakeVaultStorage: Caller is not an admin\""
+                                }
+                              ],
+                              "overloadedDeclarations": [
+                                4294967278,
+                                4294967278
+                              ],
+                              "referencedDeclaration": 4294967278,
+                              "type": "function (bool,string memory) pure",
+                              "value": "require"
+                            },
+                            "id": 6655,
+                            "name": "Identifier",
+                            "src": "1735:7:39"
+                          },
+                          {
+                            "attributes": {
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": false,
+                              "isStructConstructorCall": false,
+                              "lValueRequested": false,
+                              "names": [
+                                null
+                              ],
+                              "tryCall": false,
+                              "type": "bool",
+                              "type_conversion": false
+                            },
+                            "children": [
+                              {
+                                "attributes": {
+                                  "argumentTypes": [
+                                    {
+                                      "typeIdentifier": "t_bytes32",
+                                      "typeString": "bytes32"
+                                    },
+                                    {
+                                      "typeIdentifier": "t_address_payable",
+                                      "typeString": "address payable"
+                                    }
+                                  ],
+                                  "overloadedDeclarations": [
+                                    null
+                                  ],
+                                  "referencedDeclaration": 7032,
+                                  "type": "function (bytes32,address) view returns (bool)",
+                                  "value": "hasRole"
+                                },
+                                "id": 6656,
+                                "name": "Identifier",
+                                "src": "1756:7:39"
+                              },
+                              {
+                                "attributes": {
+                                  "overloadedDeclarations": [
+                                    null
+                                  ],
+                                  "referencedDeclaration": 6600,
+                                  "type": "bytes32",
+                                  "value": "ADMIN_ROLE"
+                                },
+                                "id": 6657,
+                                "name": "Identifier",
+                                "src": "1764:10:39"
+                              },
+                              {
+                                "attributes": {
+                                  "isConstant": false,
+                                  "isLValue": false,
+                                  "isPure": false,
+                                  "lValueRequested": false,
+                                  "member_name": "sender",
+                                  "type": "address payable"
+                                },
+                                "children": [
+                                  {
+                                    "attributes": {
+                                      "overloadedDeclarations": [
+                                        null
+                                      ],
+                                      "referencedDeclaration": 4294967281,
+                                      "type": "msg",
+                                      "value": "msg"
+                                    },
+                                    "id": 6658,
+                                    "name": "Identifier",
+                                    "src": "1776:3:39"
+                                  }
+                                ],
+                                "id": 6659,
+                                "name": "MemberAccess",
+                                "src": "1776:10:39"
+                              }
+                            ],
+                            "id": 6660,
+                            "name": "FunctionCall",
+                            "src": "1756:31:39"
+                          },
+                          {
+                            "attributes": {
+                              "hexvalue": "5374616b655661756c7453746f726167653a2043616c6c6572206973206e6f7420616e2061646d696e",
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": true,
+                              "lValueRequested": false,
+                              "token": "string",
+                              "type": "literal_string \"StakeVaultStorage: Caller is not an admin\"",
+                              "value": "StakeVaultStorage: Caller is not an admin"
+                            },
+                            "id": 6661,
+                            "name": "Literal",
+                            "src": "1801:43:39"
+                          }
+                        ],
+                        "id": 6662,
+                        "name": "FunctionCall",
+                        "src": "1735:119:39"
+                      }
+                    ],
+                    "id": 6663,
+                    "name": "ExpressionStatement",
+                    "src": "1735:119:39"
+                  },
+                  {
+                    "id": 6664,
+                    "name": "PlaceholderStatement",
+                    "src": "1864:1:39"
+                  }
+                ],
+                "id": 6665,
+                "name": "Block",
+                "src": "1725:147:39"
+              }
+            ],
+            "id": 6666,
+            "name": "ModifierDefinition",
+            "src": "1704:168:39"
+          },
+          {
+            "attributes": {
+              "name": "lock",
+              "virtual": false,
+              "visibility": "internal"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 6667,
+                "name": "ParameterList",
+                "src": "1891:2:39"
+              },
+              {
+                "children": [
+                  {
+                    "children": [
+                      {
+                        "attributes": {
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "isStructConstructorCall": false,
+                          "lValueRequested": false,
+                          "names": [
+                            null
+                          ],
+                          "tryCall": false,
+                          "type": "tuple()",
+                          "type_conversion": false
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "argumentTypes": [
+                                {
+                                  "typeIdentifier": "t_bool",
+                                  "typeString": "bool"
+                                },
+                                {
+                                  "typeIdentifier": "t_stringliteral_a952b2657fd79b201839de8a36d65ea13d6329a6de3f4dbcd1ab033219682fa7",
+                                  "typeString": "literal_string \"Stake1Vault: LOCKED\""
+                                }
+                              ],
+                              "overloadedDeclarations": [
+                                4294967278,
+                                4294967278
+                              ],
+                              "referencedDeclaration": 4294967278,
+                              "type": "function (bool,string memory) pure",
+                              "value": "require"
+                            },
+                            "id": 6668,
+                            "name": "Identifier",
+                            "src": "1904:7:39"
+                          },
+                          {
+                            "attributes": {
+                              "commonType": {
+                                "typeIdentifier": "t_uint256",
+                                "typeString": "uint256"
+                              },
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": false,
+                              "lValueRequested": false,
+                              "operator": "==",
+                              "type": "bool"
+                            },
+                            "children": [
+                              {
+                                "attributes": {
+                                  "overloadedDeclarations": [
+                                    null
+                                  ],
+                                  "referencedDeclaration": 6653,
+                                  "type": "uint256",
+                                  "value": "_lock"
+                                },
+                                "id": 6669,
+                                "name": "Identifier",
+                                "src": "1912:5:39"
+                              },
+                              {
+                                "attributes": {
+                                  "hexvalue": "30",
+                                  "isConstant": false,
+                                  "isLValue": false,
+                                  "isPure": true,
+                                  "lValueRequested": false,
+                                  "token": "number",
+                                  "type": "int_const 0",
+                                  "value": "0"
+                                },
+                                "id": 6670,
+                                "name": "Literal",
+                                "src": "1921:1:39"
+                              }
+                            ],
+                            "id": 6671,
+                            "name": "BinaryOperation",
+                            "src": "1912:10:39"
+                          },
+                          {
+                            "attributes": {
+                              "hexvalue": "5374616b65315661756c743a204c4f434b4544",
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": true,
+                              "lValueRequested": false,
+                              "token": "string",
+                              "type": "literal_string \"Stake1Vault: LOCKED\"",
+                              "value": "Stake1Vault: LOCKED"
+                            },
+                            "id": 6672,
+                            "name": "Literal",
+                            "src": "1924:21:39"
+                          }
+                        ],
+                        "id": 6673,
+                        "name": "FunctionCall",
+                        "src": "1904:42:39"
+                      }
+                    ],
+                    "id": 6674,
+                    "name": "ExpressionStatement",
+                    "src": "1904:42:39"
+                  },
+                  {
+                    "children": [
+                      {
+                        "attributes": {
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "lValueRequested": false,
+                          "operator": "=",
+                          "type": "uint256"
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "overloadedDeclarations": [
+                                null
+                              ],
+                              "referencedDeclaration": 6653,
+                              "type": "uint256",
+                              "value": "_lock"
+                            },
+                            "id": 6675,
+                            "name": "Identifier",
+                            "src": "1956:5:39"
+                          },
+                          {
+                            "attributes": {
+                              "hexvalue": "31",
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": true,
+                              "lValueRequested": false,
+                              "token": "number",
+                              "type": "int_const 1",
+                              "value": "1"
+                            },
+                            "id": 6676,
+                            "name": "Literal",
+                            "src": "1964:1:39"
+                          }
+                        ],
+                        "id": 6677,
+                        "name": "Assignment",
+                        "src": "1956:9:39"
+                      }
+                    ],
+                    "id": 6678,
+                    "name": "ExpressionStatement",
+                    "src": "1956:9:39"
+                  },
+                  {
+                    "id": 6679,
+                    "name": "PlaceholderStatement",
+                    "src": "1975:1:39"
+                  },
+                  {
+                    "children": [
+                      {
+                        "attributes": {
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "lValueRequested": false,
+                          "operator": "=",
+                          "type": "uint256"
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "overloadedDeclarations": [
+                                null
+                              ],
+                              "referencedDeclaration": 6653,
+                              "type": "uint256",
+                              "value": "_lock"
+                            },
+                            "id": 6680,
+                            "name": "Identifier",
+                            "src": "1986:5:39"
+                          },
+                          {
+                            "attributes": {
+                              "hexvalue": "30",
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": true,
+                              "lValueRequested": false,
+                              "token": "number",
+                              "type": "int_const 0",
+                              "value": "0"
+                            },
+                            "id": 6681,
+                            "name": "Literal",
+                            "src": "1994:1:39"
+                          }
+                        ],
+                        "id": 6682,
+                        "name": "Assignment",
+                        "src": "1986:9:39"
+                      }
+                    ],
+                    "id": 6683,
+                    "name": "ExpressionStatement",
+                    "src": "1986:9:39"
+                  }
+                ],
+                "id": 6684,
+                "name": "Block",
+                "src": "1894:108:39"
+              }
+            ],
+            "id": 6685,
+            "name": "ModifierDefinition",
+            "src": "1878:124:39"
+          },
+          {
+            "attributes": {
+              "functionSelector": "f2fde38b",
+              "implemented": true,
+              "isConstructor": false,
+              "kind": "function",
+              "name": "transferOwnership",
+              "scope": 6714,
+              "stateMutability": "nonpayable",
+              "virtual": false,
+              "visibility": "external"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "text": "@dev transfer Ownership\n @param newOwner new owner address"
+                },
+                "id": 6686,
+                "name": "StructuredDocumentation",
+                "src": "2008:69:39"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "newOwner",
+                      "scope": 6713,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "address",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "address",
+                          "stateMutability": "nonpayable",
+                          "type": "address"
+                        },
+                        "id": 6687,
+                        "name": "ElementaryTypeName",
+                        "src": "2109:7:39"
+                      }
+                    ],
+                    "id": 6688,
+                    "name": "VariableDeclaration",
+                    "src": "2109:16:39"
+                  }
+                ],
+                "id": 6689,
+                "name": "ParameterList",
+                "src": "2108:18:39"
+              },
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 6692,
+                "name": "ParameterList",
+                "src": "2146:0:39"
+              },
+              {
+                "attributes": {},
+                "children": [
+                  {
+                    "attributes": {
+                      "overloadedDeclarations": [
+                        null
+                      ],
+                      "referencedDeclaration": 6666,
+                      "type": "modifier ()",
+                      "value": "onlyOwner"
+                    },
+                    "id": 6690,
+                    "name": "Identifier",
+                    "src": "2136:9:39"
+                  }
+                ],
+                "id": 6691,
+                "name": "ModifierInvocation",
+                "src": "2136:9:39"
+              },
+              {
+                "children": [
+                  {
+                    "children": [
+                      {
+                        "attributes": {
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "isStructConstructorCall": false,
+                          "lValueRequested": false,
+                          "names": [
+                            null
+                          ],
+                          "tryCall": false,
+                          "type": "tuple()",
+                          "type_conversion": false
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "argumentTypes": [
+                                {
+                                  "typeIdentifier": "t_bool",
+                                  "typeString": "bool"
+                                },
+                                {
+                                  "typeIdentifier": "t_stringliteral_aabf681a6f707af910c8b303634ea853f9b551aa429ab25ab7741894cf9447a3",
+                                  "typeString": "literal_string \"StakeVaultStorage: same owner\""
+                                }
+                              ],
+                              "overloadedDeclarations": [
+                                4294967278,
+                                4294967278
+                              ],
+                              "referencedDeclaration": 4294967278,
+                              "type": "function (bool,string memory) pure",
+                              "value": "require"
+                            },
+                            "id": 6693,
+                            "name": "Identifier",
+                            "src": "2156:7:39"
+                          },
+                          {
+                            "attributes": {
+                              "commonType": {
+                                "typeIdentifier": "t_address",
+                                "typeString": "address"
+                              },
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": false,
+                              "lValueRequested": false,
+                              "operator": "!=",
+                              "type": "bool"
+                            },
+                            "children": [
+                              {
+                                "attributes": {
+                                  "isConstant": false,
+                                  "isLValue": false,
+                                  "isPure": false,
+                                  "lValueRequested": false,
+                                  "member_name": "sender",
+                                  "type": "address payable"
+                                },
+                                "children": [
+                                  {
+                                    "attributes": {
+                                      "overloadedDeclarations": [
+                                        null
+                                      ],
+                                      "referencedDeclaration": 4294967281,
+                                      "type": "msg",
+                                      "value": "msg"
+                                    },
+                                    "id": 6694,
+                                    "name": "Identifier",
+                                    "src": "2164:3:39"
+                                  }
+                                ],
+                                "id": 6695,
+                                "name": "MemberAccess",
+                                "src": "2164:10:39"
+                              },
+                              {
+                                "attributes": {
+                                  "overloadedDeclarations": [
+                                    null
+                                  ],
+                                  "referencedDeclaration": 6688,
+                                  "type": "address",
+                                  "value": "newOwner"
+                                },
+                                "id": 6696,
+                                "name": "Identifier",
+                                "src": "2178:8:39"
+                              }
+                            ],
+                            "id": 6697,
+                            "name": "BinaryOperation",
+                            "src": "2164:22:39"
+                          },
+                          {
+                            "attributes": {
+                              "hexvalue": "5374616b655661756c7453746f726167653a2073616d65206f776e6572",
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": true,
+                              "lValueRequested": false,
+                              "token": "string",
+                              "type": "literal_string \"StakeVaultStorage: same owner\"",
+                              "value": "StakeVaultStorage: same owner"
+                            },
+                            "id": 6698,
+                            "name": "Literal",
+                            "src": "2188:31:39"
+                          }
+                        ],
+                        "id": 6699,
+                        "name": "FunctionCall",
+                        "src": "2156:64:39"
+                      }
+                    ],
+                    "id": 6700,
+                    "name": "ExpressionStatement",
+                    "src": "2156:64:39"
+                  },
+                  {
+                    "children": [
+                      {
+                        "attributes": {
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "isStructConstructorCall": false,
+                          "lValueRequested": false,
+                          "names": [
+                            null
+                          ],
+                          "tryCall": false,
+                          "type": "tuple()",
+                          "type_conversion": false
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "argumentTypes": [
+                                {
+                                  "typeIdentifier": "t_bytes32",
+                                  "typeString": "bytes32"
+                                },
+                                {
+                                  "typeIdentifier": "t_address",
+                                  "typeString": "address"
+                                }
+                              ],
+                              "overloadedDeclarations": [
+                                null
+                              ],
+                              "referencedDeclaration": 7107,
+                              "type": "function (bytes32,address)",
+                              "value": "grantRole"
+                            },
+                            "id": 6701,
+                            "name": "Identifier",
+                            "src": "2230:9:39"
+                          },
+                          {
+                            "attributes": {
+                              "overloadedDeclarations": [
+                                null
+                              ],
+                              "referencedDeclaration": 6600,
+                              "type": "bytes32",
+                              "value": "ADMIN_ROLE"
+                            },
+                            "id": 6702,
+                            "name": "Identifier",
+                            "src": "2240:10:39"
+                          },
+                          {
+                            "attributes": {
+                              "overloadedDeclarations": [
+                                null
+                              ],
+                              "referencedDeclaration": 6688,
+                              "type": "address",
+                              "value": "newOwner"
+                            },
+                            "id": 6703,
+                            "name": "Identifier",
+                            "src": "2252:8:39"
+                          }
+                        ],
+                        "id": 6704,
+                        "name": "FunctionCall",
+                        "src": "2230:31:39"
+                      }
+                    ],
+                    "id": 6705,
+                    "name": "ExpressionStatement",
+                    "src": "2230:31:39"
+                  },
+                  {
+                    "children": [
+                      {
+                        "attributes": {
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "isStructConstructorCall": false,
+                          "lValueRequested": false,
+                          "names": [
+                            null
+                          ],
+                          "tryCall": false,
+                          "type": "tuple()",
+                          "type_conversion": false
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "argumentTypes": [
+                                {
+                                  "typeIdentifier": "t_bytes32",
+                                  "typeString": "bytes32"
+                                },
+                                {
+                                  "typeIdentifier": "t_address_payable",
+                                  "typeString": "address payable"
+                                }
+                              ],
+                              "overloadedDeclarations": [
+                                null
+                              ],
+                              "referencedDeclaration": 7133,
+                              "type": "function (bytes32,address)",
+                              "value": "revokeRole"
+                            },
+                            "id": 6706,
+                            "name": "Identifier",
+                            "src": "2271:10:39"
+                          },
+                          {
+                            "attributes": {
+                              "overloadedDeclarations": [
+                                null
+                              ],
+                              "referencedDeclaration": 6600,
+                              "type": "bytes32",
+                              "value": "ADMIN_ROLE"
+                            },
+                            "id": 6707,
+                            "name": "Identifier",
+                            "src": "2282:10:39"
+                          },
+                          {
+                            "attributes": {
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": false,
+                              "lValueRequested": false,
+                              "member_name": "sender",
+                              "type": "address payable"
+                            },
+                            "children": [
+                              {
+                                "attributes": {
+                                  "overloadedDeclarations": [
+                                    null
+                                  ],
+                                  "referencedDeclaration": 4294967281,
+                                  "type": "msg",
+                                  "value": "msg"
+                                },
+                                "id": 6708,
+                                "name": "Identifier",
+                                "src": "2294:3:39"
+                              }
+                            ],
+                            "id": 6709,
+                            "name": "MemberAccess",
+                            "src": "2294:10:39"
+                          }
+                        ],
+                        "id": 6710,
+                        "name": "FunctionCall",
+                        "src": "2271:34:39"
+                      }
+                    ],
+                    "id": 6711,
+                    "name": "ExpressionStatement",
+                    "src": "2271:34:39"
+                  }
+                ],
+                "id": 6712,
+                "name": "Block",
+                "src": "2146:166:39"
+              }
+            ],
+            "id": 6713,
+            "name": "FunctionDefinition",
+            "src": "2082:230:39"
+          }
+        ],
+        "id": 6714,
+        "name": "ContractDefinition",
+        "src": "257:2057:39"
+      }
+    ],
+    "id": 6715,
+    "name": "SourceUnit",
+    "src": "37:2278:39"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.7.6+commit.7338295f.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "3.3.4",
+  "updatedAt": "2021-06-04T15:23:33.937Z",
+  "devdoc": {
+    "kind": "dev",
+    "methods": {
+      "getRoleAdmin(bytes32)": {
+        "details": "Returns the admin role that controls `role`. See {grantRole} and {revokeRole}. To change a role's admin, use {_setRoleAdmin}."
+      },
+      "getRoleMember(bytes32,uint256)": {
+        "details": "Returns one of the accounts that have `role`. `index` must be a value between 0 and {getRoleMemberCount}, non-inclusive. Role bearers are not sorted in any particular way, and their ordering may change at any point. WARNING: When using {getRoleMember} and {getRoleMemberCount}, make sure you perform all queries on the same block. See the following https://forum.openzeppelin.com/t/iterating-over-elements-on-enumerableset-in-openzeppelin-contracts/2296[forum post] for more information."
+      },
+      "getRoleMemberCount(bytes32)": {
+        "details": "Returns the number of accounts that have `role`. Can be used together with {getRoleMember} to enumerate all bearers of a role."
+      },
+      "grantRole(bytes32,address)": {
+        "details": "Grants `role` to `account`. If `account` had not been already granted `role`, emits a {RoleGranted} event. Requirements: - the caller must have ``role``'s admin role."
+      },
+      "hasRole(bytes32,address)": {
+        "details": "Returns `true` if `account` has been granted `role`."
+      },
+      "renounceRole(bytes32,address)": {
+        "details": "Revokes `role` from the calling account. Roles are often managed via {grantRole} and {revokeRole}: this function's purpose is to provide a mechanism for accounts to lose their privileges if they are compromised (such as when a trusted device is misplaced). If the calling account had been granted `role`, emits a {RoleRevoked} event. Requirements: - the caller must be `account`."
+      },
+      "revokeRole(bytes32,address)": {
+        "details": "Revokes `role` from `account`. If `account` had been granted `role`, emits a {RoleRevoked} event. Requirements: - the caller must have ``role``'s admin role."
+      },
+      "transferOwnership(address)": {
+        "details": "transfer Ownership",
+        "params": {
+          "newOwner": "new owner address"
+        }
+      }
+    },
+    "stateVariables": {
+      "blockTotalReward": {
+        "details": "reward amount per block"
+      },
+      "cap": {
+        "details": "allocated amount of fld"
+      },
+      "defiAddr": {
+        "details": "External contract address used when operating the staking amount"
+      },
+      "fld": {
+        "details": "reward token : FLD"
+      },
+      "orderedEndBlocks": {
+        "details": "the end blocks of the stake contracts, which must be in ascending order"
+      },
+      "paytoken": {
+        "details": "paytoken is the token that the user stakes."
+      },
+      "realEndBlock": {
+        "details": "the staking real end block."
+      },
+      "saleClosed": {
+        "details": "sale closed flag"
+      },
+      "saleStartBlock": {
+        "details": "the start block for sale."
+      },
+      "stakeAddresses": {
+        "details": "a list of stakeContracts maintained by the vault"
+      },
+      "stakeEndBlock": {
+        "details": "the staking end block."
+      },
+      "stakeEndBlockTotal": {
+        "details": "the total staked amount stored at orderedEndBlock’s end block time"
+      },
+      "stakeInfos": {
+        "details": "the information of the stake contract"
+      },
+      "stakeStartBlock": {
+        "details": "the staking start block"
+      },
+      "stakeType": {
+        "details": "Operation type of staking amount"
+      }
+    },
+    "title": "the storage of StakeVaultStorage",
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {},
+    "version": 1
+  }
+}

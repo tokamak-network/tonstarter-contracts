@@ -2,11 +2,26 @@
 pragma solidity ^0.7.6;
 
 library LibTokenStake1 {
-    enum DefiStatus { NONE, APPROVE, DEPOSITED, REQUESTWITHDRAW, WITHDRAW, END }
-
+    enum DefiStatus {
+        NONE,
+        APPROVE,
+        DEPOSITED,
+        REQUESTWITHDRAW,
+        REQUESTWITHDRAWALL,
+        WITHDRAW,
+        END
+    }
+    struct DefiInfo {
+        string name;
+        address router;
+        address ext1;
+        address ext2;
+        uint256 fee;
+        address routerV2;
+    }
     struct StakeInfo {
         string name;
-        uint256 startBlcok;
+        uint256 startBlock;
         uint256 endBlock;
         uint256 balance;
         uint256 totalRewardAmount;
@@ -19,6 +34,7 @@ library LibTokenStake1 {
         uint256 claimedAmount;
         uint256 releasedBlock;
         uint256 releasedAmount;
+        uint256 releasedFLDAmount;
         bool released;
     }
 

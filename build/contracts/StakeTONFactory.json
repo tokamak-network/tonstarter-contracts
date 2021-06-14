@@ -1,0 +1,2619 @@
+{
+  "contractName": "StakeTONFactory",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_stakeTONProxyFactory",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "_stakeTONLogic",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "inputs": [],
+      "name": "stakeTONLogic",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "stakeTONProxyFactory",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address[4]",
+          "name": "_addr",
+          "type": "address[4]"
+        },
+        {
+          "internalType": "address",
+          "name": "_registry",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256[3]",
+          "name": "_intdata",
+          "type": "uint256[3]"
+        },
+        {
+          "internalType": "address",
+          "name": "owner",
+          "type": "address"
+        }
+      ],
+      "name": "create",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "metadata": "{\"compiler\":{\"version\":\"0.7.6+commit.7338295f\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_stakeTONProxyFactory\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_stakeTONLogic\",\"type\":\"address\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"inputs\":[{\"internalType\":\"address[4]\",\"name\":\"_addr\",\"type\":\"address[4]\"},{\"internalType\":\"address\",\"name\":\"_registry\",\"type\":\"address\"},{\"internalType\":\"uint256[3]\",\"name\":\"_intdata\",\"type\":\"uint256[3]\"},{\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"}],\"name\":\"create\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"stakeTONLogic\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"stakeTONProxyFactory\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{\"constructor\":{\"details\":\"constructor of StakeTONFactory\",\"params\":{\"_stakeTONLogic\":\"the StakeTONLogic address used in StakeTONFactory\",\"_stakeTONProxyFactory\":\"the StakeTONProxyFactory address used in StakeTONFactory\"}},\"create(address[4],address,uint256[3],address)\":{\"details\":\"Create a stake contract that can stake TON.\",\"params\":{\"_addr\":\"the array of [token, paytoken, vault, defiAddr]\",\"_intdata\":\"the array of [saleStartBlock, startBlock, periodBlocks]\",\"_registry\":\"the registry address\",\"owner\":\"owner address\"},\"returns\":{\"_0\":\"contract address\"}}},\"title\":\"A factory that creates a stake contract that can stake TON\",\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"/Users/zena/ico2.0/ico20-contracts/contracts/factory/StakeTONFactory.sol\":\"StakeTONFactory\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"/Users/zena/ico2.0/ico20-contracts/contracts/factory/StakeTONFactory.sol\":{\"keccak256\":\"0x885b9bacc7bb4bd72518bea97d5ce3be507420005dd7a28ad312817d6b0fbc78\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://7641c7f447aaf2d42c9f2b6f7cbd645dfebb69e6dac3e066cc8df728f479a42f\",\"dweb:/ipfs/QmUgKsGqUt7VtvLeDKFphx2VkoSqWxFww1trANoXjjyvsU\"]},\"/Users/zena/ico2.0/ico20-contracts/contracts/interfaces/IStakeTONFactory.sol\":{\"keccak256\":\"0xb3d7a05513c358f2eb094e729408a2326b56b0b5e42b4c55950499b23460c3f2\",\"license\":\"Unlicense\",\"urls\":[\"bzz-raw://0a695d596e1e6b436b600b50a6cad81be314696f33a7455b880487eb9bbfaa22\",\"dweb:/ipfs/QmNV4XTSP4rkV5SVvLyiSDyBVu4REvuPgXBjaR2U4cWTv8\"]},\"/Users/zena/ico2.0/ico20-contracts/contracts/interfaces/IStakeTONProxyFactory.sol\":{\"keccak256\":\"0x883eedc5b40ceea4dff541e8b26f1fb550afd503c2a561e10c8f21b77aab68de\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://585cf3e4d6b83c410b3a4046e283c708f2dad1171780eaf40b7a5ebf69dbee5f\",\"dweb:/ipfs/QmVwvheRLdoCg9hTxkqZnKC8uT1iXh3UW8Ff3xbAv4dmsy\"]}},\"version\":1}",
+  "bytecode": "0x608060405234801561001057600080fd5b506040516103ab3803806103ab8339818101604052604081101561003357600080fd5b5080516020909101516001600160a01b0382161580159061005c57506001600160a01b03811615155b6100ad576040805162461bcd60e51b815260206004820152601560248201527f5374616b65544f4e466163746f72793a207a65726f0000000000000000000000604482015290519081900360640190fd5b600080546001600160a01b039384166001600160a01b031991821617909155600180549290931691161790556102c3806100e86000396000f3fe608060405234801561001057600080fd5b50600436106100415760003560e01c80638a59d90a14610046578063ba3d30451461006a578063dd18f68f14610106575b600080fd5b61004e61010e565b604080516001600160a01b039092168252519081900360200190f35b61004e600480360361012081101561008157600080fd5b81019080806080019060048060200260405190810160405280929190826004602002808284376000920191909152505060408051606081810190925292956001600160a01b0385351695909490936080820193509160209091019060039083908390808284376000920191909152509194505050356001600160a01b0316905061011d565b61004e61027e565b6000546001600160a01b031681565b6000805460015460405163afd0239d60e01b81526001600160a01b03918216600482018181528594939093169263afd0239d928a918a918a918a916024018560808083838e5b8381101561017b578181015183820152602001610163565b50505050905001846001600160a01b0316815260200183600360200280838360005b838110156101b557818101518382015260200161019d565b50505050905001826001600160a01b0316815260200195505050505050602060405180830381600087803b1580156101ec57600080fd5b505af1158015610200573d6000803e3d6000fd5b505050506040513d602081101561021657600080fd5b505190506001600160a01b038116610275576040805162461bcd60e51b815260206004820152601b60248201527f5374616b65544f4e466163746f72793a2070726f7879207a65726f0000000000604482015290519081900360640190fd5b95945050505050565b6001546001600160a01b03168156fea2646970667358221220f30814cce1d0643736ca71a7f6a78b78eb17a4e389bde467c1ca0e801259f33b64736f6c63430007060033",
+  "deployedBytecode": "0x608060405234801561001057600080fd5b50600436106100415760003560e01c80638a59d90a14610046578063ba3d30451461006a578063dd18f68f14610106575b600080fd5b61004e61010e565b604080516001600160a01b039092168252519081900360200190f35b61004e600480360361012081101561008157600080fd5b81019080806080019060048060200260405190810160405280929190826004602002808284376000920191909152505060408051606081810190925292956001600160a01b0385351695909490936080820193509160209091019060039083908390808284376000920191909152509194505050356001600160a01b0316905061011d565b61004e61027e565b6000546001600160a01b031681565b6000805460015460405163afd0239d60e01b81526001600160a01b03918216600482018181528594939093169263afd0239d928a918a918a918a916024018560808083838e5b8381101561017b578181015183820152602001610163565b50505050905001846001600160a01b0316815260200183600360200280838360005b838110156101b557818101518382015260200161019d565b50505050905001826001600160a01b0316815260200195505050505050602060405180830381600087803b1580156101ec57600080fd5b505af1158015610200573d6000803e3d6000fd5b505050506040513d602081101561021657600080fd5b505190506001600160a01b038116610275576040805162461bcd60e51b815260206004820152601b60248201527f5374616b65544f4e466163746f72793a2070726f7879207a65726f0000000000604482015290519081900360640190fd5b95945050505050565b6001546001600160a01b03168156fea2646970667358221220f30814cce1d0643736ca71a7f6a78b78eb17a4e389bde467c1ca0e801259f33b64736f6c63430007060033",
+  "immutableReferences": {},
+  "generatedSources": [],
+  "deployedGeneratedSources": [],
+  "sourceMap": "223:1497:3:-:0;;;568:313;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;568:313:3;;;;;;;-1:-1:-1;;;;;666:35:3;;;;;;:67;;-1:-1:-1;;;;;;705:28:3;;;;666:67;645:135;;;;;-1:-1:-1;;;645:135:3;;;;;;;;;;;;;;;;;;;;;;;;;;;;790:20;:44;;-1:-1:-1;;;;;790:44:3;;;-1:-1:-1;;;;;;790:44:3;;;;;;;;844:30;;;;;;;;;;;223:1497;;;;;;",
+  "deployedSourceMap": "223:1497:3:-:0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;274:35;;;:::i;:::-;;;;-1:-1:-1;;;;;274:35:3;;;;;;;;;;;;;;1209:509;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;;1209:509:3;;;;;;;;;;;;-1:-1:-1;;;;;1209:509:3;;;;;;;;;;;;-1:-1:-1;1209:509:3;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;1209:509:3;;-1:-1:-1;;;1209:509:3;-1:-1:-1;;;;;1209:509:3;;-1:-1:-1;1209:509:3;:::i;315:28::-;;;:::i;274:35::-;;;-1:-1:-1;;;;;274:35:3;;:::o;1209:509::-;1377:7;1446:20;;;1492:13;1424:194;;-1:-1:-1;;;1424:194:3;;-1:-1:-1;;;;;1492:13:3;;;1424:194;;;;;;1377:7;;1446:20;;;;;1424:50;;1523:5;;1546:9;;1573:8;;1599:5;;1424:194;;1523:5;1424:194;;;1523:5;1377:7;1424:194;;;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;;;;;1424:194:3;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;;;;;1424:194:3;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;1424:194:3;;-1:-1:-1;;;;;;1637:19:3;;1629:59;;;;;-1:-1:-1;;;1629:59:3;;;;;;;;;;;;;;;;;;;;;;;;;;;;1706:5;1209:509;-1:-1:-1;;;;;1209:509:3:o;315:28::-;;;-1:-1:-1;;;;;315:28:3;;:::o",
+  "source": "// SPDX-License-Identifier: MIT\npragma solidity ^0.7.6;\n\nimport \"../interfaces/IStakeTONFactory.sol\";\nimport \"../interfaces/IStakeTONProxyFactory.sol\";\n\n/// @title A factory that creates a stake contract that can stake TON\ncontract StakeTONFactory is IStakeTONFactory {\n    address public stakeTONProxyFactory;\n    address public stakeTONLogic;\n\n    /// @dev constructor of StakeTONFactory\n    /// @param _stakeTONProxyFactory the StakeTONProxyFactory address used in StakeTONFactory\n    /// @param _stakeTONLogic the StakeTONLogic address used in StakeTONFactory\n    constructor(address _stakeTONProxyFactory, address _stakeTONLogic) {\n        require(\n            _stakeTONProxyFactory != address(0) && _stakeTONLogic != address(0),\n            \"StakeTONFactory: zero\"\n        );\n        stakeTONProxyFactory = _stakeTONProxyFactory;\n        stakeTONLogic = _stakeTONLogic;\n    }\n\n    /// @dev Create a stake contract that can stake TON.\n    /// @param _addr the array of [token, paytoken, vault, defiAddr]\n    /// @param _registry  the registry address\n    /// @param _intdata the array of [saleStartBlock, startBlock, periodBlocks]\n    /// @param owner  owner address\n    /// @return contract address\n    function create(\n        address[4] memory _addr,\n        address _registry,\n        uint256[3] memory _intdata,\n        address owner\n    ) external override returns (address) {\n        address proxy =\n            IStakeTONProxyFactory(stakeTONProxyFactory).deploy(\n                stakeTONLogic,\n                _addr,\n                _registry,\n                _intdata,\n                owner\n            );\n\n        require(proxy != address(0), \"StakeTONFactory: proxy zero\");\n\n        return proxy;\n    }\n}\n",
+  "sourcePath": "/Users/zena/ico2.0/ico20-contracts/contracts/factory/StakeTONFactory.sol",
+  "ast": {
+    "absolutePath": "/Users/zena/ico2.0/ico20-contracts/contracts/factory/StakeTONFactory.sol",
+    "exportedSymbols": {
+      "IStakeTONFactory": [
+        2795
+      ],
+      "IStakeTONProxyFactory": [
+        2818
+      ],
+      "StakeTONFactory": [
+        1797
+      ]
+    },
+    "id": 1798,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 1708,
+        "literals": [
+          "solidity",
+          "^",
+          "0.7",
+          ".6"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "32:23:3"
+      },
+      {
+        "absolutePath": "/Users/zena/ico2.0/ico20-contracts/contracts/interfaces/IStakeTONFactory.sol",
+        "file": "../interfaces/IStakeTONFactory.sol",
+        "id": 1709,
+        "nodeType": "ImportDirective",
+        "scope": 1798,
+        "sourceUnit": 2796,
+        "src": "57:44:3",
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "absolutePath": "/Users/zena/ico2.0/ico20-contracts/contracts/interfaces/IStakeTONProxyFactory.sol",
+        "file": "../interfaces/IStakeTONProxyFactory.sol",
+        "id": 1710,
+        "nodeType": "ImportDirective",
+        "scope": 1798,
+        "sourceUnit": 2819,
+        "src": "102:49:3",
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "abstract": false,
+        "baseContracts": [
+          {
+            "baseName": {
+              "id": 1712,
+              "name": "IStakeTONFactory",
+              "nodeType": "UserDefinedTypeName",
+              "referencedDeclaration": 2795,
+              "src": "251:16:3",
+              "typeDescriptions": {
+                "typeIdentifier": "t_contract$_IStakeTONFactory_$2795",
+                "typeString": "contract IStakeTONFactory"
+              }
+            },
+            "id": 1713,
+            "nodeType": "InheritanceSpecifier",
+            "src": "251:16:3"
+          }
+        ],
+        "contractDependencies": [
+          2795
+        ],
+        "contractKind": "contract",
+        "documentation": {
+          "id": 1711,
+          "nodeType": "StructuredDocumentation",
+          "src": "153:70:3",
+          "text": "@title A factory that creates a stake contract that can stake TON"
+        },
+        "fullyImplemented": true,
+        "id": 1797,
+        "linearizedBaseContracts": [
+          1797,
+          2795
+        ],
+        "name": "StakeTONFactory",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "constant": false,
+            "functionSelector": "8a59d90a",
+            "id": 1715,
+            "mutability": "mutable",
+            "name": "stakeTONProxyFactory",
+            "nodeType": "VariableDeclaration",
+            "scope": 1797,
+            "src": "274:35:3",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_address",
+              "typeString": "address"
+            },
+            "typeName": {
+              "id": 1714,
+              "name": "address",
+              "nodeType": "ElementaryTypeName",
+              "src": "274:7:3",
+              "stateMutability": "nonpayable",
+              "typeDescriptions": {
+                "typeIdentifier": "t_address",
+                "typeString": "address"
+              }
+            },
+            "visibility": "public"
+          },
+          {
+            "constant": false,
+            "functionSelector": "dd18f68f",
+            "id": 1717,
+            "mutability": "mutable",
+            "name": "stakeTONLogic",
+            "nodeType": "VariableDeclaration",
+            "scope": 1797,
+            "src": "315:28:3",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_address",
+              "typeString": "address"
+            },
+            "typeName": {
+              "id": 1716,
+              "name": "address",
+              "nodeType": "ElementaryTypeName",
+              "src": "315:7:3",
+              "stateMutability": "nonpayable",
+              "typeDescriptions": {
+                "typeIdentifier": "t_address",
+                "typeString": "address"
+              }
+            },
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 1750,
+              "nodeType": "Block",
+              "src": "635:246:3",
+              "statements": [
+                {
+                  "expression": {
+                    "arguments": [
+                      {
+                        "commonType": {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        },
+                        "id": 1738,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "leftExpression": {
+                          "commonType": {
+                            "typeIdentifier": "t_address",
+                            "typeString": "address"
+                          },
+                          "id": 1731,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "lValueRequested": false,
+                          "leftExpression": {
+                            "id": 1726,
+                            "name": "_stakeTONProxyFactory",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 1720,
+                            "src": "666:21:3",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_address",
+                              "typeString": "address"
+                            }
+                          },
+                          "nodeType": "BinaryOperation",
+                          "operator": "!=",
+                          "rightExpression": {
+                            "arguments": [
+                              {
+                                "hexValue": "30",
+                                "id": 1729,
+                                "isConstant": false,
+                                "isLValue": false,
+                                "isPure": true,
+                                "kind": "number",
+                                "lValueRequested": false,
+                                "nodeType": "Literal",
+                                "src": "699:1:3",
+                                "typeDescriptions": {
+                                  "typeIdentifier": "t_rational_0_by_1",
+                                  "typeString": "int_const 0"
+                                },
+                                "value": "0"
+                              }
+                            ],
+                            "expression": {
+                              "argumentTypes": [
+                                {
+                                  "typeIdentifier": "t_rational_0_by_1",
+                                  "typeString": "int_const 0"
+                                }
+                              ],
+                              "id": 1728,
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": true,
+                              "lValueRequested": false,
+                              "nodeType": "ElementaryTypeNameExpression",
+                              "src": "691:7:3",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_type$_t_address_$",
+                                "typeString": "type(address)"
+                              },
+                              "typeName": {
+                                "id": 1727,
+                                "name": "address",
+                                "nodeType": "ElementaryTypeName",
+                                "src": "691:7:3",
+                                "typeDescriptions": {}
+                              }
+                            },
+                            "id": 1730,
+                            "isConstant": false,
+                            "isLValue": false,
+                            "isPure": true,
+                            "kind": "typeConversion",
+                            "lValueRequested": false,
+                            "names": [],
+                            "nodeType": "FunctionCall",
+                            "src": "691:10:3",
+                            "tryCall": false,
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_address_payable",
+                              "typeString": "address payable"
+                            }
+                          },
+                          "src": "666:35:3",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_bool",
+                            "typeString": "bool"
+                          }
+                        },
+                        "nodeType": "BinaryOperation",
+                        "operator": "&&",
+                        "rightExpression": {
+                          "commonType": {
+                            "typeIdentifier": "t_address",
+                            "typeString": "address"
+                          },
+                          "id": 1737,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "lValueRequested": false,
+                          "leftExpression": {
+                            "id": 1732,
+                            "name": "_stakeTONLogic",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 1722,
+                            "src": "705:14:3",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_address",
+                              "typeString": "address"
+                            }
+                          },
+                          "nodeType": "BinaryOperation",
+                          "operator": "!=",
+                          "rightExpression": {
+                            "arguments": [
+                              {
+                                "hexValue": "30",
+                                "id": 1735,
+                                "isConstant": false,
+                                "isLValue": false,
+                                "isPure": true,
+                                "kind": "number",
+                                "lValueRequested": false,
+                                "nodeType": "Literal",
+                                "src": "731:1:3",
+                                "typeDescriptions": {
+                                  "typeIdentifier": "t_rational_0_by_1",
+                                  "typeString": "int_const 0"
+                                },
+                                "value": "0"
+                              }
+                            ],
+                            "expression": {
+                              "argumentTypes": [
+                                {
+                                  "typeIdentifier": "t_rational_0_by_1",
+                                  "typeString": "int_const 0"
+                                }
+                              ],
+                              "id": 1734,
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": true,
+                              "lValueRequested": false,
+                              "nodeType": "ElementaryTypeNameExpression",
+                              "src": "723:7:3",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_type$_t_address_$",
+                                "typeString": "type(address)"
+                              },
+                              "typeName": {
+                                "id": 1733,
+                                "name": "address",
+                                "nodeType": "ElementaryTypeName",
+                                "src": "723:7:3",
+                                "typeDescriptions": {}
+                              }
+                            },
+                            "id": 1736,
+                            "isConstant": false,
+                            "isLValue": false,
+                            "isPure": true,
+                            "kind": "typeConversion",
+                            "lValueRequested": false,
+                            "names": [],
+                            "nodeType": "FunctionCall",
+                            "src": "723:10:3",
+                            "tryCall": false,
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_address_payable",
+                              "typeString": "address payable"
+                            }
+                          },
+                          "src": "705:28:3",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_bool",
+                            "typeString": "bool"
+                          }
+                        },
+                        "src": "666:67:3",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        }
+                      },
+                      {
+                        "hexValue": "5374616b65544f4e466163746f72793a207a65726f",
+                        "id": 1739,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": true,
+                        "kind": "string",
+                        "lValueRequested": false,
+                        "nodeType": "Literal",
+                        "src": "747:23:3",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_stringliteral_7285b9cc9a78d0d7d5455ec2084eaef93d5deb775ec0a2f2d5c500d345a8057a",
+                          "typeString": "literal_string \"StakeTONFactory: zero\""
+                        },
+                        "value": "StakeTONFactory: zero"
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        },
+                        {
+                          "typeIdentifier": "t_stringliteral_7285b9cc9a78d0d7d5455ec2084eaef93d5deb775ec0a2f2d5c500d345a8057a",
+                          "typeString": "literal_string \"StakeTONFactory: zero\""
+                        }
+                      ],
+                      "id": 1725,
+                      "name": "require",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [
+                        4294967278,
+                        4294967278
+                      ],
+                      "referencedDeclaration": 4294967278,
+                      "src": "645:7:3",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_require_pure$_t_bool_$_t_string_memory_ptr_$returns$__$",
+                        "typeString": "function (bool,string memory) pure"
+                      }
+                    },
+                    "id": 1740,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "645:135:3",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 1741,
+                  "nodeType": "ExpressionStatement",
+                  "src": "645:135:3"
+                },
+                {
+                  "expression": {
+                    "id": 1744,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "id": 1742,
+                      "name": "stakeTONProxyFactory",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 1715,
+                      "src": "790:20:3",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_address",
+                        "typeString": "address"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "=",
+                    "rightHandSide": {
+                      "id": 1743,
+                      "name": "_stakeTONProxyFactory",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 1720,
+                      "src": "813:21:3",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_address",
+                        "typeString": "address"
+                      }
+                    },
+                    "src": "790:44:3",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "id": 1745,
+                  "nodeType": "ExpressionStatement",
+                  "src": "790:44:3"
+                },
+                {
+                  "expression": {
+                    "id": 1748,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "id": 1746,
+                      "name": "stakeTONLogic",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 1717,
+                      "src": "844:13:3",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_address",
+                        "typeString": "address"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "=",
+                    "rightHandSide": {
+                      "id": 1747,
+                      "name": "_stakeTONLogic",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 1722,
+                      "src": "860:14:3",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_address",
+                        "typeString": "address"
+                      }
+                    },
+                    "src": "844:30:3",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "id": 1749,
+                  "nodeType": "ExpressionStatement",
+                  "src": "844:30:3"
+                }
+              ]
+            },
+            "documentation": {
+              "id": 1718,
+              "nodeType": "StructuredDocumentation",
+              "src": "350:213:3",
+              "text": "@dev constructor of StakeTONFactory\n @param _stakeTONProxyFactory the StakeTONProxyFactory address used in StakeTONFactory\n @param _stakeTONLogic the StakeTONLogic address used in StakeTONFactory"
+            },
+            "id": 1751,
+            "implemented": true,
+            "kind": "constructor",
+            "modifiers": [],
+            "name": "",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 1723,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1720,
+                  "mutability": "mutable",
+                  "name": "_stakeTONProxyFactory",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1751,
+                  "src": "580:29:3",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 1719,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "580:7:3",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 1722,
+                  "mutability": "mutable",
+                  "name": "_stakeTONLogic",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1751,
+                  "src": "611:22:3",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 1721,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "611:7:3",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "579:55:3"
+            },
+            "returnParameters": {
+              "id": 1724,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "635:0:3"
+            },
+            "scope": 1797,
+            "src": "568:313:3",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "public"
+          },
+          {
+            "baseFunctions": [
+              2794
+            ],
+            "body": {
+              "id": 1795,
+              "nodeType": "Block",
+              "src": "1386:332:3",
+              "statements": [
+                {
+                  "assignments": [
+                    1771
+                  ],
+                  "declarations": [
+                    {
+                      "constant": false,
+                      "id": 1771,
+                      "mutability": "mutable",
+                      "name": "proxy",
+                      "nodeType": "VariableDeclaration",
+                      "scope": 1795,
+                      "src": "1396:13:3",
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_address",
+                        "typeString": "address"
+                      },
+                      "typeName": {
+                        "id": 1770,
+                        "name": "address",
+                        "nodeType": "ElementaryTypeName",
+                        "src": "1396:7:3",
+                        "stateMutability": "nonpayable",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      },
+                      "visibility": "internal"
+                    }
+                  ],
+                  "id": 1782,
+                  "initialValue": {
+                    "arguments": [
+                      {
+                        "id": 1776,
+                        "name": "stakeTONLogic",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 1717,
+                        "src": "1492:13:3",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      },
+                      {
+                        "id": 1777,
+                        "name": "_addr",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 1756,
+                        "src": "1523:5:3",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_array$_t_address_$4_memory_ptr",
+                          "typeString": "address[4] memory"
+                        }
+                      },
+                      {
+                        "id": 1778,
+                        "name": "_registry",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 1758,
+                        "src": "1546:9:3",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      },
+                      {
+                        "id": 1779,
+                        "name": "_intdata",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 1762,
+                        "src": "1573:8:3",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_array$_t_uint256_$3_memory_ptr",
+                          "typeString": "uint256[3] memory"
+                        }
+                      },
+                      {
+                        "id": 1780,
+                        "name": "owner",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 1764,
+                        "src": "1599:5:3",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        },
+                        {
+                          "typeIdentifier": "t_array$_t_address_$4_memory_ptr",
+                          "typeString": "address[4] memory"
+                        },
+                        {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        },
+                        {
+                          "typeIdentifier": "t_array$_t_uint256_$3_memory_ptr",
+                          "typeString": "uint256[3] memory"
+                        },
+                        {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      ],
+                      "expression": {
+                        "arguments": [
+                          {
+                            "id": 1773,
+                            "name": "stakeTONProxyFactory",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 1715,
+                            "src": "1446:20:3",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_address",
+                              "typeString": "address"
+                            }
+                          }
+                        ],
+                        "expression": {
+                          "argumentTypes": [
+                            {
+                              "typeIdentifier": "t_address",
+                              "typeString": "address"
+                            }
+                          ],
+                          "id": 1772,
+                          "name": "IStakeTONProxyFactory",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 2818,
+                          "src": "1424:21:3",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_type$_t_contract$_IStakeTONProxyFactory_$2818_$",
+                            "typeString": "type(contract IStakeTONProxyFactory)"
+                          }
+                        },
+                        "id": 1774,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "kind": "typeConversion",
+                        "lValueRequested": false,
+                        "names": [],
+                        "nodeType": "FunctionCall",
+                        "src": "1424:43:3",
+                        "tryCall": false,
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_contract$_IStakeTONProxyFactory_$2818",
+                          "typeString": "contract IStakeTONProxyFactory"
+                        }
+                      },
+                      "id": 1775,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberName": "deploy",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 2817,
+                      "src": "1424:50:3",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_external_nonpayable$_t_address_$_t_array$_t_address_$4_memory_ptr_$_t_address_$_t_array$_t_uint256_$3_memory_ptr_$_t_address_$returns$_t_address_$",
+                        "typeString": "function (address,address[4] memory,address,uint256[3] memory,address) external returns (address)"
+                      }
+                    },
+                    "id": 1781,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "1424:194:3",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "nodeType": "VariableDeclarationStatement",
+                  "src": "1396:222:3"
+                },
+                {
+                  "expression": {
+                    "arguments": [
+                      {
+                        "commonType": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        },
+                        "id": 1789,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "leftExpression": {
+                          "id": 1784,
+                          "name": "proxy",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 1771,
+                          "src": "1637:5:3",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_address",
+                            "typeString": "address"
+                          }
+                        },
+                        "nodeType": "BinaryOperation",
+                        "operator": "!=",
+                        "rightExpression": {
+                          "arguments": [
+                            {
+                              "hexValue": "30",
+                              "id": 1787,
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": true,
+                              "kind": "number",
+                              "lValueRequested": false,
+                              "nodeType": "Literal",
+                              "src": "1654:1:3",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_rational_0_by_1",
+                                "typeString": "int_const 0"
+                              },
+                              "value": "0"
+                            }
+                          ],
+                          "expression": {
+                            "argumentTypes": [
+                              {
+                                "typeIdentifier": "t_rational_0_by_1",
+                                "typeString": "int_const 0"
+                              }
+                            ],
+                            "id": 1786,
+                            "isConstant": false,
+                            "isLValue": false,
+                            "isPure": true,
+                            "lValueRequested": false,
+                            "nodeType": "ElementaryTypeNameExpression",
+                            "src": "1646:7:3",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_type$_t_address_$",
+                              "typeString": "type(address)"
+                            },
+                            "typeName": {
+                              "id": 1785,
+                              "name": "address",
+                              "nodeType": "ElementaryTypeName",
+                              "src": "1646:7:3",
+                              "typeDescriptions": {}
+                            }
+                          },
+                          "id": 1788,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": true,
+                          "kind": "typeConversion",
+                          "lValueRequested": false,
+                          "names": [],
+                          "nodeType": "FunctionCall",
+                          "src": "1646:10:3",
+                          "tryCall": false,
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_address_payable",
+                            "typeString": "address payable"
+                          }
+                        },
+                        "src": "1637:19:3",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        }
+                      },
+                      {
+                        "hexValue": "5374616b65544f4e466163746f72793a2070726f7879207a65726f",
+                        "id": 1790,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": true,
+                        "kind": "string",
+                        "lValueRequested": false,
+                        "nodeType": "Literal",
+                        "src": "1658:29:3",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_stringliteral_122f3aa4a4ca34e9b5e7402827ddf85b82ac9c3006e014a89e4d8ee2ec8f331b",
+                          "typeString": "literal_string \"StakeTONFactory: proxy zero\""
+                        },
+                        "value": "StakeTONFactory: proxy zero"
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        },
+                        {
+                          "typeIdentifier": "t_stringliteral_122f3aa4a4ca34e9b5e7402827ddf85b82ac9c3006e014a89e4d8ee2ec8f331b",
+                          "typeString": "literal_string \"StakeTONFactory: proxy zero\""
+                        }
+                      ],
+                      "id": 1783,
+                      "name": "require",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [
+                        4294967278,
+                        4294967278
+                      ],
+                      "referencedDeclaration": 4294967278,
+                      "src": "1629:7:3",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_require_pure$_t_bool_$_t_string_memory_ptr_$returns$__$",
+                        "typeString": "function (bool,string memory) pure"
+                      }
+                    },
+                    "id": 1791,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "1629:59:3",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 1792,
+                  "nodeType": "ExpressionStatement",
+                  "src": "1629:59:3"
+                },
+                {
+                  "expression": {
+                    "id": 1793,
+                    "name": "proxy",
+                    "nodeType": "Identifier",
+                    "overloadedDeclarations": [],
+                    "referencedDeclaration": 1771,
+                    "src": "1706:5:3",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "functionReturnParameters": 1769,
+                  "id": 1794,
+                  "nodeType": "Return",
+                  "src": "1699:12:3"
+                }
+              ]
+            },
+            "documentation": {
+              "id": 1752,
+              "nodeType": "StructuredDocumentation",
+              "src": "887:317:3",
+              "text": "@dev Create a stake contract that can stake TON.\n @param _addr the array of [token, paytoken, vault, defiAddr]\n @param _registry  the registry address\n @param _intdata the array of [saleStartBlock, startBlock, periodBlocks]\n @param owner  owner address\n @return contract address"
+            },
+            "functionSelector": "ba3d3045",
+            "id": 1796,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "create",
+            "nodeType": "FunctionDefinition",
+            "overrides": {
+              "id": 1766,
+              "nodeType": "OverrideSpecifier",
+              "overrides": [],
+              "src": "1359:8:3"
+            },
+            "parameters": {
+              "id": 1765,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1756,
+                  "mutability": "mutable",
+                  "name": "_addr",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1796,
+                  "src": "1234:23:3",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_array$_t_address_$4_memory_ptr",
+                    "typeString": "address[4]"
+                  },
+                  "typeName": {
+                    "baseType": {
+                      "id": 1753,
+                      "name": "address",
+                      "nodeType": "ElementaryTypeName",
+                      "src": "1234:7:3",
+                      "stateMutability": "nonpayable",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_address",
+                        "typeString": "address"
+                      }
+                    },
+                    "id": 1755,
+                    "length": {
+                      "hexValue": "34",
+                      "id": 1754,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": true,
+                      "kind": "number",
+                      "lValueRequested": false,
+                      "nodeType": "Literal",
+                      "src": "1242:1:3",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_rational_4_by_1",
+                        "typeString": "int_const 4"
+                      },
+                      "value": "4"
+                    },
+                    "nodeType": "ArrayTypeName",
+                    "src": "1234:10:3",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_array$_t_address_$4_storage_ptr",
+                      "typeString": "address[4]"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 1758,
+                  "mutability": "mutable",
+                  "name": "_registry",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1796,
+                  "src": "1267:17:3",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 1757,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1267:7:3",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 1762,
+                  "mutability": "mutable",
+                  "name": "_intdata",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1796,
+                  "src": "1294:26:3",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_array$_t_uint256_$3_memory_ptr",
+                    "typeString": "uint256[3]"
+                  },
+                  "typeName": {
+                    "baseType": {
+                      "id": 1759,
+                      "name": "uint256",
+                      "nodeType": "ElementaryTypeName",
+                      "src": "1294:7:3",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "id": 1761,
+                    "length": {
+                      "hexValue": "33",
+                      "id": 1760,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": true,
+                      "kind": "number",
+                      "lValueRequested": false,
+                      "nodeType": "Literal",
+                      "src": "1302:1:3",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_rational_3_by_1",
+                        "typeString": "int_const 3"
+                      },
+                      "value": "3"
+                    },
+                    "nodeType": "ArrayTypeName",
+                    "src": "1294:10:3",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_array$_t_uint256_$3_storage_ptr",
+                      "typeString": "uint256[3]"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 1764,
+                  "mutability": "mutable",
+                  "name": "owner",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1796,
+                  "src": "1330:13:3",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 1763,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1330:7:3",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1224:125:3"
+            },
+            "returnParameters": {
+              "id": 1769,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1768,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1796,
+                  "src": "1377:7:3",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 1767,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1377:7:3",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1376:9:3"
+            },
+            "scope": 1797,
+            "src": "1209:509:3",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 1798,
+        "src": "223:1497:3"
+      }
+    ],
+    "src": "32:1689:3"
+  },
+  "legacyAST": {
+    "attributes": {
+      "absolutePath": "/Users/zena/ico2.0/ico20-contracts/contracts/factory/StakeTONFactory.sol",
+      "exportedSymbols": {
+        "IStakeTONFactory": [
+          2795
+        ],
+        "IStakeTONProxyFactory": [
+          2818
+        ],
+        "StakeTONFactory": [
+          1797
+        ]
+      },
+      "license": "MIT"
+    },
+    "children": [
+      {
+        "attributes": {
+          "literals": [
+            "solidity",
+            "^",
+            "0.7",
+            ".6"
+          ]
+        },
+        "id": 1708,
+        "name": "PragmaDirective",
+        "src": "32:23:3"
+      },
+      {
+        "attributes": {
+          "SourceUnit": 2796,
+          "absolutePath": "/Users/zena/ico2.0/ico20-contracts/contracts/interfaces/IStakeTONFactory.sol",
+          "file": "../interfaces/IStakeTONFactory.sol",
+          "scope": 1798,
+          "symbolAliases": [
+            null
+          ],
+          "unitAlias": ""
+        },
+        "id": 1709,
+        "name": "ImportDirective",
+        "src": "57:44:3"
+      },
+      {
+        "attributes": {
+          "SourceUnit": 2819,
+          "absolutePath": "/Users/zena/ico2.0/ico20-contracts/contracts/interfaces/IStakeTONProxyFactory.sol",
+          "file": "../interfaces/IStakeTONProxyFactory.sol",
+          "scope": 1798,
+          "symbolAliases": [
+            null
+          ],
+          "unitAlias": ""
+        },
+        "id": 1710,
+        "name": "ImportDirective",
+        "src": "102:49:3"
+      },
+      {
+        "attributes": {
+          "abstract": false,
+          "contractDependencies": [
+            2795
+          ],
+          "contractKind": "contract",
+          "fullyImplemented": true,
+          "linearizedBaseContracts": [
+            1797,
+            2795
+          ],
+          "name": "StakeTONFactory",
+          "scope": 1798
+        },
+        "children": [
+          {
+            "attributes": {
+              "text": "@title A factory that creates a stake contract that can stake TON"
+            },
+            "id": 1711,
+            "name": "StructuredDocumentation",
+            "src": "153:70:3"
+          },
+          {
+            "attributes": {},
+            "children": [
+              {
+                "attributes": {
+                  "name": "IStakeTONFactory",
+                  "referencedDeclaration": 2795,
+                  "type": "contract IStakeTONFactory"
+                },
+                "id": 1712,
+                "name": "UserDefinedTypeName",
+                "src": "251:16:3"
+              }
+            ],
+            "id": 1713,
+            "name": "InheritanceSpecifier",
+            "src": "251:16:3"
+          },
+          {
+            "attributes": {
+              "constant": false,
+              "functionSelector": "8a59d90a",
+              "mutability": "mutable",
+              "name": "stakeTONProxyFactory",
+              "scope": 1797,
+              "stateVariable": true,
+              "storageLocation": "default",
+              "type": "address",
+              "visibility": "public"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "name": "address",
+                  "stateMutability": "nonpayable",
+                  "type": "address"
+                },
+                "id": 1714,
+                "name": "ElementaryTypeName",
+                "src": "274:7:3"
+              }
+            ],
+            "id": 1715,
+            "name": "VariableDeclaration",
+            "src": "274:35:3"
+          },
+          {
+            "attributes": {
+              "constant": false,
+              "functionSelector": "dd18f68f",
+              "mutability": "mutable",
+              "name": "stakeTONLogic",
+              "scope": 1797,
+              "stateVariable": true,
+              "storageLocation": "default",
+              "type": "address",
+              "visibility": "public"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "name": "address",
+                  "stateMutability": "nonpayable",
+                  "type": "address"
+                },
+                "id": 1716,
+                "name": "ElementaryTypeName",
+                "src": "315:7:3"
+              }
+            ],
+            "id": 1717,
+            "name": "VariableDeclaration",
+            "src": "315:28:3"
+          },
+          {
+            "attributes": {
+              "implemented": true,
+              "isConstructor": true,
+              "kind": "constructor",
+              "modifiers": [
+                null
+              ],
+              "name": "",
+              "scope": 1797,
+              "stateMutability": "nonpayable",
+              "virtual": false,
+              "visibility": "public"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "text": "@dev constructor of StakeTONFactory\n @param _stakeTONProxyFactory the StakeTONProxyFactory address used in StakeTONFactory\n @param _stakeTONLogic the StakeTONLogic address used in StakeTONFactory"
+                },
+                "id": 1718,
+                "name": "StructuredDocumentation",
+                "src": "350:213:3"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "_stakeTONProxyFactory",
+                      "scope": 1751,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "address",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "address",
+                          "stateMutability": "nonpayable",
+                          "type": "address"
+                        },
+                        "id": 1719,
+                        "name": "ElementaryTypeName",
+                        "src": "580:7:3"
+                      }
+                    ],
+                    "id": 1720,
+                    "name": "VariableDeclaration",
+                    "src": "580:29:3"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "_stakeTONLogic",
+                      "scope": 1751,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "address",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "address",
+                          "stateMutability": "nonpayable",
+                          "type": "address"
+                        },
+                        "id": 1721,
+                        "name": "ElementaryTypeName",
+                        "src": "611:7:3"
+                      }
+                    ],
+                    "id": 1722,
+                    "name": "VariableDeclaration",
+                    "src": "611:22:3"
+                  }
+                ],
+                "id": 1723,
+                "name": "ParameterList",
+                "src": "579:55:3"
+              },
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 1724,
+                "name": "ParameterList",
+                "src": "635:0:3"
+              },
+              {
+                "children": [
+                  {
+                    "children": [
+                      {
+                        "attributes": {
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "isStructConstructorCall": false,
+                          "lValueRequested": false,
+                          "names": [
+                            null
+                          ],
+                          "tryCall": false,
+                          "type": "tuple()",
+                          "type_conversion": false
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "argumentTypes": [
+                                {
+                                  "typeIdentifier": "t_bool",
+                                  "typeString": "bool"
+                                },
+                                {
+                                  "typeIdentifier": "t_stringliteral_7285b9cc9a78d0d7d5455ec2084eaef93d5deb775ec0a2f2d5c500d345a8057a",
+                                  "typeString": "literal_string \"StakeTONFactory: zero\""
+                                }
+                              ],
+                              "overloadedDeclarations": [
+                                4294967278,
+                                4294967278
+                              ],
+                              "referencedDeclaration": 4294967278,
+                              "type": "function (bool,string memory) pure",
+                              "value": "require"
+                            },
+                            "id": 1725,
+                            "name": "Identifier",
+                            "src": "645:7:3"
+                          },
+                          {
+                            "attributes": {
+                              "commonType": {
+                                "typeIdentifier": "t_bool",
+                                "typeString": "bool"
+                              },
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": false,
+                              "lValueRequested": false,
+                              "operator": "&&",
+                              "type": "bool"
+                            },
+                            "children": [
+                              {
+                                "attributes": {
+                                  "commonType": {
+                                    "typeIdentifier": "t_address",
+                                    "typeString": "address"
+                                  },
+                                  "isConstant": false,
+                                  "isLValue": false,
+                                  "isPure": false,
+                                  "lValueRequested": false,
+                                  "operator": "!=",
+                                  "type": "bool"
+                                },
+                                "children": [
+                                  {
+                                    "attributes": {
+                                      "overloadedDeclarations": [
+                                        null
+                                      ],
+                                      "referencedDeclaration": 1720,
+                                      "type": "address",
+                                      "value": "_stakeTONProxyFactory"
+                                    },
+                                    "id": 1726,
+                                    "name": "Identifier",
+                                    "src": "666:21:3"
+                                  },
+                                  {
+                                    "attributes": {
+                                      "isConstant": false,
+                                      "isLValue": false,
+                                      "isPure": true,
+                                      "isStructConstructorCall": false,
+                                      "lValueRequested": false,
+                                      "names": [
+                                        null
+                                      ],
+                                      "tryCall": false,
+                                      "type": "address payable",
+                                      "type_conversion": true
+                                    },
+                                    "children": [
+                                      {
+                                        "attributes": {
+                                          "argumentTypes": [
+                                            {
+                                              "typeIdentifier": "t_rational_0_by_1",
+                                              "typeString": "int_const 0"
+                                            }
+                                          ],
+                                          "isConstant": false,
+                                          "isLValue": false,
+                                          "isPure": true,
+                                          "lValueRequested": false,
+                                          "type": "type(address)"
+                                        },
+                                        "children": [
+                                          {
+                                            "attributes": {
+                                              "name": "address"
+                                            },
+                                            "id": 1727,
+                                            "name": "ElementaryTypeName",
+                                            "src": "691:7:3"
+                                          }
+                                        ],
+                                        "id": 1728,
+                                        "name": "ElementaryTypeNameExpression",
+                                        "src": "691:7:3"
+                                      },
+                                      {
+                                        "attributes": {
+                                          "hexvalue": "30",
+                                          "isConstant": false,
+                                          "isLValue": false,
+                                          "isPure": true,
+                                          "lValueRequested": false,
+                                          "token": "number",
+                                          "type": "int_const 0",
+                                          "value": "0"
+                                        },
+                                        "id": 1729,
+                                        "name": "Literal",
+                                        "src": "699:1:3"
+                                      }
+                                    ],
+                                    "id": 1730,
+                                    "name": "FunctionCall",
+                                    "src": "691:10:3"
+                                  }
+                                ],
+                                "id": 1731,
+                                "name": "BinaryOperation",
+                                "src": "666:35:3"
+                              },
+                              {
+                                "attributes": {
+                                  "commonType": {
+                                    "typeIdentifier": "t_address",
+                                    "typeString": "address"
+                                  },
+                                  "isConstant": false,
+                                  "isLValue": false,
+                                  "isPure": false,
+                                  "lValueRequested": false,
+                                  "operator": "!=",
+                                  "type": "bool"
+                                },
+                                "children": [
+                                  {
+                                    "attributes": {
+                                      "overloadedDeclarations": [
+                                        null
+                                      ],
+                                      "referencedDeclaration": 1722,
+                                      "type": "address",
+                                      "value": "_stakeTONLogic"
+                                    },
+                                    "id": 1732,
+                                    "name": "Identifier",
+                                    "src": "705:14:3"
+                                  },
+                                  {
+                                    "attributes": {
+                                      "isConstant": false,
+                                      "isLValue": false,
+                                      "isPure": true,
+                                      "isStructConstructorCall": false,
+                                      "lValueRequested": false,
+                                      "names": [
+                                        null
+                                      ],
+                                      "tryCall": false,
+                                      "type": "address payable",
+                                      "type_conversion": true
+                                    },
+                                    "children": [
+                                      {
+                                        "attributes": {
+                                          "argumentTypes": [
+                                            {
+                                              "typeIdentifier": "t_rational_0_by_1",
+                                              "typeString": "int_const 0"
+                                            }
+                                          ],
+                                          "isConstant": false,
+                                          "isLValue": false,
+                                          "isPure": true,
+                                          "lValueRequested": false,
+                                          "type": "type(address)"
+                                        },
+                                        "children": [
+                                          {
+                                            "attributes": {
+                                              "name": "address"
+                                            },
+                                            "id": 1733,
+                                            "name": "ElementaryTypeName",
+                                            "src": "723:7:3"
+                                          }
+                                        ],
+                                        "id": 1734,
+                                        "name": "ElementaryTypeNameExpression",
+                                        "src": "723:7:3"
+                                      },
+                                      {
+                                        "attributes": {
+                                          "hexvalue": "30",
+                                          "isConstant": false,
+                                          "isLValue": false,
+                                          "isPure": true,
+                                          "lValueRequested": false,
+                                          "token": "number",
+                                          "type": "int_const 0",
+                                          "value": "0"
+                                        },
+                                        "id": 1735,
+                                        "name": "Literal",
+                                        "src": "731:1:3"
+                                      }
+                                    ],
+                                    "id": 1736,
+                                    "name": "FunctionCall",
+                                    "src": "723:10:3"
+                                  }
+                                ],
+                                "id": 1737,
+                                "name": "BinaryOperation",
+                                "src": "705:28:3"
+                              }
+                            ],
+                            "id": 1738,
+                            "name": "BinaryOperation",
+                            "src": "666:67:3"
+                          },
+                          {
+                            "attributes": {
+                              "hexvalue": "5374616b65544f4e466163746f72793a207a65726f",
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": true,
+                              "lValueRequested": false,
+                              "token": "string",
+                              "type": "literal_string \"StakeTONFactory: zero\"",
+                              "value": "StakeTONFactory: zero"
+                            },
+                            "id": 1739,
+                            "name": "Literal",
+                            "src": "747:23:3"
+                          }
+                        ],
+                        "id": 1740,
+                        "name": "FunctionCall",
+                        "src": "645:135:3"
+                      }
+                    ],
+                    "id": 1741,
+                    "name": "ExpressionStatement",
+                    "src": "645:135:3"
+                  },
+                  {
+                    "children": [
+                      {
+                        "attributes": {
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "lValueRequested": false,
+                          "operator": "=",
+                          "type": "address"
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "overloadedDeclarations": [
+                                null
+                              ],
+                              "referencedDeclaration": 1715,
+                              "type": "address",
+                              "value": "stakeTONProxyFactory"
+                            },
+                            "id": 1742,
+                            "name": "Identifier",
+                            "src": "790:20:3"
+                          },
+                          {
+                            "attributes": {
+                              "overloadedDeclarations": [
+                                null
+                              ],
+                              "referencedDeclaration": 1720,
+                              "type": "address",
+                              "value": "_stakeTONProxyFactory"
+                            },
+                            "id": 1743,
+                            "name": "Identifier",
+                            "src": "813:21:3"
+                          }
+                        ],
+                        "id": 1744,
+                        "name": "Assignment",
+                        "src": "790:44:3"
+                      }
+                    ],
+                    "id": 1745,
+                    "name": "ExpressionStatement",
+                    "src": "790:44:3"
+                  },
+                  {
+                    "children": [
+                      {
+                        "attributes": {
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "lValueRequested": false,
+                          "operator": "=",
+                          "type": "address"
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "overloadedDeclarations": [
+                                null
+                              ],
+                              "referencedDeclaration": 1717,
+                              "type": "address",
+                              "value": "stakeTONLogic"
+                            },
+                            "id": 1746,
+                            "name": "Identifier",
+                            "src": "844:13:3"
+                          },
+                          {
+                            "attributes": {
+                              "overloadedDeclarations": [
+                                null
+                              ],
+                              "referencedDeclaration": 1722,
+                              "type": "address",
+                              "value": "_stakeTONLogic"
+                            },
+                            "id": 1747,
+                            "name": "Identifier",
+                            "src": "860:14:3"
+                          }
+                        ],
+                        "id": 1748,
+                        "name": "Assignment",
+                        "src": "844:30:3"
+                      }
+                    ],
+                    "id": 1749,
+                    "name": "ExpressionStatement",
+                    "src": "844:30:3"
+                  }
+                ],
+                "id": 1750,
+                "name": "Block",
+                "src": "635:246:3"
+              }
+            ],
+            "id": 1751,
+            "name": "FunctionDefinition",
+            "src": "568:313:3"
+          },
+          {
+            "attributes": {
+              "baseFunctions": [
+                2794
+              ],
+              "functionSelector": "ba3d3045",
+              "implemented": true,
+              "isConstructor": false,
+              "kind": "function",
+              "modifiers": [
+                null
+              ],
+              "name": "create",
+              "scope": 1797,
+              "stateMutability": "nonpayable",
+              "virtual": false,
+              "visibility": "external"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "text": "@dev Create a stake contract that can stake TON.\n @param _addr the array of [token, paytoken, vault, defiAddr]\n @param _registry  the registry address\n @param _intdata the array of [saleStartBlock, startBlock, periodBlocks]\n @param owner  owner address\n @return contract address"
+                },
+                "id": 1752,
+                "name": "StructuredDocumentation",
+                "src": "887:317:3"
+              },
+              {
+                "attributes": {
+                  "overrides": [
+                    null
+                  ]
+                },
+                "id": 1766,
+                "name": "OverrideSpecifier",
+                "src": "1359:8:3"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "_addr",
+                      "scope": 1796,
+                      "stateVariable": false,
+                      "storageLocation": "memory",
+                      "type": "address[4]",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "type": "address[4]"
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "name": "address",
+                              "stateMutability": "nonpayable",
+                              "type": "address"
+                            },
+                            "id": 1753,
+                            "name": "ElementaryTypeName",
+                            "src": "1234:7:3"
+                          },
+                          {
+                            "attributes": {
+                              "hexvalue": "34",
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": true,
+                              "lValueRequested": false,
+                              "token": "number",
+                              "type": "int_const 4",
+                              "value": "4"
+                            },
+                            "id": 1754,
+                            "name": "Literal",
+                            "src": "1242:1:3"
+                          }
+                        ],
+                        "id": 1755,
+                        "name": "ArrayTypeName",
+                        "src": "1234:10:3"
+                      }
+                    ],
+                    "id": 1756,
+                    "name": "VariableDeclaration",
+                    "src": "1234:23:3"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "_registry",
+                      "scope": 1796,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "address",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "address",
+                          "stateMutability": "nonpayable",
+                          "type": "address"
+                        },
+                        "id": 1757,
+                        "name": "ElementaryTypeName",
+                        "src": "1267:7:3"
+                      }
+                    ],
+                    "id": 1758,
+                    "name": "VariableDeclaration",
+                    "src": "1267:17:3"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "_intdata",
+                      "scope": 1796,
+                      "stateVariable": false,
+                      "storageLocation": "memory",
+                      "type": "uint256[3]",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "type": "uint256[3]"
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "name": "uint256",
+                              "type": "uint256"
+                            },
+                            "id": 1759,
+                            "name": "ElementaryTypeName",
+                            "src": "1294:7:3"
+                          },
+                          {
+                            "attributes": {
+                              "hexvalue": "33",
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": true,
+                              "lValueRequested": false,
+                              "token": "number",
+                              "type": "int_const 3",
+                              "value": "3"
+                            },
+                            "id": 1760,
+                            "name": "Literal",
+                            "src": "1302:1:3"
+                          }
+                        ],
+                        "id": 1761,
+                        "name": "ArrayTypeName",
+                        "src": "1294:10:3"
+                      }
+                    ],
+                    "id": 1762,
+                    "name": "VariableDeclaration",
+                    "src": "1294:26:3"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "owner",
+                      "scope": 1796,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "address",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "address",
+                          "stateMutability": "nonpayable",
+                          "type": "address"
+                        },
+                        "id": 1763,
+                        "name": "ElementaryTypeName",
+                        "src": "1330:7:3"
+                      }
+                    ],
+                    "id": 1764,
+                    "name": "VariableDeclaration",
+                    "src": "1330:13:3"
+                  }
+                ],
+                "id": 1765,
+                "name": "ParameterList",
+                "src": "1224:125:3"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "",
+                      "scope": 1796,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "address",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "address",
+                          "stateMutability": "nonpayable",
+                          "type": "address"
+                        },
+                        "id": 1767,
+                        "name": "ElementaryTypeName",
+                        "src": "1377:7:3"
+                      }
+                    ],
+                    "id": 1768,
+                    "name": "VariableDeclaration",
+                    "src": "1377:7:3"
+                  }
+                ],
+                "id": 1769,
+                "name": "ParameterList",
+                "src": "1376:9:3"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "assignments": [
+                        1771
+                      ]
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "constant": false,
+                          "mutability": "mutable",
+                          "name": "proxy",
+                          "scope": 1795,
+                          "stateVariable": false,
+                          "storageLocation": "default",
+                          "type": "address",
+                          "visibility": "internal"
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "name": "address",
+                              "stateMutability": "nonpayable",
+                              "type": "address"
+                            },
+                            "id": 1770,
+                            "name": "ElementaryTypeName",
+                            "src": "1396:7:3"
+                          }
+                        ],
+                        "id": 1771,
+                        "name": "VariableDeclaration",
+                        "src": "1396:13:3"
+                      },
+                      {
+                        "attributes": {
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "isStructConstructorCall": false,
+                          "lValueRequested": false,
+                          "names": [
+                            null
+                          ],
+                          "tryCall": false,
+                          "type": "address",
+                          "type_conversion": false
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "argumentTypes": [
+                                {
+                                  "typeIdentifier": "t_address",
+                                  "typeString": "address"
+                                },
+                                {
+                                  "typeIdentifier": "t_array$_t_address_$4_memory_ptr",
+                                  "typeString": "address[4] memory"
+                                },
+                                {
+                                  "typeIdentifier": "t_address",
+                                  "typeString": "address"
+                                },
+                                {
+                                  "typeIdentifier": "t_array$_t_uint256_$3_memory_ptr",
+                                  "typeString": "uint256[3] memory"
+                                },
+                                {
+                                  "typeIdentifier": "t_address",
+                                  "typeString": "address"
+                                }
+                              ],
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": false,
+                              "lValueRequested": false,
+                              "member_name": "deploy",
+                              "referencedDeclaration": 2817,
+                              "type": "function (address,address[4] memory,address,uint256[3] memory,address) external returns (address)"
+                            },
+                            "children": [
+                              {
+                                "attributes": {
+                                  "isConstant": false,
+                                  "isLValue": false,
+                                  "isPure": false,
+                                  "isStructConstructorCall": false,
+                                  "lValueRequested": false,
+                                  "names": [
+                                    null
+                                  ],
+                                  "tryCall": false,
+                                  "type": "contract IStakeTONProxyFactory",
+                                  "type_conversion": true
+                                },
+                                "children": [
+                                  {
+                                    "attributes": {
+                                      "argumentTypes": [
+                                        {
+                                          "typeIdentifier": "t_address",
+                                          "typeString": "address"
+                                        }
+                                      ],
+                                      "overloadedDeclarations": [
+                                        null
+                                      ],
+                                      "referencedDeclaration": 2818,
+                                      "type": "type(contract IStakeTONProxyFactory)",
+                                      "value": "IStakeTONProxyFactory"
+                                    },
+                                    "id": 1772,
+                                    "name": "Identifier",
+                                    "src": "1424:21:3"
+                                  },
+                                  {
+                                    "attributes": {
+                                      "overloadedDeclarations": [
+                                        null
+                                      ],
+                                      "referencedDeclaration": 1715,
+                                      "type": "address",
+                                      "value": "stakeTONProxyFactory"
+                                    },
+                                    "id": 1773,
+                                    "name": "Identifier",
+                                    "src": "1446:20:3"
+                                  }
+                                ],
+                                "id": 1774,
+                                "name": "FunctionCall",
+                                "src": "1424:43:3"
+                              }
+                            ],
+                            "id": 1775,
+                            "name": "MemberAccess",
+                            "src": "1424:50:3"
+                          },
+                          {
+                            "attributes": {
+                              "overloadedDeclarations": [
+                                null
+                              ],
+                              "referencedDeclaration": 1717,
+                              "type": "address",
+                              "value": "stakeTONLogic"
+                            },
+                            "id": 1776,
+                            "name": "Identifier",
+                            "src": "1492:13:3"
+                          },
+                          {
+                            "attributes": {
+                              "overloadedDeclarations": [
+                                null
+                              ],
+                              "referencedDeclaration": 1756,
+                              "type": "address[4] memory",
+                              "value": "_addr"
+                            },
+                            "id": 1777,
+                            "name": "Identifier",
+                            "src": "1523:5:3"
+                          },
+                          {
+                            "attributes": {
+                              "overloadedDeclarations": [
+                                null
+                              ],
+                              "referencedDeclaration": 1758,
+                              "type": "address",
+                              "value": "_registry"
+                            },
+                            "id": 1778,
+                            "name": "Identifier",
+                            "src": "1546:9:3"
+                          },
+                          {
+                            "attributes": {
+                              "overloadedDeclarations": [
+                                null
+                              ],
+                              "referencedDeclaration": 1762,
+                              "type": "uint256[3] memory",
+                              "value": "_intdata"
+                            },
+                            "id": 1779,
+                            "name": "Identifier",
+                            "src": "1573:8:3"
+                          },
+                          {
+                            "attributes": {
+                              "overloadedDeclarations": [
+                                null
+                              ],
+                              "referencedDeclaration": 1764,
+                              "type": "address",
+                              "value": "owner"
+                            },
+                            "id": 1780,
+                            "name": "Identifier",
+                            "src": "1599:5:3"
+                          }
+                        ],
+                        "id": 1781,
+                        "name": "FunctionCall",
+                        "src": "1424:194:3"
+                      }
+                    ],
+                    "id": 1782,
+                    "name": "VariableDeclarationStatement",
+                    "src": "1396:222:3"
+                  },
+                  {
+                    "children": [
+                      {
+                        "attributes": {
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "isStructConstructorCall": false,
+                          "lValueRequested": false,
+                          "names": [
+                            null
+                          ],
+                          "tryCall": false,
+                          "type": "tuple()",
+                          "type_conversion": false
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "argumentTypes": [
+                                {
+                                  "typeIdentifier": "t_bool",
+                                  "typeString": "bool"
+                                },
+                                {
+                                  "typeIdentifier": "t_stringliteral_122f3aa4a4ca34e9b5e7402827ddf85b82ac9c3006e014a89e4d8ee2ec8f331b",
+                                  "typeString": "literal_string \"StakeTONFactory: proxy zero\""
+                                }
+                              ],
+                              "overloadedDeclarations": [
+                                4294967278,
+                                4294967278
+                              ],
+                              "referencedDeclaration": 4294967278,
+                              "type": "function (bool,string memory) pure",
+                              "value": "require"
+                            },
+                            "id": 1783,
+                            "name": "Identifier",
+                            "src": "1629:7:3"
+                          },
+                          {
+                            "attributes": {
+                              "commonType": {
+                                "typeIdentifier": "t_address",
+                                "typeString": "address"
+                              },
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": false,
+                              "lValueRequested": false,
+                              "operator": "!=",
+                              "type": "bool"
+                            },
+                            "children": [
+                              {
+                                "attributes": {
+                                  "overloadedDeclarations": [
+                                    null
+                                  ],
+                                  "referencedDeclaration": 1771,
+                                  "type": "address",
+                                  "value": "proxy"
+                                },
+                                "id": 1784,
+                                "name": "Identifier",
+                                "src": "1637:5:3"
+                              },
+                              {
+                                "attributes": {
+                                  "isConstant": false,
+                                  "isLValue": false,
+                                  "isPure": true,
+                                  "isStructConstructorCall": false,
+                                  "lValueRequested": false,
+                                  "names": [
+                                    null
+                                  ],
+                                  "tryCall": false,
+                                  "type": "address payable",
+                                  "type_conversion": true
+                                },
+                                "children": [
+                                  {
+                                    "attributes": {
+                                      "argumentTypes": [
+                                        {
+                                          "typeIdentifier": "t_rational_0_by_1",
+                                          "typeString": "int_const 0"
+                                        }
+                                      ],
+                                      "isConstant": false,
+                                      "isLValue": false,
+                                      "isPure": true,
+                                      "lValueRequested": false,
+                                      "type": "type(address)"
+                                    },
+                                    "children": [
+                                      {
+                                        "attributes": {
+                                          "name": "address"
+                                        },
+                                        "id": 1785,
+                                        "name": "ElementaryTypeName",
+                                        "src": "1646:7:3"
+                                      }
+                                    ],
+                                    "id": 1786,
+                                    "name": "ElementaryTypeNameExpression",
+                                    "src": "1646:7:3"
+                                  },
+                                  {
+                                    "attributes": {
+                                      "hexvalue": "30",
+                                      "isConstant": false,
+                                      "isLValue": false,
+                                      "isPure": true,
+                                      "lValueRequested": false,
+                                      "token": "number",
+                                      "type": "int_const 0",
+                                      "value": "0"
+                                    },
+                                    "id": 1787,
+                                    "name": "Literal",
+                                    "src": "1654:1:3"
+                                  }
+                                ],
+                                "id": 1788,
+                                "name": "FunctionCall",
+                                "src": "1646:10:3"
+                              }
+                            ],
+                            "id": 1789,
+                            "name": "BinaryOperation",
+                            "src": "1637:19:3"
+                          },
+                          {
+                            "attributes": {
+                              "hexvalue": "5374616b65544f4e466163746f72793a2070726f7879207a65726f",
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": true,
+                              "lValueRequested": false,
+                              "token": "string",
+                              "type": "literal_string \"StakeTONFactory: proxy zero\"",
+                              "value": "StakeTONFactory: proxy zero"
+                            },
+                            "id": 1790,
+                            "name": "Literal",
+                            "src": "1658:29:3"
+                          }
+                        ],
+                        "id": 1791,
+                        "name": "FunctionCall",
+                        "src": "1629:59:3"
+                      }
+                    ],
+                    "id": 1792,
+                    "name": "ExpressionStatement",
+                    "src": "1629:59:3"
+                  },
+                  {
+                    "attributes": {
+                      "functionReturnParameters": 1769
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "overloadedDeclarations": [
+                            null
+                          ],
+                          "referencedDeclaration": 1771,
+                          "type": "address",
+                          "value": "proxy"
+                        },
+                        "id": 1793,
+                        "name": "Identifier",
+                        "src": "1706:5:3"
+                      }
+                    ],
+                    "id": 1794,
+                    "name": "Return",
+                    "src": "1699:12:3"
+                  }
+                ],
+                "id": 1795,
+                "name": "Block",
+                "src": "1386:332:3"
+              }
+            ],
+            "id": 1796,
+            "name": "FunctionDefinition",
+            "src": "1209:509:3"
+          }
+        ],
+        "id": 1797,
+        "name": "ContractDefinition",
+        "src": "223:1497:3"
+      }
+    ],
+    "id": 1798,
+    "name": "SourceUnit",
+    "src": "32:1689:3"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.7.6+commit.7338295f.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "3.3.4",
+  "updatedAt": "2021-06-02T09:23:59.556Z",
+  "devdoc": {
+    "kind": "dev",
+    "methods": {
+      "constructor": {
+        "details": "constructor of StakeTONFactory",
+        "params": {
+          "_stakeTONLogic": "the StakeTONLogic address used in StakeTONFactory",
+          "_stakeTONProxyFactory": "the StakeTONProxyFactory address used in StakeTONFactory"
+        }
+      },
+      "create(address[4],address,uint256[3],address)": {
+        "details": "Create a stake contract that can stake TON.",
+        "params": {
+          "_addr": "the array of [token, paytoken, vault, defiAddr]",
+          "_intdata": "the array of [saleStartBlock, startBlock, periodBlocks]",
+          "_registry": "the registry address",
+          "owner": "owner address"
+        },
+        "returns": {
+          "_0": "contract address"
+        }
+      }
+    },
+    "title": "A factory that creates a stake contract that can stake TON",
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {},
+    "version": 1
+  }
+}

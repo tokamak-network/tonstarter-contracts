@@ -1,0 +1,25 @@
+# Functions:
+
+- [`deploy(address _logic, address[4] _addr, address _registry, uint256[3] _intdata, address owner)`](#IStakeTONProxyFactory-deploy-address-address-4--address-uint256-3--address-)
+
+###### IStakeTONProxyFactory-deploy-address-address-4--address-uint256-3--address-
+
+## Function `deploy(address _logic, address[4] _addr, address _registry, uint256[3] _intdata, address owner)`
+
+Create a StakeTONProxy that can stake TON.
+
+### Parameters:
+
+- `_logic`: the logic contract address used in proxy
+
+- `_addr`: the array of [token, paytoken, vault, defiAddr]
+
+- `_registry`: the registry address
+
+- `_intdata`: the array of [saleStartBlock, startBlock, periodBlocks]
+
+- `owner`:  owner address
+
+### Return Values:
+
+- contract address

@@ -87,28 +87,6 @@ let seigManager = "0x957DaC3D3C4B82088A4939BE9A8063e20cB2efBE";
 
 async function deployMain(defaultSender) {
   const [deployer, user1] = await ethers.getSigners();
-  /*
-    const FLD = await ethers.getContractFactory("FLD");
-    const fld = await FLD.deploy();
-    console.log("fld:", fld.address);
-
-    const StakeRegistry = await ethers.getContractFactory("StakeRegistry");
-    const Stake1Logic = await ethers.getContractFactory("Stake1Logic");
-    const Stake1Proxy = await ethers.getContractFactory("Stake1Proxy");
-    const StakeFactory = await ethers.getContractFactory("StakeFactory");
-
-    const stakeRegistry = await StakeRegistry.deploy();
-    console.log("stakeRegistry:", stakeRegistry.address);
-    const stakeFactory = await StakeFactory.deploy();
-    console.log("stakeFactory:", stakeFactory.address);
-    const stake1Logic = await Stake1Logic.deploy();
-    console.log("stake1Logic:", stake1Logic.address);
-    const stake1Proxy = await Stake1Proxy.deploy();
-    console.log("stake1Proxy:", stake1Proxy.address);
-
-    await stake1Proxy.upgradeTo(stake1Logic.address);
-    console.log("upgradeTo:" );
-  */
 
   const stake1Proxy = await ethers.getContractAt("Stake1Proxy", proxy);
   const _logic = await stake1Proxy.implementation();

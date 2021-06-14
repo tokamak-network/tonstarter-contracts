@@ -1,7 +1,7 @@
 const fs = require("fs");
-/*
+
 module.exports = function (network, deployed) {
-  if (!fs.existsSync(`../deployed.${network}.json`)) {
+  if (!fs.existsSync(`deployed.${network}.json`)) {
     fs.writeFileSync(
       `../deployed.${network}.json`,
       "{}",
@@ -17,21 +17,20 @@ module.exports = function (network, deployed) {
     JSON.stringify(deployed, null, 2)
   );
 };
-*/
 
-module.exports = function (network, deployed) {
-  console.log('save ', network, deployed);
+// module.exports = function (network, deployed) {
+//   console.log('save ', network, deployed);
 
-  if (!fs.existsSync(`deployed.${network}.json`)) {
-    fs.writeFileSync(`deployed.${network}.json`, '{}', { flag: 'w' }, function (err) {
-      if (err) throw err;
-    });
-  }
+//   if (!fs.existsSync(`deployed.${network}.json`)) {
+//     fs.writeFileSync(`deployed.${network}.json`, '{}', { flag: 'w' }, function (err) {
+//       if (err) throw err;
+//     });
+//   }
 
-  let data = JSON.parse(fs.readFileSync(`deployed.${network}.json`).toString());
-  data[deployed.name] = deployed.address;
+//   let data = JSON.parse(fs.readFileSync(`deployed.${network}.json`).toString());
+//   data[deployed.name] = deployed.address;
 
-  console.log('data[deployed.name]', deployed.name, data[deployed.name]);
+//   console.log('data[deployed.name]', deployed.name, data[deployed.name]);
 
-  fs.writeFileSync(`deployed.${network}.json`, JSON.stringify(data, null, 2))
-}
+//   fs.writeFileSync(`deployed.${network}.json`, JSON.stringify(data, null, 2))
+// }

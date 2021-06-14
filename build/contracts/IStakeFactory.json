@@ -1,0 +1,1075 @@
+{
+  "contractName": "IStakeFactory",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "stakeType",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address[4]",
+          "name": "_addr",
+          "type": "address[4]"
+        },
+        {
+          "internalType": "address",
+          "name": "registry",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256[3]",
+          "name": "_intdata",
+          "type": "uint256[3]"
+        }
+      ],
+      "name": "create",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_stakeTONFactory",
+          "type": "address"
+        }
+      ],
+      "name": "setStakeTONFactory",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_stakeDefiFactory",
+          "type": "address"
+        }
+      ],
+      "name": "setStakeDefiFactory",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_stakeSimpleFactory",
+          "type": "address"
+        }
+      ],
+      "name": "setStakeSimpleFactory",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "metadata": "{\"compiler\":{\"version\":\"0.7.6+commit.7338295f\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"stakeType\",\"type\":\"uint256\"},{\"internalType\":\"address[4]\",\"name\":\"_addr\",\"type\":\"address[4]\"},{\"internalType\":\"address\",\"name\":\"registry\",\"type\":\"address\"},{\"internalType\":\"uint256[3]\",\"name\":\"_intdata\",\"type\":\"uint256[3]\"}],\"name\":\"create\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_stakeDefiFactory\",\"type\":\"address\"}],\"name\":\"setStakeDefiFactory\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_stakeSimpleFactory\",\"type\":\"address\"}],\"name\":\"setStakeSimpleFactory\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_stakeTONFactory\",\"type\":\"address\"}],\"name\":\"setStakeTONFactory\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{\"create(uint256,address[4],address,uint256[3])\":{\"details\":\"Create a stake contract that calls the desired stake factory according to stakeType\",\"params\":{\"_addr\":\"array of [token, paytoken, vault, _defiAddr]\",\"_intdata\":\"array of [saleStartBlock, startBlock, periodBlocks]\",\"registry\":\"registry address\",\"stakeType\":\"if 0, stakeTONFactory, else if 1 , stakeSimpleFactory , else if 2, stakeDefiFactory\"},\"returns\":{\"_0\":\"contract address\"}},\"setStakeDefiFactory(address)\":{\"details\":\"Set StakeDefiFactory address\",\"params\":{\"_stakeDefiFactory\":\"new StakeDefiFactory address\"}},\"setStakeSimpleFactory(address)\":{\"details\":\"Set StakeSimpleFactory address\",\"params\":{\"_stakeSimpleFactory\":\"new StakeSimpleFactory address\"}},\"setStakeTONFactory(address)\":{\"details\":\"Set StakeTONFactory address\",\"params\":{\"_stakeTONFactory\":\"new StakeTONFactory address\"}}},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"/Users/zena/ico2.0/ico20-contracts/contracts/interfaces/IStakeFactory.sol\":\"IStakeFactory\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"/Users/zena/ico2.0/ico20-contracts/contracts/interfaces/IStakeFactory.sol\":{\"keccak256\":\"0x557231d525b9e1a74525ecd20a9acf53af76e0e1fa30e1939ad64abec76b614d\",\"license\":\"Unlicense\",\"urls\":[\"bzz-raw://693eeb2d8424ff21af7e273a586b8191fc3be6687908fd6eec4d7a462ea13a39\",\"dweb:/ipfs/QmSzM1ZxC5wnvN4KnAT19UgBXxqm5Qtf7C4DZofc11rRgv\"]}},\"version\":1}",
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "immutableReferences": {},
+  "generatedSources": [],
+  "deployedGeneratedSources": [],
+  "sourceMap": "",
+  "deployedSourceMap": "",
+  "source": "//SPDX-License-Identifier: Unlicense\npragma solidity ^0.7.6;\n\ninterface IStakeFactory {\n    /// @dev Create a stake contract that calls the desired stake factory according to stakeType\n    /// @param stakeType if 0, stakeTONFactory, else if 1 , stakeSimpleFactory , else if 2, stakeDefiFactory\n    /// @param _addr array of [token, paytoken, vault, _defiAddr]\n    /// @param registry  registry address\n    /// @param _intdata array of [saleStartBlock, startBlock, periodBlocks]\n    /// @return contract address\n    function create(\n        uint256 stakeType,\n        address[4] calldata _addr,\n        address registry,\n        uint256[3] calldata _intdata\n    ) external returns (address);\n\n    /// @dev Set StakeTONFactory address\n    /// @param _stakeTONFactory new StakeTONFactory address\n    function setStakeTONFactory(address _stakeTONFactory) external;\n\n    /// @dev Set StakeDefiFactory address\n    /// @param _stakeDefiFactory new StakeDefiFactory address\n    function setStakeDefiFactory(address _stakeDefiFactory) external;\n\n    /// @dev Set StakeSimpleFactory address\n    /// @param _stakeSimpleFactory new StakeSimpleFactory address\n    function setStakeSimpleFactory(address _stakeSimpleFactory) external;\n}\n",
+  "sourcePath": "/Users/zena/ico2.0/ico20-contracts/contracts/interfaces/IStakeFactory.sol",
+  "ast": {
+    "absolutePath": "/Users/zena/ico2.0/ico20-contracts/contracts/interfaces/IStakeFactory.sol",
+    "exportedSymbols": {
+      "IStakeFactory": [
+        1163
+      ]
+    },
+    "id": 1164,
+    "license": "Unlicense",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 1126,
+        "literals": [
+          "solidity",
+          "^",
+          "0.7",
+          ".6"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "37:23:11"
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "fullyImplemented": false,
+        "id": 1163,
+        "linearizedBaseContracts": [
+          1163
+        ],
+        "name": "IStakeFactory",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "documentation": {
+              "id": 1127,
+              "nodeType": "StructuredDocumentation",
+              "src": "92:418:11",
+              "text": "@dev Create a stake contract that calls the desired stake factory according to stakeType\n @param stakeType if 0, stakeTONFactory, else if 1 , stakeSimpleFactory , else if 2, stakeDefiFactory\n @param _addr array of [token, paytoken, vault, _defiAddr]\n @param registry  registry address\n @param _intdata array of [saleStartBlock, startBlock, periodBlocks]\n @return contract address"
+            },
+            "functionSelector": "115c289b",
+            "id": 1144,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "create",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 1140,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1129,
+                  "mutability": "mutable",
+                  "name": "stakeType",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1144,
+                  "src": "540:17:11",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 1128,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "540:7:11",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 1133,
+                  "mutability": "mutable",
+                  "name": "_addr",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1144,
+                  "src": "567:25:11",
+                  "stateVariable": false,
+                  "storageLocation": "calldata",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_array$_t_address_$4_calldata_ptr",
+                    "typeString": "address[4]"
+                  },
+                  "typeName": {
+                    "baseType": {
+                      "id": 1130,
+                      "name": "address",
+                      "nodeType": "ElementaryTypeName",
+                      "src": "567:7:11",
+                      "stateMutability": "nonpayable",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_address",
+                        "typeString": "address"
+                      }
+                    },
+                    "id": 1132,
+                    "length": {
+                      "hexValue": "34",
+                      "id": 1131,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": true,
+                      "kind": "number",
+                      "lValueRequested": false,
+                      "nodeType": "Literal",
+                      "src": "575:1:11",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_rational_4_by_1",
+                        "typeString": "int_const 4"
+                      },
+                      "value": "4"
+                    },
+                    "nodeType": "ArrayTypeName",
+                    "src": "567:10:11",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_array$_t_address_$4_storage_ptr",
+                      "typeString": "address[4]"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 1135,
+                  "mutability": "mutable",
+                  "name": "registry",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1144,
+                  "src": "602:16:11",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 1134,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "602:7:11",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 1139,
+                  "mutability": "mutable",
+                  "name": "_intdata",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1144,
+                  "src": "628:28:11",
+                  "stateVariable": false,
+                  "storageLocation": "calldata",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_array$_t_uint256_$3_calldata_ptr",
+                    "typeString": "uint256[3]"
+                  },
+                  "typeName": {
+                    "baseType": {
+                      "id": 1136,
+                      "name": "uint256",
+                      "nodeType": "ElementaryTypeName",
+                      "src": "628:7:11",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "id": 1138,
+                    "length": {
+                      "hexValue": "33",
+                      "id": 1137,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": true,
+                      "kind": "number",
+                      "lValueRequested": false,
+                      "nodeType": "Literal",
+                      "src": "636:1:11",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_rational_3_by_1",
+                        "typeString": "int_const 3"
+                      },
+                      "value": "3"
+                    },
+                    "nodeType": "ArrayTypeName",
+                    "src": "628:10:11",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_array$_t_uint256_$3_storage_ptr",
+                      "typeString": "uint256[3]"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "530:132:11"
+            },
+            "returnParameters": {
+              "id": 1143,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1142,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1144,
+                  "src": "681:7:11",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 1141,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "681:7:11",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "680:9:11"
+            },
+            "scope": 1163,
+            "src": "515:175:11",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 1145,
+              "nodeType": "StructuredDocumentation",
+              "src": "696:96:11",
+              "text": "@dev Set StakeTONFactory address\n @param _stakeTONFactory new StakeTONFactory address"
+            },
+            "functionSelector": "aa53f97e",
+            "id": 1150,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "setStakeTONFactory",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 1148,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1147,
+                  "mutability": "mutable",
+                  "name": "_stakeTONFactory",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1150,
+                  "src": "825:24:11",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 1146,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "825:7:11",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "824:26:11"
+            },
+            "returnParameters": {
+              "id": 1149,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "859:0:11"
+            },
+            "scope": 1163,
+            "src": "797:63:11",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 1151,
+              "nodeType": "StructuredDocumentation",
+              "src": "866:99:11",
+              "text": "@dev Set StakeDefiFactory address\n @param _stakeDefiFactory new StakeDefiFactory address"
+            },
+            "functionSelector": "d6e9ac79",
+            "id": 1156,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "setStakeDefiFactory",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 1154,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1153,
+                  "mutability": "mutable",
+                  "name": "_stakeDefiFactory",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1156,
+                  "src": "999:25:11",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 1152,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "999:7:11",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "998:27:11"
+            },
+            "returnParameters": {
+              "id": 1155,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1034:0:11"
+            },
+            "scope": 1163,
+            "src": "970:65:11",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 1157,
+              "nodeType": "StructuredDocumentation",
+              "src": "1041:105:11",
+              "text": "@dev Set StakeSimpleFactory address\n @param _stakeSimpleFactory new StakeSimpleFactory address"
+            },
+            "functionSelector": "aaa5baf4",
+            "id": 1162,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "setStakeSimpleFactory",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 1160,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1159,
+                  "mutability": "mutable",
+                  "name": "_stakeSimpleFactory",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1162,
+                  "src": "1182:27:11",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 1158,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1182:7:11",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1181:29:11"
+            },
+            "returnParameters": {
+              "id": 1161,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1219:0:11"
+            },
+            "scope": 1163,
+            "src": "1151:69:11",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 1164,
+        "src": "62:1160:11"
+      }
+    ],
+    "src": "37:1186:11"
+  },
+  "legacyAST": {
+    "attributes": {
+      "absolutePath": "/Users/zena/ico2.0/ico20-contracts/contracts/interfaces/IStakeFactory.sol",
+      "exportedSymbols": {
+        "IStakeFactory": [
+          1163
+        ]
+      },
+      "license": "Unlicense"
+    },
+    "children": [
+      {
+        "attributes": {
+          "literals": [
+            "solidity",
+            "^",
+            "0.7",
+            ".6"
+          ]
+        },
+        "id": 1126,
+        "name": "PragmaDirective",
+        "src": "37:23:11"
+      },
+      {
+        "attributes": {
+          "abstract": false,
+          "baseContracts": [
+            null
+          ],
+          "contractDependencies": [
+            null
+          ],
+          "contractKind": "interface",
+          "fullyImplemented": false,
+          "linearizedBaseContracts": [
+            1163
+          ],
+          "name": "IStakeFactory",
+          "scope": 1164
+        },
+        "children": [
+          {
+            "attributes": {
+              "functionSelector": "115c289b",
+              "implemented": false,
+              "isConstructor": false,
+              "kind": "function",
+              "modifiers": [
+                null
+              ],
+              "name": "create",
+              "scope": 1163,
+              "stateMutability": "nonpayable",
+              "virtual": false,
+              "visibility": "external"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "text": "@dev Create a stake contract that calls the desired stake factory according to stakeType\n @param stakeType if 0, stakeTONFactory, else if 1 , stakeSimpleFactory , else if 2, stakeDefiFactory\n @param _addr array of [token, paytoken, vault, _defiAddr]\n @param registry  registry address\n @param _intdata array of [saleStartBlock, startBlock, periodBlocks]\n @return contract address"
+                },
+                "id": 1127,
+                "name": "StructuredDocumentation",
+                "src": "92:418:11"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "stakeType",
+                      "scope": 1144,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "uint256",
+                          "type": "uint256"
+                        },
+                        "id": 1128,
+                        "name": "ElementaryTypeName",
+                        "src": "540:7:11"
+                      }
+                    ],
+                    "id": 1129,
+                    "name": "VariableDeclaration",
+                    "src": "540:17:11"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "_addr",
+                      "scope": 1144,
+                      "stateVariable": false,
+                      "storageLocation": "calldata",
+                      "type": "address[4]",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "type": "address[4]"
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "name": "address",
+                              "stateMutability": "nonpayable",
+                              "type": "address"
+                            },
+                            "id": 1130,
+                            "name": "ElementaryTypeName",
+                            "src": "567:7:11"
+                          },
+                          {
+                            "attributes": {
+                              "hexvalue": "34",
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": true,
+                              "lValueRequested": false,
+                              "token": "number",
+                              "type": "int_const 4",
+                              "value": "4"
+                            },
+                            "id": 1131,
+                            "name": "Literal",
+                            "src": "575:1:11"
+                          }
+                        ],
+                        "id": 1132,
+                        "name": "ArrayTypeName",
+                        "src": "567:10:11"
+                      }
+                    ],
+                    "id": 1133,
+                    "name": "VariableDeclaration",
+                    "src": "567:25:11"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "registry",
+                      "scope": 1144,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "address",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "address",
+                          "stateMutability": "nonpayable",
+                          "type": "address"
+                        },
+                        "id": 1134,
+                        "name": "ElementaryTypeName",
+                        "src": "602:7:11"
+                      }
+                    ],
+                    "id": 1135,
+                    "name": "VariableDeclaration",
+                    "src": "602:16:11"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "_intdata",
+                      "scope": 1144,
+                      "stateVariable": false,
+                      "storageLocation": "calldata",
+                      "type": "uint256[3]",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "type": "uint256[3]"
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "name": "uint256",
+                              "type": "uint256"
+                            },
+                            "id": 1136,
+                            "name": "ElementaryTypeName",
+                            "src": "628:7:11"
+                          },
+                          {
+                            "attributes": {
+                              "hexvalue": "33",
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": true,
+                              "lValueRequested": false,
+                              "token": "number",
+                              "type": "int_const 3",
+                              "value": "3"
+                            },
+                            "id": 1137,
+                            "name": "Literal",
+                            "src": "636:1:11"
+                          }
+                        ],
+                        "id": 1138,
+                        "name": "ArrayTypeName",
+                        "src": "628:10:11"
+                      }
+                    ],
+                    "id": 1139,
+                    "name": "VariableDeclaration",
+                    "src": "628:28:11"
+                  }
+                ],
+                "id": 1140,
+                "name": "ParameterList",
+                "src": "530:132:11"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "",
+                      "scope": 1144,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "address",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "address",
+                          "stateMutability": "nonpayable",
+                          "type": "address"
+                        },
+                        "id": 1141,
+                        "name": "ElementaryTypeName",
+                        "src": "681:7:11"
+                      }
+                    ],
+                    "id": 1142,
+                    "name": "VariableDeclaration",
+                    "src": "681:7:11"
+                  }
+                ],
+                "id": 1143,
+                "name": "ParameterList",
+                "src": "680:9:11"
+              }
+            ],
+            "id": 1144,
+            "name": "FunctionDefinition",
+            "src": "515:175:11"
+          },
+          {
+            "attributes": {
+              "functionSelector": "aa53f97e",
+              "implemented": false,
+              "isConstructor": false,
+              "kind": "function",
+              "modifiers": [
+                null
+              ],
+              "name": "setStakeTONFactory",
+              "scope": 1163,
+              "stateMutability": "nonpayable",
+              "virtual": false,
+              "visibility": "external"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "text": "@dev Set StakeTONFactory address\n @param _stakeTONFactory new StakeTONFactory address"
+                },
+                "id": 1145,
+                "name": "StructuredDocumentation",
+                "src": "696:96:11"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "_stakeTONFactory",
+                      "scope": 1150,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "address",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "address",
+                          "stateMutability": "nonpayable",
+                          "type": "address"
+                        },
+                        "id": 1146,
+                        "name": "ElementaryTypeName",
+                        "src": "825:7:11"
+                      }
+                    ],
+                    "id": 1147,
+                    "name": "VariableDeclaration",
+                    "src": "825:24:11"
+                  }
+                ],
+                "id": 1148,
+                "name": "ParameterList",
+                "src": "824:26:11"
+              },
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 1149,
+                "name": "ParameterList",
+                "src": "859:0:11"
+              }
+            ],
+            "id": 1150,
+            "name": "FunctionDefinition",
+            "src": "797:63:11"
+          },
+          {
+            "attributes": {
+              "functionSelector": "d6e9ac79",
+              "implemented": false,
+              "isConstructor": false,
+              "kind": "function",
+              "modifiers": [
+                null
+              ],
+              "name": "setStakeDefiFactory",
+              "scope": 1163,
+              "stateMutability": "nonpayable",
+              "virtual": false,
+              "visibility": "external"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "text": "@dev Set StakeDefiFactory address\n @param _stakeDefiFactory new StakeDefiFactory address"
+                },
+                "id": 1151,
+                "name": "StructuredDocumentation",
+                "src": "866:99:11"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "_stakeDefiFactory",
+                      "scope": 1156,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "address",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "address",
+                          "stateMutability": "nonpayable",
+                          "type": "address"
+                        },
+                        "id": 1152,
+                        "name": "ElementaryTypeName",
+                        "src": "999:7:11"
+                      }
+                    ],
+                    "id": 1153,
+                    "name": "VariableDeclaration",
+                    "src": "999:25:11"
+                  }
+                ],
+                "id": 1154,
+                "name": "ParameterList",
+                "src": "998:27:11"
+              },
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 1155,
+                "name": "ParameterList",
+                "src": "1034:0:11"
+              }
+            ],
+            "id": 1156,
+            "name": "FunctionDefinition",
+            "src": "970:65:11"
+          },
+          {
+            "attributes": {
+              "functionSelector": "aaa5baf4",
+              "implemented": false,
+              "isConstructor": false,
+              "kind": "function",
+              "modifiers": [
+                null
+              ],
+              "name": "setStakeSimpleFactory",
+              "scope": 1163,
+              "stateMutability": "nonpayable",
+              "virtual": false,
+              "visibility": "external"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "text": "@dev Set StakeSimpleFactory address\n @param _stakeSimpleFactory new StakeSimpleFactory address"
+                },
+                "id": 1157,
+                "name": "StructuredDocumentation",
+                "src": "1041:105:11"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "_stakeSimpleFactory",
+                      "scope": 1162,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "address",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "address",
+                          "stateMutability": "nonpayable",
+                          "type": "address"
+                        },
+                        "id": 1158,
+                        "name": "ElementaryTypeName",
+                        "src": "1182:7:11"
+                      }
+                    ],
+                    "id": 1159,
+                    "name": "VariableDeclaration",
+                    "src": "1182:27:11"
+                  }
+                ],
+                "id": 1160,
+                "name": "ParameterList",
+                "src": "1181:29:11"
+              },
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 1161,
+                "name": "ParameterList",
+                "src": "1219:0:11"
+              }
+            ],
+            "id": 1162,
+            "name": "FunctionDefinition",
+            "src": "1151:69:11"
+          }
+        ],
+        "id": 1163,
+        "name": "ContractDefinition",
+        "src": "62:1160:11"
+      }
+    ],
+    "id": 1164,
+    "name": "SourceUnit",
+    "src": "37:1186:11"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.7.6+commit.7338295f.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "3.3.4",
+  "updatedAt": "2021-06-02T04:10:00.302Z",
+  "devdoc": {
+    "kind": "dev",
+    "methods": {
+      "create(uint256,address[4],address,uint256[3])": {
+        "details": "Create a stake contract that calls the desired stake factory according to stakeType",
+        "params": {
+          "_addr": "array of [token, paytoken, vault, _defiAddr]",
+          "_intdata": "array of [saleStartBlock, startBlock, periodBlocks]",
+          "registry": "registry address",
+          "stakeType": "if 0, stakeTONFactory, else if 1 , stakeSimpleFactory , else if 2, stakeDefiFactory"
+        },
+        "returns": {
+          "_0": "contract address"
+        }
+      },
+      "setStakeDefiFactory(address)": {
+        "details": "Set StakeDefiFactory address",
+        "params": {
+          "_stakeDefiFactory": "new StakeDefiFactory address"
+        }
+      },
+      "setStakeSimpleFactory(address)": {
+        "details": "Set StakeSimpleFactory address",
+        "params": {
+          "_stakeSimpleFactory": "new StakeSimpleFactory address"
+        }
+      },
+      "setStakeTONFactory(address)": {
+        "details": "Set StakeTONFactory address",
+        "params": {
+          "_stakeTONFactory": "new StakeTONFactory address"
+        }
+      }
+    },
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {},
+    "version": 1
+  }
+}

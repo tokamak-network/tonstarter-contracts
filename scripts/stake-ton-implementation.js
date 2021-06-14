@@ -43,6 +43,7 @@ let vaultfactory = loadDeployed(process.env.NETWORK,"StakeVaultFactory");
 let logic = loadDeployed(process.env.NETWORK,"Stake1Logic");
 let proxy = loadDeployed(process.env.NETWORK,"Stake1Proxy");
 
+let swapProxy = loadDeployed(process.env.NETWORK,"swapProxy");
 let ton = loadDeployed(process.env.NETWORK,"TON");
 let wton = loadDeployed(process.env.NETWORK,"WTON");
 let depositManager = loadDeployed(process.env.NETWORK,"DepositManager");
@@ -84,7 +85,9 @@ async function deployMain(defaultSender) {
     ton,
     wton,
     depositManager,
-    seigManager);
+    seigManager,
+    swapProxy
+  );
   console.log("stakeRegistry setTokamak:");
 
   await stakeRegistry.grantRole(ADMIN_ROLE, proxy);

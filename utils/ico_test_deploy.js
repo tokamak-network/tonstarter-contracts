@@ -31,23 +31,24 @@ const {
 const chai = require("chai");
 const { expect } = chai;
 chai.use(require("chai-bn")(BN)).should();
-/*
-const StakeFactoryAbi = require("../build/contracts/StakeFactory.json").abi;
-const StakeRegistryAbi = require("../build/contracts/StakeRegistry.json").abi;
-const FLDAbi = require("../build/contracts/FLD.json").abi;
-const SFLDAbi = require("../build/contracts/SFLD.json").abi;
-const StakeForSFLDAbi = require("../build/contracts/StakeForSFLD.json").abi;
-const Stake1VaultAbi = require("../build/contracts/Stake1Vault.json").abi;
-const Stake1LogicAbi = require("../build/contracts/Stake1Logic.json").abi;
-const Stake1ProxyAbi = require("../build/contracts/Stake1Proxy.json").abi;
-const StakeTONAbi = require("../build/contracts/StakeTON.json").abi;
-const IERC20Abi = require("../build/contracts/IERC20.json").abi;
-*/
+
+const name = "Fair Launchpad Dao";
+const symbol = "FLD";
+const version = "1";
+
 // ico2.0 contracts
 const StakeTONFactory = contract.fromArtifact("StakeTONFactory");
-const StakeForStableCoinFactory = contract.fromArtifact(
-  "StakeForStableCoinFactory"
+const StakeDefiFactory = contract.fromArtifact(
+  "StakeDefiFactory"
 );
+
+const StakeSimple = contract.fromArtifact("StakeSimple");
+const StakeSimpleFactory = contract.fromArtifact("StakeSimpleFactory");
+const StakeVaultFactory = contract.fromArtifact("StakeVaultFactory");
+
+const StakeTONLogic = contract.fromArtifact("StakeTON");
+const StakeTONProxyFactory = contract.fromArtifact("StakeTONProxyFactory");
+
 const StakeFactory = contract.fromArtifact("StakeFactory");
 const StakeRegistry = contract.fromArtifact("StakeRegistry");
 const FLD = contract.fromArtifact("FLD");
@@ -82,6 +83,7 @@ const AutoRefactorCoinage = contract.fromArtifact("AutoRefactorCoinage");
 const PowerTON = contract.fromArtifact("PowerTON");
 // const OldDAOVaultMock = contract.fromArtifact('OldDAOVaultMock');
 const DAOVault = contract.fromArtifact("DAOVault");
+const SwapProxy = contract.fromArtifact("SwapProxy");
 
 const EtherToken = contract.fromArtifact("EtherToken");
 const EpochHandler = contract.fromArtifact("EpochHandler");
@@ -160,6 +162,7 @@ class ICO20Contracts {
     // this.oldDaoVault = null;
     this.seigManager = null;
     this.powerton = null;
+    this.swapProxy = null;
 
     this.layer2s = [];
     this.coinages = [];
@@ -207,14 +210,19 @@ class ICO20Contracts {
     };
   }
 
+
+
   initializeICO20Contracts = async function (owner) {
     // this = self;
     // console.log(' initializeICO20Contracts owner:',owner );
     this.fld = null;
     this.sfld = null;
-    //this.stakeForSFLD = null;
+
+    this.stakeVaultFactory = null;
+    this.stakeSimpleFactory = null;
+
     this.stakeTONfactory = null;
-    this.stakeForStableCoinFactory = null;
+    this.stakeDefiFactory = null;
 
     this.stakeregister = null;
     this.stakefactory = null;
@@ -224,34 +232,44 @@ class ICO20Contracts {
     this.vault_phase1_ton = null;
     this.vault_phase1_fldethlp = null;
     this.vault_phase1_dev = null;
+    this.swapProxy = await SwapProxy.new({ from: owner });
 
-    this.fld = await FLD.new({ from: owner });
-    this.sfld = await SFLD.new({ from: owner });
-    //this.stakeForSFLD = await StakeForSFLD.new({ from: owner });
-    this.stakeregister = await StakeRegistry.new({ from: owner });
+    this.fld = await FLD.new(name, symbol, version, { from: owner });
+    this.stakeregister = await StakeRegistry.new(this.fld.address,  { from: owner });
 
-    this.stakeTONLogicFactory = await StakeTONLogicFactory.new({ from: owner });
+    this.stakeSimple = await StakeSimple.new({ from: owner });
+    this.stakeSimpleFactory = await StakeSimpleFactory.new(
+      this.stakeSimple.address,
+      { from: owner });
+
+    this.stake1Vault = await Stake1Vault.new({ from: owner });
+    this.stakeVaultFactory = await StakeVaultFactory.new(
+      this.stake1Vault.address,
+      { from: owner });
+
+    this.stakeTONLogic = await StakeTONLogic.new({ from: owner });
     this.stakeTONProxyFactory = await StakeTONProxyFactory.new({ from: owner });
-
 
     this.stakeTONfactory = await StakeTONFactory.new(
       this.stakeTONProxyFactory.address,
-      this.stakeTONLogicFactory.address,
+      this.stakeTONLogic.address,
       { from: owner });
 
-    this.stakeForStableCoinFactory = await StakeForStableCoinFactory.new({
+    this.stakeDefiFactory = await StakeDefiFactory.new(this.stakeSimple.address,
+    {
       from: owner,
     });
 
     this.stakefactory = await StakeFactory.new(
+      this.stakeSimpleFactory.address,
       this.stakeTONfactory.address,
-      this.stakeForStableCoinFactory.address,
+      this.stakeDefiFactory.address,
       { from: owner }
     );
     this.stake1logic = await Stake1Logic.new({ from: owner });
-    this.stake1proxy = await Stake1Proxy.new({ from: owner });
+    this.stake1proxy = await Stake1Proxy.new(this.stake1logic.address, { from: owner });
 
-    await this.stake1proxy.upgradeTo(this.stake1logic.address, { from: owner });
+    // await this.stake1proxy.upgradeTo(this.stake1logic.address, { from: owner });
 
     this.stakeEntry = await Stake1Logic.at(this.stake1proxy.address, {
       from: owner,
@@ -260,8 +278,8 @@ class ICO20Contracts {
     const returnData = {
       fld: this.fld,
       sfld: this.sfld,
-      // stakeForSFLD: this.stakeForSFLD,
-      stakeForStableCoinFactory: this.stakeForStableCoinFactory,
+      stakeSimpleFactory: this.stakeSimpleFactory,
+      stakeDefiFactory: this.stakeDefiFactory,
       stakeTONfactory: this.stakeTONfactory,
       stakeregister: this.stakeregister,
       stakefactory: this.stakefactory,
@@ -274,20 +292,20 @@ class ICO20Contracts {
     return returnData;
   };
 
-  createStaekForSFLD = async function (startB, owner) {
-    let stakeForSFLD = await StakeForSFLD.new({ from: owner });
+  // createStaekForSFLD = async function (startB, owner) {
+  //   let stakeForSFLD = await StakeForSFLD.new({ from: owner });
 
-    await stakeForSFLD.initialize(this.fld.address, this.sfld.address, startB, {
-      from: owner,
-    });
+  //   await stakeForSFLD.initialize(this.fld.address, this.sfld.address, startB, {
+  //     from: owner,
+  //   });
 
-    this.fld.grantRole(MINTER_ROLE, stakeForSFLD.address, { from: owner });
-    this.fld.grantRole(BURNER_ROLE, stakeForSFLD.address, { from: owner });
-    this.sfld.grantRole(MINTER_ROLE, stakeForSFLD.address, { from: owner });
-    this.sfld.grantRole(BURNER_ROLE, stakeForSFLD.address, { from: owner });
+  //   this.fld.grantRole(MINTER_ROLE, stakeForSFLD.address, { from: owner });
+  //   this.fld.grantRole(BURNER_ROLE, stakeForSFLD.address, { from: owner });
+  //   this.sfld.grantRole(MINTER_ROLE, stakeForSFLD.address, { from: owner });
+  //   this.sfld.grantRole(BURNER_ROLE, stakeForSFLD.address, { from: owner });
 
-    return stakeForSFLD;
-  };
+  //   return stakeForSFLD;
+  // };
 
   initializePlasmaEvmContracts = async function (owner) {
     // this = self;
@@ -422,16 +440,25 @@ class ICO20Contracts {
       stake1logic: this.stake1logic,
       stake1proxy: this.stake1proxy,
       stakeEntry: this.stakeEntry,
-      stakeForStableCoinFactory: this.stakeForStableCoinFactory,
+      stakeDefiFactory: this.stakeDefiFactory,
       stakeTONfactory: this.stakeTONfactory,
+      stakeSimpleFactory: this.stakeSimpleFactory
     };
   };
 
   setEntry = async function (owner) {
+
+    const uniswapRouter = "0xe592427a0aece92de3edee1f18e0157c05861564";
+    const uniswapNPM ="0xd1e1C3995695650ABc3Ea3c68ae5d365b35174ED";
+    const uniswapWeth ="0xe592427a0aece92de3edee1f18e0157c05861564";
+    const uniswapFee ="3000";
+    const uniswapRouter2 ="0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D";
+
     await this.stakeEntry.setStore(
       this.fld.address,
       this.stakeregister.address,
       this.stakefactory.address,
+      this.stakeVaultFactory.address,
       this.ton.address,
       this.wton.address,
       this.depositManager.address,
@@ -439,9 +466,28 @@ class ICO20Contracts {
       { from: owner }
     );
 
+    await this.stakeregister.setTokamak(
+      this.ton.address,
+      this.wton.address,
+      this.depositManager.address,
+      this.seigManager.address,
+      this.swapProxy.address
+      );
+
+    await this.stakeregister.addDefiInfo(
+        "UNISWAP_V3",
+        uniswapRouter,
+        uniswapNPM,
+        uniswapWeth,
+        uniswapFee,
+        uniswapRouter2
+      );
+
     await this.stakeregister.grantRole(ADMIN_ROLE, this.stake1proxy.address, {
       from: owner,
     });
+
+    await this.stakefactory.grantRole(ADMIN_ROLE, this.stake1proxy.address);
 
     return this.stakeEntry;
   };
@@ -726,6 +772,7 @@ class ICO20Contracts {
     const saleStartBlock = await vault.saleStartBlock();
     const stakeStartBlock = await vault.stakeStartBlock();
     const stakeEndBlock = await vault.stakeEndBlock();
+    const realEndBlock = await vault.realEndBlock();
     const blockTotalReward = await vault.blockTotalReward();
     const saleClosed = await vault.saleClosed();
     const orderedEndBlocks = await vault.orderedEndBlocksAll();
@@ -736,6 +783,7 @@ class ICO20Contracts {
     console.log("saleStartBlock", saleStartBlock.toString());
     console.log("stakeStartBlock", stakeStartBlock.toString());
     console.log("stakeEndBlock", stakeEndBlock.toString());
+    console.log("realEndBlock", realEndBlock.toString());
     console.log(
       "global reward per block",
       utils.formatUnits(blockTotalReward.toString(), 18)
@@ -761,6 +809,7 @@ class ICO20Contracts {
       const endBlock = await stakeContract.endBlock();
       const rewardClaimedTotal = await stakeContract.rewardClaimedTotal();
       const totalStakedAmount = await stakeContract.totalStakedAmount();
+
 
       let payTokenBalance = toBN("0");
       if (paytoken == zeroAddress) {
@@ -810,11 +859,13 @@ class ICO20Contracts {
     const saleClosed = await vault.saleClosed();
     const orderedEndBlocks = await vault.orderedEndBlocksAll();
     const stakeAddresses = await vault.stakeAddressesAll();
-
+    const realEndBlock = await vault.realEndBlock();
     console.log("cap", utils.formatUnits(cap.toString(), 18));
     console.log("paytoken", paytoken);
     console.log("saleStartBlock", saleStartBlock.toString());
     console.log("stakeStartBlock", stakeStartBlock.toString());
+    console.log("realEndBlock", realEndBlock.toString());
+
     console.log("stakeEndBlock", stakeEndBlock.toString());
     console.log(
       "blockTotalReward",
@@ -876,7 +927,7 @@ class ICO20Contracts {
       );
 
       console.log(" name", stakeInfo.name);
-      console.log(" startBlcok", stakeInfo.startBlcok.toString());
+      console.log(" startBlock", stakeInfo.startBlock.toString());
       console.log(" endBlock", stakeInfo.endBlock.toString());
       console.log(
         " balance",
@@ -891,8 +942,8 @@ class ICO20Contracts {
         utils.formatUnits(stakeInfo.claimRewardAmount.toString(), 18)
       );
 
-      await logUserStaked(_contract, user1, "user1");
-      await logUserStaked(_contract, user2, "user2");
+      await this.logUserStaked(_contract, user1, "user1");
+      await this.logUserStaked(_contract, user2, "user2");
     }
   }
 

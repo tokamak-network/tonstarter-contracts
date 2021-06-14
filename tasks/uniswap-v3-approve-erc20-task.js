@@ -2,27 +2,27 @@ const { findAccount } = require("./utils");
 
 const approveABI = [
   {
-    "constant": false,
-    "inputs": [
-        {
-            "name": "_spender",
-            "type": "address"
-        },
-        {
-            "name": "_value",
-            "type": "uint256"
-        }
+    constant: false,
+    inputs: [
+      {
+        name: "_spender",
+        type: "address",
+      },
+      {
+        name: "_value",
+        type: "uint256",
+      },
     ],
-    "name": "approve",
-    "outputs": [
-        {
-            "name": "",
-            "type": "bool"
-        }
+    name: "approve",
+    outputs: [
+      {
+        name: "",
+        type: "bool",
+      },
     ],
-    "payable": false,
-    "stateMutability": "nonpayable",
-    "type": "function"
+    payable: false,
+    stateMutability: "nonpayable",
+    type: "function",
   },
 ];
 
@@ -36,7 +36,8 @@ task("approve-erc20", "Approves amount to WTON")
     const token = new ethers.Contract(tokenAddress, approveABI);
 
     const tx = await token.connect(approver).approve(npmAddress, amount, {
-      gasLimit: 10000000, gasPrice: 6000000000
+      gasLimit: 10000000,
+      gasPrice: 6000000000,
     });
     await tx.wait();
   });
@@ -53,10 +54,9 @@ task("rinkeby-approve-wton", "Approves amount to WTON")
       account,
       tokenAddress,
       amount,
-      npmAddress
+      npmAddress,
     });
   });
-
 
 task("rinkeby-approve-fld", "Approves amount to FLD")
   .addParam("amount", "Amount")
@@ -70,10 +70,10 @@ task("rinkeby-approve-fld", "Approves amount to FLD")
       account,
       tokenAddress,
       amount,
-      npmAddress
+      npmAddress,
     });
   });
-  
+
 task("rinkeby-approve-weth", "Approves amount to WETH")
   .addParam("amount", "Amount")
   .setAction(async ({ amount }) => {
@@ -87,6 +87,6 @@ task("rinkeby-approve-weth", "Approves amount to WETH")
       account,
       tokenAddress,
       amount,
-      npmAddress
+      npmAddress,
     });
   });

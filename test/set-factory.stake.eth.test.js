@@ -16,9 +16,10 @@ const zeroAddress = "0x0000000000000000000000000000000000000000";
 const Stake1Vault = contract.fromArtifact("Stake1Vault");
 const StakeTON = contract.fromArtifact("StakeTON");
 const StakeTONProxy = contract.fromArtifact("StakeTONProxy");
-const StakeFactoyModified = contract.fromArtifact("StakeFactoryModified");
+const StakeSimpleFactoryModified = contract.fromArtifact("StakeFactory");
+const StakeSimpleLogicModified = contract.fromArtifact("StakeSimple");
 
-describe ("Upgradable Stake Contracts", function () {
+describe ("Stake1Logic : Upgradable Stake Contracts", function () {
   const usersInfo = [
     {
       name: "Bob",
@@ -38,12 +39,14 @@ describe ("Upgradable Stake Contracts", function () {
   let stakeEntry;
   let saleStartBlock, stakeStartBlock;
   let stakeFactoryModified;
+  saleStartBlock = 100;
+  stakeStartBlock = 200;
 
   const stakingContractInfo = [
     {name: "short staking", period: 50},
     {name: "long staking", period: 100}
   ];
-  
+
   before(async function () {
     this.timeout(1000000);
     contractsInitializer = new ICO20Contracts();
@@ -51,14 +54,14 @@ describe ("Upgradable Stake Contracts", function () {
 
 
 
-  it("Initialize contracts", async function () {
+  it("1. Initialize contracts", async function () {
     this.timeout(1000000);
 
     await contractsInitializer.initializeICO20Contracts(defaultSender);
     await contractsInitializer.initializePlasmaEvmContracts(defaultSender);
-    
+
     stakeEntry = await contractsInitializer.setEntry(defaultSender);
-  
+
     const result = await contractsInitializer.getICOContracts();
     ICO20Instances.fld = result.fld;
     ICO20Instances.stakeRegister = result.stakeregister;
@@ -66,21 +69,22 @@ describe ("Upgradable Stake Contracts", function () {
     ICO20Instances.stake1proxy = result.stake1proxy;
     ICO20Instances.stake1logic = result.stake1logic;
     ICO20Instances.stakeTONfactory = result.stakeTONfactory;
-    ICO20Instances.stakeForStableCoinFactory = result.stakeForStableCoinFactory;
+    ICO20Instances.stakeDefiFactory = result.stakeDefiFactory;
+    ICO20Instances.stakeSimpleFactory = result.stakeSimpleFactory;
   });
 
-  it("Deploy stake contracts modified", async function () {
-    stakeFactoryModified = await StakeFactoyModified.new(
+  it("2. Deploy stake contracts modified", async function () {
+
+    stakeFactoryModified = await StakeSimpleFactoryModified.new(
+      ICO20Instances.stakeSimpleFactory.address,
       ICO20Instances.stakeTONfactory.address,
-      ICO20Instances.stakeForStableCoinFactory.address,
+      ICO20Instances.stakeDefiFactory.address,
       { from: defaultSender }
     );
   });
 
-  it('should create a vault', async function () {
-    const current = await time.latestBlock();
-    saleStartBlock = parseInt(current + 4);
-    stakeStartBlock = saleStartBlock + 20;
+  it('3. createVault', async function () {
+
     const HASH_Pharse1_ETH_Staking = keccak256("PHASE1_ETH_STAKING");
 
     const tx = await stakeEntry.createVault(
@@ -90,7 +94,7 @@ describe ("Upgradable Stake Contracts", function () {
       toBN(stakeStartBlock),
       toBN('1'),
       HASH_Pharse1_ETH_Staking,
-      toBN('0'),
+      toBN('1'),
       zeroAddress
       , { from: defaultSender });
 
@@ -100,9 +104,13 @@ describe ("Upgradable Stake Contracts", function () {
   });
 
 
-  it("should create stake contracts", async function () {
+  it("4. createStakeContract", async function () {
     this.timeout(10000000);
-    await stakeEntry.setFactory(stakeFactoryModified.address);
+
+    await stakeEntry.setStakeFactory(stakeFactoryModified.address,
+    { from: defaultSender });
+    /// await this.stakefactory.grantRole(ADMIN_ROLE, this.stake1proxy.address);
+
     for (const { name, period } of stakingContractInfo) {
       await expect(
         stakeEntry.createStakeContract(
@@ -113,10 +121,12 @@ describe ("Upgradable Stake Contracts", function () {
           toBN(period), // staking period
           name, // staking name
           { from: defaultSender }
-      )).to.be.revertedWith("Function cannot be used");
+      )).to.be.revertedWith("StakeFactory: not an admin");
     }
 
-    await stakeEntry.setFactory(ICO20Instances.stakeFactory.address);
+    await stakeEntry.setStakeFactory(ICO20Instances.stakeFactory.address,
+    { from: defaultSender });
+
     for (const { name, period } of stakingContractInfo) {
       stakeEntry.createStakeContract(
         toBN("1"), // phase number
@@ -134,9 +144,10 @@ describe ("Upgradable Stake Contracts", function () {
     for (let i = 0; i < stakingContractInfo.length; ++i) {
       stakingContractInfo[i].address = stakeAddresses[i];
     }
+
   });
 
-  it("should set new factory stake to invalid contract", async function () {
+  it("5. should set new factory stake to invalid contract", async function () {
     this.timeout(10000000);
     const currentBlockTime = parseInt(saleStartBlock);
     await time.advanceBlockTo(currentBlockTime);
@@ -153,13 +164,25 @@ describe ("Upgradable Stake Contracts", function () {
     }
   });
 
-  it("should close sale", async function () {
+  it("6. should close sale", async function () {
     const current = parseInt(stakeStartBlock);
     await time.advanceBlockTo(current);
     await stakeEntry.closeSale(Vault.address, { from: defaultSender });
   });
 
-  it("should claim rewards", async function () {
+   it("7. upgradeStakeTo ", async function () {
+    this.timeout(10000000);
+
+    let stakeSimpleLogicModified = await StakeSimpleLogicModified.new({ from: defaultSender });
+
+    await stakeEntry.upgradeStakeTo(
+      stakingContractInfo[0].address,
+      stakeSimpleLogicModified.address,
+      { from: defaultSender });
+
+  });
+
+  it("8. should claim rewards", async function () {
     this.timeout(10000000);
     const fld = ICO20Instances.fld;
 
@@ -168,26 +191,29 @@ describe ("Upgradable Stake Contracts", function () {
       await time.advanceBlockTo(block - 1);
       for (const { name: stakeName, address: stakeAddress, period: stakePeriod } of stakingContractInfo) {
         const stakeContract = await StakeTON.at(stakeAddress);
-        for (const { address: userAddress } of usersInfo) {
-          const reward = await stakeContract.canRewardAmount(userAddress);
-          console.log({ reward: reward.toString() });
+        const prevRewardClaimedTotal = await stakeContract.rewardClaimedTotal();
+        let sum = toBN(prevRewardClaimedTotal.toString());
 
+        for (const { address: userAddress } of usersInfo) {
+          const reward = await stakeContract.canRewardAmount(userAddress, block);
           const fldBalance = await fld.balanceOf(userAddress);
           await stakeContract.claim({ from: userAddress });
           block++;
-          console.log({ fldBalance: fldBalance.toString() });
+          sum = sum.add(toBN(reward.toString()));
 
           const newFldBalance = await fld.balanceOf(userAddress);
-          await expect(newFldBalance).to.be.bignumber.above(fldBalance);
-          console.log({ newFldBalance: newFldBalance.toString() });
+
+          await expect(reward.add(fldBalance)).to.be.bignumber.equal(newFldBalance);
 
           const rewardClaimedTotal = await stakeContract.rewardClaimedTotal();
-          console.log(fromWei(rewardClaimedTotal.toString(), "ether"));
+
+          await expect(sum.toString()).to.be.bignumber.equal(toBN(rewardClaimedTotal).toString());
 
           const { amount, claimedAmount } = await stakeContract.userStaked(userAddress);
-          console.log({ amount: amount.toString(), claimedAmount: claimedAmount.toString() });
+          //console.log({ amount: amount.toString(), claimedAmount: claimedAmount.toString() });
         }
       }
     }
   });
+
 });

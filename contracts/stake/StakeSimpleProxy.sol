@@ -17,7 +17,7 @@ contract StakeSimpleProxy is Stake1Storage, AccessControl {
     modifier onlyOwner() {
         require(
             hasRole(ADMIN_ROLE, msg.sender),
-            "not an admin"
+            "StakeSimpleProxy:not an admin"
         );
         _;
     }
@@ -29,6 +29,14 @@ contract StakeSimpleProxy is Stake1Storage, AccessControl {
         _implementation = _logic;
     }
 
+    /// @dev transfer Ownership
+    /// @param newOwner new owner address
+    function transferOwnership(address newOwner) external onlyOwner {
+        require(msg.sender != newOwner, "StakeSimpleProxy:same owner");
+        grantRole(ADMIN_ROLE, newOwner);
+        revokeRole(ADMIN_ROLE, msg.sender);
+    }
+
     /// @notice Set pause state
     /// @param _pause true:pause or false:resume
     function setProxyPause(bool _pause) external onlyOwner {
@@ -38,11 +46,8 @@ contract StakeSimpleProxy is Stake1Storage, AccessControl {
     /// @notice Set implementation contract
     /// @param impl New implementation contract address
     function upgradeTo(address impl) external onlyOwner {
-        require(impl != address(0), "input is zero");
-        require(
-            _implementation != impl,
-            "same"
-        );
+        require(impl != address(0), "StakeSimpleProxy: input is zero");
+        require(_implementation != impl, "StakeSimpleProxy: same");
         _implementation = impl;
         emit Upgraded(impl);
     }
@@ -64,7 +69,7 @@ contract StakeSimpleProxy is Stake1Storage, AccessControl {
         address _impl = implementation();
         require(
             _impl != address(0) && !pauseProxy,
-            "StakeYearnProxy: impl is zero OR proxy is false"
+            "StakeSimpleProxy: impl is zero OR proxy is false"
         );
 
         assembly {
@@ -91,13 +96,16 @@ contract StakeSimpleProxy is Stake1Storage, AccessControl {
         }
     }
 
-    function setInit(
-        address[3] memory _addr,
-        uint256[3] memory _intdata
-    ) external onlyOwner {
+    /// @dev set initial storage
+    /// @param _addr the array addresses of token, paytoken, vault
+    /// @param _intdata the array valued of saleStartBlock, stakeStartBlock, periodBlocks
+    function setInit(address[3] memory _addr, uint256[3] memory _intdata)
+        external
+        onlyOwner
+    {
         require(
-                _addr[2] != address(0) &&
-                _intdata[0] < _intdata[1], "setInit fail"
+            _addr[2] != address(0) && _intdata[0] < _intdata[1],
+            "StakeSimpleProxy: setInit fail"
         );
         token = _addr[0];
         paytoken = _addr[1];
@@ -107,5 +115,4 @@ contract StakeSimpleProxy is Stake1Storage, AccessControl {
         startBlock = _intdata[1];
         endBlock = startBlock + _intdata[2];
     }
-
 }

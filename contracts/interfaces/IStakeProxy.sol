@@ -2,9 +2,15 @@
 pragma solidity ^0.7.6;
 
 interface IStakeProxy {
-    function setProxyPause(bool _pause) external ;
-    function upgradeTo(address impl) external ;
+    /// @dev Set pause state
+    /// @param _pause true:pause or false:resume
+    function setProxyPause(bool _pause) external;
+
+    /// @dev Set implementation contract
+    /// @param impl New implementation contract address
+    function upgradeTo(address impl) external;
+
+    /// @dev view implementation address
+    /// @return the logic address
     function implementation() external view returns (address);
-    function grantRole(bytes32 role, address account) external ;
-    function revokeRole(bytes32 role, address account) external ;
 }

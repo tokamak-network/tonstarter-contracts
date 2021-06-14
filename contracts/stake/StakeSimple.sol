@@ -1,50 +1,75 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity ^0.7.0;
 
+import "../interfaces/IStakeSimple.sol";
 import {IIStake1Vault} from "../interfaces/IIStake1Vault.sol";
 import {IIERC20} from "../interfaces/IIERC20.sol";
 import "../libraries/LibTokenStake1.sol";
 import {SafeMath} from "../utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
-import "../stake/StakeTONStorage.sol";
+import "../stake/Stake1Storage.sol";
 
 /// @title Simple Stake Contract
 /// @notice Stake contracts can interact with the vault to claim fld tokens
-contract StakeSimple is StakeTONStorage, AccessControl  {
+contract StakeSimple is Stake1Storage, AccessControl, IStakeSimple {
     using SafeMath for uint256;
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
 
     modifier onlyOwner() {
-        require(
-            hasRole(ADMIN_ROLE, msg.sender),
-            "not an admin"
-        );
+        require(hasRole(ADMIN_ROLE, msg.sender), "StakeSimple: not an admin");
         _;
     }
     modifier lock() {
-        require(_lock == 0, "LOCKED");
+        require(_lock == 0, "StakeSimple: LOCKED");
         _lock = 1;
         _;
         _lock = 0;
     }
 
-    //////////////////////////////
-    // Events
-    //////////////////////////////
+    /// @dev event on staking
+    /// @param to the sender
+    /// @param amount the amount of staking
     event Staked(address indexed to, uint256 amount);
-    event Claimed(address indexed to, uint256 amount, uint256 currentBlcok);
+
+    /// @dev event on claim
+    /// @param to the sender
+    /// @param amount the amount of claim
+    /// @param claimBlock the block of claim
+    event Claimed(address indexed to, uint256 amount, uint256 claimBlock);
+
+    /// @dev event on withdrawal
+    /// @param to the sender
+    /// @param amount the amount of withdrawal
     event Withdrawal(address indexed to, uint256 amount);
 
+    /// @dev constructor of StakeSimple
     constructor() {
         _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
         _setupRole(ADMIN_ROLE, msg.sender);
     }
 
+    /// @dev receive ether
+    /// @dev call stake function with msg.value
     receive() external payable {
         stake(msg.value);
     }
 
+    /// @dev transfer Ownership
+    /// @param newOwner new owner address
+    function transferOwnership(address newOwner) external onlyOwner {
+        require(msg.sender != newOwner, "StakeSimple: same owner");
+        grantRole(ADMIN_ROLE, newOwner);
+        revokeRole(ADMIN_ROLE, msg.sender);
+    }
+
     /// @dev Initialize
+    /// @param _token  the reward token address , It is FLD address.
+    /// @param _paytoken  Tokens staked by users, can be used as ERC20 tokens.
+    //                     (In case of ETH, input address(0))
+    /// @param _vault  the _ault's address
+    /// @param _saleStartBlock  the sale start block
+    /// @param _startBlock  the staking start block
+    /// @param _period the period that user can generate reward amount
     function initialize(
         address _token,
         address _paytoken,
@@ -52,11 +77,12 @@ contract StakeSimple is StakeTONStorage, AccessControl  {
         uint256 _saleStartBlock,
         uint256 _startBlock,
         uint256 _period
-    ) external onlyOwner {
+    ) external override onlyOwner {
         require(
             _token != address(0) &&
                 _vault != address(0) &&
-                _saleStartBlock < _startBlock, "zero"
+                _saleStartBlock < _startBlock,
+            "StakeSimple: initialize zero"
         );
         token = _token;
         paytoken = _paytoken;
@@ -67,48 +93,53 @@ contract StakeSimple is StakeTONStorage, AccessControl  {
     }
 
     /// @dev Stake amount
-    function stake(uint256 amount) public payable {
+    /// @param amount  the amount of staked
+    function stake(uint256 amount) public payable override {
         require(
             (paytoken == address(0) && msg.value == amount) ||
                 (paytoken != address(0) && amount > 0),
-            "zero"
+            "StakeSimple: stake zero"
         );
         require(
-            block.number >= saleStartBlock &&
-                block.number < startBlock,
-            "unavailable"
+            block.number >= saleStartBlock && block.number < startBlock,
+            "StakeSimple: period is not allowed"
         );
 
         require(!IIStake1Vault(vault).saleClosed(), "not end");
 
         if (paytoken == address(0)) amount = msg.value;
-        else
-            require(
-                IIERC20(paytoken).balanceOf(msg.sender) >= amount,
-                "lack"
-            );
+        else require(IIERC20(paytoken).balanceOf(msg.sender) >= amount, "lack");
 
         LibTokenStake1.StakedAmount storage staked = userStaked[msg.sender];
+        if (staked.amount == 0) totalStakers = totalStakers.add(1);
+
         staked.amount = staked.amount.add(amount);
         totalStakedAmount = totalStakedAmount.add(amount);
         if (paytoken != address(0))
             require(
-                IIERC20(paytoken).transferFrom(msg.sender, address(this), amount)
+                IIERC20(paytoken).transferFrom(
+                    msg.sender,
+                    address(this),
+                    amount
+                )
             );
 
         emit Staked(msg.sender, amount);
     }
 
-    /// @dev To withdraw
-    function withdraw() external {
+    /// @dev withdraw
+    function withdraw() external override {
         require(
             endBlock > 0 && endBlock < block.number,
-            "not end"
+            "StakeSimple: not end"
         );
 
         LibTokenStake1.StakedAmount storage staked = userStaked[msg.sender];
-        require(staked.released == false, "Already withdraw");
-        require(staked.releasedAmount <= staked.amount,"Amount wrong");
+        require(staked.released == false, "StakeSimple: Already withdraw");
+        require(
+            staked.releasedAmount <= staked.amount,
+            "StakeSimple: Amount wrong"
+        );
 
         staked.released = true;
         staked.releasedBlock = block.number;
@@ -121,12 +152,11 @@ contract StakeSimple is StakeTONStorage, AccessControl  {
             address payable self = address(uint160(address(this)));
             require(self.balance >= amount);
             (bool success, ) = msg.sender.call{value: amount}("");
-            require(success, "withdraw failed.");
-
+            require(success, "StakeSimple: withdraw failed.");
         } else {
             require(
                 IIERC20(paytoken).transfer(msg.sender, amount),
-                "transfer fail"
+                "StakeSimple: transfer fail"
             );
         }
 
@@ -134,25 +164,25 @@ contract StakeSimple is StakeTONStorage, AccessControl  {
     }
 
     /// @dev Claim for reward
-    function claim() external lock {
+    function claim() external override lock {
         require(
             IIStake1Vault(vault).saleClosed() == true,
-            "not closed"
+            "StakeSimple: not closed"
         );
         uint256 rewardClaim = 0;
 
         LibTokenStake1.StakedAmount storage staked = userStaked[msg.sender];
-        require(staked.claimedBlock < endBlock, "claimed");
+        require(staked.claimedBlock < endBlock, "StakeSimple: claimed");
 
         rewardClaim = canRewardAmount(msg.sender, block.number);
 
-        require(rewardClaim > 0, "reward is zero");
+        require(rewardClaim > 0, "StakeSimple: reward is zero");
 
         uint256 rewardTotal =
             IIStake1Vault(vault).totalRewardAmount(address(this));
         require(
             rewardClaimedTotal.add(rewardClaim) <= rewardTotal,
-            "total reward exceeds"
+            "StakeSimple: total reward exceeds"
         );
 
         staked.claimedBlock = block.number;
@@ -165,19 +195,23 @@ contract StakeSimple is StakeTONStorage, AccessControl  {
     }
 
     /// @dev Returns the amount that can be rewarded
-    //function canRewardAmount(address account) public view returns (uint256) {
-    function canRewardAmount(address account, uint256 specilaBlock)
-        public view
+    /// @param account  the account that claimed reward
+    /// @param specificBlock the block that claimed reward
+    /// @return reward the reward amount that can be taken
+    function canRewardAmount(address account, uint256 specificBlock)
+        public
+        view
+        override
         returns (uint256)
     {
         uint256 reward = 0;
-        if(specilaBlock > endBlock ) specilaBlock = endBlock;
+        if (specificBlock > endBlock) specificBlock = endBlock;
 
         if (
-            specilaBlock < startBlock ||
+            specificBlock < startBlock ||
             userStaked[account].amount == 0 ||
             userStaked[account].claimedBlock > endBlock ||
-            userStaked[account].claimedBlock > specilaBlock
+            userStaked[account].claimedBlock > specificBlock
         ) {
             reward = 0;
         } else {
@@ -185,7 +219,7 @@ contract StakeSimple is StakeTONStorage, AccessControl  {
             uint256 endR = endBlock;
             if (startR < userStaked[account].claimedBlock)
                 startR = userStaked[account].claimedBlock;
-            if (specilaBlock < endR) endR = specilaBlock;
+            if (specificBlock < endR) endR = specificBlock;
 
             uint256[] memory orderedEndBlocks =
                 IIStake1Vault(vault).orderedEndBlocksAll();
@@ -203,25 +237,26 @@ contract StakeSimple is StakeTONStorage, AccessControl  {
                 for (uint256 i = 0; i < orderedEndBlocks.length; i++) {
                     _end = orderedEndBlocks[i];
                     _total = IIStake1Vault(vault).stakeEndBlockTotal(_end);
-                    uint256 _period = endR.sub(startR);
 
-                    if (_start > _end) {
-
-                    } else if (endR <= _end) {
-                        // reward +=
-                        //     (blockTotalReward *
-                        //         (endR - startR) * amount) /
-                        //     _total;
-                        reward = reward.add(blockTotalReward.mul(_period).mul(amount).div(_total));
+                    if (_start > _end) {} else if (endR <= _end) {
+                        if (_total > 0) {
+                            uint256 _period1 = endR.sub(startR);
+                            reward = reward.add(
+                                blockTotalReward.mul(_period1).mul(amount).div(
+                                    _total
+                                )
+                            );
+                        }
                         break;
                     } else {
-                        // reward +=
-                        //     (blockTotalReward *
-                        //         (_end - startR) *
-                        //         amount) /
-                        //     _total;
-                        reward = reward.add(blockTotalReward.mul(_period).mul(amount).div(_total));
-
+                        if (_total > 0) {
+                            uint256 _period2 = _end.sub(startR);
+                            reward = reward.add(
+                                blockTotalReward.mul(_period2).mul(amount).div(
+                                    _total
+                                )
+                            );
+                        }
                         startR = _end;
                     }
                 }
@@ -230,7 +265,7 @@ contract StakeSimple is StakeTONStorage, AccessControl  {
         return reward;
     }
     /*
-    function canRewardAmountTest(address account, uint256 specilaBlock)
+    function canRewardAmountTest(address account, uint256 specificBlock)
         public view
         returns (uint256, uint256, uint256, uint256)
     {
@@ -238,13 +273,13 @@ contract StakeSimple is StakeTONStorage, AccessControl  {
         uint256 startR = 0;
         uint256 endR = 0;
         uint256 blockTotalReward = 0;
-        if(specilaBlock > endBlock ) specilaBlock = endBlock;
+        if(specificBlock > endBlock ) specificBlock = endBlock;
 
         if (
-            specilaBlock < startBlock ||
+            specificBlock < startBlock ||
             userStaked[account].amount == 0 ||
             userStaked[account].claimedBlock > endBlock ||
-            userStaked[account].claimedBlock > specilaBlock
+            userStaked[account].claimedBlock > specificBlock
         ) {
             reward = 0;
         } else {
@@ -252,7 +287,7 @@ contract StakeSimple is StakeTONStorage, AccessControl  {
             endR = endBlock;
             if (startR < userStaked[account].claimedBlock)
                 startR = userStaked[account].claimedBlock;
-            if (specilaBlock < endR) endR = specilaBlock;
+            if (specificBlock < endR) endR = specificBlock;
 
             uint256[] memory orderedEndBlocks =
                 IStake1Vault(vault).orderedEndBlocksAll();

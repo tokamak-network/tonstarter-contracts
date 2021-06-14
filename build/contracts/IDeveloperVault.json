@@ -1,0 +1,909 @@
+{
+  "contractName": "IDeveloperVault",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_fld",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_cap",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_rewardPeriod",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_startRewardBlock",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_claimsNumberMax",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address[]",
+          "name": "_developers",
+          "type": "address[]"
+        },
+        {
+          "internalType": "uint256[]",
+          "name": "_claimAmounts",
+          "type": "uint256[]"
+        }
+      ],
+      "name": "initialize",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "claimReward",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "currentRewardBlock",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "metadata": "{\"compiler\":{\"version\":\"0.7.6+commit.7338295f\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[],\"name\":\"claimReward\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"currentRewardBlock\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_fld\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_cap\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_rewardPeriod\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_startRewardBlock\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_claimsNumberMax\",\"type\":\"uint256\"},{\"internalType\":\"address[]\",\"name\":\"_developers\",\"type\":\"address[]\"},{\"internalType\":\"uint256[]\",\"name\":\"_claimAmounts\",\"type\":\"uint256[]\"}],\"name\":\"initialize\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{\"claimReward()\":{\"details\":\"Developers can receive their FLDs\"},\"currentRewardBlock()\":{\"details\":\"Returns current reward block for sender\"},\"initialize(address,uint256,uint256,uint256,uint256,address[],uint256[])\":{\"details\":\"set initial storage\",\"params\":{\"_cap\":\"the allocated FLD amount to devs\",\"_claimAmounts\":\"How much do you pay at one time?\",\"_claimsNumberMax\":\"Total number of payments\",\"_developers\":\"the developer list\",\"_fld\":\"the FLD address\",\"_rewardPeriod\":\"given only once per _rewardPeriod.\",\"_startRewardBlock\":\"the start block to give .\"}}},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"/Users/zena/ico2.0/ico20-contracts/contracts/interfaces/IDeveloperVault.sol\":\"IDeveloperVault\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"/Users/zena/ico2.0/ico20-contracts/contracts/interfaces/IDeveloperVault.sol\":{\"keccak256\":\"0x789a403f822efdd0c6f824e4db86ac652170604bbe89c7e51b8680077f9f84de\",\"license\":\"Unlicense\",\"urls\":[\"bzz-raw://f8c58539c7a853963edd654cb4e8f41b7840c9e2120145e609387c73c5fb3af2\",\"dweb:/ipfs/QmVWsMvTNu8AzFp6mBm6xaoQzSdcDPgiPaWaAat3eR8Sg6\"]}},\"version\":1}",
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "immutableReferences": {},
+  "generatedSources": [],
+  "deployedGeneratedSources": [],
+  "sourceMap": "",
+  "deployedSourceMap": "",
+  "source": "//SPDX-License-Identifier: Unlicense\npragma solidity ^0.7.6;\n\ninterface IDeveloperVault {\n    /// @dev set initial storage\n    /// @param _fld the FLD address\n    /// @param _cap the allocated FLD amount to devs\n    /// @param _rewardPeriod given only once per _rewardPeriod.\n    /// @param _startRewardBlock the start block to give .\n    /// @param _claimsNumberMax Total number of payments\n    /// @param _developers the developer list\n    /// @param _claimAmounts How much do you pay at one time?\n    function initialize(\n        address _fld,\n        uint256 _cap,\n        uint256 _rewardPeriod,\n        uint256 _startRewardBlock,\n        uint256 _claimsNumberMax,\n        address[] memory _developers,\n        uint256[] memory _claimAmounts\n    ) external;\n\n    /// @dev Developers can receive their FLDs\n    function claimReward() external;\n\n    /// @dev Returns current reward block for sender\n    function currentRewardBlock() external view returns (uint256);\n}\n",
+  "sourcePath": "/Users/zena/ico2.0/ico20-contracts/contracts/interfaces/IDeveloperVault.sol",
+  "ast": {
+    "absolutePath": "/Users/zena/ico2.0/ico20-contracts/contracts/interfaces/IDeveloperVault.sol",
+    "exportedSymbols": {
+      "IDeveloperVault": [
+        2687
+      ]
+    },
+    "id": 2688,
+    "license": "Unlicense",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 2656,
+        "literals": [
+          "solidity",
+          "^",
+          "0.7",
+          ".6"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "37:23:8"
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "fullyImplemented": false,
+        "id": 2687,
+        "linearizedBaseContracts": [
+          2687
+        ],
+        "name": "IDeveloperVault",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "documentation": {
+              "id": 2657,
+              "nodeType": "StructuredDocumentation",
+              "src": "94:405:8",
+              "text": "@dev set initial storage\n @param _fld the FLD address\n @param _cap the allocated FLD amount to devs\n @param _rewardPeriod given only once per _rewardPeriod.\n @param _startRewardBlock the start block to give .\n @param _claimsNumberMax Total number of payments\n @param _developers the developer list\n @param _claimAmounts How much do you pay at one time?"
+            },
+            "functionSelector": "279708e8",
+            "id": 2676,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "initialize",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 2674,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 2659,
+                  "mutability": "mutable",
+                  "name": "_fld",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2676,
+                  "src": "533:12:8",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 2658,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "533:7:8",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 2661,
+                  "mutability": "mutable",
+                  "name": "_cap",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2676,
+                  "src": "555:12:8",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 2660,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "555:7:8",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 2663,
+                  "mutability": "mutable",
+                  "name": "_rewardPeriod",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2676,
+                  "src": "577:21:8",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 2662,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "577:7:8",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 2665,
+                  "mutability": "mutable",
+                  "name": "_startRewardBlock",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2676,
+                  "src": "608:25:8",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 2664,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "608:7:8",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 2667,
+                  "mutability": "mutable",
+                  "name": "_claimsNumberMax",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2676,
+                  "src": "643:24:8",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 2666,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "643:7:8",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 2670,
+                  "mutability": "mutable",
+                  "name": "_developers",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2676,
+                  "src": "677:28:8",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_array$_t_address_$dyn_memory_ptr",
+                    "typeString": "address[]"
+                  },
+                  "typeName": {
+                    "baseType": {
+                      "id": 2668,
+                      "name": "address",
+                      "nodeType": "ElementaryTypeName",
+                      "src": "677:7:8",
+                      "stateMutability": "nonpayable",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_address",
+                        "typeString": "address"
+                      }
+                    },
+                    "id": 2669,
+                    "nodeType": "ArrayTypeName",
+                    "src": "677:9:8",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_array$_t_address_$dyn_storage_ptr",
+                      "typeString": "address[]"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 2673,
+                  "mutability": "mutable",
+                  "name": "_claimAmounts",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2676,
+                  "src": "715:30:8",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_array$_t_uint256_$dyn_memory_ptr",
+                    "typeString": "uint256[]"
+                  },
+                  "typeName": {
+                    "baseType": {
+                      "id": 2671,
+                      "name": "uint256",
+                      "nodeType": "ElementaryTypeName",
+                      "src": "715:7:8",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "id": 2672,
+                    "nodeType": "ArrayTypeName",
+                    "src": "715:9:8",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_array$_t_uint256_$dyn_storage_ptr",
+                      "typeString": "uint256[]"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "523:228:8"
+            },
+            "returnParameters": {
+              "id": 2675,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "760:0:8"
+            },
+            "scope": 2687,
+            "src": "504:257:8",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 2677,
+              "nodeType": "StructuredDocumentation",
+              "src": "767:42:8",
+              "text": "@dev Developers can receive their FLDs"
+            },
+            "functionSelector": "b88a802f",
+            "id": 2680,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "claimReward",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 2678,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "834:2:8"
+            },
+            "returnParameters": {
+              "id": 2679,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "845:0:8"
+            },
+            "scope": 2687,
+            "src": "814:32:8",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 2681,
+              "nodeType": "StructuredDocumentation",
+              "src": "852:48:8",
+              "text": "@dev Returns current reward block for sender"
+            },
+            "functionSelector": "4ed8e5dd",
+            "id": 2686,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "currentRewardBlock",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 2682,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "932:2:8"
+            },
+            "returnParameters": {
+              "id": 2685,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 2684,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2686,
+                  "src": "958:7:8",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 2683,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "958:7:8",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "957:9:8"
+            },
+            "scope": 2687,
+            "src": "905:62:8",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 2688,
+        "src": "62:907:8"
+      }
+    ],
+    "src": "37:933:8"
+  },
+  "legacyAST": {
+    "attributes": {
+      "absolutePath": "/Users/zena/ico2.0/ico20-contracts/contracts/interfaces/IDeveloperVault.sol",
+      "exportedSymbols": {
+        "IDeveloperVault": [
+          2687
+        ]
+      },
+      "license": "Unlicense"
+    },
+    "children": [
+      {
+        "attributes": {
+          "literals": [
+            "solidity",
+            "^",
+            "0.7",
+            ".6"
+          ]
+        },
+        "id": 2656,
+        "name": "PragmaDirective",
+        "src": "37:23:8"
+      },
+      {
+        "attributes": {
+          "abstract": false,
+          "baseContracts": [
+            null
+          ],
+          "contractDependencies": [
+            null
+          ],
+          "contractKind": "interface",
+          "fullyImplemented": false,
+          "linearizedBaseContracts": [
+            2687
+          ],
+          "name": "IDeveloperVault",
+          "scope": 2688
+        },
+        "children": [
+          {
+            "attributes": {
+              "functionSelector": "279708e8",
+              "implemented": false,
+              "isConstructor": false,
+              "kind": "function",
+              "modifiers": [
+                null
+              ],
+              "name": "initialize",
+              "scope": 2687,
+              "stateMutability": "nonpayable",
+              "virtual": false,
+              "visibility": "external"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "text": "@dev set initial storage\n @param _fld the FLD address\n @param _cap the allocated FLD amount to devs\n @param _rewardPeriod given only once per _rewardPeriod.\n @param _startRewardBlock the start block to give .\n @param _claimsNumberMax Total number of payments\n @param _developers the developer list\n @param _claimAmounts How much do you pay at one time?"
+                },
+                "id": 2657,
+                "name": "StructuredDocumentation",
+                "src": "94:405:8"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "_fld",
+                      "scope": 2676,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "address",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "address",
+                          "stateMutability": "nonpayable",
+                          "type": "address"
+                        },
+                        "id": 2658,
+                        "name": "ElementaryTypeName",
+                        "src": "533:7:8"
+                      }
+                    ],
+                    "id": 2659,
+                    "name": "VariableDeclaration",
+                    "src": "533:12:8"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "_cap",
+                      "scope": 2676,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "uint256",
+                          "type": "uint256"
+                        },
+                        "id": 2660,
+                        "name": "ElementaryTypeName",
+                        "src": "555:7:8"
+                      }
+                    ],
+                    "id": 2661,
+                    "name": "VariableDeclaration",
+                    "src": "555:12:8"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "_rewardPeriod",
+                      "scope": 2676,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "uint256",
+                          "type": "uint256"
+                        },
+                        "id": 2662,
+                        "name": "ElementaryTypeName",
+                        "src": "577:7:8"
+                      }
+                    ],
+                    "id": 2663,
+                    "name": "VariableDeclaration",
+                    "src": "577:21:8"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "_startRewardBlock",
+                      "scope": 2676,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "uint256",
+                          "type": "uint256"
+                        },
+                        "id": 2664,
+                        "name": "ElementaryTypeName",
+                        "src": "608:7:8"
+                      }
+                    ],
+                    "id": 2665,
+                    "name": "VariableDeclaration",
+                    "src": "608:25:8"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "_claimsNumberMax",
+                      "scope": 2676,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "uint256",
+                          "type": "uint256"
+                        },
+                        "id": 2666,
+                        "name": "ElementaryTypeName",
+                        "src": "643:7:8"
+                      }
+                    ],
+                    "id": 2667,
+                    "name": "VariableDeclaration",
+                    "src": "643:24:8"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "_developers",
+                      "scope": 2676,
+                      "stateVariable": false,
+                      "storageLocation": "memory",
+                      "type": "address[]",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "type": "address[]"
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "name": "address",
+                              "stateMutability": "nonpayable",
+                              "type": "address"
+                            },
+                            "id": 2668,
+                            "name": "ElementaryTypeName",
+                            "src": "677:7:8"
+                          }
+                        ],
+                        "id": 2669,
+                        "name": "ArrayTypeName",
+                        "src": "677:9:8"
+                      }
+                    ],
+                    "id": 2670,
+                    "name": "VariableDeclaration",
+                    "src": "677:28:8"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "_claimAmounts",
+                      "scope": 2676,
+                      "stateVariable": false,
+                      "storageLocation": "memory",
+                      "type": "uint256[]",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "type": "uint256[]"
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "name": "uint256",
+                              "type": "uint256"
+                            },
+                            "id": 2671,
+                            "name": "ElementaryTypeName",
+                            "src": "715:7:8"
+                          }
+                        ],
+                        "id": 2672,
+                        "name": "ArrayTypeName",
+                        "src": "715:9:8"
+                      }
+                    ],
+                    "id": 2673,
+                    "name": "VariableDeclaration",
+                    "src": "715:30:8"
+                  }
+                ],
+                "id": 2674,
+                "name": "ParameterList",
+                "src": "523:228:8"
+              },
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 2675,
+                "name": "ParameterList",
+                "src": "760:0:8"
+              }
+            ],
+            "id": 2676,
+            "name": "FunctionDefinition",
+            "src": "504:257:8"
+          },
+          {
+            "attributes": {
+              "functionSelector": "b88a802f",
+              "implemented": false,
+              "isConstructor": false,
+              "kind": "function",
+              "modifiers": [
+                null
+              ],
+              "name": "claimReward",
+              "scope": 2687,
+              "stateMutability": "nonpayable",
+              "virtual": false,
+              "visibility": "external"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "text": "@dev Developers can receive their FLDs"
+                },
+                "id": 2677,
+                "name": "StructuredDocumentation",
+                "src": "767:42:8"
+              },
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 2678,
+                "name": "ParameterList",
+                "src": "834:2:8"
+              },
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 2679,
+                "name": "ParameterList",
+                "src": "845:0:8"
+              }
+            ],
+            "id": 2680,
+            "name": "FunctionDefinition",
+            "src": "814:32:8"
+          },
+          {
+            "attributes": {
+              "functionSelector": "4ed8e5dd",
+              "implemented": false,
+              "isConstructor": false,
+              "kind": "function",
+              "modifiers": [
+                null
+              ],
+              "name": "currentRewardBlock",
+              "scope": 2687,
+              "stateMutability": "view",
+              "virtual": false,
+              "visibility": "external"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "text": "@dev Returns current reward block for sender"
+                },
+                "id": 2681,
+                "name": "StructuredDocumentation",
+                "src": "852:48:8"
+              },
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 2682,
+                "name": "ParameterList",
+                "src": "932:2:8"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "",
+                      "scope": 2686,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "uint256",
+                          "type": "uint256"
+                        },
+                        "id": 2683,
+                        "name": "ElementaryTypeName",
+                        "src": "958:7:8"
+                      }
+                    ],
+                    "id": 2684,
+                    "name": "VariableDeclaration",
+                    "src": "958:7:8"
+                  }
+                ],
+                "id": 2685,
+                "name": "ParameterList",
+                "src": "957:9:8"
+              }
+            ],
+            "id": 2686,
+            "name": "FunctionDefinition",
+            "src": "905:62:8"
+          }
+        ],
+        "id": 2687,
+        "name": "ContractDefinition",
+        "src": "62:907:8"
+      }
+    ],
+    "id": 2688,
+    "name": "SourceUnit",
+    "src": "37:933:8"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.7.6+commit.7338295f.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "3.3.4",
+  "updatedAt": "2021-06-02T02:39:03.493Z",
+  "devdoc": {
+    "kind": "dev",
+    "methods": {
+      "claimReward()": {
+        "details": "Developers can receive their FLDs"
+      },
+      "currentRewardBlock()": {
+        "details": "Returns current reward block for sender"
+      },
+      "initialize(address,uint256,uint256,uint256,uint256,address[],uint256[])": {
+        "details": "set initial storage",
+        "params": {
+          "_cap": "the allocated FLD amount to devs",
+          "_claimAmounts": "How much do you pay at one time?",
+          "_claimsNumberMax": "Total number of payments",
+          "_developers": "the developer list",
+          "_fld": "the FLD address",
+          "_rewardPeriod": "given only once per _rewardPeriod.",
+          "_startRewardBlock": "the start block to give ."
+        }
+      }
+    },
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {},
+    "version": 1
+  }
+}

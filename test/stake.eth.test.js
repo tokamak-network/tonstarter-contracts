@@ -1,6 +1,3 @@
-// const { BigNumber, utils } = require("ethers")
-// const { ethers, upgrades } = require("hardhat")
-
 const { ether, wei, time, expectEvent } = require("@openzeppelin/test-helpers");
 const { ethers } = require("ethers");
 const BigNumber = ethers.BigNumber; // https://docs.ethers.io/v5/api/utils/bignumber/
@@ -13,8 +10,6 @@ const {
   web3,
   privateKeys,
 } = require("@openzeppelin/test-environment");
-
-// const { expectEvent } = require('openzeppelin-test-helpers');
 
 const BN = require("bn.js");
 
@@ -59,18 +54,7 @@ const Stake1Vault = contract.fromArtifact("Stake1Vault");
 const StakeTON = contract.fromArtifact("StakeTON");
 const IERC20 = contract.fromArtifact("IERC20");
 // ----------------------
-/*
-const initialTotal = "10000000000." + "0".repeat(18);
-const Pharse1_TON_Staking = "175000000." + "0".repeat(18);
-const Pharse1_ETH_Staking = "175000000." + "0".repeat(18);
-const Pharse1_FLDETHLP_Staking = "150000000." + "0".repeat(18);
-const Pharse1_DEV_Mining = "150000000." + "0".repeat(18);
 
-const HASH_Pharse1_TON_Staking = keccak256("PHASE1_TON_STAKING");
-const HASH_Pharse1_ETH_Staking = keccak256("PHASE1_ETH_STAKING");
-const HASH_Pharse1_FLDETHLP_Staking = keccak256("PHASE1_FLDETHLP_Staking");
-const HASH_Pharse1_DEV_Mining = keccak256("PHASE1_DEV_Mining");
-*/
 const saleStartBlock = 0;
 let salePeriod = (60 * 60 * 24 * 14) / 13;
 let stakePeriod = (60 * 60 * 24 * 30) / 13;
@@ -81,7 +65,7 @@ const zeroAddress = "0x0000000000000000000000000000000000000000";
 
 const logFlag = 0;
 
-describe("Phase1. StakeContract with ETH", function () {
+describe("StakeSimple : Stake with ETH", function () {
   let weth, fld, stakeregister, stakefactory, stake1proxy, stake1logic;
   let vault_phase1_eth,
     vault_phase1_ton,
@@ -116,7 +100,7 @@ describe("Phase1. StakeContract with ETH", function () {
     ico20Contracts = new ICO20Contracts();
   });
 
-  describe('# Global Setting', async function () {
+  describe('# 1. Pre-requisite Setting', async function () {
     it("ico20Contracts init  ", async function () {
       this.timeout(1000000);
       ICOContractsDeployed = await ico20Contracts.initializeICO20Contracts(
@@ -129,10 +113,10 @@ describe("Phase1. StakeContract with ETH", function () {
         await ico20Contracts.initializePlasmaEvmContracts(defaultSender);
     });
 
-    it("Set StakeProxy  ", async function () {
+    it('Set StakeProxy  ', async function () {
       this.timeout(1000000);
       stakeEntry = await ico20Contracts.setEntry(defaultSender);
-      if (logFlag) console.log("StakeProxy", stakeEntry.address);
+      if (logFlag) console.log('StakeProxy', stakeEntry.address);
 
       const cons = await ico20Contracts.getICOContracts();
       fld = cons.fld;
@@ -141,9 +125,10 @@ describe("Phase1. StakeContract with ETH", function () {
       stake1proxy = cons.stake1proxy;
       stake1logic = cons.stake1logic;
     });
+
   });
 
-  describe('# Vault & StakeContract Setting', async function () {
+  describe('# 2. Vault & StakeContract Setting', async function () {
     it("1. Create Vault", async function () {
       const current = await time.latestBlock();
       saleStartBlock = 100;
@@ -165,7 +150,7 @@ describe("Phase1. StakeContract with ETH", function () {
         toBN(stakeStartBlock),
         toBN("1"),
         HASH_Pharse1_ETH_Staking,
-        toBN("0"),
+        toBN("1"),
         zeroAddress,
         { from: defaultSender }
       );
@@ -183,6 +168,8 @@ describe("Phase1. StakeContract with ETH", function () {
 
     it("2. createStakeContract ", async function () {
       for (let i = 0; i < testStakingPeriodBlocks.length; i++) {
+        //console.log('createStakeContract period ',i,testStakingPeriodBlocks[i]);
+
         await stakeEntry.createStakeContract(
           toBN("1"),
           vault_phase1_eth.address,
@@ -199,7 +186,7 @@ describe("Phase1. StakeContract with ETH", function () {
     });
   });
 
-  describe('# Function Test For Sale ', async function () {
+  describe('# 3. Function Test For Sale ', async function () {
     it("1. If the sale period does not start, staking will fail.", async function () {
       const stakeContract = await StakeTON.at(stakeAddresses[0]);
       await expect(
@@ -207,18 +194,18 @@ describe("Phase1. StakeContract with ETH", function () {
           from: user1,
           value: toWei(testUser1StakingAmount[0], "ether"),
         })
-      ).to.be.revertedWith("StakeTON: period is unavailable");
+      ).to.be.revertedWith("StakeSimple: period is not allowed");
     });
 
     it("2. If the sales period does not start, the sales closing function fails.", async function () {
       await expect(
         stakeEntry.closeSale(vault_phase1_eth.address, { from: user1 })
-      ).to.be.revertedWith("Stake1Vault: closeSale init fail");
+      ).to.be.revertedWith("Stake1Vault: Before stakeStartBlock");
     });
 
   });
 
-  describe('# Function Test For Staking ', async function () {
+  describe('# 4. Function Test For Staking ', async function () {
     it("1. If during the sale period and staking has not started yet, then Ether is staked.", async function () {
 
       this.timeout(1000000);
@@ -240,12 +227,20 @@ describe("Phase1. StakeContract with ETH", function () {
             value: toWei(testUser1StakingAmount[i], "ether"),
           });
 
+          let stakedInfo = await stakeContract.getUserStaked(user1);
+
+          await expect(toBN(stakedInfo.amount)).to.be.bignumber.equal(toBN(testUser1StakingAmount[i]).mul(toBN(10**18)));
+
           await stakeContract.sendTransaction({
             from: user2,
             value: toWei(testUser2StakingAmount[i], "ether"),
           });
+          stakedInfo = await stakeContract.getUserStaked(user2);
 
-          if (logFlag) await ico20Contracts.logStake(stakeContractAddress, user1, user2);
+          await expect(toBN(stakedInfo.amount)).to.be.bignumber.equal(toBN(testUser2StakingAmount[i]).mul(toBN(10**18)));
+
+          if (logFlag)
+          await ico20Contracts.logStake(stakeContractAddress, user1, user2);
         }
       }
     });
@@ -253,7 +248,7 @@ describe("Phase1. StakeContract with ETH", function () {
     it("2. If the sales period is not over, the sales closing function will fail.", async function () {
       await expect(
         stakeEntry.closeSale(vault_phase1_eth.address, { from: user1 })
-      ).to.be.revertedWith("Stake1Vault: closeSale init fail");
+      ).to.be.revertedWith("Stake1Vault: Before stakeStartBlock");
     });
 
     it("3. Ether staking is not allowed after the sale period is over.", async function () {
@@ -266,14 +261,14 @@ describe("Phase1. StakeContract with ETH", function () {
           from: user1,
           value: toWei(testUser1StakingAmount[0], "ether"),
         })
-      ).to.be.revertedWith("StakeTON: period is unavailable");
+      ).to.be.revertedWith("StakeSimple: period is not allowed");
     });
 
     it("4. If the sales closing function is not performed, the reward claim will fail.", async function () {
       const stakeContract = await StakeTON.at(stakeAddresses[0]);
       await expect(
         stakeContract.claim({ from: testStakingUsers[0] })
-      ).to.be.revertedWith("StakeTON: The sale is not closed");
+      ).to.be.revertedWith("StakeSimple: not closed");
     });
 
     it("5. When the sales period is over, the sales closing function can be performed.", async function () {
@@ -288,55 +283,48 @@ describe("Phase1. StakeContract with ETH", function () {
     it("6. The sales closing function can be performed only once.", async function () {
       await expect(
         stakeEntry.closeSale(vault_phase1_eth.address, { from: user1 })
-      ).to.be.revertedWith("Stake1Vault: sale is already closed");
+      ).to.be.revertedWith("Stake1Vault: already closed");
     });
+
   });
 
-  describe('# Function Test1 For withdraw ', async function () {
+  describe('# 5. Function Test1 For Withdraw ', async function () {
     it("1. cannot withdraw unless the staking deadline has passed.", async function () {
       let current = await time.latestBlock();
-      if (logFlag) console.log(`\n\n Current block: ${current} `);
+      if (logFlag)
+      console.log(`\n\n Current block: ${current} `);
       let i = 0;
       const stakeContract1 = await StakeTON.at(stakeAddresses[i]);
       await expect(
         stakeContract1.withdraw({ from: user1 })
-      ).to.be.revertedWith("StakeTON: on staking period");
+      ).to.be.revertedWith("StakeSimple: not end");
     });
   });
 
-  describe('# Function Test For Claim ', async function () {
-    it("2. You can claim a reward after the sales closing function is performed", async function () {
+  describe('# 6. Function Test For Claim ', async function () {
+    it("1. You can claim a reward after the sales closing function is performed", async function () {
       this.timeout(1000000);
       for (let i = 0; i < 2; i++) {
-        let testBlcok = stakeStartBlock + testClaimBlock[i] ;
-       // if (logFlag) console.log(`\n ------- ClaimBlcok:`, testBlcok);
-        await time.advanceBlockTo(testBlcok-1);
-        //let current = await time.latestBlock();
-        //if (logFlag) console.log(`\n\n Current block: ${current} `);
+        let block = stakeStartBlock + testClaimBlock[i] ;
+        await time.advanceBlockTo(block-1);
+
         if (logFlag) console.log(`\n ====== delay blocks for test :`);
         if (stakeAddresses.length > 0) {
           for (let j = 0; j < stakeAddresses.length; j++) {
             if (logFlag) console.log(`\n ----  StakeContract:`, j);
             let stakeContract = await StakeTON.at(stakeAddresses[j]);
+            const prevRewardClaimedTotal = await stakeContract.rewardClaimedTotal();
+            let sum = toBN(prevRewardClaimedTotal.toString());
+
             for (let u = 0; u < 2; u++) {
               if (logFlag){
-                console.log(`\n ------- ClaimBlcok:`, testBlcok);
+                console.log(`\n ------- ClaimBlcok:`, block);
                 console.log("\n testStakingUsers : ", u, testStakingUsers[u]);
               }
-              /*
-              let rewardCheck = await stakeContract.canRewardAmountForTest(
-                testStakingUsers[u]
-              );
-              if (logFlag) console.log(` \n------- rewardCheck.reward`, fromWei(rewardCheck.reward.toString(), "ether"));
-              if (logFlag) console.log(` \n------- rewardCheck.startR`, rewardCheck.startR.toString() );
-              if (logFlag) console.log(` \n------- rewardCheck.endR`, rewardCheck.endR.toString());
-              if (logFlag) console.log(` \n------- rewardCheck.blockTotalReward`, fromWei(rewardCheck.blockTotalReward.toString(), "ether"));
-              */
+
               let reward = await stakeContract.canRewardAmount(
-                testStakingUsers[u]
+                testStakingUsers[u], block
               );
-              //if (logFlag) console.log(` \n------- user`, u, testStakingUsers[u]);
-              //if (logFlag) console.log(` reward:  `, fromWei(reward.toString(), "ether"));
 
               if (reward.gt(toBN("0"))) {
                 let fldBalance1 = await fld.balanceOf(testStakingUsers[u]);
@@ -347,7 +335,8 @@ describe("Phase1. StakeContract with ETH", function () {
                   );
 
                 let tx = await stakeContract.claim({ from: testStakingUsers[u] });
-                testBlcok++;
+                block++;
+                sum = sum.add(toBN(reward.toString()));
 
                 if (logFlag)
                   console.log(
@@ -355,7 +344,7 @@ describe("Phase1. StakeContract with ETH", function () {
                     tx.receipt.logs[0].event,
                     //tx.receipt.logs[0].args.from,
                     fromWei(tx.receipt.logs[0].args.amount.toString(),'ether'),
-                    tx.receipt.logs[0].args.currentBlcok.toString()
+                    tx.receipt.logs[0].args.claimBlock.toString()
                   );
 
                 let fldBalance2 = await fld.balanceOf(testStakingUsers[u]);
@@ -364,15 +353,17 @@ describe("Phase1. StakeContract with ETH", function () {
                     ` after claim -> fldBalance2 :  `,
                     fromWei(fldBalance2.toString(), "ether")
                   );
+                await expect(reward.add(fldBalance1)).to.be.bignumber.equal(fldBalance2);
 
-                await expect(fldBalance2).to.be.bignumber.above(fldBalance1);
-
-                let rewardClaimedTotal2 =
+                let rewardClaimedTotal =
                   await stakeContract.rewardClaimedTotal();
+
+                await expect(sum.toString()).to.be.bignumber.equal(toBN(rewardClaimedTotal).toString());
+
                 if (logFlag)
                   console.log(
-                    `after claim -> stakeContract rewardClaimedTotal2 :  `,
-                    fromWei(rewardClaimedTotal2.toString(), "ether")
+                    `after claim -> stakeContract rewardClaimedTotal :  `,
+                    fromWei(rewardClaimedTotal.toString(), "ether")
                   );
                 if (logFlag)
                   await ico20Contracts.logUserStaked(
@@ -388,7 +379,7 @@ describe("Phase1. StakeContract with ETH", function () {
     });
   });
 
-  describe('# Function Test2 For withdraw ', async function () {
+  describe('# 7. Function Test2 For withdraw ', async function () {
     it('1. can withdraw after the staking end block is passed. ', async function () {
       this.timeout(1000000);
       stakeEndBlock = await vault_phase1_eth.stakeEndBlock();
@@ -397,7 +388,7 @@ describe("Phase1. StakeContract with ETH", function () {
       if(logFlag) console.log(`\n Withdrawal block: ${stakeEndBlock} `);
 
       for (let i = 0; i < stakeAddresses.length; i++) {
-        if (logFlag) console.log('\n  ************* withdraw : ', i, stakeAddresses[i]);
+        //if (logFlag) console.log('\n  ************* withdraw : ', i, stakeAddresses[i]);
         const stakeContract1 = await StakeTON.at(stakeAddresses[i]);
         let payTokenBalance1 = await web3.eth.getBalance(user1);
         if (logFlag){
@@ -405,19 +396,19 @@ describe("Phase1. StakeContract with ETH", function () {
           await ico20Contracts.logUserStaked(stakeAddresses[i], user1, 'user1 pre withdraw');
         }
 
-        //const userStaked = await stakeContract1.userStaked(user1);
-        //console.log("amount", utils.formatUnits(userStaked.amount.toString(), 18));
-
         await stakeContract1.withdraw({ from: user1 });
         stakeEndBlock++;
 
         const payTokenBalance2 = await web3.eth.getBalance(user1);
+
+        let userStaked = await stakeContract1.getUserStaked(user1);
+        await expect(toBN(userStaked.amount).add(toBN(payTokenBalance1))).to.be.bignumber.above(toBN(payTokenBalance2));
+        await expect(payTokenBalance2).to.be.bignumber.above(payTokenBalance1);
+
         if (logFlag){
           console.log('\n user1\'s payTokenBalance2:', fromWei(payTokenBalance2.toString(), 'ether'));
           await ico20Contracts.logUserStaked(stakeAddresses[i], user1, 'user1 after withdraw');
         }
-
-        await expect(payTokenBalance2).to.be.bignumber.above(payTokenBalance1);
 
       }
     });

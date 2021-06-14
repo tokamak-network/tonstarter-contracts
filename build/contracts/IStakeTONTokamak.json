@@ -1,0 +1,1679 @@
+{
+  "contractName": "IStakeTONTokamak",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_layer2",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "stakeAmount",
+          "type": "uint256"
+        }
+      ],
+      "name": "tokamakStaking",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_layer2",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "wtonAmount",
+          "type": "uint256"
+        }
+      ],
+      "name": "tokamakRequestUnStaking",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_layer2",
+          "type": "address"
+        }
+      ],
+      "name": "tokamakRequestUnStakingAll",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_layer2",
+          "type": "address"
+        }
+      ],
+      "name": "tokamakProcessUnStaking",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_amountIn",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_amountOutMinimum",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_deadline",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint160",
+          "name": "sqrtPriceLimitX96",
+          "type": "uint160"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_kind",
+          "type": "uint256"
+        }
+      ],
+      "name": "exchangeWTONtoFLD",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "amountOut",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_amountIn",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_amountOutMinimum",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_deadline",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_kind",
+          "type": "uint256"
+        }
+      ],
+      "name": "exchangeWTONtoFLDv2",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "amountOut",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "metadata": "{\"compiler\":{\"version\":\"0.7.6+commit.7338295f\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_amountIn\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_amountOutMinimum\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_deadline\",\"type\":\"uint256\"},{\"internalType\":\"uint160\",\"name\":\"sqrtPriceLimitX96\",\"type\":\"uint160\"},{\"internalType\":\"uint256\",\"name\":\"_kind\",\"type\":\"uint256\"}],\"name\":\"exchangeWTONtoFLD\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"amountOut\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_amountIn\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_amountOutMinimum\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_deadline\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_kind\",\"type\":\"uint256\"}],\"name\":\"exchangeWTONtoFLDv2\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"amountOut\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_layer2\",\"type\":\"address\"}],\"name\":\"tokamakProcessUnStaking\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_layer2\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"wtonAmount\",\"type\":\"uint256\"}],\"name\":\"tokamakRequestUnStaking\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_layer2\",\"type\":\"address\"}],\"name\":\"tokamakRequestUnStakingAll\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_layer2\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"stakeAmount\",\"type\":\"uint256\"}],\"name\":\"tokamakStaking\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{\"exchangeWTONtoFLD(uint256,uint256,uint256,uint160,uint256)\":{\"details\":\"exchange holded WTON to FLD using uniswap\",\"params\":{\"_amountIn\":\"the input amount\",\"_amountOutMinimum\":\"the minimun output amount\",\"_deadline\":\"deadline\",\"_kind\":\"the function type, if 0, use exactInputSingle function, else if, use exactInput function\",\"sqrtPriceLimitX96\":\"sqrtPriceLimitX96\"},\"returns\":{\"amountOut\":\"the amount of exchanged out token\"}},\"exchangeWTONtoFLDv2(uint256,uint256,uint256,uint256)\":{\"details\":\"exchange holded WTON to FLD using uniswap\",\"params\":{\"_amountIn\":\"the input amount\",\"_amountOutMinimum\":\"the minimun output amount\",\"_deadline\":\"deadline\",\"_kind\":\"the function type, if 0, use exactInputSingle function, else if, use exactInput function\"},\"returns\":{\"amountOut\":\"the amount of exchanged out token\"}},\"tokamakProcessUnStaking(address)\":{\"details\":\"process unstaking in layer2 in tokamak\",\"params\":{\"_layer2\":\"the layer2 address in tokamak\"}},\"tokamakRequestUnStaking(address,uint256)\":{\"details\":\"request unstaking the wtonAmount in layer2 in tokamak\",\"params\":{\"_layer2\":\"the layer2 address in tokamak\",\"wtonAmount\":\"the amount requested to unstaking\"}},\"tokamakRequestUnStakingAll(address)\":{\"details\":\"Requests unstaking the amount of all  in tokamak's layer2\",\"params\":{\"_layer2\":\"the layer2 address in Tokamak\"}},\"tokamakStaking(address,uint256)\":{\"details\":\"staking the staked TON in layer2 in tokamak\",\"params\":{\"_layer2\":\"the layer2 address in tokamak\",\"stakeAmount\":\"the amount that stake to layer2\"}}},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"/Users/zena/ico2.0/ico20-contracts/contracts/interfaces/IStakeTONTokamak.sol\":\"IStakeTONTokamak\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":100},\"remappings\":[]},\"sources\":{\"/Users/zena/ico2.0/ico20-contracts/contracts/interfaces/IStakeTONTokamak.sol\":{\"keccak256\":\"0x821d29a10f69ad7a1bb46e1fe6b1afca5df7aa280106d146b39fceba01dfd557\",\"license\":\"Unlicense\",\"urls\":[\"bzz-raw://33ed2378fc743429bdda8db1a27a6e469aac99ffa91b64c9ee5617d4a5139427\",\"dweb:/ipfs/QmV6i36CxfmgyGv8WxDqBhXoqNPckDB6GHvyerCri7KNXt\"]}},\"version\":1}",
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "immutableReferences": {},
+  "generatedSources": [],
+  "deployedGeneratedSources": [],
+  "sourceMap": "",
+  "deployedSourceMap": "",
+  "source": "//SPDX-License-Identifier: Unlicense\npragma solidity ^0.7.6;\n\ninterface IStakeTONTokamak {\n    /// @dev  staking the staked TON in layer2 in tokamak\n    /// @param _layer2 the layer2 address in tokamak\n    /// @param stakeAmount the amount that stake to layer2\n    function tokamakStaking(address _layer2, uint256 stakeAmount) external;\n\n    /// @dev  request unstaking the wtonAmount in layer2 in tokamak\n    /// @param _layer2 the layer2 address in tokamak\n    /// @param wtonAmount the amount requested to unstaking\n    function tokamakRequestUnStaking(address _layer2, uint256 wtonAmount)\n        external;\n\n    /// @dev Requests unstaking the amount of all  in tokamak's layer2\n    /// @param _layer2 the layer2 address in Tokamak\n    function tokamakRequestUnStakingAll(address _layer2) external;\n\n    /// @dev process unstaking in layer2 in tokamak\n    /// @param _layer2 the layer2 address in tokamak\n    function tokamakProcessUnStaking(address _layer2) external;\n\n    /// @dev exchange holded WTON to FLD using uniswap\n    /// @param _amountIn the input amount\n    /// @param _amountOutMinimum the minimun output amount\n    /// @param _deadline deadline\n    /// @param sqrtPriceLimitX96 sqrtPriceLimitX96\n    /// @param _kind the function type, if 0, use exactInputSingle function, else if, use exactInput function\n    /// @return amountOut the amount of exchanged out token\n    function exchangeWTONtoFLD(\n        uint256 _amountIn,\n        uint256 _amountOutMinimum,\n        uint256 _deadline,\n        uint160 sqrtPriceLimitX96,\n        uint256 _kind\n    ) external returns (uint256 amountOut);\n\n    /// @dev exchange holded WTON to FLD using uniswap\n    /// @param _amountIn the input amount\n    /// @param _amountOutMinimum the minimun output amount\n    /// @param _deadline deadline\n    /// @param _kind the function type, if 0, use exactInputSingle function, else if, use exactInput function\n    /// @return amountOut the amount of exchanged out token\n    function exchangeWTONtoFLDv2(\n        uint256 _amountIn,\n        uint256 _amountOutMinimum,\n        uint256 _deadline,\n        uint256 _kind\n    ) external returns (uint256 amountOut);\n}\n",
+  "sourcePath": "/Users/zena/ico2.0/ico20-contracts/contracts/interfaces/IStakeTONTokamak.sol",
+  "ast": {
+    "absolutePath": "/Users/zena/ico2.0/ico20-contracts/contracts/interfaces/IStakeTONTokamak.sol",
+    "exportedSymbols": {
+      "IStakeTONTokamak": [
+        2402
+      ]
+    },
+    "id": 2403,
+    "license": "Unlicense",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 2343,
+        "literals": [
+          "solidity",
+          "^",
+          "0.7",
+          ".6"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "37:23:24"
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "fullyImplemented": false,
+        "id": 2402,
+        "linearizedBaseContracts": [
+          2402
+        ],
+        "name": "IStakeTONTokamak",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "documentation": {
+              "id": 2344,
+              "nodeType": "StructuredDocumentation",
+              "src": "95:165:24",
+              "text": "@dev  staking the staked TON in layer2 in tokamak\n @param _layer2 the layer2 address in tokamak\n @param stakeAmount the amount that stake to layer2"
+            },
+            "functionSelector": "065c4313",
+            "id": 2351,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "tokamakStaking",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 2349,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 2346,
+                  "mutability": "mutable",
+                  "name": "_layer2",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2351,
+                  "src": "289:15:24",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 2345,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "289:7:24",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 2348,
+                  "mutability": "mutable",
+                  "name": "stakeAmount",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2351,
+                  "src": "306:19:24",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 2347,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "306:7:24",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "288:38:24"
+            },
+            "returnParameters": {
+              "id": 2350,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "335:0:24"
+            },
+            "scope": 2402,
+            "src": "265:71:24",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 2352,
+              "nodeType": "StructuredDocumentation",
+              "src": "342:176:24",
+              "text": "@dev  request unstaking the wtonAmount in layer2 in tokamak\n @param _layer2 the layer2 address in tokamak\n @param wtonAmount the amount requested to unstaking"
+            },
+            "functionSelector": "ce681ce6",
+            "id": 2359,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "tokamakRequestUnStaking",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 2357,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 2354,
+                  "mutability": "mutable",
+                  "name": "_layer2",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2359,
+                  "src": "556:15:24",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 2353,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "556:7:24",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 2356,
+                  "mutability": "mutable",
+                  "name": "wtonAmount",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2359,
+                  "src": "573:18:24",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 2355,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "573:7:24",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "555:37:24"
+            },
+            "returnParameters": {
+              "id": 2358,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "609:0:24"
+            },
+            "scope": 2402,
+            "src": "523:87:24",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 2360,
+              "nodeType": "StructuredDocumentation",
+              "src": "616:119:24",
+              "text": "@dev Requests unstaking the amount of all  in tokamak's layer2\n @param _layer2 the layer2 address in Tokamak"
+            },
+            "functionSelector": "71def0b3",
+            "id": 2365,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "tokamakRequestUnStakingAll",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 2363,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 2362,
+                  "mutability": "mutable",
+                  "name": "_layer2",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2365,
+                  "src": "776:15:24",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 2361,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "776:7:24",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "775:17:24"
+            },
+            "returnParameters": {
+              "id": 2364,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "801:0:24"
+            },
+            "scope": 2402,
+            "src": "740:62:24",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 2366,
+              "nodeType": "StructuredDocumentation",
+              "src": "808:100:24",
+              "text": "@dev process unstaking in layer2 in tokamak\n @param _layer2 the layer2 address in tokamak"
+            },
+            "functionSelector": "730464a9",
+            "id": 2371,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "tokamakProcessUnStaking",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 2369,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 2368,
+                  "mutability": "mutable",
+                  "name": "_layer2",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2371,
+                  "src": "946:15:24",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 2367,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "946:7:24",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "945:17:24"
+            },
+            "returnParameters": {
+              "id": 2370,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "971:0:24"
+            },
+            "scope": 2402,
+            "src": "913:59:24",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 2372,
+              "nodeType": "StructuredDocumentation",
+              "src": "978:406:24",
+              "text": "@dev exchange holded WTON to FLD using uniswap\n @param _amountIn the input amount\n @param _amountOutMinimum the minimun output amount\n @param _deadline deadline\n @param sqrtPriceLimitX96 sqrtPriceLimitX96\n @param _kind the function type, if 0, use exactInputSingle function, else if, use exactInput function\n @return amountOut the amount of exchanged out token"
+            },
+            "functionSelector": "821f9267",
+            "id": 2387,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "exchangeWTONtoFLD",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 2383,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 2374,
+                  "mutability": "mutable",
+                  "name": "_amountIn",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2387,
+                  "src": "1425:17:24",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 2373,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1425:7:24",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 2376,
+                  "mutability": "mutable",
+                  "name": "_amountOutMinimum",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2387,
+                  "src": "1452:25:24",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 2375,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1452:7:24",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 2378,
+                  "mutability": "mutable",
+                  "name": "_deadline",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2387,
+                  "src": "1487:17:24",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 2377,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1487:7:24",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 2380,
+                  "mutability": "mutable",
+                  "name": "sqrtPriceLimitX96",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2387,
+                  "src": "1514:25:24",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint160",
+                    "typeString": "uint160"
+                  },
+                  "typeName": {
+                    "id": 2379,
+                    "name": "uint160",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1514:7:24",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint160",
+                      "typeString": "uint160"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 2382,
+                  "mutability": "mutable",
+                  "name": "_kind",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2387,
+                  "src": "1549:13:24",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 2381,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1549:7:24",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1415:153:24"
+            },
+            "returnParameters": {
+              "id": 2386,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 2385,
+                  "mutability": "mutable",
+                  "name": "amountOut",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2387,
+                  "src": "1587:17:24",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 2384,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1587:7:24",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1586:19:24"
+            },
+            "scope": 2402,
+            "src": "1389:217:24",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 2388,
+              "nodeType": "StructuredDocumentation",
+              "src": "1612:355:24",
+              "text": "@dev exchange holded WTON to FLD using uniswap\n @param _amountIn the input amount\n @param _amountOutMinimum the minimun output amount\n @param _deadline deadline\n @param _kind the function type, if 0, use exactInputSingle function, else if, use exactInput function\n @return amountOut the amount of exchanged out token"
+            },
+            "functionSelector": "8b8292ec",
+            "id": 2401,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "exchangeWTONtoFLDv2",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 2397,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 2390,
+                  "mutability": "mutable",
+                  "name": "_amountIn",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2401,
+                  "src": "2010:17:24",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 2389,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2010:7:24",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 2392,
+                  "mutability": "mutable",
+                  "name": "_amountOutMinimum",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2401,
+                  "src": "2037:25:24",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 2391,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2037:7:24",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 2394,
+                  "mutability": "mutable",
+                  "name": "_deadline",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2401,
+                  "src": "2072:17:24",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 2393,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2072:7:24",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 2396,
+                  "mutability": "mutable",
+                  "name": "_kind",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2401,
+                  "src": "2099:13:24",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 2395,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2099:7:24",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2000:118:24"
+            },
+            "returnParameters": {
+              "id": 2400,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 2399,
+                  "mutability": "mutable",
+                  "name": "amountOut",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2401,
+                  "src": "2137:17:24",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 2398,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2137:7:24",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2136:19:24"
+            },
+            "scope": 2402,
+            "src": "1972:184:24",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 2403,
+        "src": "62:2096:24"
+      }
+    ],
+    "src": "37:2122:24"
+  },
+  "legacyAST": {
+    "attributes": {
+      "absolutePath": "/Users/zena/ico2.0/ico20-contracts/contracts/interfaces/IStakeTONTokamak.sol",
+      "exportedSymbols": {
+        "IStakeTONTokamak": [
+          2402
+        ]
+      },
+      "license": "Unlicense"
+    },
+    "children": [
+      {
+        "attributes": {
+          "literals": [
+            "solidity",
+            "^",
+            "0.7",
+            ".6"
+          ]
+        },
+        "id": 2343,
+        "name": "PragmaDirective",
+        "src": "37:23:24"
+      },
+      {
+        "attributes": {
+          "abstract": false,
+          "baseContracts": [
+            null
+          ],
+          "contractDependencies": [
+            null
+          ],
+          "contractKind": "interface",
+          "fullyImplemented": false,
+          "linearizedBaseContracts": [
+            2402
+          ],
+          "name": "IStakeTONTokamak",
+          "scope": 2403
+        },
+        "children": [
+          {
+            "attributes": {
+              "functionSelector": "065c4313",
+              "implemented": false,
+              "isConstructor": false,
+              "kind": "function",
+              "modifiers": [
+                null
+              ],
+              "name": "tokamakStaking",
+              "scope": 2402,
+              "stateMutability": "nonpayable",
+              "virtual": false,
+              "visibility": "external"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "text": "@dev  staking the staked TON in layer2 in tokamak\n @param _layer2 the layer2 address in tokamak\n @param stakeAmount the amount that stake to layer2"
+                },
+                "id": 2344,
+                "name": "StructuredDocumentation",
+                "src": "95:165:24"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "_layer2",
+                      "scope": 2351,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "address",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "address",
+                          "stateMutability": "nonpayable",
+                          "type": "address"
+                        },
+                        "id": 2345,
+                        "name": "ElementaryTypeName",
+                        "src": "289:7:24"
+                      }
+                    ],
+                    "id": 2346,
+                    "name": "VariableDeclaration",
+                    "src": "289:15:24"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "stakeAmount",
+                      "scope": 2351,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "uint256",
+                          "type": "uint256"
+                        },
+                        "id": 2347,
+                        "name": "ElementaryTypeName",
+                        "src": "306:7:24"
+                      }
+                    ],
+                    "id": 2348,
+                    "name": "VariableDeclaration",
+                    "src": "306:19:24"
+                  }
+                ],
+                "id": 2349,
+                "name": "ParameterList",
+                "src": "288:38:24"
+              },
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 2350,
+                "name": "ParameterList",
+                "src": "335:0:24"
+              }
+            ],
+            "id": 2351,
+            "name": "FunctionDefinition",
+            "src": "265:71:24"
+          },
+          {
+            "attributes": {
+              "functionSelector": "ce681ce6",
+              "implemented": false,
+              "isConstructor": false,
+              "kind": "function",
+              "modifiers": [
+                null
+              ],
+              "name": "tokamakRequestUnStaking",
+              "scope": 2402,
+              "stateMutability": "nonpayable",
+              "virtual": false,
+              "visibility": "external"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "text": "@dev  request unstaking the wtonAmount in layer2 in tokamak\n @param _layer2 the layer2 address in tokamak\n @param wtonAmount the amount requested to unstaking"
+                },
+                "id": 2352,
+                "name": "StructuredDocumentation",
+                "src": "342:176:24"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "_layer2",
+                      "scope": 2359,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "address",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "address",
+                          "stateMutability": "nonpayable",
+                          "type": "address"
+                        },
+                        "id": 2353,
+                        "name": "ElementaryTypeName",
+                        "src": "556:7:24"
+                      }
+                    ],
+                    "id": 2354,
+                    "name": "VariableDeclaration",
+                    "src": "556:15:24"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "wtonAmount",
+                      "scope": 2359,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "uint256",
+                          "type": "uint256"
+                        },
+                        "id": 2355,
+                        "name": "ElementaryTypeName",
+                        "src": "573:7:24"
+                      }
+                    ],
+                    "id": 2356,
+                    "name": "VariableDeclaration",
+                    "src": "573:18:24"
+                  }
+                ],
+                "id": 2357,
+                "name": "ParameterList",
+                "src": "555:37:24"
+              },
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 2358,
+                "name": "ParameterList",
+                "src": "609:0:24"
+              }
+            ],
+            "id": 2359,
+            "name": "FunctionDefinition",
+            "src": "523:87:24"
+          },
+          {
+            "attributes": {
+              "functionSelector": "71def0b3",
+              "implemented": false,
+              "isConstructor": false,
+              "kind": "function",
+              "modifiers": [
+                null
+              ],
+              "name": "tokamakRequestUnStakingAll",
+              "scope": 2402,
+              "stateMutability": "nonpayable",
+              "virtual": false,
+              "visibility": "external"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "text": "@dev Requests unstaking the amount of all  in tokamak's layer2\n @param _layer2 the layer2 address in Tokamak"
+                },
+                "id": 2360,
+                "name": "StructuredDocumentation",
+                "src": "616:119:24"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "_layer2",
+                      "scope": 2365,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "address",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "address",
+                          "stateMutability": "nonpayable",
+                          "type": "address"
+                        },
+                        "id": 2361,
+                        "name": "ElementaryTypeName",
+                        "src": "776:7:24"
+                      }
+                    ],
+                    "id": 2362,
+                    "name": "VariableDeclaration",
+                    "src": "776:15:24"
+                  }
+                ],
+                "id": 2363,
+                "name": "ParameterList",
+                "src": "775:17:24"
+              },
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 2364,
+                "name": "ParameterList",
+                "src": "801:0:24"
+              }
+            ],
+            "id": 2365,
+            "name": "FunctionDefinition",
+            "src": "740:62:24"
+          },
+          {
+            "attributes": {
+              "functionSelector": "730464a9",
+              "implemented": false,
+              "isConstructor": false,
+              "kind": "function",
+              "modifiers": [
+                null
+              ],
+              "name": "tokamakProcessUnStaking",
+              "scope": 2402,
+              "stateMutability": "nonpayable",
+              "virtual": false,
+              "visibility": "external"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "text": "@dev process unstaking in layer2 in tokamak\n @param _layer2 the layer2 address in tokamak"
+                },
+                "id": 2366,
+                "name": "StructuredDocumentation",
+                "src": "808:100:24"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "_layer2",
+                      "scope": 2371,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "address",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "address",
+                          "stateMutability": "nonpayable",
+                          "type": "address"
+                        },
+                        "id": 2367,
+                        "name": "ElementaryTypeName",
+                        "src": "946:7:24"
+                      }
+                    ],
+                    "id": 2368,
+                    "name": "VariableDeclaration",
+                    "src": "946:15:24"
+                  }
+                ],
+                "id": 2369,
+                "name": "ParameterList",
+                "src": "945:17:24"
+              },
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 2370,
+                "name": "ParameterList",
+                "src": "971:0:24"
+              }
+            ],
+            "id": 2371,
+            "name": "FunctionDefinition",
+            "src": "913:59:24"
+          },
+          {
+            "attributes": {
+              "functionSelector": "821f9267",
+              "implemented": false,
+              "isConstructor": false,
+              "kind": "function",
+              "modifiers": [
+                null
+              ],
+              "name": "exchangeWTONtoFLD",
+              "scope": 2402,
+              "stateMutability": "nonpayable",
+              "virtual": false,
+              "visibility": "external"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "text": "@dev exchange holded WTON to FLD using uniswap\n @param _amountIn the input amount\n @param _amountOutMinimum the minimun output amount\n @param _deadline deadline\n @param sqrtPriceLimitX96 sqrtPriceLimitX96\n @param _kind the function type, if 0, use exactInputSingle function, else if, use exactInput function\n @return amountOut the amount of exchanged out token"
+                },
+                "id": 2372,
+                "name": "StructuredDocumentation",
+                "src": "978:406:24"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "_amountIn",
+                      "scope": 2387,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "uint256",
+                          "type": "uint256"
+                        },
+                        "id": 2373,
+                        "name": "ElementaryTypeName",
+                        "src": "1425:7:24"
+                      }
+                    ],
+                    "id": 2374,
+                    "name": "VariableDeclaration",
+                    "src": "1425:17:24"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "_amountOutMinimum",
+                      "scope": 2387,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "uint256",
+                          "type": "uint256"
+                        },
+                        "id": 2375,
+                        "name": "ElementaryTypeName",
+                        "src": "1452:7:24"
+                      }
+                    ],
+                    "id": 2376,
+                    "name": "VariableDeclaration",
+                    "src": "1452:25:24"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "_deadline",
+                      "scope": 2387,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "uint256",
+                          "type": "uint256"
+                        },
+                        "id": 2377,
+                        "name": "ElementaryTypeName",
+                        "src": "1487:7:24"
+                      }
+                    ],
+                    "id": 2378,
+                    "name": "VariableDeclaration",
+                    "src": "1487:17:24"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "sqrtPriceLimitX96",
+                      "scope": 2387,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint160",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "uint160",
+                          "type": "uint160"
+                        },
+                        "id": 2379,
+                        "name": "ElementaryTypeName",
+                        "src": "1514:7:24"
+                      }
+                    ],
+                    "id": 2380,
+                    "name": "VariableDeclaration",
+                    "src": "1514:25:24"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "_kind",
+                      "scope": 2387,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "uint256",
+                          "type": "uint256"
+                        },
+                        "id": 2381,
+                        "name": "ElementaryTypeName",
+                        "src": "1549:7:24"
+                      }
+                    ],
+                    "id": 2382,
+                    "name": "VariableDeclaration",
+                    "src": "1549:13:24"
+                  }
+                ],
+                "id": 2383,
+                "name": "ParameterList",
+                "src": "1415:153:24"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "amountOut",
+                      "scope": 2387,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "uint256",
+                          "type": "uint256"
+                        },
+                        "id": 2384,
+                        "name": "ElementaryTypeName",
+                        "src": "1587:7:24"
+                      }
+                    ],
+                    "id": 2385,
+                    "name": "VariableDeclaration",
+                    "src": "1587:17:24"
+                  }
+                ],
+                "id": 2386,
+                "name": "ParameterList",
+                "src": "1586:19:24"
+              }
+            ],
+            "id": 2387,
+            "name": "FunctionDefinition",
+            "src": "1389:217:24"
+          },
+          {
+            "attributes": {
+              "functionSelector": "8b8292ec",
+              "implemented": false,
+              "isConstructor": false,
+              "kind": "function",
+              "modifiers": [
+                null
+              ],
+              "name": "exchangeWTONtoFLDv2",
+              "scope": 2402,
+              "stateMutability": "nonpayable",
+              "virtual": false,
+              "visibility": "external"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "text": "@dev exchange holded WTON to FLD using uniswap\n @param _amountIn the input amount\n @param _amountOutMinimum the minimun output amount\n @param _deadline deadline\n @param _kind the function type, if 0, use exactInputSingle function, else if, use exactInput function\n @return amountOut the amount of exchanged out token"
+                },
+                "id": 2388,
+                "name": "StructuredDocumentation",
+                "src": "1612:355:24"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "_amountIn",
+                      "scope": 2401,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "uint256",
+                          "type": "uint256"
+                        },
+                        "id": 2389,
+                        "name": "ElementaryTypeName",
+                        "src": "2010:7:24"
+                      }
+                    ],
+                    "id": 2390,
+                    "name": "VariableDeclaration",
+                    "src": "2010:17:24"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "_amountOutMinimum",
+                      "scope": 2401,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "uint256",
+                          "type": "uint256"
+                        },
+                        "id": 2391,
+                        "name": "ElementaryTypeName",
+                        "src": "2037:7:24"
+                      }
+                    ],
+                    "id": 2392,
+                    "name": "VariableDeclaration",
+                    "src": "2037:25:24"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "_deadline",
+                      "scope": 2401,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "uint256",
+                          "type": "uint256"
+                        },
+                        "id": 2393,
+                        "name": "ElementaryTypeName",
+                        "src": "2072:7:24"
+                      }
+                    ],
+                    "id": 2394,
+                    "name": "VariableDeclaration",
+                    "src": "2072:17:24"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "_kind",
+                      "scope": 2401,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "uint256",
+                          "type": "uint256"
+                        },
+                        "id": 2395,
+                        "name": "ElementaryTypeName",
+                        "src": "2099:7:24"
+                      }
+                    ],
+                    "id": 2396,
+                    "name": "VariableDeclaration",
+                    "src": "2099:13:24"
+                  }
+                ],
+                "id": 2397,
+                "name": "ParameterList",
+                "src": "2000:118:24"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "amountOut",
+                      "scope": 2401,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "uint256",
+                          "type": "uint256"
+                        },
+                        "id": 2398,
+                        "name": "ElementaryTypeName",
+                        "src": "2137:7:24"
+                      }
+                    ],
+                    "id": 2399,
+                    "name": "VariableDeclaration",
+                    "src": "2137:17:24"
+                  }
+                ],
+                "id": 2400,
+                "name": "ParameterList",
+                "src": "2136:19:24"
+              }
+            ],
+            "id": 2401,
+            "name": "FunctionDefinition",
+            "src": "1972:184:24"
+          }
+        ],
+        "id": 2402,
+        "name": "ContractDefinition",
+        "src": "62:2096:24"
+      }
+    ],
+    "id": 2403,
+    "name": "SourceUnit",
+    "src": "37:2122:24"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.7.6+commit.7338295f.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "3.3.4",
+  "updatedAt": "2021-06-04T14:36:48.279Z",
+  "devdoc": {
+    "kind": "dev",
+    "methods": {
+      "exchangeWTONtoFLD(uint256,uint256,uint256,uint160,uint256)": {
+        "details": "exchange holded WTON to FLD using uniswap",
+        "params": {
+          "_amountIn": "the input amount",
+          "_amountOutMinimum": "the minimun output amount",
+          "_deadline": "deadline",
+          "_kind": "the function type, if 0, use exactInputSingle function, else if, use exactInput function",
+          "sqrtPriceLimitX96": "sqrtPriceLimitX96"
+        },
+        "returns": {
+          "amountOut": "the amount of exchanged out token"
+        }
+      },
+      "exchangeWTONtoFLDv2(uint256,uint256,uint256,uint256)": {
+        "details": "exchange holded WTON to FLD using uniswap",
+        "params": {
+          "_amountIn": "the input amount",
+          "_amountOutMinimum": "the minimun output amount",
+          "_deadline": "deadline",
+          "_kind": "the function type, if 0, use exactInputSingle function, else if, use exactInput function"
+        },
+        "returns": {
+          "amountOut": "the amount of exchanged out token"
+        }
+      },
+      "tokamakProcessUnStaking(address)": {
+        "details": "process unstaking in layer2 in tokamak",
+        "params": {
+          "_layer2": "the layer2 address in tokamak"
+        }
+      },
+      "tokamakRequestUnStaking(address,uint256)": {
+        "details": "request unstaking the wtonAmount in layer2 in tokamak",
+        "params": {
+          "_layer2": "the layer2 address in tokamak",
+          "wtonAmount": "the amount requested to unstaking"
+        }
+      },
+      "tokamakRequestUnStakingAll(address)": {
+        "details": "Requests unstaking the amount of all  in tokamak's layer2",
+        "params": {
+          "_layer2": "the layer2 address in Tokamak"
+        }
+      },
+      "tokamakStaking(address,uint256)": {
+        "details": "staking the staked TON in layer2 in tokamak",
+        "params": {
+          "_layer2": "the layer2 address in tokamak",
+          "stakeAmount": "the amount that stake to layer2"
+        }
+      }
+    },
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {},
+    "version": 1
+  }
+}

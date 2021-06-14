@@ -8,17 +8,21 @@
 
 `npm run compile`
 
-### Run Contract Tests & Get Callstacks
-
-In one terminal run `npx hardhat node`
-
-Then in another run `npm run test` or `npm run test:mocha`
-
 ### Deploy to Ethereum
 
 Create/modify network config in `hardhat.config.ts` and add API key and private key, then run:
 
-`npx hardhat run --network rinkeby scripts/deploy.js`
+To deploy,
+`npx hardhat run --network rinkeby scripts/deploy_1.js`
+
+To set init storage,
+`npx hardhat run --network rinkeby scripts/deploy_2.js`
+
+To create vault,
+`npx hardhat run --network rinkeby scripts/deploy_createvault_1.js`
+
+To create stakeContract in vault,
+Modify the vault address in deploy_createvault_1
 
 ### Verify on Etherscan
 
@@ -30,21 +34,13 @@ Using the [hardhat-etherscan plugin](https://hardhat.org/plugins/nomiclabs-hardh
 `git clone https://github.com/Onther-Tech/plasma-evm-contracts`
 `npm run compile:plasma`
 
-### To integration test with Uniswap
-`git clone https://github.com/Uniswap/uniswap-v2-core.git`
-`cd uniswap-v2-core`
-`yarn`
-`yarn compile`
-`cd..`
-`npm run compile:uniswap-core`
+### lint
+`npm run lint`
 
-`git clone https://github.com/Uniswap/uniswap-v2-periphery.git`
-`cd uniswap-v2-periphery`
-`yarn`
-`yarn compile`
-`cd..`
-`npm run compile:uniswap-periphery`
+### To generate documents by solidity-docgen
+`npm run docify`
 
 
-### solhint
-`solhint ./contracts/*/*.sol`
+### To generate UML by sol2uml
+`sol2uml ./contracts`
+

@@ -1,0 +1,559 @@
+{
+  "contractName": "DAOProxyStorage",
+  "abi": [
+    {
+      "inputs": [],
+      "name": "VOTING_DEADLINE_PERIOD",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "agendaIDCounter",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "agendas",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "exists",
+          "type": "bool"
+        },
+        {
+          "internalType": "uint256",
+          "name": "votingDeadline",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bool",
+          "name": "open",
+          "type": "bool"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "agendaHash",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "bool",
+          "name": "passed",
+          "type": "bool"
+        },
+        {
+          "internalType": "address payable",
+          "name": "recipient",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "yesVotesCount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "noVotesCount",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "metadata": "{\"compiler\":{\"version\":\"0.7.6+commit.7338295f\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[],\"name\":\"VOTING_DEADLINE_PERIOD\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"agendaIDCounter\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"agendas\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"exists\",\"type\":\"bool\"},{\"internalType\":\"uint256\",\"name\":\"votingDeadline\",\"type\":\"uint256\"},{\"internalType\":\"bool\",\"name\":\"open\",\"type\":\"bool\"},{\"internalType\":\"bytes32\",\"name\":\"agendaHash\",\"type\":\"bytes32\"},{\"internalType\":\"bool\",\"name\":\"passed\",\"type\":\"bool\"},{\"internalType\":\"address payable\",\"name\":\"recipient\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"yesVotesCount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"noVotesCount\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"/Users/zena/ico2.0/ico20-contracts/contracts/dao/DAOProxyStorage.sol\":\"DAOProxyStorage\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"/Users/zena/ico2.0/ico20-contracts/contracts/dao/DAOProxyStorage.sol\":{\"keccak256\":\"0x4b64ab9e954deef8a57b3fda024d03eb04b3c9fa6009c206e14e651c4bc28db3\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://f8cd421d5f146e3860afa90bba9a7b42ff28ee8a7e2a6ea63168aa7987fc9d7a\",\"dweb:/ipfs/QmZ4Gtk9Mqj4ZfmnsydzpTKf6Epw8jCq2jEpyqw1s1Hiuz\"]},\"/Users/zena/ico2.0/ico20-contracts/contracts/interfaces/ISFLD.sol\":{\"keccak256\":\"0xf361eb815052c54e0335e187e613b5cf7273238910e415de6f3a993c793e1e78\",\"license\":\"Unlicense\",\"urls\":[\"bzz-raw://f3ac6fc305a039f093473d3eba954364f8bfe7f5121107b98213040647f58299\",\"dweb:/ipfs/QmcADb3G98jN3B9Q9gtvmMA6FcfpELmTvUCHVZF31HrSZf\"]},\"/Users/zena/ico2.0/ico20-contracts/contracts/libraries/LibDAO.sol\":{\"keccak256\":\"0xaa38aacf8eabcc98a5320d61c673ec46ae85ccaffb5b7253462b8396d14fa895\",\"license\":\"Unlicense\",\"urls\":[\"bzz-raw://01b816fbb68ed6692e403b4ec55cd6800fb1d4868c32d5176d69b627bb53cf2c\",\"dweb:/ipfs/QmZgpXfHRNM2GYjG9g9qNt7FmCi75zC5CkfndavaaFuMQZ\"]}},\"version\":1}",
+  "bytecode": "0x60806040526212750060005534801561001757600080fd5b50610169806100276000396000f3fe608060405234801561001057600080fd5b50600436106100415760003560e01c80633c4a819c14610046578063431f6d1c146100af578063aeebf0be146100c9575b600080fd5b6100636004803603602081101561005c57600080fd5b50356100d1565b604080519815158952602089019790975294151587870152606087019390935290151560808601526001600160a01b031660a085015260c084015260e083015251908190036101000190f35b6100b7610127565b60408051918252519081900360200190f35b6100b761012d565b6002602081905260009182526040909120805460018201549282015460038301546004840154600585015460069095015460ff9485169695938516949293928216926101009092046001600160a01b0316919088565b60005481565b6001548156fea2646970667358221220b228ce8100bbed132b649d3f8412a9c9b2479ee7b83fefcaa5c554b7567821d064736f6c63430007060033",
+  "deployedBytecode": "0x608060405234801561001057600080fd5b50600436106100415760003560e01c80633c4a819c14610046578063431f6d1c146100af578063aeebf0be146100c9575b600080fd5b6100636004803603602081101561005c57600080fd5b50356100d1565b604080519815158952602089019790975294151587870152606087019390935290151560808601526001600160a01b031660a085015260c084015260e083015251908190036101000190f35b6100b7610127565b60408051918252519081900360200190f35b6100b761012d565b6002602081905260009182526040909120805460018201549282015460038301546004840154600585015460069095015460ff9485169695938516949293928216926101009092046001600160a01b0316919088565b60005481565b6001548156fea2646970667358221220b228ce8100bbed132b649d3f8412a9c9b2479ee7b83fefcaa5c554b7567821d064736f6c63430007060033",
+  "immutableReferences": {},
+  "generatedSources": [],
+  "deployedGeneratedSources": [],
+  "sourceMap": "125:187:4:-:0;;;196:7;156:47;;125:187;;;;;;;;;;;;;;;;",
+  "deployedSourceMap": "125:187:4:-:0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;245:48;;;;;;;;;;;;;;;;-1:-1:-1;245:48:4;;:::i;:::-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;;;;;245:48:4;;;;;;;;;;;;;;;;;;;;;;156:47;;;:::i;:::-;;;;;;;;;;;;;;;;209:30;;;:::i;245:48::-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;;;;;245:48:4;;;;:::o;156:47::-;;;;:::o;209:30::-;;;;:::o",
+  "source": "// SPDX-License-Identifier: MIT\npragma solidity ^0.7.6;\nimport \"../libraries/LibDAO.sol\";\nimport \"../interfaces/ISFLD.sol\";\n\ncontract DAOProxyStorage {\n    uint256 public VOTING_DEADLINE_PERIOD = 2 weeks;\n    uint256 public agendaIDCounter;\n    mapping(uint256 => LibDAO.Agenda) public agendas;\n    ISFLD sfld;\n}\n",
+  "sourcePath": "/Users/zena/ico2.0/ico20-contracts/contracts/dao/DAOProxyStorage.sol",
+  "ast": {
+    "absolutePath": "/Users/zena/ico2.0/ico20-contracts/contracts/dao/DAOProxyStorage.sol",
+    "exportedSymbols": {
+      "DAOProxyStorage": [
+        1509
+      ],
+      "ISFLD": [
+        2787
+      ],
+      "LibDAO": [
+        4128
+      ]
+    },
+    "id": 1510,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 1495,
+        "literals": [
+          "solidity",
+          "^",
+          "0.7",
+          ".6"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "32:23:4"
+      },
+      {
+        "absolutePath": "/Users/zena/ico2.0/ico20-contracts/contracts/libraries/LibDAO.sol",
+        "file": "../libraries/LibDAO.sol",
+        "id": 1496,
+        "nodeType": "ImportDirective",
+        "scope": 1510,
+        "sourceUnit": 4129,
+        "src": "56:33:4",
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "absolutePath": "/Users/zena/ico2.0/ico20-contracts/contracts/interfaces/ISFLD.sol",
+        "file": "../interfaces/ISFLD.sol",
+        "id": 1497,
+        "nodeType": "ImportDirective",
+        "scope": 1510,
+        "sourceUnit": 2788,
+        "src": "90:33:4",
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "fullyImplemented": true,
+        "id": 1509,
+        "linearizedBaseContracts": [
+          1509
+        ],
+        "name": "DAOProxyStorage",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "constant": false,
+            "functionSelector": "431f6d1c",
+            "id": 1500,
+            "mutability": "mutable",
+            "name": "VOTING_DEADLINE_PERIOD",
+            "nodeType": "VariableDeclaration",
+            "scope": 1509,
+            "src": "156:47:4",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_uint256",
+              "typeString": "uint256"
+            },
+            "typeName": {
+              "id": 1498,
+              "name": "uint256",
+              "nodeType": "ElementaryTypeName",
+              "src": "156:7:4",
+              "typeDescriptions": {
+                "typeIdentifier": "t_uint256",
+                "typeString": "uint256"
+              }
+            },
+            "value": {
+              "hexValue": "32",
+              "id": 1499,
+              "isConstant": false,
+              "isLValue": false,
+              "isPure": true,
+              "kind": "number",
+              "lValueRequested": false,
+              "nodeType": "Literal",
+              "src": "196:7:4",
+              "subdenomination": "weeks",
+              "typeDescriptions": {
+                "typeIdentifier": "t_rational_1209600_by_1",
+                "typeString": "int_const 1209600"
+              },
+              "value": "2"
+            },
+            "visibility": "public"
+          },
+          {
+            "constant": false,
+            "functionSelector": "aeebf0be",
+            "id": 1502,
+            "mutability": "mutable",
+            "name": "agendaIDCounter",
+            "nodeType": "VariableDeclaration",
+            "scope": 1509,
+            "src": "209:30:4",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_uint256",
+              "typeString": "uint256"
+            },
+            "typeName": {
+              "id": 1501,
+              "name": "uint256",
+              "nodeType": "ElementaryTypeName",
+              "src": "209:7:4",
+              "typeDescriptions": {
+                "typeIdentifier": "t_uint256",
+                "typeString": "uint256"
+              }
+            },
+            "visibility": "public"
+          },
+          {
+            "constant": false,
+            "functionSelector": "3c4a819c",
+            "id": 1506,
+            "mutability": "mutable",
+            "name": "agendas",
+            "nodeType": "VariableDeclaration",
+            "scope": 1509,
+            "src": "245:48:4",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_mapping$_t_uint256_$_t_struct$_Agenda_$4127_storage_$",
+              "typeString": "mapping(uint256 => struct LibDAO.Agenda)"
+            },
+            "typeName": {
+              "id": 1505,
+              "keyType": {
+                "id": 1503,
+                "name": "uint256",
+                "nodeType": "ElementaryTypeName",
+                "src": "253:7:4",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                }
+              },
+              "nodeType": "Mapping",
+              "src": "245:33:4",
+              "typeDescriptions": {
+                "typeIdentifier": "t_mapping$_t_uint256_$_t_struct$_Agenda_$4127_storage_$",
+                "typeString": "mapping(uint256 => struct LibDAO.Agenda)"
+              },
+              "valueType": {
+                "id": 1504,
+                "name": "LibDAO.Agenda",
+                "nodeType": "UserDefinedTypeName",
+                "referencedDeclaration": 4127,
+                "src": "264:13:4",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_struct$_Agenda_$4127_storage_ptr",
+                  "typeString": "struct LibDAO.Agenda"
+                }
+              }
+            },
+            "visibility": "public"
+          },
+          {
+            "constant": false,
+            "id": 1508,
+            "mutability": "mutable",
+            "name": "sfld",
+            "nodeType": "VariableDeclaration",
+            "scope": 1509,
+            "src": "299:10:4",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_contract$_ISFLD_$2787",
+              "typeString": "contract ISFLD"
+            },
+            "typeName": {
+              "id": 1507,
+              "name": "ISFLD",
+              "nodeType": "UserDefinedTypeName",
+              "referencedDeclaration": 2787,
+              "src": "299:5:4",
+              "typeDescriptions": {
+                "typeIdentifier": "t_contract$_ISFLD_$2787",
+                "typeString": "contract ISFLD"
+              }
+            },
+            "visibility": "internal"
+          }
+        ],
+        "scope": 1510,
+        "src": "125:187:4"
+      }
+    ],
+    "src": "32:281:4"
+  },
+  "legacyAST": {
+    "attributes": {
+      "absolutePath": "/Users/zena/ico2.0/ico20-contracts/contracts/dao/DAOProxyStorage.sol",
+      "exportedSymbols": {
+        "DAOProxyStorage": [
+          1509
+        ],
+        "ISFLD": [
+          2787
+        ],
+        "LibDAO": [
+          4128
+        ]
+      },
+      "license": "MIT"
+    },
+    "children": [
+      {
+        "attributes": {
+          "literals": [
+            "solidity",
+            "^",
+            "0.7",
+            ".6"
+          ]
+        },
+        "id": 1495,
+        "name": "PragmaDirective",
+        "src": "32:23:4"
+      },
+      {
+        "attributes": {
+          "SourceUnit": 4129,
+          "absolutePath": "/Users/zena/ico2.0/ico20-contracts/contracts/libraries/LibDAO.sol",
+          "file": "../libraries/LibDAO.sol",
+          "scope": 1510,
+          "symbolAliases": [
+            null
+          ],
+          "unitAlias": ""
+        },
+        "id": 1496,
+        "name": "ImportDirective",
+        "src": "56:33:4"
+      },
+      {
+        "attributes": {
+          "SourceUnit": 2788,
+          "absolutePath": "/Users/zena/ico2.0/ico20-contracts/contracts/interfaces/ISFLD.sol",
+          "file": "../interfaces/ISFLD.sol",
+          "scope": 1510,
+          "symbolAliases": [
+            null
+          ],
+          "unitAlias": ""
+        },
+        "id": 1497,
+        "name": "ImportDirective",
+        "src": "90:33:4"
+      },
+      {
+        "attributes": {
+          "abstract": false,
+          "baseContracts": [
+            null
+          ],
+          "contractDependencies": [
+            null
+          ],
+          "contractKind": "contract",
+          "fullyImplemented": true,
+          "linearizedBaseContracts": [
+            1509
+          ],
+          "name": "DAOProxyStorage",
+          "scope": 1510
+        },
+        "children": [
+          {
+            "attributes": {
+              "constant": false,
+              "functionSelector": "431f6d1c",
+              "mutability": "mutable",
+              "name": "VOTING_DEADLINE_PERIOD",
+              "scope": 1509,
+              "stateVariable": true,
+              "storageLocation": "default",
+              "type": "uint256",
+              "visibility": "public"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "name": "uint256",
+                  "type": "uint256"
+                },
+                "id": 1498,
+                "name": "ElementaryTypeName",
+                "src": "156:7:4"
+              },
+              {
+                "attributes": {
+                  "hexvalue": "32",
+                  "isConstant": false,
+                  "isLValue": false,
+                  "isPure": true,
+                  "lValueRequested": false,
+                  "subdenomination": "weeks",
+                  "token": "number",
+                  "type": "int_const 1209600",
+                  "value": "2"
+                },
+                "id": 1499,
+                "name": "Literal",
+                "src": "196:7:4"
+              }
+            ],
+            "id": 1500,
+            "name": "VariableDeclaration",
+            "src": "156:47:4"
+          },
+          {
+            "attributes": {
+              "constant": false,
+              "functionSelector": "aeebf0be",
+              "mutability": "mutable",
+              "name": "agendaIDCounter",
+              "scope": 1509,
+              "stateVariable": true,
+              "storageLocation": "default",
+              "type": "uint256",
+              "visibility": "public"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "name": "uint256",
+                  "type": "uint256"
+                },
+                "id": 1501,
+                "name": "ElementaryTypeName",
+                "src": "209:7:4"
+              }
+            ],
+            "id": 1502,
+            "name": "VariableDeclaration",
+            "src": "209:30:4"
+          },
+          {
+            "attributes": {
+              "constant": false,
+              "functionSelector": "3c4a819c",
+              "mutability": "mutable",
+              "name": "agendas",
+              "scope": 1509,
+              "stateVariable": true,
+              "storageLocation": "default",
+              "type": "mapping(uint256 => struct LibDAO.Agenda)",
+              "visibility": "public"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "type": "mapping(uint256 => struct LibDAO.Agenda)"
+                },
+                "children": [
+                  {
+                    "attributes": {
+                      "name": "uint256",
+                      "type": "uint256"
+                    },
+                    "id": 1503,
+                    "name": "ElementaryTypeName",
+                    "src": "253:7:4"
+                  },
+                  {
+                    "attributes": {
+                      "name": "LibDAO.Agenda",
+                      "referencedDeclaration": 4127,
+                      "type": "struct LibDAO.Agenda"
+                    },
+                    "id": 1504,
+                    "name": "UserDefinedTypeName",
+                    "src": "264:13:4"
+                  }
+                ],
+                "id": 1505,
+                "name": "Mapping",
+                "src": "245:33:4"
+              }
+            ],
+            "id": 1506,
+            "name": "VariableDeclaration",
+            "src": "245:48:4"
+          },
+          {
+            "attributes": {
+              "constant": false,
+              "mutability": "mutable",
+              "name": "sfld",
+              "scope": 1509,
+              "stateVariable": true,
+              "storageLocation": "default",
+              "type": "contract ISFLD",
+              "visibility": "internal"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "name": "ISFLD",
+                  "referencedDeclaration": 2787,
+                  "type": "contract ISFLD"
+                },
+                "id": 1507,
+                "name": "UserDefinedTypeName",
+                "src": "299:5:4"
+              }
+            ],
+            "id": 1508,
+            "name": "VariableDeclaration",
+            "src": "299:10:4"
+          }
+        ],
+        "id": 1509,
+        "name": "ContractDefinition",
+        "src": "125:187:4"
+      }
+    ],
+    "id": 1510,
+    "name": "SourceUnit",
+    "src": "32:281:4"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.7.6+commit.7338295f.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "3.3.4",
+  "updatedAt": "2021-05-14T01:45:59.629Z",
+  "devdoc": {
+    "kind": "dev",
+    "methods": {},
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {},
+    "version": 1
+  }
+}

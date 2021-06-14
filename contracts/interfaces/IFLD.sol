@@ -2,67 +2,72 @@
 pragma solidity ^0.7.6;
 
 interface IFLD {
-    // event Approval(address indexed owner, address indexed spender, uint value);
-    // event Transfer(address indexed from, address indexed to, uint value);
-
-    function name() external pure returns (string memory);
-
-    function symbol() external pure returns (string memory);
-
-    function decimals() external pure returns (uint8);
-
-    function totalSupply() external view returns (uint256);
-
-    function balanceOf(address owner) external view returns (uint256);
-
-    function allowance(address owner, address spender)
-        external
-        view
-        returns (uint256);
-
-    /**
-     * Issue a token.
-     */
+    /// @dev Issue a token.
+    /// @param to  who takes the issue
+    /// @param amount the amount to issue
     function mint(address to, uint256 amount) external returns (bool);
 
-    /**
-     * burn a token.
-     */
+    // @dev burn a token.
+    /// @param from Whose tokens are burned
+    /// @param amount the amount to burn
     function burn(address from, uint256 amount) external returns (bool);
-
-    /**
-     * The sender authorize spender to spend sender's tokens in the amount.
-     */
-    function approve(address spender, uint256 value) external returns (bool);
-
-    /**
-     * The sender sends the value of this token to addressTO.
-     */
-    function transfer(address to, uint256 value) external returns (bool);
-
-    /**
-     * The sender sends the amount of tokens from fromAddress to toAddress.
-     */
-    function transferFrom(
-        address from,
-        address to,
-        uint256 value
-    ) external returns (bool);
 
     function DOMAIN_SEPARATOR() external view returns (bytes32);
 
-    //function PERMIT_TYPEHASH() external pure returns (bytes32);
     function nonces(address owner) external view returns (uint256);
 
-    /**
-     * Authorizes the owner's token to be used by the spender as much as the value.
-     * The signature must have the owner's signature.
-     */
+    /// @dev Authorizes the owner's token to be used by the spender as much as the value.
+    /// @dev The signature must have the owner's signature.
+    /// @param owner the token's owner
+    /// @param spender the account that spend owner's token
+    /// @param value the amount to be approve to spend
+    /// @param deadline the deadline that vaild the owner's signature
+    /// @param v the owner's signature - v
+    /// @param r the owner's signature - r
+    /// @param s the owner's signature - s
     function permit(
         address owner,
         address spender,
         uint256 value,
         uint256 deadline,
-        bytes memory signature
+        uint8 v,
+        bytes32 r,
+        bytes32 s
     ) external;
+
+    /// @dev verify the signature
+    /// @param signer the signer address
+    /// @param owner the token's owner
+    /// @param spender the account that spend owner's token
+    /// @param value the amount to be approve to spend
+    /// @param deadline the deadline that vaild the owner's signature
+    /// @param _nounce the _nounce
+    /// @param sigR the owner's signature - r
+    /// @param sigS the owner's signature - s
+    /// @param sigV the owner's signature - v
+    function verify(
+        address signer,
+        address owner,
+        address spender,
+        uint256 value,
+        uint256 deadline,
+        uint256 _nounce,
+        bytes32 sigR,
+        bytes32 sigS,
+        uint8 sigV
+    ) external view returns (bool);
+
+    /// @dev the hash of Permit
+    /// @param owner the token's owner
+    /// @param spender the account that spend owner's token
+    /// @param value the amount to be approve to spend
+    /// @param deadline the deadline that vaild the owner's signature
+    /// @param _nounce the _nounce
+    function hashPermit(
+        address owner,
+        address spender,
+        uint256 value,
+        uint256 deadline,
+        uint256 _nounce
+    ) external view returns (bytes32);
 }

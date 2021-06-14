@@ -45,6 +45,9 @@ const PSEIG_RATE = _WTON("0.4");
 
 const TON_MINIMUM_STAKE_AMOUNT = _TON("1000");
 
+const name = "Fair Launchpad Dao";
+const symbol = "FLD";
+const version = "1";
 
 // ico2.0 contracts
 let StakeFactory,
@@ -57,7 +60,9 @@ let StakeFactory,
   Stake1Proxy,
   StakeTON,
   IERC20;
-let StakeTONFactory, StakeForStableCoinFactory;
+let StakeTONFactory, StakeDefiFactory,
+  StakeVaultFactory,
+  StakeSimpleFactory;
 
 // plasma-evm-contracts
 let TON,
@@ -68,7 +73,8 @@ let TON,
   Layer2Registry,
   AutoRefactorCoinage,
   PowerTON,
-  DAOVault;
+  DAOVault,
+  SwapProxy;
 let EtherToken, EpochHandler, SubmitHandler, Layer2;
 
 let o;
@@ -90,6 +96,7 @@ class ICO20Contracts {
     // this.oldDaoVault = null;
     this.seigManager = null;
     this.powerton = null;
+    this.swapProxy = null;
 
     this.layer2s = [];
     this.coinages = [];
@@ -103,6 +110,13 @@ class ICO20Contracts {
     this.fld = null;
     this.sfld = null;
     this.stakeForSFLD = null;
+
+    this.stakeVaultFactory = null;
+    this.stakeSimpleFactory = null;
+
+    this.stakeTONfactory = null;
+    this.StakeDefiFactory = null;
+
     this.stakeregister = null;
     this.stakefactory = null;
     this.stake1proxy = null;
@@ -170,12 +184,19 @@ class ICO20Contracts {
     this.vault_phase1_dev = null;
 
     this.stakeTONfactory = null;
-    this.stakeForStableCoinFactory = null;
+    this.StakeDefiFactory = null;
 
-    this.stakeTONfactory = await ethers.getContractFactory("StakeTONFactory");
-    this.stakeForStableCoinFactory = await ethers.getContractFactory(
-      "StakeForStableCoinFactory"
+    this.stakeVaultFactory = null;
+    this.stakeSimpleFactory = null;
+
+    StakeTONProxyFactory = await ethers.getContractFactory("StakeTONProxyFactory");
+    StakeTONLogic = await ethers.getContractFactory(
+      "StakeTON"
     );
+    StakeVaultFactory = await ethers.getContractFactory("StakeVaultFactory");
+
+    StakeSimple = await ethers.getContractFactory("StakeSimple");
+    StakeSimpleFactory = await ethers.getContractFactory("StakeSimpleFactory");
 
     StakeFactory = await ethers.getContractFactory("StakeFactory");
     StakeRegistry = await ethers.getContractFactory("StakeRegistry");
@@ -187,26 +208,43 @@ class ICO20Contracts {
     Stake1Proxy = await ethers.getContractFactory("Stake1Proxy");
 
     StakeTONFactory = await ethers.getContractFactory("StakeTONFactory");
-    StakeForStableCoinFactory = await ethers.getContractFactory("StakeForStableCoinFactory");
+    StakeDefiFactory = await ethers.getContractFactory("StakeDefiFactory");
+    SwapProxy = await ethers.getContractFactory("SwapProxy");
 
-    this.fld = await FLD.connect(owner).deploy();
-    this.sfld = await SFLD.connect(owner).deploy();
+    this.swapProxy = await SwapProxy.connect(owner).deploy();
 
-    this.stakeregister = await StakeRegistry.connect(owner).deploy();
+    this.fld = await FLD.connect(owner).deploy(name, symbol, version);
+    //this.sfld = await SFLD.connect(owner).deploy();
 
-    this.stakeTONfactory = await StakeTONFactory.connect(owner).deploy();
-    this.stakeForStableCoinFactory = await StakeForStableCoinFactory.connect(
+    this.stakeregister = await StakeRegistry.connect(owner).deploy(this.fld.address);
+
+    this.stake1Vault = await Stake1Vault.new({ from: owner });
+    this.stakeVaultFactory = await StakeVaultFactory.connect(owner).deploy(this.stake1Vault.address);
+
+    this.stakeSimple = await StakeSimple.connect(owner).deploy();
+    this.stakeSimpleFactory = await StakeSimpleFactory.connect(owner).deploy(this.stakeSimple.address);
+
+    this.stakeTONProxyFactory = await StakeTONProxyFactory.connect(owner).deploy();
+    this.stakeTONLogic = await StakeTONLogic.connect(owner).deploy();
+
+    this.stakeTONfactory = await StakeTONFactory.connect(owner).deploy(
+      this.stakeTONProxyFactory.address,
+      this.stakeTONLogic.address
+    );
+
+    this.stakeDefiFactory = await stakeDefiFactory.connect(
       owner
-    ).deploy();
+    ).deploy(this.stakeSimple.address);
 
     this.stakefactory = await StakeFactory.connect(owner).deploy(
+      this.stakeSimpleFactory.address,
       this.stakeTONfactory.address,
-      this.stakeForStableCoinFactory.address
+      this.stakeDefiFactory.address
     );
     this.stake1logic = await Stake1Logic.connect(owner).deploy();
-    this.stake1proxy = await Stake1Proxy.connect(owner).deploy();
+    this.stake1proxy = await Stake1Proxy.connect(owner).deploy(this.stake1logic.address);
 
-    await this.stake1proxy.connect(owner).upgradeTo(this.stake1logic.address);
+    // await this.stake1proxy.connect(owner).upgradeTo(this.stake1logic.address);
 
     this.stakeEntry = await ethers.getContractAt(
       "Stake1Logic",
@@ -222,6 +260,7 @@ class ICO20Contracts {
       stake1logic: this.stake1logic,
       stake1proxy: this.stake1proxy,
       stakeEntry: this.stakeEntry,
+      swapProxy: this.swapProxy,
     };
     // console.log(' initializeICO20Contracts  :',returnData );
 
@@ -239,8 +278,9 @@ class ICO20Contracts {
     DAOVault = await ethers.getContractFactory("DAOVault");
     SeigManager = await ethers.getContractFactory("SeigManager");
     PowerTON = await ethers.getContractFactory("PowerTON");
+
     console.log("HI1");
-    
+
     this.ton = await TON.connect(owner).deploy();
     this.wton = await WTON.connect(owner).deploy(this.ton.address);
     this.registry = await Layer2Registry.connect(owner).deploy();
@@ -273,8 +313,9 @@ class ICO20Contracts {
       this.wton.address,
       ROUND_DURATION
     );
+
     await this.powerton.connect(owner).init();
-    
+
     await this.seigManager.connect(owner).setPowerTON(this.powerton.address);
     await this.powerton.connect(owner).start();
     await this.seigManager.connect(owner).setDao(this.daoVault.address);
@@ -287,7 +328,7 @@ class ICO20Contracts {
       )
     );
     console.log("HI4");
-    
+
     // ton setting
     await this.ton
       .connect(owner)
@@ -337,7 +378,7 @@ class ICO20Contracts {
       coinageFactory: this.factory,
       daoVault: this.daoVault,
       seigManager: this.seigManager,
-      powerton: this.powerton,
+      powerton: this.powerton
     };
     return returnData;
   };
@@ -356,10 +397,18 @@ class ICO20Contracts {
   };
 
   setEntry = async function (owner) {
-    await this.stakeEntry.setStore(
+    const uniswapRouter = "0xe592427a0aece92de3edee1f18e0157c05861564";
+    const uniswapNPM ="0xd1e1C3995695650ABc3Ea3c68ae5d365b35174ED";
+    const uniswapWeth ="0xe592427a0aece92de3edee1f18e0157c05861564";
+    const uniswapFee ="3000";
+    const uniswapRouter2 ="0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D";
+
+
+    await this.stakeEntry.connect(owner).setStore(
       this.fld.address,
       this.stakeregister.address,
       this.stakefactory.address,
+      this.stakeVaultFactory.address,
       this.ton.address,
       this.wton.address,
       this.depositManager.address,
@@ -368,6 +417,31 @@ class ICO20Contracts {
     );
 
     await this.stakeregister
+      .connect(owner)
+      .setTokamak(
+        this.ton.address,
+        this.wton.address,
+        this.depositManager.address,
+        this.seigManager.address,
+        this.swapProxy.address
+      );
+
+    await this.stakeregister
+      .connect(owner)
+      .addDefiInfo(
+        "UNISWAP_V3",
+        uniswapRouter,
+        uniswapNPM,
+        uniswapWeth,
+        uniswapFee,
+        uniswapRouter2
+      );
+
+    await this.stakeregister
+      .connect(owner)
+      .grantRole(ADMIN_ROLE, this.stake1proxy.address);
+
+    await this.stakefactory
       .connect(owner)
       .grantRole(ADMIN_ROLE, this.stake1proxy.address);
 
