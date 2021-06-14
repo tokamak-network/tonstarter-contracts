@@ -2,7 +2,7 @@
 pragma solidity ^0.7.0;
 
 import "../interfaces/IFLD.sol";
-import "../interfaces/ISFLD.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "../libraries/LibTokenStake1.sol";
 import {SafeMath} from "../utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
@@ -12,9 +12,9 @@ contract StakeForSFLD is AccessControl {
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
 
     // reward token : FLD
-    IFLD public fld;
+    address public fld;
     // governance token : SFLD
-    ISFLD public sfld;
+    address public sfld;
 
     // amount of claimed SFLD in wei unit,
     uint256 public claimedSFLDTotal;
@@ -59,8 +59,8 @@ contract StakeForSFLD is AccessControl {
             "StakeForSFLD: input is zero"
         );
 
-        fld = IFLD(_fld);
-        sfld = ISFLD(_sfld);
+        fld = _fld;
+        sfld = _sfld;
         startBlock = _startBlock;
         started = true;
     }
@@ -84,7 +84,9 @@ contract StakeForSFLD is AccessControl {
         uint256 amount,
         uint256 _periodBlock,
         uint256 deadline,
-        bytes memory signature
+        uint8 v,
+        bytes32 r,
+        bytes32 s
     ) external {
         require(
             amount > 0 && started == true && deadline > 0,
@@ -97,7 +99,7 @@ contract StakeForSFLD is AccessControl {
         );
 
         require(
-            fld.balanceOf(msg.sender) >= amount,
+            IERC20(fld).balanceOf(msg.sender) >= amount,
             "StakeForSFLD: FLD.balanceOf is lack."
         );
 
@@ -110,8 +112,8 @@ contract StakeForSFLD is AccessControl {
         staked.periodBlock = _periodBlock;
         totalStakedAmount = totalStakedAmount.add(amount);
 
-        fld.permit(msg.sender, address(this), amount, deadline, signature);
-        fld.transferFrom(msg.sender, address(this), amount);
+        IFLD(fld).permit(msg.sender, address(this), amount, deadline, v, r, s);
+        IERC20(fld).transferFrom(msg.sender, address(this), amount);
     }
 
     /// dev. SFLD is minted according to the ratio of the specified period.
@@ -156,7 +158,7 @@ contract StakeForSFLD is AccessControl {
         staked.claimedAmount = staked.claimedAmount.add(rewardClaim);
         claimedSFLDTotal = claimedSFLDTotal.add(rewardClaim);
 
-        sfld.mint(msg.sender, rewardClaim);
+        IFLD(sfld).mint(msg.sender, rewardClaim);
     }
 
     /// dev. You can change to FLD as much as you have SFLD. exchage SFLD to FLD.
@@ -164,7 +166,9 @@ contract StakeForSFLD is AccessControl {
     function withdraw(
         uint256 amount,
         uint256 deadline,
-        bytes memory signature
+        uint8 v,
+        bytes32 r,
+        bytes32 s
     ) external {
         LibTokenStake1.StakedAmountForSFLD storage staked =
             userStaked[msg.sender];
@@ -178,7 +182,7 @@ contract StakeForSFLD is AccessControl {
             "StakeForSFLD: staking period is not end"
         );
 
-        uint256 sfldBalance = sfld.balanceOf(msg.sender);
+        uint256 sfldBalance = IERC20(sfld).balanceOf(msg.sender);
         require(
             sfldBalance > 0 && amount == sfldBalance,
             "StakeForSFLD: balanceOf SFLD is zero"
@@ -187,25 +191,25 @@ contract StakeForSFLD is AccessControl {
         staked.releasedAmount = staked.releasedAmount.add(sfldBalance);
         staked.releasedBlock = block.number;
 
-        uint256 fldBalance = fld.balanceOf(address(this));
+        uint256 fldBalance = IERC20(fld).balanceOf(address(this));
         if (sfldBalance > fldBalance)
-            fld.mint(address(this), sfldBalance.sub(fldBalance));
+            IFLD(fld).mint(address(this), sfldBalance.sub(fldBalance));
 
-        sfld.permit(
+        IFLD(sfld).permit(
             msg.sender,
             address(this),
             sfldBalance,
             deadline,
-            signature
+            v, r, s
         );
 
         require(
-            sfld.burn(msg.sender, sfldBalance),
+            IFLD(sfld).burn(msg.sender, sfldBalance),
             "StakeForSFLD: withdraw sfld.burn fail"
         );
 
         require(
-            fld.transfer(msg.sender, sfldBalance),
+            IERC20(fld).transfer(msg.sender, sfldBalance),
             "StakeForSFLD: withdraw fld.transfer fail"
         );
     }
