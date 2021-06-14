@@ -155,7 +155,7 @@ async function main() {
   stakeStartBlock = parseInt(stakeStartBlock);
 
 // change vault name
-  let VaultName = "TON #1";
+  let VaultName = "TON #4";
   let periodsMins = [
       {
         name: VaultName + " 10 MINs",
@@ -173,15 +173,15 @@ async function main() {
 
   let periodsHours = [
     {
-      name: VaultName + " 1 HOUR",
+      name: VaultName + " 2 HOUR",
       period: getPeriodBlockByTimes(0, 1, 0)
     },
     {
-      name: VaultName + " 2 HOURS",
+      name: VaultName + " 4 HOURS",
       period: getPeriodBlockByTimes(0, 2, 0)
     },
     {
-      name: VaultName + " 5 HOURS",
+      name: VaultName + " 6 HOURS",
       period: getPeriodBlockByTimes(0, 5, 0)
     }
   ];
@@ -234,9 +234,9 @@ async function main() {
   ////////////////////////////////////////////////////////
   // For TON Vault : hashName must be specified as a unique value.
   // ton_vault.hashName = keccak256(VaultName);
-  ton_vault.saleStartBlock = parseInt(curBlock) + parseInt(60*30/13);
-  ton_vault.stakeStartBlock = ton_vault.saleStartBlock + parseInt(60*60*4/13);
-  await createValue(ton_vault, ton);
+  // ton_vault.saleStartBlock = parseInt(curBlock) + parseInt(60*10/13);
+  // ton_vault.stakeStartBlock = ton_vault.saleStartBlock + parseInt(60*60*24*3/13);
+  // await createValue(ton_vault, ton);
 
   ////////////////////////////////////////////////////////
   // For Ether Vault
@@ -247,16 +247,16 @@ async function main() {
   /// /////////////////////////////////////////////////////
   // For StakeContract of Vault
   // write your vault
-  // let token = ton;
+  let token = ton;
   // let token = zeroAddress;
-  // let vaultAddress ='0x75F194a509180D86bB9869da45BbEAC68b278c11';
-  // console.log('vaultAddress',vaultAddress);
-  // let periods = periodsDays;
-  // console.log('periods',periods);
-  // for (let i =0; i< periods.length ; i++){
-  //   await createStakeContract(vaultAddress, periods[i].period.blocks, periods[i].name, token );
-  //   timeout(10000);
-  // }
+  let vaultAddress ='0xd2495Bbc9150739E50Ad78b2c5a4FEf9c8e2C608';
+  console.log('vaultAddress',vaultAddress);
+  let periods = periodsDays;
+  console.log('periods',periods);
+  for (let i =0; i< periods.length ; i++){
+    await createStakeContract(vaultAddress, periods[i].period.blocks, periods[i].name, token );
+    timeout(10000);
+  }
 
 }
 
