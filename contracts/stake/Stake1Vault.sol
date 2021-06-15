@@ -102,6 +102,27 @@ contract Stake1Vault is StakeVaultStorage, IStake1Vault {
         defiAddr = _defiAddr;
     }
 
+    /// @dev If the vault has more money than the reward owed, the owner can withdraw the remaining amount.
+    /// @param _amount the amount of withdrawal
+    function withdrawReward(uint256 _amount) external override onlyOwner {
+        require(saleClosed == true, "Stake1Vault: not closed");
+        uint256 rewardAmount = 0;
+        for (uint256 i = 0; i < stakeAddresses.length; i++) {
+            rewardAmount = rewardAmount
+                .add(stakeInfos[stakeAddresses[i]].totalRewardAmount)
+                .sub(stakeInfos[stakeAddresses[i]].claimRewardAmount);
+        }
+        uint256 balanceOf = IERC20(tos).balanceOf(address(this));
+        require(
+            balanceOf >= rewardAmount.add(_amount),
+            "Stake1Vault: insuffient"
+        );
+        require(
+            IERC20(tos).transfer(msg.sender, _amount),
+            "Stake1Vault: withdrawReward fail"
+        );
+    }
+
     /// @dev  Add stake contract
     /// @param _name stakeContract's name
     /// @param stakeContract stakeContract's address

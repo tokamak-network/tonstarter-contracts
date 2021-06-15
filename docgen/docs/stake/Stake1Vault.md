@@ -12,6 +12,8 @@
 
 - [`setDefiAddr(address _defiAddr)`](#Stake1Vault-setDefiAddr-address-)
 
+- [`withdrawReward(uint256 _amount)`](#Stake1Vault-withdrawReward-uint256-)
+
 - [`addSubVaultOfStake(string _name, address stakeContract, uint256 periodBlocks)`](#Stake1Vault-addSubVaultOfStake-string-address-uint256-)
 
 - [`closeSale()`](#Stake1Vault-closeSale--)
@@ -97,6 +99,16 @@ Set Defi Address
 ### Parameters:
 
 - `_defiAddr`: DeFi related address
+
+###### Stake1Vault-withdrawReward-uint256-
+
+## Function `withdrawReward(uint256 _amount)`
+
+If the vault has more money than the reward owed, the owner can withdraw the remaining amount.
+
+### Parameters:
+
+- `_amount`: the amount of withdrawal
 
 ###### Stake1Vault-addSubVaultOfStake-string-address-uint256-
 

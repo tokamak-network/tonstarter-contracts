@@ -74,29 +74,29 @@
   "immutableReferences": {},
   "generatedSources": [],
   "deployedGeneratedSources": [],
-  "sourceMap": "226:1791:5:-:0;;;502:205;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;502:205:5;-1:-1:-1;;;;;571:30:5;;550:106;;;;;-1:-1:-1;;;550:106:5;;;;;;;;;;;;;;;;;;;;;;;;;;;;666:15;:34;;-1:-1:-1;;;;;666:34:5;;;-1:-1:-1;;;;;;666:34:5;;;;;;;;;226:1791;;;;;;",
-  "deployedSourceMap": "226:1791:5:-:0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;343:30;;;:::i;:::-;;;;-1:-1:-1;;;;;343:30:5;;;;;;;;;;;;;;281:55;;;:::i;:::-;;;;;;;;;;;;;;;;1020:995;;;;;;;;;;;;;;;;-1:-1:-1;1020:995:5;;;-1:-1:-1;;;;;1020:995:5;;;;;;:::i;343:30::-;;;-1:-1:-1;;;;;343:30:5;;:::o;281:55::-;-1:-1:-1;;;;;;;;;;;281:55:5;:::o;1020:995::-;1165:7;1553:15;;1279:8;1533:36;;1199:8;;-1:-1:-1;;;;;1199:8:5;;;;1237;;;;;;;;1279;;;;;;;1317;;;;;;;;1356:11;;;1392;;;;;1439;;;;;1487;;;;;1165:7;;1553:15;;;;1533:36;;;:::i;:::-;-1:-1:-1;;;;;1533:36:5;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;1509:60:5;-1:-1:-1;;;;;;1587:28:5;;1579:70;;;;;-1:-1:-1;;;1579:70:5;;;;;;;;;;;;;;;;;;;;;;;;;;;;1660:218;;;-1:-1:-1;;;1660:218:5;;-1:-1:-1;;;;;1660:218:5;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;:16;;;;;;:218;;;;;-1:-1:-1;;1660:218:5;;;;;;;;-1:-1:-1;1660:16:5;:218;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;1889:5;-1:-1:-1;;;;;1889:15:5;;-1:-1:-1;;;;;;;;;;;1917:5:5;1889:34;;;;;;;;;;;;;;;;;;-1:-1:-1;;;;;1889:34:5;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;;1933:43:5;;;-1:-1:-1;;;1933:43:5;;-1:-1:-1;;;;;;;;;;;1933:43:5;;;;1970:4;1933:43;;;;;;-1:-1:-1;;;;;1933:16:5;;;-1:-1:-1;1933:16:5;;-1:-1:-1;1933:43:5;;;;;-1:-1:-1;;1933:43:5;;;;;;;-1:-1:-1;1933:16:5;:43;;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;2002:5:5;;1020:995;-1:-1:-1;;;;;;;;;;;;;;;1020:995:5:o;-1:-1:-1:-;;;;;;;;:::o",
+  "sourceMap": "226:1791:4:-:0;;;502:205;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;502:205:4;-1:-1:-1;;;;;571:30:4;;550:106;;;;;-1:-1:-1;;;550:106:4;;;;;;;;;;;;;;;;;;;;;;;;;;;;666:15;:34;;-1:-1:-1;;;;;666:34:4;;;-1:-1:-1;;;;;;666:34:4;;;;;;;;;226:1791;;;;;;",
+  "deployedSourceMap": "226:1791:4:-:0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;343:30;;;:::i;:::-;;;;-1:-1:-1;;;;;343:30:4;;;;;;;;;;;;;;281:55;;;:::i;:::-;;;;;;;;;;;;;;;;1020:995;;;;;;;;;;;;;;;;-1:-1:-1;1020:995:4;;;-1:-1:-1;;;;;1020:995:4;;;;;;:::i;343:30::-;;;-1:-1:-1;;;;;343:30:4;;:::o;281:55::-;-1:-1:-1;;;;;;;;;;;281:55:4;:::o;1020:995::-;1165:7;1553:15;;1279:8;1533:36;;1199:8;;-1:-1:-1;;;;;1199:8:4;;;;1237;;;;;;;;1279;;;;;;;1317;;;;;;;;1356:11;;;1392;;;;;1439;;;;;1487;;;;;1165:7;;1553:15;;;;1533:36;;;:::i;:::-;-1:-1:-1;;;;;1533:36:4;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;1509:60:4;-1:-1:-1;;;;;;1587:28:4;;1579:70;;;;;-1:-1:-1;;;1579:70:4;;;;;;;;;;;;;;;;;;;;;;;;;;;;1660:218;;;-1:-1:-1;;;1660:218:4;;-1:-1:-1;;;;;1660:218:4;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;:16;;;;;;:218;;;;;-1:-1:-1;;1660:218:4;;;;;;;;-1:-1:-1;1660:16:4;:218;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;1889:5;-1:-1:-1;;;;;1889:15:4;;-1:-1:-1;;;;;;;;;;;1917:5:4;1889:34;;;;;;;;;;;;;;;;;;-1:-1:-1;;;;;1889:34:4;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;;1933:43:4;;;-1:-1:-1;;;1933:43:4;;-1:-1:-1;;;;;;;;;;;1933:43:4;;;;1970:4;1933:43;;;;;;-1:-1:-1;;;;;1933:16:4;;;-1:-1:-1;1933:16:4;;-1:-1:-1;1933:43:4;;;;;-1:-1:-1;;1933:43:4;;;;;;;-1:-1:-1;1933:16:4;:43;;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;2002:5:4;;1020:995;-1:-1:-1;;;;;;;;;;;;;;;1020:995:4:o;-1:-1:-1:-;;;;;;;;:::o",
   "source": "// SPDX-License-Identifier: MIT\npragma solidity ^0.7.6;\n\nimport \"../interfaces/IStakeVaultFactory.sol\";\nimport {StakeVaultProxy} from \"../stake/StakeVaultProxy.sol\";\n\n/// @title A factory that creates a vault that hold reward\ncontract StakeVaultFactory is IStakeVaultFactory {\n    bytes32 public constant ADMIN_ROLE = keccak256(\"ADMIN\");\n\n    address public stakeVaultLogic;\n\n    /// @dev constructor of StakeVaultFactory\n    /// @param _stakeVaultLogic the logic address used in StakeVaultFactory\n    constructor(address _stakeVaultLogic) {\n        require(\n            _stakeVaultLogic != address(0),\n            \"StakeVaultFactory: logic zero\"\n        );\n        stakeVaultLogic = _stakeVaultLogic;\n    }\n\n    /// @dev Create a vault that hold reward, _cap is allocated reward amount.\n    /// @param _addr the array of [token, paytoken, vault, defiAddr]\n    /// @param _intInfo array of [_stakeType, _cap, _saleStartBlock, _stakeStartBlock]\n    /// @param owner the owner adderess\n    /// @return a vault address\n    function create(\n        address[4] calldata _addr,\n        uint256[4] calldata _intInfo,\n        address owner\n    ) external override returns (address) {\n        address _tos = _addr[0];\n        address _paytoken = _addr[1];\n        address _stakefactory = _addr[2];\n        address _defiAddr = _addr[3];\n        uint256 _stakeType = _intInfo[0];\n        uint256 _cap = _intInfo[1];\n        uint256 _saleStartBlock = _intInfo[2];\n        uint256 _stakeStartBlock = _intInfo[3];\n\n        StakeVaultProxy proxy = new StakeVaultProxy(stakeVaultLogic);\n        require(address(proxy) != address(0), \"StakeVaultFactory: proxy zero\");\n\n        proxy.initialize(\n            _tos,\n            _paytoken,\n            _cap,\n            _saleStartBlock,\n            _stakeStartBlock,\n            _stakefactory,\n            _stakeType,\n            _defiAddr\n        );\n\n        proxy.grantRole(ADMIN_ROLE, owner);\n        proxy.revokeRole(ADMIN_ROLE, address(this));\n\n        return address(proxy);\n    }\n}\n",
   "sourcePath": "/Users/zena/ico2.0/ico20-contracts/contracts/factory/StakeVaultFactory.sol",
   "ast": {
     "absolutePath": "/Users/zena/ico2.0/ico20-contracts/contracts/factory/StakeVaultFactory.sol",
     "exportedSymbols": {
       "IStakeVaultFactory": [
-        3516
+        3058
       ],
       "StakeVaultFactory": [
-        2382
+        2086
       ],
       "StakeVaultProxy": [
-        9944
+        8787
       ]
     },
-    "id": 2383,
+    "id": 2087,
     "license": "MIT",
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 2226,
+        "id": 1930,
         "literals": [
           "solidity",
           "^",
@@ -104,35 +104,35 @@
           ".6"
         ],
         "nodeType": "PragmaDirective",
-        "src": "32:23:5"
+        "src": "32:23:4"
       },
       {
         "absolutePath": "/Users/zena/ico2.0/ico20-contracts/contracts/interfaces/IStakeVaultFactory.sol",
         "file": "../interfaces/IStakeVaultFactory.sol",
-        "id": 2227,
+        "id": 1931,
         "nodeType": "ImportDirective",
-        "scope": 2383,
-        "sourceUnit": 3517,
-        "src": "57:46:5",
+        "scope": 2087,
+        "sourceUnit": 3059,
+        "src": "57:46:4",
         "symbolAliases": [],
         "unitAlias": ""
       },
       {
         "absolutePath": "/Users/zena/ico2.0/ico20-contracts/contracts/stake/StakeVaultProxy.sol",
         "file": "../stake/StakeVaultProxy.sol",
-        "id": 2229,
+        "id": 1933,
         "nodeType": "ImportDirective",
-        "scope": 2383,
-        "sourceUnit": 9945,
-        "src": "104:61:5",
+        "scope": 2087,
+        "sourceUnit": 8788,
+        "src": "104:61:4",
         "symbolAliases": [
           {
             "foreign": {
-              "id": 2228,
+              "id": 1932,
               "name": "StakeVaultProxy",
               "nodeType": "Identifier",
               "overloadedDeclarations": [],
-              "src": "112:15:5",
+              "src": "112:15:4",
               "typeDescriptions": {}
             }
           }
@@ -144,37 +144,37 @@
         "baseContracts": [
           {
             "baseName": {
-              "id": 2231,
+              "id": 1935,
               "name": "IStakeVaultFactory",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 3516,
-              "src": "256:18:5",
+              "referencedDeclaration": 3058,
+              "src": "256:18:4",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_IStakeVaultFactory_$3516",
+                "typeIdentifier": "t_contract$_IStakeVaultFactory_$3058",
                 "typeString": "contract IStakeVaultFactory"
               }
             },
-            "id": 2232,
+            "id": 1936,
             "nodeType": "InheritanceSpecifier",
-            "src": "256:18:5"
+            "src": "256:18:4"
           }
         ],
         "contractDependencies": [
-          3516,
-          9944
+          3058,
+          8787
         ],
         "contractKind": "contract",
         "documentation": {
-          "id": 2230,
+          "id": 1934,
           "nodeType": "StructuredDocumentation",
-          "src": "167:59:5",
+          "src": "167:59:4",
           "text": "@title A factory that creates a vault that hold reward"
         },
         "fullyImplemented": true,
-        "id": 2382,
+        "id": 2086,
         "linearizedBaseContracts": [
-          2382,
-          3516
+          2086,
+          3058
         ],
         "name": "StakeVaultFactory",
         "nodeType": "ContractDefinition",
@@ -182,12 +182,12 @@
           {
             "constant": true,
             "functionSelector": "75b238fc",
-            "id": 2237,
+            "id": 1941,
             "mutability": "constant",
             "name": "ADMIN_ROLE",
             "nodeType": "VariableDeclaration",
-            "scope": 2382,
-            "src": "281:55:5",
+            "scope": 2086,
+            "src": "281:55:4",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -195,10 +195,10 @@
               "typeString": "bytes32"
             },
             "typeName": {
-              "id": 2233,
+              "id": 1937,
               "name": "bytes32",
               "nodeType": "ElementaryTypeName",
-              "src": "281:7:5",
+              "src": "281:7:4",
               "typeDescriptions": {
                 "typeIdentifier": "t_bytes32",
                 "typeString": "bytes32"
@@ -208,14 +208,14 @@
               "arguments": [
                 {
                   "hexValue": "41444d494e",
-                  "id": 2235,
+                  "id": 1939,
                   "isConstant": false,
                   "isLValue": false,
                   "isPure": true,
                   "kind": "string",
                   "lValueRequested": false,
                   "nodeType": "Literal",
-                  "src": "328:7:5",
+                  "src": "328:7:4",
                   "typeDescriptions": {
                     "typeIdentifier": "t_stringliteral_df8b4c520ffe197c5343c6f5aec59570151ef9a492f2c624fd45ddde6135ec42",
                     "typeString": "literal_string \"ADMIN\""
@@ -230,18 +230,18 @@
                     "typeString": "literal_string \"ADMIN\""
                   }
                 ],
-                "id": 2234,
+                "id": 1938,
                 "name": "keccak256",
                 "nodeType": "Identifier",
                 "overloadedDeclarations": [],
                 "referencedDeclaration": 4294967288,
-                "src": "318:9:5",
+                "src": "318:9:4",
                 "typeDescriptions": {
                   "typeIdentifier": "t_function_keccak256_pure$_t_bytes_memory_ptr_$returns$_t_bytes32_$",
                   "typeString": "function (bytes memory) pure returns (bytes32)"
                 }
               },
-              "id": 2236,
+              "id": 1940,
               "isConstant": false,
               "isLValue": false,
               "isPure": true,
@@ -249,7 +249,7 @@
               "lValueRequested": false,
               "names": [],
               "nodeType": "FunctionCall",
-              "src": "318:18:5",
+              "src": "318:18:4",
               "tryCall": false,
               "typeDescriptions": {
                 "typeIdentifier": "t_bytes32",
@@ -261,12 +261,12 @@
           {
             "constant": false,
             "functionSelector": "4d59eaf5",
-            "id": 2239,
+            "id": 1943,
             "mutability": "mutable",
             "name": "stakeVaultLogic",
             "nodeType": "VariableDeclaration",
-            "scope": 2382,
-            "src": "343:30:5",
+            "scope": 2086,
+            "src": "343:30:4",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -274,10 +274,10 @@
               "typeString": "address"
             },
             "typeName": {
-              "id": 2238,
+              "id": 1942,
               "name": "address",
               "nodeType": "ElementaryTypeName",
-              "src": "343:7:5",
+              "src": "343:7:4",
               "stateMutability": "nonpayable",
               "typeDescriptions": {
                 "typeIdentifier": "t_address",
@@ -288,9 +288,9 @@
           },
           {
             "body": {
-              "id": 2259,
+              "id": 1963,
               "nodeType": "Block",
-              "src": "540:167:5",
+              "src": "540:167:4",
               "statements": [
                 {
                   "expression": {
@@ -300,18 +300,18 @@
                           "typeIdentifier": "t_address",
                           "typeString": "address"
                         },
-                        "id": 2251,
+                        "id": 1955,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": false,
                         "lValueRequested": false,
                         "leftExpression": {
-                          "id": 2246,
+                          "id": 1950,
                           "name": "_stakeVaultLogic",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 2242,
-                          "src": "571:16:5",
+                          "referencedDeclaration": 1946,
+                          "src": "571:16:4",
                           "typeDescriptions": {
                             "typeIdentifier": "t_address",
                             "typeString": "address"
@@ -323,14 +323,14 @@
                           "arguments": [
                             {
                               "hexValue": "30",
-                              "id": 2249,
+                              "id": 1953,
                               "isConstant": false,
                               "isLValue": false,
                               "isPure": true,
                               "kind": "number",
                               "lValueRequested": false,
                               "nodeType": "Literal",
-                              "src": "599:1:5",
+                              "src": "599:1:4",
                               "typeDescriptions": {
                                 "typeIdentifier": "t_rational_0_by_1",
                                 "typeString": "int_const 0"
@@ -345,26 +345,26 @@
                                 "typeString": "int_const 0"
                               }
                             ],
-                            "id": 2248,
+                            "id": 1952,
                             "isConstant": false,
                             "isLValue": false,
                             "isPure": true,
                             "lValueRequested": false,
                             "nodeType": "ElementaryTypeNameExpression",
-                            "src": "591:7:5",
+                            "src": "591:7:4",
                             "typeDescriptions": {
                               "typeIdentifier": "t_type$_t_address_$",
                               "typeString": "type(address)"
                             },
                             "typeName": {
-                              "id": 2247,
+                              "id": 1951,
                               "name": "address",
                               "nodeType": "ElementaryTypeName",
-                              "src": "591:7:5",
+                              "src": "591:7:4",
                               "typeDescriptions": {}
                             }
                           },
-                          "id": 2250,
+                          "id": 1954,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": true,
@@ -372,14 +372,14 @@
                           "lValueRequested": false,
                           "names": [],
                           "nodeType": "FunctionCall",
-                          "src": "591:10:5",
+                          "src": "591:10:4",
                           "tryCall": false,
                           "typeDescriptions": {
                             "typeIdentifier": "t_address_payable",
                             "typeString": "address payable"
                           }
                         },
-                        "src": "571:30:5",
+                        "src": "571:30:4",
                         "typeDescriptions": {
                           "typeIdentifier": "t_bool",
                           "typeString": "bool"
@@ -387,14 +387,14 @@
                       },
                       {
                         "hexValue": "5374616b655661756c74466163746f72793a206c6f676963207a65726f",
-                        "id": 2252,
+                        "id": 1956,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": true,
                         "kind": "string",
                         "lValueRequested": false,
                         "nodeType": "Literal",
-                        "src": "615:31:5",
+                        "src": "615:31:4",
                         "typeDescriptions": {
                           "typeIdentifier": "t_stringliteral_8aa7ce9aeb1d196c60d64006daa1ee9d9cd59d1398f87c170875d34cf44df979",
                           "typeString": "literal_string \"StakeVaultFactory: logic zero\""
@@ -413,7 +413,7 @@
                           "typeString": "literal_string \"StakeVaultFactory: logic zero\""
                         }
                       ],
-                      "id": 2245,
+                      "id": 1949,
                       "name": "require",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
@@ -421,13 +421,13 @@
                         4294967278
                       ],
                       "referencedDeclaration": 4294967278,
-                      "src": "550:7:5",
+                      "src": "550:7:4",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_require_pure$_t_bool_$_t_string_memory_ptr_$returns$__$",
                         "typeString": "function (bool,string memory) pure"
                       }
                     },
-                    "id": 2253,
+                    "id": 1957,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -435,31 +435,31 @@
                     "lValueRequested": false,
                     "names": [],
                     "nodeType": "FunctionCall",
-                    "src": "550:106:5",
+                    "src": "550:106:4",
                     "tryCall": false,
                     "typeDescriptions": {
                       "typeIdentifier": "t_tuple$__$",
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 2254,
+                  "id": 1958,
                   "nodeType": "ExpressionStatement",
-                  "src": "550:106:5"
+                  "src": "550:106:4"
                 },
                 {
                   "expression": {
-                    "id": 2257,
+                    "id": 1961,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
                     "lValueRequested": false,
                     "leftHandSide": {
-                      "id": 2255,
+                      "id": 1959,
                       "name": "stakeVaultLogic",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 2239,
-                      "src": "666:15:5",
+                      "referencedDeclaration": 1943,
+                      "src": "666:15:4",
                       "typeDescriptions": {
                         "typeIdentifier": "t_address",
                         "typeString": "address"
@@ -468,53 +468,53 @@
                     "nodeType": "Assignment",
                     "operator": "=",
                     "rightHandSide": {
-                      "id": 2256,
+                      "id": 1960,
                       "name": "_stakeVaultLogic",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 2242,
-                      "src": "684:16:5",
+                      "referencedDeclaration": 1946,
+                      "src": "684:16:4",
                       "typeDescriptions": {
                         "typeIdentifier": "t_address",
                         "typeString": "address"
                       }
                     },
-                    "src": "666:34:5",
+                    "src": "666:34:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
                       "typeString": "address"
                     }
                   },
-                  "id": 2258,
+                  "id": 1962,
                   "nodeType": "ExpressionStatement",
-                  "src": "666:34:5"
+                  "src": "666:34:4"
                 }
               ]
             },
             "documentation": {
-              "id": 2240,
+              "id": 1944,
               "nodeType": "StructuredDocumentation",
-              "src": "380:117:5",
+              "src": "380:117:4",
               "text": "@dev constructor of StakeVaultFactory\n @param _stakeVaultLogic the logic address used in StakeVaultFactory"
             },
-            "id": 2260,
+            "id": 1964,
             "implemented": true,
             "kind": "constructor",
             "modifiers": [],
             "name": "",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 2243,
+              "id": 1947,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 2242,
+                  "id": 1946,
                   "mutability": "mutable",
                   "name": "_stakeVaultLogic",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2260,
-                  "src": "514:24:5",
+                  "scope": 1964,
+                  "src": "514:24:4",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -522,10 +522,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 2241,
+                    "id": 1945,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "514:7:5",
+                    "src": "514:7:4",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -535,42 +535,42 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "513:26:5"
+              "src": "513:26:4"
             },
             "returnParameters": {
-              "id": 2244,
+              "id": 1948,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "540:0:5"
+              "src": "540:0:4"
             },
-            "scope": 2382,
-            "src": "502:205:5",
+            "scope": 2086,
+            "src": "502:205:4",
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "public"
           },
           {
             "baseFunctions": [
-              3515
+              3057
             ],
             "body": {
-              "id": 2380,
+              "id": 2084,
               "nodeType": "Block",
-              "src": "1174:841:5",
+              "src": "1174:841:4",
               "statements": [
                 {
                   "assignments": [
-                    2278
+                    1982
                   ],
                   "declarations": [
                     {
                       "constant": false,
-                      "id": 2278,
+                      "id": 1982,
                       "mutability": "mutable",
                       "name": "_tos",
                       "nodeType": "VariableDeclaration",
-                      "scope": 2380,
-                      "src": "1184:12:5",
+                      "scope": 2084,
+                      "src": "1184:12:4",
                       "stateVariable": false,
                       "storageLocation": "default",
                       "typeDescriptions": {
@@ -578,10 +578,10 @@
                         "typeString": "address"
                       },
                       "typeName": {
-                        "id": 2277,
+                        "id": 1981,
                         "name": "address",
                         "nodeType": "ElementaryTypeName",
-                        "src": "1184:7:5",
+                        "src": "1184:7:4",
                         "stateMutability": "nonpayable",
                         "typeDescriptions": {
                           "typeIdentifier": "t_address",
@@ -591,31 +591,31 @@
                       "visibility": "internal"
                     }
                   ],
-                  "id": 2282,
+                  "id": 1986,
                   "initialValue": {
                     "baseExpression": {
-                      "id": 2279,
+                      "id": 1983,
                       "name": "_addr",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 2265,
-                      "src": "1199:5:5",
+                      "referencedDeclaration": 1969,
+                      "src": "1199:5:4",
                       "typeDescriptions": {
                         "typeIdentifier": "t_array$_t_address_$4_calldata_ptr",
                         "typeString": "address[4] calldata"
                       }
                     },
-                    "id": 2281,
+                    "id": 1985,
                     "indexExpression": {
                       "hexValue": "30",
-                      "id": 2280,
+                      "id": 1984,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": true,
                       "kind": "number",
                       "lValueRequested": false,
                       "nodeType": "Literal",
-                      "src": "1205:1:5",
+                      "src": "1205:1:4",
                       "typeDescriptions": {
                         "typeIdentifier": "t_rational_0_by_1",
                         "typeString": "int_const 0"
@@ -627,28 +627,28 @@
                     "isPure": false,
                     "lValueRequested": false,
                     "nodeType": "IndexAccess",
-                    "src": "1199:8:5",
+                    "src": "1199:8:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
                       "typeString": "address"
                     }
                   },
                   "nodeType": "VariableDeclarationStatement",
-                  "src": "1184:23:5"
+                  "src": "1184:23:4"
                 },
                 {
                   "assignments": [
-                    2284
+                    1988
                   ],
                   "declarations": [
                     {
                       "constant": false,
-                      "id": 2284,
+                      "id": 1988,
                       "mutability": "mutable",
                       "name": "_paytoken",
                       "nodeType": "VariableDeclaration",
-                      "scope": 2380,
-                      "src": "1217:17:5",
+                      "scope": 2084,
+                      "src": "1217:17:4",
                       "stateVariable": false,
                       "storageLocation": "default",
                       "typeDescriptions": {
@@ -656,10 +656,10 @@
                         "typeString": "address"
                       },
                       "typeName": {
-                        "id": 2283,
+                        "id": 1987,
                         "name": "address",
                         "nodeType": "ElementaryTypeName",
-                        "src": "1217:7:5",
+                        "src": "1217:7:4",
                         "stateMutability": "nonpayable",
                         "typeDescriptions": {
                           "typeIdentifier": "t_address",
@@ -669,31 +669,31 @@
                       "visibility": "internal"
                     }
                   ],
-                  "id": 2288,
+                  "id": 1992,
                   "initialValue": {
                     "baseExpression": {
-                      "id": 2285,
+                      "id": 1989,
                       "name": "_addr",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 2265,
-                      "src": "1237:5:5",
+                      "referencedDeclaration": 1969,
+                      "src": "1237:5:4",
                       "typeDescriptions": {
                         "typeIdentifier": "t_array$_t_address_$4_calldata_ptr",
                         "typeString": "address[4] calldata"
                       }
                     },
-                    "id": 2287,
+                    "id": 1991,
                     "indexExpression": {
                       "hexValue": "31",
-                      "id": 2286,
+                      "id": 1990,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": true,
                       "kind": "number",
                       "lValueRequested": false,
                       "nodeType": "Literal",
-                      "src": "1243:1:5",
+                      "src": "1243:1:4",
                       "typeDescriptions": {
                         "typeIdentifier": "t_rational_1_by_1",
                         "typeString": "int_const 1"
@@ -705,28 +705,28 @@
                     "isPure": false,
                     "lValueRequested": false,
                     "nodeType": "IndexAccess",
-                    "src": "1237:8:5",
+                    "src": "1237:8:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
                       "typeString": "address"
                     }
                   },
                   "nodeType": "VariableDeclarationStatement",
-                  "src": "1217:28:5"
+                  "src": "1217:28:4"
                 },
                 {
                   "assignments": [
-                    2290
+                    1994
                   ],
                   "declarations": [
                     {
                       "constant": false,
-                      "id": 2290,
+                      "id": 1994,
                       "mutability": "mutable",
                       "name": "_stakefactory",
                       "nodeType": "VariableDeclaration",
-                      "scope": 2380,
-                      "src": "1255:21:5",
+                      "scope": 2084,
+                      "src": "1255:21:4",
                       "stateVariable": false,
                       "storageLocation": "default",
                       "typeDescriptions": {
@@ -734,10 +734,10 @@
                         "typeString": "address"
                       },
                       "typeName": {
-                        "id": 2289,
+                        "id": 1993,
                         "name": "address",
                         "nodeType": "ElementaryTypeName",
-                        "src": "1255:7:5",
+                        "src": "1255:7:4",
                         "stateMutability": "nonpayable",
                         "typeDescriptions": {
                           "typeIdentifier": "t_address",
@@ -747,31 +747,31 @@
                       "visibility": "internal"
                     }
                   ],
-                  "id": 2294,
+                  "id": 1998,
                   "initialValue": {
                     "baseExpression": {
-                      "id": 2291,
+                      "id": 1995,
                       "name": "_addr",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 2265,
-                      "src": "1279:5:5",
+                      "referencedDeclaration": 1969,
+                      "src": "1279:5:4",
                       "typeDescriptions": {
                         "typeIdentifier": "t_array$_t_address_$4_calldata_ptr",
                         "typeString": "address[4] calldata"
                       }
                     },
-                    "id": 2293,
+                    "id": 1997,
                     "indexExpression": {
                       "hexValue": "32",
-                      "id": 2292,
+                      "id": 1996,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": true,
                       "kind": "number",
                       "lValueRequested": false,
                       "nodeType": "Literal",
-                      "src": "1285:1:5",
+                      "src": "1285:1:4",
                       "typeDescriptions": {
                         "typeIdentifier": "t_rational_2_by_1",
                         "typeString": "int_const 2"
@@ -783,28 +783,28 @@
                     "isPure": false,
                     "lValueRequested": false,
                     "nodeType": "IndexAccess",
-                    "src": "1279:8:5",
+                    "src": "1279:8:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
                       "typeString": "address"
                     }
                   },
                   "nodeType": "VariableDeclarationStatement",
-                  "src": "1255:32:5"
+                  "src": "1255:32:4"
                 },
                 {
                   "assignments": [
-                    2296
+                    2000
                   ],
                   "declarations": [
                     {
                       "constant": false,
-                      "id": 2296,
+                      "id": 2000,
                       "mutability": "mutable",
                       "name": "_defiAddr",
                       "nodeType": "VariableDeclaration",
-                      "scope": 2380,
-                      "src": "1297:17:5",
+                      "scope": 2084,
+                      "src": "1297:17:4",
                       "stateVariable": false,
                       "storageLocation": "default",
                       "typeDescriptions": {
@@ -812,10 +812,10 @@
                         "typeString": "address"
                       },
                       "typeName": {
-                        "id": 2295,
+                        "id": 1999,
                         "name": "address",
                         "nodeType": "ElementaryTypeName",
-                        "src": "1297:7:5",
+                        "src": "1297:7:4",
                         "stateMutability": "nonpayable",
                         "typeDescriptions": {
                           "typeIdentifier": "t_address",
@@ -825,31 +825,31 @@
                       "visibility": "internal"
                     }
                   ],
-                  "id": 2300,
+                  "id": 2004,
                   "initialValue": {
                     "baseExpression": {
-                      "id": 2297,
+                      "id": 2001,
                       "name": "_addr",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 2265,
-                      "src": "1317:5:5",
+                      "referencedDeclaration": 1969,
+                      "src": "1317:5:4",
                       "typeDescriptions": {
                         "typeIdentifier": "t_array$_t_address_$4_calldata_ptr",
                         "typeString": "address[4] calldata"
                       }
                     },
-                    "id": 2299,
+                    "id": 2003,
                     "indexExpression": {
                       "hexValue": "33",
-                      "id": 2298,
+                      "id": 2002,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": true,
                       "kind": "number",
                       "lValueRequested": false,
                       "nodeType": "Literal",
-                      "src": "1323:1:5",
+                      "src": "1323:1:4",
                       "typeDescriptions": {
                         "typeIdentifier": "t_rational_3_by_1",
                         "typeString": "int_const 3"
@@ -861,28 +861,28 @@
                     "isPure": false,
                     "lValueRequested": false,
                     "nodeType": "IndexAccess",
-                    "src": "1317:8:5",
+                    "src": "1317:8:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
                       "typeString": "address"
                     }
                   },
                   "nodeType": "VariableDeclarationStatement",
-                  "src": "1297:28:5"
+                  "src": "1297:28:4"
                 },
                 {
                   "assignments": [
-                    2302
+                    2006
                   ],
                   "declarations": [
                     {
                       "constant": false,
-                      "id": 2302,
+                      "id": 2006,
                       "mutability": "mutable",
                       "name": "_stakeType",
                       "nodeType": "VariableDeclaration",
-                      "scope": 2380,
-                      "src": "1335:18:5",
+                      "scope": 2084,
+                      "src": "1335:18:4",
                       "stateVariable": false,
                       "storageLocation": "default",
                       "typeDescriptions": {
@@ -890,10 +890,10 @@
                         "typeString": "uint256"
                       },
                       "typeName": {
-                        "id": 2301,
+                        "id": 2005,
                         "name": "uint256",
                         "nodeType": "ElementaryTypeName",
-                        "src": "1335:7:5",
+                        "src": "1335:7:4",
                         "typeDescriptions": {
                           "typeIdentifier": "t_uint256",
                           "typeString": "uint256"
@@ -902,31 +902,31 @@
                       "visibility": "internal"
                     }
                   ],
-                  "id": 2306,
+                  "id": 2010,
                   "initialValue": {
                     "baseExpression": {
-                      "id": 2303,
+                      "id": 2007,
                       "name": "_intInfo",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 2269,
-                      "src": "1356:8:5",
+                      "referencedDeclaration": 1973,
+                      "src": "1356:8:4",
                       "typeDescriptions": {
                         "typeIdentifier": "t_array$_t_uint256_$4_calldata_ptr",
                         "typeString": "uint256[4] calldata"
                       }
                     },
-                    "id": 2305,
+                    "id": 2009,
                     "indexExpression": {
                       "hexValue": "30",
-                      "id": 2304,
+                      "id": 2008,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": true,
                       "kind": "number",
                       "lValueRequested": false,
                       "nodeType": "Literal",
-                      "src": "1365:1:5",
+                      "src": "1365:1:4",
                       "typeDescriptions": {
                         "typeIdentifier": "t_rational_0_by_1",
                         "typeString": "int_const 0"
@@ -938,28 +938,28 @@
                     "isPure": false,
                     "lValueRequested": false,
                     "nodeType": "IndexAccess",
-                    "src": "1356:11:5",
+                    "src": "1356:11:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
                     }
                   },
                   "nodeType": "VariableDeclarationStatement",
-                  "src": "1335:32:5"
+                  "src": "1335:32:4"
                 },
                 {
                   "assignments": [
-                    2308
+                    2012
                   ],
                   "declarations": [
                     {
                       "constant": false,
-                      "id": 2308,
+                      "id": 2012,
                       "mutability": "mutable",
                       "name": "_cap",
                       "nodeType": "VariableDeclaration",
-                      "scope": 2380,
-                      "src": "1377:12:5",
+                      "scope": 2084,
+                      "src": "1377:12:4",
                       "stateVariable": false,
                       "storageLocation": "default",
                       "typeDescriptions": {
@@ -967,10 +967,10 @@
                         "typeString": "uint256"
                       },
                       "typeName": {
-                        "id": 2307,
+                        "id": 2011,
                         "name": "uint256",
                         "nodeType": "ElementaryTypeName",
-                        "src": "1377:7:5",
+                        "src": "1377:7:4",
                         "typeDescriptions": {
                           "typeIdentifier": "t_uint256",
                           "typeString": "uint256"
@@ -979,31 +979,31 @@
                       "visibility": "internal"
                     }
                   ],
-                  "id": 2312,
+                  "id": 2016,
                   "initialValue": {
                     "baseExpression": {
-                      "id": 2309,
+                      "id": 2013,
                       "name": "_intInfo",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 2269,
-                      "src": "1392:8:5",
+                      "referencedDeclaration": 1973,
+                      "src": "1392:8:4",
                       "typeDescriptions": {
                         "typeIdentifier": "t_array$_t_uint256_$4_calldata_ptr",
                         "typeString": "uint256[4] calldata"
                       }
                     },
-                    "id": 2311,
+                    "id": 2015,
                     "indexExpression": {
                       "hexValue": "31",
-                      "id": 2310,
+                      "id": 2014,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": true,
                       "kind": "number",
                       "lValueRequested": false,
                       "nodeType": "Literal",
-                      "src": "1401:1:5",
+                      "src": "1401:1:4",
                       "typeDescriptions": {
                         "typeIdentifier": "t_rational_1_by_1",
                         "typeString": "int_const 1"
@@ -1015,28 +1015,28 @@
                     "isPure": false,
                     "lValueRequested": false,
                     "nodeType": "IndexAccess",
-                    "src": "1392:11:5",
+                    "src": "1392:11:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
                     }
                   },
                   "nodeType": "VariableDeclarationStatement",
-                  "src": "1377:26:5"
+                  "src": "1377:26:4"
                 },
                 {
                   "assignments": [
-                    2314
+                    2018
                   ],
                   "declarations": [
                     {
                       "constant": false,
-                      "id": 2314,
+                      "id": 2018,
                       "mutability": "mutable",
                       "name": "_saleStartBlock",
                       "nodeType": "VariableDeclaration",
-                      "scope": 2380,
-                      "src": "1413:23:5",
+                      "scope": 2084,
+                      "src": "1413:23:4",
                       "stateVariable": false,
                       "storageLocation": "default",
                       "typeDescriptions": {
@@ -1044,10 +1044,10 @@
                         "typeString": "uint256"
                       },
                       "typeName": {
-                        "id": 2313,
+                        "id": 2017,
                         "name": "uint256",
                         "nodeType": "ElementaryTypeName",
-                        "src": "1413:7:5",
+                        "src": "1413:7:4",
                         "typeDescriptions": {
                           "typeIdentifier": "t_uint256",
                           "typeString": "uint256"
@@ -1056,31 +1056,31 @@
                       "visibility": "internal"
                     }
                   ],
-                  "id": 2318,
+                  "id": 2022,
                   "initialValue": {
                     "baseExpression": {
-                      "id": 2315,
+                      "id": 2019,
                       "name": "_intInfo",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 2269,
-                      "src": "1439:8:5",
+                      "referencedDeclaration": 1973,
+                      "src": "1439:8:4",
                       "typeDescriptions": {
                         "typeIdentifier": "t_array$_t_uint256_$4_calldata_ptr",
                         "typeString": "uint256[4] calldata"
                       }
                     },
-                    "id": 2317,
+                    "id": 2021,
                     "indexExpression": {
                       "hexValue": "32",
-                      "id": 2316,
+                      "id": 2020,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": true,
                       "kind": "number",
                       "lValueRequested": false,
                       "nodeType": "Literal",
-                      "src": "1448:1:5",
+                      "src": "1448:1:4",
                       "typeDescriptions": {
                         "typeIdentifier": "t_rational_2_by_1",
                         "typeString": "int_const 2"
@@ -1092,28 +1092,28 @@
                     "isPure": false,
                     "lValueRequested": false,
                     "nodeType": "IndexAccess",
-                    "src": "1439:11:5",
+                    "src": "1439:11:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
                     }
                   },
                   "nodeType": "VariableDeclarationStatement",
-                  "src": "1413:37:5"
+                  "src": "1413:37:4"
                 },
                 {
                   "assignments": [
-                    2320
+                    2024
                   ],
                   "declarations": [
                     {
                       "constant": false,
-                      "id": 2320,
+                      "id": 2024,
                       "mutability": "mutable",
                       "name": "_stakeStartBlock",
                       "nodeType": "VariableDeclaration",
-                      "scope": 2380,
-                      "src": "1460:24:5",
+                      "scope": 2084,
+                      "src": "1460:24:4",
                       "stateVariable": false,
                       "storageLocation": "default",
                       "typeDescriptions": {
@@ -1121,10 +1121,10 @@
                         "typeString": "uint256"
                       },
                       "typeName": {
-                        "id": 2319,
+                        "id": 2023,
                         "name": "uint256",
                         "nodeType": "ElementaryTypeName",
-                        "src": "1460:7:5",
+                        "src": "1460:7:4",
                         "typeDescriptions": {
                           "typeIdentifier": "t_uint256",
                           "typeString": "uint256"
@@ -1133,31 +1133,31 @@
                       "visibility": "internal"
                     }
                   ],
-                  "id": 2324,
+                  "id": 2028,
                   "initialValue": {
                     "baseExpression": {
-                      "id": 2321,
+                      "id": 2025,
                       "name": "_intInfo",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 2269,
-                      "src": "1487:8:5",
+                      "referencedDeclaration": 1973,
+                      "src": "1487:8:4",
                       "typeDescriptions": {
                         "typeIdentifier": "t_array$_t_uint256_$4_calldata_ptr",
                         "typeString": "uint256[4] calldata"
                       }
                     },
-                    "id": 2323,
+                    "id": 2027,
                     "indexExpression": {
                       "hexValue": "33",
-                      "id": 2322,
+                      "id": 2026,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": true,
                       "kind": "number",
                       "lValueRequested": false,
                       "nodeType": "Literal",
-                      "src": "1496:1:5",
+                      "src": "1496:1:4",
                       "typeDescriptions": {
                         "typeIdentifier": "t_rational_3_by_1",
                         "typeString": "int_const 3"
@@ -1169,58 +1169,58 @@
                     "isPure": false,
                     "lValueRequested": false,
                     "nodeType": "IndexAccess",
-                    "src": "1487:11:5",
+                    "src": "1487:11:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
                     }
                   },
                   "nodeType": "VariableDeclarationStatement",
-                  "src": "1460:38:5"
+                  "src": "1460:38:4"
                 },
                 {
                   "assignments": [
-                    2326
+                    2030
                   ],
                   "declarations": [
                     {
                       "constant": false,
-                      "id": 2326,
+                      "id": 2030,
                       "mutability": "mutable",
                       "name": "proxy",
                       "nodeType": "VariableDeclaration",
-                      "scope": 2380,
-                      "src": "1509:21:5",
+                      "scope": 2084,
+                      "src": "1509:21:4",
                       "stateVariable": false,
                       "storageLocation": "default",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_contract$_StakeVaultProxy_$9944",
+                        "typeIdentifier": "t_contract$_StakeVaultProxy_$8787",
                         "typeString": "contract StakeVaultProxy"
                       },
                       "typeName": {
-                        "id": 2325,
+                        "id": 2029,
                         "name": "StakeVaultProxy",
                         "nodeType": "UserDefinedTypeName",
-                        "referencedDeclaration": 9944,
-                        "src": "1509:15:5",
+                        "referencedDeclaration": 8787,
+                        "src": "1509:15:4",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_StakeVaultProxy_$9944",
+                          "typeIdentifier": "t_contract$_StakeVaultProxy_$8787",
                           "typeString": "contract StakeVaultProxy"
                         }
                       },
                       "visibility": "internal"
                     }
                   ],
-                  "id": 2331,
+                  "id": 2035,
                   "initialValue": {
                     "arguments": [
                       {
-                        "id": 2329,
+                        "id": 2033,
                         "name": "stakeVaultLogic",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 2239,
-                        "src": "1553:15:5",
+                        "referencedDeclaration": 1943,
+                        "src": "1553:15:4",
                         "typeDescriptions": {
                           "typeIdentifier": "t_address",
                           "typeString": "address"
@@ -1234,30 +1234,30 @@
                           "typeString": "address"
                         }
                       ],
-                      "id": 2328,
+                      "id": 2032,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": false,
                       "lValueRequested": false,
                       "nodeType": "NewExpression",
-                      "src": "1533:19:5",
+                      "src": "1533:19:4",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_function_creation_nonpayable$_t_address_$returns$_t_contract$_StakeVaultProxy_$9944_$",
+                        "typeIdentifier": "t_function_creation_nonpayable$_t_address_$returns$_t_contract$_StakeVaultProxy_$8787_$",
                         "typeString": "function (address) returns (contract StakeVaultProxy)"
                       },
                       "typeName": {
-                        "id": 2327,
+                        "id": 2031,
                         "name": "StakeVaultProxy",
                         "nodeType": "UserDefinedTypeName",
-                        "referencedDeclaration": 9944,
-                        "src": "1537:15:5",
+                        "referencedDeclaration": 8787,
+                        "src": "1537:15:4",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_StakeVaultProxy_$9944",
+                          "typeIdentifier": "t_contract$_StakeVaultProxy_$8787",
                           "typeString": "contract StakeVaultProxy"
                         }
                       }
                     },
-                    "id": 2330,
+                    "id": 2034,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -1265,15 +1265,15 @@
                     "lValueRequested": false,
                     "names": [],
                     "nodeType": "FunctionCall",
-                    "src": "1533:36:5",
+                    "src": "1533:36:4",
                     "tryCall": false,
                     "typeDescriptions": {
-                      "typeIdentifier": "t_contract$_StakeVaultProxy_$9944",
+                      "typeIdentifier": "t_contract$_StakeVaultProxy_$8787",
                       "typeString": "contract StakeVaultProxy"
                     }
                   },
                   "nodeType": "VariableDeclarationStatement",
-                  "src": "1509:60:5"
+                  "src": "1509:60:4"
                 },
                 {
                   "expression": {
@@ -1283,7 +1283,7 @@
                           "typeIdentifier": "t_address_payable",
                           "typeString": "address payable"
                         },
-                        "id": 2341,
+                        "id": 2045,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": false,
@@ -1291,14 +1291,14 @@
                         "leftExpression": {
                           "arguments": [
                             {
-                              "id": 2335,
+                              "id": 2039,
                               "name": "proxy",
                               "nodeType": "Identifier",
                               "overloadedDeclarations": [],
-                              "referencedDeclaration": 2326,
-                              "src": "1595:5:5",
+                              "referencedDeclaration": 2030,
+                              "src": "1595:5:4",
                               "typeDescriptions": {
-                                "typeIdentifier": "t_contract$_StakeVaultProxy_$9944",
+                                "typeIdentifier": "t_contract$_StakeVaultProxy_$8787",
                                 "typeString": "contract StakeVaultProxy"
                               }
                             }
@@ -1306,30 +1306,30 @@
                           "expression": {
                             "argumentTypes": [
                               {
-                                "typeIdentifier": "t_contract$_StakeVaultProxy_$9944",
+                                "typeIdentifier": "t_contract$_StakeVaultProxy_$8787",
                                 "typeString": "contract StakeVaultProxy"
                               }
                             ],
-                            "id": 2334,
+                            "id": 2038,
                             "isConstant": false,
                             "isLValue": false,
                             "isPure": true,
                             "lValueRequested": false,
                             "nodeType": "ElementaryTypeNameExpression",
-                            "src": "1587:7:5",
+                            "src": "1587:7:4",
                             "typeDescriptions": {
                               "typeIdentifier": "t_type$_t_address_$",
                               "typeString": "type(address)"
                             },
                             "typeName": {
-                              "id": 2333,
+                              "id": 2037,
                               "name": "address",
                               "nodeType": "ElementaryTypeName",
-                              "src": "1587:7:5",
+                              "src": "1587:7:4",
                               "typeDescriptions": {}
                             }
                           },
-                          "id": 2336,
+                          "id": 2040,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": false,
@@ -1337,7 +1337,7 @@
                           "lValueRequested": false,
                           "names": [],
                           "nodeType": "FunctionCall",
-                          "src": "1587:14:5",
+                          "src": "1587:14:4",
                           "tryCall": false,
                           "typeDescriptions": {
                             "typeIdentifier": "t_address_payable",
@@ -1350,14 +1350,14 @@
                           "arguments": [
                             {
                               "hexValue": "30",
-                              "id": 2339,
+                              "id": 2043,
                               "isConstant": false,
                               "isLValue": false,
                               "isPure": true,
                               "kind": "number",
                               "lValueRequested": false,
                               "nodeType": "Literal",
-                              "src": "1613:1:5",
+                              "src": "1613:1:4",
                               "typeDescriptions": {
                                 "typeIdentifier": "t_rational_0_by_1",
                                 "typeString": "int_const 0"
@@ -1372,26 +1372,26 @@
                                 "typeString": "int_const 0"
                               }
                             ],
-                            "id": 2338,
+                            "id": 2042,
                             "isConstant": false,
                             "isLValue": false,
                             "isPure": true,
                             "lValueRequested": false,
                             "nodeType": "ElementaryTypeNameExpression",
-                            "src": "1605:7:5",
+                            "src": "1605:7:4",
                             "typeDescriptions": {
                               "typeIdentifier": "t_type$_t_address_$",
                               "typeString": "type(address)"
                             },
                             "typeName": {
-                              "id": 2337,
+                              "id": 2041,
                               "name": "address",
                               "nodeType": "ElementaryTypeName",
-                              "src": "1605:7:5",
+                              "src": "1605:7:4",
                               "typeDescriptions": {}
                             }
                           },
-                          "id": 2340,
+                          "id": 2044,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": true,
@@ -1399,14 +1399,14 @@
                           "lValueRequested": false,
                           "names": [],
                           "nodeType": "FunctionCall",
-                          "src": "1605:10:5",
+                          "src": "1605:10:4",
                           "tryCall": false,
                           "typeDescriptions": {
                             "typeIdentifier": "t_address_payable",
                             "typeString": "address payable"
                           }
                         },
-                        "src": "1587:28:5",
+                        "src": "1587:28:4",
                         "typeDescriptions": {
                           "typeIdentifier": "t_bool",
                           "typeString": "bool"
@@ -1414,14 +1414,14 @@
                       },
                       {
                         "hexValue": "5374616b655661756c74466163746f72793a2070726f7879207a65726f",
-                        "id": 2342,
+                        "id": 2046,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": true,
                         "kind": "string",
                         "lValueRequested": false,
                         "nodeType": "Literal",
-                        "src": "1617:31:5",
+                        "src": "1617:31:4",
                         "typeDescriptions": {
                           "typeIdentifier": "t_stringliteral_e39705f5911e5e5519ef636dac6802a3d6a444678c345e2bec18d05550076457",
                           "typeString": "literal_string \"StakeVaultFactory: proxy zero\""
@@ -1440,7 +1440,7 @@
                           "typeString": "literal_string \"StakeVaultFactory: proxy zero\""
                         }
                       ],
-                      "id": 2332,
+                      "id": 2036,
                       "name": "require",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
@@ -1448,13 +1448,13 @@
                         4294967278
                       ],
                       "referencedDeclaration": 4294967278,
-                      "src": "1579:7:5",
+                      "src": "1579:7:4",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_require_pure$_t_bool_$_t_string_memory_ptr_$returns$__$",
                         "typeString": "function (bool,string memory) pure"
                       }
                     },
-                    "id": 2343,
+                    "id": 2047,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -1462,111 +1462,111 @@
                     "lValueRequested": false,
                     "names": [],
                     "nodeType": "FunctionCall",
-                    "src": "1579:70:5",
+                    "src": "1579:70:4",
                     "tryCall": false,
                     "typeDescriptions": {
                       "typeIdentifier": "t_tuple$__$",
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 2344,
+                  "id": 2048,
                   "nodeType": "ExpressionStatement",
-                  "src": "1579:70:5"
+                  "src": "1579:70:4"
                 },
                 {
                   "expression": {
                     "arguments": [
                       {
-                        "id": 2348,
+                        "id": 2052,
                         "name": "_tos",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 2278,
-                        "src": "1690:4:5",
+                        "referencedDeclaration": 1982,
+                        "src": "1690:4:4",
                         "typeDescriptions": {
                           "typeIdentifier": "t_address",
                           "typeString": "address"
                         }
                       },
                       {
-                        "id": 2349,
+                        "id": 2053,
                         "name": "_paytoken",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 2284,
-                        "src": "1708:9:5",
+                        "referencedDeclaration": 1988,
+                        "src": "1708:9:4",
                         "typeDescriptions": {
                           "typeIdentifier": "t_address",
                           "typeString": "address"
                         }
                       },
                       {
-                        "id": 2350,
+                        "id": 2054,
                         "name": "_cap",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 2308,
-                        "src": "1731:4:5",
+                        "referencedDeclaration": 2012,
+                        "src": "1731:4:4",
                         "typeDescriptions": {
                           "typeIdentifier": "t_uint256",
                           "typeString": "uint256"
                         }
                       },
                       {
-                        "id": 2351,
+                        "id": 2055,
                         "name": "_saleStartBlock",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 2314,
-                        "src": "1749:15:5",
+                        "referencedDeclaration": 2018,
+                        "src": "1749:15:4",
                         "typeDescriptions": {
                           "typeIdentifier": "t_uint256",
                           "typeString": "uint256"
                         }
                       },
                       {
-                        "id": 2352,
+                        "id": 2056,
                         "name": "_stakeStartBlock",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 2320,
-                        "src": "1778:16:5",
+                        "referencedDeclaration": 2024,
+                        "src": "1778:16:4",
                         "typeDescriptions": {
                           "typeIdentifier": "t_uint256",
                           "typeString": "uint256"
                         }
                       },
                       {
-                        "id": 2353,
+                        "id": 2057,
                         "name": "_stakefactory",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 2290,
-                        "src": "1808:13:5",
+                        "referencedDeclaration": 1994,
+                        "src": "1808:13:4",
                         "typeDescriptions": {
                           "typeIdentifier": "t_address",
                           "typeString": "address"
                         }
                       },
                       {
-                        "id": 2354,
+                        "id": 2058,
                         "name": "_stakeType",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 2302,
-                        "src": "1835:10:5",
+                        "referencedDeclaration": 2006,
+                        "src": "1835:10:4",
                         "typeDescriptions": {
                           "typeIdentifier": "t_uint256",
                           "typeString": "uint256"
                         }
                       },
                       {
-                        "id": 2355,
+                        "id": 2059,
                         "name": "_defiAddr",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 2296,
-                        "src": "1859:9:5",
+                        "referencedDeclaration": 2000,
+                        "src": "1859:9:4",
                         "typeDescriptions": {
                           "typeIdentifier": "t_address",
                           "typeString": "address"
@@ -1609,32 +1609,32 @@
                         }
                       ],
                       "expression": {
-                        "id": 2345,
+                        "id": 2049,
                         "name": "proxy",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 2326,
-                        "src": "1660:5:5",
+                        "referencedDeclaration": 2030,
+                        "src": "1660:5:4",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_StakeVaultProxy_$9944",
+                          "typeIdentifier": "t_contract$_StakeVaultProxy_$8787",
                           "typeString": "contract StakeVaultProxy"
                         }
                       },
-                      "id": 2347,
+                      "id": 2051,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": false,
                       "lValueRequested": false,
                       "memberName": "initialize",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 9943,
-                      "src": "1660:16:5",
+                      "referencedDeclaration": 8786,
+                      "src": "1660:16:4",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_external_nonpayable$_t_address_$_t_address_$_t_uint256_$_t_uint256_$_t_uint256_$_t_address_$_t_uint256_$_t_address_$returns$__$",
                         "typeString": "function (address,address,uint256,uint256,uint256,address,uint256,address) external"
                       }
                     },
-                    "id": 2356,
+                    "id": 2060,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -1642,39 +1642,39 @@
                     "lValueRequested": false,
                     "names": [],
                     "nodeType": "FunctionCall",
-                    "src": "1660:218:5",
+                    "src": "1660:218:4",
                     "tryCall": false,
                     "typeDescriptions": {
                       "typeIdentifier": "t_tuple$__$",
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 2357,
+                  "id": 2061,
                   "nodeType": "ExpressionStatement",
-                  "src": "1660:218:5"
+                  "src": "1660:218:4"
                 },
                 {
                   "expression": {
                     "arguments": [
                       {
-                        "id": 2361,
+                        "id": 2065,
                         "name": "ADMIN_ROLE",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 2237,
-                        "src": "1905:10:5",
+                        "referencedDeclaration": 1941,
+                        "src": "1905:10:4",
                         "typeDescriptions": {
                           "typeIdentifier": "t_bytes32",
                           "typeString": "bytes32"
                         }
                       },
                       {
-                        "id": 2362,
+                        "id": 2066,
                         "name": "owner",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 2271,
-                        "src": "1917:5:5",
+                        "referencedDeclaration": 1975,
+                        "src": "1917:5:4",
                         "typeDescriptions": {
                           "typeIdentifier": "t_address",
                           "typeString": "address"
@@ -1693,32 +1693,32 @@
                         }
                       ],
                       "expression": {
-                        "id": 2358,
+                        "id": 2062,
                         "name": "proxy",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 2326,
-                        "src": "1889:5:5",
+                        "referencedDeclaration": 2030,
+                        "src": "1889:5:4",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_StakeVaultProxy_$9944",
+                          "typeIdentifier": "t_contract$_StakeVaultProxy_$8787",
                           "typeString": "contract StakeVaultProxy"
                         }
                       },
-                      "id": 2360,
+                      "id": 2064,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": false,
                       "lValueRequested": false,
                       "memberName": "grantRole",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 10842,
-                      "src": "1889:15:5",
+                      "referencedDeclaration": 9270,
+                      "src": "1889:15:4",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_external_nonpayable$_t_bytes32_$_t_address_$returns$__$",
                         "typeString": "function (bytes32,address) external"
                       }
                     },
-                    "id": 2363,
+                    "id": 2067,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -1726,27 +1726,27 @@
                     "lValueRequested": false,
                     "names": [],
                     "nodeType": "FunctionCall",
-                    "src": "1889:34:5",
+                    "src": "1889:34:4",
                     "tryCall": false,
                     "typeDescriptions": {
                       "typeIdentifier": "t_tuple$__$",
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 2364,
+                  "id": 2068,
                   "nodeType": "ExpressionStatement",
-                  "src": "1889:34:5"
+                  "src": "1889:34:4"
                 },
                 {
                   "expression": {
                     "arguments": [
                       {
-                        "id": 2368,
+                        "id": 2072,
                         "name": "ADMIN_ROLE",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 2237,
-                        "src": "1950:10:5",
+                        "referencedDeclaration": 1941,
+                        "src": "1950:10:4",
                         "typeDescriptions": {
                           "typeIdentifier": "t_bytes32",
                           "typeString": "bytes32"
@@ -1755,14 +1755,14 @@
                       {
                         "arguments": [
                           {
-                            "id": 2371,
+                            "id": 2075,
                             "name": "this",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
                             "referencedDeclaration": 4294967268,
-                            "src": "1970:4:5",
+                            "src": "1970:4:4",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_contract$_StakeVaultFactory_$2382",
+                              "typeIdentifier": "t_contract$_StakeVaultFactory_$2086",
                               "typeString": "contract StakeVaultFactory"
                             }
                           }
@@ -1770,30 +1770,30 @@
                         "expression": {
                           "argumentTypes": [
                             {
-                              "typeIdentifier": "t_contract$_StakeVaultFactory_$2382",
+                              "typeIdentifier": "t_contract$_StakeVaultFactory_$2086",
                               "typeString": "contract StakeVaultFactory"
                             }
                           ],
-                          "id": 2370,
+                          "id": 2074,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": true,
                           "lValueRequested": false,
                           "nodeType": "ElementaryTypeNameExpression",
-                          "src": "1962:7:5",
+                          "src": "1962:7:4",
                           "typeDescriptions": {
                             "typeIdentifier": "t_type$_t_address_$",
                             "typeString": "type(address)"
                           },
                           "typeName": {
-                            "id": 2369,
+                            "id": 2073,
                             "name": "address",
                             "nodeType": "ElementaryTypeName",
-                            "src": "1962:7:5",
+                            "src": "1962:7:4",
                             "typeDescriptions": {}
                           }
                         },
-                        "id": 2372,
+                        "id": 2076,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": false,
@@ -1801,7 +1801,7 @@
                         "lValueRequested": false,
                         "names": [],
                         "nodeType": "FunctionCall",
-                        "src": "1962:13:5",
+                        "src": "1962:13:4",
                         "tryCall": false,
                         "typeDescriptions": {
                           "typeIdentifier": "t_address",
@@ -1821,32 +1821,32 @@
                         }
                       ],
                       "expression": {
-                        "id": 2365,
+                        "id": 2069,
                         "name": "proxy",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 2326,
-                        "src": "1933:5:5",
+                        "referencedDeclaration": 2030,
+                        "src": "1933:5:4",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_StakeVaultProxy_$9944",
+                          "typeIdentifier": "t_contract$_StakeVaultProxy_$8787",
                           "typeString": "contract StakeVaultProxy"
                         }
                       },
-                      "id": 2367,
+                      "id": 2071,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": false,
                       "lValueRequested": false,
                       "memberName": "revokeRole",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 10868,
-                      "src": "1933:16:5",
+                      "referencedDeclaration": 9296,
+                      "src": "1933:16:4",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_external_nonpayable$_t_bytes32_$_t_address_$returns$__$",
                         "typeString": "function (bytes32,address) external"
                       }
                     },
-                    "id": 2373,
+                    "id": 2077,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -1854,29 +1854,29 @@
                     "lValueRequested": false,
                     "names": [],
                     "nodeType": "FunctionCall",
-                    "src": "1933:43:5",
+                    "src": "1933:43:4",
                     "tryCall": false,
                     "typeDescriptions": {
                       "typeIdentifier": "t_tuple$__$",
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 2374,
+                  "id": 2078,
                   "nodeType": "ExpressionStatement",
-                  "src": "1933:43:5"
+                  "src": "1933:43:4"
                 },
                 {
                   "expression": {
                     "arguments": [
                       {
-                        "id": 2377,
+                        "id": 2081,
                         "name": "proxy",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 2326,
-                        "src": "2002:5:5",
+                        "referencedDeclaration": 2030,
+                        "src": "2002:5:4",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_StakeVaultProxy_$9944",
+                          "typeIdentifier": "t_contract$_StakeVaultProxy_$8787",
                           "typeString": "contract StakeVaultProxy"
                         }
                       }
@@ -1884,30 +1884,30 @@
                     "expression": {
                       "argumentTypes": [
                         {
-                          "typeIdentifier": "t_contract$_StakeVaultProxy_$9944",
+                          "typeIdentifier": "t_contract$_StakeVaultProxy_$8787",
                           "typeString": "contract StakeVaultProxy"
                         }
                       ],
-                      "id": 2376,
+                      "id": 2080,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": true,
                       "lValueRequested": false,
                       "nodeType": "ElementaryTypeNameExpression",
-                      "src": "1994:7:5",
+                      "src": "1994:7:4",
                       "typeDescriptions": {
                         "typeIdentifier": "t_type$_t_address_$",
                         "typeString": "type(address)"
                       },
                       "typeName": {
-                        "id": 2375,
+                        "id": 2079,
                         "name": "address",
                         "nodeType": "ElementaryTypeName",
-                        "src": "1994:7:5",
+                        "src": "1994:7:4",
                         "typeDescriptions": {}
                       }
                     },
-                    "id": 2378,
+                    "id": 2082,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -1915,51 +1915,51 @@
                     "lValueRequested": false,
                     "names": [],
                     "nodeType": "FunctionCall",
-                    "src": "1994:14:5",
+                    "src": "1994:14:4",
                     "tryCall": false,
                     "typeDescriptions": {
                       "typeIdentifier": "t_address_payable",
                       "typeString": "address payable"
                     }
                   },
-                  "functionReturnParameters": 2276,
-                  "id": 2379,
+                  "functionReturnParameters": 1980,
+                  "id": 2083,
                   "nodeType": "Return",
-                  "src": "1987:21:5"
+                  "src": "1987:21:4"
                 }
               ]
             },
             "documentation": {
-              "id": 2261,
+              "id": 1965,
               "nodeType": "StructuredDocumentation",
-              "src": "713:302:5",
+              "src": "713:302:4",
               "text": "@dev Create a vault that hold reward, _cap is allocated reward amount.\n @param _addr the array of [token, paytoken, vault, defiAddr]\n @param _intInfo array of [_stakeType, _cap, _saleStartBlock, _stakeStartBlock]\n @param owner the owner adderess\n @return a vault address"
             },
             "functionSelector": "8f3091da",
-            "id": 2381,
+            "id": 2085,
             "implemented": true,
             "kind": "function",
             "modifiers": [],
             "name": "create",
             "nodeType": "FunctionDefinition",
             "overrides": {
-              "id": 2273,
+              "id": 1977,
               "nodeType": "OverrideSpecifier",
               "overrides": [],
-              "src": "1147:8:5"
+              "src": "1147:8:4"
             },
             "parameters": {
-              "id": 2272,
+              "id": 1976,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 2265,
+                  "id": 1969,
                   "mutability": "mutable",
                   "name": "_addr",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2381,
-                  "src": "1045:25:5",
+                  "scope": 2085,
+                  "src": "1045:25:4",
                   "stateVariable": false,
                   "storageLocation": "calldata",
                   "typeDescriptions": {
@@ -1968,27 +1968,27 @@
                   },
                   "typeName": {
                     "baseType": {
-                      "id": 2262,
+                      "id": 1966,
                       "name": "address",
                       "nodeType": "ElementaryTypeName",
-                      "src": "1045:7:5",
+                      "src": "1045:7:4",
                       "stateMutability": "nonpayable",
                       "typeDescriptions": {
                         "typeIdentifier": "t_address",
                         "typeString": "address"
                       }
                     },
-                    "id": 2264,
+                    "id": 1968,
                     "length": {
                       "hexValue": "34",
-                      "id": 2263,
+                      "id": 1967,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": true,
                       "kind": "number",
                       "lValueRequested": false,
                       "nodeType": "Literal",
-                      "src": "1053:1:5",
+                      "src": "1053:1:4",
                       "typeDescriptions": {
                         "typeIdentifier": "t_rational_4_by_1",
                         "typeString": "int_const 4"
@@ -1996,7 +1996,7 @@
                       "value": "4"
                     },
                     "nodeType": "ArrayTypeName",
-                    "src": "1045:10:5",
+                    "src": "1045:10:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_array$_t_address_$4_storage_ptr",
                       "typeString": "address[4]"
@@ -2006,12 +2006,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 2269,
+                  "id": 1973,
                   "mutability": "mutable",
                   "name": "_intInfo",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2381,
-                  "src": "1080:28:5",
+                  "scope": 2085,
+                  "src": "1080:28:4",
                   "stateVariable": false,
                   "storageLocation": "calldata",
                   "typeDescriptions": {
@@ -2020,26 +2020,26 @@
                   },
                   "typeName": {
                     "baseType": {
-                      "id": 2266,
+                      "id": 1970,
                       "name": "uint256",
                       "nodeType": "ElementaryTypeName",
-                      "src": "1080:7:5",
+                      "src": "1080:7:4",
                       "typeDescriptions": {
                         "typeIdentifier": "t_uint256",
                         "typeString": "uint256"
                       }
                     },
-                    "id": 2268,
+                    "id": 1972,
                     "length": {
                       "hexValue": "34",
-                      "id": 2267,
+                      "id": 1971,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": true,
                       "kind": "number",
                       "lValueRequested": false,
                       "nodeType": "Literal",
-                      "src": "1088:1:5",
+                      "src": "1088:1:4",
                       "typeDescriptions": {
                         "typeIdentifier": "t_rational_4_by_1",
                         "typeString": "int_const 4"
@@ -2047,7 +2047,7 @@
                       "value": "4"
                     },
                     "nodeType": "ArrayTypeName",
-                    "src": "1080:10:5",
+                    "src": "1080:10:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_array$_t_uint256_$4_storage_ptr",
                       "typeString": "uint256[4]"
@@ -2057,12 +2057,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 2271,
+                  "id": 1975,
                   "mutability": "mutable",
                   "name": "owner",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2381,
-                  "src": "1118:13:5",
+                  "scope": 2085,
+                  "src": "1118:13:4",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -2070,10 +2070,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 2270,
+                    "id": 1974,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1118:7:5",
+                    "src": "1118:7:4",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -2083,20 +2083,20 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "1035:102:5"
+              "src": "1035:102:4"
             },
             "returnParameters": {
-              "id": 2276,
+              "id": 1980,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 2275,
+                  "id": 1979,
                   "mutability": "mutable",
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2381,
-                  "src": "1165:7:5",
+                  "scope": 2085,
+                  "src": "1165:7:4",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -2104,10 +2104,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 2274,
+                    "id": 1978,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1165:7:5",
+                    "src": "1165:7:4",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -2117,33 +2117,33 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "1164:9:5"
+              "src": "1164:9:4"
             },
-            "scope": 2382,
-            "src": "1020:995:5",
+            "scope": 2086,
+            "src": "1020:995:4",
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "external"
           }
         ],
-        "scope": 2383,
-        "src": "226:1791:5"
+        "scope": 2087,
+        "src": "226:1791:4"
       }
     ],
-    "src": "32:1986:5"
+    "src": "32:1986:4"
   },
   "legacyAST": {
     "attributes": {
       "absolutePath": "/Users/zena/ico2.0/ico20-contracts/contracts/factory/StakeVaultFactory.sol",
       "exportedSymbols": {
         "IStakeVaultFactory": [
-          3516
+          3058
         ],
         "StakeVaultFactory": [
-          2382
+          2086
         ],
         "StakeVaultProxy": [
-          9944
+          8787
         ]
       },
       "license": "MIT"
@@ -2158,31 +2158,31 @@
             ".6"
           ]
         },
-        "id": 2226,
+        "id": 1930,
         "name": "PragmaDirective",
-        "src": "32:23:5"
+        "src": "32:23:4"
       },
       {
         "attributes": {
-          "SourceUnit": 3517,
+          "SourceUnit": 3059,
           "absolutePath": "/Users/zena/ico2.0/ico20-contracts/contracts/interfaces/IStakeVaultFactory.sol",
           "file": "../interfaces/IStakeVaultFactory.sol",
-          "scope": 2383,
+          "scope": 2087,
           "symbolAliases": [
             null
           ],
           "unitAlias": ""
         },
-        "id": 2227,
+        "id": 1931,
         "name": "ImportDirective",
-        "src": "57:46:5"
+        "src": "57:46:4"
       },
       {
         "attributes": {
-          "SourceUnit": 9945,
+          "SourceUnit": 8788,
           "absolutePath": "/Users/zena/ico2.0/ico20-contracts/contracts/stake/StakeVaultProxy.sol",
           "file": "../stake/StakeVaultProxy.sol",
-          "scope": 2383,
+          "scope": 2087,
           "symbolAliases": [
             {
               "foreign": {
@@ -2192,42 +2192,42 @@
                   ],
                   "value": "StakeVaultProxy"
                 },
-                "id": 2228,
+                "id": 1932,
                 "name": "Identifier",
-                "src": "112:15:5"
+                "src": "112:15:4"
               }
             }
           ],
           "unitAlias": ""
         },
-        "id": 2229,
+        "id": 1933,
         "name": "ImportDirective",
-        "src": "104:61:5"
+        "src": "104:61:4"
       },
       {
         "attributes": {
           "abstract": false,
           "contractDependencies": [
-            3516,
-            9944
+            3058,
+            8787
           ],
           "contractKind": "contract",
           "fullyImplemented": true,
           "linearizedBaseContracts": [
-            2382,
-            3516
+            2086,
+            3058
           ],
           "name": "StakeVaultFactory",
-          "scope": 2383
+          "scope": 2087
         },
         "children": [
           {
             "attributes": {
               "text": "@title A factory that creates a vault that hold reward"
             },
-            "id": 2230,
+            "id": 1934,
             "name": "StructuredDocumentation",
-            "src": "167:59:5"
+            "src": "167:59:4"
           },
           {
             "attributes": {},
@@ -2235,17 +2235,17 @@
               {
                 "attributes": {
                   "name": "IStakeVaultFactory",
-                  "referencedDeclaration": 3516,
+                  "referencedDeclaration": 3058,
                   "type": "contract IStakeVaultFactory"
                 },
-                "id": 2231,
+                "id": 1935,
                 "name": "UserDefinedTypeName",
-                "src": "256:18:5"
+                "src": "256:18:4"
               }
             ],
-            "id": 2232,
+            "id": 1936,
             "name": "InheritanceSpecifier",
-            "src": "256:18:5"
+            "src": "256:18:4"
           },
           {
             "attributes": {
@@ -2253,7 +2253,7 @@
               "functionSelector": "75b238fc",
               "mutability": "constant",
               "name": "ADMIN_ROLE",
-              "scope": 2382,
+              "scope": 2086,
               "stateVariable": true,
               "storageLocation": "default",
               "type": "bytes32",
@@ -2265,9 +2265,9 @@
                   "name": "bytes32",
                   "type": "bytes32"
                 },
-                "id": 2233,
+                "id": 1937,
                 "name": "ElementaryTypeName",
-                "src": "281:7:5"
+                "src": "281:7:4"
               },
               {
                 "attributes": {
@@ -2299,9 +2299,9 @@
                       "type": "function (bytes memory) pure returns (bytes32)",
                       "value": "keccak256"
                     },
-                    "id": 2234,
+                    "id": 1938,
                     "name": "Identifier",
-                    "src": "318:9:5"
+                    "src": "318:9:4"
                   },
                   {
                     "attributes": {
@@ -2314,19 +2314,19 @@
                       "type": "literal_string \"ADMIN\"",
                       "value": "ADMIN"
                     },
-                    "id": 2235,
+                    "id": 1939,
                     "name": "Literal",
-                    "src": "328:7:5"
+                    "src": "328:7:4"
                   }
                 ],
-                "id": 2236,
+                "id": 1940,
                 "name": "FunctionCall",
-                "src": "318:18:5"
+                "src": "318:18:4"
               }
             ],
-            "id": 2237,
+            "id": 1941,
             "name": "VariableDeclaration",
-            "src": "281:55:5"
+            "src": "281:55:4"
           },
           {
             "attributes": {
@@ -2334,7 +2334,7 @@
               "functionSelector": "4d59eaf5",
               "mutability": "mutable",
               "name": "stakeVaultLogic",
-              "scope": 2382,
+              "scope": 2086,
               "stateVariable": true,
               "storageLocation": "default",
               "type": "address",
@@ -2347,14 +2347,14 @@
                   "stateMutability": "nonpayable",
                   "type": "address"
                 },
-                "id": 2238,
+                "id": 1942,
                 "name": "ElementaryTypeName",
-                "src": "343:7:5"
+                "src": "343:7:4"
               }
             ],
-            "id": 2239,
+            "id": 1943,
             "name": "VariableDeclaration",
-            "src": "343:30:5"
+            "src": "343:30:4"
           },
           {
             "attributes": {
@@ -2365,7 +2365,7 @@
                 null
               ],
               "name": "",
-              "scope": 2382,
+              "scope": 2086,
               "stateMutability": "nonpayable",
               "virtual": false,
               "visibility": "public"
@@ -2375,9 +2375,9 @@
                 "attributes": {
                   "text": "@dev constructor of StakeVaultFactory\n @param _stakeVaultLogic the logic address used in StakeVaultFactory"
                 },
-                "id": 2240,
+                "id": 1944,
                 "name": "StructuredDocumentation",
-                "src": "380:117:5"
+                "src": "380:117:4"
               },
               {
                 "children": [
@@ -2386,7 +2386,7 @@
                       "constant": false,
                       "mutability": "mutable",
                       "name": "_stakeVaultLogic",
-                      "scope": 2260,
+                      "scope": 1964,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "address",
@@ -2399,19 +2399,19 @@
                           "stateMutability": "nonpayable",
                           "type": "address"
                         },
-                        "id": 2241,
+                        "id": 1945,
                         "name": "ElementaryTypeName",
-                        "src": "514:7:5"
+                        "src": "514:7:4"
                       }
                     ],
-                    "id": 2242,
+                    "id": 1946,
                     "name": "VariableDeclaration",
-                    "src": "514:24:5"
+                    "src": "514:24:4"
                   }
                 ],
-                "id": 2243,
+                "id": 1947,
                 "name": "ParameterList",
-                "src": "513:26:5"
+                "src": "513:26:4"
               },
               {
                 "attributes": {
@@ -2420,9 +2420,9 @@
                   ]
                 },
                 "children": [],
-                "id": 2244,
+                "id": 1948,
                 "name": "ParameterList",
-                "src": "540:0:5"
+                "src": "540:0:4"
               },
               {
                 "children": [
@@ -2463,9 +2463,9 @@
                               "type": "function (bool,string memory) pure",
                               "value": "require"
                             },
-                            "id": 2245,
+                            "id": 1949,
                             "name": "Identifier",
-                            "src": "550:7:5"
+                            "src": "550:7:4"
                           },
                           {
                             "attributes": {
@@ -2486,13 +2486,13 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 2242,
+                                  "referencedDeclaration": 1946,
                                   "type": "address",
                                   "value": "_stakeVaultLogic"
                                 },
-                                "id": 2246,
+                                "id": 1950,
                                 "name": "Identifier",
-                                "src": "571:16:5"
+                                "src": "571:16:4"
                               },
                               {
                                 "attributes": {
@@ -2528,14 +2528,14 @@
                                         "attributes": {
                                           "name": "address"
                                         },
-                                        "id": 2247,
+                                        "id": 1951,
                                         "name": "ElementaryTypeName",
-                                        "src": "591:7:5"
+                                        "src": "591:7:4"
                                       }
                                     ],
-                                    "id": 2248,
+                                    "id": 1952,
                                     "name": "ElementaryTypeNameExpression",
-                                    "src": "591:7:5"
+                                    "src": "591:7:4"
                                   },
                                   {
                                     "attributes": {
@@ -2548,19 +2548,19 @@
                                       "type": "int_const 0",
                                       "value": "0"
                                     },
-                                    "id": 2249,
+                                    "id": 1953,
                                     "name": "Literal",
-                                    "src": "599:1:5"
+                                    "src": "599:1:4"
                                   }
                                 ],
-                                "id": 2250,
+                                "id": 1954,
                                 "name": "FunctionCall",
-                                "src": "591:10:5"
+                                "src": "591:10:4"
                               }
                             ],
-                            "id": 2251,
+                            "id": 1955,
                             "name": "BinaryOperation",
-                            "src": "571:30:5"
+                            "src": "571:30:4"
                           },
                           {
                             "attributes": {
@@ -2573,19 +2573,19 @@
                               "type": "literal_string \"StakeVaultFactory: logic zero\"",
                               "value": "StakeVaultFactory: logic zero"
                             },
-                            "id": 2252,
+                            "id": 1956,
                             "name": "Literal",
-                            "src": "615:31:5"
+                            "src": "615:31:4"
                           }
                         ],
-                        "id": 2253,
+                        "id": 1957,
                         "name": "FunctionCall",
-                        "src": "550:106:5"
+                        "src": "550:106:4"
                       }
                     ],
-                    "id": 2254,
+                    "id": 1958,
                     "name": "ExpressionStatement",
-                    "src": "550:106:5"
+                    "src": "550:106:4"
                   },
                   {
                     "children": [
@@ -2604,51 +2604,51 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 2239,
+                              "referencedDeclaration": 1943,
                               "type": "address",
                               "value": "stakeVaultLogic"
                             },
-                            "id": 2255,
+                            "id": 1959,
                             "name": "Identifier",
-                            "src": "666:15:5"
+                            "src": "666:15:4"
                           },
                           {
                             "attributes": {
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 2242,
+                              "referencedDeclaration": 1946,
                               "type": "address",
                               "value": "_stakeVaultLogic"
                             },
-                            "id": 2256,
+                            "id": 1960,
                             "name": "Identifier",
-                            "src": "684:16:5"
+                            "src": "684:16:4"
                           }
                         ],
-                        "id": 2257,
+                        "id": 1961,
                         "name": "Assignment",
-                        "src": "666:34:5"
+                        "src": "666:34:4"
                       }
                     ],
-                    "id": 2258,
+                    "id": 1962,
                     "name": "ExpressionStatement",
-                    "src": "666:34:5"
+                    "src": "666:34:4"
                   }
                 ],
-                "id": 2259,
+                "id": 1963,
                 "name": "Block",
-                "src": "540:167:5"
+                "src": "540:167:4"
               }
             ],
-            "id": 2260,
+            "id": 1964,
             "name": "FunctionDefinition",
-            "src": "502:205:5"
+            "src": "502:205:4"
           },
           {
             "attributes": {
               "baseFunctions": [
-                3515
+                3057
               ],
               "functionSelector": "8f3091da",
               "implemented": true,
@@ -2658,7 +2658,7 @@
                 null
               ],
               "name": "create",
-              "scope": 2382,
+              "scope": 2086,
               "stateMutability": "nonpayable",
               "virtual": false,
               "visibility": "external"
@@ -2668,9 +2668,9 @@
                 "attributes": {
                   "text": "@dev Create a vault that hold reward, _cap is allocated reward amount.\n @param _addr the array of [token, paytoken, vault, defiAddr]\n @param _intInfo array of [_stakeType, _cap, _saleStartBlock, _stakeStartBlock]\n @param owner the owner adderess\n @return a vault address"
                 },
-                "id": 2261,
+                "id": 1965,
                 "name": "StructuredDocumentation",
-                "src": "713:302:5"
+                "src": "713:302:4"
               },
               {
                 "attributes": {
@@ -2678,9 +2678,9 @@
                     null
                   ]
                 },
-                "id": 2273,
+                "id": 1977,
                 "name": "OverrideSpecifier",
-                "src": "1147:8:5"
+                "src": "1147:8:4"
               },
               {
                 "children": [
@@ -2689,7 +2689,7 @@
                       "constant": false,
                       "mutability": "mutable",
                       "name": "_addr",
-                      "scope": 2381,
+                      "scope": 2085,
                       "stateVariable": false,
                       "storageLocation": "calldata",
                       "type": "address[4]",
@@ -2707,9 +2707,9 @@
                               "stateMutability": "nonpayable",
                               "type": "address"
                             },
-                            "id": 2262,
+                            "id": 1966,
                             "name": "ElementaryTypeName",
-                            "src": "1045:7:5"
+                            "src": "1045:7:4"
                           },
                           {
                             "attributes": {
@@ -2722,26 +2722,26 @@
                               "type": "int_const 4",
                               "value": "4"
                             },
-                            "id": 2263,
+                            "id": 1967,
                             "name": "Literal",
-                            "src": "1053:1:5"
+                            "src": "1053:1:4"
                           }
                         ],
-                        "id": 2264,
+                        "id": 1968,
                         "name": "ArrayTypeName",
-                        "src": "1045:10:5"
+                        "src": "1045:10:4"
                       }
                     ],
-                    "id": 2265,
+                    "id": 1969,
                     "name": "VariableDeclaration",
-                    "src": "1045:25:5"
+                    "src": "1045:25:4"
                   },
                   {
                     "attributes": {
                       "constant": false,
                       "mutability": "mutable",
                       "name": "_intInfo",
-                      "scope": 2381,
+                      "scope": 2085,
                       "stateVariable": false,
                       "storageLocation": "calldata",
                       "type": "uint256[4]",
@@ -2758,9 +2758,9 @@
                               "name": "uint256",
                               "type": "uint256"
                             },
-                            "id": 2266,
+                            "id": 1970,
                             "name": "ElementaryTypeName",
-                            "src": "1080:7:5"
+                            "src": "1080:7:4"
                           },
                           {
                             "attributes": {
@@ -2773,26 +2773,26 @@
                               "type": "int_const 4",
                               "value": "4"
                             },
-                            "id": 2267,
+                            "id": 1971,
                             "name": "Literal",
-                            "src": "1088:1:5"
+                            "src": "1088:1:4"
                           }
                         ],
-                        "id": 2268,
+                        "id": 1972,
                         "name": "ArrayTypeName",
-                        "src": "1080:10:5"
+                        "src": "1080:10:4"
                       }
                     ],
-                    "id": 2269,
+                    "id": 1973,
                     "name": "VariableDeclaration",
-                    "src": "1080:28:5"
+                    "src": "1080:28:4"
                   },
                   {
                     "attributes": {
                       "constant": false,
                       "mutability": "mutable",
                       "name": "owner",
-                      "scope": 2381,
+                      "scope": 2085,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "address",
@@ -2805,19 +2805,19 @@
                           "stateMutability": "nonpayable",
                           "type": "address"
                         },
-                        "id": 2270,
+                        "id": 1974,
                         "name": "ElementaryTypeName",
-                        "src": "1118:7:5"
+                        "src": "1118:7:4"
                       }
                     ],
-                    "id": 2271,
+                    "id": 1975,
                     "name": "VariableDeclaration",
-                    "src": "1118:13:5"
+                    "src": "1118:13:4"
                   }
                 ],
-                "id": 2272,
+                "id": 1976,
                 "name": "ParameterList",
-                "src": "1035:102:5"
+                "src": "1035:102:4"
               },
               {
                 "children": [
@@ -2826,7 +2826,7 @@
                       "constant": false,
                       "mutability": "mutable",
                       "name": "",
-                      "scope": 2381,
+                      "scope": 2085,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "address",
@@ -2839,26 +2839,26 @@
                           "stateMutability": "nonpayable",
                           "type": "address"
                         },
-                        "id": 2274,
+                        "id": 1978,
                         "name": "ElementaryTypeName",
-                        "src": "1165:7:5"
+                        "src": "1165:7:4"
                       }
                     ],
-                    "id": 2275,
+                    "id": 1979,
                     "name": "VariableDeclaration",
-                    "src": "1165:7:5"
+                    "src": "1165:7:4"
                   }
                 ],
-                "id": 2276,
+                "id": 1980,
                 "name": "ParameterList",
-                "src": "1164:9:5"
+                "src": "1164:9:4"
               },
               {
                 "children": [
                   {
                     "attributes": {
                       "assignments": [
-                        2278
+                        1982
                       ]
                     },
                     "children": [
@@ -2867,7 +2867,7 @@
                           "constant": false,
                           "mutability": "mutable",
                           "name": "_tos",
-                          "scope": 2380,
+                          "scope": 2084,
                           "stateVariable": false,
                           "storageLocation": "default",
                           "type": "address",
@@ -2880,14 +2880,14 @@
                               "stateMutability": "nonpayable",
                               "type": "address"
                             },
-                            "id": 2277,
+                            "id": 1981,
                             "name": "ElementaryTypeName",
-                            "src": "1184:7:5"
+                            "src": "1184:7:4"
                           }
                         ],
-                        "id": 2278,
+                        "id": 1982,
                         "name": "VariableDeclaration",
-                        "src": "1184:12:5"
+                        "src": "1184:12:4"
                       },
                       {
                         "attributes": {
@@ -2903,13 +2903,13 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 2265,
+                              "referencedDeclaration": 1969,
                               "type": "address[4] calldata",
                               "value": "_addr"
                             },
-                            "id": 2279,
+                            "id": 1983,
                             "name": "Identifier",
-                            "src": "1199:5:5"
+                            "src": "1199:5:4"
                           },
                           {
                             "attributes": {
@@ -2922,24 +2922,24 @@
                               "type": "int_const 0",
                               "value": "0"
                             },
-                            "id": 2280,
+                            "id": 1984,
                             "name": "Literal",
-                            "src": "1205:1:5"
+                            "src": "1205:1:4"
                           }
                         ],
-                        "id": 2281,
+                        "id": 1985,
                         "name": "IndexAccess",
-                        "src": "1199:8:5"
+                        "src": "1199:8:4"
                       }
                     ],
-                    "id": 2282,
+                    "id": 1986,
                     "name": "VariableDeclarationStatement",
-                    "src": "1184:23:5"
+                    "src": "1184:23:4"
                   },
                   {
                     "attributes": {
                       "assignments": [
-                        2284
+                        1988
                       ]
                     },
                     "children": [
@@ -2948,7 +2948,7 @@
                           "constant": false,
                           "mutability": "mutable",
                           "name": "_paytoken",
-                          "scope": 2380,
+                          "scope": 2084,
                           "stateVariable": false,
                           "storageLocation": "default",
                           "type": "address",
@@ -2961,14 +2961,14 @@
                               "stateMutability": "nonpayable",
                               "type": "address"
                             },
-                            "id": 2283,
+                            "id": 1987,
                             "name": "ElementaryTypeName",
-                            "src": "1217:7:5"
+                            "src": "1217:7:4"
                           }
                         ],
-                        "id": 2284,
+                        "id": 1988,
                         "name": "VariableDeclaration",
-                        "src": "1217:17:5"
+                        "src": "1217:17:4"
                       },
                       {
                         "attributes": {
@@ -2984,13 +2984,13 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 2265,
+                              "referencedDeclaration": 1969,
                               "type": "address[4] calldata",
                               "value": "_addr"
                             },
-                            "id": 2285,
+                            "id": 1989,
                             "name": "Identifier",
-                            "src": "1237:5:5"
+                            "src": "1237:5:4"
                           },
                           {
                             "attributes": {
@@ -3003,24 +3003,24 @@
                               "type": "int_const 1",
                               "value": "1"
                             },
-                            "id": 2286,
+                            "id": 1990,
                             "name": "Literal",
-                            "src": "1243:1:5"
+                            "src": "1243:1:4"
                           }
                         ],
-                        "id": 2287,
+                        "id": 1991,
                         "name": "IndexAccess",
-                        "src": "1237:8:5"
+                        "src": "1237:8:4"
                       }
                     ],
-                    "id": 2288,
+                    "id": 1992,
                     "name": "VariableDeclarationStatement",
-                    "src": "1217:28:5"
+                    "src": "1217:28:4"
                   },
                   {
                     "attributes": {
                       "assignments": [
-                        2290
+                        1994
                       ]
                     },
                     "children": [
@@ -3029,7 +3029,7 @@
                           "constant": false,
                           "mutability": "mutable",
                           "name": "_stakefactory",
-                          "scope": 2380,
+                          "scope": 2084,
                           "stateVariable": false,
                           "storageLocation": "default",
                           "type": "address",
@@ -3042,14 +3042,14 @@
                               "stateMutability": "nonpayable",
                               "type": "address"
                             },
-                            "id": 2289,
+                            "id": 1993,
                             "name": "ElementaryTypeName",
-                            "src": "1255:7:5"
+                            "src": "1255:7:4"
                           }
                         ],
-                        "id": 2290,
+                        "id": 1994,
                         "name": "VariableDeclaration",
-                        "src": "1255:21:5"
+                        "src": "1255:21:4"
                       },
                       {
                         "attributes": {
@@ -3065,13 +3065,13 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 2265,
+                              "referencedDeclaration": 1969,
                               "type": "address[4] calldata",
                               "value": "_addr"
                             },
-                            "id": 2291,
+                            "id": 1995,
                             "name": "Identifier",
-                            "src": "1279:5:5"
+                            "src": "1279:5:4"
                           },
                           {
                             "attributes": {
@@ -3084,24 +3084,24 @@
                               "type": "int_const 2",
                               "value": "2"
                             },
-                            "id": 2292,
+                            "id": 1996,
                             "name": "Literal",
-                            "src": "1285:1:5"
+                            "src": "1285:1:4"
                           }
                         ],
-                        "id": 2293,
+                        "id": 1997,
                         "name": "IndexAccess",
-                        "src": "1279:8:5"
+                        "src": "1279:8:4"
                       }
                     ],
-                    "id": 2294,
+                    "id": 1998,
                     "name": "VariableDeclarationStatement",
-                    "src": "1255:32:5"
+                    "src": "1255:32:4"
                   },
                   {
                     "attributes": {
                       "assignments": [
-                        2296
+                        2000
                       ]
                     },
                     "children": [
@@ -3110,7 +3110,7 @@
                           "constant": false,
                           "mutability": "mutable",
                           "name": "_defiAddr",
-                          "scope": 2380,
+                          "scope": 2084,
                           "stateVariable": false,
                           "storageLocation": "default",
                           "type": "address",
@@ -3123,14 +3123,14 @@
                               "stateMutability": "nonpayable",
                               "type": "address"
                             },
-                            "id": 2295,
+                            "id": 1999,
                             "name": "ElementaryTypeName",
-                            "src": "1297:7:5"
+                            "src": "1297:7:4"
                           }
                         ],
-                        "id": 2296,
+                        "id": 2000,
                         "name": "VariableDeclaration",
-                        "src": "1297:17:5"
+                        "src": "1297:17:4"
                       },
                       {
                         "attributes": {
@@ -3146,13 +3146,13 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 2265,
+                              "referencedDeclaration": 1969,
                               "type": "address[4] calldata",
                               "value": "_addr"
                             },
-                            "id": 2297,
+                            "id": 2001,
                             "name": "Identifier",
-                            "src": "1317:5:5"
+                            "src": "1317:5:4"
                           },
                           {
                             "attributes": {
@@ -3165,24 +3165,24 @@
                               "type": "int_const 3",
                               "value": "3"
                             },
-                            "id": 2298,
+                            "id": 2002,
                             "name": "Literal",
-                            "src": "1323:1:5"
+                            "src": "1323:1:4"
                           }
                         ],
-                        "id": 2299,
+                        "id": 2003,
                         "name": "IndexAccess",
-                        "src": "1317:8:5"
+                        "src": "1317:8:4"
                       }
                     ],
-                    "id": 2300,
+                    "id": 2004,
                     "name": "VariableDeclarationStatement",
-                    "src": "1297:28:5"
+                    "src": "1297:28:4"
                   },
                   {
                     "attributes": {
                       "assignments": [
-                        2302
+                        2006
                       ]
                     },
                     "children": [
@@ -3191,7 +3191,7 @@
                           "constant": false,
                           "mutability": "mutable",
                           "name": "_stakeType",
-                          "scope": 2380,
+                          "scope": 2084,
                           "stateVariable": false,
                           "storageLocation": "default",
                           "type": "uint256",
@@ -3203,14 +3203,14 @@
                               "name": "uint256",
                               "type": "uint256"
                             },
-                            "id": 2301,
+                            "id": 2005,
                             "name": "ElementaryTypeName",
-                            "src": "1335:7:5"
+                            "src": "1335:7:4"
                           }
                         ],
-                        "id": 2302,
+                        "id": 2006,
                         "name": "VariableDeclaration",
-                        "src": "1335:18:5"
+                        "src": "1335:18:4"
                       },
                       {
                         "attributes": {
@@ -3226,13 +3226,13 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 2269,
+                              "referencedDeclaration": 1973,
                               "type": "uint256[4] calldata",
                               "value": "_intInfo"
                             },
-                            "id": 2303,
+                            "id": 2007,
                             "name": "Identifier",
-                            "src": "1356:8:5"
+                            "src": "1356:8:4"
                           },
                           {
                             "attributes": {
@@ -3245,24 +3245,24 @@
                               "type": "int_const 0",
                               "value": "0"
                             },
-                            "id": 2304,
+                            "id": 2008,
                             "name": "Literal",
-                            "src": "1365:1:5"
+                            "src": "1365:1:4"
                           }
                         ],
-                        "id": 2305,
+                        "id": 2009,
                         "name": "IndexAccess",
-                        "src": "1356:11:5"
+                        "src": "1356:11:4"
                       }
                     ],
-                    "id": 2306,
+                    "id": 2010,
                     "name": "VariableDeclarationStatement",
-                    "src": "1335:32:5"
+                    "src": "1335:32:4"
                   },
                   {
                     "attributes": {
                       "assignments": [
-                        2308
+                        2012
                       ]
                     },
                     "children": [
@@ -3271,7 +3271,7 @@
                           "constant": false,
                           "mutability": "mutable",
                           "name": "_cap",
-                          "scope": 2380,
+                          "scope": 2084,
                           "stateVariable": false,
                           "storageLocation": "default",
                           "type": "uint256",
@@ -3283,14 +3283,14 @@
                               "name": "uint256",
                               "type": "uint256"
                             },
-                            "id": 2307,
+                            "id": 2011,
                             "name": "ElementaryTypeName",
-                            "src": "1377:7:5"
+                            "src": "1377:7:4"
                           }
                         ],
-                        "id": 2308,
+                        "id": 2012,
                         "name": "VariableDeclaration",
-                        "src": "1377:12:5"
+                        "src": "1377:12:4"
                       },
                       {
                         "attributes": {
@@ -3306,13 +3306,13 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 2269,
+                              "referencedDeclaration": 1973,
                               "type": "uint256[4] calldata",
                               "value": "_intInfo"
                             },
-                            "id": 2309,
+                            "id": 2013,
                             "name": "Identifier",
-                            "src": "1392:8:5"
+                            "src": "1392:8:4"
                           },
                           {
                             "attributes": {
@@ -3325,24 +3325,24 @@
                               "type": "int_const 1",
                               "value": "1"
                             },
-                            "id": 2310,
+                            "id": 2014,
                             "name": "Literal",
-                            "src": "1401:1:5"
+                            "src": "1401:1:4"
                           }
                         ],
-                        "id": 2311,
+                        "id": 2015,
                         "name": "IndexAccess",
-                        "src": "1392:11:5"
+                        "src": "1392:11:4"
                       }
                     ],
-                    "id": 2312,
+                    "id": 2016,
                     "name": "VariableDeclarationStatement",
-                    "src": "1377:26:5"
+                    "src": "1377:26:4"
                   },
                   {
                     "attributes": {
                       "assignments": [
-                        2314
+                        2018
                       ]
                     },
                     "children": [
@@ -3351,7 +3351,7 @@
                           "constant": false,
                           "mutability": "mutable",
                           "name": "_saleStartBlock",
-                          "scope": 2380,
+                          "scope": 2084,
                           "stateVariable": false,
                           "storageLocation": "default",
                           "type": "uint256",
@@ -3363,14 +3363,14 @@
                               "name": "uint256",
                               "type": "uint256"
                             },
-                            "id": 2313,
+                            "id": 2017,
                             "name": "ElementaryTypeName",
-                            "src": "1413:7:5"
+                            "src": "1413:7:4"
                           }
                         ],
-                        "id": 2314,
+                        "id": 2018,
                         "name": "VariableDeclaration",
-                        "src": "1413:23:5"
+                        "src": "1413:23:4"
                       },
                       {
                         "attributes": {
@@ -3386,13 +3386,13 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 2269,
+                              "referencedDeclaration": 1973,
                               "type": "uint256[4] calldata",
                               "value": "_intInfo"
                             },
-                            "id": 2315,
+                            "id": 2019,
                             "name": "Identifier",
-                            "src": "1439:8:5"
+                            "src": "1439:8:4"
                           },
                           {
                             "attributes": {
@@ -3405,24 +3405,24 @@
                               "type": "int_const 2",
                               "value": "2"
                             },
-                            "id": 2316,
+                            "id": 2020,
                             "name": "Literal",
-                            "src": "1448:1:5"
+                            "src": "1448:1:4"
                           }
                         ],
-                        "id": 2317,
+                        "id": 2021,
                         "name": "IndexAccess",
-                        "src": "1439:11:5"
+                        "src": "1439:11:4"
                       }
                     ],
-                    "id": 2318,
+                    "id": 2022,
                     "name": "VariableDeclarationStatement",
-                    "src": "1413:37:5"
+                    "src": "1413:37:4"
                   },
                   {
                     "attributes": {
                       "assignments": [
-                        2320
+                        2024
                       ]
                     },
                     "children": [
@@ -3431,7 +3431,7 @@
                           "constant": false,
                           "mutability": "mutable",
                           "name": "_stakeStartBlock",
-                          "scope": 2380,
+                          "scope": 2084,
                           "stateVariable": false,
                           "storageLocation": "default",
                           "type": "uint256",
@@ -3443,14 +3443,14 @@
                               "name": "uint256",
                               "type": "uint256"
                             },
-                            "id": 2319,
+                            "id": 2023,
                             "name": "ElementaryTypeName",
-                            "src": "1460:7:5"
+                            "src": "1460:7:4"
                           }
                         ],
-                        "id": 2320,
+                        "id": 2024,
                         "name": "VariableDeclaration",
-                        "src": "1460:24:5"
+                        "src": "1460:24:4"
                       },
                       {
                         "attributes": {
@@ -3466,13 +3466,13 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 2269,
+                              "referencedDeclaration": 1973,
                               "type": "uint256[4] calldata",
                               "value": "_intInfo"
                             },
-                            "id": 2321,
+                            "id": 2025,
                             "name": "Identifier",
-                            "src": "1487:8:5"
+                            "src": "1487:8:4"
                           },
                           {
                             "attributes": {
@@ -3485,24 +3485,24 @@
                               "type": "int_const 3",
                               "value": "3"
                             },
-                            "id": 2322,
+                            "id": 2026,
                             "name": "Literal",
-                            "src": "1496:1:5"
+                            "src": "1496:1:4"
                           }
                         ],
-                        "id": 2323,
+                        "id": 2027,
                         "name": "IndexAccess",
-                        "src": "1487:11:5"
+                        "src": "1487:11:4"
                       }
                     ],
-                    "id": 2324,
+                    "id": 2028,
                     "name": "VariableDeclarationStatement",
-                    "src": "1460:38:5"
+                    "src": "1460:38:4"
                   },
                   {
                     "attributes": {
                       "assignments": [
-                        2326
+                        2030
                       ]
                     },
                     "children": [
@@ -3511,7 +3511,7 @@
                           "constant": false,
                           "mutability": "mutable",
                           "name": "proxy",
-                          "scope": 2380,
+                          "scope": 2084,
                           "stateVariable": false,
                           "storageLocation": "default",
                           "type": "contract StakeVaultProxy",
@@ -3521,17 +3521,17 @@
                           {
                             "attributes": {
                               "name": "StakeVaultProxy",
-                              "referencedDeclaration": 9944,
+                              "referencedDeclaration": 8787,
                               "type": "contract StakeVaultProxy"
                             },
-                            "id": 2325,
+                            "id": 2029,
                             "name": "UserDefinedTypeName",
-                            "src": "1509:15:5"
+                            "src": "1509:15:4"
                           }
                         ],
-                        "id": 2326,
+                        "id": 2030,
                         "name": "VariableDeclaration",
-                        "src": "1509:21:5"
+                        "src": "1509:21:4"
                       },
                       {
                         "attributes": {
@@ -3566,40 +3566,40 @@
                               {
                                 "attributes": {
                                   "name": "StakeVaultProxy",
-                                  "referencedDeclaration": 9944,
+                                  "referencedDeclaration": 8787,
                                   "type": "contract StakeVaultProxy"
                                 },
-                                "id": 2327,
+                                "id": 2031,
                                 "name": "UserDefinedTypeName",
-                                "src": "1537:15:5"
+                                "src": "1537:15:4"
                               }
                             ],
-                            "id": 2328,
+                            "id": 2032,
                             "name": "NewExpression",
-                            "src": "1533:19:5"
+                            "src": "1533:19:4"
                           },
                           {
                             "attributes": {
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 2239,
+                              "referencedDeclaration": 1943,
                               "type": "address",
                               "value": "stakeVaultLogic"
                             },
-                            "id": 2329,
+                            "id": 2033,
                             "name": "Identifier",
-                            "src": "1553:15:5"
+                            "src": "1553:15:4"
                           }
                         ],
-                        "id": 2330,
+                        "id": 2034,
                         "name": "FunctionCall",
-                        "src": "1533:36:5"
+                        "src": "1533:36:4"
                       }
                     ],
-                    "id": 2331,
+                    "id": 2035,
                     "name": "VariableDeclarationStatement",
-                    "src": "1509:60:5"
+                    "src": "1509:60:4"
                   },
                   {
                     "children": [
@@ -3638,9 +3638,9 @@
                               "type": "function (bool,string memory) pure",
                               "value": "require"
                             },
-                            "id": 2332,
+                            "id": 2036,
                             "name": "Identifier",
-                            "src": "1579:7:5"
+                            "src": "1579:7:4"
                           },
                           {
                             "attributes": {
@@ -3675,7 +3675,7 @@
                                     "attributes": {
                                       "argumentTypes": [
                                         {
-                                          "typeIdentifier": "t_contract$_StakeVaultProxy_$9944",
+                                          "typeIdentifier": "t_contract$_StakeVaultProxy_$8787",
                                           "typeString": "contract StakeVaultProxy"
                                         }
                                       ],
@@ -3690,32 +3690,32 @@
                                         "attributes": {
                                           "name": "address"
                                         },
-                                        "id": 2333,
+                                        "id": 2037,
                                         "name": "ElementaryTypeName",
-                                        "src": "1587:7:5"
+                                        "src": "1587:7:4"
                                       }
                                     ],
-                                    "id": 2334,
+                                    "id": 2038,
                                     "name": "ElementaryTypeNameExpression",
-                                    "src": "1587:7:5"
+                                    "src": "1587:7:4"
                                   },
                                   {
                                     "attributes": {
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 2326,
+                                      "referencedDeclaration": 2030,
                                       "type": "contract StakeVaultProxy",
                                       "value": "proxy"
                                     },
-                                    "id": 2335,
+                                    "id": 2039,
                                     "name": "Identifier",
-                                    "src": "1595:5:5"
+                                    "src": "1595:5:4"
                                   }
                                 ],
-                                "id": 2336,
+                                "id": 2040,
                                 "name": "FunctionCall",
-                                "src": "1587:14:5"
+                                "src": "1587:14:4"
                               },
                               {
                                 "attributes": {
@@ -3751,14 +3751,14 @@
                                         "attributes": {
                                           "name": "address"
                                         },
-                                        "id": 2337,
+                                        "id": 2041,
                                         "name": "ElementaryTypeName",
-                                        "src": "1605:7:5"
+                                        "src": "1605:7:4"
                                       }
                                     ],
-                                    "id": 2338,
+                                    "id": 2042,
                                     "name": "ElementaryTypeNameExpression",
-                                    "src": "1605:7:5"
+                                    "src": "1605:7:4"
                                   },
                                   {
                                     "attributes": {
@@ -3771,19 +3771,19 @@
                                       "type": "int_const 0",
                                       "value": "0"
                                     },
-                                    "id": 2339,
+                                    "id": 2043,
                                     "name": "Literal",
-                                    "src": "1613:1:5"
+                                    "src": "1613:1:4"
                                   }
                                 ],
-                                "id": 2340,
+                                "id": 2044,
                                 "name": "FunctionCall",
-                                "src": "1605:10:5"
+                                "src": "1605:10:4"
                               }
                             ],
-                            "id": 2341,
+                            "id": 2045,
                             "name": "BinaryOperation",
-                            "src": "1587:28:5"
+                            "src": "1587:28:4"
                           },
                           {
                             "attributes": {
@@ -3796,19 +3796,19 @@
                               "type": "literal_string \"StakeVaultFactory: proxy zero\"",
                               "value": "StakeVaultFactory: proxy zero"
                             },
-                            "id": 2342,
+                            "id": 2046,
                             "name": "Literal",
-                            "src": "1617:31:5"
+                            "src": "1617:31:4"
                           }
                         ],
-                        "id": 2343,
+                        "id": 2047,
                         "name": "FunctionCall",
-                        "src": "1579:70:5"
+                        "src": "1579:70:4"
                       }
                     ],
-                    "id": 2344,
+                    "id": 2048,
                     "name": "ExpressionStatement",
-                    "src": "1579:70:5"
+                    "src": "1579:70:4"
                   },
                   {
                     "children": [
@@ -3868,7 +3868,7 @@
                               "isPure": false,
                               "lValueRequested": false,
                               "member_name": "initialize",
-                              "referencedDeclaration": 9943,
+                              "referencedDeclaration": 8786,
                               "type": "function (address,address,uint256,uint256,uint256,address,uint256,address) external"
                             },
                             "children": [
@@ -3877,132 +3877,132 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 2326,
+                                  "referencedDeclaration": 2030,
                                   "type": "contract StakeVaultProxy",
                                   "value": "proxy"
                                 },
-                                "id": 2345,
+                                "id": 2049,
                                 "name": "Identifier",
-                                "src": "1660:5:5"
+                                "src": "1660:5:4"
                               }
                             ],
-                            "id": 2347,
+                            "id": 2051,
                             "name": "MemberAccess",
-                            "src": "1660:16:5"
+                            "src": "1660:16:4"
                           },
                           {
                             "attributes": {
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 2278,
+                              "referencedDeclaration": 1982,
                               "type": "address",
                               "value": "_tos"
                             },
-                            "id": 2348,
+                            "id": 2052,
                             "name": "Identifier",
-                            "src": "1690:4:5"
+                            "src": "1690:4:4"
                           },
                           {
                             "attributes": {
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 2284,
+                              "referencedDeclaration": 1988,
                               "type": "address",
                               "value": "_paytoken"
                             },
-                            "id": 2349,
+                            "id": 2053,
                             "name": "Identifier",
-                            "src": "1708:9:5"
+                            "src": "1708:9:4"
                           },
                           {
                             "attributes": {
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 2308,
+                              "referencedDeclaration": 2012,
                               "type": "uint256",
                               "value": "_cap"
                             },
-                            "id": 2350,
+                            "id": 2054,
                             "name": "Identifier",
-                            "src": "1731:4:5"
+                            "src": "1731:4:4"
                           },
                           {
                             "attributes": {
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 2314,
+                              "referencedDeclaration": 2018,
                               "type": "uint256",
                               "value": "_saleStartBlock"
                             },
-                            "id": 2351,
+                            "id": 2055,
                             "name": "Identifier",
-                            "src": "1749:15:5"
+                            "src": "1749:15:4"
                           },
                           {
                             "attributes": {
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 2320,
+                              "referencedDeclaration": 2024,
                               "type": "uint256",
                               "value": "_stakeStartBlock"
                             },
-                            "id": 2352,
+                            "id": 2056,
                             "name": "Identifier",
-                            "src": "1778:16:5"
+                            "src": "1778:16:4"
                           },
                           {
                             "attributes": {
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 2290,
+                              "referencedDeclaration": 1994,
                               "type": "address",
                               "value": "_stakefactory"
                             },
-                            "id": 2353,
+                            "id": 2057,
                             "name": "Identifier",
-                            "src": "1808:13:5"
+                            "src": "1808:13:4"
                           },
                           {
                             "attributes": {
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 2302,
+                              "referencedDeclaration": 2006,
                               "type": "uint256",
                               "value": "_stakeType"
                             },
-                            "id": 2354,
+                            "id": 2058,
                             "name": "Identifier",
-                            "src": "1835:10:5"
+                            "src": "1835:10:4"
                           },
                           {
                             "attributes": {
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 2296,
+                              "referencedDeclaration": 2000,
                               "type": "address",
                               "value": "_defiAddr"
                             },
-                            "id": 2355,
+                            "id": 2059,
                             "name": "Identifier",
-                            "src": "1859:9:5"
+                            "src": "1859:9:4"
                           }
                         ],
-                        "id": 2356,
+                        "id": 2060,
                         "name": "FunctionCall",
-                        "src": "1660:218:5"
+                        "src": "1660:218:4"
                       }
                     ],
-                    "id": 2357,
+                    "id": 2061,
                     "name": "ExpressionStatement",
-                    "src": "1660:218:5"
+                    "src": "1660:218:4"
                   },
                   {
                     "children": [
@@ -4038,7 +4038,7 @@
                               "isPure": false,
                               "lValueRequested": false,
                               "member_name": "grantRole",
-                              "referencedDeclaration": 10842,
+                              "referencedDeclaration": 9270,
                               "type": "function (bytes32,address) external"
                             },
                             "children": [
@@ -4047,54 +4047,54 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 2326,
+                                  "referencedDeclaration": 2030,
                                   "type": "contract StakeVaultProxy",
                                   "value": "proxy"
                                 },
-                                "id": 2358,
+                                "id": 2062,
                                 "name": "Identifier",
-                                "src": "1889:5:5"
+                                "src": "1889:5:4"
                               }
                             ],
-                            "id": 2360,
+                            "id": 2064,
                             "name": "MemberAccess",
-                            "src": "1889:15:5"
+                            "src": "1889:15:4"
                           },
                           {
                             "attributes": {
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 2237,
+                              "referencedDeclaration": 1941,
                               "type": "bytes32",
                               "value": "ADMIN_ROLE"
                             },
-                            "id": 2361,
+                            "id": 2065,
                             "name": "Identifier",
-                            "src": "1905:10:5"
+                            "src": "1905:10:4"
                           },
                           {
                             "attributes": {
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 2271,
+                              "referencedDeclaration": 1975,
                               "type": "address",
                               "value": "owner"
                             },
-                            "id": 2362,
+                            "id": 2066,
                             "name": "Identifier",
-                            "src": "1917:5:5"
+                            "src": "1917:5:4"
                           }
                         ],
-                        "id": 2363,
+                        "id": 2067,
                         "name": "FunctionCall",
-                        "src": "1889:34:5"
+                        "src": "1889:34:4"
                       }
                     ],
-                    "id": 2364,
+                    "id": 2068,
                     "name": "ExpressionStatement",
-                    "src": "1889:34:5"
+                    "src": "1889:34:4"
                   },
                   {
                     "children": [
@@ -4130,7 +4130,7 @@
                               "isPure": false,
                               "lValueRequested": false,
                               "member_name": "revokeRole",
-                              "referencedDeclaration": 10868,
+                              "referencedDeclaration": 9296,
                               "type": "function (bytes32,address) external"
                             },
                             "children": [
@@ -4139,31 +4139,31 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 2326,
+                                  "referencedDeclaration": 2030,
                                   "type": "contract StakeVaultProxy",
                                   "value": "proxy"
                                 },
-                                "id": 2365,
+                                "id": 2069,
                                 "name": "Identifier",
-                                "src": "1933:5:5"
+                                "src": "1933:5:4"
                               }
                             ],
-                            "id": 2367,
+                            "id": 2071,
                             "name": "MemberAccess",
-                            "src": "1933:16:5"
+                            "src": "1933:16:4"
                           },
                           {
                             "attributes": {
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 2237,
+                              "referencedDeclaration": 1941,
                               "type": "bytes32",
                               "value": "ADMIN_ROLE"
                             },
-                            "id": 2368,
+                            "id": 2072,
                             "name": "Identifier",
-                            "src": "1950:10:5"
+                            "src": "1950:10:4"
                           },
                           {
                             "attributes": {
@@ -4184,7 +4184,7 @@
                                 "attributes": {
                                   "argumentTypes": [
                                     {
-                                      "typeIdentifier": "t_contract$_StakeVaultFactory_$2382",
+                                      "typeIdentifier": "t_contract$_StakeVaultFactory_$2086",
                                       "typeString": "contract StakeVaultFactory"
                                     }
                                   ],
@@ -4199,14 +4199,14 @@
                                     "attributes": {
                                       "name": "address"
                                     },
-                                    "id": 2369,
+                                    "id": 2073,
                                     "name": "ElementaryTypeName",
-                                    "src": "1962:7:5"
+                                    "src": "1962:7:4"
                                   }
                                 ],
-                                "id": 2370,
+                                "id": 2074,
                                 "name": "ElementaryTypeNameExpression",
-                                "src": "1962:7:5"
+                                "src": "1962:7:4"
                               },
                               {
                                 "attributes": {
@@ -4217,28 +4217,28 @@
                                   "type": "contract StakeVaultFactory",
                                   "value": "this"
                                 },
-                                "id": 2371,
+                                "id": 2075,
                                 "name": "Identifier",
-                                "src": "1970:4:5"
+                                "src": "1970:4:4"
                               }
                             ],
-                            "id": 2372,
+                            "id": 2076,
                             "name": "FunctionCall",
-                            "src": "1962:13:5"
+                            "src": "1962:13:4"
                           }
                         ],
-                        "id": 2373,
+                        "id": 2077,
                         "name": "FunctionCall",
-                        "src": "1933:43:5"
+                        "src": "1933:43:4"
                       }
                     ],
-                    "id": 2374,
+                    "id": 2078,
                     "name": "ExpressionStatement",
-                    "src": "1933:43:5"
+                    "src": "1933:43:4"
                   },
                   {
                     "attributes": {
-                      "functionReturnParameters": 2276
+                      "functionReturnParameters": 1980
                     },
                     "children": [
                       {
@@ -4260,7 +4260,7 @@
                             "attributes": {
                               "argumentTypes": [
                                 {
-                                  "typeIdentifier": "t_contract$_StakeVaultProxy_$9944",
+                                  "typeIdentifier": "t_contract$_StakeVaultProxy_$8787",
                                   "typeString": "contract StakeVaultProxy"
                                 }
                               ],
@@ -4275,57 +4275,57 @@
                                 "attributes": {
                                   "name": "address"
                                 },
-                                "id": 2375,
+                                "id": 2079,
                                 "name": "ElementaryTypeName",
-                                "src": "1994:7:5"
+                                "src": "1994:7:4"
                               }
                             ],
-                            "id": 2376,
+                            "id": 2080,
                             "name": "ElementaryTypeNameExpression",
-                            "src": "1994:7:5"
+                            "src": "1994:7:4"
                           },
                           {
                             "attributes": {
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 2326,
+                              "referencedDeclaration": 2030,
                               "type": "contract StakeVaultProxy",
                               "value": "proxy"
                             },
-                            "id": 2377,
+                            "id": 2081,
                             "name": "Identifier",
-                            "src": "2002:5:5"
+                            "src": "2002:5:4"
                           }
                         ],
-                        "id": 2378,
+                        "id": 2082,
                         "name": "FunctionCall",
-                        "src": "1994:14:5"
+                        "src": "1994:14:4"
                       }
                     ],
-                    "id": 2379,
+                    "id": 2083,
                     "name": "Return",
-                    "src": "1987:21:5"
+                    "src": "1987:21:4"
                   }
                 ],
-                "id": 2380,
+                "id": 2084,
                 "name": "Block",
-                "src": "1174:841:5"
+                "src": "1174:841:4"
               }
             ],
-            "id": 2381,
+            "id": 2085,
             "name": "FunctionDefinition",
-            "src": "1020:995:5"
+            "src": "1020:995:4"
           }
         ],
-        "id": 2382,
+        "id": 2086,
         "name": "ContractDefinition",
-        "src": "226:1791:5"
+        "src": "226:1791:4"
       }
     ],
-    "id": 2383,
+    "id": 2087,
     "name": "SourceUnit",
-    "src": "32:1986:5"
+    "src": "32:1986:4"
   },
   "compiler": {
     "name": "solc",
@@ -4333,7 +4333,7 @@
   },
   "networks": {},
   "schemaVersion": "3.3.4",
-  "updatedAt": "2021-06-15T09:38:41.449Z",
+  "updatedAt": "2021-06-15T10:39:19.782Z",
   "devdoc": {
     "kind": "dev",
     "methods": {

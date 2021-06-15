@@ -65,4 +65,28 @@ contract Stake1Storage {
             userStaked[user].released
         );
     }
+
+    /// @dev Give the infomation of this stakeContracts
+    /// @return paytoken, vault, [saleStartBlock, startBlock, endBlock], rewardClaimedTotal, totalStakedAmount, totalStakers
+    function infos()
+        external
+        view
+        returns (
+            address,
+            address,
+            uint256[3] memory,
+            uint256,
+            uint256,
+            uint256
+        )
+    {
+        return (
+            paytoken,
+            vault,
+            [saleStartBlock, startBlock, endBlock],
+            rewardClaimedTotal,
+            totalStakedAmount,
+            totalStakers
+        );
+    }
 }
