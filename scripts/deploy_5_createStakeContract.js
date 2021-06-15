@@ -4,7 +4,6 @@ const utils = ethers.utils;
 const save = require("./save_deployed_file");
 const loadDeployed = require("./load_deployed");
 const loadDeployedInput = require("./load_deployed_input");
-
 const {
   padLeft,
   toBN,
@@ -29,7 +28,6 @@ const tonFactory = loadDeployed(process.env.NETWORK, "StakeTONFactory");
 
 const ton = loadDeployed(process.env.NETWORK, "TON");
 
-
 const {
   createValue,
   createStakeContract,
@@ -37,20 +35,67 @@ const {
   getPeriodBlockByTimes
   } = require("../utils/deploy_common.js");
 
+let periodsMins = [
+      {
+        name: " 10 MINs",
+        period: getPeriodBlockByTimes(0, 0, 10)
+      },
+      {
+        name: " 30 MINs",
+        period: getPeriodBlockByTimes(0, 0, 30)
+      },
+      {
+        name: " 60 MINs",
+        period: getPeriodBlockByTimes(0, 0, 60)
+      }
+    ];
+
+let periodsHours = [
+  {
+    name: " 2 HOUR",
+    period: getPeriodBlockByTimes(0, 1, 0)
+  },
+  {
+    name: " 4 HOURS",
+    period: getPeriodBlockByTimes(0, 2, 0)
+  },
+  {
+    name: " 6 HOURS",
+    period: getPeriodBlockByTimes(0, 5, 0)
+  }
+ ];
+let periodsDays = [
+  {
+    name: " 1 Day",
+    period: getPeriodBlockByTimes(1, 0, 0)
+  },
+  {
+    name: " 2 Days",
+    period: getPeriodBlockByTimes(2, 0, 0)
+  },
+  {
+    name: " 3 Days",
+    period: getPeriodBlockByTimes(3, 0, 0)
+  }
+ ]
+
+
 async function main() {
 
   let VaultName = null;
+  let VaultAddress = null;
   let StakeType = null;
 
   StakeType = loadDeployedInput(process.env.NETWORK, "StakeType");
   VaultName = loadDeployedInput(process.env.NETWORK, "VaultName");
+  VaultAddress = loadDeployedInput(process.env.NETWORK, "VaultAddress");
   console.log("StakeType", StakeType);
   console.log("VaultName", VaultName);
+  console.log("VaultAddress", VaultAddress );
 
   const [deployer, user1] = await ethers.getSigners();
   const users = await ethers.getSigners();
   console.log("Deploying contracts with the account:", deployer.address);
-
   console.log("Account balance:", (await deployer.getBalance()).toString());
   const provider = await ethers.getDefaultProvider("rinkeby");
   console.log("ADMIN_ROLE", ADMIN_ROLE);
@@ -63,31 +108,45 @@ async function main() {
   let stakeStartBlock = parseInt(saleStartBlock) + (60 * 5) / 13;
   stakeStartBlock = parseInt(stakeStartBlock);
 
-  const vault = {
-    allocatedTOS: "100000",
-    saleStartBlock: saleStartBlock,
-    stakeStartBlock: stakeStartBlock,
-    phase: 1,
-    hashName : keccak256(VaultName),
-    type: 0,
-  }
-
+  //==============================
+  let periods = periodsHours;
   let token = null ;
-  if(StakeType == "TON"){
-    vault.type = 0;
-    token = ton;
 
-  }else if(StakeType == "ETH"){
-    vault.type = 1;
-    token = zeroAddress;
+  if (VaultAddress != null && VaultAddress.length > 5
+    && (StakeType == "TON" || StakeType == "ETH")
+    && (VaultName !=null && VaultName.length > 1 ))
+  {
+    if(StakeType == "TON"){
+      token = ton;
+
+    }else if(StakeType == "ETH"){
+      token = zeroAddress;
+
+    }
+    console.log('StakeType',StakeType);
+    console.log('token',token);
+    console.log('periods',periods);
+
+    for (let i =0; i< periods.length ; i++){
+      await createStakeContract(VaultAddress, periods[i].period.blocks, VaultName + periods[i].name, token );
+      timeout(10000);
+    }
+
   }
 
-  vault.saleStartBlock = parseInt(curBlock) + parseInt(60*10/13);
-  vault.stakeStartBlock = vault.saleStartBlock + parseInt(60*60*24*3/13);
-
-  console.log('StakeType',StakeType);
-  console.log('token',token);
-  await createValue(vault, token);
+  /// /////////////////////////////////////////////////////
+  // For StakeContract of Vault
+  // write your vault
+  // let token = ton;
+  // // let token = zeroAddress;
+  // let vaultAddress ='0xd2495Bbc9150739E50Ad78b2c5a4FEf9c8e2C608';
+  // console.log('vaultAddress',vaultAddress);
+  // let periods = periodsDays;
+  // console.log('periods',periods);
+  // for (let i =0; i< periods.length ; i++){
+  //   await createStakeContract(vaultAddress, periods[i].period.blocks, periods[i].name, token );
+  //   timeout(10000);
+  // }
 
 }
 
