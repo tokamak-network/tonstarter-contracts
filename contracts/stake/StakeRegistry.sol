@@ -13,8 +13,8 @@ contract StakeRegistry is AccessControl, IStakeRegistry {
     bytes32 public constant ZERO_HASH =
         0x0000000000000000000000000000000000000000000000000000000000000000;
 
-    /// @dev FLD address
-    address public fld;
+    /// @dev TOS address
+    address public tos;
 
     /// @dev TON address in Tokamak
     address public ton;
@@ -64,7 +64,7 @@ contract StakeRegistry is AccessControl, IStakeRegistry {
 
     /// @dev event on add the vault
     /// @param vault the vault address
-    /// @param phase the phase of FLD platform
+    /// @param phase the phase of TOS platform
     event AddedVault(address indexed vault, uint256 phase);
 
     /// @dev event on add the stake contract in vault
@@ -108,11 +108,11 @@ contract StakeRegistry is AccessControl, IStakeRegistry {
     );
 
     /// @dev constructor of StakeRegistry
-    /// @param _fld FLD address
-    constructor(address _fld) {
+    /// @param _tos TOS address
+    constructor(address _tos) {
         _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
         _setupRole(ADMIN_ROLE, msg.sender);
-        fld = _fld;
+        tos = _tos;
     }
 
     /// @dev transfer Ownership

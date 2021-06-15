@@ -1,6 +1,6 @@
 # Functions:
 
-- [`setStore(address _fld, address _stakeRegistry, address _stakeFactory, address _stakeVaultFactory, address _ton, address _wton, address _depositManager, address _seigManager)`](#IStake1Logic-setStore-address-address-address-address-address-address-address-address-)
+- [`setStore(address _tos, address _stakeRegistry, address _stakeFactory, address _stakeVaultFactory, address _ton, address _wton, address _depositManager, address _seigManager)`](#IStake1Logic-setStore-address-address-address-address-address-address-address-address-)
 
 - [`createVault(address _paytoken, uint256 _cap, uint256 _saleStartBlock, uint256 _stakeStartBlock, uint256 _phase, bytes32 _vaultName, uint256 _stakeType, address _defiAddr)`](#IStake1Logic-createVault-address-uint256-uint256-uint256-uint256-bytes32-uint256-address-)
 
@@ -22,19 +22,19 @@
 
 - [`tokamakProcessUnStaking(address _stakeContract, address _layer2)`](#IStake1Logic-tokamakProcessUnStaking-address-address-)
 
-- [`exchangeWTONtoFLD(address _stakeContract, uint256 amountIn, uint256 amountOutMinimum, uint256 deadline, uint160 sqrtPriceLimitX96, uint256 _type)`](#IStake1Logic-exchangeWTONtoFLD-address-uint256-uint256-uint256-uint160-uint256-)
+- [`exchangeWTONtoTOS(address _stakeContract, uint256 amountIn, uint256 amountOutMinimum, uint256 deadline, uint160 sqrtPriceLimitX96, uint256 _type)`](#IStake1Logic-exchangeWTONtoTOS-address-uint256-uint256-uint256-uint160-uint256-)
 
 - [`vaultsOfPahse(uint256 _phase)`](#IStake1Logic-vaultsOfPahse-uint256-)
 
 ###### IStake1Logic-setStore-address-address-address-address-address-address-address-address-
 
-## Function `setStore(address _fld, address _stakeRegistry, address _stakeFactory, address _stakeVaultFactory, address _ton, address _wton, address _depositManager, address _seigManager)`
+## Function `setStore(address _tos, address _stakeRegistry, address _stakeFactory, address _stakeVaultFactory, address _ton, address _wton, address _depositManager, address _seigManager)`
 
 No description
 
 ### Parameters:
 
-- `_fld`:  FLD token address
+- `_tos`:  TOS token address
 
 - `_stakeRegistry`: the registry address
 
@@ -66,7 +66,7 @@ create vault
 
 - `_stakeStartBlock`: the start block that end staking by user and start that can claim reward by user
 
-- `_phase`:  phase of FLD platform
+- `_phase`:  phase of TOS platform
 
 - `_vaultName`:  vault's name's hash
 
@@ -82,7 +82,7 @@ create stake contract in vault
 
 ### Parameters:
 
-- `_phase`: the phase of FLD platform
+- `_phase`: the phase of TOS platform
 
 - `_vault`:  vault's address
 
@@ -102,7 +102,7 @@ create stake contract in vault
 
 ### Parameters:
 
-- `_phase`: phase of FLD platform
+- `_phase`: phase of TOS platform
 
 - `_vaultName`: vault's name's hash
 
@@ -190,11 +190,11 @@ Processes unstaking the requested unstaking amount in tokamak's layer2
 
 - `_layer2`: the layer2 address in Tokamak
 
-###### IStake1Logic-exchangeWTONtoFLD-address-uint256-uint256-uint256-uint160-uint256-
+###### IStake1Logic-exchangeWTONtoTOS-address-uint256-uint256-uint256-uint160-uint256-
 
-## Function `exchangeWTONtoFLD(address _stakeContract, uint256 amountIn, uint256 amountOutMinimum, uint256 deadline, uint160 sqrtPriceLimitX96, uint256 _type)`
+## Function `exchangeWTONtoTOS(address _stakeContract, uint256 amountIn, uint256 amountOutMinimum, uint256 deadline, uint160 sqrtPriceLimitX96, uint256 _type)`
 
-Swap TON to FLD using uniswap v3
+Swap TON to TOS using uniswap v3
 
 this function used in StakeTON ( stakeType=0 )
 

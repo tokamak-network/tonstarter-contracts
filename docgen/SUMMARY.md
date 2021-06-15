@@ -14,7 +14,6 @@
   * interfaces
     * [IDepositManager](docs/interfaces/IDepositManager.md)
     * [IDeveloperVault](docs/interfaces/IDeveloperVault.md)
-    * [IFLD](docs/interfaces/IFLD.md)
     * [IIDepositManager](docs/interfaces/IIDepositManager.md)
     * [IIERC20](docs/interfaces/IIERC20.md)
     * [IISeigManager](docs/interfaces/IISeigManager.md)
@@ -41,6 +40,7 @@
     * [IStakeVaultProxy](docs/interfaces/IStakeVaultProxy.md)
     * [IStakeVaultStorage](docs/interfaces/IStakeVaultStorage.md)
     * [ITON](docs/interfaces/ITON.md)
+    * [ITOS](docs/interfaces/ITOS.md)
     * [ITokamakStaker](docs/interfaces/ITokamakStaker.md)
     * [IWTON](docs/interfaces/IWTON.md)
   * libraries
@@ -62,8 +62,8 @@
     * [StakeVaultProxy](docs/stake/StakeVaultProxy.md)
     * [StakeVaultStorage](docs/stake/StakeVaultStorage.md)
   * tokens
-    * [FLD](docs/tokens/FLD.md)
     * [OnApprove](docs/tokens/OnApprove.md)
+    * [TOS](docs/tokens/TOS.md)
   * utils
     * math
       * [Math](docs/utils/math/Math.md)

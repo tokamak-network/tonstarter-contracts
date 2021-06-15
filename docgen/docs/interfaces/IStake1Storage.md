@@ -26,7 +26,7 @@
 
 ## Function `token()`
 
-reward token : FLD
+reward token : TOS
 
 ###### IStake1Storage-stakeRegistry--
 
@@ -44,7 +44,7 @@ paytoken is the token that the user stakes. ( if paytoken is ether, paytoken is 
 
 ## Function `vault()`
 
-A vault that holds fld rewards.
+A vault that holds tos rewards.
 
 ###### IStake1Storage-saleStartBlock--
 

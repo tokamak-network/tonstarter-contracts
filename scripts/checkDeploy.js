@@ -17,32 +17,6 @@ require("dotenv").config();
 
 const initialTotal = process.env.initialTotal + "." + "0".repeat(18);
 
-const Pharse1_TOTAL = process.env.Pharse1_TOTAL + "." + "0".repeat(18);
-const Pharse1_TON_Staking =
-  process.env.Pharse1_TON_Staking + "." + "0".repeat(18);
-const Pharse1_ETH_Staking =
-  process.env.Pharse1_ETH_Staking + "." + "0".repeat(18);
-const Pharse1_FLDETHLP_Staking =
-  process.env.Pharse1_FLDETHLP_Staking + "." + "0".repeat(18);
-const Pharse1_DEV_Mining =
-  process.env.Pharse1_DEV_Mining + "." + "0".repeat(18);
-
-const Pharse2_TOTAL = process.env.Pharse2_TOTAL + "." + "0".repeat(18);
-const Pharse2_FLDETH_Staking =
-  process.env.Pharse2_FLDETH_Staking + "." + "0".repeat(18);
-const Pharse2_FLD_Staking =
-  process.env.Pharse2_FLD_Staking + "." + "0".repeat(18);
-const Pharse2_DEV_Mining =
-  process.env.Pharse2_DEV_Mining + "." + "0".repeat(18);
-
-const Pharse3_TOTAL = process.env.Pharse3_TOTAL + "." + "0".repeat(18);
-const Pharse3_FLDETH_Staking =
-  process.env.Pharse3_FLDETH_Staking + "." + "0".repeat(18);
-const Pharse3_FLD_Staking =
-  process.env.Pharse3_FLD_Staking + "." + "0".repeat(18);
-const Pharse3_DEV_Mining =
-  process.env.Pharse3_DEV_Mining + "." + "0".repeat(18);
-
 const zeroAddress = "0x0000000000000000000000000000000000000000";
 const sendAmountForTest = "10000";
 
@@ -54,27 +28,27 @@ const PHASE2_VAULT_HASH = keccak256("PHASE2_VAULT");
 const EVENT_VAULT_HASH = keccak256("EVENT_VAULT");
 
 /*
-const fldtoken = '0x08F36b925467188830887A1b1abfcd9ad68621F3';
+const tostoken = '0x08F36b925467188830887A1b1abfcd9ad68621F3';
 const registry = '0x3ddE16b82B92A40642A566aac9bc22b9e8023448';
 const factory = '0x2f8D6E6D35728A82C003F1054eD9684aF1ce34Ac';
 const logic = '0x4bEa5ead63d6eE25D9801E305B4D9dB378135af4';
 const proxy = '0x340780f192fe554069431EA1f5F8848b48364E14';
 
-const fldtoken = '0x3E9B83166f5B83454ACE140f8dc6580cdFdf74E4';
+const tostoken = '0x3E9B83166f5B83454ACE140f8dc6580cdFdf74E4';
 const registry = '0xbB4CD62E85eb9558BBC1b7b2cBFb15A55b347FbA';
 const factory = '0xb292DCb384ead40E1E5D902413172196dEf8B3E9';
 const logic = '0x5775A4d306dD45Deb93AaFDA3597F1C780a837a8';
 const proxy = '0xb5032fA7Eb52b9d21b97449a31c37167636018d8';
 
 
-let fldtoken = '0xf5286e574B3a1e369Ffe8f0c258ee4481bEF0DD0';
+let tostoken = '0xf5286e574B3a1e369Ffe8f0c258ee4481bEF0DD0';
 let registry = '0x82F59eF5D5CA7d228914876f5F5206Be2DD740f6';
 let factory = '0x0e07C3213ED88F1f8005b570BB209593Dc85aBeb';
 let logic = '0x848192a9757509e36254a4C757793FA25844F004';
 let proxy = '0x74d7Ec44ECDCd21Adf4Ed6264A4E0A5E6A9F3f89';
 */
 
-let fldtoken = "0xE6C0e049f5b07D84b68299A7297fB9DaB90E7a85";
+let tostoken = "0xE6C0e049f5b07D84b68299A7297fB9DaB90E7a85";
 let registry = "0x12A1493B5aB990244eb9bEB807b96215e420E393";
 let factory = "0x313013b0Bd5B29e821866d25630F2F324dCbe4dc";
 let logic = "0x298822574dECAA886cbb5429902d2694571a78b0";
@@ -99,7 +73,7 @@ async function deployMain(defaultSender) {
   console.log("stakeEntry:", stakeEntry.address);
 
   await stakeEntry.setStore(
-    fldtoken,
+    tostoken,
     registry,
     factory,
     ton,
@@ -117,17 +91,17 @@ async function deployMain(defaultSender) {
     "utils.parseUnits(initialTotal, 18):",
     utils.parseUnits(initialTotal, 18)
   );
-  const fld = await ethers.getContractAt("FLD", fldtoken);
-  console.log("fld:", fld.address);
+  const tos = await ethers.getContractAt("TOS", tostoken);
+  console.log("tos:", tos.address);
   console.log("deployer:", deployer.address);
 
-  //await fld.grantRole(MINTER_ROLE, deployer.address);
+  //await tos.grantRole(MINTER_ROLE, deployer.address);
 
-  await fld.mint(deployer.address, utils.parseUnits(initialTotal, 18));
-  console.log("fld mint:", fld.address);
+  await tos.mint(deployer.address, utils.parseUnits(initialTotal, 18));
+  console.log("tos mint:", tos.address);
 
   let out = {};
-  out.FLD = fldtoken;
+  out.TOS = tostoken;
 
   out.StakeRegistry = registry;
   out.Stake1Logic = logic;

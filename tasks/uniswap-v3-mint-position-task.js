@@ -91,14 +91,14 @@ task("rinkeby-mint-position-wton-weth", "Mint position on rinkeby").setAction(
   }
 );
 
-task("rinkeby-mint-position-fld-weth", "Mint FLD-WETH position on rinkeby")
+task("rinkeby-mint-position-tos-weth", "Mint TOS-WETH position on rinkeby")
   .addParam("amount0", "amount0 desired")
   .addParam("amount1", "amount1 desired")
   .setAction(async ({ amount0, amount1 }) => {
     const {
       RINKEBY_NONFUNGIBLE_POSITION_MANAGER_ADDRESS: npmAddress,
       RINKEBY_UNISWAP_V3_ACCOUNT: minterAddress,
-      RINKEBY_FLD_ADDRESS: token0,
+      RINKEBY_TOS_ADDRESS: token0,
       RINKEBY_WETH_ADDRESS: token1,
     } = process.env;
 

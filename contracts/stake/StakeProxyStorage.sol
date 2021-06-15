@@ -17,8 +17,8 @@ contract StakeProxyStorage {
     /// @dev stakeVaultFactory
     IStakeVaultFactory public stakeVaultFactory;
 
-    /// @dev FLD address
-    address public fld;
+    /// @dev TOS address
+    address public tos;
 
     /// @dev TON address in Tokamak
     address public ton;

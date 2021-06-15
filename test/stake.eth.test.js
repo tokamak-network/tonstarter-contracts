@@ -38,11 +38,11 @@ const {
   initialTotal,
   Pharse1_TON_Staking,
   Pharse1_ETH_Staking,
-  Pharse1_FLDETHLP_Staking,
+  Pharse1_TOSETHLP_Staking,
   Pharse1_DEV_Mining,
   HASH_Pharse1_TON_Staking,
   HASH_Pharse1_ETH_Staking,
-  HASH_Pharse1_FLDETHLP_Staking,
+  HASH_Pharse1_TOSETHLP_Staking,
   HASH_Pharse1_DEV_Mining
   } = require("../utils/ico_test_deploy.js");
 
@@ -66,10 +66,10 @@ const zeroAddress = "0x0000000000000000000000000000000000000000";
 const logFlag = 0;
 
 describe("StakeSimple : Stake with ETH", function () {
-  let weth, fld, stakeregister, stakefactory, stake1proxy, stake1logic;
+  let weth, tos, stakeregister, stakefactory, stake1proxy, stake1logic;
   let vault_phase1_eth,
     vault_phase1_ton,
-    vault_phase1_fldethlp,
+    vault_phase1_tosethlp,
     vault_phase1_dev;
 
   let stakeEntry;
@@ -119,7 +119,7 @@ describe("StakeSimple : Stake with ETH", function () {
       if (logFlag) console.log('StakeProxy', stakeEntry.address);
 
       const cons = await ico20Contracts.getICOContracts();
-      fld = cons.fld;
+      tos = cons.tos;
       stakeregister = cons.stakeregister;
       stakefactory = cons.stakefactory;
       stake1proxy = cons.stake1proxy;
@@ -159,7 +159,7 @@ describe("StakeSimple : Stake with ETH", function () {
       vault_phase1_eth = await Stake1Vault.at(vaultAddress, {
         from: defaultSender,
       });
-      await fld.mint(
+      await tos.mint(
         vault_phase1_eth.address,
         utils.parseUnits(Pharse1_ETH_Staking, 18),
         { from: defaultSender }
@@ -173,7 +173,7 @@ describe("StakeSimple : Stake with ETH", function () {
         await stakeEntry.createStakeContract(
           toBN("1"),
           vault_phase1_eth.address,
-          fld.address,
+          tos.address,
           zeroAddress,
           toBN(testStakingPeriodBlocks[i] + ""),
           "PHASE1_ETH_" + testStakingPeriodBlocks[i] + "_BLOCKS",
@@ -327,11 +327,11 @@ describe("StakeSimple : Stake with ETH", function () {
               );
 
               if (reward.gt(toBN("0"))) {
-                let fldBalance1 = await fld.balanceOf(testStakingUsers[u]);
+                let tosBalance1 = await tos.balanceOf(testStakingUsers[u]);
                 if (logFlag)
                   console.log(
-                    ` pre claim -> fldBalance1 :  `,
-                    fromWei(fldBalance1.toString(), "ether")
+                    ` pre claim -> tosBalance1 :  `,
+                    fromWei(tosBalance1.toString(), "ether")
                   );
 
                 let tx = await stakeContract.claim({ from: testStakingUsers[u] });
@@ -347,13 +347,13 @@ describe("StakeSimple : Stake with ETH", function () {
                     tx.receipt.logs[0].args.claimBlock.toString()
                   );
 
-                let fldBalance2 = await fld.balanceOf(testStakingUsers[u]);
+                let tosBalance2 = await tos.balanceOf(testStakingUsers[u]);
                 if (logFlag)
                   console.log(
-                    ` after claim -> fldBalance2 :  `,
-                    fromWei(fldBalance2.toString(), "ether")
+                    ` after claim -> tosBalance2 :  `,
+                    fromWei(tosBalance2.toString(), "ether")
                   );
-                await expect(reward.add(fldBalance1)).to.be.bignumber.equal(fldBalance2);
+                await expect(reward.add(tosBalance1)).to.be.bignumber.equal(tosBalance2);
 
                 let rewardClaimedTotal =
                   await stakeContract.rewardClaimedTotal();

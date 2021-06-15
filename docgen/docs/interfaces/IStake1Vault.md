@@ -1,8 +1,8 @@
 # Functions:
 
-- [`initialize(address _fld, address _paytoken, uint256 _cap, uint256 _saleStartBlock, uint256 _stakeStartBlock, address _stakefactory, uint256 _stakeType, address _defiAddr)`](#IStake1Vault-initialize-address-address-uint256-uint256-uint256-address-uint256-address-)
+- [`initialize(address _tos, address _paytoken, uint256 _cap, uint256 _saleStartBlock, uint256 _stakeStartBlock, address _stakefactory, uint256 _stakeType, address _defiAddr)`](#IStake1Vault-initialize-address-address-uint256-uint256-uint256-address-uint256-address-)
 
-- [`setFLD(address _fld)`](#IStake1Vault-setFLD-address-)
+- [`setTOS(address _tos)`](#IStake1Vault-setTOS-address-)
 
 - [`changeCap(uint256 _cap)`](#IStake1Vault-changeCap-uint256-)
 
@@ -18,7 +18,7 @@
 
 - [`infos()`](#IStake1Vault-infos--)
 
-- [`balanceFLDAvailableAmount()`](#IStake1Vault-balanceFLDAvailableAmount--)
+- [`balanceTOSAvailableAmount()`](#IStake1Vault-balanceTOSAvailableAmount--)
 
 - [`totalRewardAmount(address _account)`](#IStake1Vault-totalRewardAmount-address-)
 
@@ -28,7 +28,7 @@
 
 ###### IStake1Vault-initialize-address-address-uint256-uint256-uint256-address-uint256-address-
 
-## Function `initialize(address _fld, address _paytoken, uint256 _cap, uint256 _saleStartBlock, uint256 _stakeStartBlock, address _stakefactory, uint256 _stakeType, address _defiAddr)`
+## Function `initialize(address _tos, address _paytoken, uint256 _cap, uint256 _saleStartBlock, uint256 _stakeStartBlock, address _stakefactory, uint256 _stakeType, address _defiAddr)`
 
 No description
 
@@ -46,15 +46,15 @@ No description
 
 - `_defiAddr`: Used when an external address is required. default: address(0)
 
-###### IStake1Vault-setFLD-address-
+###### IStake1Vault-setTOS-address-
 
-## Function `setFLD(address _fld)`
+## Function `setTOS(address _tos)`
 
-Sets FLD address
+Sets TOS address
 
 ### Parameters:
 
-- `_fld`:  FLD address
+- `_tos`:  TOS address
 
 ###### IStake1Vault-changeCap-uint256-
 
@@ -106,7 +106,7 @@ sender is a staking contract.
 
 A function that pays the amount(_amount) to _to by the staking contract.
 
-A function that _to claim the amount(_amount) from the staking contract and gets the FLD in the vault.
+A function that _to claim the amount(_amount) from the staking contract and gets the TOS in the vault.
 
 ### Parameters:
 
@@ -132,15 +132,15 @@ whether it is available to claim amount, if it is available , return the total r
 
 Give the infomation of this vault
 
-###### IStake1Vault-balanceFLDAvailableAmount--
+###### IStake1Vault-balanceTOSAvailableAmount--
 
-## Function `balanceFLDAvailableAmount()`
+## Function `balanceTOSAvailableAmount()`
 
-Returns Give the FLD balance stored in the vault
+Returns Give the TOS balance stored in the vault
 
 ### Return Values:
 
-- the balance of FLD in this vault.
+- the balance of TOS in this vault.
 
 ###### IStake1Vault-totalRewardAmount-address-
 

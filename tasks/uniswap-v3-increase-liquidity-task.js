@@ -69,7 +69,7 @@ task("rinkeby-increase-liquidity-wton-weth", "Create pool")
     });
   });
 
-task("rinkeby-increase-liquidity-fld-weth", "Create pool")
+task("rinkeby-increase-liquidity-tos-weth", "Create pool")
   .addParam("amount0", "Amount0")
   .addParam("amount1", "Amount1")
   .setAction(async ({ amount0, amount1 }) => {

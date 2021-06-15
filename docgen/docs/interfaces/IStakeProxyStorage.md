@@ -1,6 +1,6 @@
 # Functions:
 
-- [`fld()`](#IStakeProxyStorage-fld--)
+- [`tos()`](#IStakeProxyStorage-tos--)
 
 - [`ton()`](#IStakeProxyStorage-ton--)
 
@@ -10,11 +10,11 @@
 
 - [`seigManager()`](#IStakeProxyStorage-seigManager--)
 
-###### IStakeProxyStorage-fld--
+###### IStakeProxyStorage-tos--
 
-## Function `fld()`
+## Function `tos()`
 
-FLD address
+TOS address
 
 ###### IStakeProxyStorage-ton--
 

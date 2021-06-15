@@ -9,13 +9,13 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 contract StakeVaultStorage is AccessControl {
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
 
-    /// @dev reward token : FLD
-    address public fld;
+    /// @dev reward token : TOS
+    address public tos;
 
     /// @dev paytoken is the token that the user stakes.
     address public paytoken;
 
-    /// @dev allocated amount of fld
+    /// @dev allocated amount of tos
     uint256 public cap;
 
     /// @dev the start block for sale.

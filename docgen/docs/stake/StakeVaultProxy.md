@@ -12,7 +12,7 @@
 
 - [`fallback()`](#StakeVaultProxy-fallback--)
 
-- [`initialize(address _fld, address _paytoken, uint256 _cap, uint256 _saleStartBlock, uint256 _stakeStartBlock, address _stakefactory, uint256 _stakeType, address _defiAddr)`](#StakeVaultProxy-initialize-address-address-uint256-uint256-uint256-address-uint256-address-)
+- [`initialize(address _tos, address _paytoken, uint256 _cap, uint256 _saleStartBlock, uint256 _stakeStartBlock, address _stakefactory, uint256 _stakeType, address _defiAddr)`](#StakeVaultProxy-initialize-address-address-uint256-uint256-uint256-address-uint256-address-)
 
 # Events:
 
@@ -68,7 +68,7 @@ fallback function , execute on undefined function call
 
 ###### StakeVaultProxy-initialize-address-address-uint256-uint256-uint256-address-uint256-address-
 
-## Function `initialize(address _fld, address _paytoken, uint256 _cap, uint256 _saleStartBlock, uint256 _stakeStartBlock, address _stakefactory, uint256 _stakeType, address _defiAddr)`
+## Function `initialize(address _tos, address _paytoken, uint256 _cap, uint256 _saleStartBlock, uint256 _stakeStartBlock, address _stakefactory, uint256 _stakeType, address _defiAddr)`
 
 No description
 

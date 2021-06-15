@@ -3,7 +3,7 @@ pragma solidity ^0.7.6;
 
 interface IStakeSimple {
     /// @dev Initialize
-    /// @param _token  the reward token address , It is FLD address.
+    /// @param _token  the reward token address , It is TOS address.
     /// @param _paytoken  Tokens staked by users, can be used as ERC20 tokens.
     //                     (In case of ETH, input address(0))
     /// @param _vault  the _ault's address

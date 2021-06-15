@@ -36,7 +36,7 @@ const {
 const loadDeployed = require("./load_deployed");
 const loadDeployedInitVariable = require("./load_deployed_init");
 
-const fldAddress = loadDeployed(process.env.NETWORK, "FLD");
+const tosAddress = loadDeployed(process.env.NETWORK, "TOS");
 const wtonAddress = loadDeployed(process.env.NETWORK, "WTON");
 const wethAddress = loadDeployedInitVariable(
   process.env.NETWORK,
@@ -51,7 +51,7 @@ async function main() {
   const [signer] = await ethers.getSigners();
   // const npm = new ethers.Contract(npmAddress, NPM_ABI);
   const stakeTonAddress = "0x77a44BD31F4399B4e367b52f63891E458598F494";
-  const StakeTon =  
+  const StakeTon =
 
   const amountOutMinimum = 10;
 
@@ -92,7 +92,7 @@ async function main() {
   await tx.wait();
   await mintPosition(
     wethAddress,
-    fldAddress,
+    tosAddress,
     toWei("0.01", "ether").toString(),
     toWei(toBN("100000"), "ether").toString()
   );

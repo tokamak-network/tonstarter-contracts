@@ -46,15 +46,15 @@ const PSEIG_RATE = _WTON("0.4");
 const TON_MINIMUM_STAKE_AMOUNT = _TON("1000");
 
 const name = "Fair Launchpad Dao";
-const symbol = "FLD";
+const symbol = "TOS";
 const version = "1";
 
 // ico2.0 contracts
 let StakeFactory,
   StakeRegistry,
-  FLD,
-  SFLD,
-  StakeForSFLD,
+  TOS,
+  STOS,
+  StakeForSTOS,
   Stake1Vault,
   Stake1Logic,
   Stake1Proxy,
@@ -107,9 +107,9 @@ class ICO20Contracts {
     this.committee = null;
     this.committeeProxy = null;
 
-    this.fld = null;
-    this.sfld = null;
-    this.stakeForSFLD = null;
+    this.tos = null;
+    this.stos = null;
+    this.stakeForSTOS = null;
 
     this.stakeVaultFactory = null;
     this.stakeSimpleFactory = null;
@@ -123,7 +123,7 @@ class ICO20Contracts {
     this.stake1logic = null;
     this.vault_phase1_eth = null;
     this.vault_phase1_ton = null;
-    this.vault_phase1_fldethlp = null;
+    this.vault_phase1_tosethlp = null;
     this.vault_phase1_dev = null;
     this.stakeEntry = null;
 
@@ -139,9 +139,9 @@ class ICO20Contracts {
       Agenda: null,
       Candidate: null,
       CommitteeProxy: null,
-      FLD: null,
-      SFLD: null,
-      StakeForSFLD: null,
+      TOS: null,
+      STOS: null,
+      StakeForSTOS: null,
       StakeFactory: null,
       StakeRegistry: null,
       Stake1Logic: null,
@@ -171,16 +171,16 @@ class ICO20Contracts {
 
     // this = self;
     // console.log(' initializeICO20Contracts owner:',owner );
-    this.fld = null;
-    this.sfld = null;
-    //this.stakeForSFLD = null;
+    this.tos = null;
+    this.stos = null;
+    //this.stakeForSTOS = null;
     this.stakeregister = null;
     this.stakefactory = null;
     this.stake1proxy = null;
     this.stake1logic = null;
     this.vault_phase1_eth = null;
     this.vault_phase1_ton = null;
-    this.vault_phase1_fldethlp = null;
+    this.vault_phase1_tosethlp = null;
     this.vault_phase1_dev = null;
 
     this.stakeTONfactory = null;
@@ -200,9 +200,9 @@ class ICO20Contracts {
 
     StakeFactory = await ethers.getContractFactory("StakeFactory");
     StakeRegistry = await ethers.getContractFactory("StakeRegistry");
-    FLD = await ethers.getContractFactory("FLD");
-    SFLD = await ethers.getContractFactory("SFLD");
-    StakeForSFLD = await ethers.getContractFactory("StakeForSFLD");
+    TOS = await ethers.getContractFactory("TOS");
+    STOS = await ethers.getContractFactory("STOS");
+    StakeForSTOS = await ethers.getContractFactory("StakeForSTOS");
     Stake1Vault = await ethers.getContractFactory("Stake1Vault");
     Stake1Logic = await ethers.getContractFactory("Stake1Logic");
     Stake1Proxy = await ethers.getContractFactory("Stake1Proxy");
@@ -213,10 +213,10 @@ class ICO20Contracts {
 
     this.swapProxy = await SwapProxy.connect(owner).deploy();
 
-    this.fld = await FLD.connect(owner).deploy(name, symbol, version);
-    //this.sfld = await SFLD.connect(owner).deploy();
+    this.tos = await TOS.connect(owner).deploy(name, symbol, version);
+    //this.stos = await STOS.connect(owner).deploy();
 
-    this.stakeregister = await StakeRegistry.connect(owner).deploy(this.fld.address);
+    this.stakeregister = await StakeRegistry.connect(owner).deploy(this.tos.address);
 
     this.stake1Vault = await Stake1Vault.new({ from: owner });
     this.stakeVaultFactory = await StakeVaultFactory.connect(owner).deploy(this.stake1Vault.address);
@@ -252,9 +252,9 @@ class ICO20Contracts {
     );
 
     const returnData = {
-      fld: this.fld,
-      sfld: this.sfld,
-      // stakeForSFLD: this.stakeForSFLD,
+      tos: this.tos,
+      stos: this.stos,
+      // stakeForSTOS: this.stakeForSTOS,
       stakeregister: this.stakeregister,
       stakefactory: this.stakefactory,
       stake1logic: this.stake1logic,
@@ -385,9 +385,9 @@ class ICO20Contracts {
 
   getICOContracts = function () {
     return {
-      fld: this.fld,
-      sfld: this.sfld,
-      // stakeFroSFLD: this.stakeFroSFLD,
+      tos: this.tos,
+      stos: this.stos,
+      // stakeFroSTOS: this.stakeFroSTOS,
       stakeregister: this.stakeregister,
       stakefactory: this.stakefactory,
       stake1logic: this.stake1logic,
@@ -405,7 +405,7 @@ class ICO20Contracts {
 
 
     await this.stakeEntry.connect(owner).setStore(
-      this.fld.address,
+      this.tos.address,
       this.stakeregister.address,
       this.stakefactory.address,
       this.stakeVaultFactory.address,

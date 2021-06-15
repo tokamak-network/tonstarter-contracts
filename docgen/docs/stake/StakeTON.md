@@ -16,7 +16,7 @@
 
 - [`Claimed(address to, uint256 amount, uint256 claimBlock)`](#StakeTON-Claimed-address-uint256-uint256-)
 
-- [`Withdrawal(address to, uint256 tonAmount, uint256 fldAmount)`](#StakeTON-Withdrawal-address-uint256-uint256-)
+- [`Withdrawal(address to, uint256 tonAmount, uint256 tosAmount)`](#StakeTON-Withdrawal-address-uint256-uint256-)
 
 ###### StakeTON-constructor--
 
@@ -88,7 +88,7 @@ event on claim
 
 ###### StakeTON-Withdrawal-address-uint256-uint256-
 
-## Event `Withdrawal(address to, uint256 tonAmount, uint256 fldAmount)`
+## Event `Withdrawal(address to, uint256 tonAmount, uint256 tosAmount)`
 
 event on withdrawal
 
@@ -98,4 +98,4 @@ event on withdrawal
 
 - `tonAmount`: the amount of TON withdrawal
 
-- `fldAmount`: the amount of FLD withdrawal
+- `tosAmount`: the amount of TOS withdrawal

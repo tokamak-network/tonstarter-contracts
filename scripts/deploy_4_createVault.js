@@ -18,7 +18,7 @@ require("dotenv").config();
 const zeroAddress = "0x0000000000000000000000000000000000000000";
 const ADMIN_ROLE = keccak256("ADMIN");
 
-const fldtoken = loadDeployed(process.env.NETWORK, "FLD");
+const tostoken = loadDeployed(process.env.NETWORK, "TOS");
 const registry = loadDeployed(process.env.NETWORK, "StakeRegistry");
 const factory = loadDeployed(process.env.NETWORK, "StakeFactory");
 const logic = loadDeployed(process.env.NETWORK, "Stake1Logic");
@@ -57,7 +57,7 @@ async function createValue(tonVault, paytoken) {
 
   const tx = await stakeEntry.createVault(
     paytoken,
-    toWei(tonVault.allocatedFLD, "ether"),
+    toWei(tonVault.allocatedTOS, "ether"),
     tonVault.saleStartBlock,
     tonVault.stakeStartBlock,
     tonVault.phase,
@@ -77,7 +77,7 @@ async function createStakeContract(vaultAddress, periodBlock, name, paytoken) {
     const estimateGas = await stakeEntry.estimateGas.createStakeContract(
       1,
       vaultAddress,
-      fldtoken,
+      tostoken,
       paytoken,
       periodBlock,
       name
@@ -95,7 +95,7 @@ async function createStakeContract(vaultAddress, periodBlock, name, paytoken) {
   const tx = await stakeEntry.createStakeContract(
     1,
     vaultAddress,
-    fldtoken,
+    tostoken,
     paytoken,
     periodBlock,
     name,
@@ -202,7 +202,7 @@ async function main() {
   ]
 
   const ton_vault = {
-    allocatedFLD: "100000",
+    allocatedTOS: "100000",
     saleStartBlock: saleStartBlock,
     stakeStartBlock: stakeStartBlock,
     phase: 1,
@@ -211,7 +211,7 @@ async function main() {
   }
 
   const ether_vault = {
-    allocatedFLD: "100000",
+    allocatedTOS: "100000",
     saleStartBlock: saleStartBlock,
     stakeStartBlock: stakeStartBlock,
     phase: 1,

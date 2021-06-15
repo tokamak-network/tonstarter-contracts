@@ -55,8 +55,8 @@ async function setupContracts(account) {
 
   const TON_MINIMUM_STAKE_AMOUNT = _TON("1000");
 
-  const name = "FLD";
-  const symbol = "FLD";
+  const name = "TOS";
+  const symbol = "TOS";
   const version = "1";
 
   const addresses = await getAddresses();
@@ -78,19 +78,19 @@ async function setupContracts(account) {
 
   const deployer = await findSigner(account);
 
-  const fld = await (await ethers.getContractFactory("FLD"))
+  const tos = await (await ethers.getContractFactory("TOS"))
     .connect(deployer)
     .deploy(name, symbol, version);
-  await fld.deployed();
+  await tos.deployed();
 
-  const sfld = await (await ethers.getContractFactory("SFLD"))
+  const stos = await (await ethers.getContractFactory("STOS"))
     .connect(deployer)
     .deploy();
-  await sfld.deployed();
+  await stos.deployed();
 
   const stakeRegistry = await (await ethers.getContractFactory("StakeRegistry"))
     .connect(deployer)
-    .deploy(fld.address);
+    .deploy(tos.address);
   await stakeRegistry.deployed();
 
   const stakeSimple = await (await ethers.getContractFactory("StakeSimple"))
@@ -303,8 +303,8 @@ async function setupContracts(account) {
     .deploy();
 
   return {
-    fld,
-    sfld,
+    tos,
+    stos,
     stakeRegistry,
     stakeSimple,
     stakeSimpleFactory,
@@ -323,7 +323,7 @@ async function setupContracts(account) {
       await stakeEntry
         .connect(deployer)
         .setStore(
-          fld.address,
+          tos.address,
           stakeRegistry.address,
           stakeFactory.address,
           stakeVaultFactory.address,

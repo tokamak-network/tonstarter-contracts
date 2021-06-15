@@ -3,7 +3,7 @@ pragma solidity ^0.7.6;
 
 interface IStake1Logic {
     /// Set initial variables
-    /// @param _fld  FLD token address
+    /// @param _tos  TOS token address
     /// @param _stakeRegistry the registry address
     /// @param _stakeFactory the StakeFactory address
     /// @param _stakeVaultFactory the StakeVaultFactory address
@@ -12,7 +12,7 @@ interface IStake1Logic {
     /// @param _depositManager DepositManager address in Tokamak
     /// @param _seigManager SeigManager address in Tokamak
     function setStore(
-        address _fld,
+        address _tos,
         address _stakeRegistry,
         address _stakeFactory,
         address _stakeVaultFactory,
@@ -27,7 +27,7 @@ interface IStake1Logic {
     /// @param _cap  allocated reward amount
     /// @param _saleStartBlock  the start block that can stake by user
     /// @param _stakeStartBlock the start block that end staking by user and start that can claim reward by user
-    /// @param _phase  phase of FLD platform
+    /// @param _phase  phase of TOS platform
     /// @param _vaultName  vault's name's hash
     /// @param _stakeType  stakeContract's type, if 0, StakeTON, else if 1 , StakeSimple , else if 2, StakeDefi
     /// @param _defiAddr  extra defi address , default is zero address
@@ -43,7 +43,7 @@ interface IStake1Logic {
     ) external;
 
     /// @dev create stake contract in vault
-    /// @param _phase the phase of FLD platform
+    /// @param _phase the phase of TOS platform
     /// @param _vault  vault's address
     /// @param token  the reward token's address
     /// @param paytoken  the token used for staking by user
@@ -59,7 +59,7 @@ interface IStake1Logic {
     ) external;
 
     /// @dev create stake contract in vault
-    /// @param _phase phase of FLD platform
+    /// @param _phase phase of TOS platform
     /// @param _vaultName vault's name's hash
     /// @param _vault vault's address
     function addVault(
@@ -118,7 +118,7 @@ interface IStake1Logic {
     function tokamakProcessUnStaking(address _stakeContract, address _layer2)
         external;
 
-    /// @dev Swap TON to FLD using uniswap v3
+    /// @dev Swap TON to TOS using uniswap v3
     /// @dev this function used in StakeTON ( stakeType=0 )
     /// @param _stakeContract the stakeContract's address
     /// @param amountIn the input amount
@@ -126,7 +126,7 @@ interface IStake1Logic {
     /// @param deadline deadline
     /// @param sqrtPriceLimitX96 sqrtPriceLimitX96
     /// @param _type the function type, if 0, use exactInputSingle function, else if, use exactInput function
-    function exchangeWTONtoFLD(
+    function exchangeWTONtoTOS(
         address _stakeContract,
         uint256 amountIn,
         uint256 amountOutMinimum,

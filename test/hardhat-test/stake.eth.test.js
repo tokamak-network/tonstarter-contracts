@@ -84,7 +84,7 @@ describe("Stake", function () {
     Vault = await (
       await ethers.getContractFactory("Stake1Vault")
     ).attach(stakeVaultAddress);
-    await setup.fld
+    await setup.tos
       .connect(sender)
       .mint(Vault.address, ethers.utils.parseUnits(Pharse1_ETH_Staking, 18));
   });
@@ -96,7 +96,7 @@ describe("Stake", function () {
       await stakeEntry.connect(sender).createStakeContract(
         "1", // phase number
         Vault.address, // vault address
-        setup.fld.address, // fld address
+        setup.tos.address, // tos address
         zeroAddress, // token address - ether
         period, // staking period
         name // staking name
@@ -142,7 +142,7 @@ describe("Stake", function () {
 
   it("should claim rewards", async function () {
     this.timeout(10000000);
-    const fld = setup.fld;
+    const tos = setup.tos;
 
     for (const { claimBlock } of [{ claimBlock: 10 }, { claimBlock: 60 }]) {
       let block = stakeStartBlock + claimBlock;
@@ -162,14 +162,14 @@ describe("Stake", function () {
           );
           console.log({ reward: reward.toString() });
 
-          const fldBalance = await fld.balanceOf(userAddress);
+          const tosBalance = await tos.balanceOf(userAddress);
           await stakeContract.connect(await findSigner(userAddress)).claim();
           block++;
-          console.log({ fldBalance: fldBalance.toString() });
+          console.log({ tosBalance: tosBalance.toString() });
 
-          const newFldBalance = await fld.balanceOf(userAddress);
-          await expect(newFldBalance).to.be.above(fldBalance);
-          console.log({ newFldBalance: newFldBalance.toString() });
+          const newTosBalance = await tos.balanceOf(userAddress);
+          await expect(newTosBalance).to.be.above(tosBalance);
+          console.log({ newTosBalance: newTosBalance.toString() });
 
           const rewardClaimedTotal = await stakeContract.rewardClaimedTotal();
           console.log(fromWei(rewardClaimedTotal.toString(), "ether"));

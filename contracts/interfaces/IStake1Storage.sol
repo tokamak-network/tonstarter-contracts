@@ -2,7 +2,7 @@
 pragma solidity ^0.7.6;
 
 interface IStake1Storage {
-    /// @dev reward token : FLD
+    /// @dev reward token : TOS
     function token() external view returns (address);
 
     /// @dev registry
@@ -11,7 +11,7 @@ interface IStake1Storage {
     /// @dev paytoken is the token that the user stakes. ( if paytoken is ether, paytoken is address(0) )
     function paytoken() external view returns (address);
 
-    /// @dev A vault that holds fld rewards.
+    /// @dev A vault that holds tos rewards.
     function vault() external view returns (address);
 
     /// @dev the start block for sale.
@@ -42,7 +42,7 @@ interface IStake1Storage {
             uint256 claimedAmount,
             uint256 releasedBlock,
             uint256 releasedAmount,
-            uint256 releasedFLDAmount,
+            uint256 releasedTOSAmount,
             bool released
         );
 }

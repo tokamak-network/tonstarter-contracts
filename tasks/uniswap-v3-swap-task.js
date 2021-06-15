@@ -71,53 +71,53 @@ task("rinkeby-swap-task-weth-wton", "Create pool")
     });
   });
 
-task("rinkeby-swap-task-fld-weth", "Create pool")
+task("rinkeby-swap-task-tos-weth", "Create pool")
   .addParam("amount", " ")
   .setAction(async ({ amount }) => {
     const {
       RINKEBY_SWAP_ROUTER_ADDRESS: routerAddress,
       RINKEBY_UNISWAP_V3_ACCOUNT: account,
-      RINKEBY_FLD_ADDRESS: fld,
+      RINKEBY_TOS_ADDRESS: tos,
       RINKEBY_WETH_ADDRESS: weth,
     } = process.env;
 
     await run("swap-task", {
       routerAddress,
       account,
-      path: encodePath([fld, weth], [FeeAmount.LOW]),
+      path: encodePath([tos, weth], [FeeAmount.LOW]),
       amount,
       amountOutMinimum: "0",
       deadline: "1000000000000",
     });
   });
 
-task("rinkeby-swap-task-weth-fld", "Create pool")
+task("rinkeby-swap-task-weth-tos", "Create pool")
   .addParam("amount", " ")
   .setAction(async ({ amount }) => {
     const {
       RINKEBY_SWAP_ROUTER_ADDRESS: routerAddress,
       RINKEBY_UNISWAP_V3_ACCOUNT2: account,
-      RINKEBY_FLD_ADDRESS: fld,
+      RINKEBY_TOS_ADDRESS: tos,
       RINKEBY_WETH_ADDRESS: weth,
     } = process.env;
 
     await run("swap-task", {
       routerAddress,
       account,
-      path: encodePath([weth, fld], [FeeAmount.LOW]),
+      path: encodePath([weth, tos], [FeeAmount.LOW]),
       amountIn: amount,
       amountOutMinimum: "0",
       deadline: "1000000000000",
     });
   });
 
-task("rinkeby-swap-task-fld-wton", "Create pool")
+task("rinkeby-swap-task-tos-wton", "Create pool")
   .addParam("amount", " ")
   .setAction(async ({ amount }) => {
     const {
       RINKEBY_SWAP_ROUTER_ADDRESS: routerAddress,
       RINKEBY_UNISWAP_V3_ACCOUNT2: account,
-      RINKEBY_FLD_ADDRESS: fld,
+      RINKEBY_TOS_ADDRESS: tos,
       RINKEBY_WTON_ADDRESS: wton,
       RINKEBY_WETH_ADDRESS: weth,
     } = process.env;
@@ -125,7 +125,7 @@ task("rinkeby-swap-task-fld-wton", "Create pool")
     await run("swap-task", {
       routerAddress,
       account,
-      path: encodePath([fld, weth, wton], [FeeAmount.LOW, FeeAmount.LOW]),
+      path: encodePath([tos, weth, wton], [FeeAmount.LOW, FeeAmount.LOW]),
       amountIn: amount,
       tokenOut: wton,
       amountOutMinimum: "0",

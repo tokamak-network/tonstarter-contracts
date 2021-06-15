@@ -20,9 +20,9 @@
 
 - [`tokamakProcessUnStaking(address _layer2)`](#TokamakStaker-tokamakProcessUnStaking-address-)
 
-- [`exchangeWTONtoFLD(uint256 _amountIn, uint256 _amountOutMinimum, uint256 _deadline, uint160 _sqrtPriceLimitX96, uint256 _kind)`](#TokamakStaker-exchangeWTONtoFLD-uint256-uint256-uint256-uint160-uint256-)
+- [`exchangeWTONtoTOS(uint256 _amountIn, uint256 _amountOutMinimum, uint256 _deadline, uint160 _sqrtPriceLimitX96, uint256 _kind)`](#TokamakStaker-exchangeWTONtoTOS-uint256-uint256-uint256-uint160-uint256-)
 
-- [`exchangeWTONtoFLDv2(uint256 _amountIn, uint256 _amountOutMinimum, uint256 _deadline, uint256 _kind)`](#TokamakStaker-exchangeWTONtoFLDv2-uint256-uint256-uint256-uint256-)
+- [`exchangeWTONtoTOSv2(uint256 _amountIn, uint256 _amountOutMinimum, uint256 _deadline, uint256 _kind)`](#TokamakStaker-exchangeWTONtoTOSv2-uint256-uint256-uint256-uint256-)
 
 # Events:
 
@@ -38,9 +38,9 @@
 
 - [`tokamakRequestedUnStakingAll(address layer2)`](#TokamakStaker-tokamakRequestedUnStakingAll-address-)
 
-- [`exchangedWTONtoFLD(address caller, uint256 amountIn, uint256 amountOut)`](#TokamakStaker-exchangedWTONtoFLD-address-uint256-uint256-)
+- [`exchangedWTONtoTOS(address caller, uint256 amountIn, uint256 amountOut)`](#TokamakStaker-exchangedWTONtoTOS-address-uint256-uint256-)
 
-- [`exchangedWTONtoFLD2(address caller, uint256 amountIn, uint256 amountOut)`](#TokamakStaker-exchangedWTONtoFLD2-address-uint256-uint256-)
+- [`exchangedWTONtoTOS2(address caller, uint256 amountIn, uint256 amountOut)`](#TokamakStaker-exchangedWTONtoTOS2-address-uint256-uint256-)
 
 ###### TokamakStaker-transferOwnership-address-
 
@@ -150,11 +150,11 @@ process unstaking in layer2 in tokamak
 
 - `_layer2`: the layer2 address in tokamak
 
-###### TokamakStaker-exchangeWTONtoFLD-uint256-uint256-uint256-uint160-uint256-
+###### TokamakStaker-exchangeWTONtoTOS-uint256-uint256-uint256-uint160-uint256-
 
-## Function `exchangeWTONtoFLD(uint256 _amountIn, uint256 _amountOutMinimum, uint256 _deadline, uint160 _sqrtPriceLimitX96, uint256 _kind)`
+## Function `exchangeWTONtoTOS(uint256 _amountIn, uint256 _amountOutMinimum, uint256 _deadline, uint160 _sqrtPriceLimitX96, uint256 _kind)`
 
-exchange holded WTON to FLD using uniswap
+exchange holded WTON to TOS using uniswap
 
 @notice
 
@@ -174,11 +174,11 @@ exchange holded WTON to FLD using uniswap
 
 - amountOut the amount of exchanged out token
 
-###### TokamakStaker-exchangeWTONtoFLDv2-uint256-uint256-uint256-uint256-
+###### TokamakStaker-exchangeWTONtoTOSv2-uint256-uint256-uint256-uint256-
 
-## Function `exchangeWTONtoFLDv2(uint256 _amountIn, uint256 _amountOutMinimum, uint256 _deadline, uint256 _kind)`
+## Function `exchangeWTONtoTOSv2(uint256 _amountIn, uint256 _amountOutMinimum, uint256 _deadline, uint256 _kind)`
 
-exchange holded WTON to FLD using uniswap-v2
+exchange holded WTON to TOS using uniswap-v2
 
 ### Parameters:
 
@@ -258,11 +258,11 @@ event on request unstaking the amount of all in layer2 in tokamak
 
 - `layer2`: the layer2 address in tokamak
 
-###### TokamakStaker-exchangedWTONtoFLD-address-uint256-uint256-
+###### TokamakStaker-exchangedWTONtoTOS-address-uint256-uint256-
 
-## Event `exchangedWTONtoFLD(address caller, uint256 amountIn, uint256 amountOut)`
+## Event `exchangedWTONtoTOS(address caller, uint256 amountIn, uint256 amountOut)`
 
-exchange WTON to FLD using uniswap v3
+exchange WTON to TOS using uniswap v3
 
 ### Parameters:
 
@@ -270,11 +270,11 @@ exchange WTON to FLD using uniswap v3
 
 - `amountIn`: the input amount
 
-###### TokamakStaker-exchangedWTONtoFLD2-address-uint256-uint256-
+###### TokamakStaker-exchangedWTONtoTOS2-address-uint256-uint256-
 
-## Event `exchangedWTONtoFLD2(address caller, uint256 amountIn, uint256 amountOut)`
+## Event `exchangedWTONtoTOS2(address caller, uint256 amountIn, uint256 amountOut)`
 
-exchange WTON to FLD using uniswap v2
+exchange WTON to TOS using uniswap v2
 
 ### Parameters:
 

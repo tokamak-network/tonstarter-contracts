@@ -34,11 +34,11 @@ library LibTokenStake1 {
         uint256 claimedAmount;
         uint256 releasedBlock;
         uint256 releasedAmount;
-        uint256 releasedFLDAmount;
+        uint256 releasedTOSAmount;
         bool released;
     }
 
-    struct StakedAmountForSFLD {
+    struct StakedAmountForSTOS {
         uint256 amount;
         uint256 startBlock;
         uint256 periodBlock;

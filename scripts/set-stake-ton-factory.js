@@ -3,7 +3,7 @@ const { findAccount } = require("../tasks/utils");
 
 require("dotenv").config();
 
-let fldtoken = loadDeployed(process.env.NETWORK,"FLD");
+let tostoken = loadDeployed(process.env.NETWORK,"TOS");
 let registry = loadDeployed(process.env.NETWORK,"StakeRegistry");
 let factory = loadDeployed(process.env.NETWORK,"StakeFactory");
 let vaultfactory = loadDeployed(process.env.NETWORK,"StakeVaultFactory");

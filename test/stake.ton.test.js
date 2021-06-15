@@ -37,11 +37,11 @@ const {
   initialTotal,
   Pharse1_TON_Staking,
   Pharse1_ETH_Staking,
-  Pharse1_FLDETHLP_Staking,
+  Pharse1_TOSETHLP_Staking,
   Pharse1_DEV_Mining,
   HASH_Pharse1_TON_Staking,
   HASH_Pharse1_ETH_Staking,
-  HASH_Pharse1_FLDETHLP_Staking,
+  HASH_Pharse1_TOSETHLP_Staking,
   HASH_Pharse1_DEV_Mining
   } = require("../utils/ico_test_deploy.js");
 
@@ -63,10 +63,10 @@ const zeroAddress = "0x0000000000000000000000000000000000000000";
 let logFlag = false;
 
 describe("StakeTON: Stake with TON", function () {
-  let weth, fld, stakeregister, stakefactory, stake1proxy, stake1logic;
+  let weth, tos, stakeregister, stakefactory, stake1proxy, stake1logic;
   let vault_phase1_eth,
     vault_phase1_ton,
-    vault_phase1_fldethlp,
+    vault_phase1_tosethlp,
     vault_phase1_dev;
   let ton, wton, depositManager, seigManager;
   let stakeEntry, layer2;
@@ -138,7 +138,7 @@ let stakeContractTokamak = [];
       if (logFlag) console.log("StakeProxy", stakeEntry.address);
 
       const cons = await ico20Contracts.getICOContracts();
-      fld = cons.fld;
+      tos = cons.tos;
       stakeregister = cons.stakeregister;
       stakefactory = cons.stakefactory;
       stake1proxy = cons.stake1proxy;
@@ -176,7 +176,7 @@ let stakeContractTokamak = [];
       vault_phase1_ton = await Stake1Vault.at(vaultAddress, {
         from: defaultSender,
       });
-      await fld.mint(
+      await tos.mint(
         vault_phase1_ton.address,
         utils.parseUnits(Pharse1_TON_Staking, 18),
         { from: defaultSender }
@@ -188,7 +188,7 @@ let stakeContractTokamak = [];
         await stakeEntry.createStakeContract(
           toBN("1"),
           vault_phase1_ton.address,
-          fld.address,
+          tos.address,
           ton.address,
           toBN(testStakingPeriodBlocks[i] + ""),
           "PHASE1_ETH_" + testStakingPeriodBlocks[i] + "_BLOCKS",
@@ -448,11 +448,11 @@ let stakeContractTokamak = [];
                 testStakingUsers[u], testBlcok
               );
               if (reward.gt(toBN("0"))) {
-                let fldBalance1 = await fld.balanceOf(testStakingUsers[u]);
+                let tosBalance1 = await tos.balanceOf(testStakingUsers[u]);
                 if (logFlag)
                   console.log(
-                    ` pre claim -> fldBalance1 :  `,
-                    fromWei(fldBalance1.toString(), "ether")
+                    ` pre claim -> tosBalance1 :  `,
+                    fromWei(tosBalance1.toString(), "ether")
                   );
 
                 let tx = await stakeContract.claim({ from: testStakingUsers[u] });
@@ -468,16 +468,16 @@ let stakeContractTokamak = [];
                     tx.receipt.logs[0].args.claimBlock.toString()
                   );
 
-                let fldBalance2 = await fld.balanceOf(testStakingUsers[u]);
-                await expect(reward.add(fldBalance1)).to.be.bignumber.equal(fldBalance2);
+                let tosBalance2 = await tos.balanceOf(testStakingUsers[u]);
+                await expect(reward.add(tosBalance1)).to.be.bignumber.equal(tosBalance2);
 
                 if (logFlag)
                   console.log(
-                    ` after claim -> fldBalance2 :  `,
-                    fromWei(fldBalance2.toString(), "ether")
+                    ` after claim -> tosBalance2 :  `,
+                    fromWei(tosBalance2.toString(), "ether")
                   );
 
-                //await expect(fldBalance2).to.be.bignumber.above(fldBalance1);
+                //await expect(tosBalance2).to.be.bignumber.above(tosBalance1);
 
                 let rewardClaimedTotal =
                   await stakeContract.rewardClaimedTotal();
@@ -694,11 +694,11 @@ let stakeContractTokamak = [];
               );
 
               if (reward.gt(toBN("0"))) {
-                let fldBalance1 = await fld.balanceOf(testStakingUsers[u]);
+                let tosBalance1 = await tos.balanceOf(testStakingUsers[u]);
                 if (logFlag)
                   console.log(
-                    ` pre claim -> fldBalance1 :  `,
-                    fromWei(fldBalance1.toString(), "ether")
+                    ` pre claim -> tosBalance1 :  `,
+                    fromWei(tosBalance1.toString(), "ether")
                   );
 
                 let tx = await stakeContract.claim({ from: testStakingUsers[u] });
@@ -714,14 +714,14 @@ let stakeContractTokamak = [];
                     tx.receipt.logs[0].args.claimBlock.toString()
                   );
 
-                let fldBalance2 = await fld.balanceOf(testStakingUsers[u]);
-                await expect(reward.add(fldBalance1)).to.be.bignumber.equal(fldBalance2);
+                let tosBalance2 = await tos.balanceOf(testStakingUsers[u]);
+                await expect(reward.add(tosBalance1)).to.be.bignumber.equal(tosBalance2);
 
 
                 if (logFlag)
                   console.log(
-                    ` after claim -> fldBalance2 :  `,
-                    fromWei(fldBalance2.toString(), "ether")
+                    ` after claim -> tosBalance2 :  `,
+                    fromWei(tosBalance2.toString(), "ether")
                   );
 
                 let rewardClaimedTotal =

@@ -16,7 +16,7 @@ const {
 require("dotenv").config();
 
 const ADMIN_ROLE = keccak256("ADMIN");
-let fldtoken = loadDeployed(process.env.NETWORK,"FLD");
+let tostoken = loadDeployed(process.env.NETWORK,"TOS");
 let registry = loadDeployed(process.env.NETWORK,"StakeRegistry");
 let factory = loadDeployed(process.env.NETWORK,"StakeFactory");
 let logic = loadDeployed(process.env.NETWORK,"Stake1Logic");

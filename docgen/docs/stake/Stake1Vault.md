@@ -4,9 +4,9 @@
 
 - [`receive()`](#Stake1Vault-receive--)
 
-- [`initialize(address _fld, address _paytoken, uint256 _cap, uint256 _saleStartBlock, uint256 _stakeStartBlock, address _stakefactory, uint256 _stakeType, address _defiAddr)`](#Stake1Vault-initialize-address-address-uint256-uint256-uint256-address-uint256-address-)
+- [`initialize(address _tos, address _paytoken, uint256 _cap, uint256 _saleStartBlock, uint256 _stakeStartBlock, address _stakefactory, uint256 _stakeType, address _defiAddr)`](#Stake1Vault-initialize-address-address-uint256-uint256-uint256-address-uint256-address-)
 
-- [`setFLD(address _fld)`](#Stake1Vault-setFLD-address-)
+- [`setTOS(address _tos)`](#Stake1Vault-setTOS-address-)
 
 - [`changeCap(uint256 _cap)`](#Stake1Vault-changeCap-uint256-)
 
@@ -20,7 +20,7 @@
 
 - [`canClaim(address _to, uint256 _amount)`](#Stake1Vault-canClaim-address-uint256-)
 
-- [`balanceFLDAvailableAmount()`](#Stake1Vault-balanceFLDAvailableAmount--)
+- [`balanceTOSAvailableAmount()`](#Stake1Vault-balanceTOSAvailableAmount--)
 
 - [`stakeAddressesAll()`](#Stake1Vault-stakeAddressesAll--)
 
@@ -50,7 +50,7 @@ receive function
 
 ###### Stake1Vault-initialize-address-address-uint256-uint256-uint256-address-uint256-address-
 
-## Function `initialize(address _fld, address _paytoken, uint256 _cap, uint256 _saleStartBlock, uint256 _stakeStartBlock, address _stakefactory, uint256 _stakeType, address _defiAddr)`
+## Function `initialize(address _tos, address _paytoken, uint256 _cap, uint256 _saleStartBlock, uint256 _stakeStartBlock, address _stakefactory, uint256 _stakeType, address _defiAddr)`
 
 No description
 
@@ -68,15 +68,15 @@ No description
 
 - `_defiAddr`: Used when an external address is required. default: address(0)
 
-###### Stake1Vault-setFLD-address-
+###### Stake1Vault-setTOS-address-
 
-## Function `setFLD(address _fld)`
+## Function `setTOS(address _tos)`
 
-Sets FLD address
+Sets TOS address
 
 ### Parameters:
 
-- `_fld`:  FLD address
+- `_tos`:  TOS address
 
 ###### Stake1Vault-changeCap-uint256-
 
@@ -128,7 +128,7 @@ sender is a staking contract.
 
 A function that pays the amount(_amount) to _to by the staking contract.
 
-A function that _to claim the amount(_amount) from the staking contract and gets the FLD in the vault.
+A function that _to claim the amount(_amount) from the staking contract and gets the TOS in the vault.
 
 ### Parameters:
 
@@ -148,15 +148,15 @@ whether it is available to claim amount, if it is available , return the total r
 
 - `_amount`: the total reward amount of stakeContract
 
-###### Stake1Vault-balanceFLDAvailableAmount--
+###### Stake1Vault-balanceTOSAvailableAmount--
 
-## Function `balanceFLDAvailableAmount()`
+## Function `balanceTOSAvailableAmount()`
 
-Returns Give the FLD balance stored in the vault
+Returns Give the TOS balance stored in the vault
 
 ### Return Values:
 
-- the balance of FLD in this vault.
+- the balance of TOS in this vault.
 
 ###### Stake1Vault-stakeAddressesAll--
 

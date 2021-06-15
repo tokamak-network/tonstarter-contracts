@@ -1,6 +1,6 @@
 # Functions:
 
-- [`fld()`](#IStakeVaultStorage-fld--)
+- [`tos()`](#IStakeVaultStorage-tos--)
 
 - [`paytoken()`](#IStakeVaultStorage-paytoken--)
 
@@ -24,11 +24,11 @@
 
 - [`stakeEndBlockTotal(uint256 endblock)`](#IStakeVaultStorage-stakeEndBlockTotal-uint256-)
 
-###### IStakeVaultStorage-fld--
+###### IStakeVaultStorage-tos--
 
-## Function `fld()`
+## Function `tos()`
 
-reward token : FLD
+reward token : TOS
 
 ###### IStakeVaultStorage-paytoken--
 
@@ -40,7 +40,7 @@ paytoken is the token that the user stakes.
 
 ## Function `cap()`
 
-allocated amount of fld
+allocated amount of tos
 
 ###### IStakeVaultStorage-stakeType--
 

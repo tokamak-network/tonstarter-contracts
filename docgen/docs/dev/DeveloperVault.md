@@ -2,7 +2,7 @@
 
 - [`constructor(address admin)`](#DeveloperVault-constructor-address-)
 
-- [`initialize(address _fld, uint256 _cap, uint256 _rewardPeriod, uint256 _startRewardBlock, uint256 _claimsNumberMax, address[] _developers, uint256[] _claimAmounts)`](#DeveloperVault-initialize-address-uint256-uint256-uint256-uint256-address---uint256---)
+- [`initialize(address _tos, uint256 _cap, uint256 _rewardPeriod, uint256 _startRewardBlock, uint256 _claimsNumberMax, address[] _developers, uint256[] _claimAmounts)`](#DeveloperVault-initialize-address-uint256-uint256-uint256-uint256-address---uint256---)
 
 - [`claimReward()`](#DeveloperVault-claimReward--)
 
@@ -20,15 +20,15 @@ constructor of DeveloperVault
 
 ###### DeveloperVault-initialize-address-uint256-uint256-uint256-uint256-address---uint256---
 
-## Function `initialize(address _fld, uint256 _cap, uint256 _rewardPeriod, uint256 _startRewardBlock, uint256 _claimsNumberMax, address[] _developers, uint256[] _claimAmounts)`
+## Function `initialize(address _tos, uint256 _cap, uint256 _rewardPeriod, uint256 _startRewardBlock, uint256 _claimsNumberMax, address[] _developers, uint256[] _claimAmounts)`
 
 set initial storage
 
 ### Parameters:
 
-- `_fld`: the FLD address
+- `_tos`: the TOS address
 
-- `_cap`: the allocated FLD amount to devs
+- `_cap`: the allocated TOS amount to devs
 
 - `_rewardPeriod`: given only once per _rewardPeriod.
 
@@ -44,7 +44,7 @@ set initial storage
 
 ## Function `claimReward()`
 
-Developers can receive their FLDs
+Developers can receive their TOSs
 
 ###### DeveloperVault-currentRewardBlock--
 

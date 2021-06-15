@@ -8,9 +8,9 @@
 
 - [`tokamakProcessUnStaking(address _layer2)`](#IStakeTONTokamak-tokamakProcessUnStaking-address-)
 
-- [`exchangeWTONtoFLD(uint256 _amountIn, uint256 _amountOutMinimum, uint256 _deadline, uint160 sqrtPriceLimitX96, uint256 _kind)`](#IStakeTONTokamak-exchangeWTONtoFLD-uint256-uint256-uint256-uint160-uint256-)
+- [`exchangeWTONtoTOS(uint256 _amountIn, uint256 _amountOutMinimum, uint256 _deadline, uint160 sqrtPriceLimitX96, uint256 _kind)`](#IStakeTONTokamak-exchangeWTONtoTOS-uint256-uint256-uint256-uint160-uint256-)
 
-- [`exchangeWTONtoFLDv2(uint256 _amountIn, uint256 _amountOutMinimum, uint256 _deadline, uint256 _kind)`](#IStakeTONTokamak-exchangeWTONtoFLDv2-uint256-uint256-uint256-uint256-)
+- [`exchangeWTONtoTOSv2(uint256 _amountIn, uint256 _amountOutMinimum, uint256 _deadline, uint256 _kind)`](#IStakeTONTokamak-exchangeWTONtoTOSv2-uint256-uint256-uint256-uint256-)
 
 ###### IStakeTONTokamak-tokamakStaking-address-uint256-
 
@@ -56,11 +56,11 @@ process unstaking in layer2 in tokamak
 
 - `_layer2`: the layer2 address in tokamak
 
-###### IStakeTONTokamak-exchangeWTONtoFLD-uint256-uint256-uint256-uint160-uint256-
+###### IStakeTONTokamak-exchangeWTONtoTOS-uint256-uint256-uint256-uint160-uint256-
 
-## Function `exchangeWTONtoFLD(uint256 _amountIn, uint256 _amountOutMinimum, uint256 _deadline, uint160 sqrtPriceLimitX96, uint256 _kind)`
+## Function `exchangeWTONtoTOS(uint256 _amountIn, uint256 _amountOutMinimum, uint256 _deadline, uint160 sqrtPriceLimitX96, uint256 _kind)`
 
-exchange holded WTON to FLD using uniswap
+exchange holded WTON to TOS using uniswap
 
 ### Parameters:
 
@@ -78,11 +78,11 @@ exchange holded WTON to FLD using uniswap
 
 - amountOut the amount of exchanged out token
 
-###### IStakeTONTokamak-exchangeWTONtoFLDv2-uint256-uint256-uint256-uint256-
+###### IStakeTONTokamak-exchangeWTONtoTOSv2-uint256-uint256-uint256-uint256-
 
-## Function `exchangeWTONtoFLDv2(uint256 _amountIn, uint256 _amountOutMinimum, uint256 _deadline, uint256 _kind)`
+## Function `exchangeWTONtoTOSv2(uint256 _amountIn, uint256 _amountOutMinimum, uint256 _deadline, uint256 _kind)`
 
-exchange holded WTON to FLD using uniswap
+exchange holded WTON to TOS using uniswap
 
 ### Parameters:
 

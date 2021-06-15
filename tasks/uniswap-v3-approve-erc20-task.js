@@ -58,13 +58,13 @@ task("rinkeby-approve-wton", "Approves amount to WTON")
     });
   });
 
-task("rinkeby-approve-fld", "Approves amount to FLD")
+task("rinkeby-approve-tos", "Approves amount to TOS")
   .addParam("amount", "Amount")
   .setAction(async ({ amount }) => {
     const {
       RINKEBY_UNISWAP_V3_ACCOUNT: account,
       RINKEBY_NONFUNGIBLE_POSITION_MANAGER_ADDRESS: npmAddress,
-      RINKEBY_FLD_ADDRESS: tokenAddress,
+      RINKEBY_TOS_ADDRESS: tokenAddress,
     } = process.env;
     await run("approve-erc20", {
       account,

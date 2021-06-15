@@ -30,7 +30,7 @@ contract StakeVaultFactory is IStakeVaultFactory {
         uint256[4] calldata _intInfo,
         address owner
     ) external override returns (address) {
-        address _fld = _addr[0];
+        address _tos = _addr[0];
         address _paytoken = _addr[1];
         address _stakefactory = _addr[2];
         address _defiAddr = _addr[3];
@@ -43,7 +43,7 @@ contract StakeVaultFactory is IStakeVaultFactory {
         require(address(proxy) != address(0), "StakeVaultFactory: proxy zero");
 
         proxy.initialize(
-            _fld,
+            _tos,
             _paytoken,
             _cap,
             _saleStartBlock,

@@ -3,7 +3,7 @@ const { time, expectEvent } = require('@openzeppelin/test-helpers');
 
 describe("DAO", function () {
   let deployer, user1, user2, user3;
-  let SFLD;
+  let STOS;
   let DAOEntry;
   let DAORecipient;
 
@@ -11,27 +11,27 @@ describe("DAO", function () {
   before(async function () {
     [deployer, user1, user2, user3, user4] = await ethers.getSigners();
 
-    const SFLDContract = await ethers.getContractFactory("SFLD");
-    SFLD = await SFLDContract.connect(deployer).deploy();
-    await SFLD.deployed();
+    const STOSContract = await ethers.getContractFactory("STOS");
+    STOS = await STOSContract.connect(deployer).deploy();
+    await STOS.deployed();
 
 
 
     const DAOContract = await ethers.getContractFactory("DAO");
     const DAO = await DAOContract.connect(deployer).deploy();
     await DAO.deployed();
-    await SFLD.connect(deployer).mint(DAO.address, "10000000");
-  
+    await STOS.connect(deployer).mint(DAO.address, "10000000");
+
     const DAOProxyContract = await ethers.getContractFactory("DAOProxy");
-    const DAOProxy = await DAOProxyContract.connect(deployer).deploy(SFLD.address);
+    const DAOProxy = await DAOProxyContract.connect(deployer).deploy(STOS.address);
     await DAOProxy.deployed();
     DAOProxy.upgradeTo(DAO.address);
-  
+
     DAOEntry = await DAOContract.attach(DAOProxy.address);
 
     const DAORecipientContract = await ethers.getContractFactory("DAORecipientExample");
     DAORecipient = await DAORecipientContract.connect(deployer).deploy(DAOProxy.address);
-    await DAORecipient.deployed();    
+    await DAORecipient.deployed();
   });
 
   it("should create new agenda", async function () {

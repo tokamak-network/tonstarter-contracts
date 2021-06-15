@@ -1,6 +1,6 @@
 # Functions:
 
-- [`constructor(address _fld)`](#StakeRegistry-constructor-address-)
+- [`constructor(address _tos)`](#StakeRegistry-constructor-address-)
 
 - [`transferOwnership(address newOwner)`](#StakeRegistry-transferOwnership-address-)
 
@@ -34,13 +34,13 @@
 
 ###### StakeRegistry-constructor-address-
 
-## Function `constructor(address _fld)`
+## Function `constructor(address _tos)`
 
 constructor of StakeRegistry
 
 ### Parameters:
 
-- `_fld`: FLD address
+- `_tos`: TOS address
 
 ###### StakeRegistry-transferOwnership-address-
 
@@ -182,7 +182,7 @@ event on add the vault
 
 - `vault`: the vault address
 
-- `phase`: the phase of FLD platform
+- `phase`: the phase of TOS platform
 
 ###### StakeRegistry-AddedStakeContract-address-address-
 

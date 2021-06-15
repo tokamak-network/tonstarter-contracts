@@ -10,7 +10,7 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 import "../stake/Stake1Storage.sol";
 
 /// @title Simple Stake Contract
-/// @notice Stake contracts can interact with the vault to claim fld tokens
+/// @notice Stake contracts can interact with the vault to claim tos tokens
 contract StakeSimple is Stake1Storage, AccessControl, IStakeSimple {
     using SafeMath for uint256;
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
@@ -63,7 +63,7 @@ contract StakeSimple is Stake1Storage, AccessControl, IStakeSimple {
     }
 
     /// @dev Initialize
-    /// @param _token  the reward token address , It is FLD address.
+    /// @param _token  the reward token address , It is TOS address.
     /// @param _paytoken  Tokens staked by users, can be used as ERC20 tokens.
     //                     (In case of ETH, input address(0))
     /// @param _vault  the _ault's address

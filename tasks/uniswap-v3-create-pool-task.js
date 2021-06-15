@@ -47,11 +47,11 @@ task("rinkeby-create-pool-wton-weth", "Create pool").setAction(async () => {
   });
 });
 
-task("rinkeby-create-pool-fld-weth", "Create pool").setAction(async () => {
+task("rinkeby-create-pool-tos-weth", "Create pool").setAction(async () => {
   const {
     RINKEBY_NONFUNGIBLE_POSITION_MANAGER_ADDRESS: npmAddress,
     RINKEBY_UNISWAP_V3_ACCOUNT: creatorAddress,
-    RINKEBY_FLD_ADDRESS: token0,
+    RINKEBY_TOS_ADDRESS: token0,
     RINKEBY_WETH_ADDRESS: token1,
   } = process.env;
 

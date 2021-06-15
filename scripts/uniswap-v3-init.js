@@ -36,7 +36,7 @@ const {
 const loadDeployed = require("./load_deployed");
 const loadDeployedInitVariable = require("./load_deployed_init");
 
-const fldAddress = loadDeployed(process.env.NETWORK, "FLD");
+const tosAddress = loadDeployed(process.env.NETWORK, "TOS");
 const wtonAddress = loadDeployed(process.env.NETWORK, "WTON");
 const wethAddress = loadDeployedInitVariable(
   process.env.NETWORK,
@@ -108,12 +108,12 @@ async function mintPosition(token0, token1, amount0, amount1) {
 }
 
 async function main() {
-  await createPool(wethAddress, fldAddress);
+  await createPool(wethAddress, tosAddress);
   await createPool(wtonAddress, wethAddress);
 
   await mintPosition(
     wethAddress,
-    fldAddress,
+    tosAddress,
     toWei("0.01", "ether").toString(),
     toWei(toBN("100000"), "ether").toString()
   );

@@ -1,20 +1,20 @@
 # Functions:
 
-- [`mint(address to, uint256 amount)`](#IFLD-mint-address-uint256-)
+- [`mint(address to, uint256 amount)`](#ITOS-mint-address-uint256-)
 
-- [`burn(address from, uint256 amount)`](#IFLD-burn-address-uint256-)
+- [`burn(address from, uint256 amount)`](#ITOS-burn-address-uint256-)
 
-- [`DOMAIN_SEPARATOR()`](#IFLD-DOMAIN_SEPARATOR--)
+- [`DOMAIN_SEPARATOR()`](#ITOS-DOMAIN_SEPARATOR--)
 
-- [`nonces(address owner)`](#IFLD-nonces-address-)
+- [`nonces(address owner)`](#ITOS-nonces-address-)
 
-- [`permit(address owner, address spender, uint256 value, uint256 deadline, uint8 v, bytes32 r, bytes32 s)`](#IFLD-permit-address-address-uint256-uint256-uint8-bytes32-bytes32-)
+- [`permit(address owner, address spender, uint256 value, uint256 deadline, uint8 v, bytes32 r, bytes32 s)`](#ITOS-permit-address-address-uint256-uint256-uint8-bytes32-bytes32-)
 
-- [`verify(address signer, address owner, address spender, uint256 value, uint256 deadline, uint256 _nounce, bytes32 sigR, bytes32 sigS, uint8 sigV)`](#IFLD-verify-address-address-address-uint256-uint256-uint256-bytes32-bytes32-uint8-)
+- [`verify(address signer, address owner, address spender, uint256 value, uint256 deadline, uint256 _nounce, bytes32 sigR, bytes32 sigS, uint8 sigV)`](#ITOS-verify-address-address-address-uint256-uint256-uint256-bytes32-bytes32-uint8-)
 
-- [`hashPermit(address owner, address spender, uint256 value, uint256 deadline, uint256 _nounce)`](#IFLD-hashPermit-address-address-uint256-uint256-uint256-)
+- [`hashPermit(address owner, address spender, uint256 value, uint256 deadline, uint256 _nounce)`](#ITOS-hashPermit-address-address-uint256-uint256-uint256-)
 
-###### IFLD-mint-address-uint256-
+###### ITOS-mint-address-uint256-
 
 ## Function `mint(address to, uint256 amount)`
 
@@ -26,7 +26,7 @@ Issue a token.
 
 - `amount`: the amount to issue
 
-###### IFLD-burn-address-uint256-
+###### ITOS-burn-address-uint256-
 
 ## Function `burn(address from, uint256 amount)`
 
@@ -38,19 +38,19 @@ No description
 
 - `amount`: the amount to burn
 
-###### IFLD-DOMAIN_SEPARATOR--
+###### ITOS-DOMAIN_SEPARATOR--
 
 ## Function `DOMAIN_SEPARATOR()`
 
 No description
 
-###### IFLD-nonces-address-
+###### ITOS-nonces-address-
 
 ## Function `nonces(address owner)`
 
 No description
 
-###### IFLD-permit-address-address-uint256-uint256-uint8-bytes32-bytes32-
+###### ITOS-permit-address-address-uint256-uint256-uint8-bytes32-bytes32-
 
 ## Function `permit(address owner, address spender, uint256 value, uint256 deadline, uint8 v, bytes32 r, bytes32 s)`
 
@@ -74,7 +74,7 @@ The signature must have the owner's signature.
 
 - `s`: the owner's signature - s
 
-###### IFLD-verify-address-address-address-uint256-uint256-uint256-bytes32-bytes32-uint8-
+###### ITOS-verify-address-address-address-uint256-uint256-uint256-bytes32-bytes32-uint8-
 
 ## Function `verify(address signer, address owner, address spender, uint256 value, uint256 deadline, uint256 _nounce, bytes32 sigR, bytes32 sigS, uint8 sigV)`
 
@@ -100,7 +100,7 @@ verify the signature
 
 - `sigV`: the owner's signature - v
 
-###### IFLD-hashPermit-address-address-uint256-uint256-uint256-
+###### ITOS-hashPermit-address-address-uint256-uint256-uint256-
 
 ## Function `hashPermit(address owner, address spender, uint256 value, uint256 deadline, uint256 _nounce)`
 

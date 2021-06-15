@@ -2,8 +2,8 @@
 pragma solidity ^0.7.6;
 
 interface IStakeProxyStorage {
-    /// @dev FLD address
-    function fld() external view returns (address);
+    /// @dev TOS address
+    function tos() external view returns (address);
 
     /// @dev TON address in Tokamak
     function ton() external view returns (address);

@@ -119,21 +119,21 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
     /// @param layer2 the layer2 address in tokamak
     event tokamakRequestedUnStakingAll(address layer2);
 
-    /// @dev exchange WTON to FLD using uniswap v3
+    /// @dev exchange WTON to TOS using uniswap v3
     /// @param caller the sender
     /// @param amountIn the input amount
     /// @return amountOut the amount of exchanged out token
-    event exchangedWTONtoFLD(
+    event exchangedWTONtoTOS(
         address caller,
         uint256 amountIn,
         uint256 amountOut
     );
 
-    /// @dev exchange WTON to FLD using uniswap v2
+    /// @dev exchange WTON to TOS using uniswap v2
     /// @param caller the sender
     /// @param amountIn the input amount
     /// @return amountOut the amount of exchanged out token
-    event exchangedWTONtoFLD2(
+    event exchangedWTONtoTOS2(
         address caller,
         uint256 amountIn,
         uint256 amountOut
@@ -402,7 +402,7 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
         emit tokamakProcessedUnStaking(_layer2, rn, true);
     }
 
-    /// @dev exchange holded WTON to FLD using uniswap
+    /// @dev exchange holded WTON to TOS using uniswap
     /// @notice
     /// @param _amountIn the input amount
     /// @param _amountOutMinimum the minimun output amount
@@ -410,7 +410,7 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
     /// @param _sqrtPriceLimitX96 sqrtPriceLimitX96
     /// @param _kind the function type, if 0, use exactInputSingle function, else if, use exactInput function
     /// @return amountOut the amount of exchanged out token
-    function exchangeWTONtoFLD(
+    function exchangeWTONtoTOS(
         uint256 _amountIn,
         uint256 _amountOutMinimum,
         uint256 _deadline,
@@ -462,7 +462,7 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
                 uint256 swapTON = _amountIn.sub(_amountWTON).div(10**9);
                 require(
                     ITON(ton).approveAndCall(wton, swapTON, data),
-                    "TokamakStaker:exchangeWTONtoFLD approveAndCall fail"
+                    "TokamakStaker:exchangeWTONtoTOS approveAndCall fail"
                 );
             }
         }
@@ -507,15 +507,15 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
             amountOut = ISwapRouter(uniswapRouter).exactInput(params);
         }
 
-        emit exchangedWTONtoFLD(msg.sender, _amountIn, amountOut);
+        emit exchangedWTONtoTOS(msg.sender, _amountIn, amountOut);
     }
 
-    /// @dev exchange holded WTON to FLD using uniswap-v2
+    /// @dev exchange holded WTON to TOS using uniswap-v2
     /// @param _amountIn the input amount
     /// @param _amountOutMinimum the minimun output amount
     /// @param _deadline deadline
     /// @param _kind the function type, if 0, use exactInputSingle function, else if, use exactInput function
-    function exchangeWTONtoFLDv2(
+    function exchangeWTONtoTOSv2(
         uint256 _amountIn,
         uint256 _amountOutMinimum,
         uint256 _deadline,
@@ -564,7 +564,7 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
                 uint256 swapTON = _amountIn.sub(_amountWTON).div(10**9);
                 require(
                     ITON(ton).approveAndCall(wton, swapTON, data),
-                    "TokamakStaker:exchangeWTONtoFLD approveAndCall fail"
+                    "TokamakStaker:exchangeWTONtoTOS approveAndCall fail"
                 );
             }
         }
@@ -608,7 +608,7 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
             amountOut = amounts[amounts.length - 1];
         }
 
-        emit exchangedWTONtoFLD2(msg.sender, _amountIn, amountOut);
+        emit exchangedWTONtoTOS2(msg.sender, _amountIn, amountOut);
     }
 
     /*

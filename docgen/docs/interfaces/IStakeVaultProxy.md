@@ -6,7 +6,7 @@
 
 - [`implementation()`](#IStakeVaultProxy-implementation--)
 
-- [`initialize(address _fld, address _paytoken, uint256 _cap, uint256 _saleStartBlock, uint256 _stakeStartBlock, address _stakefactory, uint256 _stakeType, address _defiAddr)`](#IStakeVaultProxy-initialize-address-address-uint256-uint256-uint256-address-uint256-address-)
+- [`initialize(address _tos, address _paytoken, uint256 _cap, uint256 _saleStartBlock, uint256 _stakeStartBlock, address _stakefactory, uint256 _stakeType, address _defiAddr)`](#IStakeVaultProxy-initialize-address-address-uint256-uint256-uint256-address-uint256-address-)
 
 ###### IStakeVaultProxy-setProxyPause-bool-
 
@@ -40,7 +40,7 @@ view implementation address
 
 ###### IStakeVaultProxy-initialize-address-address-uint256-uint256-uint256-address-uint256-address-
 
-## Function `initialize(address _fld, address _paytoken, uint256 _cap, uint256 _saleStartBlock, uint256 _stakeStartBlock, address _stakefactory, uint256 _stakeType, address _defiAddr)`
+## Function `initialize(address _tos, address _paytoken, uint256 _cap, uint256 _saleStartBlock, uint256 _stakeStartBlock, address _stakefactory, uint256 _stakeType, address _defiAddr)`
 
 No description
 

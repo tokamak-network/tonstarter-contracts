@@ -21,8 +21,8 @@ const Pharse1_TON_Staking =
   process.env.Pharse1_TON_Staking + "." + "0".repeat(18);
 const Pharse1_ETH_Staking =
   process.env.Pharse1_ETH_Staking + "." + "0".repeat(18);
-const Pharse1_FLDETHLP_Staking =
-  process.env.Pharse1_FLDETHLP_Staking + "." + "0".repeat(18);
+const Pharse1_TOSETHLP_Staking =
+  process.env.Pharse1_TOSETHLP_Staking + "." + "0".repeat(18);
 const Pharse1_DEV_Mining =
   process.env.Pharse1_DEV_Mining + "." + "0".repeat(18);
 
@@ -36,7 +36,7 @@ const CLAIMER_ROLE = keccak256("CLAIMER");
 const PHASE2_VAULT_HASH = keccak256("PHASE2_VAULT");
 const EVENT_VAULT_HASH = keccak256("EVENT_VAULT");
 
-let fldtoken = loadDeployed(process.env.NETWORK,"FLD");
+let tostoken = loadDeployed(process.env.NETWORK,"TOS");
 let registry = loadDeployed(process.env.NETWORK,"StakeRegistry");
 let factory = loadDeployed(process.env.NETWORK,"StakeFactory");
 let vaultfactory = loadDeployed(process.env.NETWORK,"StakeVaultFactory");
@@ -68,7 +68,7 @@ async function deployMain(defaultSender) {
 
 
   await stakeEntry.setStore(
-    fldtoken,
+    tostoken,
     registry,
     factory,
     vaultfactory,
@@ -102,13 +102,13 @@ async function deployMain(defaultSender) {
     utils.parseUnits(initialTotal, 18)
   );
 
-  const fld = await ethers.getContractAt("FLD", fldtoken);
-  console.log("fld:", fld.address);
+  const tos = await ethers.getContractAt("TOS", tostoken);
+  console.log("tos:", tos.address);
   console.log("deployer:", deployer.address);
 
-  //await fld.grantRole(MINTER_ROLE, deployer.address);
-  await fld.mint(deployer.address, utils.parseUnits(initialTotal, 18));
-  console.log("fld mint:", fld.address);
+  //await tos.grantRole(MINTER_ROLE, deployer.address);
+  await tos.mint(deployer.address, utils.parseUnits(initialTotal, 18));
+  console.log("tos mint:", tos.address);
 
   return null;
 }

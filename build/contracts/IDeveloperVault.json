@@ -5,7 +5,7 @@
       "inputs": [
         {
           "internalType": "address",
-          "name": "_fld",
+          "name": "_tos",
           "type": "address"
         },
         {
@@ -65,7 +65,7 @@
       "type": "function"
     }
   ],
-  "metadata": "{\"compiler\":{\"version\":\"0.7.6+commit.7338295f\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[],\"name\":\"claimReward\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"currentRewardBlock\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_fld\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_cap\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_rewardPeriod\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_startRewardBlock\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_claimsNumberMax\",\"type\":\"uint256\"},{\"internalType\":\"address[]\",\"name\":\"_developers\",\"type\":\"address[]\"},{\"internalType\":\"uint256[]\",\"name\":\"_claimAmounts\",\"type\":\"uint256[]\"}],\"name\":\"initialize\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{\"claimReward()\":{\"details\":\"Developers can receive their FLDs\"},\"currentRewardBlock()\":{\"details\":\"Returns current reward block for sender\"},\"initialize(address,uint256,uint256,uint256,uint256,address[],uint256[])\":{\"details\":\"set initial storage\",\"params\":{\"_cap\":\"the allocated FLD amount to devs\",\"_claimAmounts\":\"How much do you pay at one time?\",\"_claimsNumberMax\":\"Total number of payments\",\"_developers\":\"the developer list\",\"_fld\":\"the FLD address\",\"_rewardPeriod\":\"given only once per _rewardPeriod.\",\"_startRewardBlock\":\"the start block to give .\"}}},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"/Users/zena/ico2.0/ico20-contracts/contracts/interfaces/IDeveloperVault.sol\":\"IDeveloperVault\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"/Users/zena/ico2.0/ico20-contracts/contracts/interfaces/IDeveloperVault.sol\":{\"keccak256\":\"0x789a403f822efdd0c6f824e4db86ac652170604bbe89c7e51b8680077f9f84de\",\"license\":\"Unlicense\",\"urls\":[\"bzz-raw://f8c58539c7a853963edd654cb4e8f41b7840c9e2120145e609387c73c5fb3af2\",\"dweb:/ipfs/QmVWsMvTNu8AzFp6mBm6xaoQzSdcDPgiPaWaAat3eR8Sg6\"]}},\"version\":1}",
+  "metadata": "{\"compiler\":{\"version\":\"0.7.6+commit.7338295f\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[],\"name\":\"claimReward\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"currentRewardBlock\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_tos\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_cap\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_rewardPeriod\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_startRewardBlock\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_claimsNumberMax\",\"type\":\"uint256\"},{\"internalType\":\"address[]\",\"name\":\"_developers\",\"type\":\"address[]\"},{\"internalType\":\"uint256[]\",\"name\":\"_claimAmounts\",\"type\":\"uint256[]\"}],\"name\":\"initialize\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{\"claimReward()\":{\"details\":\"Developers can receive their TOSs\"},\"currentRewardBlock()\":{\"details\":\"Returns current reward block for sender\"},\"initialize(address,uint256,uint256,uint256,uint256,address[],uint256[])\":{\"details\":\"set initial storage\",\"params\":{\"_cap\":\"the allocated TOS amount to devs\",\"_claimAmounts\":\"How much do you pay at one time?\",\"_claimsNumberMax\":\"Total number of payments\",\"_developers\":\"the developer list\",\"_rewardPeriod\":\"given only once per _rewardPeriod.\",\"_startRewardBlock\":\"the start block to give .\",\"_tos\":\"the TOS address\"}}},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"/Users/zena/ico2.0/ico20-contracts/contracts/interfaces/IDeveloperVault.sol\":\"IDeveloperVault\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":100},\"remappings\":[]},\"sources\":{\"/Users/zena/ico2.0/ico20-contracts/contracts/interfaces/IDeveloperVault.sol\":{\"keccak256\":\"0xcde9cc854961e803bf6badb69833c6c26abf1ae1cadcfc472f96d894f6e1021f\",\"license\":\"Unlicense\",\"urls\":[\"bzz-raw://f21c09279a4a45697664292d22ced907d40ca9d5ab5fd62beaf186a8fb3171b5\",\"dweb:/ipfs/QmUhqXgBr6Sr1j5XuUbaNATeNooUNTZbEbW5gN6QaSdGwP\"]}},\"version\":1}",
   "bytecode": "0x",
   "deployedBytecode": "0x",
   "immutableReferences": {},
@@ -73,21 +73,21 @@
   "deployedGeneratedSources": [],
   "sourceMap": "",
   "deployedSourceMap": "",
-  "source": "//SPDX-License-Identifier: Unlicense\npragma solidity ^0.7.6;\n\ninterface IDeveloperVault {\n    /// @dev set initial storage\n    /// @param _fld the FLD address\n    /// @param _cap the allocated FLD amount to devs\n    /// @param _rewardPeriod given only once per _rewardPeriod.\n    /// @param _startRewardBlock the start block to give .\n    /// @param _claimsNumberMax Total number of payments\n    /// @param _developers the developer list\n    /// @param _claimAmounts How much do you pay at one time?\n    function initialize(\n        address _fld,\n        uint256 _cap,\n        uint256 _rewardPeriod,\n        uint256 _startRewardBlock,\n        uint256 _claimsNumberMax,\n        address[] memory _developers,\n        uint256[] memory _claimAmounts\n    ) external;\n\n    /// @dev Developers can receive their FLDs\n    function claimReward() external;\n\n    /// @dev Returns current reward block for sender\n    function currentRewardBlock() external view returns (uint256);\n}\n",
+  "source": "//SPDX-License-Identifier: Unlicense\npragma solidity ^0.7.6;\n\ninterface IDeveloperVault {\n    /// @dev set initial storage\n    /// @param _tos the TOS address\n    /// @param _cap the allocated TOS amount to devs\n    /// @param _rewardPeriod given only once per _rewardPeriod.\n    /// @param _startRewardBlock the start block to give .\n    /// @param _claimsNumberMax Total number of payments\n    /// @param _developers the developer list\n    /// @param _claimAmounts How much do you pay at one time?\n    function initialize(\n        address _tos,\n        uint256 _cap,\n        uint256 _rewardPeriod,\n        uint256 _startRewardBlock,\n        uint256 _claimsNumberMax,\n        address[] memory _developers,\n        uint256[] memory _claimAmounts\n    ) external;\n\n    /// @dev Developers can receive their TOSs\n    function claimReward() external;\n\n    /// @dev Returns current reward block for sender\n    function currentRewardBlock() external view returns (uint256);\n}\n",
   "sourcePath": "/Users/zena/ico2.0/ico20-contracts/contracts/interfaces/IDeveloperVault.sol",
   "ast": {
     "absolutePath": "/Users/zena/ico2.0/ico20-contracts/contracts/interfaces/IDeveloperVault.sol",
     "exportedSymbols": {
       "IDeveloperVault": [
-        2687
+        2838
       ]
     },
-    "id": 2688,
+    "id": 2839,
     "license": "Unlicense",
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 2656,
+        "id": 2807,
         "literals": [
           "solidity",
           "^",
@@ -103,38 +103,38 @@
         "contractDependencies": [],
         "contractKind": "interface",
         "fullyImplemented": false,
-        "id": 2687,
+        "id": 2838,
         "linearizedBaseContracts": [
-          2687
+          2838
         ],
         "name": "IDeveloperVault",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
             "documentation": {
-              "id": 2657,
+              "id": 2808,
               "nodeType": "StructuredDocumentation",
               "src": "94:405:8",
-              "text": "@dev set initial storage\n @param _fld the FLD address\n @param _cap the allocated FLD amount to devs\n @param _rewardPeriod given only once per _rewardPeriod.\n @param _startRewardBlock the start block to give .\n @param _claimsNumberMax Total number of payments\n @param _developers the developer list\n @param _claimAmounts How much do you pay at one time?"
+              "text": "@dev set initial storage\n @param _tos the TOS address\n @param _cap the allocated TOS amount to devs\n @param _rewardPeriod given only once per _rewardPeriod.\n @param _startRewardBlock the start block to give .\n @param _claimsNumberMax Total number of payments\n @param _developers the developer list\n @param _claimAmounts How much do you pay at one time?"
             },
             "functionSelector": "279708e8",
-            "id": 2676,
+            "id": 2827,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "initialize",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 2674,
+              "id": 2825,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 2659,
+                  "id": 2810,
                   "mutability": "mutable",
-                  "name": "_fld",
+                  "name": "_tos",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2676,
+                  "scope": 2827,
                   "src": "533:12:8",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -143,7 +143,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 2658,
+                    "id": 2809,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "533:7:8",
@@ -157,11 +157,11 @@
                 },
                 {
                   "constant": false,
-                  "id": 2661,
+                  "id": 2812,
                   "mutability": "mutable",
                   "name": "_cap",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2676,
+                  "scope": 2827,
                   "src": "555:12:8",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -170,7 +170,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 2660,
+                    "id": 2811,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
                     "src": "555:7:8",
@@ -183,11 +183,11 @@
                 },
                 {
                   "constant": false,
-                  "id": 2663,
+                  "id": 2814,
                   "mutability": "mutable",
                   "name": "_rewardPeriod",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2676,
+                  "scope": 2827,
                   "src": "577:21:8",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -196,7 +196,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 2662,
+                    "id": 2813,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
                     "src": "577:7:8",
@@ -209,11 +209,11 @@
                 },
                 {
                   "constant": false,
-                  "id": 2665,
+                  "id": 2816,
                   "mutability": "mutable",
                   "name": "_startRewardBlock",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2676,
+                  "scope": 2827,
                   "src": "608:25:8",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -222,7 +222,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 2664,
+                    "id": 2815,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
                     "src": "608:7:8",
@@ -235,11 +235,11 @@
                 },
                 {
                   "constant": false,
-                  "id": 2667,
+                  "id": 2818,
                   "mutability": "mutable",
                   "name": "_claimsNumberMax",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2676,
+                  "scope": 2827,
                   "src": "643:24:8",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -248,7 +248,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 2666,
+                    "id": 2817,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
                     "src": "643:7:8",
@@ -261,11 +261,11 @@
                 },
                 {
                   "constant": false,
-                  "id": 2670,
+                  "id": 2821,
                   "mutability": "mutable",
                   "name": "_developers",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2676,
+                  "scope": 2827,
                   "src": "677:28:8",
                   "stateVariable": false,
                   "storageLocation": "memory",
@@ -275,7 +275,7 @@
                   },
                   "typeName": {
                     "baseType": {
-                      "id": 2668,
+                      "id": 2819,
                       "name": "address",
                       "nodeType": "ElementaryTypeName",
                       "src": "677:7:8",
@@ -285,7 +285,7 @@
                         "typeString": "address"
                       }
                     },
-                    "id": 2669,
+                    "id": 2820,
                     "nodeType": "ArrayTypeName",
                     "src": "677:9:8",
                     "typeDescriptions": {
@@ -297,11 +297,11 @@
                 },
                 {
                   "constant": false,
-                  "id": 2673,
+                  "id": 2824,
                   "mutability": "mutable",
                   "name": "_claimAmounts",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2676,
+                  "scope": 2827,
                   "src": "715:30:8",
                   "stateVariable": false,
                   "storageLocation": "memory",
@@ -311,7 +311,7 @@
                   },
                   "typeName": {
                     "baseType": {
-                      "id": 2671,
+                      "id": 2822,
                       "name": "uint256",
                       "nodeType": "ElementaryTypeName",
                       "src": "715:7:8",
@@ -320,7 +320,7 @@
                         "typeString": "uint256"
                       }
                     },
-                    "id": 2672,
+                    "id": 2823,
                     "nodeType": "ArrayTypeName",
                     "src": "715:9:8",
                     "typeDescriptions": {
@@ -334,12 +334,12 @@
               "src": "523:228:8"
             },
             "returnParameters": {
-              "id": 2675,
+              "id": 2826,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "760:0:8"
             },
-            "scope": 2687,
+            "scope": 2838,
             "src": "504:257:8",
             "stateMutability": "nonpayable",
             "virtual": false,
@@ -347,31 +347,31 @@
           },
           {
             "documentation": {
-              "id": 2677,
+              "id": 2828,
               "nodeType": "StructuredDocumentation",
               "src": "767:42:8",
-              "text": "@dev Developers can receive their FLDs"
+              "text": "@dev Developers can receive their TOSs"
             },
             "functionSelector": "b88a802f",
-            "id": 2680,
+            "id": 2831,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "claimReward",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 2678,
+              "id": 2829,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "834:2:8"
             },
             "returnParameters": {
-              "id": 2679,
+              "id": 2830,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "845:0:8"
             },
-            "scope": 2687,
+            "scope": 2838,
             "src": "814:32:8",
             "stateMutability": "nonpayable",
             "virtual": false,
@@ -379,35 +379,35 @@
           },
           {
             "documentation": {
-              "id": 2681,
+              "id": 2832,
               "nodeType": "StructuredDocumentation",
               "src": "852:48:8",
               "text": "@dev Returns current reward block for sender"
             },
             "functionSelector": "4ed8e5dd",
-            "id": 2686,
+            "id": 2837,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "currentRewardBlock",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 2682,
+              "id": 2833,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "932:2:8"
             },
             "returnParameters": {
-              "id": 2685,
+              "id": 2836,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 2684,
+                  "id": 2835,
                   "mutability": "mutable",
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2686,
+                  "scope": 2837,
                   "src": "958:7:8",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -416,7 +416,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 2683,
+                    "id": 2834,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
                     "src": "958:7:8",
@@ -430,14 +430,14 @@
               ],
               "src": "957:9:8"
             },
-            "scope": 2687,
+            "scope": 2838,
             "src": "905:62:8",
             "stateMutability": "view",
             "virtual": false,
             "visibility": "external"
           }
         ],
-        "scope": 2688,
+        "scope": 2839,
         "src": "62:907:8"
       }
     ],
@@ -448,7 +448,7 @@
       "absolutePath": "/Users/zena/ico2.0/ico20-contracts/contracts/interfaces/IDeveloperVault.sol",
       "exportedSymbols": {
         "IDeveloperVault": [
-          2687
+          2838
         ]
       },
       "license": "Unlicense"
@@ -463,7 +463,7 @@
             ".6"
           ]
         },
-        "id": 2656,
+        "id": 2807,
         "name": "PragmaDirective",
         "src": "37:23:8"
       },
@@ -479,10 +479,10 @@
           "contractKind": "interface",
           "fullyImplemented": false,
           "linearizedBaseContracts": [
-            2687
+            2838
           ],
           "name": "IDeveloperVault",
-          "scope": 2688
+          "scope": 2839
         },
         "children": [
           {
@@ -495,7 +495,7 @@
                 null
               ],
               "name": "initialize",
-              "scope": 2687,
+              "scope": 2838,
               "stateMutability": "nonpayable",
               "virtual": false,
               "visibility": "external"
@@ -503,9 +503,9 @@
             "children": [
               {
                 "attributes": {
-                  "text": "@dev set initial storage\n @param _fld the FLD address\n @param _cap the allocated FLD amount to devs\n @param _rewardPeriod given only once per _rewardPeriod.\n @param _startRewardBlock the start block to give .\n @param _claimsNumberMax Total number of payments\n @param _developers the developer list\n @param _claimAmounts How much do you pay at one time?"
+                  "text": "@dev set initial storage\n @param _tos the TOS address\n @param _cap the allocated TOS amount to devs\n @param _rewardPeriod given only once per _rewardPeriod.\n @param _startRewardBlock the start block to give .\n @param _claimsNumberMax Total number of payments\n @param _developers the developer list\n @param _claimAmounts How much do you pay at one time?"
                 },
-                "id": 2657,
+                "id": 2808,
                 "name": "StructuredDocumentation",
                 "src": "94:405:8"
               },
@@ -515,8 +515,8 @@
                     "attributes": {
                       "constant": false,
                       "mutability": "mutable",
-                      "name": "_fld",
-                      "scope": 2676,
+                      "name": "_tos",
+                      "scope": 2827,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "address",
@@ -529,12 +529,12 @@
                           "stateMutability": "nonpayable",
                           "type": "address"
                         },
-                        "id": 2658,
+                        "id": 2809,
                         "name": "ElementaryTypeName",
                         "src": "533:7:8"
                       }
                     ],
-                    "id": 2659,
+                    "id": 2810,
                     "name": "VariableDeclaration",
                     "src": "533:12:8"
                   },
@@ -543,7 +543,7 @@
                       "constant": false,
                       "mutability": "mutable",
                       "name": "_cap",
-                      "scope": 2676,
+                      "scope": 2827,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "uint256",
@@ -555,12 +555,12 @@
                           "name": "uint256",
                           "type": "uint256"
                         },
-                        "id": 2660,
+                        "id": 2811,
                         "name": "ElementaryTypeName",
                         "src": "555:7:8"
                       }
                     ],
-                    "id": 2661,
+                    "id": 2812,
                     "name": "VariableDeclaration",
                     "src": "555:12:8"
                   },
@@ -569,7 +569,7 @@
                       "constant": false,
                       "mutability": "mutable",
                       "name": "_rewardPeriod",
-                      "scope": 2676,
+                      "scope": 2827,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "uint256",
@@ -581,12 +581,12 @@
                           "name": "uint256",
                           "type": "uint256"
                         },
-                        "id": 2662,
+                        "id": 2813,
                         "name": "ElementaryTypeName",
                         "src": "577:7:8"
                       }
                     ],
-                    "id": 2663,
+                    "id": 2814,
                     "name": "VariableDeclaration",
                     "src": "577:21:8"
                   },
@@ -595,7 +595,7 @@
                       "constant": false,
                       "mutability": "mutable",
                       "name": "_startRewardBlock",
-                      "scope": 2676,
+                      "scope": 2827,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "uint256",
@@ -607,12 +607,12 @@
                           "name": "uint256",
                           "type": "uint256"
                         },
-                        "id": 2664,
+                        "id": 2815,
                         "name": "ElementaryTypeName",
                         "src": "608:7:8"
                       }
                     ],
-                    "id": 2665,
+                    "id": 2816,
                     "name": "VariableDeclaration",
                     "src": "608:25:8"
                   },
@@ -621,7 +621,7 @@
                       "constant": false,
                       "mutability": "mutable",
                       "name": "_claimsNumberMax",
-                      "scope": 2676,
+                      "scope": 2827,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "uint256",
@@ -633,12 +633,12 @@
                           "name": "uint256",
                           "type": "uint256"
                         },
-                        "id": 2666,
+                        "id": 2817,
                         "name": "ElementaryTypeName",
                         "src": "643:7:8"
                       }
                     ],
-                    "id": 2667,
+                    "id": 2818,
                     "name": "VariableDeclaration",
                     "src": "643:24:8"
                   },
@@ -647,7 +647,7 @@
                       "constant": false,
                       "mutability": "mutable",
                       "name": "_developers",
-                      "scope": 2676,
+                      "scope": 2827,
                       "stateVariable": false,
                       "storageLocation": "memory",
                       "type": "address[]",
@@ -665,17 +665,17 @@
                               "stateMutability": "nonpayable",
                               "type": "address"
                             },
-                            "id": 2668,
+                            "id": 2819,
                             "name": "ElementaryTypeName",
                             "src": "677:7:8"
                           }
                         ],
-                        "id": 2669,
+                        "id": 2820,
                         "name": "ArrayTypeName",
                         "src": "677:9:8"
                       }
                     ],
-                    "id": 2670,
+                    "id": 2821,
                     "name": "VariableDeclaration",
                     "src": "677:28:8"
                   },
@@ -684,7 +684,7 @@
                       "constant": false,
                       "mutability": "mutable",
                       "name": "_claimAmounts",
-                      "scope": 2676,
+                      "scope": 2827,
                       "stateVariable": false,
                       "storageLocation": "memory",
                       "type": "uint256[]",
@@ -701,22 +701,22 @@
                               "name": "uint256",
                               "type": "uint256"
                             },
-                            "id": 2671,
+                            "id": 2822,
                             "name": "ElementaryTypeName",
                             "src": "715:7:8"
                           }
                         ],
-                        "id": 2672,
+                        "id": 2823,
                         "name": "ArrayTypeName",
                         "src": "715:9:8"
                       }
                     ],
-                    "id": 2673,
+                    "id": 2824,
                     "name": "VariableDeclaration",
                     "src": "715:30:8"
                   }
                 ],
-                "id": 2674,
+                "id": 2825,
                 "name": "ParameterList",
                 "src": "523:228:8"
               },
@@ -727,12 +727,12 @@
                   ]
                 },
                 "children": [],
-                "id": 2675,
+                "id": 2826,
                 "name": "ParameterList",
                 "src": "760:0:8"
               }
             ],
-            "id": 2676,
+            "id": 2827,
             "name": "FunctionDefinition",
             "src": "504:257:8"
           },
@@ -746,7 +746,7 @@
                 null
               ],
               "name": "claimReward",
-              "scope": 2687,
+              "scope": 2838,
               "stateMutability": "nonpayable",
               "virtual": false,
               "visibility": "external"
@@ -754,9 +754,9 @@
             "children": [
               {
                 "attributes": {
-                  "text": "@dev Developers can receive their FLDs"
+                  "text": "@dev Developers can receive their TOSs"
                 },
-                "id": 2677,
+                "id": 2828,
                 "name": "StructuredDocumentation",
                 "src": "767:42:8"
               },
@@ -767,7 +767,7 @@
                   ]
                 },
                 "children": [],
-                "id": 2678,
+                "id": 2829,
                 "name": "ParameterList",
                 "src": "834:2:8"
               },
@@ -778,12 +778,12 @@
                   ]
                 },
                 "children": [],
-                "id": 2679,
+                "id": 2830,
                 "name": "ParameterList",
                 "src": "845:0:8"
               }
             ],
-            "id": 2680,
+            "id": 2831,
             "name": "FunctionDefinition",
             "src": "814:32:8"
           },
@@ -797,7 +797,7 @@
                 null
               ],
               "name": "currentRewardBlock",
-              "scope": 2687,
+              "scope": 2838,
               "stateMutability": "view",
               "virtual": false,
               "visibility": "external"
@@ -807,7 +807,7 @@
                 "attributes": {
                   "text": "@dev Returns current reward block for sender"
                 },
-                "id": 2681,
+                "id": 2832,
                 "name": "StructuredDocumentation",
                 "src": "852:48:8"
               },
@@ -818,7 +818,7 @@
                   ]
                 },
                 "children": [],
-                "id": 2682,
+                "id": 2833,
                 "name": "ParameterList",
                 "src": "932:2:8"
               },
@@ -829,7 +829,7 @@
                       "constant": false,
                       "mutability": "mutable",
                       "name": "",
-                      "scope": 2686,
+                      "scope": 2837,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "uint256",
@@ -841,32 +841,32 @@
                           "name": "uint256",
                           "type": "uint256"
                         },
-                        "id": 2683,
+                        "id": 2834,
                         "name": "ElementaryTypeName",
                         "src": "958:7:8"
                       }
                     ],
-                    "id": 2684,
+                    "id": 2835,
                     "name": "VariableDeclaration",
                     "src": "958:7:8"
                   }
                 ],
-                "id": 2685,
+                "id": 2836,
                 "name": "ParameterList",
                 "src": "957:9:8"
               }
             ],
-            "id": 2686,
+            "id": 2837,
             "name": "FunctionDefinition",
             "src": "905:62:8"
           }
         ],
-        "id": 2687,
+        "id": 2838,
         "name": "ContractDefinition",
         "src": "62:907:8"
       }
     ],
-    "id": 2688,
+    "id": 2839,
     "name": "SourceUnit",
     "src": "37:933:8"
   },
@@ -876,12 +876,12 @@
   },
   "networks": {},
   "schemaVersion": "3.3.4",
-  "updatedAt": "2021-06-02T02:39:03.493Z",
+  "updatedAt": "2021-06-15T01:36:53.765Z",
   "devdoc": {
     "kind": "dev",
     "methods": {
       "claimReward()": {
-        "details": "Developers can receive their FLDs"
+        "details": "Developers can receive their TOSs"
       },
       "currentRewardBlock()": {
         "details": "Returns current reward block for sender"
@@ -889,13 +889,13 @@
       "initialize(address,uint256,uint256,uint256,uint256,address[],uint256[])": {
         "details": "set initial storage",
         "params": {
-          "_cap": "the allocated FLD amount to devs",
+          "_cap": "the allocated TOS amount to devs",
           "_claimAmounts": "How much do you pay at one time?",
           "_claimsNumberMax": "Total number of payments",
           "_developers": "the developer list",
-          "_fld": "the FLD address",
           "_rewardPeriod": "given only once per _rewardPeriod.",
-          "_startRewardBlock": "the start block to give ."
+          "_startRewardBlock": "the start block to give .",
+          "_tos": "the TOS address"
         }
       }
     },

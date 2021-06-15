@@ -16,7 +16,7 @@
 
 - [`toUniswapWTON()`](#IStakeTONStorage-toUniswapWTON--)
 
-- [`swappedAmountFLD()`](#IStakeTONStorage-swappedAmountFLD--)
+- [`swappedAmountTOS()`](#IStakeTONStorage-swappedAmountTOS--)
 
 - [`finalBalanceTON()`](#IStakeTONStorage-finalBalanceTON--)
 
@@ -74,11 +74,11 @@ the accumulated WTON amount unstaked from tokamak , in ray unit
 
 the accumulated WTON amount swapped using uniswap , in ray unit
 
-###### IStakeTONStorage-swappedAmountFLD--
+###### IStakeTONStorage-swappedAmountTOS--
 
-## Function `swappedAmountFLD()`
+## Function `swappedAmountTOS()`
 
-the FLD balance in this contract
+the TOS balance in this contract
 
 ###### IStakeTONStorage-finalBalanceTON--
 

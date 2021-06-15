@@ -5,7 +5,7 @@ import "../interfaces/IStakeProxy.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "./StakeProxyStorage.sol";
 
-/// @title The proxy of FLD Plaform
+/// @title The proxy of TOS Plaform
 /// @notice Admin can createVault, createStakeContract.
 /// User can excute the tokamak staking function of each contract through this logic.
 contract Stake1Proxy is StakeProxyStorage, AccessControl, IStakeProxy {
