@@ -2,8 +2,6 @@
 * contracts
   * connection
     * [TokamakStaker](docs/connection/TokamakStaker.md)
-  * dev
-    * [DeveloperVault](docs/dev/DeveloperVault.md)
   * factory
     * [StakeDefiFactory](docs/factory/StakeDefiFactory.md)
     * [StakeFactory](docs/factory/StakeFactory.md)
