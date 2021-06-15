@@ -109,7 +109,7 @@ async function main() {
   stakeStartBlock = parseInt(stakeStartBlock);
 
   //==============================
-  let periods = periodsHours;
+  let periods = periodsMins;
   let token = null ;
 
   if (VaultAddress != null && VaultAddress.length > 5

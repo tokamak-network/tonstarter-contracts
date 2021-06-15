@@ -66,6 +66,4 @@
     * [TOS](docs/tokens/TOS.md)
   * utils
     * math
-      * [Math](docs/utils/math/Math.md)
       * [SafeMath](docs/utils/math/SafeMath.md)
-      * [SignedSafeMath](docs/utils/math/SignedSafeMath.md)

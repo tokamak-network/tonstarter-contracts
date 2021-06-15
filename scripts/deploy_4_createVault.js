@@ -82,9 +82,6 @@ async function main() {
     token = zeroAddress;
   }
 
-  vault.saleStartBlock = parseInt(curBlock) + parseInt(60*10/13);
-  vault.stakeStartBlock = vault.saleStartBlock + parseInt(60*60*24*3/13);
-
   console.log('StakeType',StakeType);
   console.log('token',token);
   await createValue(vault, token);

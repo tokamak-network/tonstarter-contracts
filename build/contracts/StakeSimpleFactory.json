@@ -74,29 +74,29 @@
   "immutableReferences": {},
   "generatedSources": [],
   "deployedGeneratedSources": [],
-  "sourceMap": "221:1276:4:-:0;;;503:210;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;503:210:4;-1:-1:-1;;;;;573:31:4;;552:108;;;;;-1:-1:-1;;;552:108:4;;;;;;;;;;;;;;;;;;;;;;;;;;;;670:16;:36;;-1:-1:-1;;;;;670:36:4;;;-1:-1:-1;;;;;;670:36:4;;;;;;;;;221:1276;;;;;;",
-  "deployedSourceMap": "221:1276:4:-:0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;1010:485;;;;;;;;;;;;;;;;-1:-1:-1;1010:485:4;;;-1:-1:-1;;;;;1010:485:4;;;;;;:::i;:::-;;;;-1:-1:-1;;;;;1010:485:4;;;;;;;;;;;;;;340:31;;;:::i;278:55::-;;;:::i;:::-;;;;;;;;;;;;;;;;1010:485;1155:7;1220:16;;1199:38;;1155:7;;-1:-1:-1;;;;;1220:16:4;;1199:38;;;:::i;:::-;-1:-1:-1;;;;;1199:38:4;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;1174:63:4;-1:-1:-1;;;;;;1255:28:4;;1247:71;;;;;-1:-1:-1;;;1247:71:4;;;;;;;;;;;;;;;;;;;;;;;;;;;;1329:30;;-1:-1:-1;;;1329:30:4;;-1:-1:-1;;;;;1329:13:4;;;;;1343:5;;1350:8;;1329:30;;;1343:5;1329:30;;1343:5;1329:30;;;;;;;;;-1:-1:-1;;1329:30:4;;;;;-1:-1:-1;1329:30:4;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;1369:5;-1:-1:-1;;;;;1369:15:4;;-1:-1:-1;;;;;;;;;;;1397:5:4;1369:34;;;;;;;;;;;;;;;;;;-1:-1:-1;;;;;1369:34:4;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;;1413:43:4;;;-1:-1:-1;;;1413:43:4;;-1:-1:-1;;;;;;;;;;;1413:43:4;;;;1450:4;1413:43;;;;;;-1:-1:-1;;;;;1413:16:4;;;-1:-1:-1;1413:16:4;;-1:-1:-1;1413:43:4;;;;;-1:-1:-1;;1413:43:4;;;;;;;-1:-1:-1;1413:16:4;:43;;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;1482:5:4;;1010:485;-1:-1:-1;;;;;;;1010:485:4:o;340:31::-;;;-1:-1:-1;;;;;340:31:4;;:::o;278:55::-;-1:-1:-1;;;;;;;;;;;278:55:4;:::o;-1:-1:-1:-;;;;;;;;:::o",
+  "sourceMap": "221:1276:3:-:0;;;503:210;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;503:210:3;-1:-1:-1;;;;;573:31:3;;552:108;;;;;-1:-1:-1;;;552:108:3;;;;;;;;;;;;;;;;;;;;;;;;;;;;670:16;:36;;-1:-1:-1;;;;;670:36:3;;;-1:-1:-1;;;;;;670:36:3;;;;;;;;;221:1276;;;;;;",
+  "deployedSourceMap": "221:1276:3:-:0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;1010:485;;;;;;;;;;;;;;;;-1:-1:-1;1010:485:3;;;-1:-1:-1;;;;;1010:485:3;;;;;;:::i;:::-;;;;-1:-1:-1;;;;;1010:485:3;;;;;;;;;;;;;;340:31;;;:::i;278:55::-;;;:::i;:::-;;;;;;;;;;;;;;;;1010:485;1155:7;1220:16;;1199:38;;1155:7;;-1:-1:-1;;;;;1220:16:3;;1199:38;;;:::i;:::-;-1:-1:-1;;;;;1199:38:3;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;1174:63:3;-1:-1:-1;;;;;;1255:28:3;;1247:71;;;;;-1:-1:-1;;;1247:71:3;;;;;;;;;;;;;;;;;;;;;;;;;;;;1329:30;;-1:-1:-1;;;1329:30:3;;-1:-1:-1;;;;;1329:13:3;;;;;1343:5;;1350:8;;1329:30;;;1343:5;1329:30;;1343:5;1329:30;;;;;;;;;-1:-1:-1;;1329:30:3;;;;;-1:-1:-1;1329:30:3;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;1369:5;-1:-1:-1;;;;;1369:15:3;;-1:-1:-1;;;;;;;;;;;1397:5:3;1369:34;;;;;;;;;;;;;;;;;;-1:-1:-1;;;;;1369:34:3;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;;1413:43:3;;;-1:-1:-1;;;1413:43:3;;-1:-1:-1;;;;;;;;;;;1413:43:3;;;;1450:4;1413:43;;;;;;-1:-1:-1;;;;;1413:16:3;;;-1:-1:-1;1413:16:3;;-1:-1:-1;1413:43:3;;;;;-1:-1:-1;;1413:43:3;;;;;;;-1:-1:-1;1413:16:3;:43;;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;1482:5:3;;1010:485;-1:-1:-1;;;;;;;1010:485:3:o;340:31::-;;;-1:-1:-1;;;;;340:31:3;;:::o;278:55::-;-1:-1:-1;;;;;;;;;;;278:55:3;:::o;-1:-1:-1:-;;;;;;;;:::o",
   "source": "// SPDX-License-Identifier: MIT\npragma solidity ^0.7.6;\n\nimport \"../interfaces/IStakeSimpleFactory.sol\";\nimport {StakeSimpleProxy} from \"../stake/StakeSimpleProxy.sol\";\n\n/// @title A factory that creates a stake contract\ncontract StakeSimpleFactory is IStakeSimpleFactory {\n    bytes32 public constant ADMIN_ROLE = keccak256(\"ADMIN\");\n\n    address public stakeSimpleLogic;\n\n    /// @dev constructor of StakeSimpleFactory\n    /// @param _stakeSimpleLogic the logic address used in StakeSimpleFactory\n    constructor(address _stakeSimpleLogic) {\n        require(\n            _stakeSimpleLogic != address(0),\n            \"StakeSimpleFactory: logic zero\"\n        );\n        stakeSimpleLogic = _stakeSimpleLogic;\n    }\n\n    /// @dev Create a stake contract that can operate the staked amount as a DeFi project.\n    /// @param _addr array of [token, paytoken, vault]\n    /// @param _intdata array of [saleStartBlock, startBlock, periodBlocks]\n    /// @param owner  owner address\n    /// @return contract address\n    function create(\n        address[3] calldata _addr,\n        uint256[3] calldata _intdata,\n        address owner\n    ) external override returns (address) {\n        StakeSimpleProxy proxy = new StakeSimpleProxy(stakeSimpleLogic);\n        require(address(proxy) != address(0), \"StakeSimpleFactory: proxy zero\");\n\n        proxy.setInit(_addr, _intdata);\n        proxy.grantRole(ADMIN_ROLE, owner);\n        proxy.revokeRole(ADMIN_ROLE, address(this));\n\n        return address(proxy);\n    }\n}\n",
   "sourcePath": "/Users/zena/ico2.0/ico20-contracts/contracts/factory/StakeSimpleFactory.sol",
   "ast": {
     "absolutePath": "/Users/zena/ico2.0/ico20-contracts/contracts/factory/StakeSimpleFactory.sol",
     "exportedSymbols": {
       "IStakeSimpleFactory": [
-        3732
+        3309
       ],
       "StakeSimpleFactory": [
-        2470
+        2138
       ],
       "StakeSimpleProxy": [
-        8652
+        8208
       ]
     },
-    "id": 2471,
+    "id": 2139,
     "license": "MIT",
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 2368,
+        "id": 2036,
         "literals": [
           "solidity",
           "^",
@@ -104,35 +104,35 @@
           ".6"
         ],
         "nodeType": "PragmaDirective",
-        "src": "32:23:4"
+        "src": "32:23:3"
       },
       {
         "absolutePath": "/Users/zena/ico2.0/ico20-contracts/contracts/interfaces/IStakeSimpleFactory.sol",
         "file": "../interfaces/IStakeSimpleFactory.sol",
-        "id": 2369,
+        "id": 2037,
         "nodeType": "ImportDirective",
-        "scope": 2471,
-        "sourceUnit": 3733,
-        "src": "57:47:4",
+        "scope": 2139,
+        "sourceUnit": 3310,
+        "src": "57:47:3",
         "symbolAliases": [],
         "unitAlias": ""
       },
       {
         "absolutePath": "/Users/zena/ico2.0/ico20-contracts/contracts/stake/StakeSimpleProxy.sol",
         "file": "../stake/StakeSimpleProxy.sol",
-        "id": 2371,
+        "id": 2039,
         "nodeType": "ImportDirective",
-        "scope": 2471,
-        "sourceUnit": 8653,
-        "src": "105:63:4",
+        "scope": 2139,
+        "sourceUnit": 8209,
+        "src": "105:63:3",
         "symbolAliases": [
           {
             "foreign": {
-              "id": 2370,
+              "id": 2038,
               "name": "StakeSimpleProxy",
               "nodeType": "Identifier",
               "overloadedDeclarations": [],
-              "src": "113:16:4",
+              "src": "113:16:3",
               "typeDescriptions": {}
             }
           }
@@ -144,37 +144,37 @@
         "baseContracts": [
           {
             "baseName": {
-              "id": 2373,
+              "id": 2041,
               "name": "IStakeSimpleFactory",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 3732,
-              "src": "252:19:4",
+              "referencedDeclaration": 3309,
+              "src": "252:19:3",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_IStakeSimpleFactory_$3732",
+                "typeIdentifier": "t_contract$_IStakeSimpleFactory_$3309",
                 "typeString": "contract IStakeSimpleFactory"
               }
             },
-            "id": 2374,
+            "id": 2042,
             "nodeType": "InheritanceSpecifier",
-            "src": "252:19:4"
+            "src": "252:19:3"
           }
         ],
         "contractDependencies": [
-          3732,
-          8652
+          3309,
+          8208
         ],
         "contractKind": "contract",
         "documentation": {
-          "id": 2372,
+          "id": 2040,
           "nodeType": "StructuredDocumentation",
-          "src": "170:51:4",
+          "src": "170:51:3",
           "text": "@title A factory that creates a stake contract"
         },
         "fullyImplemented": true,
-        "id": 2470,
+        "id": 2138,
         "linearizedBaseContracts": [
-          2470,
-          3732
+          2138,
+          3309
         ],
         "name": "StakeSimpleFactory",
         "nodeType": "ContractDefinition",
@@ -182,12 +182,12 @@
           {
             "constant": true,
             "functionSelector": "75b238fc",
-            "id": 2379,
+            "id": 2047,
             "mutability": "constant",
             "name": "ADMIN_ROLE",
             "nodeType": "VariableDeclaration",
-            "scope": 2470,
-            "src": "278:55:4",
+            "scope": 2138,
+            "src": "278:55:3",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -195,10 +195,10 @@
               "typeString": "bytes32"
             },
             "typeName": {
-              "id": 2375,
+              "id": 2043,
               "name": "bytes32",
               "nodeType": "ElementaryTypeName",
-              "src": "278:7:4",
+              "src": "278:7:3",
               "typeDescriptions": {
                 "typeIdentifier": "t_bytes32",
                 "typeString": "bytes32"
@@ -208,14 +208,14 @@
               "arguments": [
                 {
                   "hexValue": "41444d494e",
-                  "id": 2377,
+                  "id": 2045,
                   "isConstant": false,
                   "isLValue": false,
                   "isPure": true,
                   "kind": "string",
                   "lValueRequested": false,
                   "nodeType": "Literal",
-                  "src": "325:7:4",
+                  "src": "325:7:3",
                   "typeDescriptions": {
                     "typeIdentifier": "t_stringliteral_df8b4c520ffe197c5343c6f5aec59570151ef9a492f2c624fd45ddde6135ec42",
                     "typeString": "literal_string \"ADMIN\""
@@ -230,18 +230,18 @@
                     "typeString": "literal_string \"ADMIN\""
                   }
                 ],
-                "id": 2376,
+                "id": 2044,
                 "name": "keccak256",
                 "nodeType": "Identifier",
                 "overloadedDeclarations": [],
                 "referencedDeclaration": 4294967288,
-                "src": "315:9:4",
+                "src": "315:9:3",
                 "typeDescriptions": {
                   "typeIdentifier": "t_function_keccak256_pure$_t_bytes_memory_ptr_$returns$_t_bytes32_$",
                   "typeString": "function (bytes memory) pure returns (bytes32)"
                 }
               },
-              "id": 2378,
+              "id": 2046,
               "isConstant": false,
               "isLValue": false,
               "isPure": true,
@@ -249,7 +249,7 @@
               "lValueRequested": false,
               "names": [],
               "nodeType": "FunctionCall",
-              "src": "315:18:4",
+              "src": "315:18:3",
               "tryCall": false,
               "typeDescriptions": {
                 "typeIdentifier": "t_bytes32",
@@ -261,12 +261,12 @@
           {
             "constant": false,
             "functionSelector": "2c4ffdda",
-            "id": 2381,
+            "id": 2049,
             "mutability": "mutable",
             "name": "stakeSimpleLogic",
             "nodeType": "VariableDeclaration",
-            "scope": 2470,
-            "src": "340:31:4",
+            "scope": 2138,
+            "src": "340:31:3",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -274,10 +274,10 @@
               "typeString": "address"
             },
             "typeName": {
-              "id": 2380,
+              "id": 2048,
               "name": "address",
               "nodeType": "ElementaryTypeName",
-              "src": "340:7:4",
+              "src": "340:7:3",
               "stateMutability": "nonpayable",
               "typeDescriptions": {
                 "typeIdentifier": "t_address",
@@ -288,9 +288,9 @@
           },
           {
             "body": {
-              "id": 2401,
+              "id": 2069,
               "nodeType": "Block",
-              "src": "542:171:4",
+              "src": "542:171:3",
               "statements": [
                 {
                   "expression": {
@@ -300,18 +300,18 @@
                           "typeIdentifier": "t_address",
                           "typeString": "address"
                         },
-                        "id": 2393,
+                        "id": 2061,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": false,
                         "lValueRequested": false,
                         "leftExpression": {
-                          "id": 2388,
+                          "id": 2056,
                           "name": "_stakeSimpleLogic",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 2384,
-                          "src": "573:17:4",
+                          "referencedDeclaration": 2052,
+                          "src": "573:17:3",
                           "typeDescriptions": {
                             "typeIdentifier": "t_address",
                             "typeString": "address"
@@ -323,14 +323,14 @@
                           "arguments": [
                             {
                               "hexValue": "30",
-                              "id": 2391,
+                              "id": 2059,
                               "isConstant": false,
                               "isLValue": false,
                               "isPure": true,
                               "kind": "number",
                               "lValueRequested": false,
                               "nodeType": "Literal",
-                              "src": "602:1:4",
+                              "src": "602:1:3",
                               "typeDescriptions": {
                                 "typeIdentifier": "t_rational_0_by_1",
                                 "typeString": "int_const 0"
@@ -345,26 +345,26 @@
                                 "typeString": "int_const 0"
                               }
                             ],
-                            "id": 2390,
+                            "id": 2058,
                             "isConstant": false,
                             "isLValue": false,
                             "isPure": true,
                             "lValueRequested": false,
                             "nodeType": "ElementaryTypeNameExpression",
-                            "src": "594:7:4",
+                            "src": "594:7:3",
                             "typeDescriptions": {
                               "typeIdentifier": "t_type$_t_address_$",
                               "typeString": "type(address)"
                             },
                             "typeName": {
-                              "id": 2389,
+                              "id": 2057,
                               "name": "address",
                               "nodeType": "ElementaryTypeName",
-                              "src": "594:7:4",
+                              "src": "594:7:3",
                               "typeDescriptions": {}
                             }
                           },
-                          "id": 2392,
+                          "id": 2060,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": true,
@@ -372,14 +372,14 @@
                           "lValueRequested": false,
                           "names": [],
                           "nodeType": "FunctionCall",
-                          "src": "594:10:4",
+                          "src": "594:10:3",
                           "tryCall": false,
                           "typeDescriptions": {
                             "typeIdentifier": "t_address_payable",
                             "typeString": "address payable"
                           }
                         },
-                        "src": "573:31:4",
+                        "src": "573:31:3",
                         "typeDescriptions": {
                           "typeIdentifier": "t_bool",
                           "typeString": "bool"
@@ -387,14 +387,14 @@
                       },
                       {
                         "hexValue": "5374616b6553696d706c65466163746f72793a206c6f676963207a65726f",
-                        "id": 2394,
+                        "id": 2062,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": true,
                         "kind": "string",
                         "lValueRequested": false,
                         "nodeType": "Literal",
-                        "src": "618:32:4",
+                        "src": "618:32:3",
                         "typeDescriptions": {
                           "typeIdentifier": "t_stringliteral_01835bb8ba25fe6c0d4cba4f0cfab3860792d5d57df071e9e05fbf60078ed153",
                           "typeString": "literal_string \"StakeSimpleFactory: logic zero\""
@@ -413,7 +413,7 @@
                           "typeString": "literal_string \"StakeSimpleFactory: logic zero\""
                         }
                       ],
-                      "id": 2387,
+                      "id": 2055,
                       "name": "require",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
@@ -421,13 +421,13 @@
                         4294967278
                       ],
                       "referencedDeclaration": 4294967278,
-                      "src": "552:7:4",
+                      "src": "552:7:3",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_require_pure$_t_bool_$_t_string_memory_ptr_$returns$__$",
                         "typeString": "function (bool,string memory) pure"
                       }
                     },
-                    "id": 2395,
+                    "id": 2063,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -435,31 +435,31 @@
                     "lValueRequested": false,
                     "names": [],
                     "nodeType": "FunctionCall",
-                    "src": "552:108:4",
+                    "src": "552:108:3",
                     "tryCall": false,
                     "typeDescriptions": {
                       "typeIdentifier": "t_tuple$__$",
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 2396,
+                  "id": 2064,
                   "nodeType": "ExpressionStatement",
-                  "src": "552:108:4"
+                  "src": "552:108:3"
                 },
                 {
                   "expression": {
-                    "id": 2399,
+                    "id": 2067,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
                     "lValueRequested": false,
                     "leftHandSide": {
-                      "id": 2397,
+                      "id": 2065,
                       "name": "stakeSimpleLogic",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 2381,
-                      "src": "670:16:4",
+                      "referencedDeclaration": 2049,
+                      "src": "670:16:3",
                       "typeDescriptions": {
                         "typeIdentifier": "t_address",
                         "typeString": "address"
@@ -468,53 +468,53 @@
                     "nodeType": "Assignment",
                     "operator": "=",
                     "rightHandSide": {
-                      "id": 2398,
+                      "id": 2066,
                       "name": "_stakeSimpleLogic",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 2384,
-                      "src": "689:17:4",
+                      "referencedDeclaration": 2052,
+                      "src": "689:17:3",
                       "typeDescriptions": {
                         "typeIdentifier": "t_address",
                         "typeString": "address"
                       }
                     },
-                    "src": "670:36:4",
+                    "src": "670:36:3",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
                       "typeString": "address"
                     }
                   },
-                  "id": 2400,
+                  "id": 2068,
                   "nodeType": "ExpressionStatement",
-                  "src": "670:36:4"
+                  "src": "670:36:3"
                 }
               ]
             },
             "documentation": {
-              "id": 2382,
+              "id": 2050,
               "nodeType": "StructuredDocumentation",
-              "src": "378:120:4",
+              "src": "378:120:3",
               "text": "@dev constructor of StakeSimpleFactory\n @param _stakeSimpleLogic the logic address used in StakeSimpleFactory"
             },
-            "id": 2402,
+            "id": 2070,
             "implemented": true,
             "kind": "constructor",
             "modifiers": [],
             "name": "",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 2385,
+              "id": 2053,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 2384,
+                  "id": 2052,
                   "mutability": "mutable",
                   "name": "_stakeSimpleLogic",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2402,
-                  "src": "515:25:4",
+                  "scope": 2070,
+                  "src": "515:25:3",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -522,10 +522,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 2383,
+                    "id": 2051,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "515:7:4",
+                    "src": "515:7:3",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -535,72 +535,72 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "514:27:4"
+              "src": "514:27:3"
             },
             "returnParameters": {
-              "id": 2386,
+              "id": 2054,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "542:0:4"
+              "src": "542:0:3"
             },
-            "scope": 2470,
-            "src": "503:210:4",
+            "scope": 2138,
+            "src": "503:210:3",
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "public"
           },
           {
             "baseFunctions": [
-              3731
+              3308
             ],
             "body": {
-              "id": 2468,
+              "id": 2136,
               "nodeType": "Block",
-              "src": "1164:331:4",
+              "src": "1164:331:3",
               "statements": [
                 {
                   "assignments": [
-                    2420
+                    2088
                   ],
                   "declarations": [
                     {
                       "constant": false,
-                      "id": 2420,
+                      "id": 2088,
                       "mutability": "mutable",
                       "name": "proxy",
                       "nodeType": "VariableDeclaration",
-                      "scope": 2468,
-                      "src": "1174:22:4",
+                      "scope": 2136,
+                      "src": "1174:22:3",
                       "stateVariable": false,
                       "storageLocation": "default",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_contract$_StakeSimpleProxy_$8652",
+                        "typeIdentifier": "t_contract$_StakeSimpleProxy_$8208",
                         "typeString": "contract StakeSimpleProxy"
                       },
                       "typeName": {
-                        "id": 2419,
+                        "id": 2087,
                         "name": "StakeSimpleProxy",
                         "nodeType": "UserDefinedTypeName",
-                        "referencedDeclaration": 8652,
-                        "src": "1174:16:4",
+                        "referencedDeclaration": 8208,
+                        "src": "1174:16:3",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_StakeSimpleProxy_$8652",
+                          "typeIdentifier": "t_contract$_StakeSimpleProxy_$8208",
                           "typeString": "contract StakeSimpleProxy"
                         }
                       },
                       "visibility": "internal"
                     }
                   ],
-                  "id": 2425,
+                  "id": 2093,
                   "initialValue": {
                     "arguments": [
                       {
-                        "id": 2423,
+                        "id": 2091,
                         "name": "stakeSimpleLogic",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 2381,
-                        "src": "1220:16:4",
+                        "referencedDeclaration": 2049,
+                        "src": "1220:16:3",
                         "typeDescriptions": {
                           "typeIdentifier": "t_address",
                           "typeString": "address"
@@ -614,30 +614,30 @@
                           "typeString": "address"
                         }
                       ],
-                      "id": 2422,
+                      "id": 2090,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": false,
                       "lValueRequested": false,
                       "nodeType": "NewExpression",
-                      "src": "1199:20:4",
+                      "src": "1199:20:3",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_function_creation_nonpayable$_t_address_$returns$_t_contract$_StakeSimpleProxy_$8652_$",
+                        "typeIdentifier": "t_function_creation_nonpayable$_t_address_$returns$_t_contract$_StakeSimpleProxy_$8208_$",
                         "typeString": "function (address) returns (contract StakeSimpleProxy)"
                       },
                       "typeName": {
-                        "id": 2421,
+                        "id": 2089,
                         "name": "StakeSimpleProxy",
                         "nodeType": "UserDefinedTypeName",
-                        "referencedDeclaration": 8652,
-                        "src": "1203:16:4",
+                        "referencedDeclaration": 8208,
+                        "src": "1203:16:3",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_StakeSimpleProxy_$8652",
+                          "typeIdentifier": "t_contract$_StakeSimpleProxy_$8208",
                           "typeString": "contract StakeSimpleProxy"
                         }
                       }
                     },
-                    "id": 2424,
+                    "id": 2092,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -645,15 +645,15 @@
                     "lValueRequested": false,
                     "names": [],
                     "nodeType": "FunctionCall",
-                    "src": "1199:38:4",
+                    "src": "1199:38:3",
                     "tryCall": false,
                     "typeDescriptions": {
-                      "typeIdentifier": "t_contract$_StakeSimpleProxy_$8652",
+                      "typeIdentifier": "t_contract$_StakeSimpleProxy_$8208",
                       "typeString": "contract StakeSimpleProxy"
                     }
                   },
                   "nodeType": "VariableDeclarationStatement",
-                  "src": "1174:63:4"
+                  "src": "1174:63:3"
                 },
                 {
                   "expression": {
@@ -663,7 +663,7 @@
                           "typeIdentifier": "t_address_payable",
                           "typeString": "address payable"
                         },
-                        "id": 2435,
+                        "id": 2103,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": false,
@@ -671,14 +671,14 @@
                         "leftExpression": {
                           "arguments": [
                             {
-                              "id": 2429,
+                              "id": 2097,
                               "name": "proxy",
                               "nodeType": "Identifier",
                               "overloadedDeclarations": [],
-                              "referencedDeclaration": 2420,
-                              "src": "1263:5:4",
+                              "referencedDeclaration": 2088,
+                              "src": "1263:5:3",
                               "typeDescriptions": {
-                                "typeIdentifier": "t_contract$_StakeSimpleProxy_$8652",
+                                "typeIdentifier": "t_contract$_StakeSimpleProxy_$8208",
                                 "typeString": "contract StakeSimpleProxy"
                               }
                             }
@@ -686,30 +686,30 @@
                           "expression": {
                             "argumentTypes": [
                               {
-                                "typeIdentifier": "t_contract$_StakeSimpleProxy_$8652",
+                                "typeIdentifier": "t_contract$_StakeSimpleProxy_$8208",
                                 "typeString": "contract StakeSimpleProxy"
                               }
                             ],
-                            "id": 2428,
+                            "id": 2096,
                             "isConstant": false,
                             "isLValue": false,
                             "isPure": true,
                             "lValueRequested": false,
                             "nodeType": "ElementaryTypeNameExpression",
-                            "src": "1255:7:4",
+                            "src": "1255:7:3",
                             "typeDescriptions": {
                               "typeIdentifier": "t_type$_t_address_$",
                               "typeString": "type(address)"
                             },
                             "typeName": {
-                              "id": 2427,
+                              "id": 2095,
                               "name": "address",
                               "nodeType": "ElementaryTypeName",
-                              "src": "1255:7:4",
+                              "src": "1255:7:3",
                               "typeDescriptions": {}
                             }
                           },
-                          "id": 2430,
+                          "id": 2098,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": false,
@@ -717,7 +717,7 @@
                           "lValueRequested": false,
                           "names": [],
                           "nodeType": "FunctionCall",
-                          "src": "1255:14:4",
+                          "src": "1255:14:3",
                           "tryCall": false,
                           "typeDescriptions": {
                             "typeIdentifier": "t_address_payable",
@@ -730,14 +730,14 @@
                           "arguments": [
                             {
                               "hexValue": "30",
-                              "id": 2433,
+                              "id": 2101,
                               "isConstant": false,
                               "isLValue": false,
                               "isPure": true,
                               "kind": "number",
                               "lValueRequested": false,
                               "nodeType": "Literal",
-                              "src": "1281:1:4",
+                              "src": "1281:1:3",
                               "typeDescriptions": {
                                 "typeIdentifier": "t_rational_0_by_1",
                                 "typeString": "int_const 0"
@@ -752,26 +752,26 @@
                                 "typeString": "int_const 0"
                               }
                             ],
-                            "id": 2432,
+                            "id": 2100,
                             "isConstant": false,
                             "isLValue": false,
                             "isPure": true,
                             "lValueRequested": false,
                             "nodeType": "ElementaryTypeNameExpression",
-                            "src": "1273:7:4",
+                            "src": "1273:7:3",
                             "typeDescriptions": {
                               "typeIdentifier": "t_type$_t_address_$",
                               "typeString": "type(address)"
                             },
                             "typeName": {
-                              "id": 2431,
+                              "id": 2099,
                               "name": "address",
                               "nodeType": "ElementaryTypeName",
-                              "src": "1273:7:4",
+                              "src": "1273:7:3",
                               "typeDescriptions": {}
                             }
                           },
-                          "id": 2434,
+                          "id": 2102,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": true,
@@ -779,14 +779,14 @@
                           "lValueRequested": false,
                           "names": [],
                           "nodeType": "FunctionCall",
-                          "src": "1273:10:4",
+                          "src": "1273:10:3",
                           "tryCall": false,
                           "typeDescriptions": {
                             "typeIdentifier": "t_address_payable",
                             "typeString": "address payable"
                           }
                         },
-                        "src": "1255:28:4",
+                        "src": "1255:28:3",
                         "typeDescriptions": {
                           "typeIdentifier": "t_bool",
                           "typeString": "bool"
@@ -794,14 +794,14 @@
                       },
                       {
                         "hexValue": "5374616b6553696d706c65466163746f72793a2070726f7879207a65726f",
-                        "id": 2436,
+                        "id": 2104,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": true,
                         "kind": "string",
                         "lValueRequested": false,
                         "nodeType": "Literal",
-                        "src": "1285:32:4",
+                        "src": "1285:32:3",
                         "typeDescriptions": {
                           "typeIdentifier": "t_stringliteral_c3930c080ee48cd83de467081619a145307b124d0b46a680715b9b743de62f1d",
                           "typeString": "literal_string \"StakeSimpleFactory: proxy zero\""
@@ -820,7 +820,7 @@
                           "typeString": "literal_string \"StakeSimpleFactory: proxy zero\""
                         }
                       ],
-                      "id": 2426,
+                      "id": 2094,
                       "name": "require",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
@@ -828,13 +828,13 @@
                         4294967278
                       ],
                       "referencedDeclaration": 4294967278,
-                      "src": "1247:7:4",
+                      "src": "1247:7:3",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_require_pure$_t_bool_$_t_string_memory_ptr_$returns$__$",
                         "typeString": "function (bool,string memory) pure"
                       }
                     },
-                    "id": 2437,
+                    "id": 2105,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -842,39 +842,39 @@
                     "lValueRequested": false,
                     "names": [],
                     "nodeType": "FunctionCall",
-                    "src": "1247:71:4",
+                    "src": "1247:71:3",
                     "tryCall": false,
                     "typeDescriptions": {
                       "typeIdentifier": "t_tuple$__$",
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 2438,
+                  "id": 2106,
                   "nodeType": "ExpressionStatement",
-                  "src": "1247:71:4"
+                  "src": "1247:71:3"
                 },
                 {
                   "expression": {
                     "arguments": [
                       {
-                        "id": 2442,
+                        "id": 2110,
                         "name": "_addr",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 2407,
-                        "src": "1343:5:4",
+                        "referencedDeclaration": 2075,
+                        "src": "1343:5:3",
                         "typeDescriptions": {
                           "typeIdentifier": "t_array$_t_address_$3_calldata_ptr",
                           "typeString": "address[3] calldata"
                         }
                       },
                       {
-                        "id": 2443,
+                        "id": 2111,
                         "name": "_intdata",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 2411,
-                        "src": "1350:8:4",
+                        "referencedDeclaration": 2079,
+                        "src": "1350:8:3",
                         "typeDescriptions": {
                           "typeIdentifier": "t_array$_t_uint256_$3_calldata_ptr",
                           "typeString": "uint256[3] calldata"
@@ -893,32 +893,32 @@
                         }
                       ],
                       "expression": {
-                        "id": 2439,
+                        "id": 2107,
                         "name": "proxy",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 2420,
-                        "src": "1329:5:4",
+                        "referencedDeclaration": 2088,
+                        "src": "1329:5:3",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_StakeSimpleProxy_$8652",
+                          "typeIdentifier": "t_contract$_StakeSimpleProxy_$8208",
                           "typeString": "contract StakeSimpleProxy"
                         }
                       },
-                      "id": 2441,
+                      "id": 2109,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": false,
                       "lValueRequested": false,
                       "memberName": "setInit",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 8651,
-                      "src": "1329:13:4",
+                      "referencedDeclaration": 8207,
+                      "src": "1329:13:3",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_external_nonpayable$_t_array$_t_address_$3_memory_ptr_$_t_array$_t_uint256_$3_memory_ptr_$returns$__$",
                         "typeString": "function (address[3] memory,uint256[3] memory) external"
                       }
                     },
-                    "id": 2444,
+                    "id": 2112,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -926,39 +926,39 @@
                     "lValueRequested": false,
                     "names": [],
                     "nodeType": "FunctionCall",
-                    "src": "1329:30:4",
+                    "src": "1329:30:3",
                     "tryCall": false,
                     "typeDescriptions": {
                       "typeIdentifier": "t_tuple$__$",
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 2445,
+                  "id": 2113,
                   "nodeType": "ExpressionStatement",
-                  "src": "1329:30:4"
+                  "src": "1329:30:3"
                 },
                 {
                   "expression": {
                     "arguments": [
                       {
-                        "id": 2449,
+                        "id": 2117,
                         "name": "ADMIN_ROLE",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 2379,
-                        "src": "1385:10:4",
+                        "referencedDeclaration": 2047,
+                        "src": "1385:10:3",
                         "typeDescriptions": {
                           "typeIdentifier": "t_bytes32",
                           "typeString": "bytes32"
                         }
                       },
                       {
-                        "id": 2450,
+                        "id": 2118,
                         "name": "owner",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 2413,
-                        "src": "1397:5:4",
+                        "referencedDeclaration": 2081,
+                        "src": "1397:5:3",
                         "typeDescriptions": {
                           "typeIdentifier": "t_address",
                           "typeString": "address"
@@ -977,32 +977,32 @@
                         }
                       ],
                       "expression": {
-                        "id": 2446,
+                        "id": 2114,
                         "name": "proxy",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 2420,
-                        "src": "1369:5:4",
+                        "referencedDeclaration": 2088,
+                        "src": "1369:5:3",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_StakeSimpleProxy_$8652",
+                          "typeIdentifier": "t_contract$_StakeSimpleProxy_$8208",
                           "typeString": "contract StakeSimpleProxy"
                         }
                       },
-                      "id": 2448,
+                      "id": 2116,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": false,
                       "lValueRequested": false,
                       "memberName": "grantRole",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 11540,
-                      "src": "1369:15:4",
+                      "referencedDeclaration": 10842,
+                      "src": "1369:15:3",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_external_nonpayable$_t_bytes32_$_t_address_$returns$__$",
                         "typeString": "function (bytes32,address) external"
                       }
                     },
-                    "id": 2451,
+                    "id": 2119,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -1010,27 +1010,27 @@
                     "lValueRequested": false,
                     "names": [],
                     "nodeType": "FunctionCall",
-                    "src": "1369:34:4",
+                    "src": "1369:34:3",
                     "tryCall": false,
                     "typeDescriptions": {
                       "typeIdentifier": "t_tuple$__$",
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 2452,
+                  "id": 2120,
                   "nodeType": "ExpressionStatement",
-                  "src": "1369:34:4"
+                  "src": "1369:34:3"
                 },
                 {
                   "expression": {
                     "arguments": [
                       {
-                        "id": 2456,
+                        "id": 2124,
                         "name": "ADMIN_ROLE",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 2379,
-                        "src": "1430:10:4",
+                        "referencedDeclaration": 2047,
+                        "src": "1430:10:3",
                         "typeDescriptions": {
                           "typeIdentifier": "t_bytes32",
                           "typeString": "bytes32"
@@ -1039,14 +1039,14 @@
                       {
                         "arguments": [
                           {
-                            "id": 2459,
+                            "id": 2127,
                             "name": "this",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
                             "referencedDeclaration": 4294967268,
-                            "src": "1450:4:4",
+                            "src": "1450:4:3",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_contract$_StakeSimpleFactory_$2470",
+                              "typeIdentifier": "t_contract$_StakeSimpleFactory_$2138",
                               "typeString": "contract StakeSimpleFactory"
                             }
                           }
@@ -1054,30 +1054,30 @@
                         "expression": {
                           "argumentTypes": [
                             {
-                              "typeIdentifier": "t_contract$_StakeSimpleFactory_$2470",
+                              "typeIdentifier": "t_contract$_StakeSimpleFactory_$2138",
                               "typeString": "contract StakeSimpleFactory"
                             }
                           ],
-                          "id": 2458,
+                          "id": 2126,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": true,
                           "lValueRequested": false,
                           "nodeType": "ElementaryTypeNameExpression",
-                          "src": "1442:7:4",
+                          "src": "1442:7:3",
                           "typeDescriptions": {
                             "typeIdentifier": "t_type$_t_address_$",
                             "typeString": "type(address)"
                           },
                           "typeName": {
-                            "id": 2457,
+                            "id": 2125,
                             "name": "address",
                             "nodeType": "ElementaryTypeName",
-                            "src": "1442:7:4",
+                            "src": "1442:7:3",
                             "typeDescriptions": {}
                           }
                         },
-                        "id": 2460,
+                        "id": 2128,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": false,
@@ -1085,7 +1085,7 @@
                         "lValueRequested": false,
                         "names": [],
                         "nodeType": "FunctionCall",
-                        "src": "1442:13:4",
+                        "src": "1442:13:3",
                         "tryCall": false,
                         "typeDescriptions": {
                           "typeIdentifier": "t_address",
@@ -1105,32 +1105,32 @@
                         }
                       ],
                       "expression": {
-                        "id": 2453,
+                        "id": 2121,
                         "name": "proxy",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 2420,
-                        "src": "1413:5:4",
+                        "referencedDeclaration": 2088,
+                        "src": "1413:5:3",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_StakeSimpleProxy_$8652",
+                          "typeIdentifier": "t_contract$_StakeSimpleProxy_$8208",
                           "typeString": "contract StakeSimpleProxy"
                         }
                       },
-                      "id": 2455,
+                      "id": 2123,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": false,
                       "lValueRequested": false,
                       "memberName": "revokeRole",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 11566,
-                      "src": "1413:16:4",
+                      "referencedDeclaration": 10868,
+                      "src": "1413:16:3",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_external_nonpayable$_t_bytes32_$_t_address_$returns$__$",
                         "typeString": "function (bytes32,address) external"
                       }
                     },
-                    "id": 2461,
+                    "id": 2129,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -1138,29 +1138,29 @@
                     "lValueRequested": false,
                     "names": [],
                     "nodeType": "FunctionCall",
-                    "src": "1413:43:4",
+                    "src": "1413:43:3",
                     "tryCall": false,
                     "typeDescriptions": {
                       "typeIdentifier": "t_tuple$__$",
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 2462,
+                  "id": 2130,
                   "nodeType": "ExpressionStatement",
-                  "src": "1413:43:4"
+                  "src": "1413:43:3"
                 },
                 {
                   "expression": {
                     "arguments": [
                       {
-                        "id": 2465,
+                        "id": 2133,
                         "name": "proxy",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 2420,
-                        "src": "1482:5:4",
+                        "referencedDeclaration": 2088,
+                        "src": "1482:5:3",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_StakeSimpleProxy_$8652",
+                          "typeIdentifier": "t_contract$_StakeSimpleProxy_$8208",
                           "typeString": "contract StakeSimpleProxy"
                         }
                       }
@@ -1168,30 +1168,30 @@
                     "expression": {
                       "argumentTypes": [
                         {
-                          "typeIdentifier": "t_contract$_StakeSimpleProxy_$8652",
+                          "typeIdentifier": "t_contract$_StakeSimpleProxy_$8208",
                           "typeString": "contract StakeSimpleProxy"
                         }
                       ],
-                      "id": 2464,
+                      "id": 2132,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": true,
                       "lValueRequested": false,
                       "nodeType": "ElementaryTypeNameExpression",
-                      "src": "1474:7:4",
+                      "src": "1474:7:3",
                       "typeDescriptions": {
                         "typeIdentifier": "t_type$_t_address_$",
                         "typeString": "type(address)"
                       },
                       "typeName": {
-                        "id": 2463,
+                        "id": 2131,
                         "name": "address",
                         "nodeType": "ElementaryTypeName",
-                        "src": "1474:7:4",
+                        "src": "1474:7:3",
                         "typeDescriptions": {}
                       }
                     },
-                    "id": 2466,
+                    "id": 2134,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -1199,51 +1199,51 @@
                     "lValueRequested": false,
                     "names": [],
                     "nodeType": "FunctionCall",
-                    "src": "1474:14:4",
+                    "src": "1474:14:3",
                     "tryCall": false,
                     "typeDescriptions": {
                       "typeIdentifier": "t_address_payable",
                       "typeString": "address payable"
                     }
                   },
-                  "functionReturnParameters": 2418,
-                  "id": 2467,
+                  "functionReturnParameters": 2086,
+                  "id": 2135,
                   "nodeType": "Return",
-                  "src": "1467:21:4"
+                  "src": "1467:21:3"
                 }
               ]
             },
             "documentation": {
-              "id": 2403,
+              "id": 2071,
               "nodeType": "StructuredDocumentation",
-              "src": "719:286:4",
+              "src": "719:286:3",
               "text": "@dev Create a stake contract that can operate the staked amount as a DeFi project.\n @param _addr array of [token, paytoken, vault]\n @param _intdata array of [saleStartBlock, startBlock, periodBlocks]\n @param owner  owner address\n @return contract address"
             },
             "functionSelector": "0df50048",
-            "id": 2469,
+            "id": 2137,
             "implemented": true,
             "kind": "function",
             "modifiers": [],
             "name": "create",
             "nodeType": "FunctionDefinition",
             "overrides": {
-              "id": 2415,
+              "id": 2083,
               "nodeType": "OverrideSpecifier",
               "overrides": [],
-              "src": "1137:8:4"
+              "src": "1137:8:3"
             },
             "parameters": {
-              "id": 2414,
+              "id": 2082,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 2407,
+                  "id": 2075,
                   "mutability": "mutable",
                   "name": "_addr",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2469,
-                  "src": "1035:25:4",
+                  "scope": 2137,
+                  "src": "1035:25:3",
                   "stateVariable": false,
                   "storageLocation": "calldata",
                   "typeDescriptions": {
@@ -1252,27 +1252,27 @@
                   },
                   "typeName": {
                     "baseType": {
-                      "id": 2404,
+                      "id": 2072,
                       "name": "address",
                       "nodeType": "ElementaryTypeName",
-                      "src": "1035:7:4",
+                      "src": "1035:7:3",
                       "stateMutability": "nonpayable",
                       "typeDescriptions": {
                         "typeIdentifier": "t_address",
                         "typeString": "address"
                       }
                     },
-                    "id": 2406,
+                    "id": 2074,
                     "length": {
                       "hexValue": "33",
-                      "id": 2405,
+                      "id": 2073,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": true,
                       "kind": "number",
                       "lValueRequested": false,
                       "nodeType": "Literal",
-                      "src": "1043:1:4",
+                      "src": "1043:1:3",
                       "typeDescriptions": {
                         "typeIdentifier": "t_rational_3_by_1",
                         "typeString": "int_const 3"
@@ -1280,7 +1280,7 @@
                       "value": "3"
                     },
                     "nodeType": "ArrayTypeName",
-                    "src": "1035:10:4",
+                    "src": "1035:10:3",
                     "typeDescriptions": {
                       "typeIdentifier": "t_array$_t_address_$3_storage_ptr",
                       "typeString": "address[3]"
@@ -1290,12 +1290,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 2411,
+                  "id": 2079,
                   "mutability": "mutable",
                   "name": "_intdata",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2469,
-                  "src": "1070:28:4",
+                  "scope": 2137,
+                  "src": "1070:28:3",
                   "stateVariable": false,
                   "storageLocation": "calldata",
                   "typeDescriptions": {
@@ -1304,26 +1304,26 @@
                   },
                   "typeName": {
                     "baseType": {
-                      "id": 2408,
+                      "id": 2076,
                       "name": "uint256",
                       "nodeType": "ElementaryTypeName",
-                      "src": "1070:7:4",
+                      "src": "1070:7:3",
                       "typeDescriptions": {
                         "typeIdentifier": "t_uint256",
                         "typeString": "uint256"
                       }
                     },
-                    "id": 2410,
+                    "id": 2078,
                     "length": {
                       "hexValue": "33",
-                      "id": 2409,
+                      "id": 2077,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": true,
                       "kind": "number",
                       "lValueRequested": false,
                       "nodeType": "Literal",
-                      "src": "1078:1:4",
+                      "src": "1078:1:3",
                       "typeDescriptions": {
                         "typeIdentifier": "t_rational_3_by_1",
                         "typeString": "int_const 3"
@@ -1331,7 +1331,7 @@
                       "value": "3"
                     },
                     "nodeType": "ArrayTypeName",
-                    "src": "1070:10:4",
+                    "src": "1070:10:3",
                     "typeDescriptions": {
                       "typeIdentifier": "t_array$_t_uint256_$3_storage_ptr",
                       "typeString": "uint256[3]"
@@ -1341,12 +1341,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 2413,
+                  "id": 2081,
                   "mutability": "mutable",
                   "name": "owner",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2469,
-                  "src": "1108:13:4",
+                  "scope": 2137,
+                  "src": "1108:13:3",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1354,10 +1354,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 2412,
+                    "id": 2080,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1108:7:4",
+                    "src": "1108:7:3",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -1367,20 +1367,20 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "1025:102:4"
+              "src": "1025:102:3"
             },
             "returnParameters": {
-              "id": 2418,
+              "id": 2086,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 2417,
+                  "id": 2085,
                   "mutability": "mutable",
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2469,
-                  "src": "1155:7:4",
+                  "scope": 2137,
+                  "src": "1155:7:3",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1388,10 +1388,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 2416,
+                    "id": 2084,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1155:7:4",
+                    "src": "1155:7:3",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -1401,33 +1401,33 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "1154:9:4"
+              "src": "1154:9:3"
             },
-            "scope": 2470,
-            "src": "1010:485:4",
+            "scope": 2138,
+            "src": "1010:485:3",
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "external"
           }
         ],
-        "scope": 2471,
-        "src": "221:1276:4"
+        "scope": 2139,
+        "src": "221:1276:3"
       }
     ],
-    "src": "32:1466:4"
+    "src": "32:1466:3"
   },
   "legacyAST": {
     "attributes": {
       "absolutePath": "/Users/zena/ico2.0/ico20-contracts/contracts/factory/StakeSimpleFactory.sol",
       "exportedSymbols": {
         "IStakeSimpleFactory": [
-          3732
+          3309
         ],
         "StakeSimpleFactory": [
-          2470
+          2138
         ],
         "StakeSimpleProxy": [
-          8652
+          8208
         ]
       },
       "license": "MIT"
@@ -1442,31 +1442,31 @@
             ".6"
           ]
         },
-        "id": 2368,
+        "id": 2036,
         "name": "PragmaDirective",
-        "src": "32:23:4"
+        "src": "32:23:3"
       },
       {
         "attributes": {
-          "SourceUnit": 3733,
+          "SourceUnit": 3310,
           "absolutePath": "/Users/zena/ico2.0/ico20-contracts/contracts/interfaces/IStakeSimpleFactory.sol",
           "file": "../interfaces/IStakeSimpleFactory.sol",
-          "scope": 2471,
+          "scope": 2139,
           "symbolAliases": [
             null
           ],
           "unitAlias": ""
         },
-        "id": 2369,
+        "id": 2037,
         "name": "ImportDirective",
-        "src": "57:47:4"
+        "src": "57:47:3"
       },
       {
         "attributes": {
-          "SourceUnit": 8653,
+          "SourceUnit": 8209,
           "absolutePath": "/Users/zena/ico2.0/ico20-contracts/contracts/stake/StakeSimpleProxy.sol",
           "file": "../stake/StakeSimpleProxy.sol",
-          "scope": 2471,
+          "scope": 2139,
           "symbolAliases": [
             {
               "foreign": {
@@ -1476,42 +1476,42 @@
                   ],
                   "value": "StakeSimpleProxy"
                 },
-                "id": 2370,
+                "id": 2038,
                 "name": "Identifier",
-                "src": "113:16:4"
+                "src": "113:16:3"
               }
             }
           ],
           "unitAlias": ""
         },
-        "id": 2371,
+        "id": 2039,
         "name": "ImportDirective",
-        "src": "105:63:4"
+        "src": "105:63:3"
       },
       {
         "attributes": {
           "abstract": false,
           "contractDependencies": [
-            3732,
-            8652
+            3309,
+            8208
           ],
           "contractKind": "contract",
           "fullyImplemented": true,
           "linearizedBaseContracts": [
-            2470,
-            3732
+            2138,
+            3309
           ],
           "name": "StakeSimpleFactory",
-          "scope": 2471
+          "scope": 2139
         },
         "children": [
           {
             "attributes": {
               "text": "@title A factory that creates a stake contract"
             },
-            "id": 2372,
+            "id": 2040,
             "name": "StructuredDocumentation",
-            "src": "170:51:4"
+            "src": "170:51:3"
           },
           {
             "attributes": {},
@@ -1519,17 +1519,17 @@
               {
                 "attributes": {
                   "name": "IStakeSimpleFactory",
-                  "referencedDeclaration": 3732,
+                  "referencedDeclaration": 3309,
                   "type": "contract IStakeSimpleFactory"
                 },
-                "id": 2373,
+                "id": 2041,
                 "name": "UserDefinedTypeName",
-                "src": "252:19:4"
+                "src": "252:19:3"
               }
             ],
-            "id": 2374,
+            "id": 2042,
             "name": "InheritanceSpecifier",
-            "src": "252:19:4"
+            "src": "252:19:3"
           },
           {
             "attributes": {
@@ -1537,7 +1537,7 @@
               "functionSelector": "75b238fc",
               "mutability": "constant",
               "name": "ADMIN_ROLE",
-              "scope": 2470,
+              "scope": 2138,
               "stateVariable": true,
               "storageLocation": "default",
               "type": "bytes32",
@@ -1549,9 +1549,9 @@
                   "name": "bytes32",
                   "type": "bytes32"
                 },
-                "id": 2375,
+                "id": 2043,
                 "name": "ElementaryTypeName",
-                "src": "278:7:4"
+                "src": "278:7:3"
               },
               {
                 "attributes": {
@@ -1583,9 +1583,9 @@
                       "type": "function (bytes memory) pure returns (bytes32)",
                       "value": "keccak256"
                     },
-                    "id": 2376,
+                    "id": 2044,
                     "name": "Identifier",
-                    "src": "315:9:4"
+                    "src": "315:9:3"
                   },
                   {
                     "attributes": {
@@ -1598,19 +1598,19 @@
                       "type": "literal_string \"ADMIN\"",
                       "value": "ADMIN"
                     },
-                    "id": 2377,
+                    "id": 2045,
                     "name": "Literal",
-                    "src": "325:7:4"
+                    "src": "325:7:3"
                   }
                 ],
-                "id": 2378,
+                "id": 2046,
                 "name": "FunctionCall",
-                "src": "315:18:4"
+                "src": "315:18:3"
               }
             ],
-            "id": 2379,
+            "id": 2047,
             "name": "VariableDeclaration",
-            "src": "278:55:4"
+            "src": "278:55:3"
           },
           {
             "attributes": {
@@ -1618,7 +1618,7 @@
               "functionSelector": "2c4ffdda",
               "mutability": "mutable",
               "name": "stakeSimpleLogic",
-              "scope": 2470,
+              "scope": 2138,
               "stateVariable": true,
               "storageLocation": "default",
               "type": "address",
@@ -1631,14 +1631,14 @@
                   "stateMutability": "nonpayable",
                   "type": "address"
                 },
-                "id": 2380,
+                "id": 2048,
                 "name": "ElementaryTypeName",
-                "src": "340:7:4"
+                "src": "340:7:3"
               }
             ],
-            "id": 2381,
+            "id": 2049,
             "name": "VariableDeclaration",
-            "src": "340:31:4"
+            "src": "340:31:3"
           },
           {
             "attributes": {
@@ -1649,7 +1649,7 @@
                 null
               ],
               "name": "",
-              "scope": 2470,
+              "scope": 2138,
               "stateMutability": "nonpayable",
               "virtual": false,
               "visibility": "public"
@@ -1659,9 +1659,9 @@
                 "attributes": {
                   "text": "@dev constructor of StakeSimpleFactory\n @param _stakeSimpleLogic the logic address used in StakeSimpleFactory"
                 },
-                "id": 2382,
+                "id": 2050,
                 "name": "StructuredDocumentation",
-                "src": "378:120:4"
+                "src": "378:120:3"
               },
               {
                 "children": [
@@ -1670,7 +1670,7 @@
                       "constant": false,
                       "mutability": "mutable",
                       "name": "_stakeSimpleLogic",
-                      "scope": 2402,
+                      "scope": 2070,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "address",
@@ -1683,19 +1683,19 @@
                           "stateMutability": "nonpayable",
                           "type": "address"
                         },
-                        "id": 2383,
+                        "id": 2051,
                         "name": "ElementaryTypeName",
-                        "src": "515:7:4"
+                        "src": "515:7:3"
                       }
                     ],
-                    "id": 2384,
+                    "id": 2052,
                     "name": "VariableDeclaration",
-                    "src": "515:25:4"
+                    "src": "515:25:3"
                   }
                 ],
-                "id": 2385,
+                "id": 2053,
                 "name": "ParameterList",
-                "src": "514:27:4"
+                "src": "514:27:3"
               },
               {
                 "attributes": {
@@ -1704,9 +1704,9 @@
                   ]
                 },
                 "children": [],
-                "id": 2386,
+                "id": 2054,
                 "name": "ParameterList",
-                "src": "542:0:4"
+                "src": "542:0:3"
               },
               {
                 "children": [
@@ -1747,9 +1747,9 @@
                               "type": "function (bool,string memory) pure",
                               "value": "require"
                             },
-                            "id": 2387,
+                            "id": 2055,
                             "name": "Identifier",
-                            "src": "552:7:4"
+                            "src": "552:7:3"
                           },
                           {
                             "attributes": {
@@ -1770,13 +1770,13 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 2384,
+                                  "referencedDeclaration": 2052,
                                   "type": "address",
                                   "value": "_stakeSimpleLogic"
                                 },
-                                "id": 2388,
+                                "id": 2056,
                                 "name": "Identifier",
-                                "src": "573:17:4"
+                                "src": "573:17:3"
                               },
                               {
                                 "attributes": {
@@ -1812,14 +1812,14 @@
                                         "attributes": {
                                           "name": "address"
                                         },
-                                        "id": 2389,
+                                        "id": 2057,
                                         "name": "ElementaryTypeName",
-                                        "src": "594:7:4"
+                                        "src": "594:7:3"
                                       }
                                     ],
-                                    "id": 2390,
+                                    "id": 2058,
                                     "name": "ElementaryTypeNameExpression",
-                                    "src": "594:7:4"
+                                    "src": "594:7:3"
                                   },
                                   {
                                     "attributes": {
@@ -1832,19 +1832,19 @@
                                       "type": "int_const 0",
                                       "value": "0"
                                     },
-                                    "id": 2391,
+                                    "id": 2059,
                                     "name": "Literal",
-                                    "src": "602:1:4"
+                                    "src": "602:1:3"
                                   }
                                 ],
-                                "id": 2392,
+                                "id": 2060,
                                 "name": "FunctionCall",
-                                "src": "594:10:4"
+                                "src": "594:10:3"
                               }
                             ],
-                            "id": 2393,
+                            "id": 2061,
                             "name": "BinaryOperation",
-                            "src": "573:31:4"
+                            "src": "573:31:3"
                           },
                           {
                             "attributes": {
@@ -1857,19 +1857,19 @@
                               "type": "literal_string \"StakeSimpleFactory: logic zero\"",
                               "value": "StakeSimpleFactory: logic zero"
                             },
-                            "id": 2394,
+                            "id": 2062,
                             "name": "Literal",
-                            "src": "618:32:4"
+                            "src": "618:32:3"
                           }
                         ],
-                        "id": 2395,
+                        "id": 2063,
                         "name": "FunctionCall",
-                        "src": "552:108:4"
+                        "src": "552:108:3"
                       }
                     ],
-                    "id": 2396,
+                    "id": 2064,
                     "name": "ExpressionStatement",
-                    "src": "552:108:4"
+                    "src": "552:108:3"
                   },
                   {
                     "children": [
@@ -1888,51 +1888,51 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 2381,
+                              "referencedDeclaration": 2049,
                               "type": "address",
                               "value": "stakeSimpleLogic"
                             },
-                            "id": 2397,
+                            "id": 2065,
                             "name": "Identifier",
-                            "src": "670:16:4"
+                            "src": "670:16:3"
                           },
                           {
                             "attributes": {
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 2384,
+                              "referencedDeclaration": 2052,
                               "type": "address",
                               "value": "_stakeSimpleLogic"
                             },
-                            "id": 2398,
+                            "id": 2066,
                             "name": "Identifier",
-                            "src": "689:17:4"
+                            "src": "689:17:3"
                           }
                         ],
-                        "id": 2399,
+                        "id": 2067,
                         "name": "Assignment",
-                        "src": "670:36:4"
+                        "src": "670:36:3"
                       }
                     ],
-                    "id": 2400,
+                    "id": 2068,
                     "name": "ExpressionStatement",
-                    "src": "670:36:4"
+                    "src": "670:36:3"
                   }
                 ],
-                "id": 2401,
+                "id": 2069,
                 "name": "Block",
-                "src": "542:171:4"
+                "src": "542:171:3"
               }
             ],
-            "id": 2402,
+            "id": 2070,
             "name": "FunctionDefinition",
-            "src": "503:210:4"
+            "src": "503:210:3"
           },
           {
             "attributes": {
               "baseFunctions": [
-                3731
+                3308
               ],
               "functionSelector": "0df50048",
               "implemented": true,
@@ -1942,7 +1942,7 @@
                 null
               ],
               "name": "create",
-              "scope": 2470,
+              "scope": 2138,
               "stateMutability": "nonpayable",
               "virtual": false,
               "visibility": "external"
@@ -1952,9 +1952,9 @@
                 "attributes": {
                   "text": "@dev Create a stake contract that can operate the staked amount as a DeFi project.\n @param _addr array of [token, paytoken, vault]\n @param _intdata array of [saleStartBlock, startBlock, periodBlocks]\n @param owner  owner address\n @return contract address"
                 },
-                "id": 2403,
+                "id": 2071,
                 "name": "StructuredDocumentation",
-                "src": "719:286:4"
+                "src": "719:286:3"
               },
               {
                 "attributes": {
@@ -1962,9 +1962,9 @@
                     null
                   ]
                 },
-                "id": 2415,
+                "id": 2083,
                 "name": "OverrideSpecifier",
-                "src": "1137:8:4"
+                "src": "1137:8:3"
               },
               {
                 "children": [
@@ -1973,7 +1973,7 @@
                       "constant": false,
                       "mutability": "mutable",
                       "name": "_addr",
-                      "scope": 2469,
+                      "scope": 2137,
                       "stateVariable": false,
                       "storageLocation": "calldata",
                       "type": "address[3]",
@@ -1991,9 +1991,9 @@
                               "stateMutability": "nonpayable",
                               "type": "address"
                             },
-                            "id": 2404,
+                            "id": 2072,
                             "name": "ElementaryTypeName",
-                            "src": "1035:7:4"
+                            "src": "1035:7:3"
                           },
                           {
                             "attributes": {
@@ -2006,26 +2006,26 @@
                               "type": "int_const 3",
                               "value": "3"
                             },
-                            "id": 2405,
+                            "id": 2073,
                             "name": "Literal",
-                            "src": "1043:1:4"
+                            "src": "1043:1:3"
                           }
                         ],
-                        "id": 2406,
+                        "id": 2074,
                         "name": "ArrayTypeName",
-                        "src": "1035:10:4"
+                        "src": "1035:10:3"
                       }
                     ],
-                    "id": 2407,
+                    "id": 2075,
                     "name": "VariableDeclaration",
-                    "src": "1035:25:4"
+                    "src": "1035:25:3"
                   },
                   {
                     "attributes": {
                       "constant": false,
                       "mutability": "mutable",
                       "name": "_intdata",
-                      "scope": 2469,
+                      "scope": 2137,
                       "stateVariable": false,
                       "storageLocation": "calldata",
                       "type": "uint256[3]",
@@ -2042,9 +2042,9 @@
                               "name": "uint256",
                               "type": "uint256"
                             },
-                            "id": 2408,
+                            "id": 2076,
                             "name": "ElementaryTypeName",
-                            "src": "1070:7:4"
+                            "src": "1070:7:3"
                           },
                           {
                             "attributes": {
@@ -2057,26 +2057,26 @@
                               "type": "int_const 3",
                               "value": "3"
                             },
-                            "id": 2409,
+                            "id": 2077,
                             "name": "Literal",
-                            "src": "1078:1:4"
+                            "src": "1078:1:3"
                           }
                         ],
-                        "id": 2410,
+                        "id": 2078,
                         "name": "ArrayTypeName",
-                        "src": "1070:10:4"
+                        "src": "1070:10:3"
                       }
                     ],
-                    "id": 2411,
+                    "id": 2079,
                     "name": "VariableDeclaration",
-                    "src": "1070:28:4"
+                    "src": "1070:28:3"
                   },
                   {
                     "attributes": {
                       "constant": false,
                       "mutability": "mutable",
                       "name": "owner",
-                      "scope": 2469,
+                      "scope": 2137,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "address",
@@ -2089,19 +2089,19 @@
                           "stateMutability": "nonpayable",
                           "type": "address"
                         },
-                        "id": 2412,
+                        "id": 2080,
                         "name": "ElementaryTypeName",
-                        "src": "1108:7:4"
+                        "src": "1108:7:3"
                       }
                     ],
-                    "id": 2413,
+                    "id": 2081,
                     "name": "VariableDeclaration",
-                    "src": "1108:13:4"
+                    "src": "1108:13:3"
                   }
                 ],
-                "id": 2414,
+                "id": 2082,
                 "name": "ParameterList",
-                "src": "1025:102:4"
+                "src": "1025:102:3"
               },
               {
                 "children": [
@@ -2110,7 +2110,7 @@
                       "constant": false,
                       "mutability": "mutable",
                       "name": "",
-                      "scope": 2469,
+                      "scope": 2137,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "address",
@@ -2123,26 +2123,26 @@
                           "stateMutability": "nonpayable",
                           "type": "address"
                         },
-                        "id": 2416,
+                        "id": 2084,
                         "name": "ElementaryTypeName",
-                        "src": "1155:7:4"
+                        "src": "1155:7:3"
                       }
                     ],
-                    "id": 2417,
+                    "id": 2085,
                     "name": "VariableDeclaration",
-                    "src": "1155:7:4"
+                    "src": "1155:7:3"
                   }
                 ],
-                "id": 2418,
+                "id": 2086,
                 "name": "ParameterList",
-                "src": "1154:9:4"
+                "src": "1154:9:3"
               },
               {
                 "children": [
                   {
                     "attributes": {
                       "assignments": [
-                        2420
+                        2088
                       ]
                     },
                     "children": [
@@ -2151,7 +2151,7 @@
                           "constant": false,
                           "mutability": "mutable",
                           "name": "proxy",
-                          "scope": 2468,
+                          "scope": 2136,
                           "stateVariable": false,
                           "storageLocation": "default",
                           "type": "contract StakeSimpleProxy",
@@ -2161,17 +2161,17 @@
                           {
                             "attributes": {
                               "name": "StakeSimpleProxy",
-                              "referencedDeclaration": 8652,
+                              "referencedDeclaration": 8208,
                               "type": "contract StakeSimpleProxy"
                             },
-                            "id": 2419,
+                            "id": 2087,
                             "name": "UserDefinedTypeName",
-                            "src": "1174:16:4"
+                            "src": "1174:16:3"
                           }
                         ],
-                        "id": 2420,
+                        "id": 2088,
                         "name": "VariableDeclaration",
-                        "src": "1174:22:4"
+                        "src": "1174:22:3"
                       },
                       {
                         "attributes": {
@@ -2206,40 +2206,40 @@
                               {
                                 "attributes": {
                                   "name": "StakeSimpleProxy",
-                                  "referencedDeclaration": 8652,
+                                  "referencedDeclaration": 8208,
                                   "type": "contract StakeSimpleProxy"
                                 },
-                                "id": 2421,
+                                "id": 2089,
                                 "name": "UserDefinedTypeName",
-                                "src": "1203:16:4"
+                                "src": "1203:16:3"
                               }
                             ],
-                            "id": 2422,
+                            "id": 2090,
                             "name": "NewExpression",
-                            "src": "1199:20:4"
+                            "src": "1199:20:3"
                           },
                           {
                             "attributes": {
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 2381,
+                              "referencedDeclaration": 2049,
                               "type": "address",
                               "value": "stakeSimpleLogic"
                             },
-                            "id": 2423,
+                            "id": 2091,
                             "name": "Identifier",
-                            "src": "1220:16:4"
+                            "src": "1220:16:3"
                           }
                         ],
-                        "id": 2424,
+                        "id": 2092,
                         "name": "FunctionCall",
-                        "src": "1199:38:4"
+                        "src": "1199:38:3"
                       }
                     ],
-                    "id": 2425,
+                    "id": 2093,
                     "name": "VariableDeclarationStatement",
-                    "src": "1174:63:4"
+                    "src": "1174:63:3"
                   },
                   {
                     "children": [
@@ -2278,9 +2278,9 @@
                               "type": "function (bool,string memory) pure",
                               "value": "require"
                             },
-                            "id": 2426,
+                            "id": 2094,
                             "name": "Identifier",
-                            "src": "1247:7:4"
+                            "src": "1247:7:3"
                           },
                           {
                             "attributes": {
@@ -2315,7 +2315,7 @@
                                     "attributes": {
                                       "argumentTypes": [
                                         {
-                                          "typeIdentifier": "t_contract$_StakeSimpleProxy_$8652",
+                                          "typeIdentifier": "t_contract$_StakeSimpleProxy_$8208",
                                           "typeString": "contract StakeSimpleProxy"
                                         }
                                       ],
@@ -2330,32 +2330,32 @@
                                         "attributes": {
                                           "name": "address"
                                         },
-                                        "id": 2427,
+                                        "id": 2095,
                                         "name": "ElementaryTypeName",
-                                        "src": "1255:7:4"
+                                        "src": "1255:7:3"
                                       }
                                     ],
-                                    "id": 2428,
+                                    "id": 2096,
                                     "name": "ElementaryTypeNameExpression",
-                                    "src": "1255:7:4"
+                                    "src": "1255:7:3"
                                   },
                                   {
                                     "attributes": {
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 2420,
+                                      "referencedDeclaration": 2088,
                                       "type": "contract StakeSimpleProxy",
                                       "value": "proxy"
                                     },
-                                    "id": 2429,
+                                    "id": 2097,
                                     "name": "Identifier",
-                                    "src": "1263:5:4"
+                                    "src": "1263:5:3"
                                   }
                                 ],
-                                "id": 2430,
+                                "id": 2098,
                                 "name": "FunctionCall",
-                                "src": "1255:14:4"
+                                "src": "1255:14:3"
                               },
                               {
                                 "attributes": {
@@ -2391,14 +2391,14 @@
                                         "attributes": {
                                           "name": "address"
                                         },
-                                        "id": 2431,
+                                        "id": 2099,
                                         "name": "ElementaryTypeName",
-                                        "src": "1273:7:4"
+                                        "src": "1273:7:3"
                                       }
                                     ],
-                                    "id": 2432,
+                                    "id": 2100,
                                     "name": "ElementaryTypeNameExpression",
-                                    "src": "1273:7:4"
+                                    "src": "1273:7:3"
                                   },
                                   {
                                     "attributes": {
@@ -2411,19 +2411,19 @@
                                       "type": "int_const 0",
                                       "value": "0"
                                     },
-                                    "id": 2433,
+                                    "id": 2101,
                                     "name": "Literal",
-                                    "src": "1281:1:4"
+                                    "src": "1281:1:3"
                                   }
                                 ],
-                                "id": 2434,
+                                "id": 2102,
                                 "name": "FunctionCall",
-                                "src": "1273:10:4"
+                                "src": "1273:10:3"
                               }
                             ],
-                            "id": 2435,
+                            "id": 2103,
                             "name": "BinaryOperation",
-                            "src": "1255:28:4"
+                            "src": "1255:28:3"
                           },
                           {
                             "attributes": {
@@ -2436,19 +2436,19 @@
                               "type": "literal_string \"StakeSimpleFactory: proxy zero\"",
                               "value": "StakeSimpleFactory: proxy zero"
                             },
-                            "id": 2436,
+                            "id": 2104,
                             "name": "Literal",
-                            "src": "1285:32:4"
+                            "src": "1285:32:3"
                           }
                         ],
-                        "id": 2437,
+                        "id": 2105,
                         "name": "FunctionCall",
-                        "src": "1247:71:4"
+                        "src": "1247:71:3"
                       }
                     ],
-                    "id": 2438,
+                    "id": 2106,
                     "name": "ExpressionStatement",
-                    "src": "1247:71:4"
+                    "src": "1247:71:3"
                   },
                   {
                     "children": [
@@ -2484,7 +2484,7 @@
                               "isPure": false,
                               "lValueRequested": false,
                               "member_name": "setInit",
-                              "referencedDeclaration": 8651,
+                              "referencedDeclaration": 8207,
                               "type": "function (address[3] memory,uint256[3] memory) external"
                             },
                             "children": [
@@ -2493,54 +2493,54 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 2420,
+                                  "referencedDeclaration": 2088,
                                   "type": "contract StakeSimpleProxy",
                                   "value": "proxy"
                                 },
-                                "id": 2439,
+                                "id": 2107,
                                 "name": "Identifier",
-                                "src": "1329:5:4"
+                                "src": "1329:5:3"
                               }
                             ],
-                            "id": 2441,
+                            "id": 2109,
                             "name": "MemberAccess",
-                            "src": "1329:13:4"
+                            "src": "1329:13:3"
                           },
                           {
                             "attributes": {
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 2407,
+                              "referencedDeclaration": 2075,
                               "type": "address[3] calldata",
                               "value": "_addr"
                             },
-                            "id": 2442,
+                            "id": 2110,
                             "name": "Identifier",
-                            "src": "1343:5:4"
+                            "src": "1343:5:3"
                           },
                           {
                             "attributes": {
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 2411,
+                              "referencedDeclaration": 2079,
                               "type": "uint256[3] calldata",
                               "value": "_intdata"
                             },
-                            "id": 2443,
+                            "id": 2111,
                             "name": "Identifier",
-                            "src": "1350:8:4"
+                            "src": "1350:8:3"
                           }
                         ],
-                        "id": 2444,
+                        "id": 2112,
                         "name": "FunctionCall",
-                        "src": "1329:30:4"
+                        "src": "1329:30:3"
                       }
                     ],
-                    "id": 2445,
+                    "id": 2113,
                     "name": "ExpressionStatement",
-                    "src": "1329:30:4"
+                    "src": "1329:30:3"
                   },
                   {
                     "children": [
@@ -2576,7 +2576,7 @@
                               "isPure": false,
                               "lValueRequested": false,
                               "member_name": "grantRole",
-                              "referencedDeclaration": 11540,
+                              "referencedDeclaration": 10842,
                               "type": "function (bytes32,address) external"
                             },
                             "children": [
@@ -2585,54 +2585,54 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 2420,
+                                  "referencedDeclaration": 2088,
                                   "type": "contract StakeSimpleProxy",
                                   "value": "proxy"
                                 },
-                                "id": 2446,
+                                "id": 2114,
                                 "name": "Identifier",
-                                "src": "1369:5:4"
+                                "src": "1369:5:3"
                               }
                             ],
-                            "id": 2448,
+                            "id": 2116,
                             "name": "MemberAccess",
-                            "src": "1369:15:4"
+                            "src": "1369:15:3"
                           },
                           {
                             "attributes": {
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 2379,
+                              "referencedDeclaration": 2047,
                               "type": "bytes32",
                               "value": "ADMIN_ROLE"
                             },
-                            "id": 2449,
+                            "id": 2117,
                             "name": "Identifier",
-                            "src": "1385:10:4"
+                            "src": "1385:10:3"
                           },
                           {
                             "attributes": {
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 2413,
+                              "referencedDeclaration": 2081,
                               "type": "address",
                               "value": "owner"
                             },
-                            "id": 2450,
+                            "id": 2118,
                             "name": "Identifier",
-                            "src": "1397:5:4"
+                            "src": "1397:5:3"
                           }
                         ],
-                        "id": 2451,
+                        "id": 2119,
                         "name": "FunctionCall",
-                        "src": "1369:34:4"
+                        "src": "1369:34:3"
                       }
                     ],
-                    "id": 2452,
+                    "id": 2120,
                     "name": "ExpressionStatement",
-                    "src": "1369:34:4"
+                    "src": "1369:34:3"
                   },
                   {
                     "children": [
@@ -2668,7 +2668,7 @@
                               "isPure": false,
                               "lValueRequested": false,
                               "member_name": "revokeRole",
-                              "referencedDeclaration": 11566,
+                              "referencedDeclaration": 10868,
                               "type": "function (bytes32,address) external"
                             },
                             "children": [
@@ -2677,31 +2677,31 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 2420,
+                                  "referencedDeclaration": 2088,
                                   "type": "contract StakeSimpleProxy",
                                   "value": "proxy"
                                 },
-                                "id": 2453,
+                                "id": 2121,
                                 "name": "Identifier",
-                                "src": "1413:5:4"
+                                "src": "1413:5:3"
                               }
                             ],
-                            "id": 2455,
+                            "id": 2123,
                             "name": "MemberAccess",
-                            "src": "1413:16:4"
+                            "src": "1413:16:3"
                           },
                           {
                             "attributes": {
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 2379,
+                              "referencedDeclaration": 2047,
                               "type": "bytes32",
                               "value": "ADMIN_ROLE"
                             },
-                            "id": 2456,
+                            "id": 2124,
                             "name": "Identifier",
-                            "src": "1430:10:4"
+                            "src": "1430:10:3"
                           },
                           {
                             "attributes": {
@@ -2722,7 +2722,7 @@
                                 "attributes": {
                                   "argumentTypes": [
                                     {
-                                      "typeIdentifier": "t_contract$_StakeSimpleFactory_$2470",
+                                      "typeIdentifier": "t_contract$_StakeSimpleFactory_$2138",
                                       "typeString": "contract StakeSimpleFactory"
                                     }
                                   ],
@@ -2737,14 +2737,14 @@
                                     "attributes": {
                                       "name": "address"
                                     },
-                                    "id": 2457,
+                                    "id": 2125,
                                     "name": "ElementaryTypeName",
-                                    "src": "1442:7:4"
+                                    "src": "1442:7:3"
                                   }
                                 ],
-                                "id": 2458,
+                                "id": 2126,
                                 "name": "ElementaryTypeNameExpression",
-                                "src": "1442:7:4"
+                                "src": "1442:7:3"
                               },
                               {
                                 "attributes": {
@@ -2755,28 +2755,28 @@
                                   "type": "contract StakeSimpleFactory",
                                   "value": "this"
                                 },
-                                "id": 2459,
+                                "id": 2127,
                                 "name": "Identifier",
-                                "src": "1450:4:4"
+                                "src": "1450:4:3"
                               }
                             ],
-                            "id": 2460,
+                            "id": 2128,
                             "name": "FunctionCall",
-                            "src": "1442:13:4"
+                            "src": "1442:13:3"
                           }
                         ],
-                        "id": 2461,
+                        "id": 2129,
                         "name": "FunctionCall",
-                        "src": "1413:43:4"
+                        "src": "1413:43:3"
                       }
                     ],
-                    "id": 2462,
+                    "id": 2130,
                     "name": "ExpressionStatement",
-                    "src": "1413:43:4"
+                    "src": "1413:43:3"
                   },
                   {
                     "attributes": {
-                      "functionReturnParameters": 2418
+                      "functionReturnParameters": 2086
                     },
                     "children": [
                       {
@@ -2798,7 +2798,7 @@
                             "attributes": {
                               "argumentTypes": [
                                 {
-                                  "typeIdentifier": "t_contract$_StakeSimpleProxy_$8652",
+                                  "typeIdentifier": "t_contract$_StakeSimpleProxy_$8208",
                                   "typeString": "contract StakeSimpleProxy"
                                 }
                               ],
@@ -2813,57 +2813,57 @@
                                 "attributes": {
                                   "name": "address"
                                 },
-                                "id": 2463,
+                                "id": 2131,
                                 "name": "ElementaryTypeName",
-                                "src": "1474:7:4"
+                                "src": "1474:7:3"
                               }
                             ],
-                            "id": 2464,
+                            "id": 2132,
                             "name": "ElementaryTypeNameExpression",
-                            "src": "1474:7:4"
+                            "src": "1474:7:3"
                           },
                           {
                             "attributes": {
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 2420,
+                              "referencedDeclaration": 2088,
                               "type": "contract StakeSimpleProxy",
                               "value": "proxy"
                             },
-                            "id": 2465,
+                            "id": 2133,
                             "name": "Identifier",
-                            "src": "1482:5:4"
+                            "src": "1482:5:3"
                           }
                         ],
-                        "id": 2466,
+                        "id": 2134,
                         "name": "FunctionCall",
-                        "src": "1474:14:4"
+                        "src": "1474:14:3"
                       }
                     ],
-                    "id": 2467,
+                    "id": 2135,
                     "name": "Return",
-                    "src": "1467:21:4"
+                    "src": "1467:21:3"
                   }
                 ],
-                "id": 2468,
+                "id": 2136,
                 "name": "Block",
-                "src": "1164:331:4"
+                "src": "1164:331:3"
               }
             ],
-            "id": 2469,
+            "id": 2137,
             "name": "FunctionDefinition",
-            "src": "1010:485:4"
+            "src": "1010:485:3"
           }
         ],
-        "id": 2470,
+        "id": 2138,
         "name": "ContractDefinition",
-        "src": "221:1276:4"
+        "src": "221:1276:3"
       }
     ],
-    "id": 2471,
+    "id": 2139,
     "name": "SourceUnit",
-    "src": "32:1466:4"
+    "src": "32:1466:3"
   },
   "compiler": {
     "name": "solc",
@@ -2871,7 +2871,7 @@
   },
   "networks": {},
   "schemaVersion": "3.3.4",
-  "updatedAt": "2021-06-15T01:36:53.754Z",
+  "updatedAt": "2021-06-15T09:38:41.443Z",
   "devdoc": {
     "kind": "dev",
     "methods": {
