@@ -72,7 +72,11 @@ async function createValue(tonVault, paytoken) {
     tonVault.phase,
     tonVault.hashName,
     0,
-    zeroAddress
+    zeroAddress,
+    {
+      gasLimit: 10000000,
+      gasPrice: 5000000000,
+    }
   );
   await tx.wait();
   console.log("createValue tx:", tx.hash);
@@ -98,7 +102,7 @@ async function createStakeContract(vaultAddress, periodBlock, name, paytoken) {
       gasLimit: gasInt,
     };
   } catch (error) {
-    console.error(error);
+    // console.error(error);
   }
 
   const tx = await stakeEntry.createStakeContract(
@@ -108,7 +112,10 @@ async function createStakeContract(vaultAddress, periodBlock, name, paytoken) {
     paytoken,
     periodBlock,
     name,
-    overrideOptions
+    {
+      gasLimit: 10000000,
+      gasPrice: 10000000000,
+    }
   );
   await tx.wait();
   console.log("createStakeContract ", name, ",tx:", tx.hash);
@@ -120,13 +127,13 @@ function timeout(sec) {
   });
 }
 
-function getPeriodBlockByTimes(day, hour, min){
-  let periodBlocks = {
+function getPeriodBlockByTimes(day, hour, min) {
+  const periodBlocks = {
     day: day,
     hour: hour,
     min: min,
-    blocks: 0
-  }
+    blocks: 0,
+  };
   let dayBlock = 0;
   let hourBlock = 0;
   let minBlock = 0;
@@ -157,97 +164,102 @@ async function main() {
   const curBlock = await provider.getBlockNumber();
   console.log("curBlock", curBlock);
 
-  let saleStartBlock = parseInt(curBlock) + (60 * 5) / 13;
+  let saleStartBlock = parseInt(curBlock) + (60 * 0) / 13;
   saleStartBlock = parseInt(saleStartBlock);
 
-  let stakeStartBlock = parseInt(saleStartBlock) + (60 * 5) / 13;
+  let stakeStartBlock = parseInt(saleStartBlock) + (60 * 30) / 13;
   stakeStartBlock = parseInt(stakeStartBlock);
 
-// change vault name
-  let VaultName = "TON #1";
-  let periodsMins = [
-      {
-        name: VaultName + " 10 MINs",
-        period: getPeriodBlockByTimes(0, 0, 10)
-      },
-      {
-        name: VaultName + " 30 MINs",
-        period: getPeriodBlockByTimes(0, 0, 30)
-      },
-      {
-        name: VaultName + " 60 MINs",
-        period: getPeriodBlockByTimes(0, 0, 60)
-      }
-    ];
-
-  let periodsHours = [
+  // change vault name
+  const VaultName = "TON #1";
+  const periodsMins = [
     {
-      name: VaultName + " 1 HOUR",
-      period: getPeriodBlockByTimes(0, 1, 0)
+      name: VaultName + " 10 MINs",
+      period: getPeriodBlockByTimes(0, 0, 10),
     },
     {
-      name: VaultName + " 2 HOURS",
-      period: getPeriodBlockByTimes(0, 2, 0)
+      name: VaultName + " 30 MINs",
+      period: getPeriodBlockByTimes(0, 0, 30),
     },
     {
-      name: VaultName + " 5 HOURS",
-      period: getPeriodBlockByTimes(0, 5, 0)
-    }
+      name: VaultName + " 60 MINs",
+      period: getPeriodBlockByTimes(0, 0, 60),
+    },
   ];
 
-  let periodsDays = [
+  const periodsHours = [
+    {
+      name: VaultName + " 1 HOUR",
+      period: getPeriodBlockByTimes(0, 1, 0),
+    },
+    // {
+    //   name: VaultName + " 2 HOURS",
+    //   period: getPeriodBlockByTimes(0, 2, 0),
+    // },
+    // {
+    //   name: VaultName + " 5 HOURS",
+    //   period: getPeriodBlockByTimes(0, 5, 0),
+    // },
+  ];
+
+  const periodsDays = [
     {
       name: VaultName + " 2 Day",
-      period: getPeriodBlockByTimes(2, 0, 0)
+      period: getPeriodBlockByTimes(2, 0, 0),
     },
     {
       name: VaultName + " 3 Days",
-      period: getPeriodBlockByTimes(3, 0, 0)
+      period: getPeriodBlockByTimes(3, 0, 0),
     },
     {
       name: VaultName + " 7 Days",
-      period: getPeriodBlockByTimes(7, 0, 0)
-    }
-  ]
+      period: getPeriodBlockByTimes(7, 0, 0),
+    },
+  ];
 
   const ton_vault = {
     allocatedFLD: "100000",
     saleStartBlock: saleStartBlock,
     stakeStartBlock: stakeStartBlock,
     phase: 1,
-    hashName : keccak256(VaultName),
-  }
+    hashName: keccak256(VaultName),
+  };
 
- // console.log('vault',ton_vault);
+  // console.log('vault',ton_vault);
 
-////////////////////////////////////////////////////////
-//   Making Vault when staking TON or ETH
-// 1. Make a Vault. hashName must be specified as a unique value.
-// 2. After confirming that the vault is deployed in the rinkeby,
-//    write the generated tone address directly to vaultAddress.
-// 3. Uncomment and execute createStakeContract creation for the desired period.
-// Note: If you want to enter multiple createStakeContracts, you must create a contract with a shorter period.
+  /// /////////////////////////////////////////////////////
+  //   Making Vault when staking TON or ETH
+  // 1. Make a Vault. hashName must be specified as a unique value.
+  // 2. After confirming that the vault is deployed in the rinkeby,
+  //    write the generated tone address directly to vaultAddress.
+  // 3. Uncomment and execute createStakeContract creation for the desired period.
+  // Note: If you want to enter multiple createStakeContracts, you must create a contract with a shorter period.
 
-  ton.saleStartBlock = parseInt(curBlock) + parseInt(60*5/13);
-  ton.stakeStartBlock = ton.saleStartBlock + parseInt(60*6/13);
-  ////////////////////////////////////////////////////////
+  ton.saleStartBlock = parseInt(curBlock) + parseInt((60 * 5) / 13);
+  ton.stakeStartBlock = ton.saleStartBlock + parseInt((60 * 6) / 13);
+  /// /////////////////////////////////////////////////////
   // For TON Vault : hashName must be specified as a unique value.
-  // ton_vault.hashName = keccak256(VaultName);
+  ton_vault.hashName = keccak256(VaultName);
   // await createValue(ton_vault, ton);
 
   /// /////////////////////////////////////////////////////
   // For TON StakeContract of Vault
   // write your vault
-  let vaultAddress ='0xDC84183F05bA6720C2Bb885f80e61Dfb4a61Fc5c';
-  console.log('vaultAddress',vaultAddress);
-  let periods = periodsMins;
-  console.log('periods',periods);
-  for (let i =0; i< periods.length ; i++){
-    await createStakeContract(vaultAddress, periods[i].period.blocks, periods[i].name, ton );
+  const vaultAddress = "0xef47c6be91208a54bd727aa79ff45a3a6cdbcda8";
+  console.log("vaultAddress", vaultAddress);
+  const periods = periodsHours;
+  console.log("periods", periods);
+  for (let i = 0; i < periods.length; i++) {
+    await createStakeContract(
+      vaultAddress,
+      periods[i].period.blocks,
+      periods[i].name,
+      ton
+    );
     timeout(10000);
   }
 
-  ////////////////////////////////////////////////////////
+  /// /////////////////////////////////////////////////////
 
   // For Ether Vault
   // ton_vault.hashName = keccak256("ETH_TEST_20210527_1650");

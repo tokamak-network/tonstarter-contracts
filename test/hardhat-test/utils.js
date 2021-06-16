@@ -1,15 +1,7 @@
 /* eslint-disable no-undef */
 const { createCurrency, createCurrencyRatio } = require("@makerdao/currency");
-const {
-  BN,
-  constants,
-  expectEvent,
-  expectRevert,
-  time,
-  ether,
-} = require("@openzeppelin/test-helpers");
-const { connect } = require("http2");
 const { toBN, toWei, keccak256, fromWei } = require("web3-utils");
+const { time } = require("@openzeppelin/test-helpers");
 
 async function findSigner(address) {
   const signers = await ethers.getSigners();
@@ -79,10 +71,10 @@ async function setupContracts(account) {
     .deploy();
   await fld.deployed();
 
-  const sfld = await (await ethers.getContractFactory("SFLD"))
-    .connect(deployer)
-    .deploy();
-  await sfld.deployed();
+  // const sfld = await (await ethers.getContractFactory("SFLD"))
+  //   .connect(deployer)
+  //   .deploy();
+  // await sfld.deployed();
 
   const stakeRegistry = await (await ethers.getContractFactory("StakeRegistry"))
     .connect(deployer)
@@ -123,6 +115,7 @@ async function setupContracts(account) {
     .connect(deployer)
     .deploy();
   await stakeTONProxyFactory.deployed();
+  console.log((await ethers.provider.getBalance(account)).toString());
 
   const stakeTONFactory = await (
     await ethers.getContractFactory("StakeTONFactory")
@@ -156,6 +149,7 @@ async function setupContracts(account) {
     .connect(deployer)
     .deploy();
   await stake1Proxy.deployed();
+  console.log((await ethers.provider.getBalance(account)).toString());
 
   await stake1Proxy.connect(deployer).upgradeTo(stake1Logic.address);
 
@@ -194,14 +188,17 @@ async function setupContracts(account) {
     .deploy();
   await coinageFactory.deployed();
   console.log("hello0.5");
+  console.log((await ethers.provider.getBalance(account)).toString());
 
-  const currentTime = await time.latest();
-  console.log(currentTime.toString());
+  const currentBlock = await ethers.provider.getBlock(
+    await ethers.provider.getBlockNumber()
+  );
   const daoVault = await (await ethers.getContractFactory("DAOVault"))
     .connect(deployer)
-    .deploy(wton.address, currentTime.toString());
+    .deploy(wton.address, currentBlock.timestamp.toString());
   await daoVault.deployed();
   console.log("hello0.7");
+  console.log((await ethers.provider.getBalance(account)).toString());
 
   const seigManager = await (await ethers.getContractFactory("SeigManager"))
     .connect(deployer)
@@ -211,7 +208,8 @@ async function setupContracts(account) {
       layer2Registry.address,
       depositManager.address,
       SEIG_PER_BLOCK.toFixed(WTON_UNIT),
-      coinageFactory.address
+      coinageFactory.address,
+      { gasLimit: 10000000 }
     );
   await seigManager.deployed();
   console.log("hello1");
@@ -291,7 +289,7 @@ async function setupContracts(account) {
 
   return {
     fld,
-    sfld,
+    // sfld,
     stakeRegistry,
     stakeSimple,
     stakeSimpleFactory,

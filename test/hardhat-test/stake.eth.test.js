@@ -23,8 +23,11 @@ describe("Stake", function () {
   let sender;
   let usersInfo;
   let stakingContractInfo;
+  let provider;
 
   before(async () => {
+    provider = await ethers.getDefaultProvider();
+
     const addresses = await getAddresses();
     sender = await findSigner(addresses[0]);
 
@@ -60,8 +63,11 @@ describe("Stake", function () {
   });
 
   it("should create a vault", async function () {
-    const current = await time.latestBlock();
-    saleStartBlock = parseInt(current + 4);
+    const currentBlockNumber = await ethers.provider.getBlockNumber();
+    const currentBlcok = await ethers.provider.getBlock(currentBlockNumber);
+
+    console.log({ currentBlcok: currentBlcok.timestamp });
+    saleStartBlock = parseInt(currentBlcok.timestamp + 4);
     stakeStartBlock = saleStartBlock + 20;
     const HASH_Pharse1_ETH_Staking = keccak256("PHASE1_ETH_STAKING");
 
@@ -115,7 +121,9 @@ describe("Stake", function () {
   it("should stake", async function () {
     this.timeout(10000000);
     const currentBlockTime = parseInt(saleStartBlock);
-    await time.advanceBlockTo(currentBlockTime);
+    // await time.advanceBlockTo(currentBlockTime);
+    await ethers.provider.send("evm_setNextBlockTimestamp", [currentBlockTime]);
+
     for (let i = 0; i < stakingContractInfo.length; ++i) {
       const { address: stakeAddress } = stakingContractInfo[i];
       // const stakeContract = await (
@@ -136,7 +144,8 @@ describe("Stake", function () {
 
   it("should close sale", async function () {
     const current = parseInt(stakeStartBlock);
-    await time.advanceBlockTo(current);
+    // await time.advanceBlockTo(current);
+    await ethers.provider.send("evm_setNextBlockTimestamp", [current]);
     await stakeEntry.connect(sender).closeSale(Vault.address);
   });
 
@@ -146,7 +155,8 @@ describe("Stake", function () {
 
     for (const { claimBlock } of [{ claimBlock: 10 }, { claimBlock: 60 }]) {
       let block = stakeStartBlock + claimBlock;
-      await time.advanceBlockTo(block - 1);
+      // await time.advanceBlockTo(block - 1);
+      await provider.send("evm_setNextBlockTimestamp", [block - 1]);
       for (const {
         name: stakeName,
         address: stakeAddress,
