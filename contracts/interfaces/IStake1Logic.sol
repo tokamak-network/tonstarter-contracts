@@ -2,6 +2,7 @@
 pragma solidity ^0.7.6;
 
 interface IStake1Logic {
+
     /// Set initial variables
     /// @param _tos  TOS token address
     /// @param _stakeRegistry the registry address
@@ -21,6 +22,12 @@ interface IStake1Logic {
         address _depositManager,
         address _seigManager
     ) external;
+
+    /// @dev Set factory address by StakeType
+    /// @param _stakeType the stake type , 0:TON, 1: Simple, 2: UniswapV3
+    /// @param _factory the factory address
+    function setFactoryByStakeType(uint256 _stakeType, address _factory)
+        external;
 
     /// @dev create vault
     /// @param _paytoken the token used for staking by user
