@@ -2,7 +2,7 @@ const { web3 } = require("@openzeppelin/test-environment");
 
 const PERMIT_TYPEHASH =
   "0x6e71edae12b1b97f4d1f60370fef10105fa2faae0126114a169c64845d6126c9";
-const signatureVaildTime = 60 * 2;
+const signatureValidTime = 60 * 2;
 async function getSignature(_private, owner, spender, value, deadline) {
   const _data = web3.utils.soliditySha3(
     { t: "bytes32", v: PERMIT_TYPEHASH },
@@ -23,6 +23,6 @@ function timeout(sec) {
 
 module.exports = {
   getSignature,
-  signatureVaildTime,
+  signatureValidTime,
   timeout,
 };

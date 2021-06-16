@@ -40,7 +40,7 @@ interface ITOS {
     /// @param owner the token's owner
     /// @param spender the account that spend owner's token
     /// @param value the amount to be approve to spend
-    /// @param deadline the deadline that vaild the owner's signature
+    /// @param deadline the deadline that valid the owner's signature
     /// @param _nounce the _nounce
     /// @param sigR the owner's signature - r
     /// @param sigS the owner's signature - s

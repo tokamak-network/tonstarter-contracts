@@ -29,7 +29,7 @@ const {
   solidityKeccak256,
 } = require("web3-utils");
 
-const { getSignature, signatureVaildTime, timeout } = require("./common");
+const { getSignature, signatureValidTime, timeout } = require("./common");
 
 // ------------------------
 const {
