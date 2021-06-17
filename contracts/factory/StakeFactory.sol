@@ -4,13 +4,13 @@ pragma solidity ^0.7.6;
 import "../interfaces/IStakeFactory.sol";
 import {IStakeSimpleFactory} from "../interfaces/IStakeSimpleFactory.sol";
 import {IStakeTONFactory} from "../interfaces/IStakeTONFactory.sol";
-import {IStakeDefiFactory} from "../interfaces/IStakeDefiFactory.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 
 /// @title A factory that calls the desired stake factory according to stakeType
 contract StakeFactory is IStakeFactory, AccessControl {
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
 
+    /// StakeType - Factory address
     mapping(uint256 => address) public factory;
 
     modifier onlyOwner() {
@@ -66,7 +66,7 @@ contract StakeFactory is IStakeFactory, AccessControl {
     }
 
     /// @dev Create a stake contract that calls the desired stake factory according to stakeType
-    /// @param stakeType if 0, stakeTONFactory, else if 1 , stakeSimpleFactory , else if 2, stakeDefiFactory
+    /// @param stakeType if 0, stakeTONFactory, else if 1 , stakeSimpleFactory , else if 2, stakeUniswapV3Factory
     /// @param _addr array of [token, paytoken, vault, _defiAddr]
     /// @param registry  registry address
     /// @param _intdata array of [saleStartBlock, startBlock, periodBlocks]
@@ -105,7 +105,5 @@ contract StakeFactory is IStakeFactory, AccessControl {
             return proxy;
 
         }
-
-
     }
 }
