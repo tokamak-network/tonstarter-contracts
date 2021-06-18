@@ -102,10 +102,10 @@ contract StakeDefiProxy is Stake1Storage, AccessControl, IStakeDefiProxy {
     /// @param _registry teh registry address
     /// @param _intdata the array valued of saleStartBlock, stakeStartBlock, periodBlocks
     function setInit(
-        address[3] memory _addr,
+        address[4] memory _addr,
         address _registry,
         uint256[3] memory _intdata
-    ) external onlyOwner {
+    ) external onlyOwner override {
         require(
             _addr[2] != address(0) && _intdata[0] < _intdata[1],
             "setInit fail"
