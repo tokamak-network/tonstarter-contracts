@@ -19,11 +19,8 @@ interface IStakeUniswapV3 {
         uint256 _period
     ) external;
 
-    /// @dev stakeETHtoTOS
-    function stakeETHtoTOS(uint256 tokenId) external;
-
-    /// @dev stakeWTONtoTOS
-    function stakeWTONtoTOS(uint256 tokenId) external;
+    /// @dev stakeLiquidity
+    function stakeLiquidity(uint256 tokenId) external;
 
     /// @dev withdraw
     function withdraw(uint256 tokenId) external;

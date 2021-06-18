@@ -19,11 +19,11 @@ import { IIERC20 } from "../interfaces/IIERC20.sol";
 
 import "../libraries/LibTokenStake1.sol";
 import { SafeMath } from "../utils/math/SafeMath.sol";
-import "../stake/Stake1Storage.sol";
+import "./StakeUniswapV3Storage.sol";
 
 /// @title Simple Stake Contract
 /// @notice Stake contracts can interact with the vault to claim tos tokens
-contract StakeUniswapV3 is Stake1Storage, AccessControl, IStakeUniswapV3 {
+contract StakeUniswapV3 is StakeUniswapV3Storage, AccessControl, IStakeUniswapV3 {
     using SafeMath for uint256;
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
 
@@ -108,50 +108,28 @@ contract StakeUniswapV3 is Stake1Storage, AccessControl, IStakeUniswapV3 {
       uint256 claimedAmount;
     }
 
-    INonfungiblePositionManager public nonfungiblePositionManager;
-    IUniswapV3Factory public factory;
-    uint256 private REWARDS_PER_SECOND;
-
-    address public WTONAddress;
-    address public TOSAddress;
-    address public WETHAddress;
-
     mapping (address => mapping(uint256 => StakeLiquidity)) public stakes;
     
-    /// @inheritdoc IStakeUniswapV3
-    function stakeETHtoTOS(uint256 tokenId) external override {
-      (,,address token0, address token1,,,,,,,,) = nonfungiblePositionManager.positions(tokenId);
-      require (
-        token0 == WETHAddress && token1 == TOSAddress,
-        "Wrong tokenId"
-      );
-    }
-
-
-    /// @inheritdoc IStakeUniswapV3
-    function stakeWTONtoTOS(uint256 tokenId) external override {
-      (,, address token0, address token1,,,,,,,,) = nonfungiblePositionManager.positions(tokenId);
-      require (
-        token0 == WTONAddress && token1 == TOSAddress,
-        "Wrong tokenId"
-      );
-    }
-
-    /// @dev _stakeLiquidity
-    function _stakeLiquidity(uint256 tokenId) internal {
+    /// @dev stakeLiquidity
+    function stakeLiquidity(uint256 tokenId) external override {
         require(
-            block.number >= saleStartBlock && block.number < startBlock,
-            "StakeSimple: period is not allowed"
+            !IIStake1Vault(vault).saleClosed(),
+            "StakeUniswapV3: not end"
         );
-        require(!IIStake1Vault(vault).saleClosed(), "not end");
-        // require(
-            nonfungiblePositionManager.transferFrom(msg.sender, address(this), tokenId);
-        //     "Cannot transfer"
-        // );
+        require(
+            saleStartBlock <= block.number && block.number < startBlock,
+            "StakeUniswapV3: period is not allowed"
+        );
 
         (,,address token0,address token1,uint24 fee,int24 tickLower,int24 tickUpper,uint128 liquidity,,,,) = nonfungiblePositionManager.positions(tokenId);
+        require (
+            token0 == address(token) && token1 == address(paytoken),
+            "StakeUniswapV3: Wrong tokenId"
+        );
+        nonfungiblePositionManager.transferFrom(msg.sender, address(this), tokenId);
+
         address poolAddress = PoolAddress.computeAddress(
-            address(factory),
+            uniswapV3FactoryAddress,
             PoolAddress.PoolKey({token0: token0, token1: token1, fee: fee})
         );
         IUniswapV3Pool pool = IUniswapV3Pool(poolAddress);
@@ -171,17 +149,12 @@ contract StakeUniswapV3 is Stake1Storage, AccessControl, IStakeUniswapV3 {
 
     /// @inheritdoc IStakeUniswapV3
     function withdraw(uint256 tokenId) external override {
-        require(
-            endBlock > 0 && endBlock < block.number,
-            "StakeSimple: not end"
-        );
+        require(endBlock < block.number, "StakeUniswapV3: Not end");
 
         StakeLiquidity storage stake = stakes[msg.sender][tokenId];
-        require(stake.owner == msg.sender, "Not authenticated");
-        // require(
-            nonfungiblePositionManager.safeTransferFrom(address(this), msg.sender, tokenId);
-        ///    "Cannot transfer"
-        // );
+        require(stake.owner == msg.sender, "StakeUniswapV3: Not authenticated");
+        nonfungiblePositionManager.safeTransferFrom(address(this), msg.sender, tokenId);
+    
         delete stakes[msg.sender][tokenId];
         emit Withdrawal(msg.sender, tokenId);
     }
@@ -190,17 +163,16 @@ contract StakeUniswapV3 is Stake1Storage, AccessControl, IStakeUniswapV3 {
     function claim(uint256 tokenId) external override lock {
         require(
             IIStake1Vault(vault).saleClosed() == true,
-            "StakeTON: not closed"
+            "StakeUniswapV3: not closed"
         );
 
-
         uint256 rewardClaim = canRewardAmount(msg.sender, tokenId);
-        require(rewardClaim > 0, "StakeTON: reward is zero");
+        require(rewardClaim > 0, "StakeUniswapV3: reward is zero");
 
         uint256 rewardTotal = IIStake1Vault(vault).totalRewardAmount(address(this));
         require(
             rewardClaimedTotal.add(rewardClaim) <= rewardTotal,
-            "StakeTON: total reward exceeds"
+            "StakeUniswapV3: total reward exceeds"
         );
 
         StakeLiquidity storage stake = stakes[msg.sender][tokenId];

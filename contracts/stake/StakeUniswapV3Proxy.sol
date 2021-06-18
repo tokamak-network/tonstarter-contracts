@@ -2,12 +2,12 @@
 pragma solidity ^0.7.6;
 //pragma abicoder v2;
 
-import "./Stake1Storage.sol";
+import "./StakeUniswapV3Storage.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 
 /// @title Proxy for Simple Stake contracts
 /// @notice
-contract StakeUniswapV3Proxy is Stake1Storage, AccessControl {
+contract StakeUniswapV3Proxy is StakeUniswapV3Storage, AccessControl {
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
     address internal _implementation;
     bool public pauseProxy;
