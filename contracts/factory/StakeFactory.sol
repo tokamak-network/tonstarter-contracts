@@ -81,7 +81,7 @@ contract StakeFactory is IStakeFactory, AccessControl {
         require(_addr[2] != address(0), "StakeFactory: vault zero");
 
 
-        if (stakeType == 0) {
+        if (stakeType != 1) {
             // TON Staking
             address proxy =
                 IStakeTONFactory(factory[stakeType]).create(
