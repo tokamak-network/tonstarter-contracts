@@ -143,34 +143,16 @@ contract Stake1Logic is StakeProxyStorage, AccessControl, IStake1Logic {
         stakeFactory = IStakeFactory(_stakeFactory);
     }
 
-    /// @dev Sets StakeTONFactory address
-    /// @param _stakeTONFactory new StakeTONFactory address
-    function setStakeTONFactory(address _stakeTONFactory)
-        public
+    /// @dev Set factory address by StakeType
+    /// @param _stakeType the stake type , 0:TON, 1: Simple, 2: UniswapV3
+    /// @param _factory the factory address
+    function setFactoryByStakeType(uint256 _stakeType, address _factory)
+        external
+        override
         onlyOwner
-        nonZero(_stakeTONFactory)
+        nonZero(address(stakeFactory))
     {
-        stakeFactory.setStakeTONFactory(_stakeTONFactory);
-    }
-
-    /// @dev Sets StakeSimpleFactory address
-    /// @param _stakeSimpleFactory new StakeSimpleFactory address
-    function setStakeSimpleFactory(address _stakeSimpleFactory)
-        public
-        onlyOwner
-        nonZero(_stakeSimpleFactory)
-    {
-        stakeFactory.setStakeSimpleFactory(_stakeSimpleFactory);
-    }
-
-    /// @dev Sets StakeDefiFactory address
-    /// @param _stakeDefiFactory new StakeDefiFactory address
-    function setStakeDefiFactory(address _stakeDefiFactory)
-        public
-        onlyOwner
-        nonZero(_stakeDefiFactory)
-    {
-        stakeFactory.setStakeDefiFactory(_stakeDefiFactory);
+        stakeFactory.setFactoryByStakeType(_stakeType,_factory);
     }
 
     /// @dev Sets StakeVaultFactory address
@@ -336,14 +318,14 @@ contract Stake1Logic is StakeProxyStorage, AccessControl, IStake1Logic {
     }
 
     /// @dev list of vaults in _phaseIndex phase
-    /// @param _phaseIndex the phase number
-    function vaultsOfPhase(uint256 _phaseIndex)
+    /// @param _phase the phase number
+    function vaultsOfPhase(uint256 _phase)
         external
         view
         override
         returns (address[] memory)
     {
-        return stakeRegistry.phasesAll(_phaseIndex);
+        return stakeRegistry.phasesAll(_phase);
     }
 
     /// @dev stake in tokamak's layer2
@@ -440,17 +422,5 @@ contract Stake1Logic is StakeProxyStorage, AccessControl, IStake1Logic {
                 deadline,
                 _type
             );
-    }
-
-    /// @dev Get addresses of vaults of index phase
-    /// @param _phase the pahse number
-    function vaultsOfPahse(uint256 _phase)
-        external
-        view
-        override
-        nonZero(address(stakeRegistry))
-        returns (address[] memory)
-    {
-        return stakeRegistry.phasesAll(_phase);
     }
 }

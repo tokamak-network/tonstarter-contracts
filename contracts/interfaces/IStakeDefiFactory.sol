@@ -9,7 +9,7 @@ interface IStakeDefiFactory {
     /// @param owner  owner address
     /// @return contract address
     function create(
-        address[3] calldata _addr,
+        address[4] calldata _addr,
         address _registry,
         uint256[3] calldata _intdata,
         address owner

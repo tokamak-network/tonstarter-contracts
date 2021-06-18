@@ -105,24 +105,30 @@ contract StakeSimple is Stake1Storage, AccessControl, IStakeSimple {
             "StakeSimple: period is not allowed"
         );
 
-        require(!IIStake1Vault(vault).saleClosed(), "not end");
+        require(!IIStake1Vault(vault).saleClosed(), "StakeSimple: not end");
 
         if (paytoken == address(0)) amount = msg.value;
-        else require(IIERC20(paytoken).balanceOf(msg.sender) >= amount, "lack");
+        else require(IIERC20(paytoken).balanceOf(msg.sender) >= amount, "StakeSimple: lack");
 
         LibTokenStake1.StakedAmount storage staked = userStaked[msg.sender];
         if (staked.amount == 0) totalStakers = totalStakers.add(1);
 
         staked.amount = staked.amount.add(amount);
         totalStakedAmount = totalStakedAmount.add(amount);
-        if (paytoken != address(0))
+        if (paytoken != address(0)){
+            require(
+                IIERC20(paytoken).allowance(msg.sender, address(this)) >= amount,
+                "StakeSimple: allowance amount lack"
+            );
             require(
                 IIERC20(paytoken).transferFrom(
                     msg.sender,
                     address(this),
                     amount
-                )
+                ),
+                "StakeSimple: transferFrom fail"
             );
+        }
 
         emit Staked(msg.sender, amount);
     }
