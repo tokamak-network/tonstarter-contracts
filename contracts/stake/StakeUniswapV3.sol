@@ -5,6 +5,7 @@ import "@uniswap/v3-core/contracts/interfaces/IUniswapV3Pool.sol";
 import "@uniswap/v3-core/contracts/libraries/FixedPoint128.sol";
 import "@uniswap/v3-core/contracts/libraries/FullMath.sol";
 import "@uniswap/v3-core/contracts/interfaces/IUniswapV3Factory.sol";
+import '@uniswap/v3-core/contracts/libraries/FullMath.sol';
 
 import "@uniswap/v3-periphery/contracts/interfaces/INonfungiblePositionManager.sol";
 import "@uniswap/v3-periphery/contracts/libraries/TransferHelper.sol";
@@ -12,6 +13,8 @@ import "@uniswap/v3-periphery/contracts/base/Multicall.sol";
 import "@uniswap/v3-periphery/contracts/libraries/PoolAddress.sol";
 
 import "@openzeppelin/contracts/access/AccessControl.sol";
+
+import "../libraries/LibUniswapV3Stake.sol";
 
 import "../interfaces/IStakeUniswapV3.sol";
 import { IIStake1Vault } from "../interfaces/IIStake1Vault.sol";
@@ -97,18 +100,6 @@ contract StakeUniswapV3 is StakeUniswapV3Storage, AccessControl, IStakeUniswapV3
         startBlock = _startBlock;
         endBlock = startBlock.add(_period);
     }
-
-    struct StakeLiquidity {
-      address owner;
-      IUniswapV3Pool pool;
-      uint256 liquidity;
-      int24 tickLower;
-      int24 tickUpper;
-      uint256 secondsPerLiquidityInsideX128Initial;
-      uint256 claimedAmount;
-    }
-
-    mapping (address => mapping(uint256 => StakeLiquidity)) public stakes;
     
     /// @dev stakeLiquidity
     function stakeLiquidity(uint256 tokenId) external override {
@@ -132,17 +123,17 @@ contract StakeUniswapV3 is StakeUniswapV3Storage, AccessControl, IStakeUniswapV3
             uniswapV3FactoryAddress,
             PoolAddress.PoolKey({token0: token0, token1: token1, fee: fee})
         );
-        IUniswapV3Pool pool = IUniswapV3Pool(poolAddress);
-        (, uint160 secondsPerLiquidityInsideX128, ) = pool.snapshotCumulativesInside(tickLower, tickUpper);
+        (, uint160 secondsPerLiquidityInsideX128, ) = IUniswapV3Pool(poolAddress).snapshotCumulativesInside(tickLower, tickUpper);
 
-        stakes[msg.sender][tokenId] = StakeLiquidity({
+        stakes[msg.sender][tokenId] = LibUniswapV3Stake.StakeLiquidity({
             owner: msg.sender,
-            pool: pool,
+            poolAddress: poolAddress,
             liquidity: liquidity,
             tickLower: tickLower,
             tickUpper: tickUpper,
-            secondsPerLiquidityInsideX128Initial: secondsPerLiquidityInsideX128,
-            claimedAmount: 0
+            secondsPerLiquidityInsideX128Last: secondsPerLiquidityInsideX128,
+            claimedAmount: 0,
+            claimedBlock: block.number
         });
     }
 
@@ -151,8 +142,7 @@ contract StakeUniswapV3 is StakeUniswapV3Storage, AccessControl, IStakeUniswapV3
     function withdraw(uint256 tokenId) external override {
         require(endBlock < block.number, "StakeUniswapV3: Not end");
 
-        StakeLiquidity storage stake = stakes[msg.sender][tokenId];
-        require(stake.owner == msg.sender, "StakeUniswapV3: Not authenticated");
+        require(stakes[msg.sender][tokenId].owner == msg.sender, "StakeUniswapV3: Not authenticated");
         nonfungiblePositionManager.safeTransferFrom(address(this), msg.sender, tokenId);
     
         delete stakes[msg.sender][tokenId];
@@ -175,21 +165,28 @@ contract StakeUniswapV3 is StakeUniswapV3Storage, AccessControl, IStakeUniswapV3
             "StakeUniswapV3: total reward exceeds"
         );
 
-        StakeLiquidity storage stake = stakes[msg.sender][tokenId];
-        (, uint160 secondsPerLiquidityInsideX128, ) = stake.pool.snapshotCumulativesInside(stake.tickLower, stake.tickUpper);
-        stake.secondsPerLiquidityInsideX128Initial = secondsPerLiquidityInsideX128;
+        LibUniswapV3Stake.StakeLiquidity storage stake = stakes[msg.sender][tokenId];
+        require(stake.claimedBlock < endBlock, "StakeUniswapV3: Already claimed everything");
+        (, uint160 secondsPerLiquidityInsideX128, ) = IUniswapV3Pool(stake.poolAddress).snapshotCumulativesInside(stake.tickLower, stake.tickUpper);
+
+        stake.secondsPerLiquidityInsideX128Last = secondsPerLiquidityInsideX128;
         stake.claimedAmount = stake.claimedAmount.add(rewardClaim);
+        stake.claimedBlock = block.number;
         rewardClaimedTotal = rewardClaimedTotal.add(rewardClaim);
-        require(IIStake1Vault(vault).claim(msg.sender, rewardClaim), "Cannot claim");
+        
+        require(IIStake1Vault(vault).claim(msg.sender, rewardClaim), "StakeUniswapV3: Cannot claim");
 
         emit Claimed(msg.sender, rewardClaim, block.number);
     }
 
     /// @inheritdoc IStakeUniswapV3
     function canRewardAmount(address account, uint256 tokenId) override public view returns (uint256 reward) {
-        StakeLiquidity memory stake = stakes[account][tokenId];
-        (, uint160 secondsPerLiquidityInsideX128, ) = stake.pool.snapshotCumulativesInside(stake.tickLower, stake.tickUpper);
-        uint256 secondsInside = (secondsPerLiquidityInsideX128 - stake.secondsPerLiquidityInsideX128Initial) * stake.liquidity;
-        reward = secondsInside * REWARDS_PER_SECOND;
+        LibUniswapV3Stake.StakeLiquidity memory stake = stakes[account][tokenId];
+        (, uint160 secondsPerLiquidityInsideX128, ) = IUniswapV3Pool(stake.poolAddress).snapshotCumulativesInside(stake.tickLower, stake.tickUpper);
+        uint256 secondsInsideX128 = (secondsPerLiquidityInsideX128 - stake.secondsPerLiquidityInsideX128Last) * stake.liquidity;
+        // uint256 totalSecondsX128 = (
+        //    min(endTimestamp, block.timestamp) - max(startTimestamp, stake.claimedTime)
+        // ) << 128;
+        reward = secondsInsideX128 * REWARDS_PER_SECOND;
     }
 }

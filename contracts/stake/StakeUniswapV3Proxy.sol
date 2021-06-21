@@ -110,6 +110,8 @@ contract StakeUniswapV3Proxy is StakeUniswapV3Storage, AccessControl {
         token = _addr[0];
         paytoken = _addr[1];
         vault = _addr[2];
+        // uniswapV3FactoryAddress = _addr[3];
+
 
         saleStartBlock = _intdata[0];
         startBlock = _intdata[1];

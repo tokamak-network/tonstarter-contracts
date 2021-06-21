@@ -1,8 +1,7 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity ^0.7.6;
 
-//import "../interfaces/IStake1Storage.sol";
-import "../libraries/LibTokenStake1.sol";
+import "../libraries/LibUniswapV3Stake.sol";
 import "@uniswap/v3-periphery/contracts/interfaces/INonfungiblePositionManager.sol";
 
 /// @title The base storage of stakeContract
@@ -34,44 +33,45 @@ contract StakeUniswapV3Storage {
     /// @dev the total staked amount
     uint256 public totalStakedAmount;
 
-    /// @dev information staked by user
-    mapping(address => LibTokenStake1.StakedAmount) public userStaked;
+    /// @dev stakes for user's tokenId
+    mapping (address => mapping(uint256 => LibUniswapV3Stake.StakeLiquidity)) public stakes;
 
     /// @dev total stakers
     uint256 public totalStakers;
 
+    /// @dev lock
     uint256 internal _lock;
     
+    /// @dev Rewards per second liquidity inside
     uint256 internal REWARDS_PER_SECOND;
 
+    /// @dev UniswapV3 Nonfungible position manager
     INonfungiblePositionManager public nonfungiblePositionManager;
     
+    /// @dev UniswapV3 pool factory 
     address public uniswapV3FactoryAddress;
     
     
 
     /// @dev user's staked information
-    function getUserStaked(address user)
+    function getUserStaked(address user, uint256 tokenId)
         external
         view
         returns (
-            uint256 amount,
-            uint256 claimedBlock,
-            uint256 claimedAmount,
-            uint256 releasedBlock,
-            uint256 releasedAmount,
-            uint256 releasedTOSAmount,
-            bool released
+            uint256 liquidity,
+            int24 tickLower,
+            int24 tickUpper,
+            uint256 secondsPerLiquidityInsideX128Last,
+            uint256 claimedAmount
         )
     {
+        LibUniswapV3Stake.StakeLiquidity memory stake = stakes[user][tokenId];
         return (
-            userStaked[user].amount,
-            userStaked[user].claimedBlock,
-            userStaked[user].claimedAmount,
-            userStaked[user].releasedBlock,
-            userStaked[user].releasedAmount,
-            userStaked[user].releasedTOSAmount,
-            userStaked[user].released
+            stake.liquidity,
+            stake.tickLower,
+            stake.tickUpper,
+            stake.secondsPerLiquidityInsideX128Last,
+            stake.claimedAmount
         );
     }
 
