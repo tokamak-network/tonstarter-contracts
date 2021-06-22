@@ -1,5 +1,6 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity ^0.7.0;
+pragma abicoder v2;
 
 import "@uniswap/v3-core/contracts/interfaces/IUniswapV3Pool.sol";
 import "@uniswap/v3-core/contracts/libraries/FixedPoint128.sol";
@@ -101,7 +102,7 @@ contract StakeUniswapV3 is StakeUniswapV3Storage, AccessControl, IStakeUniswapV3
         endBlock = startBlock.add(_period);
     }
     
-    /// @dev stakeLiquidity
+    /// @inheritdoc IStakeUniswapV3
     function stakeLiquidity(uint256 tokenId) external override {
         require(
             !IIStake1Vault(vault).saleClosed(),
@@ -138,19 +139,54 @@ contract StakeUniswapV3 is StakeUniswapV3Storage, AccessControl, IStakeUniswapV3
     }
 
 
-    /// @inheritdoc IStakeUniswapV3
-    function withdraw(uint256 tokenId) external override {
-        require(endBlock < block.number, "StakeUniswapV3: Not end");
+    modifier ifOwner(uint256 tokenId) {
+        require(stakes[msg.sender][tokenId].owner == msg.sender, "Not an owner");
+        _;
+    }
 
-        require(stakes[msg.sender][tokenId].owner == msg.sender, "StakeUniswapV3: Not authenticated");
-        nonfungiblePositionManager.safeTransferFrom(address(this), msg.sender, tokenId);
-    
+    /// @inheritdoc IStakeUniswapV3
+    function increaseLiquidity(INonfungiblePositionManager.IncreaseLiquidityParams calldata params)
+        external
+        override
+        ifOwner(params.tokenId)
+        returns (
+            uint128 liquidity,
+            uint256 amount0,
+            uint256 amount1
+        ) 
+    {
+        claim(params.tokenId);
+        LibUniswapV3Stake.StakeLiquidity storage stake = stakes[msg.sender][params.tokenId];
+        (liquidity, amount0, amount1) = nonfungiblePositionManager.increaseLiquidity(params);
+        stake.liquidity = liquidity;
+    }
+
+    /// @inheritdoc IStakeUniswapV3
+    function decreaseLiquidity(INonfungiblePositionManager.DecreaseLiquidityParams calldata params)
+        external
+        override
+        ifOwner(params.tokenId)
+        returns (
+            uint256 amount0,
+            uint256 amount1
+        ) 
+    {
+        claim(params.tokenId);
+        LibUniswapV3Stake.StakeLiquidity storage stake = stakes[msg.sender][params.tokenId];
+        (amount0, amount1) = nonfungiblePositionManager.decreaseLiquidity(params);
+        stake.liquidity -= params.liquidity;
+    }
+
+    /// @inheritdoc IStakeUniswapV3
+    function withdraw(uint256 tokenId) external override ifOwner(tokenId) {
+        require(endBlock < block.number, "StakeUniswapV3: Not end");
+        nonfungiblePositionManager.safeTransferFrom(address(this), msg.sender, tokenId);    
         delete stakes[msg.sender][tokenId];
         emit Withdrawal(msg.sender, tokenId);
     }
     
     /// @inheritdoc IStakeUniswapV3
-    function claim(uint256 tokenId) external override lock {
+    function claim(uint256 tokenId) public override lock ifOwner(tokenId) {
         require(
             IIStake1Vault(vault).saleClosed() == true,
             "StakeUniswapV3: not closed"

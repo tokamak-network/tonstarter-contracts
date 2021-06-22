@@ -1,5 +1,8 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity ^0.7.6;
+pragma abicoder v2;
+
+import "@uniswap/v3-periphery/contracts/interfaces/INonfungiblePositionManager.sol";
 
 interface IStakeUniswapV3 {
     /// @dev Initialize
@@ -21,6 +24,23 @@ interface IStakeUniswapV3 {
 
     /// @dev stakeLiquidity
     function stakeLiquidity(uint256 tokenId) external;
+    
+    /// @dev increaseLiquidity
+    function increaseLiquidity(INonfungiblePositionManager.IncreaseLiquidityParams calldata params)
+        external
+        returns (
+            uint128 liquidity,
+            uint256 amount0,
+            uint256 amount1
+        );
+
+    /// @dev decrseaseLiquidity
+    function decreaseLiquidity(INonfungiblePositionManager.DecreaseLiquidityParams calldata params)
+        external
+        returns (
+            uint256 amount0,
+            uint256 amount1
+        );
 
     /// @dev withdraw
     function withdraw(uint256 tokenId) external;
