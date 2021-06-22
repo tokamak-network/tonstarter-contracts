@@ -3,6 +3,7 @@ pragma solidity ^0.7.6;
 pragma abicoder v2;
 
 import "@uniswap/v3-periphery/contracts/interfaces/INonfungiblePositionManager.sol";
+import "../libraries/LibUniswapV3Stake.sol";
 
 interface IStakeUniswapV3 {
     /// @dev Initialize
@@ -40,6 +41,16 @@ interface IStakeUniswapV3 {
         returns (
             uint256 amount0,
             uint256 amount1
+        );
+
+    /// @dev transferLiquidityToNewToken
+    function transferLiquidityToNewToken(LibUniswapV3Stake.ModifyPositionParams calldata params)
+        external
+        returns (
+            uint256 newTokenId,
+            uint128 newLiquidity,
+            uint256 newAmount0,
+            uint256 newAmount1
         );
 
     /// @dev withdraw

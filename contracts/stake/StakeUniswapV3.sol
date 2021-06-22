@@ -176,6 +176,48 @@ contract StakeUniswapV3 is StakeUniswapV3Storage, AccessControl, IStakeUniswapV3
         (amount0, amount1) = nonfungiblePositionManager.decreaseLiquidity(params);
         stake.liquidity -= params.liquidity;
     }
+    
+ 
+    function transferLiquidityToNewToken(LibUniswapV3Stake.ModifyPositionParams calldata params)
+        external
+        override
+        ifOwner(params.tokenId)
+        returns (
+            uint256 newTokenId,
+            uint128 newLiquidity,
+            uint256 newAmount0,
+            uint256 newAmount1
+        )
+    {
+        claim(params.tokenId);
+
+        LibUniswapV3Stake.StakeLiquidity storage stake = stakes[msg.sender][params.tokenId];
+        (uint256 amount0, uint256 amount1) = nonfungiblePositionManager.decreaseLiquidity(INonfungiblePositionManager.DecreaseLiquidityParams({
+            tokenId: params.tokenId,
+            liquidity: stake.liquidity,
+            amount0Min: 0,
+            amount1Min: 0,
+            deadline: block.timestamp
+        }));
+
+        (,,address token0, address token1,,,,uint128 liquidity,,,,) = nonfungiblePositionManager.positions(params.tokenId);
+        nonfungiblePositionManager.transferFrom(address(this), msg.sender, params.tokenId);
+
+        INonfungiblePositionManager.MintParams memory mintParams = INonfungiblePositionManager.MintParams({
+            token0: token0,
+            token1: token1,
+            fee: params.newFee,
+            tickLower: params.newTickLower,
+            tickUpper: params.newTickUpper,
+            amount0Desired: amount0,
+            amount1Desired: amount1,
+            amount0Min: 0,
+            amount1Min: 0,
+            recipient: address(this),
+            deadline: block.timestamp
+        });
+        return nonfungiblePositionManager.mint(mintParams);
+    }
 
     /// @inheritdoc IStakeUniswapV3
     function withdraw(uint256 tokenId) external override ifOwner(tokenId) {
