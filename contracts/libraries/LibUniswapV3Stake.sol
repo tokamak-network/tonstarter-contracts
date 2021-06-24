@@ -19,4 +19,14 @@ library LibUniswapV3Stake {
     int24 newTickLower;
     int24 newTickUpper;
   }
+
+  struct CreateNewTokenStakeParams {
+    address token0;
+    address token1;
+    uint256 amount0;
+    uint256 amount1;
+    uint24 fee;
+    int24 tickLower;
+    int24 tickUpper;
+  }
 }

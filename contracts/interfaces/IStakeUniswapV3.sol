@@ -44,7 +44,7 @@ interface IStakeUniswapV3 {
         );
 
     /// @dev transferLiquidityToNewToken
-    function transferLiquidityToNewToken(LibUniswapV3Stake.ModifyPositionParams calldata params)
+    function modifyPosition(LibUniswapV3Stake.ModifyPositionParams calldata params)
         external
         returns (
             uint256 newTokenId,

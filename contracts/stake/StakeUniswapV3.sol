@@ -177,10 +177,9 @@ contract StakeUniswapV3 is StakeUniswapV3Storage, AccessControl, IStakeUniswapV3
         stake.liquidity -= params.liquidity;
     }
     
- 
-    function transferLiquidityToNewToken(LibUniswapV3Stake.ModifyPositionParams calldata params)
-        external
+    function modifyPosition(LibUniswapV3Stake.ModifyPositionParams calldata params)
         override
+        external
         ifOwner(params.tokenId)
         returns (
             uint256 newTokenId,
@@ -189,35 +188,79 @@ contract StakeUniswapV3 is StakeUniswapV3Storage, AccessControl, IStakeUniswapV3
             uint256 newAmount1
         )
     {
+        (,,address token0, address token1,,,,uint128 liquidity,,,,) = nonfungiblePositionManager.positions(params.tokenId);
         claim(params.tokenId);
+        (uint256 amount0, uint256 amount1) = _removeLiquidityAndTransferToken(params.tokenId, liquidity);
+        delete stakes[msg.sender][params.tokenId];
 
-        LibUniswapV3Stake.StakeLiquidity storage stake = stakes[msg.sender][params.tokenId];
-        (uint256 amount0, uint256 amount1) = nonfungiblePositionManager.decreaseLiquidity(INonfungiblePositionManager.DecreaseLiquidityParams({
-            tokenId: params.tokenId,
-            liquidity: stake.liquidity,
+        (newTokenId, newLiquidity, newAmount0, newAmount1) = _createNewTokenStake(LibUniswapV3Stake.CreateNewTokenStakeParams({
+            token0: token0,
+            token1: token1,
+            amount0: amount0,
+            amount1: amount1,
+            fee: params.newFee,
+            tickLower: params.newTickLower,
+            tickUpper: params.newTickUpper
+        }));
+    }
+
+    function _removeLiquidityAndTransferToken(uint256 tokenId, uint128 liquidity)
+        internal
+        returns (
+            uint256 amount0,
+            uint256 amount1
+        )
+    {
+        (amount0, amount1) = nonfungiblePositionManager.decreaseLiquidity(INonfungiblePositionManager.DecreaseLiquidityParams({
+            tokenId: tokenId,
+            liquidity: liquidity,
             amount0Min: 0,
             amount1Min: 0,
             deadline: block.timestamp
         }));
+        nonfungiblePositionManager.transferFrom(address(this), msg.sender, tokenId);
+    }
 
-        (,,address token0, address token1,,,,uint128 liquidity,,,,) = nonfungiblePositionManager.positions(params.tokenId);
-        nonfungiblePositionManager.transferFrom(address(this), msg.sender, params.tokenId);
-
-        INonfungiblePositionManager.MintParams memory mintParams = INonfungiblePositionManager.MintParams({
-            token0: token0,
-            token1: token1,
-            fee: params.newFee,
-            tickLower: params.newTickLower,
-            tickUpper: params.newTickUpper,
-            amount0Desired: amount0,
-            amount1Desired: amount1,
+    function _createNewTokenStake(LibUniswapV3Stake.CreateNewTokenStakeParams memory params)
+        internal
+        returns (
+            uint256 newTokenId,
+            uint128 newLiquidity,
+            uint256 newAmount0,
+            uint256 newAmount1
+        )
+    {
+        (newTokenId, newLiquidity, newAmount0, newAmount1) = nonfungiblePositionManager.mint(INonfungiblePositionManager.MintParams({
+            token0: params.token0,
+            token1: params.token1,
+            fee: params.fee,
+            tickLower: params.tickLower,
+            tickUpper: params.tickUpper,
+            amount0Desired: params.amount0,
+            amount1Desired: params.amount1,
             amount0Min: 0,
             amount1Min: 0,
             recipient: address(this),
             deadline: block.timestamp
+        }));
+
+        address poolAddress = PoolAddress.computeAddress(
+            uniswapV3FactoryAddress,
+            PoolAddress.PoolKey({token0: params.token0, token1: params.token1, fee: params.fee})
+        );
+        (, uint160 secondsPerLiquidityInsideX128, ) = IUniswapV3Pool(poolAddress).snapshotCumulativesInside(params.tickLower, params.tickUpper);
+        stakes[msg.sender][newTokenId] = LibUniswapV3Stake.StakeLiquidity({
+            owner: msg.sender,
+            poolAddress: poolAddress,
+            liquidity: newLiquidity,
+            tickLower: params.tickLower,
+            tickUpper: params.tickUpper,
+            secondsPerLiquidityInsideX128Last: secondsPerLiquidityInsideX128,
+            claimedAmount: 0,
+            claimedBlock: block.number
         });
-        return nonfungiblePositionManager.mint(mintParams);
     }
+
 
     /// @inheritdoc IStakeUniswapV3
     function withdraw(uint256 tokenId) external override ifOwner(tokenId) {
