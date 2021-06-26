@@ -4,6 +4,7 @@ pragma solidity ^0.7.6;
 import "../interfaces/IStakeFactory.sol";
 import {IStakeSimpleFactory} from "../interfaces/IStakeSimpleFactory.sol";
 import {IStakeTONFactory} from "../interfaces/IStakeTONFactory.sol";
+import {IStakeUniswapV3Factory} from "../interfaces/IStakeUniswapV3Factory.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 
 /// @title A factory that calls the desired stake factory according to stakeType
@@ -81,8 +82,7 @@ contract StakeFactory is IStakeFactory, AccessControl {
         require(_addr[2] != address(0), "StakeFactory: vault zero");
 
 
-        if (stakeType != 1) {
-            // TON Staking
+        if (stakeType == 0) {
             address proxy =
                 IStakeTONFactory(factory[stakeType]).create(
                     _addr,
@@ -93,8 +93,7 @@ contract StakeFactory is IStakeFactory, AccessControl {
             require(proxy != address(0), "StakeFactory: proxy zero");
             return proxy;
 
-        } else {
-
+        } else if (stakeType == 1) {
             address proxy =
                 IStakeSimpleFactory(factory[stakeType]).create(
                     [_addr[0], _addr[1], _addr[2]],
@@ -104,6 +103,15 @@ contract StakeFactory is IStakeFactory, AccessControl {
             require(proxy != address(0), "StakeFactory: proxy zero");
             return proxy;
 
+        } else if (stakeType == 2) {
+            address proxy =
+                IStakeUniswapV3Factory(factory[stakeType]).create(
+                    [_addr[0], _addr[1], _addr[2]],
+                    _intdata,
+                    msg.sender
+                );
+            require(proxy != address(0), "StakeFactory: proxy zero");
+            return proxy;            
         }
     }
 }
