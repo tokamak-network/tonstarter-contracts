@@ -10,6 +10,7 @@ const {
 } = require("@openzeppelin/test-helpers");
 const { connect } = require("http2");
 const { toBN, toWei, keccak256, fromWei } = require("web3-utils");
+const { network } = require("hardhat");
 
 async function findSigner(address) {
   const signers = await ethers.getSigners();
@@ -83,16 +84,17 @@ async function setupContracts(account) {
     .deploy(name, symbol, version);
   await tos.deployed();
 
-  const stos = await (await ethers.getContractFactory("STOS"))
-    .connect(deployer)
-    .deploy();
-  await stos.deployed();
+  // const stos = await (await ethers.getContractFactory("sTOS"))
+  //   .connect(deployer)
+  //   .deploy();
+  // await stos.deployed();
 
   const stakeRegistry = await (await ethers.getContractFactory("StakeRegistry"))
     .connect(deployer)
     .deploy(tos.address);
   await stakeRegistry.deployed();
 
+  // Stake Simple
   const stakeSimple = await (await ethers.getContractFactory("StakeSimple"))
     .connect(deployer)
     .deploy();
@@ -104,6 +106,21 @@ async function setupContracts(account) {
     .deploy(stakeSimple.address);
   await stakeSimpleFactory.deployed();
 
+  // Stake UniswapV3
+  const stakeUniswapV3 = await (
+    await ethers.getContractFactory("StakeUniswapV3")
+  )
+    .connect(deployer)
+    .deploy();
+  await stakeUniswapV3.deployed();
+  const stakeUniswapV3Factory = await (
+    await ethers.getContractFactory("StakeUniswapV3Factory")
+  )
+    .connect(deployer)
+    .deploy(stakeUniswapV3.address);
+  await stakeUniswapV3Factory.deployed();
+
+  // Stake Vault
   const stake1Vault = await (await ethers.getContractFactory("Stake1Vault"))
     .connect(deployer)
     .deploy();
@@ -135,19 +152,13 @@ async function setupContracts(account) {
     .deploy(stakeTONProxyFactory.address, stakeTONLogic.address);
   await stakeTONProxyFactory.deployed();
 
-  const stakeDefiFactory = await (
-    await ethers.getContractFactory("StakeDefiFactory")
-  )
-    .connect(deployer)
-    .deploy(stakeSimple.address);
-  await stakeDefiFactory.deployed();
 
   const stakeFactory = await (await ethers.getContractFactory("StakeFactory"))
     .connect(deployer)
     .deploy(
       stakeSimpleFactory.address,
       stakeTONFactory.address,
-      stakeDefiFactory.address
+      stakeUniswapV3Factory.address
     );
   await stakeFactory.deployed();
 
@@ -158,12 +169,10 @@ async function setupContracts(account) {
 
   const stake1Proxy = await (await ethers.getContractFactory("Stake1Proxy"))
     .connect(deployer)
-    .deploy(
-      stake1Logic.address
-    );
+    .deploy(stake1Logic.address);
   await stake1Proxy.deployed();
 
-  //await stake1Proxy.connect(deployer).upgradeTo(stake1Logic.address);
+  // await stake1Proxy.connect(deployer).upgradeTo(stake1Logic.address);
 
   const stakeEntry = await (
     await ethers.getContractFactory("Stake1Logic")
@@ -173,12 +182,13 @@ async function setupContracts(account) {
     .connect(deployer)
     .deploy();
   await ton.deployed();
-
   const wton = await (await ethers.getContractFactory("WTON"))
     .connect(deployer)
     .deploy(ton.address);
   await wton.deployed();
   console.log("hello0");
+  console.log((await ethers.provider.getBalance(deployer.address)).toString());
+
   const layer2Registry = await (
     await ethers.getContractFactory("Layer2Registry")
   )
@@ -199,15 +209,22 @@ async function setupContracts(account) {
     .connect(deployer)
     .deploy();
   await coinageFactory.deployed();
-  console.log("hello0.5");
 
+  console.log(" hell ");
   const currentTime = await time.latest();
-  console.log(currentTime.toString());
   const daoVault = await (await ethers.getContractFactory("DAOVault"))
     .connect(deployer)
     .deploy(wton.address, currentTime.toString());
   await daoVault.deployed();
-  console.log("hello0.7");
+  console.log("seig");
+  console.log({
+    ton: ton.address,
+    wton: wton.address,
+    layer2Registry: layer2Registry.address,
+    depositManager: depositManager.address,
+    SEIG_PER_BLOCK: SEIG_PER_BLOCK.toFixed(WTON_UNIT),
+    coinageFactory: coinageFactory.address,
+  });
 
   const seigManager = await (await ethers.getContractFactory("SeigManager"))
     .connect(deployer)
@@ -220,7 +237,6 @@ async function setupContracts(account) {
       coinageFactory.address
     );
   await seigManager.deployed();
-  console.log("hello1");
 
   const powerTON = await (await ethers.getContractFactory("PowerTON"))
     .connect(deployer)
@@ -233,18 +249,22 @@ async function setupContracts(account) {
   await seigManager.connect(deployer).setDao(daoVault.address);
   await wton.connect(deployer).addMinter(seigManager.address);
   await ton.connect(deployer).addMinter(wton.address);
-  console.log("hello2");
 
   await Promise.all(
     [depositManager, wton].map((contract) =>
       contract.connect(deployer).setSeigManager(seigManager.address)
     )
   );
+  console.log(" hell ");
 
   // ton setting
   await ton
     .connect(deployer)
     .mint(deployer.address, TON_INITIAL_SUPPLY.toFixed(TON_UNIT));
+  await tos
+    .connect(deployer)
+    .mint(deployer.address, TON_INITIAL_SUPPLY.toFixed(TON_UNIT));
+
   await ton
     .connect(deployer)
     .approve(wton.address, TON_INITIAL_SUPPLY.toFixed(TON_UNIT));
@@ -266,7 +286,6 @@ async function setupContracts(account) {
         .transfer(account, TON_INITIAL_HOLDERS.toFixed(TON_UNIT))
     )
   );
-  console.log("hello3");
 
   await Promise.all(
     users.map((account) =>
@@ -293,18 +312,15 @@ async function setupContracts(account) {
     .setMinimumAmount(
       TON_MINIMUM_STAKE_AMOUNT.times(WTON_TON_RATIO).toFixed(WTON_UNIT)
     );
-  console.log("hello4");
 
-
-  const swapProxy = await (
-    await ethers.getContractFactory("SwapProxy")
-  )
+  const swapProxy = await (await ethers.getContractFactory("SwapProxy"))
     .connect(deployer)
     .deploy();
 
   return {
+    ton,
     tos,
-    stos,
+    // stos,
     stakeRegistry,
     stakeSimple,
     stakeSimpleFactory,
@@ -313,7 +329,7 @@ async function setupContracts(account) {
     stakeTONLogic,
     stakeTONProxyFactory,
     stakeTONFactory,
-    stakeDefiFactory,
+    stakeUniswapV3Factory,
     stakeFactory,
     stake1Logic,
     stake1Proxy,
