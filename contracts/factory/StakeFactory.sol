@@ -105,8 +105,9 @@ contract StakeFactory is IStakeFactory, AccessControl {
 
         } else if (stakeType == 2) {
             address proxy =
-                IStakeUniswapV3Factory(factory[stakeType]).create(
-                    [_addr[0], _addr[1], _addr[2]],
+                IStakeTONFactory(factory[stakeType]).create(
+                    _addr,
+                    registry,
                     _intdata,
                     msg.sender
                 );

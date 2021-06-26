@@ -107,6 +107,13 @@ async function setupContracts(account) {
   await stakeSimpleFactory.deployed();
 
   // Stake UniswapV3
+  const stakeUniswapV3ProxyFactory = await (
+    await ethers.getContractFactory("StakeUniswapV3ProxyFactory")
+  )
+    .connect(deployer)
+    .deploy();
+  await stakeUniswapV3ProxyFactory.deployed();
+
   const stakeUniswapV3 = await (
     await ethers.getContractFactory("StakeUniswapV3")
   )
@@ -117,7 +124,7 @@ async function setupContracts(account) {
     await ethers.getContractFactory("StakeUniswapV3Factory")
   )
     .connect(deployer)
-    .deploy(stakeUniswapV3.address);
+    .deploy(stakeUniswapV3ProxyFactory.address, stakeUniswapV3.address);
   await stakeUniswapV3Factory.deployed();
 
   // Stake Vault
@@ -133,6 +140,7 @@ async function setupContracts(account) {
     .deploy(stake1Vault.address);
   await stakeVaultFactory.deployed();
 
+  // Stake TON
   const stakeTONLogic = await (await ethers.getContractFactory("StakeTON"))
     .connect(deployer)
     .deploy();
@@ -150,9 +158,9 @@ async function setupContracts(account) {
   )
     .connect(deployer)
     .deploy(stakeTONProxyFactory.address, stakeTONLogic.address);
-  await stakeTONProxyFactory.deployed();
+  await stakeTONFactory.deployed();
 
-
+  // Stake Factory
   const stakeFactory = await (await ethers.getContractFactory("StakeFactory"))
     .connect(deployer)
     .deploy(

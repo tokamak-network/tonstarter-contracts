@@ -97,12 +97,14 @@ contract StakeUniswapV3Proxy is StakeUniswapV3Storage, AccessControl {
     }
 
     /// @dev set initial storage
-    /// @param _addr the array addresses of token, paytoken, vault
+    /// @param _addr the array addresses of token, paytoken, vault, defiAddress
+    /// @param _registry the registry address
     /// @param _intdata the array valued of saleStartBlock, stakeStartBlock, periodBlocks
-    function setInit(address[3] memory _addr, uint256[3] memory _intdata)
-        external
-        onlyOwner
-    {
+    function setInit(
+        address[4] memory _addr,
+        address _registry,
+        uint256[3] memory _intdata
+    ) external onlyOwner {
         require(
             _addr[2] != address(0) && _intdata[0] < _intdata[1],
             "StakeSimpleProxy: setInit fail"

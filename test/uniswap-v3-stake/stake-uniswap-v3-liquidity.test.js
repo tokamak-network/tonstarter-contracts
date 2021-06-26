@@ -63,7 +63,7 @@ describe("Stake", function () {
 
     stakingContractInfo = [
       { name: "short staking", period: 50 },
-      { name: "long staking", period: 100 },
+      // { name: "long staking", period: 100 },
     ];
   });
 
