@@ -194,8 +194,6 @@ async function setupContracts(account) {
     .connect(deployer)
     .deploy(ton.address);
   await wton.deployed();
-  console.log("hello0");
-  console.log((await ethers.provider.getBalance(deployer.address)).toString());
 
   const layer2Registry = await (
     await ethers.getContractFactory("Layer2Registry")
@@ -218,21 +216,11 @@ async function setupContracts(account) {
     .deploy();
   await coinageFactory.deployed();
 
-  console.log(" hell ");
   const currentTime = await time.latest();
   const daoVault = await (await ethers.getContractFactory("DAOVault"))
     .connect(deployer)
     .deploy(wton.address, currentTime.toString());
   await daoVault.deployed();
-  console.log("seig");
-  console.log({
-    ton: ton.address,
-    wton: wton.address,
-    layer2Registry: layer2Registry.address,
-    depositManager: depositManager.address,
-    SEIG_PER_BLOCK: SEIG_PER_BLOCK.toFixed(WTON_UNIT),
-    coinageFactory: coinageFactory.address,
-  });
 
   const seigManager = await (await ethers.getContractFactory("SeigManager"))
     .connect(deployer)
@@ -263,7 +251,6 @@ async function setupContracts(account) {
       contract.connect(deployer).setSeigManager(seigManager.address)
     )
   );
-  console.log(" hell ");
 
   // ton setting
   await ton
@@ -324,6 +311,7 @@ async function setupContracts(account) {
   const swapProxy = await (await ethers.getContractFactory("SwapProxy"))
     .connect(deployer)
     .deploy();
+  await swapProxy.deployed();
 
   return {
     ton,
