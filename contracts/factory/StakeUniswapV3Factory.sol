@@ -5,6 +5,7 @@ import "../interfaces/IStakeUniswapV3Factory.sol";
 
 import { IStakeUniswapV3ProxyFactory } from "../interfaces/IStakeUniswapV3ProxyFactory.sol";
 import { StakeUniswapV3Proxy } from "../stake/StakeUniswapV3Proxy.sol";
+import "hardhat/console.sol";
 
 /// @title A factory that creates a stake contract
 contract StakeUniswapV3Factory is IStakeUniswapV3Factory {
@@ -45,6 +46,7 @@ contract StakeUniswapV3Factory is IStakeUniswapV3Factory {
                 _intdata,
                 owner
             );
+        console.log("Smart: I am here");
 
         require(proxy != address(0), "StakeTONFactory: proxy zero");
 

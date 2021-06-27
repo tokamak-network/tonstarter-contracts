@@ -23,14 +23,13 @@ contract StakeUniswapV3ProxyFactory is IStakeUniswapV3ProxyFactory {
         address owner
     ) external override returns (address) {
         StakeUniswapV3Proxy proxy = new StakeUniswapV3Proxy(_logic);
-
+            
         require(
             address(proxy) != address(0),
             "StakeUniswapV3ProxyFactory: proxy zero"
         );
 
         proxy.setInit(_addr, _registry, _intdata);
-
         proxy.grantRole(ADMIN_ROLE, owner);
         proxy.revokeRole(ADMIN_ROLE, address(this));
 

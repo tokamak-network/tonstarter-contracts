@@ -155,36 +155,37 @@ contract StakeRegistry is AccessControl, IStakeRegistry {
 
     /// @dev Add information related to Defi
     /// @param _name name . ex) UNISWAP_V3
-    /// @param _router entry point of defi
-    /// @param _ex1  additional variable . ex) positionManagerAddress in Uniswap V3
-    /// @param _ex2  additional variable . ex) WETH Address in Uniswap V3
-    /// @param _fee  fee
+    /// @param _uniswapV3SwapRouter entry point of defi
+    /// @param _uniswapV3NonfungiblePositionManager  additional variable . ex) positionManagerAddress in Uniswap V3
+    /// @param _uniswapV3FactoryAddress  additional variable . ex) WETH Address in Uniswap V3
+    /// @param _lpFee  fee
+    /// @param _routerV2 Swap Router V2
     function addDefiInfo(
         string calldata _name,
-        address _router,
-        address _ex1,
-        address _ex2,
-        uint256 _fee,
+        address _uniswapV3SwapRouter,
+        address _uniswapV3NonfungiblePositionManager,
+        address _uniswapV3FactoryAddress,
+        uint256 _lpFee,
         address _routerV2
-    ) external override onlyOwner nonZero(_router) {
+    ) external override onlyOwner {
         bytes32 nameHash = keccak256(abi.encodePacked(_name));
         require(nameHash != ZERO_HASH, "StakeRegistry: nameHash zero");
 
         LibTokenStake1.DefiInfo storage _defiInfo = defiInfo[nameHash];
         _defiInfo.name = _name;
-        _defiInfo.router = _router;
-        _defiInfo.ext1 = _ex1;
-        _defiInfo.ext2 = _ex2;
-        _defiInfo.fee = _fee;
+        _defiInfo.uniswapV3SwapRouter = _uniswapV3SwapRouter;
+        _defiInfo.uniswapV3NonfungiblePositionManager = _uniswapV3NonfungiblePositionManager;
+        _defiInfo.uniswapV3FactoryAddress = _uniswapV3FactoryAddress;
+        _defiInfo.lpFee = _lpFee;
         _defiInfo.routerV2 = _routerV2;
 
         emit AddedDefiInfo(
             nameHash,
             _name,
-            _router,
-            _ex1,
-            _ex2,
-            _fee,
+            _uniswapV3SwapRouter,
+            _uniswapV3NonfungiblePositionManager,
+            _uniswapV3FactoryAddress,
+            _lpFee,
             _routerV2
         );
     }
@@ -263,10 +264,10 @@ contract StakeRegistry is AccessControl, IStakeRegistry {
     {
         bytes32 nameHash = keccak256(abi.encodePacked("UNISWAP_V3"));
         return (
-            defiInfo[nameHash].router,
-            defiInfo[nameHash].ext1,
-            defiInfo[nameHash].ext2,
-            defiInfo[nameHash].fee,
+            defiInfo[nameHash].uniswapV3SwapRouter,
+            defiInfo[nameHash].uniswapV3NonfungiblePositionManager,
+            defiInfo[nameHash].uniswapV3FactoryAddress,
+            defiInfo[nameHash].lpFee,
             defiInfo[nameHash].routerV2
         );
     }

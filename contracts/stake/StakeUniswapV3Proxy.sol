@@ -3,7 +3,9 @@ pragma solidity ^0.7.6;
 //pragma abicoder v2;
 
 import "./StakeUniswapV3Storage.sol";
+import "../interfaces/IStakeRegistry.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
+import "@uniswap/v3-periphery/contracts/interfaces/INonfungiblePositionManager.sol";
 
 /// @title Proxy for Simple Stake contracts
 /// @notice
@@ -112,8 +114,12 @@ contract StakeUniswapV3Proxy is StakeUniswapV3Storage, AccessControl {
         token = _addr[0];
         paytoken = _addr[1];
         vault = _addr[2];
-        // uniswapV3FactoryAddress = _addr[3];
 
+        
+        stakeRegistry = _registry;
+        (, address _uniswapV3NonfungiblePositionManager, address _uniswapV3FactoryAddress,,) = IStakeRegistry(stakeRegistry).getUniswap();
+        nonfungiblePositionManager = INonfungiblePositionManager(_uniswapV3NonfungiblePositionManager);
+        uniswapV3FactoryAddress = _uniswapV3FactoryAddress;
 
         saleStartBlock = _intdata[0];
         startBlock = _intdata[1];

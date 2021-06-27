@@ -43,7 +43,7 @@ contract StakeUniswapV3Storage {
     uint256 internal _lock;
     
     /// @dev Rewards per second liquidity inside
-    uint256 internal REWARDS_PER_SECOND;
+    uint256 internal REWARDS_PER_SECOND = 5;
 
     /// @dev UniswapV3 Nonfungible position manager
     INonfungiblePositionManager public nonfungiblePositionManager;

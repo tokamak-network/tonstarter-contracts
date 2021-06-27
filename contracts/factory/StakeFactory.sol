@@ -114,5 +114,6 @@ contract StakeFactory is IStakeFactory, AccessControl {
             require(proxy != address(0), "StakeFactory: proxy zero");
             return proxy;            
         }
+        return address(0);
     }
 }

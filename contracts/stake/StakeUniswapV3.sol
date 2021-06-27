@@ -115,8 +115,9 @@ contract StakeUniswapV3 is StakeUniswapV3Storage, AccessControl, IStakeUniswapV3
 
         (,,address token0,address token1,uint24 fee,int24 tickLower,int24 tickUpper,uint128 liquidity,,,,) = nonfungiblePositionManager.positions(tokenId);
         require (
-            token0 == address(token) && token1 == address(paytoken),
-            "StakeUniswapV3: Wrong tokenId"
+            (token0 == address(token) && token1 == address(paytoken)) ||
+            (token0 == address(paytoken) && token1 == address(token)),
+            "StakeUniswapV3: wrong tokens"
         );
         nonfungiblePositionManager.transferFrom(msg.sender, address(this), tokenId);
 

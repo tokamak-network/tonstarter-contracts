@@ -10,6 +10,7 @@ import {IStakeTONTokamak} from "../interfaces/IStakeTONTokamak.sol";
 
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "./StakeProxyStorage.sol";
+import "hardhat/console.sol";
 
 /// @title The logic of TOS Plaform
 /// @notice Admin can createVault, createStakeContract.
@@ -253,7 +254,7 @@ contract Stake1Logic is StakeProxyStorage, AccessControl, IStake1Logic {
             stakeRegistry.validVault(_phase, _vault),
             "Stake1Logic: unvalidVault"
         );
-
+        console.log("Smart: Creating smart contract");
         IStake1Vault vault = IStake1Vault(_vault);
 
         (
