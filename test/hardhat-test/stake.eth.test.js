@@ -135,8 +135,10 @@ describe("Stake", function () {
   });
 
   it("should close sale", async function () {
-    const current = parseInt(stakeStartBlock);
+    const current = parseInt(stakeStartBlock + 1);
     await time.advanceBlockTo(current);
+    const now = time.latestBlock();
+    console.log({ current, now });
     await stakeEntry.connect(sender).closeSale(Vault.address);
   });
 

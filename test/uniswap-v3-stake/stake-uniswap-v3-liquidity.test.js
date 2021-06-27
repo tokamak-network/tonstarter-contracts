@@ -150,10 +150,10 @@ describe("Stake", function () {
     console.log({ current });
     saleStartBlock = parseInt(current + 4);
     stakeStartBlock = saleStartBlock + 20;
+    console.log({ current, saleStartBlock, stakeStartBlock });
     const HASH_Pharse1_ETH_Staking = keccak256("PHASE1_ETH_STAKING");
-
     const tx = await stakeEntry.connect(sender).createVault(
-      setup.ton.address, // ethers
+      setup.ton.address, // ton
       ethers.utils.parseUnits(Pharse1_ETH_Staking, 18),
       saleStartBlock,
       stakeStartBlock,
@@ -163,6 +163,7 @@ describe("Stake", function () {
       zeroAddress
     );
     await tx.wait();
+
     const vaults = await stakeEntry.connect(sender).vaultsOfPhase("1");
     console.log({ vaults });
     const stakeVaultAddress = vaults[vaults.length - 1];
@@ -183,8 +184,8 @@ describe("Stake", function () {
       const tx = await stakeEntry.connect(sender).createStakeContract(
         "1", // phase number
         Vault.address, // vault address
-        setup.ton.address, // ton address
         setup.tos.address, // reward tos address
+        setup.ton.address, // ton address
         period, // staking period
         name // staking name
       );
@@ -203,8 +204,8 @@ describe("Stake", function () {
 
   it("should stake", async function () {
     this.timeout(10000000);
-    // const currentBlockTime = parseInt(saleStartBlock);
-    // await time.advanceBlockTo(currentBlockTime);
+    const currentBlockTime = parseInt(saleStartBlock);
+    await time.advanceBlockTo(currentBlockTime);
     // await network.provider.send("evm_setNextBlockTimestamp", [
     //   currentBlockTime,
     // ]);
@@ -217,9 +218,13 @@ describe("Stake", function () {
       ).attach(stakeAddress);
 
       console.log({ stakeAddress });
+      const txApprove = await nftPositionManager.approve(
+        stakeContract.address,
+        1
+      );
+      await txApprove.wait();
       const tx = await stakeContract.stakeLiquidity(1);
       await tx.wait();
-      // console.log({ impl });
 
       if (true) break;
       /*
@@ -231,13 +236,19 @@ describe("Stake", function () {
       */
     }
   });
-
+  async function mineBlocks(untilBlock) {
+    const blockNumber = await ethers.provider.getBlockNumber();
+    for (let i = blockNumber; i < untilBlock; ++i) {
+      await ethers.provider.send("evm_mine");
+    }
+  }
   it("should close sale", async function () {
-    const current = parseInt(stakeStartBlock);
-    // provider.
-    await time.advanceBlockTo(current);
-    // await network.provider.send("evm_setNextBlockTimestamp", [current]);
-    // await network.provider.send("evm_mine");
+    const current = parseInt(stakeStartBlock) + 1;
+    // await time.advanceBlockTo(current);
+    await mineBlocks(current);
+
+    const now = await time.latestBlock();
+    console.log({ current, now: now.toString() });
     await stakeEntry.connect(sender).closeSale(Vault.address);
   });
 
@@ -245,9 +256,11 @@ describe("Stake", function () {
     this.timeout(10000000);
     const tos = setup.tos;
 
-    for (const { claimBlock } of [{ claimBlock: 10 }, { claimBlock: 60 }]) {
+    for (const { claimBlock } of [{ claimBlock: 10 }]) {
       let block = stakeStartBlock + claimBlock;
-      await time.advanceBlockTo(block - 1);
+      // await time.advanceBlockTo(block - 1);
+      await mineBlocks(block - 1);
+
       // await network.provider.send("evm_setNextBlockTimestamp", [block - 1]);
       // await network.provider.send("evm_mine");
       for (const {
@@ -258,33 +271,27 @@ describe("Stake", function () {
         const stakeContract = await (
           await ethers.getContractFactory("StakeUniswapV3")
         ).attach(stakeAddress);
-        for (const { address: userAddress } of usersInfo) {
-          const reward = await stakeContract.canRewardAmount(
-            userAddress,
-            block
-          );
-          console.log({ reward: reward.toString() });
+        const reward = await stakeContract.canRewardAmount(sender.address, 1);
+        console.log({ reward: reward.toString() });
 
-          const tosBalance = await tos.balanceOf(userAddress);
-          await stakeContract.connect(await findSigner(userAddress)).claim();
-          block++;
-          console.log({ tosBalance: tosBalance.toString() });
+        const tosBalance = await tos.balanceOf(sender.address);
+        await stakeContract.connect(sender).claim(1);
+        console.log({ tosBalance: tosBalance.toString() });
 
-          const newTosBalance = await tos.balanceOf(userAddress);
-          await expect(newTosBalance).to.be.above(tosBalance);
-          console.log({ newTosBalance: newTosBalance.toString() });
+        const newTosBalance = await tos.balanceOf(sender.address);
+        await expect(newTosBalance).to.be.above(tosBalance);
+        console.log({ newTosBalance: newTosBalance.toString() });
 
-          const rewardClaimedTotal = await stakeContract.rewardClaimedTotal();
-          console.log(fromWei(rewardClaimedTotal.toString(), "ether"));
+        const rewardClaimedTotal = await stakeContract.rewardClaimedTotal();
+        console.log(fromWei(rewardClaimedTotal.toString(), "ether"));
 
-          const { amount, claimedAmount } = await stakeContract.userStaked(
-            userAddress
-          );
-          console.log({
-            amount: amount.toString(),
-            claimedAmount: claimedAmount.toString(),
-          });
-        }
+        const { amount, claimedAmount } = await stakeContract.userStaked(
+          sender.address
+        );
+        console.log({
+          amount: amount.toString(),
+          claimedAmount: claimedAmount.toString(),
+        });
       }
     }
   });
