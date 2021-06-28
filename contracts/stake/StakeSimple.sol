@@ -19,6 +19,12 @@ contract StakeSimple is Stake1Storage, AccessControl, IStakeSimple {
         require(hasRole(ADMIN_ROLE, msg.sender), "StakeSimple: not an admin");
         _;
     }
+
+    modifier nonZero(address _addr) {
+        require(_addr != address(0), "TokamakStaker: zero address");
+        _;
+    }
+
     modifier lock() {
         require(_lock == 0, "StakeSimple: LOCKED");
         _lock = 1;
@@ -56,7 +62,7 @@ contract StakeSimple is Stake1Storage, AccessControl, IStakeSimple {
 
     /// @dev transfer Ownership
     /// @param newOwner new owner address
-    function transferOwnership(address newOwner) external onlyOwner {
+    function transferOwnership(address newOwner) external onlyOwner nonZero(newOwner){
         require(msg.sender != newOwner, "StakeSimple: same owner");
         grantRole(ADMIN_ROLE, newOwner);
         revokeRole(ADMIN_ROLE, msg.sender);

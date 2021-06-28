@@ -46,7 +46,7 @@ contract StakeFactory is IStakeFactory, AccessControl {
 
     /// @dev transfer Ownership
     /// @param newOwner new owner address
-    function transferOwnership(address newOwner) external onlyOwner {
+    function transferOwnership(address newOwner) external onlyOwner nonZero(newOwner){
         require(msg.sender != newOwner, "StakeFactory:same owner");
         grantRole(ADMIN_ROLE, newOwner);
         revokeRole(ADMIN_ROLE, msg.sender);

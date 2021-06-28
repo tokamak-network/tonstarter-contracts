@@ -18,6 +18,11 @@ contract StakeDefiProxy is Stake1Storage, AccessControl, IStakeDefiProxy {
         _;
     }
 
+    modifier nonZero(address _addr) {
+        require(_addr != address(0), "TokamakStaker: zero address");
+        _;
+    }
+
     /// @dev constructor of Stake1Proxy
     /// @param _logic the logic address that used in proxy
     constructor(address _logic) {
@@ -29,7 +34,7 @@ contract StakeDefiProxy is Stake1Storage, AccessControl, IStakeDefiProxy {
 
     /// @dev transfer Ownership
     /// @param newOwner new owner address
-    function transferOwnership(address newOwner) external onlyOwner {
+    function transferOwnership(address newOwner) external onlyOwner nonZero(newOwner){
         require(msg.sender != newOwner, "StakeDefiProxy:same owner");
         grantRole(ADMIN_ROLE, newOwner);
         revokeRole(ADMIN_ROLE, msg.sender);

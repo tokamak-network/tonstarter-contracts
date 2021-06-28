@@ -22,6 +22,11 @@ contract StakeSimpleProxy is Stake1Storage, AccessControl {
         _;
     }
 
+    modifier nonZero(address _addr) {
+        require(_addr != address(0), "TokamakStaker: zero address");
+        _;
+    }
+
     constructor(address _logic) {
         _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
         _setupRole(ADMIN_ROLE, msg.sender);
@@ -31,7 +36,7 @@ contract StakeSimpleProxy is Stake1Storage, AccessControl {
 
     /// @dev transfer Ownership
     /// @param newOwner new owner address
-    function transferOwnership(address newOwner) external onlyOwner {
+    function transferOwnership(address newOwner) external onlyOwner nonZero(newOwner){
         require(msg.sender != newOwner, "StakeSimpleProxy:same owner");
         grantRole(ADMIN_ROLE, newOwner);
         revokeRole(ADMIN_ROLE, msg.sender);

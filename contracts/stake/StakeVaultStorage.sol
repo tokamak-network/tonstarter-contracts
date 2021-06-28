@@ -64,6 +64,11 @@ contract StakeVaultStorage is AccessControl {
         _;
     }
 
+    modifier nonZero(address _addr) {
+        require(_addr != address(0), "TokamakStaker: zero address");
+        _;
+    }
+
     modifier lock() {
         require(_lock == 0, "Stake1Vault: LOCKED");
         _lock = 1;
@@ -73,7 +78,7 @@ contract StakeVaultStorage is AccessControl {
 
     /// @dev transfer Ownership
     /// @param newOwner new owner address
-    function transferOwnership(address newOwner) external onlyOwner {
+    function transferOwnership(address newOwner) external onlyOwner nonZero(newOwner) {
         require(msg.sender != newOwner, "StakeVaultStorage: same owner");
         grantRole(ADMIN_ROLE, newOwner);
         revokeRole(ADMIN_ROLE, msg.sender);

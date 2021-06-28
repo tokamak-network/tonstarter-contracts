@@ -70,7 +70,7 @@ contract Stake1Logic is StakeProxyStorage, AccessControl, IStake1Logic {
 
     /// @dev transfer Ownership
     /// @param newOwner new owner address
-    function transferOwnership(address newOwner) external onlyOwner {
+    function transferOwnership(address newOwner) external onlyOwner nonZero(newOwner){
         require(msg.sender != newOwner, "Stake1Logic: same owner");
         grantRole(ADMIN_ROLE, newOwner);
         revokeRole(ADMIN_ROLE, msg.sender);

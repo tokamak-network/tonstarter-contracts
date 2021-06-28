@@ -38,6 +38,11 @@ contract TOS is ERC20, AccessControl, ITOS {
         _;
     }
 
+    modifier nonZero(address _addr) {
+        require(_addr != address(0), "TokamakStaker: zero address");
+        _;
+    }
+
     /// @dev constructor of TOS, ERC20 Token
     constructor(
         string memory name_,
@@ -77,7 +82,7 @@ contract TOS is ERC20, AccessControl, ITOS {
 
     /// @dev transfer Ownership
     /// @param newOwner new owner address
-    function transferOwnership(address newOwner) external onlyOwner {
+    function transferOwnership(address newOwner) external onlyOwner nonZero(newOwner){
         require(msg.sender != newOwner, "TOS:same owner");
         grantRole(ADMIN_ROLE, newOwner);
         revokeRole(ADMIN_ROLE, msg.sender);
