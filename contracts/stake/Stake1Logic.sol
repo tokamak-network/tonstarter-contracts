@@ -28,7 +28,7 @@ contract Stake1Logic is StakeProxyStorage, AccessControl, IStake1Logic {
         require(_addr != address(0), "Stake1Logic:zero address");
         _;
     }
-
+/*
     /// @dev event on create vault
     /// @param vault the vault address created
     /// @param paytoken the token used for staking by user
@@ -52,6 +52,7 @@ contract Stake1Logic is StakeProxyStorage, AccessControl, IStake1Logic {
     /// @dev event on setting stake registry
     /// @param stakeRegistry the stakeRegistry address
     event SetStakeRegistry(address stakeRegistry);
+*/
 
     constructor() {
         _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
