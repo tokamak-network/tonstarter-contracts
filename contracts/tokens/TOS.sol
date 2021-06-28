@@ -12,13 +12,7 @@ contract TOS is ERC20, AccessControl, ITOS {
     bytes32 public constant MINTER_ROLE = keccak256("MINTER");
     bytes32 public constant BURNER_ROLE = keccak256("BURNER");
 
-    /// @dev The hash of the name used in the permit signature verification
-    bytes32 private immutable nameHash;
-
-    /// @dev The hash of the version string used in the permit signature verification
-    bytes32 private immutable versionHash;
-
-    //bytes32 public override DOMAIN_SEPARATOR;
+    bytes32 public override DOMAIN_SEPARATOR;
     mapping(address => uint256) public override nonces;
 
     /// @dev Value is equal to keccak256("Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)");
@@ -49,8 +43,22 @@ contract TOS is ERC20, AccessControl, ITOS {
         string memory symbol_,
         string memory version_
     ) ERC20(name_, symbol_) {
-        nameHash = keccak256(bytes(name_));
-        versionHash = keccak256(bytes(version_));
+
+        uint256 chainId;
+        assembly {
+            chainId := chainid()
+        }
+
+        DOMAIN_SEPARATOR = keccak256(
+            abi.encode(
+                // keccak256('EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)')
+                0x8b73c3c69bb8fe3d512ecc4cf759cc79239f7b179b0ffacaa9a75d522b39400f,
+                keccak256(bytes(name_)),
+                keccak256(bytes(version_)),
+                chainId,
+                address(this)
+            )
+        );
 
         _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
         _setRoleAdmin(BURNER_ROLE, ADMIN_ROLE);
@@ -59,25 +67,6 @@ contract TOS is ERC20, AccessControl, ITOS {
         _setupRole(ADMIN_ROLE, msg.sender);
         _setupRole(BURNER_ROLE, msg.sender);
         _setupRole(MINTER_ROLE, msg.sender);
-    }
-
-    function DOMAIN_SEPARATOR() public view override returns (bytes32) {
-        uint256 chainId;
-        assembly {
-            chainId := chainid()
-        }
-
-        return
-            keccak256(
-                abi.encode(
-                    // keccak256('EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)')
-                    0x8b73c3c69bb8fe3d512ecc4cf759cc79239f7b179b0ffacaa9a75d522b39400f,
-                    nameHash,
-                    versionHash,
-                    chainId,
-                    address(this)
-                )
-            );
     }
 
     /// @dev transfer Ownership
@@ -140,7 +129,7 @@ contract TOS is ERC20, AccessControl, ITOS {
             keccak256(
                 abi.encodePacked(
                     "\x19\x01",
-                    DOMAIN_SEPARATOR(),
+                    DOMAIN_SEPARATOR,
                     keccak256(
                         abi.encode(
                             PERMIT_TYPEHASH,
@@ -214,7 +203,7 @@ contract TOS is ERC20, AccessControl, ITOS {
             keccak256(
                 abi.encodePacked(
                     "\x19\x01",
-                    DOMAIN_SEPARATOR(),
+                    DOMAIN_SEPARATOR,
                     keccak256(
                         abi.encode(
                             PERMIT_TYPEHASH,
