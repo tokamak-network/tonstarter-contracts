@@ -368,4 +368,11 @@ async function setupContracts(account) {
   };
 }
 
-module.exports = { setupContracts, getAddresses, findSigner };
+async function mineBlocks(untilBlock) {
+  const blockNumber = await ethers.provider.getBlockNumber();
+  for (let i = blockNumber; i < untilBlock; ++i) {
+    await ethers.provider.send("evm_mine");
+  }
+}
+
+module.exports = { setupContracts, getAddresses, findSigner, mineBlocks };

@@ -12,6 +12,7 @@ const {
   getAddresses,
   findSigner,
   setupContracts,
+  mineBlocks,
 } = require("../hardhat-test/utils");
 const { network } = require("hardhat");
 
@@ -43,7 +44,6 @@ describe("Stake", function () {
   let saleStartBlock, stakeStartBlock;
   let setup;
   let nftPositionManager, weth;
-  let stakeRegistry;
 
   before(async () => {
     const addresses = await getAddresses();
@@ -63,7 +63,7 @@ describe("Stake", function () {
     ];
 
     stakingContractInfo = [
-      { name: "short staking", period: 50 },
+      { name: "short staking", period: 5 },
       // { name: "long staking", period: 100 },
     ];
   });
@@ -95,8 +95,6 @@ describe("Stake", function () {
       FeeAmount.MEDIUM,
       encodePriceSqrt(1, 1)
     );
-    console.log("create pool");
-
     await tx.wait();
   };
 
@@ -106,7 +104,6 @@ describe("Stake", function () {
     amount0Desired,
     amount1Desired
   ) => {
-    console.log("mint position");
     const tx = await nftPositionManager.connect(sender).mint({
       token0,
       token1,
@@ -130,26 +127,17 @@ describe("Stake", function () {
     if (ton.address < tos.address) {
       [token0, token1] = [ton, tos];
     }
-    console.log(
-      "TOS balance ",
-      (await tos.balanceOf(sender.address)).toString()
-    );
-    console.log(
-      "TON balance ",
-      (await ton.balanceOf(sender.address)).toString()
-    );
-    // await tos.mint()
-    await token0.connect(sender).approve(nftPositionManager.address, 100000);
-    await token1.connect(sender).approve(nftPositionManager.address, 300000);
+    await token0.connect(sender).approve(nftPositionManager.address, 100);
+    await token1.connect(sender).approve(nftPositionManager.address, 300);
     await createPool(token0.address, token1.address);
-    await mintPosition(token0.address, token1.address, 100000, 300000);
+    await mintPosition(token0.address, token1.address, 100, 300);
   });
 
   it("should create a vault", async function () {
     const current = await ethers.provider.getBlockNumber();
     console.log({ current });
-    saleStartBlock = parseInt(current + 4);
-    stakeStartBlock = saleStartBlock + 20;
+    saleStartBlock = parseInt(current + 1);
+    stakeStartBlock = saleStartBlock + 6;
     console.log({ current, saleStartBlock, stakeStartBlock });
     const HASH_Pharse1_ETH_Staking = keccak256("PHASE1_ETH_STAKING");
     const tx = await stakeEntry.connect(sender).createVault(
@@ -205,11 +193,7 @@ describe("Stake", function () {
   it("should stake", async function () {
     this.timeout(10000000);
     const currentBlockTime = parseInt(saleStartBlock);
-    await time.advanceBlockTo(currentBlockTime);
-    // await network.provider.send("evm_setNextBlockTimestamp", [
-    //   currentBlockTime,
-    // ]);
-    // await network.provider.send("evm_mine");
+    await mineBlocks(currentBlockTime);
 
     for (let i = 0; i < stakingContractInfo.length; ++i) {
       const { address: stakeAddress } = stakingContractInfo[i];
@@ -223,8 +207,14 @@ describe("Stake", function () {
         1
       );
       await txApprove.wait();
-      const tx = await stakeContract.stakeLiquidity(1);
-      await tx.wait();
+
+      const txStake = await stakeContract.stakeLiquidity(1);
+      await txStake.wait();
+
+      const txMint = await setup.ton
+        .connect(sender)
+        .mint(stakeContract.address, toWei("1000000000", "ether"));
+      await txMint.wait();
 
       if (true) break;
       /*
@@ -236,19 +226,10 @@ describe("Stake", function () {
       */
     }
   });
-  async function mineBlocks(untilBlock) {
-    const blockNumber = await ethers.provider.getBlockNumber();
-    for (let i = blockNumber; i < untilBlock; ++i) {
-      await ethers.provider.send("evm_mine");
-    }
-  }
-  it("should close sale", async function () {
-    const current = parseInt(stakeStartBlock) + 1;
-    // await time.advanceBlockTo(current);
-    await mineBlocks(current);
 
-    const now = await time.latestBlock();
-    console.log({ current, now: now.toString() });
+  it("should close sale", async function () {
+    const current = parseInt(stakeStartBlock);
+    await mineBlocks(current);
     await stakeEntry.connect(sender).closeSale(Vault.address);
   });
 
@@ -257,12 +238,8 @@ describe("Stake", function () {
     const tos = setup.tos;
 
     for (const { claimBlock } of [{ claimBlock: 10 }]) {
-      let block = stakeStartBlock + claimBlock;
-      // await time.advanceBlockTo(block - 1);
+      const block = stakeStartBlock + claimBlock;
       await mineBlocks(block - 1);
-
-      // await network.provider.send("evm_setNextBlockTimestamp", [block - 1]);
-      // await network.provider.send("evm_mine");
       for (const {
         name: stakeName,
         address: stakeAddress,
@@ -283,15 +260,20 @@ describe("Stake", function () {
         console.log({ newTosBalance: newTosBalance.toString() });
 
         const rewardClaimedTotal = await stakeContract.rewardClaimedTotal();
-        console.log(fromWei(rewardClaimedTotal.toString(), "ether"));
+        console.log({
+          rewardClaimedTotal: fromWei(rewardClaimedTotal.toString(), "ether"),
+        });
 
-        const { amount, claimedAmount } = await stakeContract.userStaked(
-          sender.address
+        const result = await stakeContract.getUserStaked(
+          sender.address,
+          1 // tokenId
         );
         console.log({
-          amount: amount.toString(),
-          claimedAmount: claimedAmount.toString(),
+          liquidity: result.liquidity.toString(),
+          perSecond: result.secondsPerLiquidityInsideX128Last.toString(),
         });
+        console.log({ claimedAmount: result.claimedAmount.toString() });
+        console.log({ result });
       }
     }
   });

@@ -15,6 +15,7 @@ import "@uniswap/v3-periphery/contracts/libraries/PoolAddress.sol";
 
 import "@openzeppelin/contracts/access/AccessControl.sol";
 
+import "hardhat/console.sol";
 import "../libraries/LibUniswapV3Stake.sol";
 
 import "../interfaces/IStakeUniswapV3.sol";
@@ -137,6 +138,7 @@ contract StakeUniswapV3 is StakeUniswapV3Storage, AccessControl, IStakeUniswapV3
             claimedAmount: 0,
             claimedBlock: block.number
         });
+        console.log("StakeLiquidity block timestamp %d", block.timestamp);
     }
 
 
@@ -282,6 +284,9 @@ contract StakeUniswapV3 is StakeUniswapV3Storage, AccessControl, IStakeUniswapV3
         require(rewardClaim > 0, "StakeUniswapV3: reward is zero");
 
         uint256 rewardTotal = IIStake1Vault(vault).totalRewardAmount(address(this));
+        console.log("Reward Total: %d", rewardTotal);
+        console.log("Reward Claim: %d", rewardClaim);
+
         require(
             rewardClaimedTotal.add(rewardClaim) <= rewardTotal,
             "StakeUniswapV3: total reward exceeds"
@@ -297,6 +302,7 @@ contract StakeUniswapV3 is StakeUniswapV3Storage, AccessControl, IStakeUniswapV3
         rewardClaimedTotal = rewardClaimedTotal.add(rewardClaim);
         
         require(IIStake1Vault(vault).claim(msg.sender, rewardClaim), "StakeUniswapV3: Cannot claim");
+        console.log("Claim block timestamp %d", block.timestamp);
 
         emit Claimed(msg.sender, rewardClaim, block.number);
     }
@@ -304,11 +310,15 @@ contract StakeUniswapV3 is StakeUniswapV3Storage, AccessControl, IStakeUniswapV3
     /// @inheritdoc IStakeUniswapV3
     function canRewardAmount(address account, uint256 tokenId) override public view returns (uint256 reward) {
         LibUniswapV3Stake.StakeLiquidity memory stake = stakes[account][tokenId];
+        require(stake.owner == account, "Not an owner of tokenId");
         (, uint160 secondsPerLiquidityInsideX128, ) = IUniswapV3Pool(stake.poolAddress).snapshotCumulativesInside(stake.tickLower, stake.tickUpper);
         uint256 secondsInsideX128 = (secondsPerLiquidityInsideX128 - stake.secondsPerLiquidityInsideX128Last) * stake.liquidity;
+        console.log("secondsPerLiquidityInsideX128: %d", secondsPerLiquidityInsideX128);
+        console.log("secondsPerLiquidityInsideX128Last: %d", stake.secondsPerLiquidityInsideX128Last);
+
         // uint256 totalSecondsX128 = (
         //    min(endTimestamp, block.timestamp) - max(startTimestamp, stake.claimedTime)
         // ) << 128;
-        reward = secondsInsideX128 * REWARDS_PER_SECOND;
+        reward = secondsInsideX128.div(REWARDS_PER_SECOND);
     }
 }
