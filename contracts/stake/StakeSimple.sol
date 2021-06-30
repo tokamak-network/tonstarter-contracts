@@ -109,7 +109,8 @@ contract StakeSimple is Stake1Storage, AccessibleCommon, IStakeSimple {
                     msg.sender,
                     address(this),
                     amount
-                )
+                ),
+                "StakeSimple: fail transferFrom"
             );
 
         emit Staked(msg.sender, amount);
@@ -138,7 +139,7 @@ contract StakeSimple is Stake1Storage, AccessibleCommon, IStakeSimple {
         // check if we send in ethers or in tokens
         if (paytoken == address(0)) {
             address payable self = address(uint160(address(this)));
-            require(self.balance >= amount);
+            require(self.balance >= amount, "StakeSimple: insuffient ETH");
             (bool success, ) = msg.sender.call{value: amount}("");
             require(success, "StakeSimple: withdraw failed.");
         } else {
@@ -177,7 +178,7 @@ contract StakeSimple is Stake1Storage, AccessibleCommon, IStakeSimple {
         staked.claimedAmount = staked.claimedAmount.add(rewardClaim);
         rewardClaimedTotal = rewardClaimedTotal.add(rewardClaim);
 
-        require(IIStake1Vault(vault).claim(msg.sender, rewardClaim));
+        require(IIStake1Vault(vault).claim(msg.sender, rewardClaim), "StakeSimple: fail claim from vault");
 
         emit Claimed(msg.sender, rewardClaim, block.number);
     }

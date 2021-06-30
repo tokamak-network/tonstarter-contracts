@@ -192,7 +192,7 @@ contract StakeTON is TokamakStaker, IStakeTON {
             );
             staked.releasedAmount = amount;
             address payable self = address(uint160(address(this)));
-            require(self.balance >= amount);
+            require(self.balance >= amount,  "StakeTON: insuffient ETH");
             (bool success, ) = msg.sender.call{value: amount}("");
             require(success, "StakeTON: withdraw failed.");
         } else {
@@ -286,7 +286,7 @@ contract StakeTON is TokamakStaker, IStakeTON {
         staked.claimedAmount = staked.claimedAmount.add(rewardClaim);
         rewardClaimedTotal = rewardClaimedTotal.add(rewardClaim);
 
-        require(IIStake1Vault(vault).claim(msg.sender, rewardClaim));
+        require(IIStake1Vault(vault).claim(msg.sender, rewardClaim), "StakeTON: fail claim from vault");
 
         emit Claimed(msg.sender, rewardClaim, block.number);
     }
