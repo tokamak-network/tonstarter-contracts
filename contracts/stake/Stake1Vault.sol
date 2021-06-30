@@ -169,6 +169,11 @@ contract Stake1Vault is StakeVaultStorage, IStake1Vault {
         for (uint256 i = 0; i < stakeAddresses.length; i++) {
             LibTokenStake1.StakeInfo storage totalcheck =
                 stakeInfos[stakeAddresses[i]];
+
+            if (totalcheck.endBlock <= realEndBlock) {
+                continue;
+            }
+
             uint256 total = 0;
             for (uint256 j = 0; j < stakeAddresses.length; j++) {
                 if (
@@ -178,54 +183,51 @@ contract Stake1Vault is StakeVaultStorage, IStake1Vault {
                     total = total.add(stakeInfos[stakeAddresses[j]].balance);
                 }
             }
+            stakeEndBlockTotal[totalcheck.endBlock] = total;
+            sum = sum.add(total);
 
-            if (totalcheck.endBlock <= realEndBlock) {
-                stakeEndBlockTotal[totalcheck.endBlock] = total;
-
-                sum = sum.add(total);
-
-                // reward total
-                uint256 totalReward = 0;
-                for (uint256 k = i; k > 0; k--) {
-                    if (
-                        stakeEndBlockTotal[
-                            stakeInfos[stakeAddresses[k]].endBlock
-                        ] > 0
-                    ) {
-                        totalReward = totalReward.add(
-                            stakeInfos[stakeAddresses[k]]
-                                .endBlock
-                                .sub(stakeInfos[stakeAddresses[k - 1]].endBlock)
-                                .mul(blockTotalReward)
-                                .mul(totalcheck.balance)
-                                .div(
-                                stakeEndBlockTotal[
-                                    stakeInfos[stakeAddresses[k]].endBlock
-                                ]
-                            )
-                        );
-                    }
-                }
-
+            // reward total
+            uint256 totalReward = 0;
+            for (uint256 k = i; k > 0; k--) {
                 if (
-                    stakeEndBlockTotal[stakeInfos[stakeAddresses[0]].endBlock] >
-                    0
+                    stakeEndBlockTotal[
+                        stakeInfos[stakeAddresses[k]].endBlock
+                    ] > 0
                 ) {
                     totalReward = totalReward.add(
-                        stakeInfos[stakeAddresses[0]]
+                        stakeInfos[stakeAddresses[k]]
                             .endBlock
-                            .sub(stakeInfos[stakeAddresses[0]].startBlock)
+                            .sub(stakeInfos[stakeAddresses[k - 1]].endBlock)
                             .mul(blockTotalReward)
                             .mul(totalcheck.balance)
                             .div(
                             stakeEndBlockTotal[
-                                stakeInfos[stakeAddresses[0]].endBlock
+                                stakeInfos[stakeAddresses[k]].endBlock
                             ]
                         )
                     );
                 }
-                totalcheck.totalRewardAmount = totalReward;
             }
+
+            if (
+                stakeEndBlockTotal[stakeInfos[stakeAddresses[0]].endBlock] >
+                0
+            ) {
+                totalReward = totalReward.add(
+                    stakeInfos[stakeAddresses[0]]
+                        .endBlock
+                        .sub(stakeInfos[stakeAddresses[0]].startBlock)
+                        .mul(blockTotalReward)
+                        .mul(totalcheck.balance)
+                        .div(
+                        stakeEndBlockTotal[
+                            stakeInfos[stakeAddresses[0]].endBlock
+                        ]
+                    )
+                );
+            }
+            totalcheck.totalRewardAmount = totalReward;
+
         }
 
         saleClosed = true;
