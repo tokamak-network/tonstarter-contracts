@@ -155,15 +155,7 @@ contract Stake1Vault is StakeVaultStorage, IStake1Vault {
             if (paytoken == address(0)) {
                 stakeInfo.balance = address(uint160(stakeAddresses[i])).balance;
             } else {
-                (bool success, bytes memory returnData) =
-                    paytoken.call(
-                        abi.encodeWithSignature(
-                            "balanceOf(address)",
-                            stakeAddresses[i]
-                        )
-                    );
-                require(success, "Stake1Vault: balance call fail");
-                uint256 balanceAmount = abi.decode(returnData, (uint256));
+                uint256 balanceAmount = IERC20(paytoken).balanceOf(stakeAddresses[i]);
                 stakeInfo.balance = balanceAmount;
             }
             if (stakeInfo.balance > 0)
