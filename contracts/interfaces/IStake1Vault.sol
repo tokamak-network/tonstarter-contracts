@@ -59,7 +59,7 @@ interface IStake1Vault {
     /// @return true
     function claim(address _to, uint256 _amount) external returns (bool);
 
-    /// @dev whether it is available to claim amount, if it is available , return the total reward amount
+    /// @dev Whether user(to) can receive a reward amount(_amount)
     /// @param _to  a staking contract.
     /// @param _amount the total reward amount of stakeContract
     /// @return true

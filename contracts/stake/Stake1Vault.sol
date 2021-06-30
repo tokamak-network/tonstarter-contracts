@@ -284,7 +284,7 @@ contract Stake1Vault is StakeVaultStorage, IStake1Vault {
         return true;
     }
 
-    /// @dev whether it is available to claim amount, if it is available , return the total reward amount
+    /// @dev  Whether user(to) can receive a reward amount(_amount)
     /// @param _to  a staking contract.
     /// @param _amount the total reward amount of stakeContract
     /// @return true
