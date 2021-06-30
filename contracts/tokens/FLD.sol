@@ -6,9 +6,11 @@ import "../libraries/ChainId.sol";
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 
+import "../common/AccessibleCommon.sol";
+
 /// @title the platform token. FLD token
-contract FLD is ERC20, AccessControl, IFLD {
-    bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
+contract FLD is ERC20, AccessibleCommon, IFLD {
+
     bytes32 public constant MINTER_ROLE = keccak256("MINTER");
     bytes32 public constant BURNER_ROLE = keccak256("BURNER");
 
@@ -35,10 +37,6 @@ contract FLD is ERC20, AccessControl, IFLD {
         address deadline;
     }
 
-    modifier onlyOwner() {
-        require(hasRole(ADMIN_ROLE, msg.sender), "FLD: Caller is not an admin");
-        _;
-    }
 
     /// @dev constructor of FLD, ERC20 Token
     constructor(
@@ -75,14 +73,6 @@ contract FLD is ERC20, AccessControl, IFLD {
                     address(this)
                 )
             );
-    }
-
-    /// @dev transfer Ownership
-    /// @param newOwner new owner address
-    function transferOwnership(address newOwner) external onlyOwner {
-        require(msg.sender != newOwner, "FLD:same owner");
-        grantRole(ADMIN_ROLE, newOwner);
-        revokeRole(ADMIN_ROLE, msg.sender);
     }
 
     /// @dev Issue a token.

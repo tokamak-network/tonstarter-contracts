@@ -2,23 +2,18 @@
 pragma solidity ^0.7.6;
 
 import "../interfaces/IStakeProxy.sol";
-import "@openzeppelin/contracts/access/AccessControl.sol";
+import "../common/AccessibleCommon.sol";
 import "./StakeProxyStorage.sol";
 
 /// @title The proxy of FLD Plaform
 /// @notice Admin can createVault, createStakeContract.
 /// User can excute the tokamak staking function of each contract through this logic.
-contract Stake1Proxy is StakeProxyStorage, AccessControl, IStakeProxy {
-    bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
+contract Stake1Proxy is StakeProxyStorage, AccessibleCommon, IStakeProxy {
+
     address internal _implementation;
     bool public pauseProxy;
 
     event Upgraded(address indexed implementation);
-
-    modifier onlyOwner() {
-        require(hasRole(ADMIN_ROLE, msg.sender), "Stake1Proxy: no admin");
-        _;
-    }
 
     /// @dev constructor of Stake1Proxy
     constructor(address _logic) {
@@ -29,13 +24,6 @@ contract Stake1Proxy is StakeProxyStorage, AccessControl, IStakeProxy {
         _setupRole(ADMIN_ROLE, address(this));
     }
 
-    /// @dev transfer Ownership
-    /// @param newOwner the new owner address
-    function transferOwnership(address newOwner) external onlyOwner {
-        require(msg.sender != newOwner, "Stake1Proxy: same owner");
-        grantRole(ADMIN_ROLE, newOwner);
-        revokeRole(ADMIN_ROLE, msg.sender);
-    }
 
     /// @dev Set pause state
     /// @param _pause true:pause or false:resume

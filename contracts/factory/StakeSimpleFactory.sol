@@ -3,10 +3,10 @@ pragma solidity ^0.7.6;
 
 import "../interfaces/IStakeSimpleFactory.sol";
 import {StakeSimpleProxy} from "../stake/StakeSimpleProxy.sol";
+import "../common/AccessRoleCommon.sol";
 
 /// @title A factory that creates a stake contract
-contract StakeSimpleFactory is IStakeSimpleFactory {
-    bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
+contract StakeSimpleFactory is AccessRoleCommon, IStakeSimpleFactory {
 
     address public stakeSimpleLogic;
 

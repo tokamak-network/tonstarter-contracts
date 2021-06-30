@@ -3,10 +3,10 @@ pragma solidity ^0.7.6;
 
 import "../interfaces/IStakeDefiFactory.sol";
 import {StakeDefiProxy} from "../stake/StakeDefiProxy.sol";
-
+import "../common/AccessRoleCommon.sol";
 /// @title A factory that creates a stake contract that can function as a DeFi function
-contract StakeDefiFactory is IStakeDefiFactory {
-    bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
+contract StakeDefiFactory is AccessRoleCommon, IStakeDefiFactory {
+
     address public stakeDefiLogic;
 
     /// @dev constructor of StakeDefiFactory

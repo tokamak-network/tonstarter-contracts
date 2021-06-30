@@ -8,7 +8,8 @@ import {IIStake1Vault} from "../interfaces/IIStake1Vault.sol";
 import {IIDepositManager} from "../interfaces/IIDepositManager.sol";
 import {IISeigManager} from "../interfaces/IISeigManager.sol";
 import {SafeMath} from "../utils/math/SafeMath.sol";
-import "@openzeppelin/contracts/access/AccessControl.sol";
+import "../common/AccessibleCommon.sol";
+
 import "../stake/StakeTONStorage.sol";
 import "@uniswap/v3-periphery/contracts/interfaces/ISwapRouter.sol";
 import "@uniswap/v2-periphery/contracts/interfaces/IUniswapV2Router01.sol";
@@ -58,9 +59,8 @@ interface ITokamakRegistry {
 }
 
 /// @title The connector that integrates tokamak
-contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
+contract TokamakStaker is StakeTONStorage, AccessibleCommon, ITokamakStaker {
     using SafeMath for uint256;
-    bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
 
     modifier nonZero(address _addr) {
         require(_addr != address(0), "TokamakStaker: zero address");
@@ -69,14 +69,6 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
 
     modifier sameTokamakLayer(address _addr) {
         require(tokamakLayer2 == _addr, "TokamakStaker:different layer");
-        _;
-    }
-
-    modifier onlyOwner() {
-        require(
-            hasRole(ADMIN_ROLE, msg.sender),
-            "TokamakStaker: Caller is not an admin"
-        );
         _;
     }
 
@@ -138,14 +130,6 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
         uint256 amountIn,
         uint256 amountOut
     );
-
-    /// @dev transfer Ownership
-    /// @param newOwner new owner address
-    function transferOwnership(address newOwner) external onlyOwner {
-        require(msg.sender != newOwner, "TokamakStaker:same owner");
-        grantRole(ADMIN_ROLE, newOwner);
-        revokeRole(ADMIN_ROLE, msg.sender);
-    }
 
     /// @dev set registry address
     /// @param _registry new registry address

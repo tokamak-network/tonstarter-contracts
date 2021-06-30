@@ -8,21 +8,18 @@ import {IStakeRegistry} from "../interfaces/IStakeRegistry.sol";
 import {IStake1Vault} from "../interfaces/IStake1Vault.sol";
 import {IStakeTONTokamak} from "../interfaces/IStakeTONTokamak.sol";
 
-import "@openzeppelin/contracts/access/AccessControl.sol";
+import "../common/AccessibleCommon.sol";
+
 import "./StakeProxyStorage.sol";
 
 /// @title The logic of FLD Plaform
 /// @notice Admin can createVault, createStakeContract.
 /// User can excute the tokamak staking function of each contract through this logic.
-contract Stake1Logic is StakeProxyStorage, AccessControl, IStake1Logic {
-    bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
+contract Stake1Logic is StakeProxyStorage, AccessibleCommon, IStake1Logic {
+
     bytes32 public constant ZERO_HASH =
         0x0000000000000000000000000000000000000000000000000000000000000000;
 
-    modifier onlyOwner() {
-        require(hasRole(ADMIN_ROLE, msg.sender), "");
-        _;
-    }
 
     modifier nonZero(address _addr) {
         require(_addr != address(0), "Stake1Logic:zero address");
@@ -68,13 +65,6 @@ contract Stake1Logic is StakeProxyStorage, AccessControl, IStake1Logic {
         IProxy(_stakeProxy).upgradeTo(_implementation);
     }
 
-    /// @dev transfer Ownership
-    /// @param newOwner new owner address
-    function transferOwnership(address newOwner) external onlyOwner {
-        require(msg.sender != newOwner, "Stake1Logic: same owner");
-        grantRole(ADMIN_ROLE, newOwner);
-        revokeRole(ADMIN_ROLE, msg.sender);
-    }
 
     /// @dev grant the role to account in target
     /// @param target target address

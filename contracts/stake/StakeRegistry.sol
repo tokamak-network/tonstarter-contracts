@@ -3,12 +3,11 @@ pragma solidity ^0.7.6;
 
 import "../interfaces/IStakeRegistry.sol";
 import "../libraries/LibTokenStake1.sol";
-import "@openzeppelin/contracts/access/AccessControl.sol";
+import "../common/AccessibleCommon.sol";
 
 /// @title Stake Registry
 /// @notice Manage the vault list by phase. Manage the list of staking contracts in the vault.
-contract StakeRegistry is AccessControl, IStakeRegistry {
-    bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
+contract StakeRegistry is AccessibleCommon, IStakeRegistry {
 
     bytes32 public constant ZERO_HASH =
         0x0000000000000000000000000000000000000000000000000000000000000000;
@@ -49,13 +48,6 @@ contract StakeRegistry is AccessControl, IStakeRegistry {
     /// Defi Info
     mapping(bytes32 => LibTokenStake1.DefiInfo) public defiInfo;
 
-    modifier onlyOwner() {
-        require(
-            hasRole(ADMIN_ROLE, msg.sender),
-            "StakeRegistry: Caller is not an admin"
-        );
-        _;
-    }
 
     modifier nonZero(address _addr) {
         require(_addr != address(0), "StakeRegistry: zero address");
@@ -113,14 +105,6 @@ contract StakeRegistry is AccessControl, IStakeRegistry {
         _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
         _setupRole(ADMIN_ROLE, msg.sender);
         fld = _fld;
-    }
-
-    /// @dev transfer Ownership
-    /// @param newOwner new owner address
-    function transferOwnership(address newOwner) external onlyOwner {
-        require(msg.sender != newOwner, "StakeRegistry:same owner");
-        grantRole(ADMIN_ROLE, newOwner);
-        revokeRole(ADMIN_ROLE, msg.sender);
     }
 
     /// @dev Set addresses for Tokamak integration

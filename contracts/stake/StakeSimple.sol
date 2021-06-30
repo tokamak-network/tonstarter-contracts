@@ -6,19 +6,14 @@ import {IIStake1Vault} from "../interfaces/IIStake1Vault.sol";
 import {IIERC20} from "../interfaces/IIERC20.sol";
 import "../libraries/LibTokenStake1.sol";
 import {SafeMath} from "../utils/math/SafeMath.sol";
-import "@openzeppelin/contracts/access/AccessControl.sol";
+import "../common/AccessibleCommon.sol";
 import "../stake/Stake1Storage.sol";
 
 /// @title Simple Stake Contract
 /// @notice Stake contracts can interact with the vault to claim fld tokens
-contract StakeSimple is Stake1Storage, AccessControl, IStakeSimple {
+contract StakeSimple is Stake1Storage, AccessibleCommon, IStakeSimple {
     using SafeMath for uint256;
-    bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
 
-    modifier onlyOwner() {
-        require(hasRole(ADMIN_ROLE, msg.sender), "StakeSimple: not an admin");
-        _;
-    }
     modifier lock() {
         require(_lock == 0, "StakeSimple: LOCKED");
         _lock = 1;
@@ -54,13 +49,6 @@ contract StakeSimple is Stake1Storage, AccessControl, IStakeSimple {
         stake(msg.value);
     }
 
-    /// @dev transfer Ownership
-    /// @param newOwner new owner address
-    function transferOwnership(address newOwner) external onlyOwner {
-        require(msg.sender != newOwner, "StakeSimple: same owner");
-        grantRole(ADMIN_ROLE, newOwner);
-        revokeRole(ADMIN_ROLE, msg.sender);
-    }
 
     /// @dev Initialize
     /// @param _token  the reward token address , It is FLD address.

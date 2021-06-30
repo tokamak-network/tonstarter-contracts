@@ -3,38 +3,23 @@ pragma solidity ^0.7.6;
 //pragma abicoder v2;
 
 import "./Stake1Storage.sol";
-import "@openzeppelin/contracts/access/AccessControl.sol";
+import "../common/AccessibleCommon.sol";
 
 /// @title Proxy for Simple Stake contracts
 /// @notice
-contract StakeSimpleProxy is Stake1Storage, AccessControl {
-    bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
+contract StakeSimpleProxy is Stake1Storage, AccessibleCommon {
+
     address internal _implementation;
     bool public pauseProxy;
 
     event Upgraded(address indexed implementation);
 
-    modifier onlyOwner() {
-        require(
-            hasRole(ADMIN_ROLE, msg.sender),
-            "StakeSimpleProxy:not an admin"
-        );
-        _;
-    }
 
     constructor(address _logic) {
         _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
         _setupRole(ADMIN_ROLE, msg.sender);
         _setupRole(ADMIN_ROLE, address(this));
         _implementation = _logic;
-    }
-
-    /// @dev transfer Ownership
-    /// @param newOwner new owner address
-    function transferOwnership(address newOwner) external onlyOwner {
-        require(msg.sender != newOwner, "StakeSimpleProxy:same owner");
-        grantRole(ADMIN_ROLE, newOwner);
-        revokeRole(ADMIN_ROLE, msg.sender);
     }
 
     /// @notice Set pause state

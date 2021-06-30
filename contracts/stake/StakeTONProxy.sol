@@ -6,14 +6,13 @@ import {IStakeVaultStorage} from "../interfaces/IStakeVaultStorage.sol";
 import {IIERC20} from "../interfaces/IIERC20.sol";
 import {SafeMath} from "../utils/math/SafeMath.sol";
 import "./StakeTONStorage.sol";
-import "@openzeppelin/contracts/access/AccessControl.sol";
+import "../common/AccessibleCommon.sol";
 import {OnApprove} from "../tokens/OnApprove.sol";
 
 /// @title Proxy for Stake contracts in Phase 1
 /// @notice
-contract StakeTONProxy is StakeTONStorage, AccessControl, OnApprove {
+contract StakeTONProxy is StakeTONStorage, AccessibleCommon, OnApprove {
     using SafeMath for uint256;
-    bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
     address internal _implementation;
     bool public pauseProxy;
 
@@ -24,11 +23,6 @@ contract StakeTONProxy is StakeTONStorage, AccessControl, OnApprove {
     /// @param amount the amount of staking
     event Staked(address indexed to, uint256 amount);
 
-    modifier onlyOwner() {
-        require(hasRole(ADMIN_ROLE, msg.sender), "StakeTONProxy: not an admin");
-        _;
-    }
-
     /// @dev the constructor of StakeTONProxy
     /// @param _logic the logic address of StakeTONProxy
     constructor(address _logic) {
@@ -36,14 +30,6 @@ contract StakeTONProxy is StakeTONStorage, AccessControl, OnApprove {
         _setupRole(ADMIN_ROLE, msg.sender);
         _setupRole(ADMIN_ROLE, address(this));
         _implementation = _logic;
-    }
-
-    /// @dev transfer Ownership
-    /// @param newOwner new owner address
-    function transferOwnership(address newOwner) external onlyOwner {
-        require(msg.sender != newOwner, "StakeTONProxy:same owner");
-        grantRole(ADMIN_ROLE, newOwner);
-        revokeRole(ADMIN_ROLE, msg.sender);
     }
 
     /// @notice Set pause state

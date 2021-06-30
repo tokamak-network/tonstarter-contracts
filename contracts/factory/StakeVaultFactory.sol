@@ -3,10 +3,10 @@ pragma solidity ^0.7.6;
 
 import "../interfaces/IStakeVaultFactory.sol";
 import {StakeVaultProxy} from "../stake/StakeVaultProxy.sol";
+import "../common/AccessRoleCommon.sol";
 
 /// @title A factory that creates a vault that hold reward
-contract StakeVaultFactory is IStakeVaultFactory {
-    bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
+contract StakeVaultFactory is AccessRoleCommon, IStakeVaultFactory {
 
     address public stakeVaultLogic;
 

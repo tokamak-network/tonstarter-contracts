@@ -5,20 +5,15 @@ import "../interfaces/IStakeFactory.sol";
 import {IStakeSimpleFactory} from "../interfaces/IStakeSimpleFactory.sol";
 import {IStakeTONFactory} from "../interfaces/IStakeTONFactory.sol";
 import {IStakeDefiFactory} from "../interfaces/IStakeDefiFactory.sol";
-import "@openzeppelin/contracts/access/AccessControl.sol";
+import "../common/AccessibleCommon.sol";
 
 /// @title A factory that calls the desired stake factory according to stakeType
-contract StakeFactory is IStakeFactory, AccessControl {
-    bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
+contract StakeFactory is IStakeFactory, AccessibleCommon {
 
     address public stakeSimpleFactory;
     address public stakeTONFactory;
     address public stakeDefiFactory;
 
-    modifier onlyOwner() {
-        require(hasRole(ADMIN_ROLE, msg.sender), "StakeFactory: not an admin");
-        _;
-    }
     modifier nonZero(address _addr) {
         require(_addr != address(0), "StakeFactory: zero");
         _;
@@ -44,13 +39,6 @@ contract StakeFactory is IStakeFactory, AccessControl {
         _setupRole(ADMIN_ROLE, msg.sender);
     }
 
-    /// @dev transfer Ownership
-    /// @param newOwner new owner address
-    function transferOwnership(address newOwner) external onlyOwner {
-        require(msg.sender != newOwner, "StakeFactory:same owner");
-        grantRole(ADMIN_ROLE, newOwner);
-        revokeRole(ADMIN_ROLE, msg.sender);
-    }
 
     /// @dev Set StakeSimpleFactory address
     /// @param _stakeSimpleFactory new StakeSimpleFactory address

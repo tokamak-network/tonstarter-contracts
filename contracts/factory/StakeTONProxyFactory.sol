@@ -3,10 +3,10 @@ pragma solidity ^0.7.6;
 
 import "../interfaces/IStakeTONProxyFactory.sol";
 import {StakeTONProxy} from "../stake/StakeTONProxy.sol";
+import "../common/AccessRoleCommon.sol";
 
 /// @title A factory that creates a stakeTONProxy
-contract StakeTONProxyFactory is IStakeTONProxyFactory {
-    bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
+contract StakeTONProxyFactory is AccessRoleCommon, IStakeTONProxyFactory {
 
     /// @dev Create a StakeTONProxy that can stake TON.
     /// @param _logic the logic contract address used in proxy

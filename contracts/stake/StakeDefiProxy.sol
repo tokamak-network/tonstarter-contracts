@@ -3,20 +3,16 @@ pragma solidity ^0.7.6;
 
 import "../interfaces/IStakeDefiProxy.sol";
 import "./Stake1Storage.sol";
-import "@openzeppelin/contracts/access/AccessControl.sol";
+import "../common/AccessibleCommon.sol";
 
 /// @title Proxy for stake defi contract
-contract StakeDefiProxy is Stake1Storage, AccessControl, IStakeDefiProxy {
-    bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
+contract StakeDefiProxy is Stake1Storage, AccessibleCommon, IStakeDefiProxy {
+
     address internal _implementation;
     bool public pauseProxy;
 
     event Upgraded(address indexed implementation);
 
-    modifier onlyOwner() {
-        require(hasRole(ADMIN_ROLE, msg.sender), "not an admin");
-        _;
-    }
 
     /// @dev constructor of Stake1Proxy
     /// @param _logic the logic address that used in proxy
@@ -27,13 +23,6 @@ contract StakeDefiProxy is Stake1Storage, AccessControl, IStakeDefiProxy {
         _implementation = _logic;
     }
 
-    /// @dev transfer Ownership
-    /// @param newOwner new owner address
-    function transferOwnership(address newOwner) external onlyOwner {
-        require(msg.sender != newOwner, "StakeDefiProxy:same owner");
-        grantRole(ADMIN_ROLE, newOwner);
-        revokeRole(ADMIN_ROLE, msg.sender);
-    }
 
     /// @dev Set pause state
     /// @param _pause true:pause or false:resume
