@@ -21,7 +21,7 @@ contract StakeVaultFactory is AccessRoleCommon, IStakeVaultFactory {
     }
 
     /// @dev Create a vault that hold reward, _cap is allocated reward amount.
-    /// @param _addr the array of [token, paytoken, vault, defiAddr]
+    /// @param _addr the array of [token, paytoken, _stakefactory, defiAddr]
     /// @param _intInfo array of [_stakeType, _cap, _saleStartBlock, _stakeStartBlock]
     /// @param owner the owner adderess
     /// @return a vault address
