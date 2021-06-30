@@ -246,7 +246,7 @@ contract Stake1Vault is StakeVaultStorage, IStake1Vault {
         override
         returns (bool)
     {
-        require(saleClosed && _amount > 0, "Stake1Vault: disclose sale");
+        require(saleClosed && _amount > 0, "Stake1Vault: on sale or need to end the sale");
         uint256 fldBalance = IERC20(fld).balanceOf(address(this));
         require(fldBalance >= _amount, "Stake1Vault: not enough balance");
 
@@ -283,7 +283,7 @@ contract Stake1Vault is StakeVaultStorage, IStake1Vault {
         override
         returns (bool)
     {
-        require(saleClosed, "Stake1Vault: disclose");
+        require(saleClosed, "Stake1Vault: on sale or need to end the sale");
         uint256 fldBalance = IERC20(fld).balanceOf(address(this));
         require(fldBalance >= _amount, "not enough");
 
