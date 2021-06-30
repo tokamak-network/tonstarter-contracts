@@ -79,6 +79,14 @@ contract TokamakStaker is StakeTONStorage, AccessibleCommon, ITokamakStaker {
         _lock = 0;
     }
 
+    modifier onlyClosed() {
+        require(
+            IIStake1Vault(vault).saleClosed() == true,
+            "TokamakStaker: not closed"
+        );
+        _;
+    }
+
     /// @dev event on set the registry address
     /// @param registry the registry address
     event SetRegistry(address registry);
@@ -243,13 +251,11 @@ contract TokamakStaker is StakeTONStorage, AccessibleCommon, ITokamakStaker {
         lock
         nonZero(stakeRegistry)
         nonZero(_layer2)
+        onlyClosed
     {
         require(block.number <= endBlock, "TokamakStaker:period end");
         require(stakeAmount > 0, "TokamakStaker:stakeAmount is zero");
-        require(
-            IIStake1Vault(vault).saleClosed() == true,
-            "TokamakStaker:not closed"
-        );
+
         defiStatus = uint256(LibTokenStake1.DefiStatus.DEPOSITED);
 
         checkTokamak();
@@ -306,12 +312,9 @@ contract TokamakStaker is StakeTONStorage, AccessibleCommon, ITokamakStaker {
         override
         lock
         nonZero(stakeRegistry)
+        onlyClosed
         sameTokamakLayer(_layer2)
     {
-        require(
-            IIStake1Vault(vault).saleClosed() == true,
-            "TokamakStaker:not closed"
-        );
         defiStatus = uint256(LibTokenStake1.DefiStatus.REQUESTWITHDRAW);
         requestNum = requestNum.add(1);
         checkTokamak();
@@ -333,12 +336,10 @@ contract TokamakStaker is StakeTONStorage, AccessibleCommon, ITokamakStaker {
         override
         lock
         nonZero(stakeRegistry)
+        onlyClosed
         sameTokamakLayer(_layer2)
     {
-        require(
-            IIStake1Vault(vault).saleClosed() == true,
-            "TokamakStaker:not closed"
-        );
+
         defiStatus = uint256(LibTokenStake1.DefiStatus.REQUESTWITHDRAW);
         requestNum = requestNum.add(1);
         checkTokamak();
@@ -355,16 +356,14 @@ contract TokamakStaker is StakeTONStorage, AccessibleCommon, ITokamakStaker {
         override
         lock
         nonZero(stakeRegistry)
+        onlyClosed
         sameTokamakLayer(_layer2)
     {
         require(
             defiStatus != uint256(LibTokenStake1.DefiStatus.WITHDRAW),
             "TokamakStaker:Already ProcessUnStaking"
         );
-        require(
-            IIStake1Vault(vault).saleClosed() == true,
-            "TokamakStaker:not closed"
-        );
+
         defiStatus = uint256(LibTokenStake1.DefiStatus.WITHDRAW);
         uint256 rn = requestNum;
         requestNum = 0;
@@ -400,12 +399,9 @@ contract TokamakStaker is StakeTONStorage, AccessibleCommon, ITokamakStaker {
         uint256 _deadline,
         uint160 _sqrtPriceLimitX96,
         uint256 _kind
-    ) external override lock returns (uint256 amountOut) {
+    ) external override lock onlyClosed returns (uint256 amountOut) {
         require(block.number <= endBlock, "TokamakStaker: period end");
-        require(
-            IIStake1Vault(vault).saleClosed() == true,
-            "TokamakStaker: not closed"
-        );
+
         require(_kind < 2, "TokamakStaker: no kind");
 
         checkTokamak();
@@ -504,12 +500,9 @@ contract TokamakStaker is StakeTONStorage, AccessibleCommon, ITokamakStaker {
         uint256 _amountOutMinimum,
         uint256 _deadline,
         uint256 _kind
-    ) external override lock returns (uint256 amountOut) {
+    ) external override lock onlyClosed returns (uint256 amountOut) {
         require(block.number <= endBlock, "TokamakStaker:period end");
-        require(
-            IIStake1Vault(vault).saleClosed() == true,
-            "TokamakStaker:not closed"
-        );
+
         require(_kind < 2, "no kind");
         checkTokamak();
 
