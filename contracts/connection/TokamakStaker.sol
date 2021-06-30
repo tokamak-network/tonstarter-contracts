@@ -401,9 +401,10 @@ contract TokamakStaker is StakeTONStorage, AccessibleCommon, ITokamakStaker {
         uint256 _kind
     ) external override lock onlyClosed returns (uint256 amountOut) {
         require(block.number <= endBlock, "TokamakStaker: period end");
-
-        require(_kind < 2, "TokamakStaker: no kind");
-
+        require(
+            _kind < 2,
+            "TokamakStaker: not available kind"
+        );
         checkTokamak();
 
         {
@@ -502,8 +503,10 @@ contract TokamakStaker is StakeTONStorage, AccessibleCommon, ITokamakStaker {
         uint256 _kind
     ) external override lock onlyClosed returns (uint256 amountOut) {
         require(block.number <= endBlock, "TokamakStaker:period end");
-
-        require(_kind < 2, "no kind");
+        require(
+            _kind < 2,
+            "TokamakStaker: not available kind"
+        );
         checkTokamak();
 
         {
