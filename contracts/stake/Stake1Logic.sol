@@ -136,7 +136,7 @@ contract Stake1Logic is StakeProxyStorage, AccessibleCommon, IStake1Logic {
     /// @dev Sets StakeTONFactory address
     /// @param _stakeTONFactory new StakeTONFactory address
     function setStakeTONFactory(address _stakeTONFactory)
-        public
+        external
         onlyOwner
         nonZero(_stakeTONFactory)
     {
@@ -146,7 +146,7 @@ contract Stake1Logic is StakeProxyStorage, AccessibleCommon, IStake1Logic {
     /// @dev Sets StakeSimpleFactory address
     /// @param _stakeSimpleFactory new StakeSimpleFactory address
     function setStakeSimpleFactory(address _stakeSimpleFactory)
-        public
+        external
         onlyOwner
         nonZero(_stakeSimpleFactory)
     {
@@ -156,7 +156,7 @@ contract Stake1Logic is StakeProxyStorage, AccessibleCommon, IStake1Logic {
     /// @dev Sets StakeDefiFactory address
     /// @param _stakeDefiFactory new StakeDefiFactory address
     function setStakeDefiFactory(address _stakeDefiFactory)
-        public
+        external
         onlyOwner
         nonZero(_stakeDefiFactory)
     {
@@ -166,7 +166,7 @@ contract Stake1Logic is StakeProxyStorage, AccessibleCommon, IStake1Logic {
     /// @dev Sets StakeVaultFactory address
     /// @param _stakeVaultFactory new StakeVaultFactory address
     function setStakeVaultFactory(address _stakeVaultFactory)
-        public
+        external
         onlyOwner
         nonZero(_stakeVaultFactory)
     {

@@ -173,7 +173,7 @@ contract FLD is ERC20, AccessibleCommon, IFLD {
         bytes32 sigR,
         bytes32 sigS,
         uint8 sigV
-    ) public view override returns (bool) {
+    ) external view override returns (bool) {
         return
             signer ==
             ecrecover(

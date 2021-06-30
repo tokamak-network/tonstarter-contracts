@@ -178,7 +178,7 @@ contract TokamakStaker is StakeTONStorage, AccessibleCommon, ITokamakStaker {
     /// @dev Change the TON holded in contract have to WTON, or change WTON to TON.
     /// @param amount the amount to be changed
     /// @param toWTON if it's true, TON->WTON , else WTON->TON
-    function swapTONtoWTON(uint256 amount, bool toWTON) public override lock {
+    function swapTONtoWTON(uint256 amount, bool toWTON) external override lock {
         checkTokamak();
 
         if (toWTON) {
@@ -302,7 +302,7 @@ contract TokamakStaker is StakeTONStorage, AccessibleCommon, ITokamakStaker {
     /// @param _layer2 the layer2 address in tokamak
     /// @param wtonAmount the amount requested to unstaking
     function tokamakRequestUnStaking(address _layer2, uint256 wtonAmount)
-        public
+        external
         override
         lock
         nonZero(stakeRegistry)
@@ -329,7 +329,7 @@ contract TokamakStaker is StakeTONStorage, AccessibleCommon, ITokamakStaker {
     /// @dev  request unstaking the amount of all in layer2 in tokamak
     /// @param _layer2 the layer2 address in tokamak
     function tokamakRequestUnStakingAll(address _layer2)
-        public
+        external
         override
         lock
         nonZero(stakeRegistry)
@@ -351,7 +351,7 @@ contract TokamakStaker is StakeTONStorage, AccessibleCommon, ITokamakStaker {
     /// @dev process unstaking in layer2 in tokamak
     /// @param _layer2 the layer2 address in tokamak
     function tokamakProcessUnStaking(address _layer2)
-        public
+        external
         override
         lock
         nonZero(stakeRegistry)
