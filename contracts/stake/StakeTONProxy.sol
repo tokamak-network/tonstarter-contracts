@@ -8,13 +8,13 @@ import {SafeMath} from "../utils/math/SafeMath.sol";
 import "./StakeTONStorage.sol";
 import "../common/AccessibleCommon.sol";
 import {OnApprove} from "../tokens/OnApprove.sol";
+import "./ProxyBase.sol";
 
 /// @title Proxy for Stake contracts in Phase 1
 /// @notice
-contract StakeTONProxy is StakeTONStorage, AccessibleCommon, OnApprove {
+contract StakeTONProxy is StakeTONStorage, AccessibleCommon, ProxyBase, OnApprove {
     using SafeMath for uint256;
-    address internal _implementation;
-    bool public pauseProxy;
+
 
     event Upgraded(address indexed implementation);
 
@@ -26,10 +26,15 @@ contract StakeTONProxy is StakeTONStorage, AccessibleCommon, OnApprove {
     /// @dev the constructor of StakeTONProxy
     /// @param _logic the logic address of StakeTONProxy
     constructor(address _logic) {
+        assert(IMPLEMENTATION_SLOT == bytes32(uint256(keccak256('eip1967.proxy.implementation')) - 1));
+
+        require(_logic != address(0), "StakeTONProxy: logic is zero");
+
+        _setImplementation(_logic);
+
         _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
         _setupRole(ADMIN_ROLE, msg.sender);
         _setupRole(ADMIN_ROLE, address(this));
-        _implementation = _logic;
     }
 
     /// @notice Set pause state
@@ -43,16 +48,16 @@ contract StakeTONProxy is StakeTONStorage, AccessibleCommon, OnApprove {
     function upgradeTo(address impl) external onlyOwner {
         require(impl != address(0), "StakeTONProxy: input is zero");
         require(
-            _implementation != impl,
+            _implementation() != impl,
             "StakeTONProxy: The input address is same as the state"
         );
-        _implementation = impl;
+        _setImplementation(impl);
         emit Upgraded(impl);
     }
 
     /// @dev returns the implementation
     function implementation() public view returns (address) {
-        return _implementation;
+        return _implementation();
     }
 
     /// @dev receive ether
@@ -67,7 +72,7 @@ contract StakeTONProxy is StakeTONStorage, AccessibleCommon, OnApprove {
 
     /// @dev fallback function , execute on undefined function call
     function _fallback() internal {
-        address _impl = implementation();
+        address _impl = _implementation();
         require(
             _impl != address(0) && !pauseProxy,
             "StakeTONProxy: impl is zero OR proxy is false"

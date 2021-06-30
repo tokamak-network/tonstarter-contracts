@@ -55,6 +55,8 @@ contract StakeVaultStorage is AccessibleCommon {
 
     uint256 private _lock;
 
+    /// @dev flag for pause proxy
+    bool public pauseProxy;
 
     modifier lock() {
         require(_lock == 0, "Stake1Vault: LOCKED");

@@ -4,22 +4,23 @@ pragma solidity ^0.7.6;
 
 import "./Stake1Storage.sol";
 import "../common/AccessibleCommon.sol";
+import "./ProxyBase.sol";
 
 /// @title Proxy for Simple Stake contracts
 /// @notice
-contract StakeSimpleProxy is Stake1Storage, AccessibleCommon {
-
-    address internal _implementation;
-    bool public pauseProxy;
+contract StakeSimpleProxy is Stake1Storage, AccessibleCommon, ProxyBase {
 
     event Upgraded(address indexed implementation);
 
-
     constructor(address _logic) {
+        assert(IMPLEMENTATION_SLOT == bytes32(uint256(keccak256('eip1967.proxy.implementation')) - 1));
+        require(_logic != address(0), "StakeSimpleProxy: logic is zero");
+
+        _setImplementation(_logic);
+
         _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
         _setupRole(ADMIN_ROLE, msg.sender);
         _setupRole(ADMIN_ROLE, address(this));
-        _implementation = _logic;
     }
 
     /// @notice Set pause state
@@ -32,14 +33,14 @@ contract StakeSimpleProxy is Stake1Storage, AccessibleCommon {
     /// @param impl New implementation contract address
     function upgradeTo(address impl) external onlyOwner {
         require(impl != address(0), "StakeSimpleProxy: input is zero");
-        require(_implementation != impl, "StakeSimpleProxy: same");
-        _implementation = impl;
+        require(_implementation() != impl, "StakeSimpleProxy: same");
+        _setImplementation(impl);
         emit Upgraded(impl);
     }
 
     /// @dev returns the implementation
     function implementation() public view returns (address) {
-        return _implementation;
+        return _implementation();
     }
 
     receive() external payable {
@@ -51,7 +52,7 @@ contract StakeSimpleProxy is Stake1Storage, AccessibleCommon {
     }
 
     function _fallback() internal {
-        address _impl = implementation();
+        address _impl = _implementation();
         require(
             _impl != address(0) && !pauseProxy,
             "StakeSimpleProxy: impl is zero OR proxy is false"

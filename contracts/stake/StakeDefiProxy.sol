@@ -2,27 +2,31 @@
 pragma solidity ^0.7.6;
 
 import "../interfaces/IStakeDefiProxy.sol";
+import {Address} from "@openzeppelin/contracts/utils/Address.sol";
+
 import "./Stake1Storage.sol";
 import "../common/AccessibleCommon.sol";
+import "./ProxyBase.sol";
 
 /// @title Proxy for stake defi contract
-contract StakeDefiProxy is Stake1Storage, AccessibleCommon, IStakeDefiProxy {
-
-    address internal _implementation;
-    bool public pauseProxy;
+contract StakeDefiProxy is Stake1Storage, AccessibleCommon, ProxyBase, IStakeDefiProxy {
 
     event Upgraded(address indexed implementation);
 
-
-    /// @dev constructor of Stake1Proxy
+    /// @dev constructor of StakeDefiProxy
     /// @param _logic the logic address that used in proxy
     constructor(address _logic) {
+        assert(IMPLEMENTATION_SLOT == bytes32(uint256(keccak256('eip1967.proxy.implementation')) - 1));
+
+        require(_logic != address(0), "StakeDefiProxy: logic is zero");
+
+        _setImplementation(_logic);
+
         _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
         _setupRole(ADMIN_ROLE, msg.sender);
         _setupRole(ADMIN_ROLE, address(this));
-        _implementation = _logic;
-    }
 
+    }
 
     /// @dev Set pause state
     /// @param _pause true:pause or false:resume
@@ -34,14 +38,14 @@ contract StakeDefiProxy is Stake1Storage, AccessibleCommon, IStakeDefiProxy {
     /// @param impl New implementation contract address
     function upgradeTo(address impl) external override onlyOwner {
         require(impl != address(0), "StakeDefiProxy: input is zero");
-        require(_implementation != impl, "same");
-        _implementation = impl;
+        require(_implementation() != impl, "same");
+        _setImplementation(impl);
         emit Upgraded(impl);
     }
 
     /// @dev returns the implementation
-    function implementation() public view override returns (address) {
-        return _implementation;
+    function implementation() external view override returns (address) {
+        return _implementation();
     }
 
     /// @dev receive ether
@@ -56,7 +60,7 @@ contract StakeDefiProxy is Stake1Storage, AccessibleCommon, IStakeDefiProxy {
 
     /// @dev fallback function , execute on undefined function call
     function _fallback() internal {
-        address _impl = implementation();
+        address _impl = _implementation();
         require(
             _impl != address(0) && !pauseProxy,
             "StakeDefiProxy: impl is zero OR proxy is false"

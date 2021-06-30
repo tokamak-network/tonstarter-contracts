@@ -41,6 +41,9 @@ contract Stake1Storage {
 
     uint256 internal _lock;
 
+    /// @dev flag for pause proxy
+    bool public pauseProxy;
+
     /// @dev user's staked information
     function getUserStaked(address user)
         external

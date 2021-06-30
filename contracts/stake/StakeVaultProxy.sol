@@ -3,22 +3,26 @@ pragma solidity ^0.7.6;
 
 import "../interfaces/IStakeVaultProxy.sol";
 import "./StakeVaultStorage.sol";
+import "./ProxyBase.sol";
 
 /// @title Proxy for StakeVault
 /// @notice
-contract StakeVaultProxy is StakeVaultStorage, IStakeVaultProxy {
-    address internal _implementation;
-    bool public pauseProxy;
+contract StakeVaultProxy is StakeVaultStorage, ProxyBase, IStakeVaultProxy {
 
     event Upgraded(address indexed implementation);
 
     /// @dev constructor of StakeVaultProxy
     /// @param impl the logic address of StakeVaultProxy
     constructor(address impl) {
+        assert(IMPLEMENTATION_SLOT == bytes32(uint256(keccak256('eip1967.proxy.implementation')) - 1));
+
+        require(impl != address(0), "Stake1Proxy: logic is zero");
+
+        _setImplementation(impl);
+
         _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
         _setupRole(ADMIN_ROLE, msg.sender);
         _setupRole(ADMIN_ROLE, address(this));
-        _implementation = impl;
     }
 
     /// @notice Set pause state
@@ -31,14 +35,14 @@ contract StakeVaultProxy is StakeVaultStorage, IStakeVaultProxy {
     /// @param impl New implementation contract address
     function upgradeTo(address impl) external override onlyOwner {
         require(impl != address(0), "StakeVaultProxy: input is zero");
-        require(_implementation != impl, "StakeVaultProxy: same");
-        _implementation = impl;
+        require(_implementation() != impl, "StakeVaultProxy: same");
+        _setImplementation(impl);
         emit Upgraded(impl);
     }
 
     /// @dev returns the implementation
     function implementation() public view override returns (address) {
-        return _implementation;
+        return _implementation();
     }
 
     /// @dev receive ether
@@ -53,7 +57,7 @@ contract StakeVaultProxy is StakeVaultStorage, IStakeVaultProxy {
 
     /// @dev fallback function , execute on undefined function call
     function _fallback() internal {
-        address _impl = implementation();
+        address _impl = _implementation();
         require(
             _impl != address(0) && !pauseProxy,
             "StakeVaultProxy: impl OR proxy is false"
