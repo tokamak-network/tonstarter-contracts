@@ -19,7 +19,7 @@ contract Stake1Vault is StakeVaultStorage, IStake1Vault {
     /// @dev event on sale-closed
     event ClosedSale();
 
-    /// @dev event on sale-closed
+    /// @dev event of according to request from(staking contract)  the amount of compensation is paid to to.
     /// @param from the stakeContract address that call claim
     /// @param to the address that will receive the reward
     /// @param amount the amount of reward
