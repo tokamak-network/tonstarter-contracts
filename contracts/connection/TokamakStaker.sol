@@ -90,18 +90,18 @@ contract TokamakStaker is StakeTONStorage, AccessibleCommon, ITokamakStaker {
     /// @dev event on staking the staked TON in layer2 in tokamak
     /// @param layer2 the layer2 address in tokamak
     /// @param amount the amount that stake to layer2
-    event tokamakStaked(address layer2, uint256 amount);
+    event TokamakStaked(address layer2, uint256 amount);
 
     /// @dev event on request unstaking the wtonAmount in layer2 in tokamak
     /// @param layer2 the layer2 address in tokamak
     /// @param amount the amount requested to unstaking
-    event tokamakRequestedUnStaking(address layer2, uint256 amount);
+    event TokamakRequestedUnStaking(address layer2, uint256 amount);
 
     /// @dev event on process unstaking in layer2 in tokamak
     /// @param layer2 the layer2 address in tokamak
     /// @param rn the number of requested unstaking
     /// @param receiveTON if is true ,TON , else is WTON
-    event tokamakProcessedUnStaking(
+    event TokamakProcessedUnStaking(
         address layer2,
         uint256 rn,
         bool receiveTON
@@ -109,13 +109,13 @@ contract TokamakStaker is StakeTONStorage, AccessibleCommon, ITokamakStaker {
 
     /// @dev event on request unstaking the amount of all in layer2 in tokamak
     /// @param layer2 the layer2 address in tokamak
-    event tokamakRequestedUnStakingAll(address layer2);
+    event TokamakRequestedUnStakingAll(address layer2);
 
     /// @dev exchange WTON to FLD using uniswap v3
     /// @param caller the sender
     /// @param amountIn the input amount
     /// @return amountOut the amount of exchanged out token
-    event exchangedWTONtoFLD(
+    event ExchangedWTONtoFLD(
         address caller,
         uint256 amountIn,
         uint256 amountOut
@@ -125,7 +125,7 @@ contract TokamakStaker is StakeTONStorage, AccessibleCommon, ITokamakStaker {
     /// @param caller the sender
     /// @param amountIn the input amount
     /// @return amountOut the amount of exchanged out token
-    event exchangedWTONtoFLD2(
+    event ExchangedWTONtoFLD2(
         address caller,
         uint256 amountIn,
         uint256 amountOut
@@ -295,7 +295,7 @@ contract TokamakStaker is StakeTONStorage, AccessibleCommon, ITokamakStaker {
             "TokamakStaker:approveAndCall fail"
         );
 
-        emit tokamakStaked(_layer2, stakeAmount);
+        emit TokamakStaked(_layer2, stakeAmount);
     }
 
     /// @dev  request unstaking the wtonAmount in layer2 in tokamak
@@ -323,7 +323,7 @@ contract TokamakStaker is StakeTONStorage, AccessibleCommon, ITokamakStaker {
 
         IIDepositManager(depositManager).requestWithdrawal(_layer2, wtonAmount);
 
-        emit tokamakRequestedUnStaking(_layer2, wtonAmount);
+        emit TokamakRequestedUnStaking(_layer2, wtonAmount);
     }
 
     /// @dev  request unstaking the amount of all in layer2 in tokamak
@@ -345,7 +345,7 @@ contract TokamakStaker is StakeTONStorage, AccessibleCommon, ITokamakStaker {
 
         IIDepositManager(depositManager).requestWithdrawalAll(_layer2);
 
-        emit tokamakRequestedUnStakingAll(_layer2);
+        emit TokamakRequestedUnStakingAll(_layer2);
     }
 
     /// @dev process unstaking in layer2 in tokamak
@@ -383,7 +383,7 @@ contract TokamakStaker is StakeTONStorage, AccessibleCommon, ITokamakStaker {
         // receiveTON = false . to WTON
         IIDepositManager(depositManager).processRequests(_layer2, rn, true);
 
-        emit tokamakProcessedUnStaking(_layer2, rn, true);
+        emit TokamakProcessedUnStaking(_layer2, rn, true);
     }
 
     /// @dev exchange holded WTON to FLD using uniswap
@@ -491,7 +491,7 @@ contract TokamakStaker is StakeTONStorage, AccessibleCommon, ITokamakStaker {
             amountOut = ISwapRouter(uniswapRouter).exactInput(params);
         }
 
-        emit exchangedWTONtoFLD(msg.sender, _amountIn, amountOut);
+        emit ExchangedWTONtoFLD(msg.sender, _amountIn, amountOut);
     }
 
     /// @dev exchange holded WTON to FLD using uniswap-v2
@@ -592,7 +592,7 @@ contract TokamakStaker is StakeTONStorage, AccessibleCommon, ITokamakStaker {
             amountOut = amounts[amounts.length - 1];
         }
 
-        emit exchangedWTONtoFLD2(msg.sender, _amountIn, amountOut);
+        emit ExchangedWTONtoFLD2(msg.sender, _amountIn, amountOut);
     }
 
     /*
