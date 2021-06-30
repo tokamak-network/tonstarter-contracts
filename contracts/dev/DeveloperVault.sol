@@ -58,12 +58,6 @@ contract DeveloperVault is AccessControl, IDeveloperVault {
             _claimAmounts.length == _developers.length,
             "DeveloperVault: length is different"
         );
-        fld = _fld;
-        cap = _cap;
-        rewardPeriod = _rewardPeriod;
-        startRewardBlock = _startRewardBlock;
-        claimsNumberMax = _claimsNumberMax;
-        developers = _developers;
 
         uint256 totalClaimPossible = 0;
         for (uint256 i = 0; i < developers.length; ++i) {
@@ -78,6 +72,12 @@ contract DeveloperVault is AccessControl, IDeveloperVault {
             totalClaimPossible <= cap,
             "DeveloperVault: total claim possible greater than cap"
         );
+        fld = _fld;
+        cap = _cap;
+        rewardPeriod = _rewardPeriod;
+        startRewardBlock = _startRewardBlock;
+        claimsNumberMax = _claimsNumberMax;
+        developers = _developers;
     }
 
     /// @dev Developers can receive their FLDs
