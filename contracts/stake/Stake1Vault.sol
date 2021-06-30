@@ -16,9 +16,6 @@ import "./StakeVaultStorage.sol";
 contract Stake1Vault is StakeVaultStorage, IStake1Vault {
     using SafeMath for uint256;
 
-    bytes32 public constant ZERO_HASH =
-        0x0000000000000000000000000000000000000000000000000000000000000000;
-
     /// @dev event on sale-closed
     event ClosedSale();
 

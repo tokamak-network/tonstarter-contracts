@@ -17,10 +17,6 @@ import "./StakeProxyStorage.sol";
 /// User can excute the tokamak staking function of each contract through this logic.
 contract Stake1Logic is StakeProxyStorage, AccessibleCommon, IStake1Logic {
 
-    bytes32 public constant ZERO_HASH =
-        0x0000000000000000000000000000000000000000000000000000000000000000;
-
-
     modifier nonZero(address _addr) {
         require(_addr != address(0), "Stake1Logic:zero address");
         _;
