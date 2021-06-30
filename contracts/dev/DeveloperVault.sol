@@ -2,6 +2,7 @@
 pragma solidity ^0.7.6;
 
 import "../interfaces/IDeveloperVault.sol";
+import "../utils/math/Math.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
@@ -92,26 +93,20 @@ contract DeveloperVault is AccessControl, IDeveloperVault {
             "DeveloperVault: number of claims exceeds max"
         );
 
-        uint256 currentBlockRewardNumber =
-            startRewardBlock + devInfo.claimsNumber * rewardPeriod;
-        require(
-            currentBlockRewardNumber <= block.number,
-            "DeveloperVault: Period for reward has not been reached"
-        );
+        uint256 claimsNumber = devInfo.claimsNumber;
+        uint256 currentRewardBlock = startRewardBlock + claimsNumber * rewardPeriod;
+        uint256 maxRewardBlock = startRewardBlock + claimsNumberMax * rewardPeriod;
 
-        uint256 allPastRewards = 0;
-        while (currentBlockRewardNumber <= block.number) {
-            allPastRewards += devInfo.claimAmount;
-            devInfo.claimsNumber += 1;
-            currentBlockRewardNumber =
-                startRewardBlock +
-                devInfo.claimsNumber *
-                rewardPeriod;
-        }
-        require(
-            IERC20(fld).transfer(msg.sender, allPastRewards),
-            "DeveloperVault: FLD transfer fail"
-        );
+        uint256 diff = Math.min(maxRewardBlock, block.number) - currentRewardBlock;
+
+        // this replaces the `while` statement.
+        uint256 n = diff / rewardPeriod;
+
+        uint256 allPastRewards = devInfo.claimAmount * n;
+        devInfo.claimsNumber += n;
+
+        IERC20(fld).transfer(msg.sender, allPastRewards);
+
     }
 
     /// @dev Returns current reward block for sender
