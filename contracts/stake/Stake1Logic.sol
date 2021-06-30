@@ -70,15 +70,7 @@ contract Stake1Logic is StakeProxyStorage, AccessibleCommon, IStake1Logic {
         bytes32 role,
         address account
     ) external onlyOwner {
-        (bool success, ) =
-            target.call(
-                abi.encodeWithSignature(
-                    "grantRole(bytes32,address)",
-                    role,
-                    account
-                )
-            );
-        require(success, "Stake1Logic: grantRole fail");
+        AccessControl(target).grantRole(role, account);
     }
 
     /// @dev revoke the role to account in target
@@ -90,15 +82,7 @@ contract Stake1Logic is StakeProxyStorage, AccessibleCommon, IStake1Logic {
         bytes32 role,
         address account
     ) external onlyOwner {
-        (bool success, ) =
-            target.call(
-                abi.encodeWithSignature(
-                    "revokeRole(bytes32,address)",
-                    role,
-                    account
-                )
-            );
-        require(success, "Stake1Logic: revokeRole fail");
+        AccessControl(target).revokeRole(role, account);
     }
 
     /// @dev Sets FLD address
