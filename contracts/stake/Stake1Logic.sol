@@ -47,8 +47,7 @@ contract Stake1Logic is StakeProxyStorage, AccessibleCommon, IStake1Logic {
     event SetStakeRegistry(address stakeRegistry);
 
     constructor() {
-        _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
-        _setupRole(ADMIN_ROLE, msg.sender);
+
     }
 
     /// @dev upgrade to the logic of _stakeProxy

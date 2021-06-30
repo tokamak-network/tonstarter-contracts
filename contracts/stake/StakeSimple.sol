@@ -39,8 +39,6 @@ contract StakeSimple is Stake1Storage, AccessibleCommon, IStakeSimple {
 
     /// @dev constructor of StakeSimple
     constructor() {
-        _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
-        _setupRole(ADMIN_ROLE, msg.sender);
     }
 
     /// @dev receive ether

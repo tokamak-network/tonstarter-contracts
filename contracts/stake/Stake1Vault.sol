@@ -27,8 +27,6 @@ contract Stake1Vault is StakeVaultStorage, IStake1Vault {
 
     /// @dev constructor of Stake1Vault
     constructor() {
-        _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
-        _setupRole(ADMIN_ROLE, msg.sender);
     }
 
     /// @dev receive function
