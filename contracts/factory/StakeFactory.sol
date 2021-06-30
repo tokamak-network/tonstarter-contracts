@@ -22,7 +22,7 @@ contract StakeFactory is IStakeFactory, AccessibleCommon {
     /// @dev constructor of StakeFactory
     /// @param _stakeSimpleFactory the logic address used in StakeSimpleFactory
     /// @param _stakeTONFactory the logic address used in StakeTONFactory
-    /// @param _stakeTONFactory the logic address used in StakeTONFactory
+    /// @param _stakeDefiFactory the logic address used in StakeDefiFactory
     constructor(
         address _stakeSimpleFactory,
         address _stakeTONFactory,
