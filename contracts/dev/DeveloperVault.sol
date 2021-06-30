@@ -94,10 +94,10 @@ contract DeveloperVault is AccessControl, IDeveloperVault {
         );
 
         uint256 claimsNumber = devInfo.claimsNumber;
-        uint256 currentRewardBlock = startRewardBlock + claimsNumber * rewardPeriod;
+        uint256 currentRewardBlock_ = startRewardBlock + claimsNumber * rewardPeriod;
         uint256 maxRewardBlock = startRewardBlock + claimsNumberMax * rewardPeriod;
 
-        uint256 diff = Math.min(maxRewardBlock, block.number) - currentRewardBlock;
+        uint256 diff = Math.min(maxRewardBlock, block.number) - currentRewardBlock_;
 
         // this replaces the `while` statement.
         uint256 n = diff / rewardPeriod;
