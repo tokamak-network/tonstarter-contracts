@@ -81,7 +81,7 @@ contract TokamakStaker is StakeTONStorage, AccessibleCommon, ITokamakStaker {
 
     modifier onlyClosed() {
         require(
-            IIStake1Vault(vault).saleClosed() == true,
+            IIStake1Vault(vault).saleClosed(),
             "TokamakStaker: not closed"
         );
         _;

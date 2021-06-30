@@ -123,7 +123,7 @@ contract StakeSimple is Stake1Storage, AccessibleCommon, IStakeSimple {
         );
 
         LibTokenStake1.StakedAmount storage staked = userStaked[msg.sender];
-        require(staked.released == false, "StakeSimple: Already withdraw");
+        require(!staked.released, "StakeSimple: Already withdraw");
         require(
             staked.releasedAmount <= staked.amount,
             "StakeSimple: Amount wrong"
@@ -154,7 +154,7 @@ contract StakeSimple is Stake1Storage, AccessibleCommon, IStakeSimple {
     /// @dev Claim for reward
     function claim() external override lock {
         require(
-            IIStake1Vault(vault).saleClosed() == true,
+            IIStake1Vault(vault).saleClosed(),
             "StakeSimple: not closed"
         );
         uint256 rewardClaim = 0;

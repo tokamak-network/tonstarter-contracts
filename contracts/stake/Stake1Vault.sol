@@ -119,7 +119,7 @@ contract Stake1Vault is StakeVaultStorage, IStake1Vault {
             block.number < stakeStartBlock,
             "Stake1Vault: Already started stake"
         );
-        require(saleClosed == false, "Stake1Vault: closed sale");
+        require(!saleClosed, "Stake1Vault: closed sale");
         require(
             paytoken == IStake1Storage(stakeContract).paytoken(),
             "Stake1Vault: Different paytoken"
@@ -141,7 +141,7 @@ contract Stake1Vault is StakeVaultStorage, IStake1Vault {
 
     /// @dev  Close the sale that can stake by user
     function closeSale() external override {
-        require(saleClosed == false, "Stake1Vault: already closed");
+        require(!saleClosed, "Stake1Vault: already closed");
         require(
             cap > 0 &&
                 stakeStartBlock > 0 &&

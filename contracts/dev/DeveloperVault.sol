@@ -84,7 +84,7 @@ contract DeveloperVault is AccessControl, IDeveloperVault {
     function claimReward() external override {
         DeveloperInfo storage devInfo = developersInfo[msg.sender];
         require(
-            devInfo.registered == true,
+            devInfo.registered,
             "DeveloperVault: developer is not registered"
         );
         require(
@@ -118,7 +118,7 @@ contract DeveloperVault is AccessControl, IDeveloperVault {
     function currentRewardBlock() external view override returns (uint256) {
         DeveloperInfo memory devInfo = developersInfo[msg.sender];
         require(
-            devInfo.registered == true,
+            devInfo.registered,
             "DeveloperVault: developer is not registered"
         );
         uint256 currentBlockRewardNumber =

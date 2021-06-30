@@ -145,9 +145,9 @@ contract StakeTON is TokamakStaker, IStakeTON {
             );
         }
         LibTokenStake1.StakedAmount storage staked = userStaked[msg.sender];
-        require(staked.released == false, "StakeTON: Already withdraw");
+        require(!staked.released, "StakeTON: Already withdraw");
 
-        if (withdrawFlag == false) {
+        if (!withdrawFlag) {
             withdrawFlag = true;
             if (paytoken == ton) {
                 swappedAmountFLD = IIERC20(token).balanceOf(address(this));
@@ -263,7 +263,7 @@ contract StakeTON is TokamakStaker, IStakeTON {
     /// @dev Claim for reward
     function claim() external override lock {
         require(
-            IIStake1Vault(vault).saleClosed() == true,
+            IIStake1Vault(vault).saleClosed(),
             "StakeTON: not closed"
         );
         uint256 rewardClaim = 0;
