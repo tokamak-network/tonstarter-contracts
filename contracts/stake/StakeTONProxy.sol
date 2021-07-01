@@ -11,7 +11,6 @@ import {OnApprove} from "../tokens/OnApprove.sol";
 import "./ProxyBase.sol";
 
 /// @title Proxy for Stake contracts in Phase 1
-/// @notice
 contract StakeTONProxy is StakeTONStorage, AccessibleCommon, ProxyBase, OnApprove {
     using SafeMath for uint256;
 

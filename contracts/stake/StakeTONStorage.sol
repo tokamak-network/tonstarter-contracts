@@ -1,7 +1,6 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity ^0.7.6;
 
-//import "../interfaces/IStakeTONStorage.sol";
 import "./Stake1Storage.sol";
 
 /// @title the storage of StakeTONStorage

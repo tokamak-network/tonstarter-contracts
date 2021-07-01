@@ -1,7 +1,6 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity ^0.7.6;
 
-//import "../interfaces/IStake1Storage.sol";
 import "../libraries/LibTokenStake1.sol";
 
 /// @title The base storage of stakeContract
