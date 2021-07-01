@@ -143,6 +143,7 @@ contract StakeRegistry is AccessibleCommon, IStakeRegistry {
     /// @param _ex1  additional variable . ex) positionManagerAddress in Uniswap V3
     /// @param _ex2  additional variable . ex) WETH Address in Uniswap V3
     /// @param _fee  fee
+    /// @param _routerV2 In case of uniswap, router address of uniswapV2
     function addDefiInfo(
         string calldata _name,
         address _router,
