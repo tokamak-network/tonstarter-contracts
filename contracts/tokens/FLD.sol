@@ -145,8 +145,8 @@ contract FLD is ERC20, AccessibleCommon, IFLD {
     }
 
     /// @dev verify the signature
-    /// @param signer the signer address
     /// @param owner the token's owner
+    /// @param spender the account that spend owner's token
     /// @param value the amount to be approve to spend
     /// @param deadline the deadline that vaild the owner's signature
     /// @param _nounce the _nounce
@@ -154,8 +154,8 @@ contract FLD is ERC20, AccessibleCommon, IFLD {
     /// @param sigS the owner's signature - s
     /// @param sigV the owner's signature - v
     function verify(
-        address signer,
         address owner,
+        address spender,
         uint256 value,
         uint256 deadline,
         uint256 _nounce,
@@ -164,9 +164,9 @@ contract FLD is ERC20, AccessibleCommon, IFLD {
         uint8 sigV
     ) external view override returns (bool) {
         return
-            signer ==
+            owner ==
             ecrecover(
-                hashPermit(owner, owner, value, deadline, _nounce),
+                hashPermit(owner, spender, value, deadline, _nounce),
                 sigV,
                 sigR,
                 sigS

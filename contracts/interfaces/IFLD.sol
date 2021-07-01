@@ -36,8 +36,8 @@ interface IFLD {
     ) external;
 
     /// @dev verify the signature
-    /// @param signer the signer address
     /// @param owner the token's owner
+    /// @param spender the account that spend owner's token
     /// @param value the amount to be approve to spend
     /// @param deadline the deadline that vaild the owner's signature
     /// @param _nounce the _nounce
@@ -45,8 +45,8 @@ interface IFLD {
     /// @param sigS the owner's signature - s
     /// @param sigV the owner's signature - v
     function verify(
-        address signer,
         address owner,
+        address spender,
         uint256 value,
         uint256 deadline,
         uint256 _nounce,
