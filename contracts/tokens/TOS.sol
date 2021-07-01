@@ -6,13 +6,10 @@ import "../libraries/ChainId.sol";
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 
-import "../common/AccessibleCommon.sol";
+import "../common/AccessiblePlusCommon.sol";
 
 /// @title the platform token. TOS token
-contract TOS is ERC20, AccessibleCommon, ITOS {
-
-    bytes32 public constant MINTER_ROLE = keccak256("MINTER");
-    bytes32 public constant BURNER_ROLE = keccak256("BURNER");
+contract TOS is ERC20, AccessiblePlusCommon, ITOS {
 
     bytes32 public override DOMAIN_SEPARATOR;
     mapping(address => uint256) public override nonces;
@@ -44,9 +41,8 @@ contract TOS is ERC20, AccessibleCommon, ITOS {
                 )
             );
 
-        setAdmin();
-        _setRoleAdmin(BURNER_ROLE, ADMIN_ROLE);
-        _setRoleAdmin(MINTER_ROLE, ADMIN_ROLE);
+        _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
+        _setupRole(ADMIN_ROLE, msg.sender);
         _setupRole(BURNER_ROLE, msg.sender);
         _setupRole(MINTER_ROLE, msg.sender);
     }
@@ -54,11 +50,8 @@ contract TOS is ERC20, AccessibleCommon, ITOS {
     /// @dev Issue a token.
     /// @param to  who takes the issue
     /// @param amount the amount to issue
-    function mint(address to, uint256 amount) external override returns (bool) {
-        require(
-            hasRole(MINTER_ROLE, msg.sender),
-            "TOS: Caller is not a minter"
-        );
+    function mint(address to, uint256 amount) external override onlyMinter returns (bool) {
+
         _mint(to, amount);
         return true;
     }
@@ -68,13 +61,9 @@ contract TOS is ERC20, AccessibleCommon, ITOS {
     /// @param amount the amount to burn
     function burn(address from, uint256 amount)
         external
-        override
+        override onlyBurner
         returns (bool)
     {
-        require(
-            hasRole(BURNER_ROLE, msg.sender),
-            "TOS: Caller is not a burner"
-        );
         _burn(from, amount);
         return true;
     }

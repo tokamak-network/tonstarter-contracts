@@ -6,27 +6,45 @@ import "./AccessRoleCommon.sol";
 contract AccessibleCommon is AccessRoleCommon, AccessControl {
 
     modifier onlyOwner() {
-
         require(
-            hasRole(ADMIN_ROLE, msg.sender),
+            isAdmin(msg.sender),
             "Accessible: Caller is not an admin"
         );
         _;
     }
 
-    function setAdmin() public onlyOwner {
-        _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
-        _setupRole(ADMIN_ROLE, msg.sender);
+    /// @dev add admin
+    /// @param account  address to add
+    function addAdmin (address account)
+        public virtual onlyOwner
+    {
+        grantRole (ADMIN_ROLE, account);
     }
 
+    /// @dev remove admin
+    /// @param account  address to remove
+    function removeAdmin (address account)
+        public virtual onlyOwner
+    {
+        renounceRole (ADMIN_ROLE, account);
+    }
 
-    /// @dev transfer Ownership
-    /// @param newOwner new owner address
-    function transferOwnership(address newOwner) external virtual onlyOwner {
-        require(newOwner != address(0), "Accessible: zero address");
-        require(msg.sender != newOwner, "Accessible: same owner");
-        grantRole(ADMIN_ROLE, newOwner);
-        revokeRole(ADMIN_ROLE, msg.sender);
+    /// @dev transfer admin
+    /// @param newAdmin new admin address
+    function transferAdmin(address newAdmin) external virtual onlyOwner {
+        require(newAdmin != address(0), "Accessible: zero address");
+        require(msg.sender != newAdmin, "Accessible: same admin");
+
+        grantRole (ADMIN_ROLE, newAdmin);
+        renounceRole (ADMIN_ROLE, msg.sender);
+    }
+
+    /// @dev whether admin
+    /// @param account  address to check
+    function isAdmin (address account)
+        public virtual view returns (bool)
+    {
+        return hasRole (ADMIN_ROLE, account);
     }
 
 }
