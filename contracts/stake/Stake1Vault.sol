@@ -151,10 +151,6 @@ contract Stake1Vault is StakeVaultStorage, IStake1Vault {
             LibTokenStake1.StakeInfo storage totalcheck =
                 stakeInfos[stakeAddresses[i]];
 
-            if (totalcheck.endBlock <= realEndBlock) {
-                continue;
-            }
-
             uint256 total = 0;
             for (uint256 j = 0; j < stakeAddresses.length; j++) {
                 if (
@@ -164,6 +160,11 @@ contract Stake1Vault is StakeVaultStorage, IStake1Vault {
                     total = total.add(stakeInfos[stakeAddresses[j]].balance);
                 }
             }
+
+            if (totalcheck.endBlock > realEndBlock) {
+                continue;
+            }
+
             stakeEndBlockTotal[totalcheck.endBlock] = total;
             sum = sum.add(total);
 
