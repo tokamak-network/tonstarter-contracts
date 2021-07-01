@@ -292,7 +292,9 @@ contract StakeRegistry is AccessibleCommon, IStakeRegistry {
         require(phases[_phase].length > 0, "StakeRegistry: validVault is fail");
 
         for (uint256 i = 0; i < phases[_phase].length; i++) {
-            if (_vault == phases[_phase][i]) valid = true;
+            if (_vault == phases[_phase][i]) {
+                return true;
+            }
         }
     }
 }
