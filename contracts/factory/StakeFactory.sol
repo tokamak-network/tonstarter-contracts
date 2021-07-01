@@ -75,6 +75,6 @@ contract StakeFactory is IStakeFactory, AccessibleCommon {
 
         require(proxy != address(0), "StakeFactory: proxy zero");
 
-        return address(0);
+        return proxy;
     }
 }
