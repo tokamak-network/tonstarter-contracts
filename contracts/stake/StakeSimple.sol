@@ -132,7 +132,7 @@ contract StakeSimple is Stake1Storage, AccessibleCommon, IStakeSimple {
         staked.releasedBlock = block.number;
 
         uint256 amount = staked.amount;
-        staked.releasedAmount = staked.amount;
+        staked.releasedAmount = amount;
 
         // check if we send in ethers or in tokens
         if (paytoken == address(0)) {

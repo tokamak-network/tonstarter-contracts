@@ -186,7 +186,7 @@ contract StakeTON is TokamakStaker, IStakeTON {
             tonWithdraw(ton, wton, tonAmount, wtonAmount, fldAmount);
         } else if (paytoken == address(0)) {
             require(
-                staked.releasedAmount <= staked.amount,
+                staked.releasedAmount <= amount,
                 "StakeTON: Amount wrong"
             );
             staked.releasedAmount = amount;
@@ -196,7 +196,7 @@ contract StakeTON is TokamakStaker, IStakeTON {
             require(success, "StakeTON: withdraw failed.");
         } else {
             require(
-                staked.releasedAmount <= staked.amount,
+                staked.releasedAmount <= amount,
                 "StakeTON: Amount wrong"
             );
             staked.releasedAmount = amount;
