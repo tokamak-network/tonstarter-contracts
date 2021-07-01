@@ -374,10 +374,10 @@ contract TokamakStaker is StakeTONStorage, AccessibleCommon, ITokamakStaker {
             0
         ) tokamakLayer2 = address(0);
 
-        fromTokamak += IIDepositManager(depositManager).pendingUnstaked(
+        fromTokamak = fromTokamak.add(IIDepositManager(depositManager).pendingUnstaked(
             _layer2,
             address(this)
-        );
+        ));
 
         // receiveTON = false . to WTON
         IIDepositManager(depositManager).processRequests(_layer2, rn, true);
@@ -386,7 +386,6 @@ contract TokamakStaker is StakeTONStorage, AccessibleCommon, ITokamakStaker {
     }
 
     /// @dev exchange holded WTON to TOS using uniswap
-    /// @notice
     /// @param _amountIn the input amount
     /// @param _amountOutMinimum the minimun output amount
     /// @param _deadline deadline
@@ -448,7 +447,7 @@ contract TokamakStaker is StakeTONStorage, AccessibleCommon, ITokamakStaker {
             }
         }
 
-        toUniswapWTON += _amountIn;
+        toUniswapWTON = toUniswapWTON.add(_amountIn);
         (address uniswapRouter, , address wethAddress, uint256 _fee, ) =
             ITokamakRegistry(stakeRegistry).getUniswap();
         require(uniswapRouter != address(0), "TokamakStaker:uniswap zero");
@@ -549,7 +548,7 @@ contract TokamakStaker is StakeTONStorage, AccessibleCommon, ITokamakStaker {
             }
         }
 
-        toUniswapWTON += _amountIn;
+        toUniswapWTON = toUniswapWTON.add(_amountIn);
         (, , address wethAddress, , address uniswapRouterV2) =
             ITokamakRegistry(stakeRegistry).getUniswap();
 
