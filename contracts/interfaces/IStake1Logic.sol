@@ -79,9 +79,9 @@ interface IStake1Logic {
         view
         returns (address[] memory);
 
-    /// @dev list of vaults in _phaseIndex phase
-    /// @param _phaseIndex the phase number
-    function vaultsOfPhase(uint256 _phaseIndex)
+    /// @dev list of vaults in _phase
+    /// @param _phase the phase number
+    function vaultsOfPhase(uint256 _phase)
         external
         view
         returns (address[] memory);
@@ -135,10 +135,4 @@ interface IStake1Logic {
         uint256 _type
     ) external returns (uint256 amountOut);
 
-    /// @dev Get addresses of vaults of index phase
-    /// @param _phase the phase number
-    function vaultsOfPhase(uint256 _phase)
-        external
-        view
-        returns (address[] memory);
 }

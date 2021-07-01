@@ -304,15 +304,15 @@ contract Stake1Logic is StakeProxyStorage, AccessibleCommon, IStake1Logic {
         return IStake1Vault(_vault).stakeAddressesAll();
     }
 
-    /// @dev list of vaults in _phaseIndex phase
-    /// @param _phaseIndex the phase number
-    function vaultsOfPhase(uint256 _phaseIndex)
+    /// @dev list of vaults in _phase
+    /// @param _phase the _phase number
+    function vaultsOfPhase(uint256 _phase)
         external
         view
         override
         returns (address[] memory)
     {
-        return stakeRegistry.phasesAll(_phaseIndex);
+        return stakeRegistry.phasesAll(_phase);
     }
 
     /// @dev stake in tokamak's layer2
@@ -409,17 +409,5 @@ contract Stake1Logic is StakeProxyStorage, AccessibleCommon, IStake1Logic {
                 deadline,
                 _type
             );
-    }
-
-    /// @dev Get addresses of vaults of index phase
-    /// @param _phase the phase number
-    function vaultsOfPhase(uint256 _phase)
-        external
-        view
-        override
-        nonZero(address(stakeRegistry))
-        returns (address[] memory)
-    {
-        return stakeRegistry.phasesAll(_phase);
     }
 }
