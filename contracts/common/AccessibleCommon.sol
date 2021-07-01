@@ -23,6 +23,7 @@ contract AccessibleCommon is AccessRoleCommon, AccessControl {
     /// @dev transfer Ownership
     /// @param newOwner new owner address
     function transferOwnership(address newOwner) external virtual onlyOwner {
+        require(newOwner != address(0), "Accessible: zero address");
         require(msg.sender != newOwner, "Accessible: same owner");
         grantRole(ADMIN_ROLE, newOwner);
         revokeRole(ADMIN_ROLE, msg.sender);
