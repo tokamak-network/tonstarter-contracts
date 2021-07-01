@@ -193,6 +193,7 @@ contract Stake1Logic is StakeProxyStorage, AccessibleCommon, IStake1Logic {
     ) external override onlyOwner nonZero(address(stakeVaultFactory)) {
         address vault =
             stakeVaultFactory.create(
+                _phase,
                 [tos, _paytoken, address(stakeFactory), _defiAddr],
                 [_stakeType, _cap, _saleStartBlock, _stakeStartBlock],
                 address(this)
