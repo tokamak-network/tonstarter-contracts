@@ -8,13 +8,13 @@ import "../common/AccessibleCommon.sol";
 /// @title the storage of StakeVaultStorage
 contract StakeVaultStorage is AccessibleCommon {
 
-    /// @dev reward token : FLD
-    address public fld;
+    /// @dev reward token : TOS
+    address public tos;
 
     /// @dev paytoken is the token that the user stakes.
     address public paytoken;
 
-    /// @dev allocated amount of fld
+    /// @dev allocated amount of tos
     uint256 public cap;
 
     /// @dev the start block for sale.

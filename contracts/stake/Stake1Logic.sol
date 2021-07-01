@@ -12,7 +12,7 @@ import "../common/AccessibleCommon.sol";
 
 import "./StakeProxyStorage.sol";
 
-/// @title The logic of FLD Plaform
+/// @title The logic of TOS Plaform
 /// @notice Admin can createVault, createStakeContract.
 /// User can excute the tokamak staking function of each contract through this logic.
 contract Stake1Logic is StakeProxyStorage, AccessibleCommon, IStake1Logic {
@@ -31,7 +31,7 @@ contract Stake1Logic is StakeProxyStorage, AccessibleCommon, IStake1Logic {
     /// @dev event on create stake contract in vault
     /// @param vault the vault address
     /// @param stakeContract the stake contract address created
-    /// @param phase the phase of FLD platform
+    /// @param phase the phase of TOS platform
     event CreatedStakeContract(
         address indexed vault,
         address indexed stakeContract,
@@ -85,10 +85,10 @@ contract Stake1Logic is StakeProxyStorage, AccessibleCommon, IStake1Logic {
         AccessControl(target).revokeRole(role, account);
     }
 
-    /// @dev Sets FLD address
-    /// @param _fld new FLD address
-    function setFLD(address _fld) public onlyOwner nonZero(_fld) {
-        fld = _fld;
+    /// @dev Sets TOS address
+    /// @param _tos new TOS address
+    function setTOS(address _tos) public onlyOwner nonZero(_tos) {
+        tos = _tos;
     }
 
     /// @dev Sets Stake Registry address
@@ -153,7 +153,7 @@ contract Stake1Logic is StakeProxyStorage, AccessibleCommon, IStake1Logic {
     }
 
     /// Set initial variables
-    /// @param _fld  FLD token address
+    /// @param _tos  TOS token address
     /// @param _stakeRegistry the registry address
     /// @param _stakeFactory the StakeFactory address
     /// @param _stakeVaultFactory the StakeVaultFactory address
@@ -162,7 +162,7 @@ contract Stake1Logic is StakeProxyStorage, AccessibleCommon, IStake1Logic {
     /// @param _depositManager DepositManager address in Tokamak
     /// @param _seigManager SeigManager address in Tokamak
     function setStore(
-        address _fld,
+        address _tos,
         address _stakeRegistry,
         address _stakeFactory,
         address _stakeVaultFactory,
@@ -179,7 +179,7 @@ contract Stake1Logic is StakeProxyStorage, AccessibleCommon, IStake1Logic {
         nonZero(_wton)
         nonZero(_depositManager)
     {
-        setFLD(_fld);
+        setTOS(_tos);
         setStakeRegistry(_stakeRegistry);
         setStakeFactory(_stakeFactory);
         stakeVaultFactory = IStakeVaultFactory(_stakeVaultFactory);
@@ -195,7 +195,7 @@ contract Stake1Logic is StakeProxyStorage, AccessibleCommon, IStake1Logic {
     /// @param _cap  allocated reward amount
     /// @param _saleStartBlock  the start block that can stake by user
     /// @param _stakeStartBlock the start block that end staking by user and start that can claim reward by user
-    /// @param _phase  phase of FLD platform
+    /// @param _phase  phase of TOS platform
     /// @param _vaultName  vault's name's hash
     /// @param _stakeType  stakeContract's type, if 0, StakeTON, else if 1 , StakeSimple , else if 2, StakeDefi
     /// @param _defiAddr  extra defi address , default is zero address
@@ -211,7 +211,7 @@ contract Stake1Logic is StakeProxyStorage, AccessibleCommon, IStake1Logic {
     ) external override onlyOwner nonZero(address(stakeVaultFactory)) {
         address vault =
             stakeVaultFactory.create(
-                [fld, _paytoken, address(stakeFactory), _defiAddr],
+                [tos, _paytoken, address(stakeFactory), _defiAddr],
                 [_stakeType, _cap, _saleStartBlock, _stakeStartBlock],
                 address(this)
             );
@@ -222,7 +222,7 @@ contract Stake1Logic is StakeProxyStorage, AccessibleCommon, IStake1Logic {
     }
 
     /// @dev create stake contract in vault
-    /// @param _phase the phase of FLD platform
+    /// @param _phase the phase of TOS platform
     /// @param _vault  vault's address
     /// @param token  the reward token's address
     /// @param paytoken  the token used for staking by user
@@ -273,7 +273,7 @@ contract Stake1Logic is StakeProxyStorage, AccessibleCommon, IStake1Logic {
     }
 
     /// @dev create stake contract in vault
-    /// @param _phase phase of FLD platform
+    /// @param _phase phase of TOS platform
     /// @param _vaultName vault's name's hash
     /// @param _vault vault's address
     function addVault(
@@ -362,7 +362,7 @@ contract Stake1Logic is StakeProxyStorage, AccessibleCommon, IStake1Logic {
         IStakeTONTokamak(_stakeContract).tokamakProcessUnStaking(_layer2);
     }
 
-    /// @dev Swap TON to FLD using uniswap v3
+    /// @dev Swap TON to TOS using uniswap v3
     /// @dev this function used in StakeTON ( stakeType=0 )
     /// @param _stakeContract the stakeContract's address
     /// @param amountIn the input amount
@@ -370,7 +370,7 @@ contract Stake1Logic is StakeProxyStorage, AccessibleCommon, IStake1Logic {
     /// @param deadline deadline
     /// @param sqrtPriceLimitX96 sqrtPriceLimitX96
     /// @param _type the function type, if 0, use exactInputSingle function, else if, use exactInput function
-    function exchangeWTONtoFLD(
+    function exchangeWTONtoTOS(
         address _stakeContract,
         uint256 amountIn,
         uint256 amountOutMinimum,
@@ -379,7 +379,7 @@ contract Stake1Logic is StakeProxyStorage, AccessibleCommon, IStake1Logic {
         uint256 _type
     ) external override returns (uint256 amountOut) {
         return
-            IStakeTONTokamak(_stakeContract).exchangeWTONtoFLD(
+            IStakeTONTokamak(_stakeContract).exchangeWTONtoTOS(
                 amountIn,
                 amountOutMinimum,
                 deadline,
@@ -388,14 +388,14 @@ contract Stake1Logic is StakeProxyStorage, AccessibleCommon, IStake1Logic {
             );
     }
 
-    /// @dev Swap TON to FLD using uniswap v2
+    /// @dev Swap TON to TOS using uniswap v2
     /// @dev this function used in StakeTON ( stakeType=0 )
     /// @param _stakeContract the stakeContract's address
     /// @param amountIn the input amount
     /// @param amountOutMinimum the minimun output amount
     /// @param deadline deadline
     /// @param _type the function type, if 0, use exactInputSingle function, else if, use exactInput function
-    function exchangeWTONtoFLDv2(
+    function exchangeWTONtoTOSv2(
         address _stakeContract,
         uint256 amountIn,
         uint256 amountOutMinimum,
@@ -403,7 +403,7 @@ contract Stake1Logic is StakeProxyStorage, AccessibleCommon, IStake1Logic {
         uint256 _type
     ) external returns (uint256 amountOut) {
         return
-            IStakeTONTokamak(_stakeContract).exchangeWTONtoFLDv2(
+            IStakeTONTokamak(_stakeContract).exchangeWTONtoTOSv2(
                 amountIn,
                 amountOutMinimum,
                 deadline,

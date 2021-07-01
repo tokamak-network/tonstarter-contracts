@@ -5,7 +5,7 @@ import "../libraries/LibTokenStake1.sol";
 
 interface IStake1Vault {
     /// @dev Initializes all variables
-    /// @param _fld  FLD token address
+    /// @param _tos  TOS token address
     /// @param _paytoken  Tokens staked by users, can be used as ERC20 tokens.
     //                     (In case of ETH, input address(0))
     /// @param _cap  Maximum amount of rewards issued, allocated reward amount.
@@ -15,7 +15,7 @@ interface IStake1Vault {
     /// @param _stakeType  Type of staking contract, 0 TON staking, 1 basic ERC20 staking, 2 Defi linked staking
     /// @param _defiAddr Used when an external address is required. default: address(0)
     function initialize(
-        address _fld,
+        address _tos,
         address _paytoken,
         uint256 _cap,
         uint256 _saleStartBlock,
@@ -25,9 +25,9 @@ interface IStake1Vault {
         address _defiAddr
     ) external;
 
-    /// @dev Sets FLD address
-    /// @param _fld  FLD address
-    function setFLD(address _fld) external;
+    /// @dev Sets TOS address
+    /// @param _tos  TOS address
+    function setTOS(address _tos) external;
 
     /// @dev Change cap of the vault
     /// @param _cap  allocated reward amount
@@ -53,7 +53,7 @@ interface IStake1Vault {
     /// @dev claim function.
     /// @dev sender is a staking contract.
     /// @dev A function that pays the amount(_amount) to _to by the staking contract.
-    /// @dev A function that _to claim the amount(_amount) from the staking contract and gets the FLD in the vault.
+    /// @dev A function that _to claim the amount(_amount) from the staking contract and gets the TOS in the vault.
     /// @param _to a user that received reward
     /// @param _amount the receiving amount
     /// @return true
@@ -82,9 +82,9 @@ interface IStake1Vault {
             bool
         );
 
-    /// @dev Returns Give the FLD balance stored in the vault
-    /// @return the balance of FLD in this vault.
-    function balanceFLDAvailableAmount() external view returns (uint256);
+    /// @dev Returns Give the TOS balance stored in the vault
+    /// @return the balance of TOS in this vault.
+    function balanceTOSAvailableAmount() external view returns (uint256);
 
     /// @dev Give Total reward amount of stakeContract(_account)
     /// @return Total reward amount of stakeContract(_account)

@@ -17,7 +17,7 @@ import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 
 /// @title Stake Contract
 /// @notice It can be staked in Tokamak. Can be swapped using Uniswap.
-/// Stake contracts can interact with the vault to claim fld tokens
+/// Stake contracts can interact with the vault to claim tos tokens
 contract StakeTON is TokamakStaker, IStakeTON {
     using SafeMath for uint256;
 
@@ -35,8 +35,8 @@ contract StakeTON is TokamakStaker, IStakeTON {
     /// @dev event on withdrawal
     /// @param to the sender
     /// @param tonAmount the amount of TON withdrawal
-    /// @param fldAmount the amount of FLD withdrawal
-    event Withdrawal(address indexed to, uint256 tonAmount, uint256 fldAmount);
+    /// @param tosAmount the amount of TOS withdrawal
+    event Withdrawal(address indexed to, uint256 tonAmount, uint256 tosAmount);
 
     /// @dev constructor of StakeTON
     constructor() {
@@ -86,7 +86,7 @@ contract StakeTON is TokamakStaker, IStakeTON {
         if (!withdrawFlag) {
             withdrawFlag = true;
             if (paytoken == ton) {
-                swappedAmountFLD = IIERC20(token).balanceOf(address(this));
+                swappedAmountTOS = IIERC20(token).balanceOf(address(this));
                 finalBalanceWTON = IIERC20(wton).balanceOf(address(this));
                 finalBalanceTON = IIERC20(ton).balanceOf(address(this));
                 require(
@@ -105,22 +105,22 @@ contract StakeTON is TokamakStaker, IStakeTON {
         if (paytoken == ton) {
             uint256 tonAmount = 0;
             uint256 wtonAmount = 0;
-            uint256 fldAmount = 0;
+            uint256 tosAmount = 0;
             if (finalBalanceTON > 0)
                 tonAmount = finalBalanceTON.mul(amount).div(totalStakedAmount);
             if (finalBalanceWTON > 0)
                 wtonAmount = finalBalanceWTON.mul(amount).div(
                     totalStakedAmount
                 );
-            if (swappedAmountFLD > 0)
-                fldAmount = swappedAmountFLD.mul(amount).div(totalStakedAmount);
+            if (swappedAmountTOS > 0)
+                tosAmount = swappedAmountTOS.mul(amount).div(totalStakedAmount);
 
-            staked.releasedFLDAmount = fldAmount;
+            staked.releasedTOSAmount = tosAmount;
             if (wtonAmount > 0)
                 staked.releasedAmount = wtonAmount.div(10**9).add(tonAmount);
             else staked.releasedAmount = tonAmount;
 
-            tonWithdraw(ton, wton, tonAmount, wtonAmount, fldAmount);
+            tonWithdraw(ton, wton, tonAmount, wtonAmount, tosAmount);
         } else if (paytoken == address(0)) {
             require(
                 staked.releasedAmount <= amount,
@@ -146,7 +146,7 @@ contract StakeTON is TokamakStaker, IStakeTON {
         emit Withdrawal(
             msg.sender,
             staked.releasedAmount,
-            staked.releasedFLDAmount
+            staked.releasedTOSAmount
         );
     }
 
@@ -155,13 +155,13 @@ contract StakeTON is TokamakStaker, IStakeTON {
     /// @param wton  WTON address
     /// @param tonAmount  the amount of TON to be withdrawn to msg.sender
     /// @param wtonAmount  the amount of WTON to be withdrawn to msg.sender
-    /// @param fldAmount  the amount of FLD to be withdrawn to msg.sender
+    /// @param tosAmount  the amount of TOS to be withdrawn to msg.sender
     function tonWithdraw(
         address ton,
         address wton,
         uint256 tonAmount,
         uint256 wtonAmount,
-        uint256 fldAmount
+        uint256 tosAmount
     ) internal {
         if (tonAmount > 0) {
             require(
@@ -184,14 +184,14 @@ contract StakeTON is TokamakStaker, IStakeTON {
                 "StakeTON: transfer wton fail"
             );
         }
-        if (fldAmount > 0) {
+        if (tosAmount > 0) {
             require(
-                IIERC20(token).balanceOf(address(this)) >= fldAmount,
-                "StakeTON: fld balance is lack"
+                IIERC20(token).balanceOf(address(this)) >= tosAmount,
+                "StakeTON: tos balance is lack"
             );
             require(
-                IIERC20(token).transfer(msg.sender, fldAmount),
-                "StakeTON: transfer fld fail"
+                IIERC20(token).transfer(msg.sender, tosAmount),
+                "StakeTON: transfer tos fail"
             );
         }
     }

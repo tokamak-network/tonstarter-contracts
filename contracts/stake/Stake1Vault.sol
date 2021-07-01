@@ -3,16 +3,16 @@ pragma solidity ^0.7.6;
 pragma abicoder v2;
 
 import "../interfaces/IStake1Vault.sol";
-import {IFLD} from "../interfaces/IFLD.sol";
+import {ITOS} from "../interfaces/ITOS.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "../interfaces/IStake1Storage.sol";
 import "../libraries/LibTokenStake1.sol";
 import {SafeMath} from "../utils/math/SafeMath.sol";
 import "./StakeVaultStorage.sol";
 
-/// @title FLD Token's Vault - stores the fld for the period of time
+/// @title TOS Token's Vault - stores the TOS for the period of time
 /// @notice A vault is associated with the set of stake contracts.
-/// Stake contracts can interact with the vault to claim fld tokens
+/// Stake contracts can interact with the vault to claim TOS tokens
 contract Stake1Vault is StakeVaultStorage, IStake1Vault {
     using SafeMath for uint256;
 
@@ -33,7 +33,7 @@ contract Stake1Vault is StakeVaultStorage, IStake1Vault {
     receive() external payable {}
 
     /// @dev Initializes all variables
-    /// @param _fld  FLD token address
+    /// @param _tos  TOS token address
     /// @param _paytoken  Tokens staked by users, can be used as ERC20 tokens.
     //                     (In case of ETH, input address(0))
     /// @param _cap  Maximum amount of rewards issued, allocated reward amount.
@@ -43,7 +43,7 @@ contract Stake1Vault is StakeVaultStorage, IStake1Vault {
     /// @param _stakeType  Type of staking contract, 0 TON staking, 1 basic ERC20 staking, 2 Defi linked staking
     /// @param _defiAddr Used when an external address is required. default: address(0)
     function initialize(
-        address _fld,
+        address _tos,
         address _paytoken,
         uint256 _cap,
         uint256 _saleStartBlock,
@@ -53,7 +53,7 @@ contract Stake1Vault is StakeVaultStorage, IStake1Vault {
         address _defiAddr
     ) external override onlyOwner {
         require(
-            _fld != address(0) && _stakefactory != address(0),
+            _tos != address(0) && _stakefactory != address(0),
             "Stake1Vault: input is zero"
         );
         require(_cap > 0, "Stake1Vault: _cap is zero");
@@ -62,7 +62,7 @@ contract Stake1Vault is StakeVaultStorage, IStake1Vault {
             "Stake1Vault: startBlock is unavailable"
         );
 
-        fld = _fld;
+        tos = _tos;
         cap = _cap;
         paytoken = _paytoken;
         saleStartBlock = _saleStartBlock;
@@ -73,11 +73,11 @@ contract Stake1Vault is StakeVaultStorage, IStake1Vault {
         grantRole(ADMIN_ROLE, _stakefactory);
     }
 
-    /// @dev Sets FLD address
-    /// @param _fld  FLD address
-    function setFLD(address _fld) external override onlyOwner {
-        require(_fld != address(0), "Stake1Vault: input is zero");
-        fld = _fld;
+    /// @dev Sets TOS address
+    /// @param _tos  TOS address
+    function setTOS(address _tos) external override onlyOwner {
+        require(_tos != address(0), "Stake1Vault: input is zero");
+        tos = _tos;
     }
 
     /// @dev Change cap of the vault
@@ -237,7 +237,7 @@ contract Stake1Vault is StakeVaultStorage, IStake1Vault {
     /// @dev claim function.
     /// @dev sender is a staking contract.
     /// @dev A function that pays the amount(_amount) to _to by the staking contract.
-    /// @dev A function that _to claim the amount(_amount) from the staking contract and gets the FLD in the vault.
+    /// @dev A function that _to claim the amount(_amount) from the staking contract and gets the tos in the vault.
     /// @param _to a user that received reward
     /// @param _amount the receiving amount
     /// @return true
@@ -247,8 +247,8 @@ contract Stake1Vault is StakeVaultStorage, IStake1Vault {
         returns (bool)
     {
         require(saleClosed && _amount > 0, "Stake1Vault: on sale or need to end the sale");
-        uint256 fldBalance = IERC20(fld).balanceOf(address(this));
-        require(fldBalance >= _amount, "Stake1Vault: not enough balance");
+        uint256 tosBalance = IERC20(tos).balanceOf(address(this));
+        require(tosBalance >= _amount, "Stake1Vault: not enough balance");
 
         LibTokenStake1.StakeInfo storage stakeInfo = stakeInfos[msg.sender];
         require(stakeInfo.startBlock > 0, "Stake1Vault: startBlock zero");
@@ -265,8 +265,8 @@ contract Stake1Vault is StakeVaultStorage, IStake1Vault {
         stakeInfo.claimRewardAmount = stakeInfo.claimRewardAmount.add(_amount);
 
         require(
-            IERC20(fld).transfer(_to, _amount),
-            "Stake1Vault: FLD transfer fail"
+            IERC20(tos).transfer(_to, _amount),
+            "Stake1Vault: TOS transfer fail"
         );
 
         emit ClaimedReward(msg.sender, _to, _amount);
@@ -284,8 +284,8 @@ contract Stake1Vault is StakeVaultStorage, IStake1Vault {
         returns (bool)
     {
         require(saleClosed, "Stake1Vault: on sale or need to end the sale");
-        uint256 fldBalance = IERC20(fld).balanceOf(address(this));
-        require(fldBalance >= _amount, "not enough");
+        uint256 tosBalance = IERC20(tos).balanceOf(address(this));
+        require(tosBalance >= _amount, "not enough");
 
         LibTokenStake1.StakeInfo storage stakeInfo = stakeInfos[_to];
         require(stakeInfo.startBlock > 0, "Stake1Vault: startBlock is zero");
@@ -303,15 +303,15 @@ contract Stake1Vault is StakeVaultStorage, IStake1Vault {
         return true;
     }
 
-    /// @dev Returns Give the FLD balance stored in the vault
-    /// @return the balance of FLD in this vault.
-    function balanceFLDAvailableAmount()
+    /// @dev Returns Give the TOS balance stored in the vault
+    /// @return the balance of TOS in this vault.
+    function balanceTOSAvailableAmount()
         external
         view
         override
         returns (uint256)
     {
-        return IERC20(fld).balanceOf(address(this));
+        return IERC20(tos).balanceOf(address(this));
     }
 
     /// @dev Give all stakeContracts's addresses in this vault

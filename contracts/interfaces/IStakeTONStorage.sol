@@ -26,8 +26,8 @@ interface IStakeTONStorage {
     /// @dev the accumulated WTON amount swapped using uniswap , in ray unit
     function toUniswapWTON() external view returns (uint256);
 
-    /// @dev the FLD balance in this contract
-    function swappedAmountFLD() external view returns (uint256);
+    /// @dev the TOS balance in this contract
+    function swappedAmountTOS() external view returns (uint256);
 
     /// @dev the TON balance in this contract when withdraw at first
     function finalBalanceTON() external view returns (uint256);

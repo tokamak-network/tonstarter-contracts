@@ -8,7 +8,7 @@ import "../common/AccessibleCommon.sol";
 import "./StakeProxyStorage.sol";
 import "./ProxyBase.sol";
 
-/// @title The proxy of FLD Plaform
+/// @title The proxy of TOS Plaform
 /// @notice Admin can createVault, createStakeContract.
 /// User can excute the tokamak staking function of each contract through this logic.
 contract Stake1Proxy is StakeProxyStorage, AccessibleCommon, ProxyBase, IStakeProxy  {

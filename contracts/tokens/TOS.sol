@@ -1,21 +1,21 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity ^0.7.6;
 
-import "../interfaces/IFLD.sol";
+import "../interfaces/ITOS.sol";
 import "../libraries/ChainId.sol";
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 
 import "../common/AccessibleCommon.sol";
 
-/// @title the platform token. FLD token
-contract FLD is ERC20, AccessibleCommon, IFLD {
+/// @title the platform token. TOS token
+contract TOS is ERC20, AccessibleCommon, ITOS {
 
     bytes32 public constant MINTER_ROLE = keccak256("MINTER");
     bytes32 public constant BURNER_ROLE = keccak256("BURNER");
 
-    // string public constant name1 = "FLD";
-    // string public constant symbol1 = "FLD";
+    // string public constant name1 = "TOS";
+    // string public constant symbol1 = "TOS";
     /// @dev The hash of the name used in the permit signature verification
     bytes32 private immutable nameHash;
 
@@ -29,7 +29,7 @@ contract FLD is ERC20, AccessibleCommon, IFLD {
     bytes32 public constant PERMIT_TYPEHASH =
         0x6e71edae12b1b97f4d1f60370fef10105fa2faae0126114a169c64845d6126c9;
 
-    /// @dev constructor of FLD, ERC20 Token
+    /// @dev constructor of TOS, ERC20 Token
     constructor(
         string memory name_,
         string memory symbol_,
@@ -72,7 +72,7 @@ contract FLD is ERC20, AccessibleCommon, IFLD {
     function mint(address to, uint256 amount) external override returns (bool) {
         require(
             hasRole(MINTER_ROLE, msg.sender),
-            "FLD: Caller is not a minter"
+            "TOS: Caller is not a minter"
         );
         _mint(to, amount);
         return true;
@@ -88,7 +88,7 @@ contract FLD is ERC20, AccessibleCommon, IFLD {
     {
         require(
             hasRole(BURNER_ROLE, msg.sender),
-            "FLD: Caller is not a burner"
+            "TOS: Caller is not a burner"
         );
         _burn(from, amount);
         return true;
@@ -112,7 +112,7 @@ contract FLD is ERC20, AccessibleCommon, IFLD {
         bytes32 r,
         bytes32 s
     ) external override {
-        require(deadline >= block.timestamp, "FLD: permit EXPIRED");
+        require(deadline >= block.timestamp, "TOS: permit EXPIRED");
 
         bytes32 digest =
             keccak256(
@@ -132,14 +132,14 @@ contract FLD is ERC20, AccessibleCommon, IFLD {
                 )
             );
 
-        require(owner != spender, "FLD: approval to current owner");
+        require(owner != spender, "TOS: approval to current owner");
 
         // if (Address.isContract(owner)) {
         //     require(IERC1271(owner).isValidSignature(digest, abi.encodePacked(r, s, v)) == 0x1626ba7e, 'Unauthorized');
         // } else {
         address recoveredAddress = ecrecover(digest, v, r, s);
-        require(recoveredAddress != address(0), "FLD: Invalid signature");
-        require(recoveredAddress == owner, "FLD: Unauthorized");
+        require(recoveredAddress != address(0), "TOS: Invalid signature");
+        require(recoveredAddress == owner, "TOS: Unauthorized");
         // }
         _approve(owner, spender, value);
     }

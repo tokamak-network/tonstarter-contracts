@@ -15,7 +15,7 @@ interface IStakeVaultProxy {
     function implementation() external view returns (address);
 
     /// @dev set initial storage
-    /// @param _fld  FLD token address
+    /// @param _tos  TOS token address
     /// @param _paytoken  Tokens staked by users, can be used as ERC20 tokens.
     //                     (In case of ETH, input address(0))
     /// @param _cap  Maximum amount of rewards issued, allocated reward amount.
@@ -25,7 +25,7 @@ interface IStakeVaultProxy {
     /// @param _stakeType  Type of staking contract, 0 TON staking, 1 basic ERC20 staking, 2 Defi linked staking
     /// @param _defiAddr Used when an external address is required. default: address(0)
     function initialize(
-        address _fld,
+        address _tos,
         address _paytoken,
         uint256 _cap,
         uint256 _saleStartBlock,

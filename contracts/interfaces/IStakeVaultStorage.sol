@@ -3,13 +3,13 @@ pragma solidity ^0.7.6;
 pragma abicoder v2;
 
 interface IStakeVaultStorage {
-    /// @dev reward token : FLD
-    function fld() external view returns (address);
+    /// @dev reward token : TOS
+    function tos() external view returns (address);
 
     /// @dev paytoken is the token that the user stakes.
     function paytoken() external view returns (address);
 
-    /// @dev allocated amount of fld
+    /// @dev allocated amount of TOS
     function cap() external view returns (uint256);
 
     /// @dev Operation type of staking amount

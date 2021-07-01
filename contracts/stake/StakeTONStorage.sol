@@ -33,8 +33,8 @@ contract StakeTONStorage is Stake1Storage {
     /// @dev the accumulated WTON amount swapped using uniswap , in ray unit
     uint256 public toUniswapWTON;
 
-    /// @dev the FLD balance in this contract
-    uint256 public swappedAmountFLD;
+    /// @dev the TOS balance in this contract
+    uint256 public swappedAmountTOS;
 
     /// @dev the TON balance in this contract when withdraw at first
     uint256 public finalBalanceTON;

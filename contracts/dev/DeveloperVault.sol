@@ -8,7 +8,7 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 /// @title DeveloperVault
 contract DeveloperVault is AccessControl, IDeveloperVault {
-    address public fld;
+    address public tos;
     uint256 public cap;
     uint256 public rewardPeriod;
     uint256 public startRewardBlock;
@@ -38,15 +38,15 @@ contract DeveloperVault is AccessControl, IDeveloperVault {
     }
 
     /// @dev set initial storage
-    /// @param _fld the FLD address
-    /// @param _cap the allocated FLD amount to devs
+    /// @param _tos the TOS address
+    /// @param _cap the allocated TOS amount to devs
     /// @param _rewardPeriod given only once per _rewardPeriod.
     /// @param _startRewardBlock the start block to give .
     /// @param _claimsNumberMax Total number of payments
     /// @param _developers the developer list
     /// @param _claimAmounts How much do you pay at one time?
     function initialize(
-        address _fld,
+        address _tos,
         uint256 _cap,
         uint256 _rewardPeriod,
         uint256 _startRewardBlock,
@@ -54,7 +54,7 @@ contract DeveloperVault is AccessControl, IDeveloperVault {
         address[] memory _developers,
         uint256[] memory _claimAmounts
     ) external override onlyAdmin {
-        require(_fld != address(0), "DeveloperVault: fld is zero");
+        require(_tos != address(0), "DeveloperVault: tos is zero");
         require(
             _claimAmounts.length == _developers.length,
             "DeveloperVault: length is different"
@@ -73,7 +73,7 @@ contract DeveloperVault is AccessControl, IDeveloperVault {
             totalClaimPossible <= cap,
             "DeveloperVault: total claim possible greater than cap"
         );
-        fld = _fld;
+        tos = _tos;
         cap = _cap;
         rewardPeriod = _rewardPeriod;
         startRewardBlock = _startRewardBlock;
@@ -81,7 +81,7 @@ contract DeveloperVault is AccessControl, IDeveloperVault {
         developers = _developers;
     }
 
-    /// @dev Developers can receive their FLDs
+    /// @dev Developers can receive their TOSs
     function claimReward() external override {
         DeveloperInfo storage devInfo = developersInfo[msg.sender];
         require(
@@ -105,7 +105,7 @@ contract DeveloperVault is AccessControl, IDeveloperVault {
         uint256 allPastRewards = devInfo.claimAmount * n;
         devInfo.claimsNumber += n;
 
-        IERC20(fld).transfer(msg.sender, allPastRewards);
+        IERC20(tos).transfer(msg.sender, allPastRewards);
 
     }
 
