@@ -26,15 +26,19 @@ const ADMIN_ROLE = keccak256("ADMIN");
 const PERMIT_TYPEHASH = keccak256("Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)");
 const EIP712Domain =  keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)");
 
-async function deployFLD(name, symbol, version) {
+async function deployTOS(name, symbol, version) {
   const [deployer, user1] = await ethers.getSigners();
 
-  const FLD = await ethers.getContractFactory("FLD");
-  const fld = await FLD.deploy(name, symbol, version);
-  await fld.deployed();
-  console.log('fld',fld.address);
+  const TOS = await ethers.getContractFactory("TOS");
+  const tos = await TOS.deploy(name, symbol, version);
+  await tos.deployed();
+  console.log('tos',tos.address);
 
-  return fld.address;
+  // await tos.grantRole(MINTER_ROLE, deployer.address);
+  await tos.mint(deployer.address, utils.parseUnits(initialTotal, 18));
+  console.log("tos mint to:", deployer.address);
+
+  return tos.address;
 }
 
 async function main() {
@@ -47,12 +51,12 @@ async function main() {
   console.log("PERMIT_TYPEHASH:", PERMIT_TYPEHASH );
   console.log("EIP712Domain:", EIP712Domain );
 
-  let name = "FLDTEST";
-  let symbol = "FLDT";
+  let name = "TON Starter";
+  let symbol = "TOS";
   let version = "1";
 
-  const contracts = await deployFLD(name, symbol, version);
-  console.log("contracts:", process.env.NETWORK, contracts);
+  const contracts = await deployTOS(name, symbol, version);
+  console.log("TOS address:", process.env.NETWORK, contracts);
 
 }
 

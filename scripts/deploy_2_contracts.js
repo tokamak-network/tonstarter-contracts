@@ -23,24 +23,24 @@ const Pharse1_TON_Staking =
   process.env.Pharse1_TON_Staking + "." + "0".repeat(18);
 const Pharse1_ETH_Staking =
   process.env.Pharse1_ETH_Staking + "." + "0".repeat(18);
-const Pharse1_FLDETHLP_Staking =
-  process.env.Pharse1_FLDETHLP_Staking + "." + "0".repeat(18);
+const Pharse1_TOSETHLP_Staking =
+  process.env.Pharse1_TOSETHLP_Staking + "." + "0".repeat(18);
 const Pharse1_DEV_Mining =
   process.env.Pharse1_DEV_Mining + "." + "0".repeat(18);
 
 const Pharse2_TOTAL = process.env.Pharse2_TOTAL + "." + "0".repeat(18);
-const Pharse2_FLDETH_Staking =
-  process.env.Pharse2_FLDETH_Staking + "." + "0".repeat(18);
-const Pharse2_FLD_Staking =
-  process.env.Pharse2_FLD_Staking + "." + "0".repeat(18);
+const Pharse2_TOSETH_Staking =
+  process.env.Pharse2_TOSETH_Staking + "." + "0".repeat(18);
+const Pharse2_TOS_Staking =
+  process.env.Pharse2_TOS_Staking + "." + "0".repeat(18);
 const Pharse2_DEV_Mining =
   process.env.Pharse2_DEV_Mining + "." + "0".repeat(18);
 
 const Pharse3_TOTAL = process.env.Pharse3_TOTAL + "." + "0".repeat(18);
-const Pharse3_FLDETH_Staking =
-  process.env.Pharse3_FLDETH_Staking + "." + "0".repeat(18);
-const Pharse3_FLD_Staking =
-  process.env.Pharse3_FLD_Staking + "." + "0".repeat(18);
+const Pharse3_TOSETH_Staking =
+  process.env.Pharse3_TOSETH_Staking + "." + "0".repeat(18);
+const Pharse3_TOS_Staking =
+  process.env.Pharse3_TOS_Staking + "." + "0".repeat(18);
 const Pharse3_DEV_Mining =
   process.env.Pharse3_DEV_Mining + "." + "0".repeat(18);
 
@@ -54,22 +54,14 @@ const CLAIMER_ROLE = keccak256("CLAIMER");
 const PHASE2_VAULT_HASH = keccak256("PHASE2_VAULT");
 const EVENT_VAULT_HASH = keccak256("EVENT_VAULT");
 
-const fldtoken = loadDeployedInitVariable(process.env.NETWORK, "FLD");
-
-const name = "FLD";
-const symbol = "FLD";
-const version = "1";
+const tostoken = loadDeployedInitVariable(process.env.NETWORK, "TOS");
 
 async function deployMain(defaultSender) {
   const [deployer, user1] = await ethers.getSigners();
 
-  const FLD = await ethers.getContractFactory("FLD");
-  const fld = await FLD.deploy(name, symbol, version);
-  await fld.deployed();
-
-  // const FLD_Address = fldtoken;
-  // const fld = await ethers.getContractAt("FLD", FLD_Address);
-  // console.log("fld:", fld.address);
+  const TOS_Address = tostoken;
+  const tos = await ethers.getContractAt("TOS", TOS_Address);
+  console.log("tos:", tos.address);
 
   const StakeSimple = await ethers.getContractFactory("StakeSimple");
   const StakeSimpleFactory = await ethers.getContractFactory(
@@ -129,7 +121,7 @@ async function deployMain(defaultSender) {
   await stakeFactory.deployed();
   console.log("stakeFactory:", stakeFactory.address);
 
-  const stakeRegistry = await StakeRegistry.deploy(fld.address);
+  const stakeRegistry = await StakeRegistry.deploy(tos.address);
   await stakeRegistry.deployed();
   console.log("stakeRegistry:", stakeRegistry.address);
 
@@ -159,7 +151,7 @@ async function deployMain(defaultSender) {
   console.log("stakeEntry:", stakeEntry.address);
 
   const out = {};
-  out.FLD = fld.address;
+  out.TOS = tos.address;
   out.StakeSimple = stakeSimple.address;
   out.StakeSimpleFactory = stakeSimpleFactory.address;
   out.StakeTONLogic = stakeTONLogic.address;
@@ -189,7 +181,7 @@ async function main() {
   // The address the Contract WILL have once mined
 
   const out = {};
-  out.FLD = contracts.FLD;
+  out.TOS = contracts.TOS;
   out.StakeSimple = contracts.StakeSimple;
   out.StakeSimpleFactory = contracts.StakeSimpleFactory;
   out.StakeTONLogic = contracts.StakeTONLogic;
