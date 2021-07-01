@@ -156,7 +156,7 @@ contract StakeTONProxy is StakeTONStorage, AccessibleCommon, ProxyBase, OnApprov
 
         require(
             !IStakeVaultStorage(vault).saleClosed(),
-            "StakeTONProxy: not end"
+            "StakeTONProxy: end sale"
         );
         require(
             IIERC20(paytoken).balanceOf(_owner) >= _amount,
