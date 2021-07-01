@@ -43,73 +43,10 @@ contract StakeTON is TokamakStaker, IStakeTON {
 
     }
 
-    /// @dev receive ether
-    /// @dev call stake function with msg.value
+    /// @dev This contract cannot stake Ether.
     receive() external payable {
-        // stake(msg.value);
+        revert("cannot stake Ether");
     }
-
-    /// @dev Initialize
-    // function initialize(
-    //     address _token,
-    //     address _paytoken,
-    //     address _vault,
-    //     uint256 _saleStartBlock,
-    //     uint256 _startBlock,
-    //     uint256 _period
-    // ) external onlyOwner {
-    //     require(
-    //         _token != address(0) &&
-    //             _vault != address(0) &&
-    //             _saleStartBlock < _startBlock, "zero"
-    //     );
-    //     token = _token;
-    //     paytoken = _paytoken;
-    //     vault = _vault;
-    //     saleStartBlock = _saleStartBlock;
-    //     startBlock = _startBlock;
-    //     endBlock = startBlock.add(_period);
-    // }
-
-    /// @dev Stake amount
-    /// @param amount  the amount of staked
-    /* function stake(uint256 amount) public payable override {
-        require(
-            (paytoken == address(0) && msg.value == amount) ||
-                (paytoken != address(0) && amount > 0),
-            "StakeTON: zero"
-        );
-        require(
-            block.number >= saleStartBlock && block.number < startBlock,
-            "StakeTON: unavailable"
-        );
-
-        require(!IIStake1Vault(vault).saleClosed(), "StakeTON: not end");
-
-        if (paytoken == address(0)) amount = msg.value;
-        else
-            require(
-                IIERC20(paytoken).balanceOf(msg.sender) >= amount,
-                "StakeTON: insuffient"
-            );
-
-        LibTokenStake1.StakedAmount storage staked = userStaked[msg.sender];
-        if (staked.amount == 0)  totalStakers = totalStakers.add(1);
-
-        staked.amount = staked.amount.add(amount);
-        totalStakedAmount = totalStakedAmount.add(amount);
-        if (paytoken != address(0))
-            require(
-                IIERC20(paytoken).transferFrom(
-                    msg.sender,
-                    address(this),
-                    amount
-                )
-            );
-
-        emit Staked(msg.sender, amount);
-    }
-    */
 
     /// @dev withdraw
     function withdraw() external override {
