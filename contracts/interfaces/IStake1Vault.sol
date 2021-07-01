@@ -37,6 +37,10 @@ interface IStake1Vault {
     /// @param _defiAddr DeFi related address
     function setDefiAddr(address _defiAddr) external;
 
+    /// @dev If the vault has more money than the reward to give, the owner can withdraw the remaining amount.
+    /// @param _amount the amount of withdrawal
+    function withdrawReward(uint256 _amount) external;
+
     /// @dev  Add stake contract
     /// @param _name stakeContract's name
     /// @param stakeContract stakeContract's address
