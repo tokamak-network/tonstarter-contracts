@@ -3,16 +3,18 @@ pragma solidity ^0.7.0;
 
 import "../interfaces/IStakeSimple.sol";
 import {IIStake1Vault} from "../interfaces/IIStake1Vault.sol";
-import {IIERC20} from "../interfaces/IIERC20.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "../libraries/LibTokenStake1.sol";
 import {SafeMath} from "../utils/math/SafeMath.sol";
 import "../common/AccessibleCommon.sol";
 import "../stake/Stake1Storage.sol";
+import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 
 /// @title Simple Stake Contract
 /// @notice Stake contracts can interact with the vault to claim fld tokens
 contract StakeSimple is Stake1Storage, AccessibleCommon, IStakeSimple {
     using SafeMath for uint256;
+    using SafeERC20 for IERC20;
 
     modifier lock() {
         require(_lock == 0, "StakeSimple: LOCKED");
@@ -94,7 +96,7 @@ contract StakeSimple is Stake1Storage, AccessibleCommon, IStakeSimple {
         require(!IIStake1Vault(vault).saleClosed(), "not end");
 
         if (paytoken == address(0)) amount = msg.value;
-        else require(IIERC20(paytoken).balanceOf(msg.sender) >= amount, "lack");
+        else require(IERC20(paytoken).balanceOf(msg.sender) >= amount, "lack");
 
         LibTokenStake1.StakedAmount storage staked = userStaked[msg.sender];
         if (staked.amount == 0) totalStakers = totalStakers.add(1);
@@ -102,13 +104,10 @@ contract StakeSimple is Stake1Storage, AccessibleCommon, IStakeSimple {
         staked.amount = staked.amount.add(amount);
         totalStakedAmount = totalStakedAmount.add(amount);
         if (paytoken != address(0))
-            require(
-                IIERC20(paytoken).transferFrom(
-                    msg.sender,
-                    address(this),
-                    amount
-                ),
-                "StakeSimple: fail transferFrom"
+            IERC20(paytoken).safeTransferFrom(
+                msg.sender,
+                address(this),
+                amount
             );
 
         emit Staked(msg.sender, amount);
@@ -141,10 +140,7 @@ contract StakeSimple is Stake1Storage, AccessibleCommon, IStakeSimple {
             (bool success, ) = msg.sender.call{value: amount}("");
             require(success, "StakeSimple: withdraw failed.");
         } else {
-            require(
-                IIERC20(paytoken).transfer(msg.sender, amount),
-                "StakeSimple: transfer fail"
-            );
+            IERC20(paytoken).safeTransfer(msg.sender, amount);
         }
 
         emit Withdrawal(msg.sender, amount);
