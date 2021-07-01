@@ -107,6 +107,8 @@ contract StakeVaultProxy is StakeVaultStorage, ProxyBase, IStakeVaultProxy {
         uint256 _stakeType,
         address _defiAddr
     ) external override onlyOwner {
+        require(tos == address(0), "StakeVaultProxy: already initialized");
+
         require(
             _tos != address(0) && _stakefactory != address(0),
             "StakeVaultProxy: input is zero"

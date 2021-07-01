@@ -99,9 +99,10 @@ contract StakeDefiProxy is Stake1Storage, AccessibleCommon, ProxyBase, IStakeDef
         address _registry,
         uint256[3] memory _intdata
     ) external onlyOwner {
+        require(token == address(0), "StakeDefiProxy: already initialized");
         require(
             _addr[2] != address(0) && _intdata[0] < _intdata[1],
-            "setInit fail"
+            "StakeDefiProxy: setInit fail"
         );
         token = _addr[0];
         paytoken = _addr[1];

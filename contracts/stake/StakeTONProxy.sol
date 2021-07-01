@@ -186,6 +186,8 @@ contract StakeTONProxy is StakeTONStorage, AccessibleCommon, ProxyBase, OnApprov
         address _registry,
         uint256[3] memory _intdata
     ) external onlyOwner {
+        require(token == address(0), "StakeTONProxy: already initialized");
+
         require(
             _registry != address(0) &&
                 _addr[2] != address(0) &&

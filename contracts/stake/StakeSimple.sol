@@ -49,37 +49,6 @@ contract StakeSimple is Stake1Storage, AccessibleCommon, IStakeSimple {
         stake(msg.value);
     }
 
-
-    /// @dev Initialize
-    /// @param _token  the reward token address , It is TOS address.
-    /// @param _paytoken  Tokens staked by users, can be used as ERC20 tokens.
-    //                     (In case of ETH, input address(0))
-    /// @param _vault  the _ault's address
-    /// @param _saleStartBlock  the sale start block
-    /// @param _startBlock  the staking start block
-    /// @param _period the period that user can generate reward amount
-    function initialize(
-        address _token,
-        address _paytoken,
-        address _vault,
-        uint256 _saleStartBlock,
-        uint256 _startBlock,
-        uint256 _period
-    ) external override onlyOwner {
-        require(
-            _token != address(0) &&
-                _vault != address(0) &&
-                _saleStartBlock < _startBlock,
-            "StakeSimple: initialize zero"
-        );
-        token = _token;
-        paytoken = _paytoken;
-        vault = _vault;
-        saleStartBlock = _saleStartBlock;
-        startBlock = _startBlock;
-        endBlock = startBlock.add(_period);
-    }
-
     /// @dev Stake amount
     /// @param amount  the amount of staked
     function stake(uint256 amount) public payable override {

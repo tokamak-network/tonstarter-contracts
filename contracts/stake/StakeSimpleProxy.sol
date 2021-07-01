@@ -89,6 +89,7 @@ contract StakeSimpleProxy is Stake1Storage, AccessibleCommon, ProxyBase {
         external
         onlyOwner
     {
+        require(token == address(0), "StakeSimpleProxy: already initialized");
         require(
             _addr[2] != address(0) && _intdata[0] < _intdata[1],
             "StakeSimpleProxy: setInit fail"
