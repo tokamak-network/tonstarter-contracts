@@ -83,9 +83,9 @@ contract StakeSimpleProxy is Stake1Storage, AccessibleCommon, ProxyBase {
     }
 
     /// @dev set initial storage
-    /// @param _addr the array addresses of token, paytoken, vault
+    /// @param _addr the array addresses of token, paytoken, vault, defiAddr
     /// @param _intdata the array valued of saleStartBlock, stakeStartBlock, periodBlocks
-    function setInit(address[3] memory _addr, uint256[3] memory _intdata)
+    function setInit(address[4] memory _addr, address _registry, uint256[3] memory _intdata)
         external
         onlyOwner
     {
@@ -97,6 +97,9 @@ contract StakeSimpleProxy is Stake1Storage, AccessibleCommon, ProxyBase {
         token = _addr[0];
         paytoken = _addr[1];
         vault = _addr[2];
+        defiAddr = _addr[3];
+
+        stakeRegistry = _registry;
 
         saleStartBlock = _intdata[0];
         startBlock = _intdata[1];

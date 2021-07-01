@@ -15,15 +15,9 @@ interface IStakeFactory {
         uint256[3] calldata _intdata
     ) external returns (address);
 
-    /// @dev Set StakeTONFactory address
-    /// @param _stakeTONFactory new StakeTONFactory address
-    function setStakeTONFactory(address _stakeTONFactory) external;
+    /// @dev Set factory address by StakeType
+    /// @param _stakeType the stake type , 0:TON, 1: Simple, 2: UniswapV3LP
+    /// @param _factory the factory address
+    function setFactoryByStakeType(uint256 _stakeType, address _factory) external;
 
-    /// @dev Set StakeDefiFactory address
-    /// @param _stakeDefiFactory new StakeDefiFactory address
-    function setStakeDefiFactory(address _stakeDefiFactory) external;
-
-    /// @dev Set StakeSimpleFactory address
-    /// @param _stakeSimpleFactory new StakeSimpleFactory address
-    function setStakeSimpleFactory(address _stakeSimpleFactory) external;
 }

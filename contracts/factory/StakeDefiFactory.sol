@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.7.6;
 
-import "../interfaces/IStakeDefiFactory.sol";
+import "../interfaces/IStakeContractFactory.sol";
 import {StakeDefiProxy} from "../stake/StakeDefiProxy.sol";
 import "../common/AccessRoleCommon.sol";
 /// @title A factory that creates a stake contract that can function as a DeFi function
-contract StakeDefiFactory is AccessRoleCommon, IStakeDefiFactory {
+contract StakeDefiFactory is AccessRoleCommon, IStakeContractFactory {
 
     address public stakeDefiLogic;
 
@@ -17,13 +17,13 @@ contract StakeDefiFactory is AccessRoleCommon, IStakeDefiFactory {
     }
 
     /// @dev Create a stake contract that can operate the staked amount as a DeFi project.
-    /// @param _addr array of [token, paytoken, vault]
+    /// @param _addr array of [token, paytoken, vault, defiAddr]
     /// @param _registry  registry address
     /// @param _intdata array of [saleStartBlock, startBlock, periodBlocks]
     /// @param owner  owner address
     /// @return contract address
     function create(
-        address[3] calldata _addr,
+        address[4] calldata _addr,
         address _registry,
         uint256[3] calldata _intdata,
         address owner

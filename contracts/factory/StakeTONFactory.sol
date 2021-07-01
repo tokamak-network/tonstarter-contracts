@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.7.6;
 
-import "../interfaces/IStakeTONFactory.sol";
+import "../interfaces/IStakeContractFactory.sol";
 import "../interfaces/IStakeTONProxyFactory.sol";
 
 /// @title A factory that creates a stake contract that can stake TON
-contract StakeTONFactory is IStakeTONFactory {
+contract StakeTONFactory is IStakeContractFactory {
     address public stakeTONProxyFactory;
     address public stakeTONLogic;
 

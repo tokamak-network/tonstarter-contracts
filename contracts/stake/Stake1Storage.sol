@@ -6,6 +6,7 @@ import "../libraries/LibTokenStake1.sol";
 
 /// @title The base storage of stakeContract
 contract Stake1Storage {
+
     /// @dev reward token : TOS
     address public token;
 
@@ -43,6 +44,9 @@ contract Stake1Storage {
 
     /// @dev flag for pause proxy
     bool public pauseProxy;
+
+    /// @dev extra address storage
+    address public defiAddr;
 
     /// @dev user's staked information
     function getUserStaked(address user)

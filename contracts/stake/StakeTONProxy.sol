@@ -197,6 +197,7 @@ contract StakeTONProxy is StakeTONStorage, AccessibleCommon, ProxyBase, OnApprov
         token = _addr[0];
         paytoken = _addr[1];
         vault = _addr[2];
+        defiAddr = _addr[3];
 
         stakeRegistry = _registry;
 
