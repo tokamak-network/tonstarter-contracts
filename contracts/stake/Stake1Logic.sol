@@ -412,8 +412,8 @@ contract Stake1Logic is StakeProxyStorage, AccessibleCommon, IStake1Logic {
     }
 
     /// @dev Get addresses of vaults of index phase
-    /// @param _phase the pahse number
-    function vaultsOfPahse(uint256 _phase)
+    /// @param _phase the phase number
+    function vaultsOfPhase(uint256 _phase)
         external
         view
         override

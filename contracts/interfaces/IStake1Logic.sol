@@ -136,8 +136,8 @@ interface IStake1Logic {
     ) external returns (uint256 amountOut);
 
     /// @dev Get addresses of vaults of index phase
-    /// @param _phase the pahse number
-    function vaultsOfPahse(uint256 _phase)
+    /// @param _phase the phase number
+    function vaultsOfPhase(uint256 _phase)
         external
         view
         returns (address[] memory);
