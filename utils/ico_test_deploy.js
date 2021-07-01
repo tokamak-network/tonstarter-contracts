@@ -33,7 +33,7 @@ const { expect } = chai;
 chai.use(require("chai-bn")(BN)).should();
 
 const name = "Fair Launchpad Dao";
-const symbol = "FLD";
+const symbol = "TOS";
 const version = "1";
 
 // ico2.0 contracts
@@ -51,9 +51,9 @@ const StakeTONProxyFactory = contract.fromArtifact("StakeTONProxyFactory");
 
 const StakeFactory = contract.fromArtifact("StakeFactory");
 const StakeRegistry = contract.fromArtifact("StakeRegistry");
-const FLD = contract.fromArtifact("FLD");
-const SFLD = contract.fromArtifact("SFLD");
-const StakeForSFLD = contract.fromArtifact("StakeForSFLD");
+const TOS = contract.fromArtifact("TOS");
+//const STOS = contract.fromArtifact("STOS");
+//const StakeForSTOS = contract.fromArtifact("StakeForSTOS");
 const Stake1Vault = contract.fromArtifact("Stake1Vault");
 const Stake1Logic = contract.fromArtifact("Stake1Logic");
 const Stake1Proxy = contract.fromArtifact("Stake1Proxy");
@@ -143,12 +143,12 @@ const TON_MINIMUM_STAKE_AMOUNT = _TON("1000");
 const initialTotal = "10000000000." + "0".repeat(18);
 const Pharse1_TON_Staking = "175000000." + "0".repeat(18);
 const Pharse1_ETH_Staking = "175000000." + "0".repeat(18);
-const Pharse1_FLDETHLP_Staking = "150000000." + "0".repeat(18);
+const Pharse1_TOSETHLP_Staking = "150000000." + "0".repeat(18);
 const Pharse1_DEV_Mining = "150000000." + "0".repeat(18);
 
 const HASH_Pharse1_TON_Staking = keccak256("PHASE1_TON_STAKING");
 const HASH_Pharse1_ETH_Staking = keccak256("PHASE1_ETH_STAKING");
-const HASH_Pharse1_FLDETHLP_Staking = keccak256("PHASE1_FLDETHLP_Staking");
+const HASH_Pharse1_TOSETHLP_Staking = keccak256("PHASE1_TOSETHLP_Staking");
 const HASH_Pharse1_DEV_Mining = keccak256("PHASE1_DEV_Mining");
 
 
@@ -173,16 +173,16 @@ class ICO20Contracts {
     this.committee = null;
     this.committeeProxy = null;
 
-    this.fld = null;
-    this.sfld = null;
-    this.stakeForSFLD = null;
+    this.tos = null;
+    this.stos = null;
+    this.stakeForSTOS = null;
     this.stakeregister = null;
     this.stakefactory = null;
     this.stake1proxy = null;
     this.stake1logic = null;
     this.vault_phase1_eth = null;
     this.vault_phase1_ton = null;
-    this.vault_phase1_fldethlp = null;
+    this.vault_phase1_tosethlp = null;
     this.vault_phase1_dev = null;
     this.stakeEntry = null;
 
@@ -198,9 +198,9 @@ class ICO20Contracts {
       Agenda: null,
       Candidate: null,
       CommitteeProxy: null,
-      FLD: null,
-      SFLD: null,
-      StakeForSFLD: null,
+      TOS: null,
+      STOS: null,
+      StakeForSTOS: null,
       StakeFactory: null,
       StakeRegistry: null,
       Stake1Logic: null,
@@ -215,8 +215,8 @@ class ICO20Contracts {
   initializeICO20Contracts = async function (owner) {
     // this = self;
     // console.log(' initializeICO20Contracts owner:',owner );
-    this.fld = null;
-    this.sfld = null;
+    this.tos = null;
+    this.stos = null;
 
     this.stakeVaultFactory = null;
     this.stakeSimpleFactory = null;
@@ -230,12 +230,12 @@ class ICO20Contracts {
     this.stake1logic = null;
     this.vault_phase1_eth = null;
     this.vault_phase1_ton = null;
-    this.vault_phase1_fldethlp = null;
+    this.vault_phase1_tosethlp = null;
     this.vault_phase1_dev = null;
     this.swapProxy = await SwapProxy.new({ from: owner });
 
-    this.fld = await FLD.new(name, symbol, version, { from: owner });
-    this.stakeregister = await StakeRegistry.new(this.fld.address,  { from: owner });
+    this.tos = await TOS.new(name, symbol, version, { from: owner });
+    this.stakeregister = await StakeRegistry.new(this.tos.address,  { from: owner });
 
     this.stakeSimple = await StakeSimple.new({ from: owner });
     this.stakeSimpleFactory = await StakeSimpleFactory.new(
@@ -276,8 +276,8 @@ class ICO20Contracts {
     });
 
     const returnData = {
-      fld: this.fld,
-      sfld: this.sfld,
+      tos: this.tos,
+      stos: this.stos,
       stakeSimpleFactory: this.stakeSimpleFactory,
       stakeDefiFactory: this.stakeDefiFactory,
       stakeTONfactory: this.stakeTONfactory,
@@ -292,19 +292,19 @@ class ICO20Contracts {
     return returnData;
   };
 
-  // createStaekForSFLD = async function (startB, owner) {
-  //   let stakeForSFLD = await StakeForSFLD.new({ from: owner });
+  // createStaekForSTOS = async function (startB, owner) {
+  //   let stakeForSTOS = await StakeForSTOS.new({ from: owner });
 
-  //   await stakeForSFLD.initialize(this.fld.address, this.sfld.address, startB, {
+  //   await stakeForSTOS.initialize(this.tos.address, this.stos.address, startB, {
   //     from: owner,
   //   });
 
-  //   this.fld.grantRole(MINTER_ROLE, stakeForSFLD.address, { from: owner });
-  //   this.fld.grantRole(BURNER_ROLE, stakeForSFLD.address, { from: owner });
-  //   this.sfld.grantRole(MINTER_ROLE, stakeForSFLD.address, { from: owner });
-  //   this.sfld.grantRole(BURNER_ROLE, stakeForSFLD.address, { from: owner });
+  //   this.tos.grantRole(MINTER_ROLE, stakeForSTOS.address, { from: owner });
+  //   this.tos.grantRole(BURNER_ROLE, stakeForSTOS.address, { from: owner });
+  //   this.stos.grantRole(MINTER_ROLE, stakeForSTOS.address, { from: owner });
+  //   this.stos.grantRole(BURNER_ROLE, stakeForSTOS.address, { from: owner });
 
-  //   return stakeForSFLD;
+  //   return stakeForSTOS;
   // };
 
   initializePlasmaEvmContracts = async function (owner) {
@@ -432,9 +432,8 @@ class ICO20Contracts {
 
   getICOContracts = function () {
     return {
-      fld: this.fld,
-      sfld: this.sfld,
-      // stakeFroSFLD: this.stakeFroSFLD,
+      tos: this.tos,
+      stos: this.stos,
       stakeregister: this.stakeregister,
       stakefactory: this.stakefactory,
       stake1logic: this.stake1logic,
@@ -455,7 +454,7 @@ class ICO20Contracts {
     const uniswapRouter2 ="0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D";
 
     await this.stakeEntry.setStore(
-      this.fld.address,
+      this.tos.address,
       this.stakeregister.address,
       this.stakefactory.address,
       this.stakeVaultFactory.address,
@@ -596,34 +595,24 @@ class ICO20Contracts {
   addCandidate = async function (candidate) {
     const minimum = await this.seigManager.minimumAmount();
     const beforeTonBalance = await this.ton.balanceOf(candidate);
-
     const stakeAmountTON = TON_MINIMUM_STAKE_AMOUNT.toFixed(TON_UNIT);
     const stakeAmountWTON = TON_MINIMUM_STAKE_AMOUNT.times(WTON_TON_RATIO).toFixed(WTON_UNIT);
     const testMemo = candidate + " memo string";
     await this.committeeProxy.createCandidate(testMemo, {from: candidate});
-
     const candidateContractAddress = await this.committeeProxy.candidateContract(candidate);
-
     (await this.registry.layer2s(candidateContractAddress)).should.be.equal(true);
-
     await this.deposit(candidateContractAddress, candidate, stakeAmountTON);
-
     const afterTonBalance = await this.ton.balanceOf(candidate);
     beforeTonBalance.sub(afterTonBalance).should.be.bignumber.equal(stakeAmountTON);
-
     const coinageAddress = await this.seigManager.coinages(candidateContractAddress);
     const coinage = await AutoRefactorCoinage.at(coinageAddress);
-
     if (this.layer2s == null) this.layer2s = [];
     let layer2 = await Candidate.at(candidateContractAddress);
     this.layer2s.push(layer2);
-
     if (this.coinages == null) this.coinages = [];
     this.coinages.push(coinage);
-
     const stakedAmount = await coinage.balanceOf(candidate);
     stakedAmount.should.be.bignumber.equal(stakeAmountWTON);
-
     const candidatesLength = await this.committeeProxy.candidatesLength();
     let foundCandidate = false;
     for (let i = 0; i < candidatesLength; i++) {
@@ -1033,10 +1022,10 @@ module.exports = {
   initialTotal,
   Pharse1_TON_Staking,
   Pharse1_ETH_Staking,
-  Pharse1_FLDETHLP_Staking,
+  Pharse1_TOSETHLP_Staking,
   Pharse1_DEV_Mining,
   HASH_Pharse1_TON_Staking,
   HASH_Pharse1_ETH_Staking,
-  HASH_Pharse1_FLDETHLP_Staking,
+  HASH_Pharse1_TOSETHLP_Staking,
   HASH_Pharse1_DEV_Mining
   };

@@ -51,7 +51,7 @@ const {
   solidityKeccak256,
 } = require("web3-utils");
 
-const { getSignature, signatureVaildTime, timeout } = require("./common");
+const { getSignature, signatureValidTime, timeout } = require("./common");
 
 // ------------------------
 const {
@@ -59,11 +59,11 @@ const {
   initialTotal,
   Pharse1_TON_Staking,
   Pharse1_ETH_Staking,
-  Pharse1_FLDETHLP_Staking,
+  Pharse1_TOSETHLP_Staking,
   Pharse1_DEV_Mining,
   HASH_Pharse1_TON_Staking,
   HASH_Pharse1_ETH_Staking,
-  HASH_Pharse1_FLDETHLP_Staking,
+  HASH_Pharse1_TOSETHLP_Staking,
   HASH_Pharse1_DEV_Mining
   } = require("../utils/ico_test_deploy.js");
 
@@ -107,10 +107,10 @@ let stakeContractTokamak = [];
 
 //
 describe("TokamakStaker ", function () {
-  let weth, fld, stakeregister, stakefactory, stake1proxy, stake1logic;
+  let weth, tos, stakeregister, stakefactory, stake1proxy, stake1logic;
   let vault_phase1_eth,
     vault_phase1_ton,
-    vault_phase1_fldethlp,
+    vault_phase1_tosethlp,
     vault_phase1_dev;
   let ton, wton, depositManager, seigManager;
   let stakeEntry, layer2;
@@ -164,7 +164,7 @@ describe("TokamakStaker ", function () {
       stakeEntry = await ico20Contracts.setEntry(defaultSender);
 
       const cons = await ico20Contracts.getICOContracts();
-      fld = cons.fld;
+      tos = cons.tos;
       stakeregister = cons.stakeregister;
       stakefactory = cons.stakefactory;
       stake1proxy = cons.stake1proxy;
@@ -197,7 +197,7 @@ describe("TokamakStaker ", function () {
       vault_phase1_ton = await Stake1Vault.at(vaultAddress, {
         from: defaultSender,
       });
-      await fld.mint(
+      await tos.mint(
         vault_phase1_ton.address,
         utils.parseUnits(Pharse1_TON_Staking, 18),
         { from: defaultSender }
@@ -209,7 +209,7 @@ describe("TokamakStaker ", function () {
         await stakeEntry.createStakeContract(
           toBN("1"),
           vault_phase1_ton.address,
-          fld.address,
+          tos.address,
           ton.address,
           toBN(testStakingPeriodBlocks[i] + ""),
           "PHASE1_TON_" + testStakingPeriodBlocks[i] + "_BLOCKS",
@@ -265,7 +265,7 @@ describe("TokamakStaker ", function () {
               tonAmount,
               { from: defaultSender }
             )
-      ).to.be.revertedWith("TokamakStaker:not closed");
+      ).to.be.revertedWith("TokamakStaker: not closed");
 
     });
 
@@ -278,7 +278,7 @@ describe("TokamakStaker ", function () {
           wtonAmount,
           { from: user1 }
         )
-      ).to.be.revertedWith("TokamakStaker:different layer");
+      ).to.be.revertedWith("TokamakStaker: not closed");
     });
 
     it("3. tokamakProcessUnStaking fails ", async function () {
@@ -288,7 +288,7 @@ describe("TokamakStaker ", function () {
           layer2.address,
           { from: user1 }
         )
-      ).to.be.revertedWith("TokamakStaker:different layer");
+      ).to.be.revertedWith("TokamakStaker: not closed");
     });
   });
 

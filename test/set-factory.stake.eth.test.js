@@ -63,7 +63,7 @@ describe ("Stake1Logic : Upgradable Stake Contracts", function () {
     stakeEntry = await contractsInitializer.setEntry(defaultSender);
 
     const result = await contractsInitializer.getICOContracts();
-    ICO20Instances.fld = result.fld;
+    ICO20Instances.tos = result.tos;
     ICO20Instances.stakeRegister = result.stakeregister;
     ICO20Instances.stakeFactory = result.stakefactory;
     ICO20Instances.stake1proxy = result.stake1proxy;
@@ -100,7 +100,7 @@ describe ("Stake1Logic : Upgradable Stake Contracts", function () {
 
     const stakeVaultAddress = tx.receipt.logs[tx.receipt.logs.length - 1].args.vault;
     Vault = await Stake1Vault.at(stakeVaultAddress, { from: defaultSender });
-    await ICO20Instances.fld.mint(Vault.address, ethers.utils.parseUnits(Pharse1_ETH_Staking, 18), { from: defaultSender });
+    await ICO20Instances.tos.mint(Vault.address, ethers.utils.parseUnits(Pharse1_ETH_Staking, 18), { from: defaultSender });
   });
 
 
@@ -116,12 +116,12 @@ describe ("Stake1Logic : Upgradable Stake Contracts", function () {
         stakeEntry.createStakeContract(
           toBN("1"), // phase number
           Vault.address, // vault address
-          ICO20Instances.fld.address, // fld address
+          ICO20Instances.tos.address, // tos address
           zeroAddress, // token address - ether
           toBN(period), // staking period
           name, // staking name
           { from: defaultSender }
-      )).to.be.revertedWith("StakeFactory: not an admin");
+      )).to.be.revertedWith("Accessible: Caller is not an admin");
     }
 
     await stakeEntry.setStakeFactory(ICO20Instances.stakeFactory.address,
@@ -131,7 +131,7 @@ describe ("Stake1Logic : Upgradable Stake Contracts", function () {
       stakeEntry.createStakeContract(
         toBN("1"), // phase number
         Vault.address, // vault address
-        ICO20Instances.fld.address, // fld address
+        ICO20Instances.tos.address, // tos address
         zeroAddress, // token address - ether
         toBN(period), // staking period
         name, // staking name
@@ -184,7 +184,7 @@ describe ("Stake1Logic : Upgradable Stake Contracts", function () {
 
   it("8. should claim rewards", async function () {
     this.timeout(10000000);
-    const fld = ICO20Instances.fld;
+    const tos = ICO20Instances.tos;
 
     for (const { claimBlock } of [{claimBlock: 10}, {claimBlock: 60}]) {
       let block = stakeStartBlock + claimBlock;
@@ -196,14 +196,15 @@ describe ("Stake1Logic : Upgradable Stake Contracts", function () {
 
         for (const { address: userAddress } of usersInfo) {
           const reward = await stakeContract.canRewardAmount(userAddress, block);
-          const fldBalance = await fld.balanceOf(userAddress);
+          //console.log({ reward: reward.toString()  });
+          const tosBalance = await tos.balanceOf(userAddress);
           await stakeContract.claim({ from: userAddress });
           block++;
           sum = sum.add(toBN(reward.toString()));
 
-          const newFldBalance = await fld.balanceOf(userAddress);
+          const newTosBalance = await tos.balanceOf(userAddress);
 
-          await expect(reward.add(fldBalance)).to.be.bignumber.equal(newFldBalance);
+          await expect(reward.add(tosBalance)).to.be.bignumber.equal(newTosBalance);
 
           const rewardClaimedTotal = await stakeContract.rewardClaimedTotal();
 
