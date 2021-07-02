@@ -186,7 +186,7 @@ contract Stake1Vault is StakeVaultStorage, IStake1Vault {
             LibTokenStake1.StakeInfo storage stakeInfo =
                 stakeInfos[stakeAddresses[i]];
             if (paytoken == address(0)) {
-                stakeInfo.balance = address(uint160(stakeAddresses[i])).balance;
+                stakeInfo.balance = 0; // address(uint160(stakeAddresses[i])).balance;
             } else {
                 (bool success, bytes memory returnData) =
                     paytoken.call(

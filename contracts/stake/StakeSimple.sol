@@ -156,7 +156,7 @@ contract StakeSimple is Stake1Storage, AccessControl, IStakeSimple {
         // check if we send in ethers or in tokens
         if (paytoken == address(0)) {
             address payable self = address(uint160(address(this)));
-            require(self.balance >= amount);
+            // require(self.balance >= amount);
             (bool success, ) = msg.sender.call{value: amount}("");
             require(success, "StakeSimple: withdraw failed.");
         } else {

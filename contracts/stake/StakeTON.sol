@@ -192,7 +192,7 @@ contract StakeTON is TokamakStaker, IStakeTON {
             );
             staked.releasedAmount = amount;
             address payable self = address(uint160(address(this)));
-            require(self.balance >= amount);
+            // require(self.balance >= amount);
             (bool success, ) = msg.sender.call{value: amount}("");
             require(success, "StakeTON: withdraw failed.");
         } else {

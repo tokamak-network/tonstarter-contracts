@@ -11,6 +11,8 @@ require("./tasks/uniswap-v3-mint-position-task");
 require("./tasks/uniswap-v3-swap-task");
 require("./tasks/view-tasks");
 
+require("@eth-optimism/hardhat-ovm");
+
 const {
   RINKEBY_UNISWAP_V3_ACCOUNT_PK1,
   RINKEBY_UNISWAP_V3_ACCOUNT_PK2,
@@ -26,6 +28,7 @@ task("accounts", "Prints the list of accounts", async () => {
     console.log((await provider.getBalance(account.address)).toString());
   }
 });
+
 module.exports = {
   defaultNetwork: "localhost",
   networks: {
@@ -43,6 +46,15 @@ module.exports = {
       },
       chainId: 31337,
     }, */,
+    // Add this network to your config!
+    optimism: {
+      url: "http://127.0.0.1:8545",
+      // This sets the gas price to 0 for all transactions on L2. We do this
+      // because account balances are not automatically initiated with an ETH
+      // balance (yet, sorry!).
+      gasPrice: 0,
+      ovm: true, // This sets the network as using the ovm and ensure contract will be compiled against that.
+    },
     rinkeby: {
       url: `https://rinkeby.infura.io/v3/${process.env.InfuraKey}`,
       accounts: [
@@ -73,5 +85,14 @@ module.exports = {
   },
   mocha: {
     timeout: 10000000,
+  },
+  ovm: {
+    solcVersion: "0.7.6",
+    settings: {
+      optimizer: {
+        enabled: true,
+        runs: 1000,
+      },
+    },
   },
 };
