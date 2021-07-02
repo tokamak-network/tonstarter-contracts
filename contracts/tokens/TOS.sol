@@ -4,8 +4,6 @@ pragma solidity ^0.7.6;
 import "../interfaces/ITOS.sol";
 import "../libraries/ChainId.sol";
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import "@openzeppelin/contracts/access/AccessControl.sol";
-
 import "../common/AccessiblePlusCommon.sol";
 
 /// @title the platform token. TOS token
