@@ -41,6 +41,9 @@ contract TOS is ERC20, AccessiblePlusCommon, ITOS {
             );
 
         _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
+        _setRoleAdmin(BURNER_ROLE, ADMIN_ROLE);
+        _setRoleAdmin(MINTER_ROLE, ADMIN_ROLE);
+
         _setupRole(ADMIN_ROLE, msg.sender);
         _setupRole(BURNER_ROLE, msg.sender);
         _setupRole(MINTER_ROLE, msg.sender);
