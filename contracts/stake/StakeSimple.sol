@@ -12,7 +12,6 @@ import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 
 /// @title Simple Stake Contract
 /// @notice Stake contracts can interact with the vault to claim tos tokens
-
 contract StakeSimple is Stake1Storage, AccessibleCommon, IStakeSimple {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
@@ -66,7 +65,6 @@ contract StakeSimple is Stake1Storage, AccessibleCommon, IStakeSimple {
         require(!IIStake1Vault(vault).saleClosed(), "StakeSimple: not end");
 
         if (paytoken == address(0)) amount = msg.value;
-
         else require(IERC20(paytoken).balanceOf(msg.sender) >= amount, "lack");
 
         LibTokenStake1.StakedAmount storage staked = userStaked[msg.sender];
@@ -74,14 +72,12 @@ contract StakeSimple is Stake1Storage, AccessibleCommon, IStakeSimple {
 
         staked.amount = staked.amount.add(amount);
         totalStakedAmount = totalStakedAmount.add(amount);
-
         if (paytoken != address(0))
             IERC20(paytoken).safeTransferFrom(
                 msg.sender,
                 address(this),
                 amount
             );
-        }
 
         emit Staked(msg.sender, amount);
     }
