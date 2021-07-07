@@ -58,6 +58,9 @@ contract StakeVaultStorage is AccessibleCommon {
     /// @dev flag for pause proxy
     bool public pauseProxy;
 
+    ///@dev for migrate L2
+    bool public migratedL2
+
     modifier lock() {
         require(_lock == 0, "Stake1Vault: LOCKED");
         _lock = 1;
