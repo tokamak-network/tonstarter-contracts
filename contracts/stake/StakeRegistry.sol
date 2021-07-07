@@ -46,7 +46,7 @@ contract StakeRegistry is AccessibleCommon, IStakeRegistry {
     mapping(address => address) public stakeContractVault;
 
     /// Defi Info
-    mapping(bytes32 => LibTokenStake1.DefiInfo) public defiInfo;
+    mapping(bytes32 => LibTokenStake1.DefiInfo) public override defiInfo;
 
 
     modifier nonZero(address _addr) {
