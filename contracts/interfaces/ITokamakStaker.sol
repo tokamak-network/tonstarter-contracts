@@ -7,10 +7,11 @@ interface ITokamakStaker {
     function setTokamakLayer2(address _layer2) external;
 
     /// @dev get the addresses yhat used in uniswap interfaces
-    /// @return uniswapRouter the address of uniswapRouter
+    /// @return uniswapRouter the address of uniswapV3 Router
     /// @return npm the address of positionManagerAddress
     /// @return ext the address of ext
     /// @return fee the amount of fee
+    /// @return uniswapV2Router uniswapV2 router address
     function getUniswapInfo()
         external
         view
@@ -19,7 +20,7 @@ interface ITokamakStaker {
             address npm,
             address ext,
             uint256 fee,
-            address uniswapRouterV2
+            address uniswapV2Router
         );
 
     /// @dev Change the TON holded in contract have to WTON, or change WTON to TON.

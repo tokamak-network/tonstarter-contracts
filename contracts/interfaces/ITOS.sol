@@ -21,7 +21,7 @@ interface ITOS {
     /// @param owner the token's owner
     /// @param spender the account that spend owner's token
     /// @param value the amount to be approve to spend
-    /// @param deadline the deadline that vaild the owner's signature
+    /// @param deadline the deadline that valid the owner's signature
     /// @param v the owner's signature - v
     /// @param r the owner's signature - r
     /// @param s the owner's signature - s
@@ -36,7 +36,6 @@ interface ITOS {
     ) external;
 
     /// @dev verify the signature
-    /// @param signer the signer address
     /// @param owner the token's owner
     /// @param spender the account that spend owner's token
     /// @param value the amount to be approve to spend
@@ -46,7 +45,6 @@ interface ITOS {
     /// @param sigS the owner's signature - s
     /// @param sigV the owner's signature - v
     function verify(
-        address signer,
         address owner,
         address spender,
         uint256 value,
@@ -61,7 +59,7 @@ interface ITOS {
     /// @param owner the token's owner
     /// @param spender the account that spend owner's token
     /// @param value the amount to be approve to spend
-    /// @param deadline the deadline that vaild the owner's signature
+    /// @param deadline the deadline that valid the owner's signature
     /// @param _nounce the _nounce
     function hashPermit(
         address owner,

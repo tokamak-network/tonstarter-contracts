@@ -17,7 +17,7 @@ interface IStakeFactory {
     ) external returns (address);
 
     /// @dev Set factory address by StakeType
-    /// @param _stakeType the stake type , 0:TON, 1: Simple, 2: UniswapV3
+    /// @param _stakeType the stake type , 0:TON, 1: Simple, 2: UniswapV3LP
     /// @param _factory the factory address
     function setFactoryByStakeType(uint256 _stakeType, address _factory) external;
 

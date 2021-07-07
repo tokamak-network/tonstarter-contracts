@@ -3,33 +3,54 @@ pragma solidity ^0.7.6;
 
 import "../interfaces/IStakeVaultFactory.sol";
 import {StakeVaultProxy} from "../stake/StakeVaultProxy.sol";
+import "../common/AccessibleCommon.sol";
 
 /// @title A factory that creates a vault that hold reward
-contract StakeVaultFactory is IStakeVaultFactory {
-    bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
+contract StakeVaultFactory is AccessibleCommon, IStakeVaultFactory {
 
-    address public stakeVaultLogic;
+    mapping(uint256 => address) public vaultLogics;
+
+    modifier nonZero(address _addr) {
+        require(_addr != address(0), "StakeVaultFactory: zero");
+        _;
+    }
 
     /// @dev constructor of StakeVaultFactory
-    /// @param _stakeVaultLogic the logic address used in StakeVaultFactory
+    /// @param _stakeVaultLogic the logic address used in StakeVault
     constructor(address _stakeVaultLogic) {
         require(
             _stakeVaultLogic != address(0),
             "StakeVaultFactory: logic zero"
         );
-        stakeVaultLogic = _stakeVaultLogic;
+        vaultLogics[1] = _stakeVaultLogic;
+    }
+
+    /// @dev Set stakeVaultLogic address by _phase
+    /// @param _phase the stake type
+    /// @param _logic the vault logic address
+    function setVaultLogicByPhase(uint256 _phase, address _logic)
+        external
+        override
+        onlyOwner
+        nonZero(_logic)
+    {
+        vaultLogics[_phase] = _logic;
     }
 
     /// @dev Create a vault that hold reward, _cap is allocated reward amount.
-    /// @param _addr the array of [token, paytoken, vault, defiAddr]
+    /// @param _phase phase number
+    /// @param _addr the array of [token, paytoken, _stakefactory, defiAddr]
     /// @param _intInfo array of [_stakeType, _cap, _saleStartBlock, _stakeStartBlock]
     /// @param owner the owner adderess
     /// @return a vault address
     function create(
+        uint256 _phase,
         address[4] calldata _addr,
         uint256[4] calldata _intInfo,
         address owner
     ) external override returns (address) {
+
+        require(vaultLogics[_phase] != address(0), "StakeVaultFactory: zero vault logic ");
         address _tos = _addr[0];
         address _paytoken = _addr[1];
         address _stakefactory = _addr[2];
@@ -39,7 +60,7 @@ contract StakeVaultFactory is IStakeVaultFactory {
         uint256 _saleStartBlock = _intInfo[2];
         uint256 _stakeStartBlock = _intInfo[3];
 
-        StakeVaultProxy proxy = new StakeVaultProxy(stakeVaultLogic);
+        StakeVaultProxy proxy = new StakeVaultProxy(vaultLogics[_phase]);
         require(address(proxy) != address(0), "StakeVaultFactory: proxy zero");
 
         proxy.initialize(

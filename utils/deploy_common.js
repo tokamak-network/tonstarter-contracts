@@ -1,4 +1,3 @@
-
 const { BigNumber } = require("ethers");
 const { ethers, upgrades } = require("hardhat");
 const utils = ethers.utils;
@@ -120,4 +119,3 @@ module.exports = {
   timeout,
   getPeriodBlockByTimes
   };
-

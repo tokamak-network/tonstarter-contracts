@@ -8,21 +8,14 @@ import {IStakeRegistry} from "../interfaces/IStakeRegistry.sol";
 import {IStake1Vault} from "../interfaces/IStake1Vault.sol";
 import {IStakeTONTokamak} from "../interfaces/IStakeTONTokamak.sol";
 
-import "@openzeppelin/contracts/access/AccessControl.sol";
+import "../common/AccessibleCommon.sol";
+
 import "./StakeProxyStorage.sol";
 
 /// @title The logic of TOS Plaform
 /// @notice Admin can createVault, createStakeContract.
 /// User can excute the tokamak staking function of each contract through this logic.
-contract Stake1Logic is StakeProxyStorage, AccessControl, IStake1Logic {
-    bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
-    bytes32 public constant ZERO_HASH =
-        0x0000000000000000000000000000000000000000000000000000000000000000;
-
-    modifier onlyOwner() {
-        require(hasRole(ADMIN_ROLE, msg.sender), "");
-        _;
-    }
+contract Stake1Logic is StakeProxyStorage, AccessibleCommon, IStake1Logic {
 
     modifier nonZero(address _addr) {
         require(_addr != address(0), "Stake1Logic:zero address");
@@ -55,8 +48,7 @@ contract Stake1Logic is StakeProxyStorage, AccessControl, IStake1Logic {
 */
 
     constructor() {
-        _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
-        _setupRole(ADMIN_ROLE, msg.sender);
+
     }
 
     /// @dev upgrade to the logic of _stakeProxy
@@ -69,13 +61,6 @@ contract Stake1Logic is StakeProxyStorage, AccessControl, IStake1Logic {
         IProxy(_stakeProxy).upgradeTo(_implementation);
     }
 
-    /// @dev transfer Ownership
-    /// @param newOwner new owner address
-    function transferOwnership(address newOwner) external onlyOwner {
-        require(msg.sender != newOwner, "Stake1Logic: same owner");
-        grantRole(ADMIN_ROLE, newOwner);
-        revokeRole(ADMIN_ROLE, msg.sender);
-    }
 
     /// @dev grant the role to account in target
     /// @param target target address
@@ -86,15 +71,7 @@ contract Stake1Logic is StakeProxyStorage, AccessControl, IStake1Logic {
         bytes32 role,
         address account
     ) external onlyOwner {
-        (bool success, ) =
-            target.call(
-                abi.encodeWithSignature(
-                    "grantRole(bytes32,address)",
-                    role,
-                    account
-                )
-            );
-        require(success, "Stake1Logic: grantRole fail");
+        AccessControl(target).grantRole(role, account);
     }
 
     /// @dev revoke the role to account in target
@@ -106,15 +83,7 @@ contract Stake1Logic is StakeProxyStorage, AccessControl, IStake1Logic {
         bytes32 role,
         address account
     ) external onlyOwner {
-        (bool success, ) =
-            target.call(
-                abi.encodeWithSignature(
-                    "revokeRole(bytes32,address)",
-                    role,
-                    account
-                )
-            );
-        require(success, "Stake1Logic: revokeRole fail");
+        AccessControl(target).revokeRole(role, account);
     }
 
     /// @dev Sets TOS address
@@ -145,7 +114,7 @@ contract Stake1Logic is StakeProxyStorage, AccessControl, IStake1Logic {
     }
 
     /// @dev Set factory address by StakeType
-    /// @param _stakeType the stake type , 0:TON, 1: Simple, 2: UniswapV3
+    /// @param _stakeType the stake type , 0:TON, 1: Simple, 2: UniswapV3LP
     /// @param _factory the factory address
     function setFactoryByStakeType(uint256 _stakeType, address _factory)
         external
@@ -153,13 +122,13 @@ contract Stake1Logic is StakeProxyStorage, AccessControl, IStake1Logic {
         onlyOwner
         nonZero(address(stakeFactory))
     {
-        stakeFactory.setFactoryByStakeType(_stakeType,_factory);
+        stakeFactory.setFactoryByStakeType(_stakeType, _factory);
     }
 
     /// @dev Sets StakeVaultFactory address
     /// @param _stakeVaultFactory new StakeVaultFactory address
     function setStakeVaultFactory(address _stakeVaultFactory)
-        public
+        external
         onlyOwner
         nonZero(_stakeVaultFactory)
     {
@@ -225,6 +194,7 @@ contract Stake1Logic is StakeProxyStorage, AccessControl, IStake1Logic {
     ) external override onlyOwner nonZero(address(stakeVaultFactory)) {
         address vault =
             stakeVaultFactory.create(
+                _phase,
                 [tos, _paytoken, address(stakeFactory), _defiAddr],
                 [_stakeType, _cap, _saleStartBlock, _stakeStartBlock],
                 address(this)
@@ -318,8 +288,8 @@ contract Stake1Logic is StakeProxyStorage, AccessControl, IStake1Logic {
         return IStake1Vault(_vault).stakeAddressesAll();
     }
 
-    /// @dev list of vaults in _phaseIndex phase
-    /// @param _phase the phase number
+    /// @dev list of vaults in _phase
+    /// @param _phase the _phase number
     function vaultsOfPhase(uint256 _phase)
         external
         view

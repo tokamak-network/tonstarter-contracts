@@ -31,4 +31,7 @@ contract StakeProxyStorage {
 
     /// @dev SeigManager address in Tokamak
     address public seigManager;
+
+    /// @dev flag for pause proxy
+    bool public pauseProxy;
 }

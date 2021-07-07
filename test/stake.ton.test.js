@@ -326,7 +326,7 @@ let stakeContractTokamak = [];
             stakeAmount,
             { from: user1 }
           )
-      ).to.be.revertedWith("TokamakStaker:not closed");
+      ).to.be.revertedWith("TokamakStaker: not closed");
 
     });
 
@@ -339,7 +339,7 @@ let stakeContractTokamak = [];
           wtonAmount,
           { from: user1 }
         )
-      ).to.be.revertedWith("TokamakStaker:different layer");
+      ).to.be.revertedWith("TokamakStaker: not closed");
     });
 
     it("4. If the sales closing function is not performed, cannot processWithdraw to Tokamak.", async function () {
@@ -349,7 +349,7 @@ let stakeContractTokamak = [];
           layer2.address,
           { from: user1 }
         )
-      ).to.be.revertedWith("TokamakStaker:different layer");
+      ).to.be.revertedWith("TokamakStaker: not closed");
     });
   });
 

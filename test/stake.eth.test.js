@@ -156,6 +156,7 @@ describe("StakeSimple : Stake with ETH", function () {
       );
 
       const vaultAddress = tx.receipt.logs[tx.receipt.logs.length - 1].args.vault;
+
       vault_phase1_eth = await Stake1Vault.at(vaultAddress, {
         from: defaultSender,
       });
@@ -183,6 +184,7 @@ describe("StakeSimple : Stake with ETH", function () {
       stakeAddresses = await stakeEntry.stakeContractsOfVault(
         vault_phase1_eth.address
       );
+
     });
   });
 
@@ -412,6 +414,7 @@ describe("StakeSimple : Stake with ETH", function () {
 
       }
     });
+
   });
 
 });

@@ -6,16 +6,14 @@ import {IStakeVaultStorage} from "../interfaces/IStakeVaultStorage.sol";
 import {IIERC20} from "../interfaces/IIERC20.sol";
 import {SafeMath} from "../utils/math/SafeMath.sol";
 import "./StakeTONStorage.sol";
-import "@openzeppelin/contracts/access/AccessControl.sol";
+import "../common/AccessibleCommon.sol";
 import {OnApprove} from "../tokens/OnApprove.sol";
+import "./ProxyBase.sol";
 
 /// @title Proxy for Stake contracts in Phase 1
-/// @notice
-contract StakeTONProxy is StakeTONStorage, AccessControl, OnApprove {
+contract StakeTONProxy is StakeTONStorage, AccessibleCommon, ProxyBase, OnApprove {
     using SafeMath for uint256;
-    bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
-    address internal _implementation;
-    bool public pauseProxy;
+
 
     event Upgraded(address indexed implementation);
 
@@ -24,26 +22,18 @@ contract StakeTONProxy is StakeTONStorage, AccessControl, OnApprove {
     /// @param amount the amount of staking
     event Staked(address indexed to, uint256 amount);
 
-    modifier onlyOwner() {
-        require(hasRole(ADMIN_ROLE, msg.sender), "StakeTONProxy: not an admin");
-        _;
-    }
-
     /// @dev the constructor of StakeTONProxy
     /// @param _logic the logic address of StakeTONProxy
     constructor(address _logic) {
+        assert(IMPLEMENTATION_SLOT == bytes32(uint256(keccak256('eip1967.proxy.implementation')) - 1));
+
+        require(_logic != address(0), "StakeTONProxy: logic is zero");
+
+        _setImplementation(_logic);
+
         _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
         _setupRole(ADMIN_ROLE, msg.sender);
         _setupRole(ADMIN_ROLE, address(this));
-        _implementation = _logic;
-    }
-
-    /// @dev transfer Ownership
-    /// @param newOwner new owner address
-    function transferOwnership(address newOwner) external onlyOwner {
-        require(msg.sender != newOwner, "StakeTONProxy:same owner");
-        grantRole(ADMIN_ROLE, newOwner);
-        revokeRole(ADMIN_ROLE, msg.sender);
     }
 
     /// @notice Set pause state
@@ -57,16 +47,16 @@ contract StakeTONProxy is StakeTONStorage, AccessControl, OnApprove {
     function upgradeTo(address impl) external onlyOwner {
         require(impl != address(0), "StakeTONProxy: input is zero");
         require(
-            _implementation != impl,
+            _implementation() != impl,
             "StakeTONProxy: The input address is same as the state"
         );
-        _implementation = impl;
+        _setImplementation(impl);
         emit Upgraded(impl);
     }
 
     /// @dev returns the implementation
     function implementation() public view returns (address) {
-        return _implementation;
+        return _implementation();
     }
 
     /// @dev receive ether
@@ -81,7 +71,7 @@ contract StakeTONProxy is StakeTONStorage, AccessControl, OnApprove {
 
     /// @dev fallback function , execute on undefined function call
     function _fallback() internal {
-        address _impl = implementation();
+        address _impl = _implementation();
         require(
             _impl != address(0) && !pauseProxy,
             "StakeTONProxy: impl is zero OR proxy is false"
@@ -165,7 +155,7 @@ contract StakeTONProxy is StakeTONStorage, AccessControl, OnApprove {
 
         require(
             !IStakeVaultStorage(vault).saleClosed(),
-            "StakeTONProxy: not end"
+            "StakeTONProxy: end sale"
         );
         require(
             IIERC20(paytoken).balanceOf(_owner) >= _amount,
@@ -195,6 +185,8 @@ contract StakeTONProxy is StakeTONStorage, AccessControl, OnApprove {
         address _registry,
         uint256[3] memory _intdata
     ) external onlyOwner {
+        require(token == address(0), "StakeTONProxy: already initialized");
+
         require(
             _registry != address(0) &&
                 _addr[2] != address(0) &&
@@ -204,6 +196,7 @@ contract StakeTONProxy is StakeTONStorage, AccessControl, OnApprove {
         token = _addr[0];
         paytoken = _addr[1];
         vault = _addr[2];
+        defiAddr = _addr[3];
 
         stakeRegistry = _registry;
 

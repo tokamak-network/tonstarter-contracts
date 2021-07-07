@@ -595,34 +595,24 @@ class ICO20Contracts {
   addCandidate = async function (candidate) {
     const minimum = await this.seigManager.minimumAmount();
     const beforeTonBalance = await this.ton.balanceOf(candidate);
-
     const stakeAmountTON = TON_MINIMUM_STAKE_AMOUNT.toFixed(TON_UNIT);
     const stakeAmountWTON = TON_MINIMUM_STAKE_AMOUNT.times(WTON_TON_RATIO).toFixed(WTON_UNIT);
     const testMemo = candidate + " memo string";
     await this.committeeProxy.createCandidate(testMemo, {from: candidate});
-
     const candidateContractAddress = await this.committeeProxy.candidateContract(candidate);
-
     (await this.registry.layer2s(candidateContractAddress)).should.be.equal(true);
-
     await this.deposit(candidateContractAddress, candidate, stakeAmountTON);
-
     const afterTonBalance = await this.ton.balanceOf(candidate);
     beforeTonBalance.sub(afterTonBalance).should.be.bignumber.equal(stakeAmountTON);
-
     const coinageAddress = await this.seigManager.coinages(candidateContractAddress);
     const coinage = await AutoRefactorCoinage.at(coinageAddress);
-
     if (this.layer2s == null) this.layer2s = [];
     let layer2 = await Candidate.at(candidateContractAddress);
     this.layer2s.push(layer2);
-
     if (this.coinages == null) this.coinages = [];
     this.coinages.push(coinage);
-
     const stakedAmount = await coinage.balanceOf(candidate);
     stakedAmount.should.be.bignumber.equal(stakeAmountWTON);
-
     const candidatesLength = await this.committeeProxy.candidatesLength();
     let foundCandidate = false;
     for (let i = 0; i < candidatesLength; i++) {

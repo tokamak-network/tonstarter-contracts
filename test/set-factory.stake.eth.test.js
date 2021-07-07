@@ -121,7 +121,7 @@ describe ("Stake1Logic : Upgradable Stake Contracts", function () {
           toBN(period), // staking period
           name, // staking name
           { from: defaultSender }
-      )).to.be.revertedWith("StakeFactory: not an admin");
+      )).to.be.revertedWith("Accessible: Caller is not an admin");
     }
 
     await stakeEntry.setStakeFactory(ICO20Instances.stakeFactory.address,

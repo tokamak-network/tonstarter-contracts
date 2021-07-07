@@ -40,77 +40,13 @@ contract StakeTON is TokamakStaker, IStakeTON {
 
     /// @dev constructor of StakeTON
     constructor() {
-        _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
-        _setupRole(ADMIN_ROLE, msg.sender);
+
     }
 
-    /// @dev receive ether
-    /// @dev call stake function with msg.value
+    /// @dev This contract cannot stake Ether.
     receive() external payable {
-        // stake(msg.value);
+        revert("cannot stake Ether");
     }
-
-    /// @dev Initialize
-    // function initialize(
-    //     address _token,
-    //     address _paytoken,
-    //     address _vault,
-    //     uint256 _saleStartBlock,
-    //     uint256 _startBlock,
-    //     uint256 _period
-    // ) external onlyOwner {
-    //     require(
-    //         _token != address(0) &&
-    //             _vault != address(0) &&
-    //             _saleStartBlock < _startBlock, "zero"
-    //     );
-    //     token = _token;
-    //     paytoken = _paytoken;
-    //     vault = _vault;
-    //     saleStartBlock = _saleStartBlock;
-    //     startBlock = _startBlock;
-    //     endBlock = startBlock.add(_period);
-    // }
-
-    /// @dev Stake amount
-    /// @param amount  the amount of staked
-    /* function stake(uint256 amount) public payable override {
-        require(
-            (paytoken == address(0) && msg.value == amount) ||
-                (paytoken != address(0) && amount > 0),
-            "StakeTON: zero"
-        );
-        require(
-            block.number >= saleStartBlock && block.number < startBlock,
-            "StakeTON: unavailable"
-        );
-
-        require(!IIStake1Vault(vault).saleClosed(), "StakeTON: not end");
-
-        if (paytoken == address(0)) amount = msg.value;
-        else
-            require(
-                IIERC20(paytoken).balanceOf(msg.sender) >= amount,
-                "StakeTON: insuffient"
-            );
-
-        LibTokenStake1.StakedAmount storage staked = userStaked[msg.sender];
-        if (staked.amount == 0)  totalStakers = totalStakers.add(1);
-
-        staked.amount = staked.amount.add(amount);
-        totalStakedAmount = totalStakedAmount.add(amount);
-        if (paytoken != address(0))
-            require(
-                IIERC20(paytoken).transferFrom(
-                    msg.sender,
-                    address(this),
-                    amount
-                )
-            );
-
-        emit Staked(msg.sender, amount);
-    }
-    */
 
     /// @dev withdraw
     function withdraw() external override {
@@ -145,9 +81,9 @@ contract StakeTON is TokamakStaker, IStakeTON {
             );
         }
         LibTokenStake1.StakedAmount storage staked = userStaked[msg.sender];
-        require(staked.released == false, "StakeTON: Already withdraw");
+        require(!staked.released, "StakeTON: Already withdraw");
 
-        if (withdrawFlag == false) {
+        if (!withdrawFlag) {
             withdrawFlag = true;
             if (paytoken == ton) {
                 swappedAmountTOS = IIERC20(token).balanceOf(address(this));
@@ -187,17 +123,17 @@ contract StakeTON is TokamakStaker, IStakeTON {
             tonWithdraw(ton, wton, tonAmount, wtonAmount, tosAmount);
         } else if (paytoken == address(0)) {
             require(
-                staked.releasedAmount <= staked.amount,
+                staked.releasedAmount <= amount,
                 "StakeTON: Amount wrong"
             );
             staked.releasedAmount = amount;
             address payable self = address(uint160(address(this)));
-            require(self.balance >= amount);
+            require(self.balance >= amount,  "StakeTON: insuffient ETH");
             (bool success, ) = msg.sender.call{value: amount}("");
             require(success, "StakeTON: withdraw failed.");
         } else {
             require(
-                staked.releasedAmount <= staked.amount,
+                staked.releasedAmount <= amount,
                 "StakeTON: Amount wrong"
             );
             staked.releasedAmount = amount;
@@ -263,7 +199,7 @@ contract StakeTON is TokamakStaker, IStakeTON {
     /// @dev Claim for reward
     function claim() external override lock {
         require(
-            IIStake1Vault(vault).saleClosed() == true,
+            IIStake1Vault(vault).saleClosed(),
             "StakeTON: not closed"
         );
         uint256 rewardClaim = 0;
@@ -286,7 +222,7 @@ contract StakeTON is TokamakStaker, IStakeTON {
         staked.claimedAmount = staked.claimedAmount.add(rewardClaim);
         rewardClaimedTotal = rewardClaimedTotal.add(rewardClaim);
 
-        require(IIStake1Vault(vault).claim(msg.sender, rewardClaim));
+        require(IIStake1Vault(vault).claim(msg.sender, rewardClaim), "StakeTON: fail claim from vault");
 
         emit Claimed(msg.sender, rewardClaim, block.number);
     }

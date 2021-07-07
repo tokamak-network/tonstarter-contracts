@@ -1,11 +1,11 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity ^0.7.6;
 
-//import "../interfaces/IStake1Storage.sol";
 import "../libraries/LibTokenStake1.sol";
 
 /// @title The base storage of stakeContract
 contract Stake1Storage {
+
     /// @dev reward token : TOS
     address public token;
 
@@ -15,7 +15,7 @@ contract Stake1Storage {
     /// @dev paytoken is the token that the user stakes. ( if paytoken is ether, paytoken is address(0) )
     address public paytoken;
 
-    /// @dev A vault that holds tos rewards.
+    /// @dev A vault that holds TOS rewards.
     address public vault;
 
     /// @dev the start block for sale.
@@ -40,6 +40,12 @@ contract Stake1Storage {
     uint256 public totalStakers;
 
     uint256 internal _lock;
+
+    /// @dev flag for pause proxy
+    bool public pauseProxy;
+
+    /// @dev extra address storage
+    address public defiAddr;
 
     /// @dev user's staked information
     function getUserStaked(address user)

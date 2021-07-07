@@ -3,11 +3,10 @@ pragma solidity ^0.7.6;
 
 //import "../interfaces/IStakeVaultStorage.sol";
 import "../libraries/LibTokenStake1.sol";
-import "@openzeppelin/contracts/access/AccessControl.sol";
+import "../common/AccessibleCommon.sol";
 
 /// @title the storage of StakeVaultStorage
-contract StakeVaultStorage is AccessControl {
-    bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
+contract StakeVaultStorage is AccessibleCommon {
 
     /// @dev reward token : TOS
     address public tos;
@@ -56,13 +55,8 @@ contract StakeVaultStorage is AccessControl {
 
     uint256 private _lock;
 
-    modifier onlyOwner() {
-        require(
-            hasRole(ADMIN_ROLE, msg.sender),
-            "StakeVaultStorage: Caller is not an admin"
-        );
-        _;
-    }
+    /// @dev flag for pause proxy
+    bool public pauseProxy;
 
     modifier lock() {
         require(_lock == 0, "Stake1Vault: LOCKED");
@@ -71,11 +65,4 @@ contract StakeVaultStorage is AccessControl {
         _lock = 0;
     }
 
-    /// @dev transfer Ownership
-    /// @param newOwner new owner address
-    function transferOwnership(address newOwner) external onlyOwner {
-        require(msg.sender != newOwner, "StakeVaultStorage: same owner");
-        grantRole(ADMIN_ROLE, newOwner);
-        revokeRole(ADMIN_ROLE, msg.sender);
-    }
 }

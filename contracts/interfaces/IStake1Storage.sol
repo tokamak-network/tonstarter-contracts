@@ -11,7 +11,7 @@ interface IStake1Storage {
     /// @dev paytoken is the token that the user stakes. ( if paytoken is ether, paytoken is address(0) )
     function paytoken() external view returns (address);
 
-    /// @dev A vault that holds tos rewards.
+    /// @dev A vault that holds TOS rewards.
     function vault() external view returns (address);
 
     /// @dev the start block for sale.

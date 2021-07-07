@@ -4,39 +4,18 @@ pragma solidity ^0.7.6;
 import "../interfaces/ITOS.sol";
 import "../libraries/ChainId.sol";
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import "@openzeppelin/contracts/access/AccessControl.sol";
+import "../common/AccessiblePlusCommon.sol";
 
 /// @title the platform token. TOS token
-contract TOS is ERC20, AccessControl, ITOS {
-    bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
-    bytes32 public constant MINTER_ROLE = keccak256("MINTER");
-    bytes32 public constant BURNER_ROLE = keccak256("BURNER");
 
-    /// @dev The hash of the name used in the permit signature verification
-    bytes32 private immutable nameHash;
+contract TOS is ERC20, AccessiblePlusCommon, ITOS {
 
-    /// @dev The hash of the version string used in the permit signature verification
-    bytes32 private immutable versionHash;
-
-    //bytes32 public override DOMAIN_SEPARATOR;
+    bytes32 public override DOMAIN_SEPARATOR;
     mapping(address => uint256) public override nonces;
 
     /// @dev Value is equal to keccak256("Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)");
     bytes32 public constant PERMIT_TYPEHASH =
         0x6e71edae12b1b97f4d1f60370fef10105fa2faae0126114a169c64845d6126c9;
-
-    struct Permit {
-        address owner;
-        address spender;
-        address value;
-        address nonce;
-        address deadline;
-    }
-
-    modifier onlyOwner() {
-        require(hasRole(ADMIN_ROLE, msg.sender), "TOS: Caller is not an admin");
-        _;
-    }
 
     /// @dev constructor of TOS, ERC20 Token
     constructor(
@@ -44,53 +23,33 @@ contract TOS is ERC20, AccessControl, ITOS {
         string memory symbol_,
         string memory version_
     ) ERC20(name_, symbol_) {
-        nameHash = keccak256(bytes(name_));
-        versionHash = keccak256(bytes(version_));
 
-        _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
-        _setRoleAdmin(BURNER_ROLE, ADMIN_ROLE);
-        _setRoleAdmin(MINTER_ROLE, ADMIN_ROLE);
-
-        _setupRole(ADMIN_ROLE, msg.sender);
-        _setupRole(BURNER_ROLE, msg.sender);
-        _setupRole(MINTER_ROLE, msg.sender);
-    }
-
-    function DOMAIN_SEPARATOR() public view override returns (bytes32) {
         uint256 chainId;
         assembly {
             chainId := chainid()
         }
 
-        return
-            keccak256(
+        DOMAIN_SEPARATOR = keccak256(
                 abi.encode(
                     // keccak256('EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)')
                     0x8b73c3c69bb8fe3d512ecc4cf759cc79239f7b179b0ffacaa9a75d522b39400f,
-                    nameHash,
-                    versionHash,
+                    keccak256(bytes(name_)),
+                    keccak256(bytes(version_)),
                     chainId,
                     address(this)
                 )
             );
-    }
 
-    /// @dev transfer Ownership
-    /// @param newOwner new owner address
-    function transferOwnership(address newOwner) external onlyOwner {
-        require(msg.sender != newOwner, "TOS:same owner");
-        grantRole(ADMIN_ROLE, newOwner);
-        revokeRole(ADMIN_ROLE, msg.sender);
+        _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
+        _setupRole(ADMIN_ROLE, msg.sender);
+        _setupRole(BURNER_ROLE, msg.sender);
+        _setupRole(MINTER_ROLE, msg.sender);
     }
 
     /// @dev Issue a token.
     /// @param to  who takes the issue
     /// @param amount the amount to issue
-    function mint(address to, uint256 amount) external override returns (bool) {
-        require(
-            hasRole(MINTER_ROLE, msg.sender),
-            "TOS: Caller is not a minter"
-        );
+    function mint(address to, uint256 amount) external override onlyMinter returns (bool) {
         _mint(to, amount);
         return true;
     }
@@ -100,13 +59,9 @@ contract TOS is ERC20, AccessControl, ITOS {
     /// @param amount the amount to burn
     function burn(address from, uint256 amount)
         external
-        override
+        override onlyBurner
         returns (bool)
     {
-        require(
-            hasRole(BURNER_ROLE, msg.sender),
-            "TOS: Caller is not a burner"
-        );
         _burn(from, amount);
         return true;
     }
@@ -116,7 +71,7 @@ contract TOS is ERC20, AccessControl, ITOS {
     /// @param owner the token's owner
     /// @param spender the account that spend owner's token
     /// @param value the amount to be approve to spend
-    /// @param deadline the deadline that vaild the owner's signature
+    /// @param deadline the deadline that valid the owner's signature
     /// @param v the owner's signature - v
     /// @param r the owner's signature - r
     /// @param s the owner's signature - s
@@ -135,7 +90,7 @@ contract TOS is ERC20, AccessControl, ITOS {
             keccak256(
                 abi.encodePacked(
                     "\x19\x01",
-                    DOMAIN_SEPARATOR(),
+                    DOMAIN_SEPARATOR,
                     keccak256(
                         abi.encode(
                             PERMIT_TYPEHASH,
@@ -162,17 +117,15 @@ contract TOS is ERC20, AccessControl, ITOS {
     }
 
     /// @dev verify the signature
-    /// @param signer the signer address
     /// @param owner the token's owner
     /// @param spender the account that spend owner's token
     /// @param value the amount to be approve to spend
-    /// @param deadline the deadline that vaild the owner's signature
+    /// @param deadline the deadline that valid the owner's signature
     /// @param _nounce the _nounce
     /// @param sigR the owner's signature - r
     /// @param sigS the owner's signature - s
     /// @param sigV the owner's signature - v
     function verify(
-        address signer,
         address owner,
         address spender,
         uint256 value,
@@ -181,9 +134,9 @@ contract TOS is ERC20, AccessControl, ITOS {
         bytes32 sigR,
         bytes32 sigS,
         uint8 sigV
-    ) public view override returns (bool) {
+    ) external view override returns (bool) {
         return
-            signer ==
+            owner ==
             ecrecover(
                 hashPermit(owner, spender, value, deadline, _nounce),
                 sigV,
@@ -196,7 +149,7 @@ contract TOS is ERC20, AccessControl, ITOS {
     /// @param owner the token's owner
     /// @param spender the account that spend owner's token
     /// @param value the amount to be approve to spend
-    /// @param deadline the deadline that vaild the owner's signature
+    /// @param deadline the deadline that valid the owner's signature
     /// @param _nounce the _nounce
     function hashPermit(
         address owner,
@@ -209,7 +162,7 @@ contract TOS is ERC20, AccessControl, ITOS {
             keccak256(
                 abi.encodePacked(
                     "\x19\x01",
-                    DOMAIN_SEPARATOR(),
+                    DOMAIN_SEPARATOR,
                     keccak256(
                         abi.encode(
                             PERMIT_TYPEHASH,

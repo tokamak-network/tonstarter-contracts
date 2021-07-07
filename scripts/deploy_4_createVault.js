@@ -33,8 +33,9 @@ const {
   createValue,
   createStakeContract,
   timeout,
-  getPeriodBlockByTimes,
-} = require("../utils/deploy_common.js");
+
+  getPeriodBlockByTimes
+  } = require("../utils/deploy_common.js");
 
 async function main() {
   let VaultName = null;
@@ -58,7 +59,7 @@ async function main() {
   let saleStartBlock = parseInt(curBlock) + (60 * 5) / 13;
   saleStartBlock = parseInt(saleStartBlock);
 
-  let stakeStartBlock = parseInt(saleStartBlock) + (60 * 60 * 2) / 13;
+  let stakeStartBlock = parseInt(saleStartBlock) + (60 * 60 * 24 * 1 ) / 13;
   stakeStartBlock = parseInt(stakeStartBlock);
 
   const vault = {
@@ -66,22 +67,25 @@ async function main() {
     saleStartBlock: saleStartBlock,
     stakeStartBlock: stakeStartBlock,
     phase: 1,
-    hashName: keccak256(VaultName),
-    type: 0,
-  };
 
-  let token = null;
-  if (StakeType == "TON") {
+    hashName : keccak256(VaultName),
+    type: 0,
+  }
+
+  let token = null ;
+  if(StakeType == "TON"){
     vault.type = 0;
     token = ton;
-  } else if (StakeType == "ETH") {
+
+  }else if(StakeType == "ETH"){
     vault.type = 1;
     token = zeroAddress;
   }
 
-  console.log("StakeType", StakeType);
-  console.log("token", token);
+  console.log('StakeType',StakeType);
+  console.log('token',token);
   await createValue(vault, token);
+
 }
 
 main()

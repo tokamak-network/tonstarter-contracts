@@ -8,7 +8,8 @@ import {IIStake1Vault} from "../interfaces/IIStake1Vault.sol";
 import {IIDepositManager} from "../interfaces/IIDepositManager.sol";
 import {IISeigManager} from "../interfaces/IISeigManager.sol";
 import {SafeMath} from "../utils/math/SafeMath.sol";
-import "@openzeppelin/contracts/access/AccessControl.sol";
+import "../common/AccessibleCommon.sol";
+
 import "../stake/StakeTONStorage.sol";
 import "@uniswap/v3-periphery/contracts/interfaces/ISwapRouter.sol";
 import "@uniswap/v2-periphery/contracts/interfaces/IUniswapV2Router01.sol";
@@ -58,9 +59,8 @@ interface ITokamakRegistry {
 }
 
 /// @title The connector that integrates tokamak
-contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
+contract TokamakStaker is StakeTONStorage, AccessibleCommon, ITokamakStaker {
     using SafeMath for uint256;
-    bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
 
     modifier nonZero(address _addr) {
         require(_addr != address(0), "TokamakStaker: zero address");
@@ -72,19 +72,19 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
         _;
     }
 
-    modifier onlyOwner() {
-        require(
-            hasRole(ADMIN_ROLE, msg.sender),
-            "TokamakStaker: Caller is not an admin"
-        );
-        _;
-    }
-
     modifier lock() {
         require(_lock == 0, "TokamakStaker:LOCKED");
         _lock = 1;
         _;
         _lock = 0;
+    }
+
+    modifier onlyClosed() {
+        require(
+            IIStake1Vault(vault).saleClosed(),
+            "TokamakStaker: not closed"
+        );
+        _;
     }
 
     /// @dev event on set the registry address
@@ -98,18 +98,18 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
     /// @dev event on staking the staked TON in layer2 in tokamak
     /// @param layer2 the layer2 address in tokamak
     /// @param amount the amount that stake to layer2
-    event tokamakStaked(address layer2, uint256 amount);
+    event TokamakStaked(address layer2, uint256 amount);
 
     /// @dev event on request unstaking the wtonAmount in layer2 in tokamak
     /// @param layer2 the layer2 address in tokamak
     /// @param amount the amount requested to unstaking
-    event tokamakRequestedUnStaking(address layer2, uint256 amount);
+    event TokamakRequestedUnStaking(address layer2, uint256 amount);
 
     /// @dev event on process unstaking in layer2 in tokamak
     /// @param layer2 the layer2 address in tokamak
     /// @param rn the number of requested unstaking
     /// @param receiveTON if is true ,TON , else is WTON
-    event tokamakProcessedUnStaking(
+    event TokamakProcessedUnStaking(
         address layer2,
         uint256 rn,
         bool receiveTON
@@ -117,13 +117,14 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
 
     /// @dev event on request unstaking the amount of all in layer2 in tokamak
     /// @param layer2 the layer2 address in tokamak
-    event tokamakRequestedUnStakingAll(address layer2);
+    event TokamakRequestedUnStakingAll(address layer2);
 
     /// @dev exchange WTON to TOS using uniswap v3
     /// @param caller the sender
     /// @param amountIn the input amount
     /// @return amountOut the amount of exchanged out token
-    event exchangedWTONtoTOS(
+
+    event ExchangedWTONtoTOS(
         address caller,
         uint256 amountIn,
         uint256 amountOut
@@ -133,19 +134,12 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
     /// @param caller the sender
     /// @param amountIn the input amount
     /// @return amountOut the amount of exchanged out token
-    event exchangedWTONtoTOS2(
+
+    event ExchangedWTONtoTOS2(
         address caller,
         uint256 amountIn,
         uint256 amountOut
     );
-
-    /// @dev transfer Ownership
-    /// @param newOwner new owner address
-    function transferOwnership(address newOwner) external onlyOwner {
-        require(msg.sender != newOwner, "TokamakStaker:same owner");
-        grantRole(ADMIN_ROLE, newOwner);
-        revokeRole(ADMIN_ROLE, msg.sender);
-    }
 
     /// @dev set registry address
     /// @param _registry new registry address
@@ -194,7 +188,7 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
     /// @dev Change the TON holded in contract have to WTON, or change WTON to TON.
     /// @param amount the amount to be changed
     /// @param toWTON if it's true, TON->WTON , else WTON->TON
-    function swapTONtoWTON(uint256 amount, bool toWTON) public override lock {
+    function swapTONtoWTON(uint256 amount, bool toWTON) external override lock {
         checkTokamak();
 
         if (toWTON) {
@@ -259,13 +253,11 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
         lock
         nonZero(stakeRegistry)
         nonZero(_layer2)
+        onlyClosed
     {
         require(block.number <= endBlock, "TokamakStaker:period end");
         require(stakeAmount > 0, "TokamakStaker:stakeAmount is zero");
-        require(
-            IIStake1Vault(vault).saleClosed() == true,
-            "TokamakStaker:not closed"
-        );
+
         defiStatus = uint256(LibTokenStake1.DefiStatus.DEPOSITED);
 
         checkTokamak();
@@ -311,23 +303,20 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
             "TokamakStaker:approveAndCall fail"
         );
 
-        emit tokamakStaked(_layer2, stakeAmount);
+        emit TokamakStaked(_layer2, stakeAmount);
     }
 
     /// @dev  request unstaking the wtonAmount in layer2 in tokamak
     /// @param _layer2 the layer2 address in tokamak
     /// @param wtonAmount the amount requested to unstaking
     function tokamakRequestUnStaking(address _layer2, uint256 wtonAmount)
-        public
+        external
         override
         lock
         nonZero(stakeRegistry)
+        onlyClosed
         sameTokamakLayer(_layer2)
     {
-        require(
-            IIStake1Vault(vault).saleClosed() == true,
-            "TokamakStaker:not closed"
-        );
         defiStatus = uint256(LibTokenStake1.DefiStatus.REQUESTWITHDRAW);
         requestNum = requestNum.add(1);
         checkTokamak();
@@ -339,48 +328,44 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
 
         IIDepositManager(depositManager).requestWithdrawal(_layer2, wtonAmount);
 
-        emit tokamakRequestedUnStaking(_layer2, wtonAmount);
+        emit TokamakRequestedUnStaking(_layer2, wtonAmount);
     }
 
     /// @dev  request unstaking the amount of all in layer2 in tokamak
     /// @param _layer2 the layer2 address in tokamak
     function tokamakRequestUnStakingAll(address _layer2)
-        public
+        external
         override
         lock
         nonZero(stakeRegistry)
+        onlyClosed
         sameTokamakLayer(_layer2)
     {
-        require(
-            IIStake1Vault(vault).saleClosed() == true,
-            "TokamakStaker:not closed"
-        );
+
         defiStatus = uint256(LibTokenStake1.DefiStatus.REQUESTWITHDRAW);
         requestNum = requestNum.add(1);
         checkTokamak();
 
         IIDepositManager(depositManager).requestWithdrawalAll(_layer2);
 
-        emit tokamakRequestedUnStakingAll(_layer2);
+        emit TokamakRequestedUnStakingAll(_layer2);
     }
 
     /// @dev process unstaking in layer2 in tokamak
     /// @param _layer2 the layer2 address in tokamak
     function tokamakProcessUnStaking(address _layer2)
-        public
+        external
         override
         lock
         nonZero(stakeRegistry)
+        onlyClosed
         sameTokamakLayer(_layer2)
     {
         require(
             defiStatus != uint256(LibTokenStake1.DefiStatus.WITHDRAW),
             "TokamakStaker:Already ProcessUnStaking"
         );
-        require(
-            IIStake1Vault(vault).saleClosed() == true,
-            "TokamakStaker:not closed"
-        );
+
         defiStatus = uint256(LibTokenStake1.DefiStatus.WITHDRAW);
         uint256 rn = requestNum;
         requestNum = 0;
@@ -391,19 +376,18 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
             0
         ) tokamakLayer2 = address(0);
 
-        fromTokamak += IIDepositManager(depositManager).pendingUnstaked(
+        fromTokamak = fromTokamak.add(IIDepositManager(depositManager).pendingUnstaked(
             _layer2,
             address(this)
-        );
+        ));
 
         // receiveTON = false . to WTON
         IIDepositManager(depositManager).processRequests(_layer2, rn, true);
 
-        emit tokamakProcessedUnStaking(_layer2, rn, true);
+        emit TokamakProcessedUnStaking(_layer2, rn, true);
     }
 
     /// @dev exchange holded WTON to TOS using uniswap
-    /// @notice
     /// @param _amountIn the input amount
     /// @param _amountOutMinimum the minimun output amount
     /// @param _deadline deadline
@@ -416,14 +400,12 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
         uint256 _deadline,
         uint160 _sqrtPriceLimitX96,
         uint256 _kind
-    ) external override lock returns (uint256 amountOut) {
+    ) external override lock onlyClosed returns (uint256 amountOut) {
         require(block.number <= endBlock, "TokamakStaker: period end");
         require(
-            IIStake1Vault(vault).saleClosed() == true,
-            "TokamakStaker: not closed"
+            _kind < 2,
+            "TokamakStaker: not available kind"
         );
-        require(_kind < 2, "TokamakStaker: no kind");
-
         checkTokamak();
 
         {
@@ -467,7 +449,7 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
             }
         }
 
-        toUniswapWTON += _amountIn;
+        toUniswapWTON = toUniswapWTON.add(_amountIn);
         (address uniswapRouter, , address wethAddress, uint256 _fee, ) =
             ITokamakRegistry(stakeRegistry).getUniswap();
         require(uniswapRouter != address(0), "TokamakStaker:uniswap zero");
@@ -507,7 +489,7 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
             amountOut = ISwapRouter(uniswapRouter).exactInput(params);
         }
 
-        emit exchangedWTONtoTOS(msg.sender, _amountIn, amountOut);
+        emit ExchangedWTONtoTOS(msg.sender, _amountIn, amountOut);
     }
 
     /// @dev exchange holded WTON to TOS using uniswap-v2
@@ -520,13 +502,12 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
         uint256 _amountOutMinimum,
         uint256 _deadline,
         uint256 _kind
-    ) external override lock returns (uint256 amountOut) {
+    ) external override lock onlyClosed returns (uint256 amountOut) {
         require(block.number <= endBlock, "TokamakStaker:period end");
         require(
-            IIStake1Vault(vault).saleClosed() == true,
-            "TokamakStaker:not closed"
+            _kind < 2,
+            "TokamakStaker: not available kind"
         );
-        require(_kind < 2, "no kind");
         checkTokamak();
 
         {
@@ -569,7 +550,7 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
             }
         }
 
-        toUniswapWTON += _amountIn;
+        toUniswapWTON = toUniswapWTON.add(_amountIn);
         (, , address wethAddress, , address uniswapRouterV2) =
             ITokamakRegistry(stakeRegistry).getUniswap();
 
@@ -608,7 +589,7 @@ contract TokamakStaker is StakeTONStorage, AccessControl, ITokamakStaker {
             amountOut = amounts[amounts.length - 1];
         }
 
-        emit exchangedWTONtoTOS2(msg.sender, _amountIn, amountOut);
+        emit ExchangedWTONtoTOS2(msg.sender, _amountIn, amountOut);
     }
 
     /*
