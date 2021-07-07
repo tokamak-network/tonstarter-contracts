@@ -48,7 +48,7 @@ contract Stake1Storage {
     address public defiAddr;
 
     ///@dev for migrate L2
-    bool public migratedL2
+    bool public migratedL2;
 
     /// @dev user's staked information
     function getUserStaked(address user)
