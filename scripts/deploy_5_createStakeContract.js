@@ -103,7 +103,7 @@ async function main() {
   let saleStartBlock = parseInt(curBlock) + (60 * 5) / 13;
   saleStartBlock = parseInt(saleStartBlock);
 
-  let stakeStartBlock = parseInt(saleStartBlock) + (60 * 60) / 13;
+  let stakeStartBlock = parseInt(saleStartBlock) + (60 * 60 * 2) / 13;
   stakeStartBlock = parseInt(stakeStartBlock);
 
   //= =============================

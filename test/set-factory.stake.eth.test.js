@@ -196,6 +196,7 @@ describe ("Stake1Logic : Upgradable Stake Contracts", function () {
 
         for (const { address: userAddress } of usersInfo) {
           const reward = await stakeContract.canRewardAmount(userAddress, block);
+          //console.log({ reward: reward.toString()  });
           const tosBalance = await tos.balanceOf(userAddress);
           await stakeContract.claim({ from: userAddress });
           block++;
