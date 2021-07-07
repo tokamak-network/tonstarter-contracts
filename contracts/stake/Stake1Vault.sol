@@ -9,6 +9,7 @@ import "../interfaces/IStake1Storage.sol";
 import "../libraries/LibTokenStake1.sol";
 import {SafeMath} from "../utils/math/SafeMath.sol";
 import "./StakeVaultStorage.sol";
+import "hardhat/console.sol";
 
 /// @title TOS Token's Vault - stores the tos for the period of time
 /// @notice A vault is associated with the set of stake contracts.
@@ -163,6 +164,11 @@ contract Stake1Vault is StakeVaultStorage, IStake1Vault {
     /// @dev  Close the sale that can stake by user
     function closeSale() external override {
         require(saleClosed == false, "Stake1Vault: already closed");
+        console.log("stakeStartBlock %d", stakeStartBlock);
+        console.log("stakeEndBlock %d", stakeEndBlock);
+        console.log("block.number %d", block.number);
+
+
         require(
             cap > 0 &&
                 stakeStartBlock > 0 &&
@@ -170,6 +176,7 @@ contract Stake1Vault is StakeVaultStorage, IStake1Vault {
                 block.number > stakeStartBlock,
             "Stake1Vault: Before stakeStartBlock"
         );
+
         require(stakeAddresses.length > 0, "Stake1Vault: no stakes");
 
         realEndBlock = stakeEndBlock;

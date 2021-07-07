@@ -1,12 +1,15 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.7.6;
+//pragma abicoder v2;
 
-import "../interfaces/IStakeDefiProxy.sol";
-import "./Stake1Storage.sol";
+import "./StakeUniswapV3Storage.sol";
+import "../interfaces/IStakeRegistry.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
+import "@uniswap/v3-periphery/contracts/interfaces/INonfungiblePositionManager.sol";
 
-/// @title Proxy for stake defi contract
-contract StakeDefiProxy is Stake1Storage, AccessControl, IStakeDefiProxy {
+/// @title Proxy for Simple Stake contracts
+/// @notice
+contract StakeUniswapV3Proxy is StakeUniswapV3Storage, AccessControl {
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
     address internal _implementation;
     bool public pauseProxy;
@@ -14,12 +17,13 @@ contract StakeDefiProxy is Stake1Storage, AccessControl, IStakeDefiProxy {
     event Upgraded(address indexed implementation);
 
     modifier onlyOwner() {
-        require(hasRole(ADMIN_ROLE, msg.sender), "not an admin");
+        require(
+            hasRole(ADMIN_ROLE, msg.sender),
+            "StakeSimpleProxy:not an admin"
+        );
         _;
     }
 
-    /// @dev constructor of Stake1Proxy
-    /// @param _logic the logic address that used in proxy
     constructor(address _logic) {
         _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
         _setupRole(ADMIN_ROLE, msg.sender);
@@ -30,47 +34,44 @@ contract StakeDefiProxy is Stake1Storage, AccessControl, IStakeDefiProxy {
     /// @dev transfer Ownership
     /// @param newOwner new owner address
     function transferOwnership(address newOwner) external onlyOwner {
-        require(msg.sender != newOwner, "StakeDefiProxy:same owner");
+        require(msg.sender != newOwner, "StakeSimpleProxy:same owner");
         grantRole(ADMIN_ROLE, newOwner);
         revokeRole(ADMIN_ROLE, msg.sender);
     }
 
-    /// @dev Set pause state
+    /// @notice Set pause state
     /// @param _pause true:pause or false:resume
-    function setProxyPause(bool _pause) external override onlyOwner {
+    function setProxyPause(bool _pause) external onlyOwner {
         pauseProxy = _pause;
     }
 
-    /// @dev Set implementation contract
+    /// @notice Set implementation contract
     /// @param impl New implementation contract address
-    function upgradeTo(address impl) external override onlyOwner {
-        require(impl != address(0), "StakeDefiProxy: input is zero");
-        require(_implementation != impl, "same");
+    function upgradeTo(address impl) external onlyOwner {
+        require(impl != address(0), "StakeSimpleProxy: input is zero");
+        require(_implementation != impl, "StakeSimpleProxy: same");
         _implementation = impl;
         emit Upgraded(impl);
     }
 
     /// @dev returns the implementation
-    function implementation() public view override returns (address) {
+    function implementation() public view returns (address) {
         return _implementation;
     }
 
-    /// @dev receive ether
     receive() external payable {
         _fallback();
     }
 
-    /// @dev fallback function , execute on undefined function call
     fallback() external payable {
         _fallback();
     }
 
-    /// @dev fallback function , execute on undefined function call
     function _fallback() internal {
         address _impl = implementation();
         require(
             _impl != address(0) && !pauseProxy,
-            "StakeDefiProxy: impl is zero OR proxy is false"
+            "StakeSimpleProxy: impl is zero OR proxy is false"
         );
 
         assembly {
@@ -98,23 +99,27 @@ contract StakeDefiProxy is Stake1Storage, AccessControl, IStakeDefiProxy {
     }
 
     /// @dev set initial storage
-    /// @param _addr the array addresses of token, paytoken, vault
-    /// @param _registry teh registry address
+    /// @param _addr the array addresses of token, paytoken, vault, defiAddress
+    /// @param _registry the registry address
     /// @param _intdata the array valued of saleStartBlock, stakeStartBlock, periodBlocks
     function setInit(
         address[4] memory _addr,
         address _registry,
         uint256[3] memory _intdata
-    ) external onlyOwner override {
+    ) external onlyOwner {
         require(
             _addr[2] != address(0) && _intdata[0] < _intdata[1],
-            "setInit fail"
+            "StakeSimpleProxy: setInit fail"
         );
         token = _addr[0];
         paytoken = _addr[1];
         vault = _addr[2];
 
+        
         stakeRegistry = _registry;
+        (, address _uniswapV3NonfungiblePositionManager, address _uniswapV3FactoryAddress,,) = IStakeRegistry(stakeRegistry).getUniswap();
+        nonfungiblePositionManager = INonfungiblePositionManager(_uniswapV3NonfungiblePositionManager);
+        uniswapV3FactoryAddress = _uniswapV3FactoryAddress;
 
         saleStartBlock = _intdata[0];
         startBlock = _intdata[1];

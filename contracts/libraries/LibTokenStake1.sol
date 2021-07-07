@@ -13,10 +13,10 @@ library LibTokenStake1 {
     }
     struct DefiInfo {
         string name;
-        address router;
-        address ext1;
-        address ext2;
-        uint256 fee;
+        address uniswapV3SwapRouter;
+        address uniswapV3NonfungiblePositionManager;
+        address uniswapV3FactoryAddress;
+        uint256 lpFee;
         address routerV2;
     }
     struct StakeInfo {
