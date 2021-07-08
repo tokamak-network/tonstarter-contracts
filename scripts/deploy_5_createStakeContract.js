@@ -100,17 +100,17 @@ async function main() {
   const curBlock = await provider.getBlockNumber();
   console.log("curBlock", curBlock);
 
-  let saleStartBlock = parseInt(curBlock) + (60 * 5) / 13;
+  let saleStartBlock = parseInt(curBlock) + (60 * 10) / 13;
   saleStartBlock = parseInt(saleStartBlock);
 
-  let stakeStartBlock = parseInt(saleStartBlock) + (60 * 60 * 24 * 1 ) / 13;
+  let stakeStartBlock = parseInt(saleStartBlock) + (60 * 60 * 15 ) / 13;
   stakeStartBlock = parseInt(stakeStartBlock);
 
   //= =============================
-  // let periods = periodsMins;
-
+  //let periods = periodsMins;
   const periods = periodsMins.concat(periodsHours).concat(periodsDays);
-  console.log("periods", periods);
+  //const periods = periodsHours.concat(periodsDays);
+  //console.log("periods", periods);
 
   let token = null;
 
