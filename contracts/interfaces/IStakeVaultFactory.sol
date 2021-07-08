@@ -15,6 +15,21 @@ interface IStakeVaultFactory {
         address owner
     ) external returns (address);
 
+    /// @dev Create a vault that hold reward, _cap is allocated reward amount.
+    /// @param _phase phase number
+    /// @param _addr the array of [tos, _stakefactory]
+    /// @param _intInfo array of [_stakeType, _cap, _rewardPerBlock ]
+    /// @param _name the name of stake contract
+    /// @param owner the owner adderess
+    /// @return a vault address
+    function create2(
+        uint256 _phase,
+        address[2] calldata _addr,
+        uint256[3] calldata _intInfo,
+        string memory _name,
+        address owner
+    ) external returns (address);
+
     /// @dev Set stakeVaultLogic address by _phase
     /// @param _phase the stake type
     /// @param _logic the vault logic address

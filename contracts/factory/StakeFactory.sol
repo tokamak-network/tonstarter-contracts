@@ -52,8 +52,10 @@ contract StakeFactory is IStakeFactory, AccessibleCommon {
     /// @dev Create a stake contract that calls the desired stake factory according to stakeType
     /// @param stakeType if 0, stakeTONFactory, else if 1 , stakeSimpleFactory , else if 2, stakeUniswapV3Factory
     /// @param _addr array of [token, paytoken, vault, _defiAddr]
+    ///         or when stakeTyoe ==2 , [tos, vault, 0, 0 ]
     /// @param registry  registry address
     /// @param _intdata array of [saleStartBlock, startBlock, periodBlocks]
+    ///         or when stakeTyoe ==2 , [cap, rewardPerBlock, 0]
     /// @return contract address
     function create(
         uint256 stakeType,
