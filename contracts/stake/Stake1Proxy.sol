@@ -11,13 +11,20 @@ import "./ProxyBase.sol";
 /// @title The proxy of TOS Plaform
 /// @notice Admin can createVault, createStakeContract.
 /// User can excute the tokamak staking function of each contract through this logic.
-contract Stake1Proxy is StakeProxyStorage, AccessibleCommon, ProxyBase, IStakeProxy  {
-
+contract Stake1Proxy is
+    StakeProxyStorage,
+    AccessibleCommon,
+    ProxyBase,
+    IStakeProxy
+{
     event Upgraded(address indexed implementation);
 
     /// @dev constructor of Stake1Proxy
     constructor(address _logic) {
-        assert(IMPLEMENTATION_SLOT == bytes32(uint256(keccak256('eip1967.proxy.implementation')) - 1));
+        assert(
+            IMPLEMENTATION_SLOT ==
+                bytes32(uint256(keccak256("eip1967.proxy.implementation")) - 1)
+        );
 
         require(_logic != address(0), "Stake1Proxy: logic is zero");
 
@@ -48,8 +55,6 @@ contract Stake1Proxy is StakeProxyStorage, AccessibleCommon, ProxyBase, IStakePr
     function implementation() external view override returns (address) {
         return _implementation();
     }
-
-
 
     /// @dev receive ether
     receive() external payable {

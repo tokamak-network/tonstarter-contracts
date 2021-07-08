@@ -9,11 +9,13 @@ import "./ProxyBase.sol";
 /// @title Proxy for Simple Stake contracts
 /// @notice
 contract StakeSimpleProxy is Stake1Storage, AccessibleCommon, ProxyBase {
-
     event Upgraded(address indexed implementation);
 
     constructor(address _logic) {
-        assert(IMPLEMENTATION_SLOT == bytes32(uint256(keccak256('eip1967.proxy.implementation')) - 1));
+        assert(
+            IMPLEMENTATION_SLOT ==
+                bytes32(uint256(keccak256("eip1967.proxy.implementation")) - 1)
+        );
         require(_logic != address(0), "StakeSimpleProxy: logic is zero");
 
         _setImplementation(_logic);
@@ -85,10 +87,11 @@ contract StakeSimpleProxy is Stake1Storage, AccessibleCommon, ProxyBase {
     /// @dev set initial storage
     /// @param _addr the array addresses of token, paytoken, vault, defiAddr
     /// @param _intdata the array valued of saleStartBlock, stakeStartBlock, periodBlocks
-    function setInit(address[4] memory _addr, address _registry, uint256[3] memory _intdata)
-        external
-        onlyOwner
-    {
+    function setInit(
+        address[4] memory _addr,
+        address _registry,
+        uint256[3] memory _intdata
+    ) external onlyOwner {
         require(token == address(0), "StakeSimpleProxy: already initialized");
         require(
             _addr[2] != address(0) && _intdata[0] < _intdata[1],

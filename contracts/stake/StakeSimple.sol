@@ -40,8 +40,7 @@ contract StakeSimple is Stake1Storage, AccessibleCommon, IStakeSimple {
     event Withdrawal(address indexed to, uint256 amount);
 
     /// @dev constructor of StakeSimple
-    constructor() {
-    }
+    constructor() {}
 
     /// @dev receive ether
     /// @dev call stake function with msg.value
@@ -117,10 +116,7 @@ contract StakeSimple is Stake1Storage, AccessibleCommon, IStakeSimple {
 
     /// @dev Claim for reward
     function claim() external override lock {
-        require(
-            IIStake1Vault(vault).saleClosed(),
-            "StakeSimple: not closed"
-        );
+        require(IIStake1Vault(vault).saleClosed(), "StakeSimple: not closed");
         uint256 rewardClaim = 0;
 
         LibTokenStake1.StakedAmount storage staked = userStaked[msg.sender];
@@ -141,7 +137,10 @@ contract StakeSimple is Stake1Storage, AccessibleCommon, IStakeSimple {
         staked.claimedAmount = staked.claimedAmount.add(rewardClaim);
         rewardClaimedTotal = rewardClaimedTotal.add(rewardClaim);
 
-        require(IIStake1Vault(vault).claim(msg.sender, rewardClaim), "StakeSimple: fail claim from vault");
+        require(
+            IIStake1Vault(vault).claim(msg.sender, rewardClaim),
+            "StakeSimple: fail claim from vault"
+        );
 
         emit Claimed(msg.sender, rewardClaim, block.number);
     }

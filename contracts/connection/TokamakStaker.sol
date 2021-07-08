@@ -80,10 +80,7 @@ contract TokamakStaker is StakeTONStorage, AccessibleCommon, ITokamakStaker {
     }
 
     modifier onlyClosed() {
-        require(
-            IIStake1Vault(vault).saleClosed(),
-            "TokamakStaker: not closed"
-        );
+        require(IIStake1Vault(vault).saleClosed(), "TokamakStaker: not closed");
         _;
     }
 
@@ -341,7 +338,6 @@ contract TokamakStaker is StakeTONStorage, AccessibleCommon, ITokamakStaker {
         onlyClosed
         sameTokamakLayer(_layer2)
     {
-
         defiStatus = uint256(LibTokenStake1.DefiStatus.REQUESTWITHDRAW);
         requestNum = requestNum.add(1);
         checkTokamak();
@@ -376,10 +372,12 @@ contract TokamakStaker is StakeTONStorage, AccessibleCommon, ITokamakStaker {
             0
         ) tokamakLayer2 = address(0);
 
-        fromTokamak = fromTokamak.add(IIDepositManager(depositManager).pendingUnstaked(
-            _layer2,
-            address(this)
-        ));
+        fromTokamak = fromTokamak.add(
+            IIDepositManager(depositManager).pendingUnstaked(
+                _layer2,
+                address(this)
+            )
+        );
 
         // receiveTON = false . to WTON
         IIDepositManager(depositManager).processRequests(_layer2, rn, true);
@@ -402,10 +400,7 @@ contract TokamakStaker is StakeTONStorage, AccessibleCommon, ITokamakStaker {
         uint256 _kind
     ) external override lock onlyClosed returns (uint256 amountOut) {
         require(block.number <= endBlock, "TokamakStaker: period end");
-        require(
-            _kind < 2,
-            "TokamakStaker: not available kind"
-        );
+        require(_kind < 2, "TokamakStaker: not available kind");
         checkTokamak();
 
         {
@@ -504,10 +499,7 @@ contract TokamakStaker is StakeTONStorage, AccessibleCommon, ITokamakStaker {
         uint256 _kind
     ) external override lock onlyClosed returns (uint256 amountOut) {
         require(block.number <= endBlock, "TokamakStaker:period end");
-        require(
-            _kind < 2,
-            "TokamakStaker: not available kind"
-        );
+        require(_kind < 2, "TokamakStaker: not available kind");
         checkTokamak();
 
         {

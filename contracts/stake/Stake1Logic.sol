@@ -7,6 +7,7 @@ import {IStakeFactory} from "../interfaces/IStakeFactory.sol";
 import {IStakeRegistry} from "../interfaces/IStakeRegistry.sol";
 import {IStake1Vault} from "../interfaces/IStake1Vault.sol";
 import {IStakeTONTokamak} from "../interfaces/IStakeTONTokamak.sol";
+import {IStakeUniswapV3} from "../interfaces/IStakeUniswapV3.sol";
 
 import "../common/AccessibleCommon.sol";
 
@@ -16,12 +17,12 @@ import "./StakeProxyStorage.sol";
 /// @notice Admin can createVault, createStakeContract.
 /// User can excute the tokamak staking function of each contract through this logic.
 contract Stake1Logic is StakeProxyStorage, AccessibleCommon, IStake1Logic {
-
     modifier nonZero(address _addr) {
         require(_addr != address(0), "Stake1Logic:zero address");
         _;
     }
-/*
+
+    /*
     /// @dev event on create vault
     /// @param vault the vault address created
     /// @param paytoken the token used for staking by user
@@ -47,9 +48,7 @@ contract Stake1Logic is StakeProxyStorage, AccessibleCommon, IStake1Logic {
     event SetStakeRegistry(address stakeRegistry);
 */
 
-    constructor() {
-
-    }
+    constructor() {}
 
     /// @dev upgrade to the logic of _stakeProxy
     /// @param _stakeProxy the StakeProxy address, it is stakeContract address in vault.
@@ -60,7 +59,6 @@ contract Stake1Logic is StakeProxyStorage, AccessibleCommon, IStake1Logic {
     {
         IProxy(_stakeProxy).upgradeTo(_implementation);
     }
-
 
     /// @dev grant the role to account in target
     /// @param target target address
@@ -393,5 +391,14 @@ contract Stake1Logic is StakeProxyStorage, AccessibleCommon, IStake1Logic {
                 deadline,
                 _type
             );
+    }
+
+    function setPool(
+        address target,
+        address token0,
+        address token1,
+        string calldata defiInfoName
+    ) external {
+        IStakeUniswapV3(target).setPool(token0, token1, defiInfoName);
     }
 }

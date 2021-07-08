@@ -2,7 +2,6 @@
 pragma solidity ^0.7.6;
 
 interface IStake1Logic {
-
     /// @dev event on create vault
     /// @param vault the vault address created
     /// @param paytoken the token used for staking by user
@@ -166,5 +165,4 @@ interface IStake1Logic {
         uint160 sqrtPriceLimitX96,
         uint256 _type
     ) external returns (uint256 amountOut);
-
 }

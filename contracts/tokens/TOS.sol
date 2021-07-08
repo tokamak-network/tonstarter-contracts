@@ -9,7 +9,6 @@ import "../common/AccessiblePlusCommon.sol";
 /// @title the platform token. TOS token
 
 contract TOS is ERC20, AccessiblePlusCommon, ITOS {
-
     bytes32 public override DOMAIN_SEPARATOR;
     mapping(address => uint256) public override nonces;
 
@@ -23,22 +22,21 @@ contract TOS is ERC20, AccessiblePlusCommon, ITOS {
         string memory symbol_,
         string memory version_
     ) ERC20(name_, symbol_) {
-
         uint256 chainId;
         assembly {
             chainId := chainid()
         }
 
         DOMAIN_SEPARATOR = keccak256(
-                abi.encode(
-                    // keccak256('EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)')
-                    0x8b73c3c69bb8fe3d512ecc4cf759cc79239f7b179b0ffacaa9a75d522b39400f,
-                    keccak256(bytes(name_)),
-                    keccak256(bytes(version_)),
-                    chainId,
-                    address(this)
-                )
-            );
+            abi.encode(
+                // keccak256('EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)')
+                0x8b73c3c69bb8fe3d512ecc4cf759cc79239f7b179b0ffacaa9a75d522b39400f,
+                keccak256(bytes(name_)),
+                keccak256(bytes(version_)),
+                chainId,
+                address(this)
+            )
+        );
 
         _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
         _setRoleAdmin(BURNER_ROLE, ADMIN_ROLE);
@@ -52,7 +50,12 @@ contract TOS is ERC20, AccessiblePlusCommon, ITOS {
     /// @dev Issue a token.
     /// @param to  who takes the issue
     /// @param amount the amount to issue
-    function mint(address to, uint256 amount) external override onlyMinter returns (bool) {
+    function mint(address to, uint256 amount)
+        external
+        override
+        onlyMinter
+        returns (bool)
+    {
         _mint(to, amount);
         return true;
     }
@@ -62,7 +65,8 @@ contract TOS is ERC20, AccessiblePlusCommon, ITOS {
     /// @param amount the amount to burn
     function burn(address from, uint256 amount)
         external
-        override onlyBurner
+        override
+        onlyBurner
         returns (bool)
     {
         _burn(from, amount);

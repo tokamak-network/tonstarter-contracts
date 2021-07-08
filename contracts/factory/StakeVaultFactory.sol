@@ -7,7 +7,6 @@ import "../common/AccessibleCommon.sol";
 
 /// @title A factory that creates a vault that hold reward
 contract StakeVaultFactory is AccessibleCommon, IStakeVaultFactory {
-
     mapping(uint256 => address) public vaultLogics;
 
     modifier nonZero(address _addr) {
@@ -49,8 +48,10 @@ contract StakeVaultFactory is AccessibleCommon, IStakeVaultFactory {
         uint256[4] calldata _intInfo,
         address owner
     ) external override returns (address) {
-
-        require(vaultLogics[_phase] != address(0), "StakeVaultFactory: zero vault logic ");
+        require(
+            vaultLogics[_phase] != address(0),
+            "StakeVaultFactory: zero vault logic "
+        );
         address _tos = _addr[0];
         address _paytoken = _addr[1];
         address _stakefactory = _addr[2];
