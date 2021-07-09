@@ -17,9 +17,13 @@
 ### Test Contracts with Truffle
 
 `npm run test:stake.eth`
+
 `npm run test:stake.ton`
+
 `npm run test:stake.tokamak`
+
 `npm run test:upgrade`
+
 `npm run test:factory`
 
 ### Deploy to Ethereum
