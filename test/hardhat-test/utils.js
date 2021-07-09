@@ -83,11 +83,6 @@ async function setupContracts(account) {
     .deploy(name, symbol, version);
   await tos.deployed();
 
-  const stos = await (await ethers.getContractFactory("STOS"))
-    .connect(deployer)
-    .deploy();
-  await stos.deployed();
-
   const stakeRegistry = await (await ethers.getContractFactory("StakeRegistry"))
     .connect(deployer)
     .deploy(tos.address);
@@ -158,12 +153,10 @@ async function setupContracts(account) {
 
   const stake1Proxy = await (await ethers.getContractFactory("Stake1Proxy"))
     .connect(deployer)
-    .deploy(
-      stake1Logic.address
-    );
+    .deploy(stake1Logic.address);
   await stake1Proxy.deployed();
 
-  //await stake1Proxy.connect(deployer).upgradeTo(stake1Logic.address);
+  // await stake1Proxy.connect(deployer).upgradeTo(stake1Logic.address);
 
   const stakeEntry = await (
     await ethers.getContractFactory("Stake1Logic")
@@ -233,7 +226,6 @@ async function setupContracts(account) {
   await seigManager.connect(deployer).setDao(daoVault.address);
   await wton.connect(deployer).addMinter(seigManager.address);
   await ton.connect(deployer).addMinter(wton.address);
-  console.log("hello2");
 
   await Promise.all(
     [depositManager, wton].map((contract) =>
@@ -293,18 +285,13 @@ async function setupContracts(account) {
     .setMinimumAmount(
       TON_MINIMUM_STAKE_AMOUNT.times(WTON_TON_RATIO).toFixed(WTON_UNIT)
     );
-  console.log("hello4");
 
-
-  const swapProxy = await (
-    await ethers.getContractFactory("SwapProxy")
-  )
+  const swapProxy = await (await ethers.getContractFactory("SwapProxy"))
     .connect(deployer)
     .deploy();
 
   return {
     tos,
-    stos,
     stakeRegistry,
     stakeSimple,
     stakeSimpleFactory,
@@ -356,4 +343,11 @@ async function setupContracts(account) {
   };
 }
 
-module.exports = { setupContracts, getAddresses, findSigner };
+const mineBlocks = async (untilBlock) => {
+  const blockNumber = await ethers.provider.getBlockNumber();
+  for (let i = blockNumber; i < untilBlock; ++i) {
+    await ethers.provider.send("evm_mine");
+  }
+};
+
+module.exports = { setupContracts, getAddresses, findSigner, mineBlocks };
