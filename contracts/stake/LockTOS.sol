@@ -6,23 +6,137 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 import "../interfaces/ILockTOS.sol";
 
+import "hardhat/console.sol";
+
 contract LockTOS is ILockTOS, AccessControl {
+  uint256 public constant ONE_WEEK = 1 weeks;
+  uint256 public constant MAXTIME = 4 * (365 days);
+  // uint256 public totalSupply = 0;
+
   Point[] private pointHistory;
   mapping (address => Point[]) public userPointHistory;
   mapping (address => LockedBalance) public lockedBalances;
   mapping (uint256 => int128) public slopeChanges;
-
-  uint256 public constant ONE_WEEK = 1 weeks;
-  uint256 public constant MAXTIME = 4 * (365 days);
-  uint256 public constant MULTIPLIER = 1e18;
   address public tos;
+
 
   constructor(address _tos) {
     _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
-
     tos = _tos;
   }
 
+  /// @inheritdoc ILockTOS
+  function increaseAmount(uint256 _value) override external {
+    depositFor(msg.sender, _value);
+  }
+
+
+  /// @inheritdoc ILockTOS
+  function depositFor(address _addr, uint256 _value) override public {
+    require(_value > 0, "Value locked should be non-zero");
+    require(lockedBalances[msg.sender].end > block.timestamp, "Withdraw old tokens");
+    require(lockedBalances[msg.sender].amount == 0, "Withdraw old tokens");
+    _deposit(_addr, _value, 0);
+  }
+
+  /// @inheritdoc ILockTOS
+  function createLock(uint256 _value, uint256 _unlockTime) override external {
+    require(_value > 0, "Value locked should be non-zero");
+    require (_unlockTime > block.timestamp, "Unlock time");
+    require(lockedBalances[msg.sender].amount == 0, "Withdraw old tokens");
+
+    uint256 unlockTime = (_unlockTime / ONE_WEEK) * ONE_WEEK;
+    _deposit(msg.sender, _value, unlockTime);
+  }
+
+  /// @inheritdoc ILockTOS
+  function increaseUnlockTime(uint256 unlockTime) override external {
+    require (lockedBalances[msg.sender].end > block.timestamp, "Unlock time");
+    require (lockedBalances[msg.sender].end < unlockTime, "Unlock time");
+    require(lockedBalances[msg.sender].amount > 0, "No existing locked TOS");
+    _deposit(msg.sender, 0, unlockTime);
+  }
+
+  /// @inheritdoc ILockTOS
+  function withdraw() override external {
+    LockedBalance memory lockedOld = lockedBalances[msg.sender];
+    LockedBalance memory lockedNew = LockedBalance({amount: 0, end: 0});
+    require(lockedOld.end < block.timestamp, "");
+
+    lockedBalances[msg.sender] = lockedNew;
+    _checkpoint(lockedNew, lockedOld);
+  }
+
+  /// @inheritdoc ILockTOS
+  function voteWeightOf(address _addr) override public view returns (int128) {
+    if (userPointHistory[_addr].length == 0) return 0;
+    Point memory lastPoint = userPointHistory[_addr][userPointHistory[_addr].length - 1];
+    int128 currentBias = lastPoint.slope * int128(block.timestamp - lastPoint.timestamp + 1);
+    console.log("Vote Weight: %d", uint256(currentBias));
+    return lastPoint.bias > currentBias ? lastPoint.bias - currentBias : 0;
+  }
+
+  /// @inheritdoc ILockTOS
+  function voteWeightOfAt(address _addr, uint256 _timestamp) override external view returns (int128) {
+    (bool success, Point memory point) = _findClosestPoint(userPointHistory[_addr], _timestamp);
+    if (!success) {
+      return 0;
+    }
+    int128 currentBias = point.slope * int128(_timestamp - point.timestamp);
+    console.log("Vote Weight At: %d", uint256(currentBias));
+    return point.bias > currentBias ? point.bias - currentBias : 0;
+  }
+
+  /// @dev Finds closest point
+  function _findClosestPoint(Point[] storage _history, uint256 _timestamp) internal view returns (bool success, Point memory point) {
+    if (_history.length == 0) {
+      return (false, point);
+    }
+
+    uint256 left = 0;
+    uint256  right = _history.length - 1;
+    while (left + 1 < right) {
+      uint256 mid = (left + right) / 2;
+      if (_history[mid].timestamp <= _timestamp) {
+        left = mid;
+      } else {
+        right = mid;
+      }
+    }
+    return (true, _history[left]);
+  }
+
+  /// @dev Deposit
+  function _deposit(address _addr, uint256 _value, uint256 _unlockTime) internal {
+    LockedBalance memory lockedOld = lockedBalances[_addr];
+    LockedBalance memory lockedNew = LockedBalance({amount: lockedOld.amount, end: lockedOld.end});
+
+    lockedNew.amount += _value;
+    if (_unlockTime > 0) {
+      lockedNew.end = _unlockTime;
+    }
+    _checkpoint(lockedNew, lockedOld);
+
+    // Transfer tos
+    IERC20(tos).transferFrom(_addr, address(this), _value);
+
+    // Save user point
+    int128 userSlope = int128(lockedNew.amount / MAXTIME);
+    int128 userBias = userSlope * int128(lockedNew.end - block.timestamp);
+    console.log("Deposit, amount: %d, end: %d", uint256(lockedNew.amount), uint256(lockedNew.end));
+    console.log("Time: %d", block.timestamp);
+    console.log("MAXTIME: %d", MAXTIME);
+    console.log("Deposit, bias: %d, slope: %d", uint256(userBias), uint256(userSlope));
+
+    Point memory userPoint = Point({
+      timestamp: block.timestamp,
+      slope: userSlope,
+      bias: userBias
+    });
+    userPointHistory[_addr].push(userPoint);
+  }
+
+  /// @dev Apply changes
   function _checkpoint(
     LockedBalance memory lockedNew,
     LockedBalance memory lockedOld
@@ -55,30 +169,32 @@ contract LockTOS is ILockTOS, AccessControl {
     _updateSlopeChanges(changeNew, changeOld);
   }
 
-  function _recordHistoryPoints() internal returns (Point memory lastWeekPoint) {
+  /// @dev Fill the gaps
+  function _recordHistoryPoints() internal returns (Point memory lastWeek) {
     uint256 timestamp = block.timestamp;
     if (pointHistory.length > 0) {
-      lastWeekPoint = pointHistory[pointHistory.length - 1];
+      lastWeek = pointHistory[pointHistory.length - 1];
     } else {
-      lastWeekPoint = Point({bias: 0, slope: 0, timestamp: timestamp, blockNumber: block.number});
+      lastWeek = Point({bias: 0, slope: 0, timestamp: timestamp});
     }
 
-    uint256 pointTimestampIterator = (lastWeekPoint.timestamp / ONE_WEEK) * ONE_WEEK;
+    uint256 pointTimestampIterator = (lastWeek.timestamp / ONE_WEEK) * ONE_WEEK;
     while (pointTimestampIterator != timestamp) {
       pointTimestampIterator = Math.min(pointTimestampIterator + ONE_WEEK, timestamp);
 
       int128 deltaSlope = slopeChanges[pointTimestampIterator];
-      uint256 deltaTime = pointTimestampIterator - lastWeekPoint.timestamp;
-      lastWeekPoint.bias -= lastWeekPoint.slope * int128(deltaTime);
-      lastWeekPoint.slope += deltaSlope;
-      lastWeekPoint.bias = lastWeekPoint.bias > 0 ? lastWeekPoint.bias : 0;
-      lastWeekPoint.slope = lastWeekPoint.slope > 0 ? lastWeekPoint.slope : 0;
-      lastWeekPoint.timestamp = pointTimestampIterator;
-      pointHistory.push(lastWeekPoint);
+      uint256 deltaTime = pointTimestampIterator - lastWeek.timestamp;
+      lastWeek.bias -= lastWeek.slope * int128(deltaTime);
+      lastWeek.slope += deltaSlope;
+      lastWeek.bias = lastWeek.bias > 0 ? lastWeek.bias : 0;
+      lastWeek.slope = lastWeek.slope > 0 ? lastWeek.slope : 0;
+      lastWeek.timestamp = pointTimestampIterator;
+      pointHistory.push(lastWeek);
     }
-    return lastWeekPoint;
+    return lastWeek;
   }
 
+  /// @dev Update slope changes
   function _updateSlopeChanges(
     SlopeChange memory changeNew,
     SlopeChange memory changeOld
@@ -103,57 +219,5 @@ contract LockTOS is ILockTOS, AccessControl {
       deltaSlopeNew -= changeNew.slope;
       slopeChanges[changeNew.changeTime] = deltaSlopeNew;
     }
-  }
-
-  function _deposit(address _addr, uint256 _value, uint256 _unlockTime) internal {
-    LockedBalance memory lockedOld = lockedBalances[_addr];
-    LockedBalance memory lockedNew = LockedBalance({amount: lockedOld.amount, end: lockedOld.end});
-
-    lockedNew.amount += _value;
-    if (_unlockTime > 0) {
-      lockedNew.end = _unlockTime;
-    }
-    _checkpoint(lockedNew, lockedOld);
-
-    // Transfer tos
-    IERC20(tos).transferFrom(_addr, address(this), _value);
-
-    // Save user point
-    int128 userSlope = int128(lockedNew.amount / MAXTIME);
-    int128 userBias = userSlope * int128(lockedNew.end - block.timestamp);
-    Point memory userPoint = Point({
-      timestamp: block.timestamp,
-      blockNumber: block.number,
-      slope: userSlope,
-      bias: userBias
-    });
-    userPointHistory[_addr].push(userPoint);
-  }
-
-  function increaseAmount(uint256 _value) override external {
-    depositFor(msg.sender, _value);
-  }
-
-  function depositFor(address _addr, uint256 _value) override public {
-    require(_value > 0, "Value locked should be non-zero");
-    require(lockedBalances[msg.sender].end > block.timestamp, "Withdraw old tokens");
-    require(lockedBalances[msg.sender].amount == 0, "Withdraw old tokens");
-    _deposit(_addr, _value, 0);
-  }
-
-  function createLock(uint256 _value, uint256 _unlockTime) override external {
-    require(_value > 0, "Value locked should be non-zero");
-    require (_unlockTime > block.timestamp, "Unlock time");
-    require(lockedBalances[msg.sender].amount == 0, "Withdraw old tokens");
-
-    uint256 unlockTime = (_unlockTime / ONE_WEEK) * ONE_WEEK;
-    _deposit(msg.sender, _value, unlockTime);
-  }
-
-  function increaseUnlockTime(uint256 unlockTime) override external {
-    require (lockedBalances[msg.sender].end > block.timestamp, "Unlock time");
-    require (lockedBalances[msg.sender].end > unlockTime, "Unlock time");
-    require(lockedBalances[msg.sender].amount > 0, "No existing locked TOS");
-    _deposit(msg.sender, 0, unlockTime);
   }
 }

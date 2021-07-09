@@ -5,7 +5,6 @@ interface ILockTOS {
     int128 bias;
     int128 slope;
     uint256 timestamp;
-    uint256 blockNumber;
   }
 
   struct LockedBalance {
@@ -19,6 +18,12 @@ interface ILockTOS {
     uint256 changeTime;
   }
 
+  /// @dev Returns current vote weight at
+  function voteWeightOf(address _addr) external view returns (int128);
+
+  /// @dev Returns vote weight at `_timestamp`
+  function voteWeightOfAt(address _addr, uint256 _timestamp) external view returns (int128);
+
   /// @dev Increase amount
   function increaseAmount(uint256 _value) external;
 
@@ -30,4 +35,7 @@ interface ILockTOS {
 
   /// @dev Increase 
   function increaseUnlockTime(uint256 unlockTime) external;
-}
+  
+  /// @dev Withdraw TOS
+  function withdraw() external;
+  }
