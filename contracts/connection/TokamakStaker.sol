@@ -7,7 +7,8 @@ import {ITON} from "../interfaces/ITON.sol";
 import {IIStake1Vault} from "../interfaces/IIStake1Vault.sol";
 import {IIDepositManager} from "../interfaces/IIDepositManager.sol";
 import {IISeigManager} from "../interfaces/IISeigManager.sol";
-import {SafeMath} from "../utils/math/SafeMath.sol";
+import "@openzeppelin/contracts/math/SafeMath.sol";
+
 import "../common/AccessibleCommon.sol";
 
 import "../stake/StakeTONStorage.sol";
