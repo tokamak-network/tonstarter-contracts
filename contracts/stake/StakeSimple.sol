@@ -5,7 +5,7 @@ import "../interfaces/IStakeSimple.sol";
 import {IIStake1Vault} from "../interfaces/IIStake1Vault.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "../libraries/LibTokenStake1.sol";
-import {SafeMath} from "../utils/math/SafeMath.sol";
+import "@openzeppelin/contracts/math/SafeMath.sol";
 import "../common/AccessibleCommon.sol";
 import "../stake/Stake1Storage.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
