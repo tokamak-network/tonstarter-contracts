@@ -8,13 +8,15 @@
 * pahse1 :
 
 * phase2 :
-*
+
 ### Build Contracts with Truffle
 
 `npm run compile:truffle`
 
 
 ### Test Contracts with Truffle
+
+`npm run test:proxy`
 
 `npm run test:stake.eth`
 
