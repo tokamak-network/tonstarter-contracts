@@ -6,6 +6,12 @@
   "scripts": {
     "build": "npm run clean && npm run compile",
     "clean": "npx hardhat clean",
+    "compile:truffle": "rm -rf ./build/contracts && truffle compile && cp ./abis_plasma/* ./build/contracts/ ",
+    "test:stake.eth": "truffle test test/stake.eth.test.js",
+    "test:stake.ton": "truffle test test/stake.ton.test.js",
+    "test:stake.tokamak": "truffle test test/stake.ton-to-tokamak.test.js",
+    "test:upgrade": "truffle test test/upgradable.stake.eth.test.js",
+    "test:factory": "truffle test test/set-factory.stake.eth.test.js",
     "compile": "npx hardhat compile",
     "compile:plasma": "bash scripts/build-plasma-evm-contracts.sh",
     "compile:uniswap-core": "bash scripts/build-uniswap-core-contracts.sh",

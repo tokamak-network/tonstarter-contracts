@@ -7,7 +7,7 @@ import {ITOS} from "../interfaces/ITOS.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "../interfaces/IStake1Storage.sol";
 import "../libraries/LibTokenStake1.sol";
-import {SafeMath} from "../utils/math/SafeMath.sol";
+import "@openzeppelin/contracts/math/SafeMath.sol";
 import "./StakeVaultStorage.sol";
 
 /// @title TOS Token's Vault - stores the TOS for the period of time

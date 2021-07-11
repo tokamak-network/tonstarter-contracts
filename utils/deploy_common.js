@@ -29,6 +29,7 @@ const tonFactory = loadDeployed(process.env.NETWORK, "StakeTONFactory");
 const ton = loadDeployed(process.env.NETWORK, "TON");
 
 async function createValue(tonVault, paytoken) {
+
   const stakeEntry = await ethers.getContractAt("Stake1Logic", proxy);
 
   const tx = await stakeEntry.createVault(

@@ -4,7 +4,7 @@ pragma abicoder v2;
 
 import {IStakeVaultStorage} from "../interfaces/IStakeVaultStorage.sol";
 import {IIERC20} from "../interfaces/IIERC20.sol";
-import {SafeMath} from "../utils/math/SafeMath.sol";
+import "@openzeppelin/contracts/math/SafeMath.sol";
 import "./StakeTONStorage.sol";
 import "../common/AccessibleCommon.sol";
 import {OnApprove} from "../tokens/OnApprove.sol";
