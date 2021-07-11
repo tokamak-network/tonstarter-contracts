@@ -51,7 +51,7 @@ let TokamakContractsDeployed;
 let ICOContractsDeployed;
 // ------------------------
 const Stake1Vault = contract.fromArtifact("Stake1Vault");
-const StakeTON = contract.fromArtifact("StakeTON");
+const StakeSimple = contract.fromArtifact("StakeSimple");
 const IERC20 = contract.fromArtifact("IERC20");
 // ----------------------
 
@@ -190,7 +190,7 @@ describe("StakeSimple : Stake with ETH", function () {
 
   describe('# 3. Function Test For Sale ', async function () {
     it("1. If the sale period does not start, staking will fail.", async function () {
-      const stakeContract = await StakeTON.at(stakeAddresses[0]);
+      const stakeContract = await StakeSimple.at(stakeAddresses[0]);
       await expect(
         stakeContract.sendTransaction({
           from: user1,
@@ -217,7 +217,7 @@ describe("StakeSimple : Stake with ETH", function () {
       for (let i = 0; i < stakeAddresses.length; i++) {
         stakeContractAddress = stakeAddresses[i];
         if (stakeContractAddress != null) {
-          const stakeContract = await StakeTON.at(stakeContractAddress);
+          const stakeContract = await StakeSimple.at(stakeContractAddress);
           if (logFlag) {
             console.log('\n ---- Stake ETH ',i );
             console.log('Stake',i,' User1 :', testUser1StakingAmount[i] );
@@ -257,7 +257,7 @@ describe("StakeSimple : Stake with ETH", function () {
       this.timeout(1000000);
       let currentBlockTime = parseInt(stakeStartBlock);
       await time.advanceBlockTo(currentBlockTime);
-      const stakeContract = await StakeTON.at(stakeAddresses[0]);
+      const stakeContract = await StakeSimple.at(stakeAddresses[0]);
       await expect(
         stakeContract.sendTransaction({
           from: user1,
@@ -267,7 +267,7 @@ describe("StakeSimple : Stake with ETH", function () {
     });
 
     it("4. If the sales closing function is not performed, the reward claim will fail.", async function () {
-      const stakeContract = await StakeTON.at(stakeAddresses[0]);
+      const stakeContract = await StakeSimple.at(stakeAddresses[0]);
       await expect(
         stakeContract.claim({ from: testStakingUsers[0] })
       ).to.be.revertedWith("StakeSimple: not closed");
@@ -296,7 +296,7 @@ describe("StakeSimple : Stake with ETH", function () {
       if (logFlag)
       console.log(`\n\n Current block: ${current} `);
       let i = 0;
-      const stakeContract1 = await StakeTON.at(stakeAddresses[i]);
+      const stakeContract1 = await StakeSimple.at(stakeAddresses[i]);
       await expect(
         stakeContract1.withdraw({ from: user1 })
       ).to.be.revertedWith("StakeSimple: not end");
@@ -314,7 +314,7 @@ describe("StakeSimple : Stake with ETH", function () {
         if (stakeAddresses.length > 0) {
           for (let j = 0; j < stakeAddresses.length; j++) {
             if (logFlag) console.log(`\n ----  StakeContract:`, j);
-            let stakeContract = await StakeTON.at(stakeAddresses[j]);
+            let stakeContract = await StakeSimple.at(stakeAddresses[j]);
             const prevRewardClaimedTotal = await stakeContract.rewardClaimedTotal();
             let sum = toBN(prevRewardClaimedTotal.toString());
 
@@ -391,7 +391,7 @@ describe("StakeSimple : Stake with ETH", function () {
 
       for (let i = 0; i < stakeAddresses.length; i++) {
         //if (logFlag) console.log('\n  ************* withdraw : ', i, stakeAddresses[i]);
-        const stakeContract1 = await StakeTON.at(stakeAddresses[i]);
+        const stakeContract1 = await StakeSimple.at(stakeAddresses[i]);
         let payTokenBalance1 = await web3.eth.getBalance(user1);
         if (logFlag){
           console.log('\n user1\'s payTokenBalance1:', fromWei(payTokenBalance1.toString(), 'ether'));
