@@ -2,7 +2,6 @@
 pragma solidity ^0.7.6;
 
 import "../interfaces/ITOS.sol";
-import "../libraries/ChainId.sol";
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "../common/AccessiblePlusCommon.sol";
 
@@ -89,23 +88,7 @@ contract TOS is ERC20, AccessiblePlusCommon, ITOS {
     ) external override {
         require(deadline >= block.timestamp, "TOS: permit EXPIRED");
 
-        bytes32 digest =
-            keccak256(
-                abi.encodePacked(
-                    "\x19\x01",
-                    DOMAIN_SEPARATOR,
-                    keccak256(
-                        abi.encode(
-                            PERMIT_TYPEHASH,
-                            owner,
-                            spender,
-                            value,
-                            nonces[owner]++,
-                            deadline
-                        )
-                    )
-                )
-            );
+        bytes32 digest = hashPermit(owner, spender, value, deadline, nonces[owner]++);
 
         require(owner != spender, "TOS: approval to current owner");
 
