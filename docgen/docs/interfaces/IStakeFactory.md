@@ -2,11 +2,7 @@
 
 - [`create(uint256 stakeType, address[4] _addr, address registry, uint256[3] _intdata)`](#IStakeFactory-create-uint256-address-4--address-uint256-3--)
 
-- [`setStakeTONFactory(address _stakeTONFactory)`](#IStakeFactory-setStakeTONFactory-address-)
-
-- [`setStakeDefiFactory(address _stakeDefiFactory)`](#IStakeFactory-setStakeDefiFactory-address-)
-
-- [`setStakeSimpleFactory(address _stakeSimpleFactory)`](#IStakeFactory-setStakeSimpleFactory-address-)
+- [`setFactoryByStakeType(uint256 _stakeType, address _factory)`](#IStakeFactory-setFactoryByStakeType-uint256-address-)
 
 ###### IStakeFactory-create-uint256-address-4--address-uint256-3--
 
@@ -16,7 +12,7 @@ Create a stake contract that calls the desired stake factory according to stakeT
 
 ### Parameters:
 
-- `stakeType`: if 0, stakeTONFactory, else if 1 , stakeSimpleFactory , else if 2, stakeDefiFactory
+- `stakeType`: if 0, stakeTONFactory, else if 1 , stakeSimpleFactory , else if 2, stakeUniswapV3Factory
 
 - `_addr`: array of [token, paytoken, vault, _defiAddr]
 
@@ -28,32 +24,14 @@ Create a stake contract that calls the desired stake factory according to stakeT
 
 - contract address
 
-###### IStakeFactory-setStakeTONFactory-address-
+###### IStakeFactory-setFactoryByStakeType-uint256-address-
 
-## Function `setStakeTONFactory(address _stakeTONFactory)`
+## Function `setFactoryByStakeType(uint256 _stakeType, address _factory)`
 
-Set StakeTONFactory address
-
-### Parameters:
-
-- `_stakeTONFactory`: new StakeTONFactory address
-
-###### IStakeFactory-setStakeDefiFactory-address-
-
-## Function `setStakeDefiFactory(address _stakeDefiFactory)`
-
-Set StakeDefiFactory address
+Set factory address by StakeType
 
 ### Parameters:
 
-- `_stakeDefiFactory`: new StakeDefiFactory address
+- `_stakeType`: the stake type , 0:TON, 1: Simple, 2: UniswapV3LP
 
-###### IStakeFactory-setStakeSimpleFactory-address-
-
-## Function `setStakeSimpleFactory(address _stakeSimpleFactory)`
-
-Set StakeSimpleFactory address
-
-### Parameters:
-
-- `_stakeSimpleFactory`: new StakeSimpleFactory address
+- `_factory`: the factory address

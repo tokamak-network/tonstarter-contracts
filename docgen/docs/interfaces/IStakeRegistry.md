@@ -34,6 +34,8 @@ Set addresses for Tokamak integration
 
 - `_seigManager`: SeigManager address
 
+- `_swapProxy`: Proxy address that can swap TON and WTON
+
 ###### IStakeRegistry-addDefiInfo-string-address-address-address-uint256-address-
 
 ## Function `addDefiInfo(string _name, address _router, address _ex1, address _ex2, uint256 _fee, address _routerV2)`
@@ -51,6 +53,8 @@ Add information related to Defi
 - `_ex2`:  additional variable . ex) WETH Address in Uniswap V3
 
 - `_fee`:  fee
+
+- `_routerV2`: In case of uniswap, router address of uniswapV2
 
 ###### IStakeRegistry-addVault-address-uint256-bytes32-
 

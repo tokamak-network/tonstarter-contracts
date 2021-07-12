@@ -36,13 +36,15 @@ get the addresses yhat used in uniswap interfaces
 
 ### Return Values:
 
-- uniswapRouter the address of uniswapRouter
+- uniswapRouter the address of uniswapV3 Router
 
 - npm the address of positionManagerAddress
 
 - ext the address of ext
 
 - fee the amount of fee
+
+- uniswapV2Router uniswapV2 router address
 
 ###### ITokamakStaker-swapTONtoWTON-uint256-bool-
 

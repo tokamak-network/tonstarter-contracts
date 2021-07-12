@@ -2,17 +2,13 @@
 
 - [`constructor(string name_, string symbol_, string version_)`](#TOS-constructor-string-string-string-)
 
-- [`DOMAIN_SEPARATOR()`](#TOS-DOMAIN_SEPARATOR--)
-
-- [`transferOwnership(address newOwner)`](#TOS-transferOwnership-address-)
-
 - [`mint(address to, uint256 amount)`](#TOS-mint-address-uint256-)
 
 - [`burn(address from, uint256 amount)`](#TOS-burn-address-uint256-)
 
 - [`permit(address owner, address spender, uint256 value, uint256 deadline, uint8 v, bytes32 r, bytes32 s)`](#TOS-permit-address-address-uint256-uint256-uint8-bytes32-bytes32-)
 
-- [`verify(address signer, address owner, address spender, uint256 value, uint256 deadline, uint256 _nounce, bytes32 sigR, bytes32 sigS, uint8 sigV)`](#TOS-verify-address-address-address-uint256-uint256-uint256-bytes32-bytes32-uint8-)
+- [`verify(address owner, address spender, uint256 value, uint256 deadline, uint256 _nounce, bytes32 sigR, bytes32 sigS, uint8 sigV)`](#TOS-verify-address-address-uint256-uint256-uint256-bytes32-bytes32-uint8-)
 
 - [`hashPermit(address owner, address spender, uint256 value, uint256 deadline, uint256 _nounce)`](#TOS-hashPermit-address-address-uint256-uint256-uint256-)
 
@@ -21,22 +17,6 @@
 ## Function `constructor(string name_, string symbol_, string version_)`
 
 constructor of TOS, ERC20 Token
-
-###### TOS-DOMAIN_SEPARATOR--
-
-## Function `DOMAIN_SEPARATOR()`
-
-No description
-
-###### TOS-transferOwnership-address-
-
-## Function `transferOwnership(address newOwner)`
-
-transfer Ownership
-
-### Parameters:
-
-- `newOwner`: new owner address
 
 ###### TOS-mint-address-uint256-
 
@@ -78,7 +58,7 @@ The signature must have the owner's signature.
 
 - `value`: the amount to be approve to spend
 
-- `deadline`: the deadline that vaild the owner's signature
+- `deadline`: the deadline that valid the owner's signature
 
 - `v`: the owner's signature - v
 
@@ -86,15 +66,13 @@ The signature must have the owner's signature.
 
 - `s`: the owner's signature - s
 
-###### TOS-verify-address-address-address-uint256-uint256-uint256-bytes32-bytes32-uint8-
+###### TOS-verify-address-address-uint256-uint256-uint256-bytes32-bytes32-uint8-
 
-## Function `verify(address signer, address owner, address spender, uint256 value, uint256 deadline, uint256 _nounce, bytes32 sigR, bytes32 sigS, uint8 sigV)`
+## Function `verify(address owner, address spender, uint256 value, uint256 deadline, uint256 _nounce, bytes32 sigR, bytes32 sigS, uint8 sigV)`
 
 verify the signature
 
 ### Parameters:
-
-- `signer`: the signer address
 
 - `owner`: the token's owner
 
@@ -102,7 +80,7 @@ verify the signature
 
 - `value`: the amount to be approve to spend
 
-- `deadline`: the deadline that vaild the owner's signature
+- `deadline`: the deadline that valid the owner's signature
 
 - `_nounce`: the _nounce
 
@@ -126,6 +104,6 @@ the hash of Permit
 
 - `value`: the amount to be approve to spend
 
-- `deadline`: the deadline that vaild the owner's signature
+- `deadline`: the deadline that valid the owner's signature
 
 - `_nounce`: the _nounce

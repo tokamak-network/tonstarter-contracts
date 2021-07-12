@@ -2,6 +2,8 @@
 
 - [`setStore(address _tos, address _stakeRegistry, address _stakeFactory, address _stakeVaultFactory, address _ton, address _wton, address _depositManager, address _seigManager)`](#IStake1Logic-setStore-address-address-address-address-address-address-address-address-)
 
+- [`setFactoryByStakeType(uint256 _stakeType, address _factory)`](#IStake1Logic-setFactoryByStakeType-uint256-address-)
+
 - [`createVault(address _paytoken, uint256 _cap, uint256 _saleStartBlock, uint256 _stakeStartBlock, uint256 _phase, bytes32 _vaultName, uint256 _stakeType, address _defiAddr)`](#IStake1Logic-createVault-address-uint256-uint256-uint256-uint256-bytes32-uint256-address-)
 
 - [`createStakeContract(uint256 _phase, address _vault, address token, address paytoken, uint256 periodBlock, string _name)`](#IStake1Logic-createStakeContract-uint256-address-address-address-uint256-string-)
@@ -12,7 +14,7 @@
 
 - [`stakeContractsOfVault(address _vault)`](#IStake1Logic-stakeContractsOfVault-address-)
 
-- [`vaultsOfPhase(uint256 _phaseIndex)`](#IStake1Logic-vaultsOfPhase-uint256-)
+- [`vaultsOfPhase(uint256 _phase)`](#IStake1Logic-vaultsOfPhase-uint256-)
 
 - [`tokamakStaking(address _stakeContract, address _layer2, uint256 stakeAmount)`](#IStake1Logic-tokamakStaking-address-address-uint256-)
 
@@ -24,7 +26,15 @@
 
 - [`exchangeWTONtoTOS(address _stakeContract, uint256 amountIn, uint256 amountOutMinimum, uint256 deadline, uint160 sqrtPriceLimitX96, uint256 _type)`](#IStake1Logic-exchangeWTONtoTOS-address-uint256-uint256-uint256-uint160-uint256-)
 
-- [`vaultsOfPahse(uint256 _phase)`](#IStake1Logic-vaultsOfPahse-uint256-)
+# Events:
+
+- [`CreatedVault(address vault, address paytoken, uint256 cap)`](#IStake1Logic-CreatedVault-address-address-uint256-)
+
+- [`CreatedStakeContract(address vault, address stakeContract, uint256 phase)`](#IStake1Logic-CreatedStakeContract-address-address-uint256-)
+
+- [`ClosedSale(address vault)`](#IStake1Logic-ClosedSale-address-)
+
+- [`SetStakeRegistry(address stakeRegistry)`](#IStake1Logic-SetStakeRegistry-address-)
 
 ###### IStake1Logic-setStore-address-address-address-address-address-address-address-address-
 
@@ -49,6 +59,18 @@ No description
 - `_depositManager`: DepositManager address in Tokamak
 
 - `_seigManager`: SeigManager address in Tokamak
+
+###### IStake1Logic-setFactoryByStakeType-uint256-address-
+
+## Function `setFactoryByStakeType(uint256 _stakeType, address _factory)`
+
+No description
+
+### Parameters:
+
+- `_stakeType`: the stake type , 0:TON, 1: Simple, 2: UniswapV3LP
+
+- `_factory`: the factory address
 
 ###### IStake1Logic-createVault-address-uint256-uint256-uint256-uint256-bytes32-uint256-address-
 
@@ -130,13 +152,13 @@ list of stakeContracts in vault
 
 ###### IStake1Logic-vaultsOfPhase-uint256-
 
-## Function `vaultsOfPhase(uint256 _phaseIndex)`
+## Function `vaultsOfPhase(uint256 _phase)`
 
-list of vaults in _phaseIndex phase
+list of vaults in _phase
 
 ### Parameters:
 
-- `_phaseIndex`: the phase number
+- `_phase`: the phase number
 
 ###### IStake1Logic-tokamakStaking-address-address-uint256-
 
@@ -212,12 +234,50 @@ this function used in StakeTON ( stakeType=0 )
 
 - `_type`: the function type, if 0, use exactInputSingle function, else if, use exactInput function
 
-###### IStake1Logic-vaultsOfPahse-uint256-
+###### IStake1Logic-CreatedVault-address-address-uint256-
 
-## Function `vaultsOfPahse(uint256 _phase)`
+## Event `CreatedVault(address vault, address paytoken, uint256 cap)`
 
-Get addresses of vaults of index phase
+event on create vault
 
 ### Parameters:
 
-- `_phase`: the pahse number
+- `vault`: the vault address created
+
+- `paytoken`: the token used for staking by user
+
+- `cap`:  allocated reward amount
+
+###### IStake1Logic-CreatedStakeContract-address-address-uint256-
+
+## Event `CreatedStakeContract(address vault, address stakeContract, uint256 phase)`
+
+event on create stake contract in vault
+
+### Parameters:
+
+- `vault`: the vault address
+
+- `stakeContract`: the stake contract address created
+
+- `phase`: the phase of TOS platform
+
+###### IStake1Logic-ClosedSale-address-
+
+## Event `ClosedSale(address vault)`
+
+event on sale-closed
+
+### Parameters:
+
+- `vault`: the vault address
+
+###### IStake1Logic-SetStakeRegistry-address-
+
+## Event `SetStakeRegistry(address stakeRegistry)`
+
+event on setting stake registry
+
+### Parameters:
+
+- `stakeRegistry`: the stakeRegistry address

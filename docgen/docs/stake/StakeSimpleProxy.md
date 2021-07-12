@@ -2,8 +2,6 @@
 
 - [`constructor(address _logic)`](#StakeSimpleProxy-constructor-address-)
 
-- [`transferOwnership(address newOwner)`](#StakeSimpleProxy-transferOwnership-address-)
-
 - [`setProxyPause(bool _pause)`](#StakeSimpleProxy-setProxyPause-bool-)
 
 - [`upgradeTo(address impl)`](#StakeSimpleProxy-upgradeTo-address-)
@@ -14,7 +12,7 @@
 
 - [`fallback()`](#StakeSimpleProxy-fallback--)
 
-- [`setInit(address[3] _addr, uint256[3] _intdata)`](#StakeSimpleProxy-setInit-address-3--uint256-3--)
+- [`setInit(address[4] _addr, address _registry, uint256[3] _intdata)`](#StakeSimpleProxy-setInit-address-4--address-uint256-3--)
 
 # Events:
 
@@ -25,16 +23,6 @@
 ## Function `constructor(address _logic)`
 
 No description
-
-###### StakeSimpleProxy-transferOwnership-address-
-
-## Function `transferOwnership(address newOwner)`
-
-transfer Ownership
-
-### Parameters:
-
-- `newOwner`: new owner address
 
 ###### StakeSimpleProxy-setProxyPause-bool-
 
@@ -74,15 +62,15 @@ No description
 
 No description
 
-###### StakeSimpleProxy-setInit-address-3--uint256-3--
+###### StakeSimpleProxy-setInit-address-4--address-uint256-3--
 
-## Function `setInit(address[3] _addr, uint256[3] _intdata)`
+## Function `setInit(address[4] _addr, address _registry, uint256[3] _intdata)`
 
 set initial storage
 
 ### Parameters:
 
-- `_addr`: the array addresses of token, paytoken, vault
+- `_addr`: the array addresses of token, paytoken, vault, defiAddr
 
 - `_intdata`: the array valued of saleStartBlock, stakeStartBlock, periodBlocks
 

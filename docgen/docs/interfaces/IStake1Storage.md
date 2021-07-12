@@ -44,7 +44,7 @@ paytoken is the token that the user stakes. ( if paytoken is ether, paytoken is 
 
 ## Function `vault()`
 
-A vault that holds tos rewards.
+A vault that holds TOS rewards.
 
 ###### IStake1Storage-saleStartBlock--
 
