@@ -136,7 +136,7 @@ contract Stake1Proxy is StakeProxyStorage, AccessibleCommon, IStakeProxy {
 
     /// @dev view implementation address of the proxy[index]
     /// @param _index index of proxy
-    /// @return address of the implementation
+    /// @return impl address of the implementation
     function _implementation(uint256 _index)
         internal
         view
@@ -147,7 +147,7 @@ contract Stake1Proxy is StakeProxyStorage, AccessibleCommon, IStakeProxy {
 
     /// @dev view implementation address of selector of function
     /// @param _selector selector of function
-    /// @return address of the implementation
+    /// @return impl address of the implementation
     function getSelectorImplementation(bytes4 _selector)
         public
         view

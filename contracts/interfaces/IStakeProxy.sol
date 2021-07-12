@@ -41,9 +41,7 @@ interface IStakeProxy {
     ) external;
 
     /// @dev set the implementation address and status of the proxy[index]
-    /// @param newImplementation Address of the new implementation.
-    /// @param _index index of proxy
-    /// @param _alive alive status
+    /// @param _selector the selector of function
     function getSelectorImplementation(bytes4 _selector)
         external
         view
