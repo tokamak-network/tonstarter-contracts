@@ -20,8 +20,10 @@ describe("LockTOS", function () {
   let admin, user1, user2;
   let tos;
   let lockTOS;
+  const user1LockInfo = [];
+  const user2LockInfo = [];
 
-  const lockedAmount = 1000000000;
+  const tosAmount = 1000000000;
   before(async () => {
     const addresses = await getAddresses();
     admin = await findSigner(addresses[0]);
@@ -35,38 +37,125 @@ describe("LockTOS", function () {
   });
 
   it("Deploy LockTOS", async function () {
-    const currentTime = await time.latest();
+    const phase3StartTime = (await time.latest()) + time.duration.weeks(10);
     lockTOS = await (
       await ethers.getContractFactory("LockTOS")
-    ).deploy(tos.address, currentTime + 10000);
+    ).deploy(tos.address, phase3StartTime);
     await lockTOS.deployed();
   });
 
   it("mint TOS to users", async function () {
-    await (await tos.connect(admin).mint(user1.address, lockedAmount)).wait();
-    await (await tos.connect(admin).mint(user2.address, lockedAmount)).wait();
-    expect(await tos.balanceOf(user1.address)).to.be.equal(lockedAmount);
-    expect(await tos.balanceOf(user2.address)).to.be.equal(lockedAmount);
+    await (await tos.connect(admin).mint(user1.address, tosAmount)).wait();
+    await (await tos.connect(admin).mint(user2.address, tosAmount)).wait();
+    expect(await tos.balanceOf(user1.address)).to.be.equal(tosAmount);
+    expect(await tos.balanceOf(user2.address)).to.be.equal(tosAmount);
   });
 
-  it("should create locks", async function () {
-    const currentTime = await time.latest();
-    await (
-      await tos.connect(user1).approve(lockTOS.address, lockedAmount)
-    ).wait();
-    await (
-      await lockTOS.connect(user1).createLock(lockedAmount, currentTime + 10000)
-    ).wait();
+  const approve = async (user, amount) => {
+    await (await tos.connect(user).approve(lockTOS.address, amount)).wait();
+  };
+
+  const createLock = async (user, amount, time) => {
+    await (await lockTOS.connect(user).createLock(amount, time)).wait();
+  };
+
+  const generateCreateProcess = async ({
+    user,
+    lockedAmount,
+    lockedDuration,
+  }) => {
+    const startTime = await time.latest();
+    const endTime = startTime + lockedDuration;
+    await approve(user, lockedAmount);
+    await createLock(user, lockedAmount, endTime);
+    return { startTime, endTime, lockedAmount };
+  };
+
+  it("should create locks for user1", async function () {
+    user1LockInfo.push(
+      await generateCreateProcess({
+        user: user1,
+        lockedAmount: 300000000,
+        lockedDuration: time.duration.weeks(20),
+      })
+    );
+    user1LockInfo.push(
+      await generateCreateProcess({
+        user: user1,
+        lockedAmount: 300000000,
+        lockedDuration: time.duration.weeks(5),
+      })
+    );
+    user1LockInfo.push(
+      await generateCreateProcess({
+        user: user1,
+        lockedAmount: 300000000,
+        lockedDuration: time.duration.weeks(30),
+      })
+    );
   });
 
-  it("should check vote weights", async function () {
-    for (let i = 0; i < 5; ++i) {
-      const voteWeight = await lockTOS.voteWeightOf(user1.address);
-      const currentTime = await time.latest();
-      console.log(
-        `Number: ${i} -- Vote Weight: ${voteWeight} -- Time: ${currentTime}`
-      );
-      await ethers.provider.send("evm_mine");
+  it("should create locks for user2", async function () {
+    user2LockInfo.push(
+      await generateCreateProcess({
+        user: user2,
+        lockedAmount: 300000000,
+        lockedDuration: time.duration.weeks(25),
+      })
+    );
+    user2LockInfo.push(
+      await generateCreateProcess({
+        user: user2,
+        lockedAmount: 400000000,
+        lockedDuration: time.duration.weeks(25),
+      })
+    );
+  });
+
+  it("should check vote weights now of user1", async function () {
+    const totalVoteWeight = await lockTOS.voteWeightOf(user1.address);
+    const locksOf = await lockTOS.locksOf(user1.address);
+    for (let i = 0; i < locksOf.length; ++i) {
+      user1LockInfo[i].lockId = locksOf[i];
+    }
+
+    console.log("Current time: ", (await time.latest()).toString());
+    console.log("User1 total: ", totalVoteWeight.toString());
+    for (const info of user1LockInfo) {
+      const { lockId } = info;
+      const voteWeight = await lockTOS.voteWeightOfLock(user1.address, lockId);
+      console.log(`Vote Weight: ${voteWeight.toString()}, LockId: ${lockId}`);
+    }
+  });
+
+  it("should check vote weights now of user2", async function () {
+    const totalVoteWeight = await lockTOS.voteWeightOf(user2.address);
+    const locksOf = await lockTOS.locksOf(user2.address);
+    for (let i = 0; i < locksOf.length; ++i) {
+      user2LockInfo[i].lockId = locksOf[i];
+    }
+
+    console.log("Current time: ", (await time.latest()).toString());
+    console.log("User1 total: ", totalVoteWeight.toString());
+    for (const info of user2LockInfo) {
+      const { lockId } = info;
+      const voteWeight = await lockTOS.voteWeightOfLock(user2.address, lockId);
+      console.log(`Vote Weight: ${voteWeight.toString()}, LockId: ${lockId}`);
+    }
+  });
+
+  it("should check total vote weights now", async function () {
+    const totalVoteWeight = await lockTOS.totalVoteWeight();
+    console.log("Total vote weight: ", totalVoteWeight);
+  });
+
+  it("should change time and check vote weights", async function () {
+    for (const info of user1LockInfo) {
+      const { lockId } = info;
+      const voteWeight = await lockTOS.voteWeightOfLock(user1.address, lockId);
+      await time.increaseTo();
+
+      console.log(`Vote Weight: ${voteWeight.toString()}, LockId: ${lockId}`);
     }
   });
 });

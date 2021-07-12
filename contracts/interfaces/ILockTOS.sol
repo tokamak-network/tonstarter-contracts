@@ -22,6 +22,12 @@ interface ILockTOS {
   /// @dev Returns all locks of `_addr`
   function locksOf(address _addr) external view returns (uint256[] memory);
 
+  /// @dev Total vote weight
+  function totalVoteWeight() external view returns (int128);
+
+  /// @dev Total vote weight at `_timestamp`
+  function totalVoteWeightAt(uint256 _timestamp) external view returns (int128);
+
   /// @dev Vote weight of lock at `_timestamp`
   function voteWeightOfLockAt(address _addr, uint256 _lockId, uint256 _timestamp) external view returns (int128);
 

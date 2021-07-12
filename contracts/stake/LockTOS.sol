@@ -76,6 +76,27 @@ contract LockTOS is ILockTOS, AccessControl {
   }
 
   /// @inheritdoc ILockTOS
+  function totalVoteWeightAt(uint256 _timestamp) override public view returns (int128) {
+    (bool success, Point memory point) = _findClosestPoint(pointHistory, _timestamp);
+    if (!success) {
+      return 0;
+    }
+    int128 currentBias = point.slope * int128(_timestamp - point.timestamp);
+    return (point.bias > currentBias ? point.bias - currentBias : 0) * point.boostValue;
+  }
+
+  /// @inheritdoc ILockTOS
+  function totalVoteWeight() override external view returns (int128) {
+    if (pointHistory.length == 0) {
+      return 0;
+    }
+
+    Point memory point = pointHistory[pointHistory.length - 1];
+    int128 currentBias = point.slope * int128(block.timestamp - point.timestamp);
+    return (point.bias > currentBias ? point.bias - currentBias : 0) * point.boostValue;
+  }
+
+  /// @inheritdoc ILockTOS
   function voteWeightOfLockAt(address _addr, uint256 _lockId, uint256 _timestamp) override public view returns (int128) {
     (bool success, Point memory point) = _findClosestPoint(userPointHistory[_addr][_lockId], _timestamp);
     if (!success) {
