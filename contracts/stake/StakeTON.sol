@@ -40,9 +40,7 @@ contract StakeTON is TokamakStaker, IStakeTON {
     event Withdrawal(address indexed to, uint256 tonAmount, uint256 tosAmount);
 
     /// @dev constructor of StakeTON
-    constructor() {
-
-    }
+    constructor() {}
 
     /// @dev This contract cannot stake Ether.
     receive() external payable {
@@ -123,20 +121,14 @@ contract StakeTON is TokamakStaker, IStakeTON {
 
             tonWithdraw(ton, wton, tonAmount, wtonAmount, tosAmount);
         } else if (paytoken == address(0)) {
-            require(
-                staked.releasedAmount <= amount,
-                "StakeTON: Amount wrong"
-            );
+            require(staked.releasedAmount <= amount, "StakeTON: Amount wrong");
             staked.releasedAmount = amount;
             address payable self = address(uint160(address(this)));
-            require(self.balance >= amount,  "StakeTON: insuffient ETH");
+            require(self.balance >= amount, "StakeTON: insuffient ETH");
             (bool success, ) = msg.sender.call{value: amount}("");
             require(success, "StakeTON: withdraw failed.");
         } else {
-            require(
-                staked.releasedAmount <= amount,
-                "StakeTON: Amount wrong"
-            );
+            require(staked.releasedAmount <= amount, "StakeTON: Amount wrong");
             staked.releasedAmount = amount;
             require(
                 IIERC20(paytoken).transfer(msg.sender, amount),
@@ -199,10 +191,7 @@ contract StakeTON is TokamakStaker, IStakeTON {
 
     /// @dev Claim for reward
     function claim() external override lock {
-        require(
-            IIStake1Vault(vault).saleClosed(),
-            "StakeTON: not closed"
-        );
+        require(IIStake1Vault(vault).saleClosed(), "StakeTON: not closed");
         uint256 rewardClaim = 0;
 
         LibTokenStake1.StakedAmount storage staked = userStaked[msg.sender];
@@ -223,7 +212,10 @@ contract StakeTON is TokamakStaker, IStakeTON {
         staked.claimedAmount = staked.claimedAmount.add(rewardClaim);
         rewardClaimedTotal = rewardClaimedTotal.add(rewardClaim);
 
-        require(IIStake1Vault(vault).claim(msg.sender, rewardClaim), "StakeTON: fail claim from vault");
+        require(
+            IIStake1Vault(vault).claim(msg.sender, rewardClaim),
+            "StakeTON: fail claim from vault"
+        );
 
         emit Claimed(msg.sender, rewardClaim, block.number);
     }

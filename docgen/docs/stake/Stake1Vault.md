@@ -4,8 +4,6 @@
 
 - [`receive()`](#Stake1Vault-receive--)
 
-- [`initialize(address _tos, address _paytoken, uint256 _cap, uint256 _saleStartBlock, uint256 _stakeStartBlock, address _stakefactory, uint256 _stakeType, address _defiAddr)`](#Stake1Vault-initialize-address-address-uint256-uint256-uint256-address-uint256-address-)
-
 - [`setTOS(address _tos)`](#Stake1Vault-setTOS-address-)
 
 - [`changeCap(uint256 _cap)`](#Stake1Vault-changeCap-uint256-)
@@ -50,26 +48,6 @@ constructor of Stake1Vault
 
 receive function
 
-###### Stake1Vault-initialize-address-address-uint256-uint256-uint256-address-uint256-address-
-
-## Function `initialize(address _tos, address _paytoken, uint256 _cap, uint256 _saleStartBlock, uint256 _stakeStartBlock, address _stakefactory, uint256 _stakeType, address _defiAddr)`
-
-No description
-
-### Parameters:
-
-- `_cap`:  Maximum amount of rewards issued, allocated reward amount.
-
-- `_saleStartBlock`:  the sale start block
-
-- `_stakeStartBlock`:  the staking start block
-
-- `_stakefactory`: the factory address to create stakeContract
-
-- `_stakeType`:  Type of staking contract, 0 TON staking, 1 basic ERC20 staking, 2 Defi linked staking
-
-- `_defiAddr`: Used when an external address is required. default: address(0)
-
 ###### Stake1Vault-setTOS-address-
 
 ## Function `setTOS(address _tos)`
@@ -104,7 +82,7 @@ Set Defi Address
 
 ## Function `withdrawReward(uint256 _amount)`
 
-If the vault has more money than the reward owed, the owner can withdraw the remaining amount.
+If the vault has more money than the reward to give, the owner can withdraw the remaining amount.
 
 ### Parameters:
 
@@ -140,7 +118,7 @@ sender is a staking contract.
 
 A function that pays the amount(_amount) to _to by the staking contract.
 
-A function that _to claim the amount(_amount) from the staking contract and gets the TOS in the vault.
+A function that _to claim the amount(_amount) from the staking contract and gets the tos in the vault.
 
 ### Parameters:
 
@@ -152,7 +130,7 @@ A function that _to claim the amount(_amount) from the staking contract and gets
 
 ## Function `canClaim(address _to, uint256 _amount)`
 
-whether it is available to claim amount, if it is available , return the total reward amount
+ Whether user(to) can receive a reward amount(_amount)
 
 ### Parameters:
 
@@ -216,7 +194,7 @@ event on sale-closed
 
 ## Event `ClaimedReward(address from, address to, uint256 amount)`
 
-event on sale-closed
+event of according to request from(staking contract)  the amount of compensation is paid to to.
 
 ### Parameters:
 

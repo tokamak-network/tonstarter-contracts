@@ -5,7 +5,6 @@ import "../libraries/LibTokenStake1.sol";
 
 /// @title The base storage of stakeContract
 contract Stake1Storage {
-
     /// @dev reward token : TOS
     address public token;
 

@@ -2,8 +2,6 @@
 
 - [`constructor(address _tos)`](#StakeRegistry-constructor-address-)
 
-- [`transferOwnership(address newOwner)`](#StakeRegistry-transferOwnership-address-)
-
 - [`setTokamak(address _ton, address _wton, address _depositManager, address _seigManager, address _swapProxy)`](#StakeRegistry-setTokamak-address-address-address-address-address-)
 
 - [`addDefiInfo(string _name, address _router, address _ex1, address _ex2, uint256 _fee, address _routerV2)`](#StakeRegistry-addDefiInfo-string-address-address-address-uint256-address-)
@@ -42,16 +40,6 @@ constructor of StakeRegistry
 
 - `_tos`: TOS address
 
-###### StakeRegistry-transferOwnership-address-
-
-## Function `transferOwnership(address newOwner)`
-
-transfer Ownership
-
-### Parameters:
-
-- `newOwner`: new owner address
-
 ###### StakeRegistry-setTokamak-address-address-address-address-address-
 
 ## Function `setTokamak(address _ton, address _wton, address _depositManager, address _seigManager, address _swapProxy)`
@@ -85,6 +73,8 @@ Add information related to Defi
 - `_ex2`:  additional variable . ex) WETH Address in Uniswap V3
 
 - `_fee`:  fee
+
+- `_routerV2`: In case of uniswap, router address of uniswapV2
 
 ###### StakeRegistry-addVault-address-uint256-bytes32-
 

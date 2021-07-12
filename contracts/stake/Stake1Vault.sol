@@ -26,12 +26,10 @@ contract Stake1Vault is StakeVaultStorage, IStake1Vault {
     event ClaimedReward(address indexed from, address to, uint256 amount);
 
     /// @dev constructor of Stake1Vault
-    constructor() {
-    }
+    constructor() {}
 
     /// @dev receive function
     receive() external payable {}
-
 
     /// @dev Sets TOS address
     /// @param _tos  TOS address
@@ -136,7 +134,8 @@ contract Stake1Vault is StakeVaultStorage, IStake1Vault {
             if (paytoken == address(0)) {
                 stakeInfo.balance = address(uint160(stakeAddresses[i])).balance;
             } else {
-                uint256 balanceAmount = IERC20(paytoken).balanceOf(stakeAddresses[i]);
+                uint256 balanceAmount =
+                    IERC20(paytoken).balanceOf(stakeAddresses[i]);
                 stakeInfo.balance = balanceAmount;
             }
             if (stakeInfo.balance > 0)
@@ -172,9 +171,8 @@ contract Stake1Vault is StakeVaultStorage, IStake1Vault {
             uint256 totalReward = 0;
             for (uint256 k = i; k > 0; k--) {
                 if (
-                    stakeEndBlockTotal[
-                        stakeInfos[stakeAddresses[k]].endBlock
-                    ] > 0
+                    stakeEndBlockTotal[stakeInfos[stakeAddresses[k]].endBlock] >
+                    0
                 ) {
                     totalReward = totalReward.add(
                         stakeInfos[stakeAddresses[k]]
@@ -192,8 +190,7 @@ contract Stake1Vault is StakeVaultStorage, IStake1Vault {
             }
 
             if (
-                stakeEndBlockTotal[stakeInfos[stakeAddresses[0]].endBlock] >
-                0
+                stakeEndBlockTotal[stakeInfos[stakeAddresses[0]].endBlock] > 0
             ) {
                 totalReward = totalReward.add(
                     stakeInfos[stakeAddresses[0]]
@@ -209,7 +206,6 @@ contract Stake1Vault is StakeVaultStorage, IStake1Vault {
                 );
             }
             totalcheck.totalRewardAmount = totalReward;
-
         }
 
         saleClosed = true;
@@ -228,8 +224,10 @@ contract Stake1Vault is StakeVaultStorage, IStake1Vault {
         override
         returns (bool)
     {
-
-        require(saleClosed && _amount > 0, "Stake1Vault: on sale or need to end the sale");
+        require(
+            saleClosed && _amount > 0,
+            "Stake1Vault: on sale or need to end the sale"
+        );
         uint256 tosBalance = IERC20(tos).balanceOf(address(this));
         require(tosBalance >= _amount, "Stake1Vault: not enough balance");
 
@@ -266,7 +264,6 @@ contract Stake1Vault is StakeVaultStorage, IStake1Vault {
         override
         returns (bool)
     {
-
         require(saleClosed, "Stake1Vault: on sale or need to end the sale");
         uint256 tosBalance = IERC20(tos).balanceOf(address(this));
         require(tosBalance >= _amount, "not enough");

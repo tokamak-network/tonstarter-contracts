@@ -8,7 +8,6 @@ import "../common/AccessibleCommon.sol";
 
 /// @title A factory that calls the desired stake factory according to stakeType
 contract StakeFactory is IStakeFactory, AccessibleCommon {
-
     mapping(uint256 => address) public factory;
 
     modifier nonZero(address _addr) {
@@ -62,16 +61,19 @@ contract StakeFactory is IStakeFactory, AccessibleCommon {
         address registry,
         uint256[3] calldata _intdata
     ) external override onlyOwner returns (address) {
-        require(factory[stakeType] != address(0), "StakeFactory: zero factory ");
+        require(
+            factory[stakeType] != address(0),
+            "StakeFactory: zero factory "
+        );
         require(_addr[2] != address(0), "StakeFactory: vault zero");
 
         address proxy =
-                IStakeContractFactory(factory[stakeType]).create(
-                    _addr,
-                    registry,
-                    _intdata,
-                    msg.sender
-                );
+            IStakeContractFactory(factory[stakeType]).create(
+                _addr,
+                registry,
+                _intdata,
+                msg.sender
+            );
 
         require(proxy != address(0), "StakeFactory: proxy zero");
 

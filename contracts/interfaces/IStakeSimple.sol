@@ -2,8 +2,6 @@
 pragma solidity ^0.7.6;
 
 interface IStakeSimple {
-
-
     /// @dev Stake amount
     /// @param amount  the amount of staked
     function stake(uint256 amount) external payable;

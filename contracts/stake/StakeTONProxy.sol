@@ -11,9 +11,13 @@ import {OnApprove} from "../tokens/OnApprove.sol";
 import "./ProxyBase.sol";
 
 /// @title Proxy for Stake contracts in Phase 1
-contract StakeTONProxy is StakeTONStorage, AccessibleCommon, ProxyBase, OnApprove {
+contract StakeTONProxy is
+    StakeTONStorage,
+    AccessibleCommon,
+    ProxyBase,
+    OnApprove
+{
     using SafeMath for uint256;
-
 
     event Upgraded(address indexed implementation);
 
@@ -25,7 +29,10 @@ contract StakeTONProxy is StakeTONStorage, AccessibleCommon, ProxyBase, OnApprov
     /// @dev the constructor of StakeTONProxy
     /// @param _logic the logic address of StakeTONProxy
     constructor(address _logic) {
-        assert(IMPLEMENTATION_SLOT == bytes32(uint256(keccak256('eip1967.proxy.implementation')) - 1));
+        assert(
+            IMPLEMENTATION_SLOT ==
+                bytes32(uint256(keccak256("eip1967.proxy.implementation")) - 1)
+        );
 
         require(_logic != address(0), "StakeTONProxy: logic is zero");
 

@@ -1,7 +1,5 @@
 # Functions:
 
-- [`transferOwnership(address newOwner)`](#TokamakStaker-transferOwnership-address-)
-
 - [`setRegistry(address _registry)`](#TokamakStaker-setRegistry-address-)
 
 - [`setTokamakLayer2(address _layer2)`](#TokamakStaker-setTokamakLayer2-address-)
@@ -30,27 +28,17 @@
 
 - [`SetTokamakLayer2(address layer2)`](#TokamakStaker-SetTokamakLayer2-address-)
 
-- [`tokamakStaked(address layer2, uint256 amount)`](#TokamakStaker-tokamakStaked-address-uint256-)
+- [`TokamakStaked(address layer2, uint256 amount)`](#TokamakStaker-TokamakStaked-address-uint256-)
 
-- [`tokamakRequestedUnStaking(address layer2, uint256 amount)`](#TokamakStaker-tokamakRequestedUnStaking-address-uint256-)
+- [`TokamakRequestedUnStaking(address layer2, uint256 amount)`](#TokamakStaker-TokamakRequestedUnStaking-address-uint256-)
 
-- [`tokamakProcessedUnStaking(address layer2, uint256 rn, bool receiveTON)`](#TokamakStaker-tokamakProcessedUnStaking-address-uint256-bool-)
+- [`TokamakProcessedUnStaking(address layer2, uint256 rn, bool receiveTON)`](#TokamakStaker-TokamakProcessedUnStaking-address-uint256-bool-)
 
-- [`tokamakRequestedUnStakingAll(address layer2)`](#TokamakStaker-tokamakRequestedUnStakingAll-address-)
+- [`TokamakRequestedUnStakingAll(address layer2)`](#TokamakStaker-TokamakRequestedUnStakingAll-address-)
 
-- [`exchangedWTONtoTOS(address caller, uint256 amountIn, uint256 amountOut)`](#TokamakStaker-exchangedWTONtoTOS-address-uint256-uint256-)
+- [`ExchangedWTONtoTOS(address caller, uint256 amountIn, uint256 amountOut)`](#TokamakStaker-ExchangedWTONtoTOS-address-uint256-uint256-)
 
-- [`exchangedWTONtoTOS2(address caller, uint256 amountIn, uint256 amountOut)`](#TokamakStaker-exchangedWTONtoTOS2-address-uint256-uint256-)
-
-###### TokamakStaker-transferOwnership-address-
-
-## Function `transferOwnership(address newOwner)`
-
-transfer Ownership
-
-### Parameters:
-
-- `newOwner`: new owner address
+- [`ExchangedWTONtoTOS2(address caller, uint256 amountIn, uint256 amountOut)`](#TokamakStaker-ExchangedWTONtoTOS2-address-uint256-uint256-)
 
 ###### TokamakStaker-setRegistry-address-
 
@@ -156,8 +144,6 @@ process unstaking in layer2 in tokamak
 
 exchange holded WTON to TOS using uniswap
 
-@notice
-
 ### Parameters:
 
 - `_amountIn`: the input amount
@@ -210,9 +196,9 @@ event on set the tokamak Layer2 address
 
 - `layer2`: the tokamak Layer2 address
 
-###### TokamakStaker-tokamakStaked-address-uint256-
+###### TokamakStaker-TokamakStaked-address-uint256-
 
-## Event `tokamakStaked(address layer2, uint256 amount)`
+## Event `TokamakStaked(address layer2, uint256 amount)`
 
 event on staking the staked TON in layer2 in tokamak
 
@@ -222,9 +208,9 @@ event on staking the staked TON in layer2 in tokamak
 
 - `amount`: the amount that stake to layer2
 
-###### TokamakStaker-tokamakRequestedUnStaking-address-uint256-
+###### TokamakStaker-TokamakRequestedUnStaking-address-uint256-
 
-## Event `tokamakRequestedUnStaking(address layer2, uint256 amount)`
+## Event `TokamakRequestedUnStaking(address layer2, uint256 amount)`
 
 event on request unstaking the wtonAmount in layer2 in tokamak
 
@@ -234,9 +220,9 @@ event on request unstaking the wtonAmount in layer2 in tokamak
 
 - `amount`: the amount requested to unstaking
 
-###### TokamakStaker-tokamakProcessedUnStaking-address-uint256-bool-
+###### TokamakStaker-TokamakProcessedUnStaking-address-uint256-bool-
 
-## Event `tokamakProcessedUnStaking(address layer2, uint256 rn, bool receiveTON)`
+## Event `TokamakProcessedUnStaking(address layer2, uint256 rn, bool receiveTON)`
 
 event on process unstaking in layer2 in tokamak
 
@@ -248,9 +234,9 @@ event on process unstaking in layer2 in tokamak
 
 - `receiveTON`: if is true ,TON , else is WTON
 
-###### TokamakStaker-tokamakRequestedUnStakingAll-address-
+###### TokamakStaker-TokamakRequestedUnStakingAll-address-
 
-## Event `tokamakRequestedUnStakingAll(address layer2)`
+## Event `TokamakRequestedUnStakingAll(address layer2)`
 
 event on request unstaking the amount of all in layer2 in tokamak
 
@@ -258,9 +244,9 @@ event on request unstaking the amount of all in layer2 in tokamak
 
 - `layer2`: the layer2 address in tokamak
 
-###### TokamakStaker-exchangedWTONtoTOS-address-uint256-uint256-
+###### TokamakStaker-ExchangedWTONtoTOS-address-uint256-uint256-
 
-## Event `exchangedWTONtoTOS(address caller, uint256 amountIn, uint256 amountOut)`
+## Event `ExchangedWTONtoTOS(address caller, uint256 amountIn, uint256 amountOut)`
 
 exchange WTON to TOS using uniswap v3
 
@@ -270,9 +256,9 @@ exchange WTON to TOS using uniswap v3
 
 - `amountIn`: the input amount
 
-###### TokamakStaker-exchangedWTONtoTOS2-address-uint256-uint256-
+###### TokamakStaker-ExchangedWTONtoTOS2-address-uint256-uint256-
 
-## Event `exchangedWTONtoTOS2(address caller, uint256 amountIn, uint256 amountOut)`
+## Event `ExchangedWTONtoTOS2(address caller, uint256 amountIn, uint256 amountOut)`
 
 exchange WTON to TOS using uniswap v2
 

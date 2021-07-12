@@ -8,13 +8,15 @@ import "./ProxyBase.sol";
 /// @title Proxy for StakeVault
 /// @notice
 contract StakeVaultProxy is StakeVaultStorage, ProxyBase, IStakeVaultProxy {
-
     event Upgraded(address indexed implementation);
 
     /// @dev constructor of StakeVaultProxy
     /// @param impl the logic address of StakeVaultProxy
     constructor(address impl) {
-        assert(IMPLEMENTATION_SLOT == bytes32(uint256(keccak256('eip1967.proxy.implementation')) - 1));
+        assert(
+            IMPLEMENTATION_SLOT ==
+                bytes32(uint256(keccak256("eip1967.proxy.implementation")) - 1)
+        );
 
         require(impl != address(0), "Stake1Proxy: logic is zero");
 

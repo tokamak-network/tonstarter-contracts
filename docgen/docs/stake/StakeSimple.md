@@ -4,10 +4,6 @@
 
 - [`receive()`](#StakeSimple-receive--)
 
-- [`transferOwnership(address newOwner)`](#StakeSimple-transferOwnership-address-)
-
-- [`initialize(address _token, address _paytoken, address _vault, uint256 _saleStartBlock, uint256 _startBlock, uint256 _period)`](#StakeSimple-initialize-address-address-address-uint256-uint256-uint256-)
-
 - [`stake(uint256 amount)`](#StakeSimple-stake-uint256-)
 
 - [`withdraw()`](#StakeSimple-withdraw--)
@@ -37,32 +33,6 @@ constructor of StakeSimple
 receive ether
 
 call stake function with msg.value
-
-###### StakeSimple-transferOwnership-address-
-
-## Function `transferOwnership(address newOwner)`
-
-transfer Ownership
-
-### Parameters:
-
-- `newOwner`: new owner address
-
-###### StakeSimple-initialize-address-address-address-uint256-uint256-uint256-
-
-## Function `initialize(address _token, address _paytoken, address _vault, uint256 _saleStartBlock, uint256 _startBlock, uint256 _period)`
-
-No description
-
-### Parameters:
-
-- `_vault`:  the _ault's address
-
-- `_saleStartBlock`:  the sale start block
-
-- `_startBlock`:  the staking start block
-
-- `_period`: the period that user can generate reward amount
 
 ###### StakeSimple-stake-uint256-
 

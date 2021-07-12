@@ -2,8 +2,6 @@
 
 - [`constructor(address _logic)`](#StakeDefiProxy-constructor-address-)
 
-- [`transferOwnership(address newOwner)`](#StakeDefiProxy-transferOwnership-address-)
-
 - [`setProxyPause(bool _pause)`](#StakeDefiProxy-setProxyPause-bool-)
 
 - [`upgradeTo(address impl)`](#StakeDefiProxy-upgradeTo-address-)
@@ -14,7 +12,7 @@
 
 - [`fallback()`](#StakeDefiProxy-fallback--)
 
-- [`setInit(address[3] _addr, address _registry, uint256[3] _intdata)`](#StakeDefiProxy-setInit-address-3--address-uint256-3--)
+- [`setInit(address[4] _addr, address _registry, uint256[3] _intdata)`](#StakeDefiProxy-setInit-address-4--address-uint256-3--)
 
 # Events:
 
@@ -24,21 +22,11 @@
 
 ## Function `constructor(address _logic)`
 
-constructor of Stake1Proxy
+constructor of StakeDefiProxy
 
 ### Parameters:
 
 - `_logic`: the logic address that used in proxy
-
-###### StakeDefiProxy-transferOwnership-address-
-
-## Function `transferOwnership(address newOwner)`
-
-transfer Ownership
-
-### Parameters:
-
-- `newOwner`: new owner address
 
 ###### StakeDefiProxy-setProxyPause-bool-
 
@@ -78,15 +66,15 @@ receive ether
 
 fallback function , execute on undefined function call
 
-###### StakeDefiProxy-setInit-address-3--address-uint256-3--
+###### StakeDefiProxy-setInit-address-4--address-uint256-3--
 
-## Function `setInit(address[3] _addr, address _registry, uint256[3] _intdata)`
+## Function `setInit(address[4] _addr, address _registry, uint256[3] _intdata)`
 
 set initial storage
 
 ### Parameters:
 
-- `_addr`: the array addresses of token, paytoken, vault
+- `_addr`: the array addresses of token, paytoken, vault, defiAddr
 
 - `_registry`: teh registry address
 

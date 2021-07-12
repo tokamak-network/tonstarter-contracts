@@ -8,7 +8,6 @@ import "../common/AccessibleCommon.sol";
 /// @title Stake Registry
 /// @notice Manage the vault list by phase. Manage the list of staking contracts in the vault.
 contract StakeRegistry is AccessibleCommon, IStakeRegistry {
-
     bytes32 public constant ZERO_HASH =
         0x0000000000000000000000000000000000000000000000000000000000000000;
 
@@ -47,7 +46,6 @@ contract StakeRegistry is AccessibleCommon, IStakeRegistry {
 
     /// Defi Info
     mapping(bytes32 => LibTokenStake1.DefiInfo) public override defiInfo;
-
 
     modifier nonZero(address _addr) {
         require(_addr != address(0), "StakeRegistry: zero address");
@@ -105,7 +103,6 @@ contract StakeRegistry is AccessibleCommon, IStakeRegistry {
         _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
         _setupRole(ADMIN_ROLE, msg.sender);
         tos = _tos;
-
     }
 
     /// @dev Set addresses for Tokamak integration

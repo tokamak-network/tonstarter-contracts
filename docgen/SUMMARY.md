@@ -1,5 +1,9 @@
 # Summary
 * contracts
+  * common
+    * [AccessRoleCommon](docs/common/AccessRoleCommon.md)
+    * [AccessibleCommon](docs/common/AccessibleCommon.md)
+    * [AccessiblePlusCommon](docs/common/AccessiblePlusCommon.md)
   * connection
     * [TokamakStaker](docs/connection/TokamakStaker.md)
   * factory
@@ -9,6 +13,7 @@
     * [StakeTONFactory](docs/factory/StakeTONFactory.md)
     * [StakeTONProxyFactory](docs/factory/StakeTONProxyFactory.md)
     * [StakeVaultFactory](docs/factory/StakeVaultFactory.md)
+    * artifacts
   * interfaces
     * [IDepositManager](docs/interfaces/IDepositManager.md)
     * [IDeveloperVault](docs/interfaces/IDeveloperVault.md)
@@ -21,6 +26,7 @@
     * [IStake1Logic](docs/interfaces/IStake1Logic.md)
     * [IStake1Storage](docs/interfaces/IStake1Storage.md)
     * [IStake1Vault](docs/interfaces/IStake1Vault.md)
+    * [IStakeContractFactory](docs/interfaces/IStakeContractFactory.md)
     * [IStakeDefiFactory](docs/interfaces/IStakeDefiFactory.md)
     * [IStakeDefiProxy](docs/interfaces/IStakeDefiProxy.md)
     * [IStakeFactory](docs/interfaces/IStakeFactory.md)
@@ -28,9 +34,7 @@
     * [IStakeProxyStorage](docs/interfaces/IStakeProxyStorage.md)
     * [IStakeRegistry](docs/interfaces/IStakeRegistry.md)
     * [IStakeSimple](docs/interfaces/IStakeSimple.md)
-    * [IStakeSimpleFactory](docs/interfaces/IStakeSimpleFactory.md)
     * [IStakeTON](docs/interfaces/IStakeTON.md)
-    * [IStakeTONFactory](docs/interfaces/IStakeTONFactory.md)
     * [IStakeTONProxyFactory](docs/interfaces/IStakeTONProxyFactory.md)
     * [IStakeTONStorage](docs/interfaces/IStakeTONStorage.md)
     * [IStakeTONTokamak](docs/interfaces/IStakeTONTokamak.md)
@@ -45,10 +49,12 @@
     * [ChainId](docs/libraries/ChainId.md)
     * [LibTokenStake1](docs/libraries/LibTokenStake1.md)
   * stake
+    * [ProxyBase](docs/stake/ProxyBase.md)
     * [Stake1Logic](docs/stake/Stake1Logic.md)
     * [Stake1Proxy](docs/stake/Stake1Proxy.md)
     * [Stake1Storage](docs/stake/Stake1Storage.md)
     * [Stake1Vault](docs/stake/Stake1Vault.md)
+    * [Stake2Logic](docs/stake/Stake2Logic.md)
     * [StakeDefiProxy](docs/stake/StakeDefiProxy.md)
     * [StakeProxyStorage](docs/stake/StakeProxyStorage.md)
     * [StakeRegistry](docs/stake/StakeRegistry.md)
@@ -59,9 +65,7 @@
     * [StakeTONStorage](docs/stake/StakeTONStorage.md)
     * [StakeVaultProxy](docs/stake/StakeVaultProxy.md)
     * [StakeVaultStorage](docs/stake/StakeVaultStorage.md)
+    * artifacts
   * tokens
     * [OnApprove](docs/tokens/OnApprove.md)
     * [TOS](docs/tokens/TOS.md)
-  * utils
-    * math
-      * [SafeMath](docs/utils/math/SafeMath.md)

@@ -1,7 +1,5 @@
 # Functions:
 
-- [`initialize(address _tos, address _paytoken, uint256 _cap, uint256 _saleStartBlock, uint256 _stakeStartBlock, address _stakefactory, uint256 _stakeType, address _defiAddr)`](#IStake1Vault-initialize-address-address-uint256-uint256-uint256-address-uint256-address-)
-
 - [`setTOS(address _tos)`](#IStake1Vault-setTOS-address-)
 
 - [`changeCap(uint256 _cap)`](#IStake1Vault-changeCap-uint256-)
@@ -27,26 +25,6 @@
 - [`stakeAddressesAll()`](#IStake1Vault-stakeAddressesAll--)
 
 - [`orderedEndBlocksAll()`](#IStake1Vault-orderedEndBlocksAll--)
-
-###### IStake1Vault-initialize-address-address-uint256-uint256-uint256-address-uint256-address-
-
-## Function `initialize(address _tos, address _paytoken, uint256 _cap, uint256 _saleStartBlock, uint256 _stakeStartBlock, address _stakefactory, uint256 _stakeType, address _defiAddr)`
-
-No description
-
-### Parameters:
-
-- `_cap`:  Maximum amount of rewards issued, allocated reward amount.
-
-- `_saleStartBlock`:  the sale start block
-
-- `_stakeStartBlock`:  the staking start block
-
-- `_stakefactory`: the factory address to create stakeContract
-
-- `_stakeType`:  Type of staking contract, 0 TON staking, 1 basic ERC20 staking, 2 Defi linked staking
-
-- `_defiAddr`: Used when an external address is required. default: address(0)
 
 ###### IStake1Vault-setTOS-address-
 
@@ -82,7 +60,7 @@ Set Defi Address
 
 ## Function `withdrawReward(uint256 _amount)`
 
-If the vault has more money than the reward owed, the owner can withdraw the remaining amount.
+If the vault has more money than the reward to give, the owner can withdraw the remaining amount.
 
 ### Parameters:
 
@@ -130,7 +108,7 @@ A function that _to claim the amount(_amount) from the staking contract and gets
 
 ## Function `canClaim(address _to, uint256 _amount)`
 
-whether it is available to claim amount, if it is available , return the total reward amount
+Whether user(to) can receive a reward amount(_amount)
 
 ### Parameters:
 
