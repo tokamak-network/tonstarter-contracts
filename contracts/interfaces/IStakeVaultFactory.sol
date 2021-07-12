@@ -18,7 +18,5 @@ interface IStakeVaultFactory {
     /// @dev Set stakeVaultLogic address by _phase
     /// @param _phase the stake type
     /// @param _logic the vault logic address
-    function setVaultLogicByPhase(uint256 _phase, address _logic)
-        external;
-
+    function setVaultLogicByPhase(uint256 _phase, address _logic) external;
 }

@@ -9,21 +9,22 @@ import "./StakeProxyStorage.sol";
 /// @notice Admin can createVault, createStakeContract.
 /// User can excute the tokamak staking function of each contract through this logic.
 contract Stake2Logic is StakeProxyStorage, AccessibleCommon {
-
     modifier nonZero(address _addr) {
         require(_addr != address(0), "Stake1Logic:zero address");
         _;
     }
 
-    constructor() {
-    }
+    constructor() {}
 
-    function balanceOf(address token, address target) external view returns(uint256) {
+    function balanceOf(address token, address target)
+        external
+        view
+        returns (uint256)
+    {
         return IERC20(token).balanceOf(target);
     }
 
-    function balanceOfTOS(address target) external view returns(uint256) {
+    function balanceOfTOS(address target) external view returns (uint256) {
         return IERC20(tos).balanceOf(target);
     }
-
 }

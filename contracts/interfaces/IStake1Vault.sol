@@ -4,7 +4,6 @@ pragma abicoder v2;
 import "../libraries/LibTokenStake1.sol";
 
 interface IStake1Vault {
-
     /// @dev Sets TOS address
     /// @param _tos  TOS address
     function setTOS(address _tos) external;

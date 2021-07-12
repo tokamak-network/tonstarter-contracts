@@ -9,14 +9,21 @@ import "../common/AccessibleCommon.sol";
 import "./ProxyBase.sol";
 
 /// @title Proxy for stake defi contract
-contract StakeDefiProxy is Stake1Storage, AccessibleCommon, ProxyBase, IStakeDefiProxy {
-
+contract StakeDefiProxy is
+    Stake1Storage,
+    AccessibleCommon,
+    ProxyBase,
+    IStakeDefiProxy
+{
     event Upgraded(address indexed implementation);
 
     /// @dev constructor of StakeDefiProxy
     /// @param _logic the logic address that used in proxy
     constructor(address _logic) {
-        assert(IMPLEMENTATION_SLOT == bytes32(uint256(keccak256('eip1967.proxy.implementation')) - 1));
+        assert(
+            IMPLEMENTATION_SLOT ==
+                bytes32(uint256(keccak256("eip1967.proxy.implementation")) - 1)
+        );
 
         require(_logic != address(0), "StakeDefiProxy: logic is zero");
 
@@ -25,7 +32,6 @@ contract StakeDefiProxy is Stake1Storage, AccessibleCommon, ProxyBase, IStakeDef
         _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
         _setupRole(ADMIN_ROLE, msg.sender);
         _setupRole(ADMIN_ROLE, address(this));
-
     }
 
     /// @dev Set pause state

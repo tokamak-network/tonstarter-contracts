@@ -7,7 +7,6 @@ import "../common/AccessibleCommon.sol";
 
 /// @title the storage of StakeVaultStorage
 contract StakeVaultStorage is AccessibleCommon {
-
     /// @dev reward token : TOS
     address public tos;
 
@@ -67,5 +66,4 @@ contract StakeVaultStorage is AccessibleCommon {
         _;
         _lock = 0;
     }
-
 }

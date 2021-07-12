@@ -41,5 +41,4 @@ contract StakeProxyStorage {
     mapping(address => bool) public aliveImplementation;
 
     mapping(bytes4 => address) public selectorImplementation;
-
 }

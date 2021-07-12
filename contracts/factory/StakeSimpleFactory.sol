@@ -7,7 +7,6 @@ import "../common/AccessRoleCommon.sol";
 
 /// @title A factory that creates a stake contract
 contract StakeSimpleFactory is AccessRoleCommon, IStakeContractFactory {
-
     address public stakeSimpleLogic;
 
     /// @dev constructor of StakeSimpleFactory
