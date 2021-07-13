@@ -1,0 +1,654 @@
+{
+  "contractName": "ITickLens",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "pool",
+          "type": "address"
+        },
+        {
+          "internalType": "int16",
+          "name": "tickBitmapIndex",
+          "type": "int16"
+        }
+      ],
+      "name": "getPopulatedTicksInWord",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "int24",
+              "name": "tick",
+              "type": "int24"
+            },
+            {
+              "internalType": "int128",
+              "name": "liquidityNet",
+              "type": "int128"
+            },
+            {
+              "internalType": "uint128",
+              "name": "liquidityGross",
+              "type": "uint128"
+            }
+          ],
+          "internalType": "struct ITickLens.PopulatedTick[]",
+          "name": "populatedTicks",
+          "type": "tuple[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "metadata": "{\"compiler\":{\"version\":\"0.7.6+commit.7338295f\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"pool\",\"type\":\"address\"},{\"internalType\":\"int16\",\"name\":\"tickBitmapIndex\",\"type\":\"int16\"}],\"name\":\"getPopulatedTicksInWord\",\"outputs\":[{\"components\":[{\"internalType\":\"int24\",\"name\":\"tick\",\"type\":\"int24\"},{\"internalType\":\"int128\",\"name\":\"liquidityNet\",\"type\":\"int128\"},{\"internalType\":\"uint128\",\"name\":\"liquidityGross\",\"type\":\"uint128\"}],\"internalType\":\"struct ITickLens.PopulatedTick[]\",\"name\":\"populatedTicks\",\"type\":\"tuple[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"details\":\"This avoids the waterfall of fetching the tick bitmap, parsing the bitmap to know which ticks to fetch, and then sending additional multicalls to fetch the tick data\",\"kind\":\"dev\",\"methods\":{\"getPopulatedTicksInWord(address,int16)\":{\"params\":{\"pool\":\"The address of the pool for which to fetch populated tick data\",\"tickBitmapIndex\":\"The index of the word in the tick bitmap for which to parse the bitmap and fetch all the populated ticks\"},\"returns\":{\"populatedTicks\":\"An array of tick data for the given word in the tick bitmap\"}}},\"title\":\"Tick Lens\",\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{\"getPopulatedTicksInWord(address,int16)\":{\"notice\":\"Get all the tick data for the populated ticks from a word of the tick bitmap of a pool\"}},\"notice\":\"Provides functions for fetching chunks of tick data for a pool\",\"version\":1}},\"settings\":{\"compilationTarget\":{\"/Users/zena/ico2.0/ico20-contracts/uniswap-v3-periphery/contracts/interfaces/ITickLens.sol\":\"ITickLens\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":100},\"remappings\":[]},\"sources\":{\"/Users/zena/ico2.0/ico20-contracts/uniswap-v3-periphery/contracts/interfaces/ITickLens.sol\":{\"keccak256\":\"0x44570f142562496f3b71e7c90c337aeffa56aa8dcce918537aa796599962f97e\",\"license\":\"GPL-2.0-or-later\",\"urls\":[\"bzz-raw://c4ff8b6e474a133d5aeac42dfc841299ca6456a87ab461caf334e7d48ac6bc70\",\"dweb:/ipfs/QmYE3nmgx65jcm5EqikS5Sw1SdWjNTKtcQkJvE1ZWFoszE\"]}},\"version\":1}",
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "immutableReferences": {},
+  "generatedSources": [],
+  "deployedGeneratedSources": [],
+  "sourceMap": "",
+  "deployedSourceMap": "",
+  "source": "// SPDX-License-Identifier: GPL-2.0-or-later\npragma solidity >=0.7.5;\npragma abicoder v2;\n\n/// @title Tick Lens\n/// @notice Provides functions for fetching chunks of tick data for a pool\n/// @dev This avoids the waterfall of fetching the tick bitmap, parsing the bitmap to know which ticks to fetch, and\n/// then sending additional multicalls to fetch the tick data\ninterface ITickLens {\n    struct PopulatedTick {\n        int24 tick;\n        int128 liquidityNet;\n        uint128 liquidityGross;\n    }\n\n    /// @notice Get all the tick data for the populated ticks from a word of the tick bitmap of a pool\n    /// @param pool The address of the pool for which to fetch populated tick data\n    /// @param tickBitmapIndex The index of the word in the tick bitmap for which to parse the bitmap and\n    /// fetch all the populated ticks\n    /// @return populatedTicks An array of tick data for the given word in the tick bitmap\n    function getPopulatedTicksInWord(address pool, int16 tickBitmapIndex)\n        external\n        view\n        returns (PopulatedTick[] memory populatedTicks);\n}\n",
+  "sourcePath": "/Users/zena/ico2.0/ico20-contracts/uniswap-v3-periphery/contracts/interfaces/ITickLens.sol",
+  "ast": {
+    "absolutePath": "/Users/zena/ico2.0/ico20-contracts/uniswap-v3-periphery/contracts/interfaces/ITickLens.sol",
+    "exportedSymbols": {
+      "ITickLens": [
+        4254
+      ]
+    },
+    "id": 4255,
+    "license": "GPL-2.0-or-later",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 4233,
+        "literals": [
+          "solidity",
+          ">=",
+          "0.7",
+          ".5"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "45:24:27"
+      },
+      {
+        "id": 4234,
+        "literals": [
+          "abicoder",
+          "v2"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "70:19:27"
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "documentation": {
+          "id": 4235,
+          "nodeType": "StructuredDocumentation",
+          "src": "91:275:27",
+          "text": "@title Tick Lens\n @notice Provides functions for fetching chunks of tick data for a pool\n @dev This avoids the waterfall of fetching the tick bitmap, parsing the bitmap to know which ticks to fetch, and\n then sending additional multicalls to fetch the tick data"
+        },
+        "fullyImplemented": false,
+        "id": 4254,
+        "linearizedBaseContracts": [
+          4254
+        ],
+        "name": "ITickLens",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "canonicalName": "ITickLens.PopulatedTick",
+            "id": 4242,
+            "members": [
+              {
+                "constant": false,
+                "id": 4237,
+                "mutability": "mutable",
+                "name": "tick",
+                "nodeType": "VariableDeclaration",
+                "scope": 4242,
+                "src": "423:10:27",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_int24",
+                  "typeString": "int24"
+                },
+                "typeName": {
+                  "id": 4236,
+                  "name": "int24",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "423:5:27",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_int24",
+                    "typeString": "int24"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 4239,
+                "mutability": "mutable",
+                "name": "liquidityNet",
+                "nodeType": "VariableDeclaration",
+                "scope": 4242,
+                "src": "443:19:27",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_int128",
+                  "typeString": "int128"
+                },
+                "typeName": {
+                  "id": 4238,
+                  "name": "int128",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "443:6:27",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_int128",
+                    "typeString": "int128"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 4241,
+                "mutability": "mutable",
+                "name": "liquidityGross",
+                "nodeType": "VariableDeclaration",
+                "scope": 4242,
+                "src": "472:22:27",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint128",
+                  "typeString": "uint128"
+                },
+                "typeName": {
+                  "id": 4240,
+                  "name": "uint128",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "472:7:27",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint128",
+                    "typeString": "uint128"
+                  }
+                },
+                "visibility": "internal"
+              }
+            ],
+            "name": "PopulatedTick",
+            "nodeType": "StructDefinition",
+            "scope": 4254,
+            "src": "392:109:27",
+            "visibility": "public"
+          },
+          {
+            "documentation": {
+              "id": 4243,
+              "nodeType": "StructuredDocumentation",
+              "src": "507:416:27",
+              "text": "@notice Get all the tick data for the populated ticks from a word of the tick bitmap of a pool\n @param pool The address of the pool for which to fetch populated tick data\n @param tickBitmapIndex The index of the word in the tick bitmap for which to parse the bitmap and\n fetch all the populated ticks\n @return populatedTicks An array of tick data for the given word in the tick bitmap"
+            },
+            "functionSelector": "351fb478",
+            "id": 4253,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "getPopulatedTicksInWord",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 4248,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 4245,
+                  "mutability": "mutable",
+                  "name": "pool",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 4253,
+                  "src": "961:12:27",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 4244,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "961:7:27",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 4247,
+                  "mutability": "mutable",
+                  "name": "tickBitmapIndex",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 4253,
+                  "src": "975:21:27",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_int16",
+                    "typeString": "int16"
+                  },
+                  "typeName": {
+                    "id": 4246,
+                    "name": "int16",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "975:5:27",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_int16",
+                      "typeString": "int16"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "960:37:27"
+            },
+            "returnParameters": {
+              "id": 4252,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 4251,
+                  "mutability": "mutable",
+                  "name": "populatedTicks",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 4253,
+                  "src": "1045:37:27",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_array$_t_struct$_PopulatedTick_$4242_memory_ptr_$dyn_memory_ptr",
+                    "typeString": "struct ITickLens.PopulatedTick[]"
+                  },
+                  "typeName": {
+                    "baseType": {
+                      "id": 4249,
+                      "name": "PopulatedTick",
+                      "nodeType": "UserDefinedTypeName",
+                      "referencedDeclaration": 4242,
+                      "src": "1045:13:27",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_struct$_PopulatedTick_$4242_storage_ptr",
+                        "typeString": "struct ITickLens.PopulatedTick"
+                      }
+                    },
+                    "id": 4250,
+                    "nodeType": "ArrayTypeName",
+                    "src": "1045:15:27",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_array$_t_struct$_PopulatedTick_$4242_storage_$dyn_storage_ptr",
+                      "typeString": "struct ITickLens.PopulatedTick[]"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1044:39:27"
+            },
+            "scope": 4254,
+            "src": "928:156:27",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 4255,
+        "src": "366:720:27"
+      }
+    ],
+    "src": "45:1042:27"
+  },
+  "legacyAST": {
+    "attributes": {
+      "absolutePath": "/Users/zena/ico2.0/ico20-contracts/uniswap-v3-periphery/contracts/interfaces/ITickLens.sol",
+      "exportedSymbols": {
+        "ITickLens": [
+          4254
+        ]
+      },
+      "license": "GPL-2.0-or-later"
+    },
+    "children": [
+      {
+        "attributes": {
+          "literals": [
+            "solidity",
+            ">=",
+            "0.7",
+            ".5"
+          ]
+        },
+        "id": 4233,
+        "name": "PragmaDirective",
+        "src": "45:24:27"
+      },
+      {
+        "attributes": {
+          "literals": [
+            "abicoder",
+            "v2"
+          ]
+        },
+        "id": 4234,
+        "name": "PragmaDirective",
+        "src": "70:19:27"
+      },
+      {
+        "attributes": {
+          "abstract": false,
+          "baseContracts": [
+            null
+          ],
+          "contractDependencies": [
+            null
+          ],
+          "contractKind": "interface",
+          "fullyImplemented": false,
+          "linearizedBaseContracts": [
+            4254
+          ],
+          "name": "ITickLens",
+          "scope": 4255
+        },
+        "children": [
+          {
+            "attributes": {
+              "text": "@title Tick Lens\n @notice Provides functions for fetching chunks of tick data for a pool\n @dev This avoids the waterfall of fetching the tick bitmap, parsing the bitmap to know which ticks to fetch, and\n then sending additional multicalls to fetch the tick data"
+            },
+            "id": 4235,
+            "name": "StructuredDocumentation",
+            "src": "91:275:27"
+          },
+          {
+            "attributes": {
+              "canonicalName": "ITickLens.PopulatedTick",
+              "name": "PopulatedTick",
+              "scope": 4254,
+              "visibility": "public"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "constant": false,
+                  "mutability": "mutable",
+                  "name": "tick",
+                  "scope": 4242,
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "type": "int24",
+                  "visibility": "internal"
+                },
+                "children": [
+                  {
+                    "attributes": {
+                      "name": "int24",
+                      "type": "int24"
+                    },
+                    "id": 4236,
+                    "name": "ElementaryTypeName",
+                    "src": "423:5:27"
+                  }
+                ],
+                "id": 4237,
+                "name": "VariableDeclaration",
+                "src": "423:10:27"
+              },
+              {
+                "attributes": {
+                  "constant": false,
+                  "mutability": "mutable",
+                  "name": "liquidityNet",
+                  "scope": 4242,
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "type": "int128",
+                  "visibility": "internal"
+                },
+                "children": [
+                  {
+                    "attributes": {
+                      "name": "int128",
+                      "type": "int128"
+                    },
+                    "id": 4238,
+                    "name": "ElementaryTypeName",
+                    "src": "443:6:27"
+                  }
+                ],
+                "id": 4239,
+                "name": "VariableDeclaration",
+                "src": "443:19:27"
+              },
+              {
+                "attributes": {
+                  "constant": false,
+                  "mutability": "mutable",
+                  "name": "liquidityGross",
+                  "scope": 4242,
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "type": "uint128",
+                  "visibility": "internal"
+                },
+                "children": [
+                  {
+                    "attributes": {
+                      "name": "uint128",
+                      "type": "uint128"
+                    },
+                    "id": 4240,
+                    "name": "ElementaryTypeName",
+                    "src": "472:7:27"
+                  }
+                ],
+                "id": 4241,
+                "name": "VariableDeclaration",
+                "src": "472:22:27"
+              }
+            ],
+            "id": 4242,
+            "name": "StructDefinition",
+            "src": "392:109:27"
+          },
+          {
+            "attributes": {
+              "functionSelector": "351fb478",
+              "implemented": false,
+              "isConstructor": false,
+              "kind": "function",
+              "modifiers": [
+                null
+              ],
+              "name": "getPopulatedTicksInWord",
+              "scope": 4254,
+              "stateMutability": "view",
+              "virtual": false,
+              "visibility": "external"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "text": "@notice Get all the tick data for the populated ticks from a word of the tick bitmap of a pool\n @param pool The address of the pool for which to fetch populated tick data\n @param tickBitmapIndex The index of the word in the tick bitmap for which to parse the bitmap and\n fetch all the populated ticks\n @return populatedTicks An array of tick data for the given word in the tick bitmap"
+                },
+                "id": 4243,
+                "name": "StructuredDocumentation",
+                "src": "507:416:27"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "pool",
+                      "scope": 4253,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "address",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "address",
+                          "stateMutability": "nonpayable",
+                          "type": "address"
+                        },
+                        "id": 4244,
+                        "name": "ElementaryTypeName",
+                        "src": "961:7:27"
+                      }
+                    ],
+                    "id": 4245,
+                    "name": "VariableDeclaration",
+                    "src": "961:12:27"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "tickBitmapIndex",
+                      "scope": 4253,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "int16",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "int16",
+                          "type": "int16"
+                        },
+                        "id": 4246,
+                        "name": "ElementaryTypeName",
+                        "src": "975:5:27"
+                      }
+                    ],
+                    "id": 4247,
+                    "name": "VariableDeclaration",
+                    "src": "975:21:27"
+                  }
+                ],
+                "id": 4248,
+                "name": "ParameterList",
+                "src": "960:37:27"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "populatedTicks",
+                      "scope": 4253,
+                      "stateVariable": false,
+                      "storageLocation": "memory",
+                      "type": "struct ITickLens.PopulatedTick[]",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "type": "struct ITickLens.PopulatedTick[]"
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "name": "PopulatedTick",
+                              "referencedDeclaration": 4242,
+                              "type": "struct ITickLens.PopulatedTick"
+                            },
+                            "id": 4249,
+                            "name": "UserDefinedTypeName",
+                            "src": "1045:13:27"
+                          }
+                        ],
+                        "id": 4250,
+                        "name": "ArrayTypeName",
+                        "src": "1045:15:27"
+                      }
+                    ],
+                    "id": 4251,
+                    "name": "VariableDeclaration",
+                    "src": "1045:37:27"
+                  }
+                ],
+                "id": 4252,
+                "name": "ParameterList",
+                "src": "1044:39:27"
+              }
+            ],
+            "id": 4253,
+            "name": "FunctionDefinition",
+            "src": "928:156:27"
+          }
+        ],
+        "id": 4254,
+        "name": "ContractDefinition",
+        "src": "366:720:27"
+      }
+    ],
+    "id": 4255,
+    "name": "SourceUnit",
+    "src": "45:1042:27"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.7.6+commit.7338295f.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "3.3.4",
+  "updatedAt": "2021-07-12T13:31:40.048Z",
+  "devdoc": {
+    "details": "This avoids the waterfall of fetching the tick bitmap, parsing the bitmap to know which ticks to fetch, and then sending additional multicalls to fetch the tick data",
+    "kind": "dev",
+    "methods": {
+      "getPopulatedTicksInWord(address,int16)": {
+        "params": {
+          "pool": "The address of the pool for which to fetch populated tick data",
+          "tickBitmapIndex": "The index of the word in the tick bitmap for which to parse the bitmap and fetch all the populated ticks"
+        },
+        "returns": {
+          "populatedTicks": "An array of tick data for the given word in the tick bitmap"
+        }
+      }
+    },
+    "title": "Tick Lens",
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {
+      "getPopulatedTicksInWord(address,int16)": {
+        "notice": "Get all the tick data for the populated ticks from a word of the tick bitmap of a pool"
+      }
+    },
+    "notice": "Provides functions for fetching chunks of tick data for a pool",
+    "version": 1
+  }
+}
