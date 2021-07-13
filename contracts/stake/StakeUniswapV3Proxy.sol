@@ -2,7 +2,7 @@
 pragma solidity ^0.7.6;
 
 import "../interfaces/IStakeUniswapV3Proxy.sol";
-import "../interfaces/ICoinageFactory.sol";
+import "../interfaces/IStakeCoinageFactory.sol";
 import "../interfaces/IStakeRegistry.sol";
 
 import "./StakeUniswapV3Storage.sol";
@@ -135,7 +135,7 @@ contract StakeUniswapV3Proxy is
             _coinageFactory() != address(0),
             "StakeUniswapV3Proxy: _coinageFactory is zero"
         );
-        coinage = ICoinageFactory(_coinageFactory()).deploy();
+        coinage = IStakeCoinageFactory(_coinageFactory()).deploy();
         require(
             coinage != address(0),
             "StakeUniswapV3Proxy: deployed coinage is zero"

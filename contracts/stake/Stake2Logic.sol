@@ -1,17 +1,31 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.7.6;
 
+import "../interfaces/IStake2Logic.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {IStake2Vault} from "../interfaces/IStake2Vault.sol";
 import "../common/AccessibleCommon.sol";
 import "./StakeProxyStorage.sol";
+
+
+interface IIStakeUniswapV3 {
+    function setPool(
+        address[4] memory uniswapInfo
+    ) external;
+}
+
 
 /// @title The logic of TOS Plaform
 /// @notice Admin can createVault, createStakeContract.
 /// User can excute the tokamak staking function of each contract through this logic.
-contract Stake2Logic is StakeProxyStorage, AccessibleCommon {
+contract Stake2Logic is StakeProxyStorage, AccessibleCommon, IStake2Logic{
 
-    modifier nonZero(address _addr) {
-        require(_addr != address(0), "Stake1Logic:zero address");
+    // modifier nonZero(address _addr) {
+    //     require(_addr != address(0), "Stake1Logic:zero address");
+    //     _;
+    // }
+    modifier nonZeroAddress(address _addr) {
+        require(_addr != address(0), "Stake2Logic: zero address");
         _;
     }
 
@@ -70,9 +84,9 @@ contract Stake2Logic is StakeProxyStorage, AccessibleCommon {
         bytes32 vaultName = _vaultName;
 
         stakeRegistry.addVault(vault, phase, vaultName);
-        emit CreatedVault(vault, _uniswapInfo[0], cap);
+        emit CreatedVault2(vault, _uniswapInfo[0], cap);
 
-        address[4] memory _addr = [tos,vault, address(0), address(0)];
+        address[4] memory _addr = [tos, vault, address(0), address(0)];
         address _contract =
             stakeFactory.create(
                 stakeType,
@@ -83,11 +97,11 @@ contract Stake2Logic is StakeProxyStorage, AccessibleCommon {
         require(_contract != address(0), "Stake1Logic: vault2 deploy fail");
 
         address[4] memory uniswapInfo = _uniswapInfo;
-        IIStakeUniswap2(_contract).setPool(uniswapInfo);
+        IIStakeUniswapV3(_contract).setPool(uniswapInfo);
         IStake2Vault(vault).setStakeAddress(_contract);
         stakeRegistry.addStakeContract(address(vault), _contract);
 
-        emit CreatedStakeContract(address(vault), _contract, phase);
+        emit CreatedStakeContract2(address(vault), _contract, phase);
 
     }
 

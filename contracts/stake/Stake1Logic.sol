@@ -6,7 +6,6 @@ import {IProxy} from "../interfaces/IProxy.sol";
 import {IStakeFactory} from "../interfaces/IStakeFactory.sol";
 import {IStakeRegistry} from "../interfaces/IStakeRegistry.sol";
 import {IStake1Vault} from "../interfaces/IStake1Vault.sol";
-import {IStake2Vault} from "../interfaces/IStake2Vault.sol";
 import {IStakeTONTokamak} from "../interfaces/IStakeTONTokamak.sol";
 import {IStakeUniswapV3} from "../interfaces/IStakeUniswapV3.sol";
 
@@ -14,11 +13,6 @@ import "../common/AccessibleCommon.sol";
 
 import "./StakeProxyStorage.sol";
 
-interface IIStakeUniswap2 {
-    function setPool(
-        address[4] memory uniswapInfo
-    ) external;
-}
 /// @title The logic of TOS Plaform
 /// @notice Admin can createVault, createStakeContract.
 /// User can excute the tokamak staking function of each contract through this logic.
