@@ -2,6 +2,7 @@
 pragma solidity ^0.7.6;
 
 interface IStakeVaultFactory {
+
     /// @dev Create a vault that hold reward, _cap is allocated reward amount.
     /// @param _phase phase number
     /// @param _addr the array of [token, paytoken, vault, defiAddr]

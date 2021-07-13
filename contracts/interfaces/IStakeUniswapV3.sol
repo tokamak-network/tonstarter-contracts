@@ -32,11 +32,11 @@ interface IStakeUniswapV3 {
     /// @dev Claim for reward
     function claim(uint256 tokenId) external;
 
-    function setPool(
-        address token0,
-        address token1,
-        string calldata defiInfoName
-    ) external;
+    // function setPool(
+    //     address token0,
+    //     address token1,
+    //     string calldata defiInfoName
+    // ) external;
 
      /// @dev
     function getUserStakedTokenIds(address user)

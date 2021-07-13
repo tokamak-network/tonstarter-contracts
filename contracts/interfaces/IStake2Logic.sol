@@ -18,6 +18,13 @@ interface IStake2Logic {
         uint256 phase
     );
 
+    /// @dev Set stakeVaultLogic address by _phase
+    /// @param _phase the stake type
+    /// @param _logic the vault logic address
+    function setVaultLogicByPhase(uint256 _phase, address _logic)
+        external ;
+
+
     /// @dev create vault2
     /// @param _cap  allocated reward amount
     /// @param _rewardPerBlock  the reward per block
