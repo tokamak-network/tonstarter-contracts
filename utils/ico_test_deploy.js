@@ -1,9 +1,11 @@
+
 const {
   defaultSender,
   accounts,
   contract,
   web3,
 } = require("@openzeppelin/test-environment");
+
 const {
   BN,
   constants,
@@ -187,6 +189,7 @@ class ICO20Contracts {
     this.tos = null;
     this.stos = null;
     this.stakeForSTOS = null;
+
     this.stakeregister = null;
     this.stakefactory = null;
     this.stake1proxy = null;
@@ -196,6 +199,9 @@ class ICO20Contracts {
     this.vault_phase1_tosethlp = null;
     this.vault_phase1_dev = null;
     this.stakeEntry = null;
+    this.stakeEntry2 = null;
+
+    this.stakeVaultFactory = null;
 
     this.AbiObject = {
       TON: null,
@@ -222,10 +228,23 @@ class ICO20Contracts {
   }
 
 
+  findSigner = async function (address) {
+    const signers = await hre.ethers.getSigners();
+    for (const signer of signers) {
+      if (signer.address === address) {
+        return signer;
+      }
+    }
+    throw Error("Address not found in Signers");
+  }
 
   initializeICO20Contracts = async function (owner) {
     // this = self;
-    // console.log(' initializeICO20Contracts owner:',owner );
+    console.log(' initializeICO20Contracts owner:',owner );
+
+    const owner1  = await this.findSigner(owner);
+    console.log(' owner1 :',owner1.address );
+
     this.tos = null;
     this.stos = null;
 
@@ -243,7 +262,7 @@ class ICO20Contracts {
     this.vault_phase1_ton = null;
     this.vault_phase1_tosethlp = null;
     this.vault_phase1_dev = null;
-    this.swapProxy = await SwapProxy.new({ from: owner });
+    this.swapProxy = await SwapProxy.new({from:owner1});
 
     this.tos = await TOS.new(name, symbol, version, { from: owner });
     this.stakeregister = await StakeRegistry.new(this.tos.address,  { from: owner });
@@ -257,6 +276,7 @@ class ICO20Contracts {
     this.stakeVaultFactory = await StakeVaultFactory.new(
       this.stake1Vault.address,
       { from: owner });
+
 
     this.stakeTONLogic = await StakeTONLogic.new({ from: owner });
     this.stakeTONProxyFactory = await StakeTONProxyFactory.new({ from: owner });
@@ -292,21 +312,53 @@ class ICO20Contracts {
       from: owner,
     });
 
-    // attach vault2
-
-
-    // attach stake2logic
-    let _func1 = web3.eth.abi.encodeFunctionSignature("balanceOf(address,address)") ;
-    let _func2 = web3.eth.abi.encodeFunctionSignature("balanceOfTOS(address)") ;
-    let _func3 = web3.eth.abi.encodeFunctionSignature("createVault2(uint256,uint256,uint256,bytes32,uint256,address[4],string)") ;
-
     this.stake2logic = await Stake2Logic.new({ from: owner });
-    await this.stake1proxy.setImplementation(this.stake2logic.address, 1, true, { from: owner });
-    await this.stake1proxy.setSelectorImplementations([_func1, _func2, _func3], this.stake2logic.address, { from: owner });
+    this.stake2vaultlogic = await Stake2Vault.new({ from: owner });
+
     this.stakeEntry2 = await Stake2Logic.at(this.stake1proxy.address, {
       from: owner,
     });
 
+    /*
+    // attach stake2logic
+    let _func1 = web3.eth.abi.encodeFunctionSignature("balanceOf(address,address)") ;
+    let _func2 = web3.eth.abi.encodeFunctionSignature("balanceOfTOS(address)") ;
+    let _func3 = web3.eth.abi.encodeFunctionSignature("createVault2(uint256,uint256,uint256,bytes32,uint256,address[4],string)") ;
+    let _func4 = web3.eth.abi.encodeFunctionSignature("setVaultLogicByPhase(uint256,address)") ;
+
+    this.stake2logic = await Stake2Logic.new({ from: owner });
+    console.log('stake2logic',this.stake2logic.address);
+
+    await this.stake1proxy.setImplementation(this.stake2logic.address, 1, true, { from: owner });
+    await this.stake1proxy.setSelectorImplementations([_func1, _func2, _func3, _func4], this.stake2logic.address, { from: owner });
+
+    let _func1_addr  = await this.stake1proxy.getSelectorImplementation(_func1);
+    console.log('_func1_addr',_func1_addr);
+    let _func2_addr  = await this.stake1proxy.getSelectorImplementation(_func2);
+    console.log('_func2_addr',_func2_addr);
+    let _func3_addr  = await this.stake1proxy.getSelectorImplementation(_func3);
+    console.log('_func3_addr',_func3_addr);
+    let _func4_addr  = await this.stake1proxy.getSelectorImplementation(_func4);
+    console.log('_func4_addr',_func4_addr);
+
+
+    let stake2proxy = await Stake2Logic.at(this.stake1proxy.address, {
+        from: defaultSender,
+      });
+    let balanceAmount = await stake2proxy.balanceOf(this.tos.address, defaultSender);
+    console.log('balanceAmount',balanceAmount.toString());
+    // this.stakeEntry2 = await Stake1Logic.at(this.stake1proxy.address, {
+    //   from: owner,
+    // });
+
+    // console.log(" this.stakeEntry2", this.stakeEntry2.address );
+
+    // attach vault2
+    this.stake2vaultlogic = await Stake2VaultLogic.new({ from: defaultSender });
+    console.log('this.stake2vaultlogic.address',this.stake2vaultlogic.address);
+    //await this.stakeEntry2.setVaultLogicByPhase( toBN("2"), this.stake2vaultlogic.address, { from: defaultSender });
+    await stake2proxy.setVaultLogicByPhase( toBN("2"), this.stake2vaultlogic.address, { from: defaultSender });
+    */
     const returnData = {
       tos: this.tos,
       stos: this.stos,
@@ -320,7 +372,12 @@ class ICO20Contracts {
       stakeEntry: this.stakeEntry,
       stakeUniswapV3Logic: this.stakeUniswapV3Logic,
       stakeCoinageFactory: this.stakeCoinageFactory,
-      stakeEntry2: this.stakeEntry2
+      stakeUniswapV3Factory: this.stakeUniswapV3Factory,
+      stakeCoinageFactory: this.stakeUniswapV3Logic,
+      stake2logic: this.stake2logic,
+      stake2vaultlogic: this.stake2vaultlogic,
+      stakeEntry2 : this.stakeEntry2,
+      stakeVaultFactory: this.stakeVaultFactory
     };
     // console.log(' initializeICO20Contracts  :',returnData );
 
@@ -477,7 +534,8 @@ class ICO20Contracts {
       stakeEntry2: this.stakeEntry2,
       stakeUniswapV3Factory: this.stakeUniswapV3Factory,
       stakeTONfactory: this.stakeTONfactory,
-      stakeSimpleFactory: this.stakeSimpleFactory
+      stakeSimpleFactory: this.stakeSimpleFactory,
+      stakeVaultFactory : this.stakeVaultFactory
     };
   };
 
@@ -524,6 +582,8 @@ class ICO20Contracts {
 
     await this.stakefactory.grantRole(ADMIN_ROLE, this.stake1proxy.address);
 
+    await this.stakeVaultFactory.grantRole(ADMIN_ROLE, this.stake1proxy.address);
+
     return this.stakeEntry;
   };
 
@@ -563,7 +623,20 @@ class ICO20Contracts {
     });
 
     await this.stakefactory.grantRole(ADMIN_ROLE, this.stake1proxy.address);
+    await this.stakeVaultFactory.grantRole(ADMIN_ROLE, this.stake1proxy.address );
 
+
+    // attach stake2logic
+    let _func1 = web3.eth.abi.encodeFunctionSignature("balanceOf(address,address)") ;
+    let _func2 = web3.eth.abi.encodeFunctionSignature("balanceOfTOS(address)") ;
+    let _func3 = web3.eth.abi.encodeFunctionSignature("createVault2(uint256,uint256,uint256,bytes32,uint256,address[4],string)") ;
+    let _func4 = web3.eth.abi.encodeFunctionSignature("setVaultLogicByPhase(uint256,address)") ;
+    await this.stake1proxy.setImplementation(this.stake2logic.address, 1, true, { from: owner });
+    await this.stake1proxy.setSelectorImplementations([_func1, _func2, _func3, _func4], this.stake2logic.address, { from: owner });
+
+    await this.stakeEntry2.setVaultLogicByPhase( toBN("2"), this.stake2vaultlogic.address, { from: owner });
+
+    //--------
     return this.stakeEntry;
   };
 
