@@ -38,9 +38,6 @@ const version = "1";
 
 // ico2.0 contracts
 const StakeTONFactory = contract.fromArtifact("StakeTONFactory");
-const StakeDefiFactory = contract.fromArtifact(
-  "StakeDefiFactory"
-);
 
 const StakeSimple = contract.fromArtifact("StakeSimple");
 const StakeSimpleFactory = contract.fromArtifact("StakeSimpleFactory");
@@ -61,6 +58,17 @@ const StakeTON = contract.fromArtifact("StakeTON");
 const IERC20 = contract.fromArtifact("IERC20");
 
 const LibTokenStake1 = contract.fromArtifact("LibTokenStake1");
+
+//--- phase2
+const StakeUniswapV3Factory = contract.fromArtifact("StakeUniswapV3Factory");
+
+const Stake2Vault = contract.fromArtifact("Stake2Vault");
+const Stake2VaultProxy = contract.fromArtifact("Stake2VaultProxy");
+
+const Stake2Logic = contract.fromArtifact("Stake2Logic");
+const StakeUniswapV3 = contract.fromArtifact("StakeUniswapV3");
+const StakeUniswapV3Proxy = contract.fromArtifact("StakeUniswapV3Proxy");
+const StakeCoinageFactory = contract.fromArtifact("StakeCoinageFactory");
 
 /*
 // dao-contracts
@@ -145,7 +153,10 @@ const Pharse1_TON_Staking = "175000000." + "0".repeat(18);
 const Pharse1_ETH_Staking = "175000000." + "0".repeat(18);
 const Pharse1_TOSETHLP_Staking = "150000000." + "0".repeat(18);
 const Pharse1_DEV_Mining = "150000000." + "0".repeat(18);
+const Pharse2_ETHTOS_Staking = "150000000." + "0".repeat(18);
+const Pharse2_REWARD_PERBLOCK = "1.5" + "0".repeat(18);
 
+const HASH_Pharse2_ETHTOS_Staking = keccak256("PHASE2_ETHTOS_STAKING");
 const HASH_Pharse1_TON_Staking = keccak256("PHASE1_TON_STAKING");
 const HASH_Pharse1_ETH_Staking = keccak256("PHASE1_ETH_STAKING");
 const HASH_Pharse1_TOSETHLP_Staking = keccak256("PHASE1_TOSETHLP_Staking");
@@ -222,7 +233,7 @@ class ICO20Contracts {
     this.stakeSimpleFactory = null;
 
     this.stakeTONfactory = null;
-    this.stakeDefiFactory = null;
+    this.stakeUniswapV3Factory = null;
 
     this.stakeregister = null;
     this.stakefactory = null;
@@ -255,23 +266,41 @@ class ICO20Contracts {
       this.stakeTONLogic.address,
       { from: owner });
 
-    this.stakeDefiFactory = await StakeDefiFactory.new(this.stakeSimple.address,
-    {
-      from: owner,
-    });
+
+    //--set stakeUniswapV3
+    this.stakeUniswapV3Logic = await StakeUniswapV3.new({ from: owner });
+    this.stakeCoinageFactory = await StakeCoinageFactory.new({ from: owner });
+
+    this.stakeUniswapV3Factory = await StakeUniswapV3Factory.new(
+        this.stakeUniswapV3Logic.address,
+        this.stakeCoinageFactory.address,
+        {
+          from: owner,
+        }
+    );
 
     this.stakefactory = await StakeFactory.new(
       this.stakeSimpleFactory.address,
       this.stakeTONfactory.address,
-      this.stakeDefiFactory.address,
+      this.stakeUniswapV3Factory.address,
       { from: owner }
     );
     this.stake1logic = await Stake1Logic.new({ from: owner });
     this.stake1proxy = await Stake1Proxy.new(this.stake1logic.address, { from: owner });
 
-    // await this.stake1proxy.upgradeTo(this.stake1logic.address, { from: owner });
-
     this.stakeEntry = await Stake1Logic.at(this.stake1proxy.address, {
+      from: owner,
+    });
+
+    // attach phase2
+    let _func1 = web3.eth.abi.encodeFunctionSignature("balanceOf(address,address)") ;
+    let _func2 = web3.eth.abi.encodeFunctionSignature("balanceOfTOS(address)") ;
+    let _func3 = web3.eth.abi.encodeFunctionSignature("createVault2(uint256,uint256,uint256,bytes32,uint256,address[4],string)") ;
+
+    this.stake2logic = await Stake2Logic.new({ from: owner });
+    await this.stake1proxy.setImplementation(this.stake2logic.address, 1, true, { from: owner });
+    await this.stake1proxy.setSelectorImplementations([_func1, _func2, _func3], this.stake2logic.address, { from: owner });
+    this.stakeEntry2 = await Stake2Logic.at(this.stake1proxy.address, {
       from: owner,
     });
 
@@ -279,13 +308,16 @@ class ICO20Contracts {
       tos: this.tos,
       stos: this.stos,
       stakeSimpleFactory: this.stakeSimpleFactory,
-      stakeDefiFactory: this.stakeDefiFactory,
+      stakeUniswapV3Factory: this.stakeUniswapV3Factory,
       stakeTONfactory: this.stakeTONfactory,
       stakeregister: this.stakeregister,
       stakefactory: this.stakefactory,
       stake1logic: this.stake1logic,
       stake1proxy: this.stake1proxy,
       stakeEntry: this.stakeEntry,
+      stakeUniswapV3Logic: this.stakeUniswapV3Logic,
+      stakeCoinageFactory: this.stakeCoinageFactory,
+      stakeEntry2: this.stakeEntry2
     };
     // console.log(' initializeICO20Contracts  :',returnData );
 
@@ -439,7 +471,7 @@ class ICO20Contracts {
       stake1logic: this.stake1logic,
       stake1proxy: this.stake1proxy,
       stakeEntry: this.stakeEntry,
-      stakeDefiFactory: this.stakeDefiFactory,
+      stakeUniswapV3Factory: this.stakeUniswapV3Factory,
       stakeTONfactory: this.stakeTONfactory,
       stakeSimpleFactory: this.stakeSimpleFactory
     };
@@ -490,6 +522,48 @@ class ICO20Contracts {
 
     return this.stakeEntry;
   };
+
+  setEntryExceptUniswap = async function (owner) {
+
+    await this.stakeEntry.setStore(
+      this.tos.address,
+      this.stakeregister.address,
+      this.stakefactory.address,
+      this.stakeVaultFactory.address,
+      this.ton.address,
+      this.wton.address,
+      this.depositManager.address,
+      this.seigManager.address,
+      { from: owner }
+    );
+
+    await this.stakeregister.setTokamak(
+      this.ton.address,
+      this.wton.address,
+      this.depositManager.address,
+      this.seigManager.address,
+      this.swapProxy.address
+      );
+
+    // await this.stakeregister.addDefiInfo(
+    //     "UNISWAP_V3",
+    //     uniswapRouter,
+    //     uniswapNPM,
+    //     uniswapWeth,
+    //     uniswapFee,
+    //     uniswapRouter2
+    //   );
+
+    await this.stakeregister.grantRole(ADMIN_ROLE, this.stake1proxy.address, {
+      from: owner,
+    });
+
+    await this.stakefactory.grantRole(ADMIN_ROLE, this.stake1proxy.address);
+
+    return this.stakeEntry;
+  };
+
+
 
   addOperator = async function (operator) {
     const etherToken = await EtherToken.new(true, this.ton.address, true, {
@@ -1024,8 +1098,11 @@ module.exports = {
   Pharse1_ETH_Staking,
   Pharse1_TOSETHLP_Staking,
   Pharse1_DEV_Mining,
+  Pharse2_ETHTOS_Staking,
+  Pharse2_REWARD_PERBLOCK,
   HASH_Pharse1_TON_Staking,
   HASH_Pharse1_ETH_Staking,
   HASH_Pharse1_TOSETHLP_Staking,
-  HASH_Pharse1_DEV_Mining
+  HASH_Pharse1_DEV_Mining,
+  HASH_Pharse2_ETHTOS_Staking
   };
