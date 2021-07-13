@@ -44,7 +44,42 @@ let deployedUniswapV3;
 let ico20Contracts;
 let TokamakContractsDeployed;
 let ICOContractsDeployed;
+let pool_eth_ton_address , pool_eth_tos_address;
 const zeroAddress = "0x0000000000000000000000000000000000000000";
+
+const createPool = async (token0, token1, nftPositionManager ) => {
+    const tx = await nftPositionManager.createAndInitializePoolIfNecessary(
+      token0,
+      token1,
+      FeeAmount.MEDIUM,
+      encodePriceSqrt(1, 1)
+    );
+    await tx.wait();
+  };
+
+const mintPosition = async (
+    token0,
+    token1,
+    amount0Desired,
+    amount1Desired,
+    nftPositionManager,
+    sender
+  ) => {
+    const tx = await nftPositionManager.connect(sender).mint({
+      token0,
+      token1,
+      amount0Desired,
+      amount1Desired,
+      amount0Min: 0,
+      amount1Min: 0,
+      deadline: 100000000000000,
+      recipient: sender.address,
+      fee: FeeAmount.MEDIUM,
+      tickLower: getMinTick(TICK_SPACINGS[FeeAmount.MEDIUM]),
+      tickUpper: getMaxTick(TICK_SPACINGS[FeeAmount.MEDIUM]),
+    });
+    await tx.wait();
+  };
 
 describe(" UniswapV3 Staking", function () {
   let sender;
@@ -126,36 +161,38 @@ describe(" UniswapV3 Staking", function () {
 
   });
 
+  describe('# 3. Set Uniswap V3 Pool', async function () {
+
+    it("Create WETH-WTON Pool ", async function () {
+      let [token0, token1] = [deployedUniswapV3.weth, wton];
+      if (wton.address < deployedUniswapV3.weth.address) {
+        [token0, token1] = [wton, deployedUniswapV3.weth];
+      }
+      await token0.connect(defaultSender).approve(deployedUniswapV3.nftPositionManager.address, 100);
+      await token1.connect(defaultSender).approve(deployedUniswapV3.nftPositionManager.address, 300);
+      pool_eth_wton_address = await createPool(token0.address, token1.address, deployedUniswapV3.nftPositionManager);
+      await mintPosition(token0.address, token1.address, 100, 300, deployedUniswapV3.nftPositionManager, defaultSender );
+
+      console.log('pool_eth_wton_address', pool_eth_wton_address);
+    });
+
+    it("Create WETH-TOS Pool ", async function () {
+      let [token0, token1] = [deployedUniswapV3.weth, tos];
+      if (tos.address < deployedUniswapV3.weth.address) {
+        [token0, token1] = [tos, deployedUniswapV3.weth];
+      }
+      await token0.connect(defaultSender).approve(deployedUniswapV3.nftPositionManager.address, 100);
+      await token1.connect(defaultSender).approve(deployedUniswapV3.nftPositionManager.address, 300);
+      pool_eth_tos_address = await createPool(token0.address, token1.address, deployedUniswapV3.nftPositionManager);
+      await mintPosition(token0.address, token1.address, 100, 300, deployedUniswapV3.nftPositionManager, defaultSender );
+
+      console.log('pool_eth_tos_address', pool_eth_tos_address);
+    });
+
+  });
+
   describe('# 3. Phase 2 ', async function () {
 
-    it("5. Create TON Vault", async function () {
-      const current = await time.latestBlock();
-      saleStartBlock = parseInt(saleStartBlock.toString());
-      saleStartBlock = saleStartBlock + salePeriod;
-      stakeStartBlock = saleStartBlock + stakingPeriod;
-
-      const tx = await stakeEntry.createVault(
-        ton.address,
-        utils.parseUnits(Pharse1_TON_Staking, 18),
-        toBN(saleStartBlock),
-        toBN(stakeStartBlock),
-        toBN("1"),
-        HASH_Pharse1_TON_Staking,
-        toBN("0"),
-        zeroAddress,
-        { from: defaultSender }
-      );
-
-      const vaultAddress = tx.receipt.logs[tx.receipt.logs.length - 1].args.vault;
-      vault_phase1_ton = await Stake1Vault.at(vaultAddress, {
-        from: defaultSender,
-      });
-      await tos.mint(
-        vault_phase1_ton.address,
-        utils.parseUnits(Pharse1_TON_Staking, 18),
-        { from: defaultSender }
-      );
-    });
     it("1. Create StakeUniswapV3  ", async function () {
         this.timeout(1000000);
         const tx = await stakeEntry2.createVault2(
@@ -165,14 +202,24 @@ describe(" UniswapV3 Staking", function () {
           HASH_Pharse2_ETHTOS_Staking,
           toBN("2"),
           [ deployedUniswapV3.nftPositionManager.address,
-            deployedUniswapV3.swapRouter.address,
+            deployedUniswapV3.coreFactory.address,
             deployedUniswapV3.weth.address,
             tos.address,
           ],
           { from: defaultSender }
         );
 
-        await stakeEntry2.createVault2
+        console.log('tx.receipt.logs',tx.receipt.logs);
+        // const vaultAddress = tx.receipt.logs[tx.receipt.logs.length - 1].args.vault;
+        //   vault_phase1_ton = await Stake2Vault.at(vaultAddress, {
+        //     from: defaultSender,
+        //   });
+        // await tos.mint(
+        //   vault_phase1_ton.address,
+        //   utils.parseUnits(Pharse1_TON_Staking, 18),
+        //   { from: defaultSender }
+        // );
+
     });
   });
 

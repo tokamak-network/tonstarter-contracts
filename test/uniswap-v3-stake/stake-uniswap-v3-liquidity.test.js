@@ -88,7 +88,7 @@ describe("Stake 2", function () {
         sender.address
       );
   });
-  /*
+
   const createPool = async (token0, token1) => {
     const tx = await nftPositionManager.createAndInitializePoolIfNecessary(
       token0,
@@ -120,7 +120,7 @@ describe("Stake 2", function () {
     });
     await tx.wait();
   };
-
+/*
   it("Initialize NFTManager", async function () {
     const tos = setup.tos;
     const ton = setup.ton;
