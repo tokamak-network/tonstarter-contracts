@@ -9,8 +9,9 @@ interface ILockTOS {
   }
 
   struct LockedBalance {
-    uint256 amount;
+    uint256 start;
     uint256 end;
+    uint256 amount;
   }
 
   struct SlopeChange {
@@ -18,7 +19,10 @@ interface ILockTOS {
     int128 slope;
     uint256 changeTime;
   }
-  
+
+  /// @dev Information about lock
+  function lockInfo(address _addr, uint256 _lockId) external view returns (uint256,uint256, uint256);
+
   /// @dev Returns all locks of `_addr`
   function locksOf(address _addr) external view returns (uint256[] memory);
 

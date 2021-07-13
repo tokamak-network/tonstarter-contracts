@@ -10,12 +10,14 @@ import "hardhat/console.sol";
 
 contract LockTOS is ILockTOS, AccessControl {
   uint256 public constant ONE_WEEK = 1 weeks;
-  uint256 public constant MAXTIME = 4 * (365 days);
+  uint256 public constant MAXTIME = 3 * (365 days); // 3 years
+  uint256 public constant MULTIPLIER = 1e18;
 
   Point[] private pointHistory;
   mapping (address => mapping(uint256 => Point[])) public userPointHistory;
-  mapping (address => uint256[]) public userLocks;
   mapping (address => mapping(uint256 => LockedBalance)) public lockedBalances;
+
+  mapping (address => uint256[]) public userLocks;
   mapping (uint256 => int128) public slopeChanges;
   address public tos;
   uint256 public lockIdCounter = 1;
@@ -26,6 +28,15 @@ contract LockTOS is ILockTOS, AccessControl {
     _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
     tos = _tos;
     phase3StartTime = _phase3StartTime;
+  }
+
+  /// @inheritdoc ILockTOS
+  function lockInfo(address _addr, uint256 _lockId) override external view returns (uint256,uint256, uint256) {
+    return (
+      lockedBalances[_addr][_lockId].start,
+      lockedBalances[_addr][_lockId].end,
+      lockedBalances[_addr][_lockId].amount
+    );
   }
 
   /// @inheritdoc ILockTOS
@@ -67,7 +78,7 @@ contract LockTOS is ILockTOS, AccessControl {
   /// @inheritdoc ILockTOS
   function withdraw(uint256 _lockId) override external {
     LockedBalance memory lockedOld = lockedBalances[msg.sender][_lockId];
-    LockedBalance memory lockedNew = LockedBalance({amount: 0, end: 0});
+    LockedBalance memory lockedNew = LockedBalance({amount: 0, start: 0, end: 0});
     require(lockedOld.end < block.timestamp, "");
     require(lockedOld.amount != 0, "");
     _checkpoint(lockedNew, lockedOld);
@@ -163,7 +174,7 @@ contract LockTOS is ILockTOS, AccessControl {
   /// @dev Deposit
   function _deposit(address _addr, uint256 _lockId, uint256 _value, uint256 _unlockTime) internal {
     LockedBalance memory lockedOld = lockedBalances[_addr][_lockId];
-    LockedBalance memory lockedNew = LockedBalance({amount: lockedOld.amount, end: lockedOld.end});
+    LockedBalance memory lockedNew = LockedBalance({amount: lockedOld.amount, start: block.timestamp, end: lockedOld.end});
 
     lockedNew.amount += _value;
     if (_unlockTime > 0) {
@@ -175,7 +186,7 @@ contract LockTOS is ILockTOS, AccessControl {
     IERC20(tos).transferFrom(_addr, address(this), _value);
 
     // Save user point
-    int128 userSlope = int128(lockedNew.amount / MAXTIME);
+    int128 userSlope = int128(lockedNew.amount * MULTIPLIER / MAXTIME);
     int128 userBias = userSlope * int128(lockedNew.end - block.timestamp);
     console.log("Deposit, amount: %d, end: %d", uint256(lockedNew.amount), uint256(lockedNew.end));
     console.log("Time: %d", block.timestamp);
@@ -188,7 +199,7 @@ contract LockTOS is ILockTOS, AccessControl {
       boostValue: 1
     });
     if (userPoint.timestamp < phase3StartTime) {
-      userPoint.boostValue = 2;
+      // userPoint.boostValue = 2;
     }
     userPointHistory[_addr][_lockId].push(userPoint);
   }
