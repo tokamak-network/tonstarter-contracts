@@ -154,7 +154,7 @@ const Pharse1_ETH_Staking = "175000000." + "0".repeat(18);
 const Pharse1_TOSETHLP_Staking = "150000000." + "0".repeat(18);
 const Pharse1_DEV_Mining = "150000000." + "0".repeat(18);
 const Pharse2_ETHTOS_Staking = "150000000." + "0".repeat(18);
-const Pharse2_REWARD_PERBLOCK = "1.5" + "0".repeat(18);
+const Pharse2_REWARD_PERBLOCK = "1.5" + "0".repeat(17);
 
 const HASH_Pharse2_ETHTOS_Staking = keccak256("PHASE2_ETHTOS_STAKING");
 const HASH_Pharse1_TON_Staking = keccak256("PHASE1_TON_STAKING");
@@ -266,7 +266,7 @@ class ICO20Contracts {
       this.stakeTONLogic.address,
       { from: owner });
 
-
+    //--for phase2
     //--set stakeUniswapV3
     this.stakeUniswapV3Logic = await StakeUniswapV3.new({ from: owner });
     this.stakeCoinageFactory = await StakeCoinageFactory.new({ from: owner });
@@ -292,7 +292,10 @@ class ICO20Contracts {
       from: owner,
     });
 
-    // attach phase2
+    // attach vault2
+
+
+    // attach stake2logic
     let _func1 = web3.eth.abi.encodeFunctionSignature("balanceOf(address,address)") ;
     let _func2 = web3.eth.abi.encodeFunctionSignature("balanceOfTOS(address)") ;
     let _func3 = web3.eth.abi.encodeFunctionSignature("createVault2(uint256,uint256,uint256,bytes32,uint256,address[4],string)") ;
@@ -471,6 +474,7 @@ class ICO20Contracts {
       stake1logic: this.stake1logic,
       stake1proxy: this.stake1proxy,
       stakeEntry: this.stakeEntry,
+      stakeEntry2: this.stakeEntry2,
       stakeUniswapV3Factory: this.stakeUniswapV3Factory,
       stakeTONfactory: this.stakeTONfactory,
       stakeSimpleFactory: this.stakeSimpleFactory

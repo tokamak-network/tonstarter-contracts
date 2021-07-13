@@ -134,6 +134,11 @@ describe(" UniswapV3 Staking", function () {
       depositManager = cons.depositManager;
       seigManager = cons.seigManager;
       globalWithdrawalDelay = await depositManager.globalWithdrawalDelay();
+
+
+
+      await ton.mint(defaultSender, ethers.utils.parseUnits('1000', 18), { from: defaultSender });
+      await wton.mint(defaultSender, ethers.utils.parseUnits('1000', 18), { from: defaultSender });
     });
 
     it("Set StakeProxy ", async function () {
@@ -148,19 +153,22 @@ describe(" UniswapV3 Staking", function () {
       stake1logic = cons.stake1logic;
       stakeEntry2 = cons.stakeEntry2;
 
-      await stakeregister.addDefiInfo(
-        "UNISWAP_V3",
-        deployedUniswapV3.swapRouter.address,
-        deployedUniswapV3.nftPositionManager.address,
-        deployedUniswapV3.weth.address,
-        FeeAmount.LOW,
-        zeroAddress
-      );
+      console.log('stakeEntry2',stakeEntry2.address);
+
+
+      // await stakeregister.addDefiInfo(
+      //   "UNISWAP_V3",
+      //   deployedUniswapV3.swapRouter.address,
+      //   deployedUniswapV3.nftPositionManager.address,
+      //   deployedUniswapV3.weth.address,
+      //   FeeAmount.LOW,
+      //   zeroAddress
+      // );
 
     });
 
   });
-
+  /*
   describe('# 3. Set Uniswap V3 Pool', async function () {
 
     it("Create WETH-WTON Pool ", async function () {
@@ -170,8 +178,8 @@ describe(" UniswapV3 Staking", function () {
       }
       await token0.connect(defaultSender).approve(deployedUniswapV3.nftPositionManager.address, 100);
       await token1.connect(defaultSender).approve(deployedUniswapV3.nftPositionManager.address, 300);
-      pool_eth_wton_address = await createPool(token0.address, token1.address, deployedUniswapV3.nftPositionManager);
-      await mintPosition(token0.address, token1.address, 100, 300, deployedUniswapV3.nftPositionManager, defaultSender );
+     // pool_eth_wton_address = await createPool(token0.address, token1.address, deployedUniswapV3.nftPositionManager);
+      //await mintPosition(token0.address, token1.address, 100, 300, deployedUniswapV3.nftPositionManager, defaultSender );
 
       console.log('pool_eth_wton_address', pool_eth_wton_address);
     });
@@ -181,8 +189,8 @@ describe(" UniswapV3 Staking", function () {
       if (tos.address < deployedUniswapV3.weth.address) {
         [token0, token1] = [tos, deployedUniswapV3.weth];
       }
-      await token0.connect(defaultSender).approve(deployedUniswapV3.nftPositionManager.address, 100);
-      await token1.connect(defaultSender).approve(deployedUniswapV3.nftPositionManager.address, 300);
+      await token0.approve(deployedUniswapV3.nftPositionManager.address, 100, { from: defaultSender });
+      await token1.approve(deployedUniswapV3.nftPositionManager.address, 300, { from: defaultSender });
       pool_eth_tos_address = await createPool(token0.address, token1.address, deployedUniswapV3.nftPositionManager);
       await mintPosition(token0.address, token1.address, 100, 300, deployedUniswapV3.nftPositionManager, defaultSender );
 
@@ -190,24 +198,32 @@ describe(" UniswapV3 Staking", function () {
     });
 
   });
+  */
 
   describe('# 3. Phase 2 ', async function () {
 
     it("1. Create StakeUniswapV3  ", async function () {
         this.timeout(1000000);
+
+        let balance  = await stakeEntry2.balanceOf(wton.address, defaultSender);
+
+        console.log('Pharse2_ETHTOS_Staking', Pharse2_ETHTOS_Staking );
+        console.log('Pharse2_REWARD_PERBLOCK', Pharse2_REWARD_PERBLOCK );
+
         const tx = await stakeEntry2.createVault2(
           utils.parseUnits(Pharse2_ETHTOS_Staking, 18),
           utils.parseUnits(Pharse2_REWARD_PERBLOCK, 18),
-          toBN("2"),
+          utils.parseUnits("2",0),
           HASH_Pharse2_ETHTOS_Staking,
-          toBN("2"),
+          utils.parseUnits("2",0),
           [ deployedUniswapV3.nftPositionManager.address,
             deployedUniswapV3.coreFactory.address,
             deployedUniswapV3.weth.address,
             tos.address,
           ],
-          { from: defaultSender }
+          "UniswapV3"
         );
+
 
         console.log('tx.receipt.logs',tx.receipt.logs);
         // const vaultAddress = tx.receipt.logs[tx.receipt.logs.length - 1].args.vault;
