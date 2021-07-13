@@ -73,6 +73,7 @@ interface IStake1Logic {
         address _defiAddr
     ) external;
 
+
     /// @dev create stake contract in vault
     /// @param _phase the phase of TOS platform
     /// @param _vault  vault's address

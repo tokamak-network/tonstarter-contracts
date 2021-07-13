@@ -23,12 +23,31 @@ task("accounts", "Prints the list of accounts", async () => {
   }
 });
 module.exports = {
-  defaultNetwork: "rinkeby",
+  defaultNetwork: "localhost",
   networks: {
+    zenalocal: {
+      url: "http://localhost:8546",
+      gas: 9500000,
+      gasMultiplier: 100,
+      blockGasLimit: 124500000,
+      accounts: {
+        mnemonic: process.env.MNEMONIC_HARDHAT,
+        count: 30,
+        initialIndex: 0,
+        accountsBalance: '1000000000000000000000',
+      },
+      chainId: 1337,
+    },
     localhost: {
       gas: 9500000,
       gasMultiplier: 100,
       blockGasLimit: 124500000,
+      accounts: {
+        mnemonic: process.env.MNEMONIC_HARDHAT,
+        count: 30,
+        initialIndex: 0,
+        accountsBalance: '10000000000000000000000',
+      },
     },
     hardhat: {
       accounts: {

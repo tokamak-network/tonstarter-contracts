@@ -3,7 +3,9 @@ pragma solidity ^0.7.6;
 
 import "../interfaces/IStakeVaultFactory.sol";
 import {StakeVaultProxy} from "../stake/StakeVaultProxy.sol";
+import {Stake2VaultProxy} from "../stake/Stake2VaultProxy.sol";
 import "../common/AccessibleCommon.sol";
+//import "hardhat/console.sol";
 
 /// @title A factory that creates a vault that hold reward
 contract StakeVaultFactory is AccessibleCommon, IStakeVaultFactory {
@@ -22,6 +24,9 @@ contract StakeVaultFactory is AccessibleCommon, IStakeVaultFactory {
             "StakeVaultFactory: logic zero"
         );
         vaultLogics[1] = _stakeVaultLogic;
+
+        _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
+        _setupRole(ADMIN_ROLE, msg.sender);
     }
 
     /// @dev Set stakeVaultLogic address by _phase
@@ -80,4 +85,49 @@ contract StakeVaultFactory is AccessibleCommon, IStakeVaultFactory {
 
         return address(proxy);
     }
+
+    /// @dev Create a vault that hold reward, _cap is allocated reward amount.
+    /// @param _phase phase number
+    /// @param _addr the array of [tos, _stakefactory]
+    /// @param _intInfo array of [_stakeType, _cap, _rewardPerBlock ]
+    /// @param owner the owner adderess
+    /// @return a vault address
+    function create2(
+        uint256 _phase,
+        address[2] calldata _addr,
+        uint256[3] calldata _intInfo,
+        string memory _name,
+        address owner
+    ) external override returns (address) {
+        require(
+            vaultLogics[_phase] != address(0),
+            "StakeVaultFactory: zero vault2 logic "
+        );
+        address _tos = _addr[0];
+        address _stakefactory = _addr[1];
+        uint256 _stakeType = _intInfo[0];
+        uint256 _cap = _intInfo[1];
+        uint256 _rewardPerBlock = _intInfo[2];
+
+        //console.log("create2 %s", vaultLogics[_phase] );
+
+        Stake2VaultProxy proxy = new Stake2VaultProxy(vaultLogics[_phase]);
+        require(address(proxy) != address(0), "StakeVaultFactory: Stake2VaultProxy zero");
+
+        proxy.initialize(
+            _tos,
+            _stakefactory,
+            _stakeType,
+            _cap,
+            _rewardPerBlock,
+            _name
+        );
+
+        proxy.grantRole(ADMIN_ROLE, owner);
+        proxy.revokeRole(ADMIN_ROLE, address(this));
+
+        return address(proxy);
+
+    }
+
 }

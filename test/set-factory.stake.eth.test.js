@@ -69,7 +69,7 @@ describe ("Stake1Logic : Upgradable Stake Contracts", function () {
     ICO20Instances.stake1proxy = result.stake1proxy;
     ICO20Instances.stake1logic = result.stake1logic;
     ICO20Instances.stakeTONfactory = result.stakeTONfactory;
-    ICO20Instances.stakeDefiFactory = result.stakeDefiFactory;
+    ICO20Instances.stakeUniswapV3Factory = result.stakeUniswapV3Factory;
     ICO20Instances.stakeSimpleFactory = result.stakeSimpleFactory;
   });
 
@@ -78,7 +78,7 @@ describe ("Stake1Logic : Upgradable Stake Contracts", function () {
     stakeFactoryModified = await StakeSimpleFactoryModified.new(
       ICO20Instances.stakeSimpleFactory.address,
       ICO20Instances.stakeTONfactory.address,
-      ICO20Instances.stakeDefiFactory.address,
+      ICO20Instances.stakeUniswapV3Factory.address,
       { from: defaultSender }
     );
   });

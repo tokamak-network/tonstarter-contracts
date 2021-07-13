@@ -7,6 +7,7 @@ import {IStakeFactory} from "../interfaces/IStakeFactory.sol";
 import {IStakeRegistry} from "../interfaces/IStakeRegistry.sol";
 import {IStake1Vault} from "../interfaces/IStake1Vault.sol";
 import {IStakeTONTokamak} from "../interfaces/IStakeTONTokamak.sol";
+import {IStakeUniswapV3} from "../interfaces/IStakeUniswapV3.sol";
 
 import "../common/AccessibleCommon.sol";
 
@@ -16,7 +17,8 @@ import "./StakeProxyStorage.sol";
 /// @notice Admin can createVault, createStakeContract.
 /// User can excute the tokamak staking function of each contract through this logic.
 contract Stake1Logic is StakeProxyStorage, AccessibleCommon, IStake1Logic {
-    modifier nonZero(address _addr) {
+
+    modifier nonZeroAddress(address _addr) {
         require(_addr != address(0), "Stake1Logic:zero address");
         _;
     }
@@ -85,7 +87,7 @@ contract Stake1Logic is StakeProxyStorage, AccessibleCommon, IStake1Logic {
 
     /// @dev Sets TOS address
     /// @param _tos new TOS address
-    function setTOS(address _tos) public onlyOwner nonZero(_tos) {
+    function setTOS(address _tos) public onlyOwner nonZeroAddress(_tos) {
         tos = _tos;
     }
 
@@ -94,7 +96,7 @@ contract Stake1Logic is StakeProxyStorage, AccessibleCommon, IStake1Logic {
     function setStakeRegistry(address _stakeRegistry)
         public
         onlyOwner
-        nonZero(_stakeRegistry)
+        nonZeroAddress(_stakeRegistry)
     {
         stakeRegistry = IStakeRegistry(_stakeRegistry);
         emit SetStakeRegistry(_stakeRegistry);
@@ -105,7 +107,7 @@ contract Stake1Logic is StakeProxyStorage, AccessibleCommon, IStake1Logic {
     function setStakeFactory(address _stakeFactory)
         public
         onlyOwner
-        nonZero(_stakeFactory)
+        nonZeroAddress(_stakeFactory)
     {
         stakeFactory = IStakeFactory(_stakeFactory);
     }
@@ -117,7 +119,7 @@ contract Stake1Logic is StakeProxyStorage, AccessibleCommon, IStake1Logic {
         external
         override
         onlyOwner
-        nonZero(address(stakeFactory))
+        nonZeroAddress(address(stakeFactory))
     {
         stakeFactory.setFactoryByStakeType(_stakeType, _factory);
     }
@@ -127,7 +129,7 @@ contract Stake1Logic is StakeProxyStorage, AccessibleCommon, IStake1Logic {
     function setStakeVaultFactory(address _stakeVaultFactory)
         external
         onlyOwner
-        nonZero(_stakeVaultFactory)
+        nonZeroAddress(_stakeVaultFactory)
     {
         stakeVaultFactory = IStakeVaultFactory(_stakeVaultFactory);
     }
@@ -154,10 +156,10 @@ contract Stake1Logic is StakeProxyStorage, AccessibleCommon, IStake1Logic {
         external
         override
         onlyOwner
-        nonZero(_stakeVaultFactory)
-        nonZero(_ton)
-        nonZero(_wton)
-        nonZero(_depositManager)
+        nonZeroAddress(_stakeVaultFactory)
+        nonZeroAddress(_ton)
+        nonZeroAddress(_wton)
+        nonZeroAddress(_depositManager)
     {
         setTOS(_tos);
         setStakeRegistry(_stakeRegistry);
@@ -188,7 +190,7 @@ contract Stake1Logic is StakeProxyStorage, AccessibleCommon, IStake1Logic {
         bytes32 _vaultName,
         uint256 _stakeType,
         address _defiAddr
-    ) external override onlyOwner nonZero(address(stakeVaultFactory)) {
+    ) external override onlyOwner nonZeroAddress(address(stakeVaultFactory)) {
         address vault =
             stakeVaultFactory.create(
                 _phase,
@@ -279,7 +281,7 @@ contract Stake1Logic is StakeProxyStorage, AccessibleCommon, IStake1Logic {
         external
         view
         override
-        nonZero(_vault)
+        nonZeroAddress(_vault)
         returns (address[] memory)
     {
         return IStake1Vault(_vault).stakeAddressesAll();
@@ -391,4 +393,5 @@ contract Stake1Logic is StakeProxyStorage, AccessibleCommon, IStake1Logic {
                 _type
             );
     }
+
 }
