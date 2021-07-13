@@ -141,6 +141,7 @@ contract StakeUniswapV3 is
         }
     }
 
+    /*
     // 사용자의 코인에이지의 리워드
     function setPool(
         address token0,
@@ -180,6 +181,7 @@ contract StakeUniswapV3 is
         poolToken0 = token0;
         poolToken0 = token1;
     }
+    */
 
     function deleteUserToken(uint256 tokenId, uint256 _index) internal {
         uint256 _tokenid = userStakedTokenIds[msg.sender][_index];

@@ -55,6 +55,8 @@ contract Stake1Proxy is StakeProxyStorage, AccessibleCommon,  IStakeProxy  {
 
     /// @dev Sets the implementation address of the proxy[index].
     /// @param newImplementation Address of the new implementation.
+    /// @param _index index
+    /// @param _alive _alive
     function setImplementation(address newImplementation, uint256 _index, bool _alive) external override onlyOwner {
         _setImplementation(newImplementation, _index, _alive);
     }

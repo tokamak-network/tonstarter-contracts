@@ -6,7 +6,7 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {IStake2Vault} from "../interfaces/IStake2Vault.sol";
 import "../common/AccessibleCommon.sol";
 import "./StakeProxyStorage.sol";
-
+// import "hardhat/console.sol";
 
 interface IIStakeUniswapV3 {
     function setPool(
@@ -40,6 +40,18 @@ contract Stake2Logic is StakeProxyStorage, AccessibleCommon, IStake2Logic{
         return IERC20(tos).balanceOf(target);
     }
 
+    /// @dev Set stakeVaultLogic address by _phase
+    /// @param _phase the stake type
+    /// @param _logic the vault logic address
+    function setVaultLogicByPhase(uint256 _phase, address _logic)
+        external
+        override
+        onlyOwner
+        nonZeroAddress(address(stakeVaultFactory))
+        nonZeroAddress(_logic)
+    {
+        stakeVaultFactory.setVaultLogicByPhase(_phase,_logic);
+    }
 
     /// @dev create vault2
     /// @param _cap  allocated reward amount
@@ -59,16 +71,21 @@ contract Stake2Logic is StakeProxyStorage, AccessibleCommon, IStake2Logic{
         string memory _name
     ) external override onlyOwner
         nonZeroAddress(address(stakeVaultFactory))
-        nonZeroAddress(_uniswapInfo[0])
-        nonZeroAddress(_uniswapInfo[1])
-        nonZeroAddress(_uniswapInfo[2])
-        nonZeroAddress(_uniswapInfo[3])
+        // nonZeroAddress(_uniswapInfo[0])
+        // nonZeroAddress(_uniswapInfo[1])
+        // nonZeroAddress(_uniswapInfo[2])
+        // nonZeroAddress(_uniswapInfo[3])
     {
         require(_phase == 2, "Stake1Logic: unsupported phase in vault2");
 
         uint256 stakeType = _stakeType;
         uint256 cap = _cap;
         uint256 rewardPerBlock = _rewardPerBlock;
+
+        // console.log("tos %s", tos );
+        // console.log("stakeFactory %s", address(stakeFactory) );
+        // console.log("rewardPerBlock %d , cap %d, stakeType %d ", rewardPerBlock, cap , stakeType);
+        // console.log("tos %s", tos );
 
         address vault =
             stakeVaultFactory.create2(
@@ -78,6 +95,8 @@ contract Stake2Logic is StakeProxyStorage, AccessibleCommon, IStake2Logic{
                 _name,
                 address(this)
             );
+
+
         require(vault != address(0), "Stake1Logic: vault2 is zero");
 
         uint256 phase = _phase;
@@ -86,7 +105,7 @@ contract Stake2Logic is StakeProxyStorage, AccessibleCommon, IStake2Logic{
         stakeRegistry.addVault(vault, phase, vaultName);
         emit CreatedVault2(vault, _uniswapInfo[0], cap);
 
-        address[4] memory _addr = [tos, vault, address(0), address(0)];
+        address[4] memory _addr = [tos, address(0),vault, address(0)];
         address _contract =
             stakeFactory.create(
                 stakeType,
@@ -99,9 +118,9 @@ contract Stake2Logic is StakeProxyStorage, AccessibleCommon, IStake2Logic{
         address[4] memory uniswapInfo = _uniswapInfo;
         IIStakeUniswapV3(_contract).setPool(uniswapInfo);
         IStake2Vault(vault).setStakeAddress(_contract);
-        stakeRegistry.addStakeContract(address(vault), _contract);
+        stakeRegistry.addStakeContract(vault, _contract);
 
-        emit CreatedStakeContract2(address(vault), _contract, phase);
+        emit CreatedStakeContract2(vault, _contract, phase);
 
     }
 

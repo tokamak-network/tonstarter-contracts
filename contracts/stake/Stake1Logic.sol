@@ -393,12 +393,4 @@ contract Stake1Logic is StakeProxyStorage, AccessibleCommon, IStake1Logic {
             );
     }
 
-    function setPool(
-        address target,
-        address token0,
-        address token1,
-        string calldata defiInfoName
-    ) external {
-        IStakeUniswapV3(target).setPool(token0, token1, defiInfoName);
-    }
 }

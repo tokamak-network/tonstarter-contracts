@@ -107,7 +107,7 @@ contract StakeUniswapV3Proxy is
     }
 
     /// @dev set initial storage
-    /// @param _addr  [tos, vault,  ,   ]
+    /// @param _addr  [tos, 0, vault,  ,   ]
     /// @param _registry teh registry address
     /// @param _intdata [cap, rewardPerBlock, 0]
     function setInit(
@@ -121,7 +121,7 @@ contract StakeUniswapV3Proxy is
         );
         require(_addr[0] != address(0) , "StakeUniswapV3Proxy: setInit fail");
         token = _addr[0];
-        vault = _addr[1];
+        vault = _addr[2];
 
         stakeRegistry = _registry;
     }

@@ -23,7 +23,7 @@ contract StakeUniswapV3Factory is AccessRoleCommon, IStakeUniswapV3Factory {
     }
 
     /// @dev Create a stake contract that can operate the staked amount as a DeFi project.
-    /// @param _addr array of [tos, vault,0, 0 ]
+    /// @param _addr array of [tos, 0, vault, 0 ]
     /// @param _registry  registry address
     /// @param _intdata array of [cap, rewardPerBlock, 0]
     /// @param owner  owner address
