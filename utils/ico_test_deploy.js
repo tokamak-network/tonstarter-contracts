@@ -228,22 +228,9 @@ class ICO20Contracts {
   }
 
 
-  findSigner = async function (address) {
-    const signers = await hre.ethers.getSigners();
-    for (const signer of signers) {
-      if (signer.address === address) {
-        return signer;
-      }
-    }
-    throw Error("Address not found in Signers");
-  }
 
   initializeICO20Contracts = async function (owner) {
     // this = self;
-    console.log(' initializeICO20Contracts owner:',owner );
-
-    const owner1  = await this.findSigner(owner);
-    console.log(' owner1 :',owner1.address );
 
     this.tos = null;
     this.stos = null;
@@ -262,7 +249,7 @@ class ICO20Contracts {
     this.vault_phase1_ton = null;
     this.vault_phase1_tosethlp = null;
     this.vault_phase1_dev = null;
-    this.swapProxy = await SwapProxy.new({from:owner1});
+    this.swapProxy = await SwapProxy.new({from:owner});
 
     this.tos = await TOS.new(name, symbol, version, { from: owner });
     this.stakeregister = await StakeRegistry.new(this.tos.address,  { from: owner });
