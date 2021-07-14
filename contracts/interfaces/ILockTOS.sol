@@ -4,7 +4,6 @@ interface ILockTOS {
   struct Point {
     int128 bias;
     int128 slope;
-    int128 boostValue;
     uint256 timestamp;
   }
 

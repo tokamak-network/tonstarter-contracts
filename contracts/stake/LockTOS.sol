@@ -44,7 +44,6 @@ contract LockTOS is ILockTOS, AccessControl {
     depositFor(msg.sender, _lockId,  _value);
   }
 
-
   /// @inheritdoc ILockTOS
   function depositFor(address _addr, uint256 _lockId, uint256 _value) override public {
     require(_value > 0, "Value locked should be non-zero");
@@ -92,8 +91,12 @@ contract LockTOS is ILockTOS, AccessControl {
     if (!success) {
       return 0;
     }
+    int128 boostValue = 1;
+    if (block.timestamp < phase3StartTime) {
+      boostValue = 2;
+    }
     int128 currentBias = point.slope * int128(_timestamp - point.timestamp);
-    return (point.bias > currentBias ? point.bias - currentBias : 0) * point.boostValue;
+    return (point.bias > currentBias ? point.bias - currentBias : 0) * boostValue / int128(MULTIPLIER);
   }
 
   /// @inheritdoc ILockTOS
@@ -104,7 +107,11 @@ contract LockTOS is ILockTOS, AccessControl {
 
     Point memory point = pointHistory[pointHistory.length - 1];
     int128 currentBias = point.slope * int128(block.timestamp - point.timestamp);
-    return (point.bias > currentBias ? point.bias - currentBias : 0) * point.boostValue;
+    int128 boostValue = 1;
+    if (block.timestamp < phase3StartTime) {
+      boostValue = 2;
+    }
+    return (point.bias > currentBias ? point.bias - currentBias : 0) * boostValue / int128(MULTIPLIER);
   }
 
   /// @inheritdoc ILockTOS
@@ -114,7 +121,11 @@ contract LockTOS is ILockTOS, AccessControl {
       return 0;
     }
     int128 currentBias = point.slope * int128(_timestamp - point.timestamp);
-    return (point.bias > currentBias ? point.bias - currentBias : 0) * point.boostValue;
+    int128 boostValue = 1;
+    if (_timestamp < phase3StartTime) {
+      boostValue = 2;
+    }
+    return (point.bias > currentBias ? point.bias - currentBias : 0) * boostValue / int128(MULTIPLIER);
   }
 
   /// @inheritdoc ILockTOS
@@ -126,7 +137,11 @@ contract LockTOS is ILockTOS, AccessControl {
 
     Point memory point = userPointHistory[_addr][_lockId][len - 1];
     int128 currentBias = point.slope * int128(block.timestamp - point.timestamp);
-    return (point.bias > currentBias ? point.bias - currentBias : 0) * point.boostValue;
+    int128 boostValue = 1;
+    if (block.timestamp < phase3StartTime) {
+      boostValue = 2;
+    }
+    return (point.bias > currentBias ? point.bias - currentBias : 0) * boostValue / int128(MULTIPLIER);
   }
 
   /// @inheritdoc ILockTOS
@@ -188,19 +203,12 @@ contract LockTOS is ILockTOS, AccessControl {
     // Save user point
     int128 userSlope = int128(lockedNew.amount * MULTIPLIER / MAXTIME);
     int128 userBias = userSlope * int128(lockedNew.end - block.timestamp);
-    console.log("Deposit, amount: %d, end: %d", uint256(lockedNew.amount), uint256(lockedNew.end));
-    console.log("Time: %d", block.timestamp);
-    console.log("MAXTIME: %d", MAXTIME);
-    console.log("Deposit, bias: %d, slope: %d", uint256(userBias), uint256(userSlope));
+    
     Point memory userPoint = Point({
       timestamp: block.timestamp,
       slope: userSlope,
-      bias: userBias,
-      boostValue: 1
+      bias: userBias
     });
-    if (userPoint.timestamp < phase3StartTime) {
-      // userPoint.boostValue = 2;
-    }
     userPointHistory[_addr][_lockId].push(userPoint);
   }
 
@@ -247,7 +255,7 @@ contract LockTOS is ILockTOS, AccessControl {
     if (pointHistory.length > 0) {
       lastWeek = pointHistory[pointHistory.length - 1];
     } else {
-      lastWeek = Point({bias: 0, slope: 0, boostValue: 1, timestamp: timestamp});
+      lastWeek = Point({bias: 0, slope: 0, timestamp: timestamp});
     }
 
     uint256 pointTimestampIterator = (lastWeek.timestamp / ONE_WEEK) * ONE_WEEK;
