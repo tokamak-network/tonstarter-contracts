@@ -4,57 +4,18 @@ const utils = ethers.utils;
 const save = require("./save_deployed_file");
 
 const {
-  padLeft,
   toBN,
-  toWei,
-  fromWei,
   keccak256,
-  soliditySha3,
-  solidityKeccak256,
 } = require("web3-utils");
 
 require("dotenv").config();
-const loadDeployedInitVariable = require("./load_deployed_init");
+//const loadDeployedInitVariable = require("./load_deployed_init");
+const loadDeployed = require("./load_deployed");
 
-const initialTotal = process.env.initialTotal + "." + "0".repeat(18);
-
-const Pharse1_TOTAL = process.env.Pharse1_TOTAL + "." + "0".repeat(18);
-const Pharse1_TON_Staking =
-  process.env.Pharse1_TON_Staking + "." + "0".repeat(18);
-const Pharse1_ETH_Staking =
-  process.env.Pharse1_ETH_Staking + "." + "0".repeat(18);
-const Pharse1_TOSETHLP_Staking =
-  process.env.Pharse1_TOSETHLP_Staking + "." + "0".repeat(18);
-const Pharse1_DEV_Mining =
-  process.env.Pharse1_DEV_Mining + "." + "0".repeat(18);
-
-const Pharse2_TOTAL = process.env.Pharse2_TOTAL + "." + "0".repeat(18);
-const Pharse2_TOSETH_Staking =
-  process.env.Pharse2_TOSETH_Staking + "." + "0".repeat(18);
-const Pharse2_TOS_Staking =
-  process.env.Pharse2_TOS_Staking + "." + "0".repeat(18);
-const Pharse2_DEV_Mining =
-  process.env.Pharse2_DEV_Mining + "." + "0".repeat(18);
-
-const Pharse3_TOTAL = process.env.Pharse3_TOTAL + "." + "0".repeat(18);
-const Pharse3_TOSETH_Staking =
-  process.env.Pharse3_TOSETH_Staking + "." + "0".repeat(18);
-const Pharse3_TOS_Staking =
-  process.env.Pharse3_TOS_Staking + "." + "0".repeat(18);
-const Pharse3_DEV_Mining =
-  process.env.Pharse3_DEV_Mining + "." + "0".repeat(18);
+//const initialTotal = process.env.initialTotal + "." + "0".repeat(18);
 
 const zeroAddress = "0x0000000000000000000000000000000000000000";
-const sendAmountForTest = "10000";
-
-const ADMIN_ROLE = keccak256("ADMIN");
-const MINTER_ROLE = keccak256("MINTER");
-const BURNER_ROLE = keccak256("BURNER");
-const CLAIMER_ROLE = keccak256("CLAIMER");
-const PHASE2_VAULT_HASH = keccak256("PHASE2_VAULT");
-const EVENT_VAULT_HASH = keccak256("EVENT_VAULT");
-
-const tostoken = loadDeployedInitVariable(process.env.NETWORK, "TOS");
+const tostoken = loadDeployed(process.env.NETWORK, "TOS");
 
 async function deployMain(defaultSender) {
   const [deployer, user1] = await ethers.getSigners();
@@ -83,7 +44,17 @@ async function deployMain(defaultSender) {
   const Stake1Proxy = await ethers.getContractFactory("Stake1Proxy");
   const StakeFactory = await ethers.getContractFactory("StakeFactory");
   const StakeTONFactory = await ethers.getContractFactory("StakeTONFactory");
-  const StakeDefiFactory = await ethers.getContractFactory("StakeDefiFactory");
+
+  //-------phase 2 -------------
+  //const StakeDefiFactory = await ethers.getContractFactory("StakeDefiFactory");
+  const StakeUniswapV3Factory = await ethers.getContractFactory("StakeUniswapV3Factory");
+  const Stake2Vault = await ethers.getContractFactory("Stake2Vault");
+  const Stake2VaultProxy = await ethers.getContractFactory("Stake2VaultProxy");
+  const Stake2Logic = await ethers.getContractFactory("Stake2Logic");
+  const StakeUniswapV3 = await ethers.getContractFactory("StakeUniswapV3");
+  const StakeUniswapV3Proxy = await ethers.getContractFactory("StakeUniswapV3Proxy");
+  const StakeCoinageFactory = await ethers.getContractFactory("StakeCoinageFactory");
+  //--------------------
 
   const stakeSimple = await StakeSimple.deploy();
   const stakeSimpleFactory = await StakeSimpleFactory.deploy(
@@ -92,8 +63,6 @@ async function deployMain(defaultSender) {
   await stakeSimpleFactory.deployed();
   console.log("StakeSimpleFactory:", stakeSimpleFactory.address);
 
-  // const stakeTONLogicFactory = await StakeTONLogicFactory.deploy();
-  // console.log('StakeTONLogicFactory:', stakeTONLogicFactory.address);
   const stakeTONLogic = await StakeTONLogic.deploy();
   await stakeTONLogic.deployed();
   console.log("StakeTONLogic:", stakeTONLogic.address);
@@ -109,15 +78,30 @@ async function deployMain(defaultSender) {
   await stakeTONFactory.deployed();
   console.log("stakeTONFactory:", stakeTONFactory.address);
 
-  const stakeDefiFactory = await StakeDefiFactory.deploy(stakeSimple.address);
-  await stakeDefiFactory.deployed();
-  console.log("stakeDefiFactory:", stakeDefiFactory.address);
+  /*
+  // const stakeDefiFactory = await StakeDefiFactory.deploy(stakeSimple.address);
+  // await stakeDefiFactory.deployed();
+  // console.log("stakeDefiFactory:", stakeDefiFactory.address);
+  const stakeUniswapV3 = await StakeUniswapV3.deploy();
+  const stakeCoinageFactory = await StakeCoinageFactory.deploy();
 
+  const stakeUniswapV3Factory = await StakeUniswapV3Factory.deploy(
+        stakeUniswapV3.address,
+        stakeCoinageFactory.address
+  );
+
+  console.log("stakeUniswapV3:", stakeUniswapV3.address);
+  console.log("stakeCoinageFactory:", stakeCoinageFactory.address);
+  console.log("stakeUniswapV3Factory:", stakeUniswapV3Factory.address);
+  */
+
+  //------------------
   const stakeFactory = await StakeFactory.deploy(
     stakeSimpleFactory.address,
     stakeTONFactory.address,
-    stakeDefiFactory.address
+    zeroAddress
   );
+
   await stakeFactory.deployed();
   console.log("stakeFactory:", stakeFactory.address);
 
@@ -141,7 +125,7 @@ async function deployMain(defaultSender) {
   await stake1Proxy.deployed();
   console.log("stake1Proxy:", stake1Proxy.address);
 
-  let _implementation = await stake1Proxy.implementation();
+  let _implementation = await stake1Proxy.implementation(0);
   console.log("stake1Proxy implementation:", _implementation);
 
   const stakeEntry = await ethers.getContractAt(
@@ -150,6 +134,7 @@ async function deployMain(defaultSender) {
   );
   console.log("stakeEntry:", stakeEntry.address);
 
+
   const out = {};
   out.TOS = tos.address;
   out.StakeSimple = stakeSimple.address;
@@ -157,7 +142,9 @@ async function deployMain(defaultSender) {
   out.StakeTONLogic = stakeTONLogic.address;
   out.StakeTONProxyFactory = stakeTONProxyFactory.address;
   out.StakeTONFactory = stakeTONFactory.address;
-  out.StakeDefiFactory = stakeDefiFactory.address;
+  //out.StakeDefiFactory = stakeDefiFactory.address;
+  //out.StakeUniswapV3Factory = stakeUniswapV3Factory.address;
+
   out.StakeFactory = stakeFactory.address;
   out.StakeRegistry = stakeRegistry.address;
 
@@ -171,14 +158,12 @@ async function deployMain(defaultSender) {
 async function main() {
   const [deployer, user1] = await ethers.getSigners();
   const users = await ethers.getSigners();
-  console.log("Deploying contracts with the account:", deployer.address);
+  console.log("Deploying contracts with the account:", deployer.address, process.env.NETWORK);
 
   console.log("Account balance:", (await deployer.getBalance()).toString());
 
-  const contracts = await deployMain(deployer);
+  contracts = await deployMain(deployer);
   console.log("contracts:", process.env.NETWORK, contracts);
-
-  // The address the Contract WILL have once mined
 
   const out = {};
   out.TOS = contracts.TOS;
@@ -187,7 +172,8 @@ async function main() {
   out.StakeTONLogic = contracts.StakeTONLogic;
   out.StakeTONProxyFactory = contracts.StakeTONProxyFactory;
   out.StakeTONFactory = contracts.StakeTONFactory;
-  out.StakeDefiFactory = contracts.StakeDefiFactory;
+  out.StakeUniswapV3Factory = contracts.StakeUniswapV3Factory;
+  //out.StakeDefiFactory = contracts.StakeDefiFactory;
   out.StakeFactory = contracts.StakeFactory;
   out.StakeRegistry = contracts.StakeRegistry;
   out.Stake1Vault = contracts.Stake1Vault;
@@ -195,11 +181,11 @@ async function main() {
   out.Stake1Logic = contracts.Stake1Logic;
   out.Stake1Proxy = contracts.Stake1Proxy;
 
-  out.TON = "0x44d4F5d89E9296337b8c48a332B3b2fb2C190CD0";
-  out.WTON = "0x709bef48982Bbfd6F2D4Be24660832665F53406C";
-  out.DepositManager = "0x57F5CD759A5652A697D539F1D9333ba38C615FC2";
-  out.SeigManager = "0x957DaC3D3C4B82088A4939BE9A8063e20cB2efBE";
-  out.SwapProxy = "0x8032d21F59CDB42C9c94a3A41524D4CCF0Cae96c";
+  out.TON = process.env.TON;
+  out.WTON = process.env.WTON;
+  out.DepositManager = process.env.DepositManager;
+  out.SeigManager = process.env.SeigManager;
+  out.SwapProxy = process.env.SwapProxy;
 
   save(process.env.NETWORK, out);
 }

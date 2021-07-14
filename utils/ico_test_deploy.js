@@ -571,6 +571,7 @@ class ICO20Contracts {
 
     await this.stakeVaultFactory.grantRole(ADMIN_ROLE, this.stake1proxy.address);
 
+
     return this.stakeEntry;
   };
 
@@ -611,7 +612,6 @@ class ICO20Contracts {
 
     await this.stakefactory.grantRole(ADMIN_ROLE, this.stake1proxy.address);
     await this.stakeVaultFactory.grantRole(ADMIN_ROLE, this.stake1proxy.address );
-
 
     // attach stake2logic
     let _func1 = web3.eth.abi.encodeFunctionSignature("balanceOf(address,address)") ;

@@ -11,6 +11,8 @@ const {
   solidityKeccak256,
 } = require("web3-utils");
 
+const moment = require("moment");
+
 require("dotenv").config();
 
 const zeroAddress = "0x0000000000000000000000000000000000000000";
@@ -114,9 +116,45 @@ function getPeriodBlockByTimes(day, hour, min){
   return periodBlocks;
 }
 
+
+function getEndTime(startTime, period){
+
+
+  let argsPeriod = period.split(',');
+  //console.log("argsPeriod", argsPeriod);
+
+  let stakeStartDate = new Date(startTime);
+  //console.log("stakeStartDate", stakeStartDate);
+
+  if(argsPeriod[1] == "hour"){
+     stakeStartDate.setHour(stakeStartDate.getHour() + parseInt(argsPeriod[0]))
+
+  } else if(argsPeriod[1] == "day"){
+     stakeStartDate.setDate(stakeStartDate.getDate() + parseInt(argsPeriod[0]))
+
+  } else if(argsPeriod[1] == "month"){
+     stakeStartDate.setMonth(stakeStartDate.getMonth() + parseInt(argsPeriod[0]))
+
+  } else if(argsPeriod[1] == "year"){
+     stakeStartDate.setYear(stakeStartDate.getFullYear() + parseInt(argsPeriod[0]))
+
+  }
+  //console.log("stakeStartDate 2", stakeStartDate);
+
+
+  let stakeStartTime = new Date(startTime).getTime();
+  let stakeEndTime = stakeStartDate.getTime();
+
+  let diff = Math.floor((stakeEndTime-stakeStartTime)/1000);
+  let periodBlocks = parseInt(diff/process.env.BLOCKTIME);
+  return {stakeEndDate: stakeStartDate, periodBlocks: periodBlocks};
+}
+
+
 module.exports = {
   createValue,
   createStakeContract,
   timeout,
-  getPeriodBlockByTimes
+  getPeriodBlockByTimes,
+  getEndTime
   };
