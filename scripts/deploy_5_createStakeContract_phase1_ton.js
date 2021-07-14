@@ -97,8 +97,6 @@ async function main() {
   const users = await ethers.getSigners();
   console.log("Deploying contracts with the account:", deployer.address);
   console.log("Account balance:", (await deployer.getBalance()).toString());
-  const provider = await ethers.getDefaultProvider("rinkeby");
-  //console.log("ADMIN_ROLE", ADMIN_ROLE);
 
   for(let i=0; i< periods.length; i++){
     let res = getEndTime(periods[i].startTime, periods[i].period);
