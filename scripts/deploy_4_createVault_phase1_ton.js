@@ -44,7 +44,6 @@ async function main() {
 
   console.log("Account balance:", (await deployer.getBalance()).toString());
 
-  //const provider = await ethers.getDefaultProvider("rinkeby");
   const provider = ethers.provider;
 
   // console.log("ADMIN_ROLE", ADMIN_ROLE);

@@ -127,7 +127,7 @@ function getEndTime(startTime, period){
   //console.log("stakeStartDate", stakeStartDate);
 
   if(argsPeriod[1] == "hour"){
-     stakeStartDate.setHour(stakeStartDate.getHour() + parseInt(argsPeriod[0]))
+     stakeStartDate.setHours(stakeStartDate.getHours() + parseInt(argsPeriod[0]))
 
   } else if(argsPeriod[1] == "day"){
      stakeStartDate.setDate(stakeStartDate.getDate() + parseInt(argsPeriod[0]))
