@@ -56,12 +56,14 @@ async function deployMain(defaultSender) {
   const StakeCoinageFactory = await ethers.getContractFactory("StakeCoinageFactory");
   //--------------------
 
+/*
   const stakeSimple = await StakeSimple.deploy();
   const stakeSimpleFactory = await StakeSimpleFactory.deploy(
     stakeSimple.address
   );
   await stakeSimpleFactory.deployed();
   console.log("StakeSimpleFactory:", stakeSimpleFactory.address);
+  */
 
   const stakeTONLogic = await StakeTONLogic.deploy();
   await stakeTONLogic.deployed();
@@ -97,7 +99,7 @@ async function deployMain(defaultSender) {
 
   //------------------
   const stakeFactory = await StakeFactory.deploy(
-    stakeSimpleFactory.address,
+    zeroAddress,
     stakeTONFactory.address,
     zeroAddress
   );
@@ -137,8 +139,8 @@ async function deployMain(defaultSender) {
 
   const out = {};
   out.TOS = tos.address;
-  out.StakeSimple = stakeSimple.address;
-  out.StakeSimpleFactory = stakeSimpleFactory.address;
+  // out.StakeSimple = stakeSimple.address;
+  // out.StakeSimpleFactory = stakeSimpleFactory.address;
   out.StakeTONLogic = stakeTONLogic.address;
   out.StakeTONProxyFactory = stakeTONProxyFactory.address;
   out.StakeTONFactory = stakeTONFactory.address;
@@ -167,12 +169,12 @@ async function main() {
 
   const out = {};
   out.TOS = contracts.TOS;
-  out.StakeSimple = contracts.StakeSimple;
-  out.StakeSimpleFactory = contracts.StakeSimpleFactory;
+  // out.StakeSimple = contracts.StakeSimple;
+  // out.StakeSimpleFactory = contracts.StakeSimpleFactory;
   out.StakeTONLogic = contracts.StakeTONLogic;
   out.StakeTONProxyFactory = contracts.StakeTONProxyFactory;
   out.StakeTONFactory = contracts.StakeTONFactory;
-  out.StakeUniswapV3Factory = contracts.StakeUniswapV3Factory;
+  //out.StakeUniswapV3Factory = contracts.StakeUniswapV3Factory;
   //out.StakeDefiFactory = contracts.StakeDefiFactory;
   out.StakeFactory = contracts.StakeFactory;
   out.StakeRegistry = contracts.StakeRegistry;

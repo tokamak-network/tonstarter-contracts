@@ -25,13 +25,13 @@ contract StakeFactory is IStakeFactory, AccessibleCommon {
         address _stakeUniswapV3Factory
     ) {
         require(
-            _stakeSimpleFactory != address(0) && _stakeTONFactory != address(0),
+            _stakeTONFactory != address(0),
             "StakeFactory: init fail"
         );
 
         factory[0] = _stakeTONFactory;
-        factory[1] = _stakeSimpleFactory;
-        factory[2] = _stakeUniswapV3Factory;
+        //factory[1] = _stakeSimpleFactory;
+        //factory[2] = _stakeUniswapV3Factory;
 
         _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
         _setupRole(ADMIN_ROLE, msg.sender);
