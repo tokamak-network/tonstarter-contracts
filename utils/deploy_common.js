@@ -11,9 +11,9 @@ const {
   solidityKeccak256,
 } = require("web3-utils");
 
-const moment = require("moment");
 
 require("dotenv").config();
+const { printGasUsedOfUnits } = require("../scripts/log_tx");
 
 const zeroAddress = "0x0000000000000000000000000000000000000000";
 const ADMIN_ROLE = keccak256("ADMIN");
@@ -46,6 +46,7 @@ async function createValue(tonVault, paytoken) {
   );
   await tx.wait();
   console.log("createValue tx:", tx.hash);
+  printGasUsedOfUnits('createVault',tx);
 }
 
 async function createStakeContract(vaultAddress, periodBlock, name, paytoken) {
@@ -82,6 +83,8 @@ async function createStakeContract(vaultAddress, periodBlock, name, paytoken) {
   );
   await tx.wait();
   console.log("createStakeContract ", name, ",tx:", tx.hash);
+  printGasUsedOfUnits('createStakeContract '+ name, tx);
+
 }
 
 function timeout(sec) {

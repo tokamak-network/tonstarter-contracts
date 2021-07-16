@@ -2,7 +2,7 @@ require('dotenv').config();
 const path = require('path');
 // const HDWalletProvider = require("@truffle/hdwallet-provider");
 //const PrivateKeyProvider = require('truffle-privatekey-provider');
-require('dotenv').config()
+//require('dotenv').config()
 
 module.exports = {
   contracts_build_directory : path.join(__dirname, "build/contracts"),
@@ -38,6 +38,9 @@ module.exports = {
   //     port: 8545,
   //     network_id: '*', // eslint-disable-line camelcase
   //   },
+  },
+  gasReporter: {
+    enabled: (process.env.REPORT_GAS) ? true : true
   },
   mocha: {
     reporter: 'eth-gas-reporter',

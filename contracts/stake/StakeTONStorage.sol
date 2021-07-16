@@ -49,4 +49,5 @@ contract StakeTONStorage is Stake1Storage {
 
     /// @dev the withdraw flag, when withdraw at first, set true
     bool public withdrawFlag;
+
 }

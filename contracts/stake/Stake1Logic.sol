@@ -371,27 +371,5 @@ contract Stake1Logic is StakeProxyStorage, AccessibleCommon, IStake1Logic {
             );
     }
 
-    /// @dev Swap TON to TOS using uniswap v2
-    /// @dev this function used in StakeTON ( stakeType=0 )
-    /// @param _stakeContract the stakeContract's address
-    /// @param amountIn the input amount
-    /// @param amountOutMinimum the minimun output amount
-    /// @param deadline deadline
-    /// @param _type the function type, if 0, use exactInputSingle function, else if, use exactInput function
-    function exchangeWTONtoTOSv2(
-        address _stakeContract,
-        uint256 amountIn,
-        uint256 amountOutMinimum,
-        uint256 deadline,
-        uint256 _type
-    ) external returns (uint256 amountOut) {
-        return
-            IStakeTONTokamak(_stakeContract).exchangeWTONtoTOSv2(
-                amountIn,
-                amountOutMinimum,
-                deadline,
-                _type
-            );
-    }
 
 }
