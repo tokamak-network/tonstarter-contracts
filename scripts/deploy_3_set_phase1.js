@@ -4,6 +4,7 @@ const utils = ethers.utils;
 const save = require("./save_deployed_file");
 const loadDeployed = require("./load_deployed");
 //const loadDeployedInitVariable = require("./load_deployed_init");
+const { printGasUsedOfUnits } = require("./log_tx");
 
 const {
   toBN,
@@ -22,7 +23,7 @@ const registry = loadDeployed(process.env.NETWORK, "StakeRegistry");
 const factory = loadDeployed(process.env.NETWORK, "StakeFactory");
 const vaultfactory = loadDeployed(process.env.NETWORK, "StakeVaultFactory");
 const logic = loadDeployed(process.env.NETWORK, "Stake1Logic");
-const proxy = loadDeployed(process.env.NETWORK, "Stake1Proxy");
+const tonproxy = loadDeployed(process.env.NETWORK, "Stake1Proxy");
 
 const ton = loadDeployed(process.env.NETWORK, "TON");
 const wton = loadDeployed(process.env.NETWORK, "WTON");
@@ -30,9 +31,9 @@ const depositManager = loadDeployed(process.env.NETWORK, "DepositManager");
 const seigManager = loadDeployed(process.env.NETWORK, "SeigManager");
 const swapProxy = loadDeployed(process.env.NETWORK, "SwapProxy");
 
-
 async function deployMain(defaultSender) {
   const [deployer, user1] = await ethers.getSigners();
+  console.log("deployer:", deployer.address);
 
   const uniswapRouter = process.env.UniswapRoute;
   const uniswapNPM = process.env.NonfungiblePositionManager;
@@ -40,7 +41,7 @@ async function deployMain(defaultSender) {
   const uniswapWeth = process.env.WethAddress;
   const uniswapRouter2 = process.env.UniswapRouter2;
 
-  const stakeEntry = await ethers.getContractAt("Stake1Logic", proxy);
+  const stakeEntry = await ethers.getContractAt("Stake1Logic", tonproxy);
   console.log("stakeEntry:", stakeEntry.address);
 
   // console.log("tostoken:", tostoken);
@@ -51,8 +52,9 @@ async function deployMain(defaultSender) {
   // console.log("wton:", vaultfactory);
   // console.log("depositManager:", depositManager);
   // console.log("seigManager:", seigManager);
+  // console.log("swapProxy:", swapProxy);
 
-  await stakeEntry.setStore(
+  let tx0 = await stakeEntry.setStore(
     tostoken,
     registry,
     factory,
@@ -63,13 +65,15 @@ async function deployMain(defaultSender) {
     seigManager
   );
   console.log("stakeEntry setStore:");
+  printGasUsedOfUnits('StakeRegistry setTokamak',tx0);
 
   const stakeRegistry = await ethers.getContractAt("StakeRegistry", registry);
 
-  await stakeRegistry.setTokamak(ton, wton, depositManager, seigManager, swapProxy);
+  let tx = await stakeRegistry.setTokamak(ton, wton, depositManager, seigManager, swapProxy);
   console.log("stakeRegistry setTokamak:");
+  printGasUsedOfUnits('StakeRegistry setTokamak',tx);
 
-  await stakeRegistry.addDefiInfo(
+  let tx1 = await stakeRegistry.addDefiInfo(
     "UNISWAP_V3",
     uniswapRouter,
     uniswapNPM,
@@ -78,18 +82,24 @@ async function deployMain(defaultSender) {
     uniswapRouter2
   );
   console.log("stakeRegistry addDefiInfo:");
+  printGasUsedOfUnits('stakeRegistry addDefiInfo',tx1);
 
-  await stakeRegistry.grantRole(ADMIN_ROLE, proxy);
+
+  let tx2 = await stakeRegistry.grantRole(ADMIN_ROLE, tonproxy);
   console.log("stakeRegistry grantRole: proxy");
+  printGasUsedOfUnits('stakeRegistry grantRole',tx2);
+
 
   const stakeFactory = await ethers.getContractAt("StakeFactory", factory);
-  await stakeFactory.grantRole(ADMIN_ROLE, proxy);
+  let tx4 = await stakeFactory.grantRole(ADMIN_ROLE, tonproxy);
   console.log("stakeFactory grantRole: proxy");
-
+  printGasUsedOfUnits('stakeFactory grantRole proxy',tx4);
 
   const stakeVaultFactory = await ethers.getContractAt("StakeVaultFactory", vaultfactory);
-  await stakeVaultFactory.grantRole(ADMIN_ROLE, proxy);
+  let tx5 = await stakeVaultFactory.grantRole(ADMIN_ROLE, tonproxy);
   console.log("StakeVaultFactory grantRole: proxy");
+  printGasUsedOfUnits('StakeVaultFactory grantRole proxy',tx5);
+
 
   return null;
 }

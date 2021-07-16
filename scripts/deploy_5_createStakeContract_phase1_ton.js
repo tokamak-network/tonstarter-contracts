@@ -16,6 +16,8 @@ const {
 
 require("dotenv").config();
 
+const { printGasUsedOfUnits } = require("./log_tx");
+
 const zeroAddress = "0x0000000000000000000000000000000000000000";
 const ADMIN_ROLE = keccak256("ADMIN");
 
@@ -82,16 +84,6 @@ const periods = [
 ];
 
 async function main() {
-  // let VaultName = null;
-  // let VaultAddress = null;
-  // let StakeType = null;
-
-  // StakeType = process.env.PHASE1_TON_STAKE_TYPE;
-  // VaultName = process.env.PHASE1_TON_STAKE_TYPE
-  // VaultAddress = loadDeployedInput(process.env.NETWORK, "VaultAddress");
-  // console.log("StakeType", StakeType);
-  // console.log("VaultName", VaultName);
-  // console.log("VaultAddress", VaultAddress);
 
   const [deployer, user1] = await ethers.getSigners();
   const users = await ethers.getSigners();

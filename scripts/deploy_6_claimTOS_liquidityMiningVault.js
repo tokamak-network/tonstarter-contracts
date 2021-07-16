@@ -3,7 +3,6 @@ const { ethers, upgrades } = require("hardhat");
 const utils = ethers.utils;
 const save = require("./save_deployed_file");
 const loadDeployed = require("./load_deployed");
-//const loadDeployedInitVariable = require("./load_deployed_init");
 
 const {
   toBN,
@@ -11,6 +10,10 @@ const {
 } = require("web3-utils");
 
 require("dotenv").config();
+
+const { printGasUsedOfUnits } = require("./log_tx");
+
+
 const SimpleVault1 = require("../abis_vaults/vaults/SimpleVault.sol/SimpleVault.json");
 
 const zeroAddress = "0x0000000000000000000000000000000000000000";
@@ -36,6 +39,9 @@ async function deployMain(defaultSender) {
     );
     console.log("LiquidityMiningVault claimTOS:  ", process.env.PHASE1_TON_VAULT_ADDRESS, utils.parseUnits(process.env.PHASE1_TON_ALLOCATED + "." + "0".repeat(18)) );
     console.log("liquidityMiningVault claimTOS tx.hash:  ", tx.hash );
+
+    printGasUsedOfUnits('liquidityMiningVault claimTOS ',tx);
+
   }
 
   return null;

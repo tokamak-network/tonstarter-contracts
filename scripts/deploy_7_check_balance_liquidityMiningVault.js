@@ -11,6 +11,10 @@ const {
 } = require("web3-utils");
 
 require("dotenv").config();
+
+const { printGasUsedOfUnits } = require("./log_tx");
+
+
 const SimpleVault1 = require("../abis_vaults/vaults/SimpleVault.sol/SimpleVault.json");
 
 const zeroAddress = "0x0000000000000000000000000000000000000000";

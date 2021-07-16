@@ -1,7 +1,8 @@
 const { BigNumber } = require("ethers");
 const { ethers, upgrades } = require("hardhat");
 const utils = ethers.utils;
-const save = require("./save_deployed_file");
+const save = require("./save_deployed");
+const { printGasUsedOfUnits } = require("./log_tx");
 
 const {
   toBN,
@@ -64,21 +65,51 @@ async function deployMain(defaultSender) {
   await stakeSimpleFactory.deployed();
   console.log("StakeSimpleFactory:", stakeSimpleFactory.address);
   */
-
+  let deployInfo = {name:'', address:''};
   const stakeTONLogic = await StakeTONLogic.deploy();
-  await stakeTONLogic.deployed();
+  let tx = await stakeTONLogic.deployed();
   console.log("StakeTONLogic:", stakeTONLogic.address);
+  deployInfo = {
+    name: "StakeTON",
+    address: stakeTONLogic.address
+  }
+  if(deployInfo.address != null && deployInfo.address.length > 0  ){
+    save(process.env.NETWORK, deployInfo);
+  }
+
+
+  printGasUsedOfUnits('StakeTON  Deploy',tx);
+
 
   const stakeTONProxyFactory = await StakeTONProxyFactory.deploy();
-  await stakeTONProxyFactory.deployed();
+  tx =  await stakeTONProxyFactory.deployed();
   console.log("StakeTONProxyFactory:", stakeTONProxyFactory.address);
+  deployInfo = {
+    name: "StakeTONProxyFactory",
+    address: stakeTONProxyFactory.address
+  }
+  if(deployInfo.address != null && deployInfo.address.length > 0  ){
+    save(process.env.NETWORK, deployInfo);
+  }
+
+  printGasUsedOfUnits('StakeTONProxyFactory Deploy',tx);
+
 
   const stakeTONFactory = await StakeTONFactory.deploy(
     stakeTONProxyFactory.address,
     stakeTONLogic.address
   );
-  await stakeTONFactory.deployed();
+  tx =  await stakeTONFactory.deployed();
   console.log("stakeTONFactory:", stakeTONFactory.address);
+  deployInfo = {
+    name: "StakeTONFactory",
+    address: stakeTONFactory.address
+  }
+  if(deployInfo.address != null && deployInfo.address.length > 0  ){
+    save(process.env.NETWORK, deployInfo);
+  }
+
+  printGasUsedOfUnits('StakeTONFactory Deploy',tx);
 
   /*
   // const stakeDefiFactory = await StakeDefiFactory.deploy(stakeSimple.address);
@@ -104,28 +135,84 @@ async function deployMain(defaultSender) {
     zeroAddress
   );
 
-  await stakeFactory.deployed();
+  let tx1 = await stakeFactory.deployed();
   console.log("stakeFactory:", stakeFactory.address);
+  deployInfo = {
+    name: "StakeFactory",
+    address: stakeFactory.address
+  }
+  if(deployInfo.address != null && deployInfo.address.length > 0  ){
+    save(process.env.NETWORK, deployInfo);
+  }
+
+  printGasUsedOfUnits('StakeFactory Deploy',tx1);
 
   const stakeRegistry = await StakeRegistry.deploy(tos.address);
-  await stakeRegistry.deployed();
+  let tx2 = await stakeRegistry.deployed();
   console.log("stakeRegistry:", stakeRegistry.address);
+  deployInfo = {
+    name: "StakeRegistry",
+    address: stakeRegistry.address
+  }
+  if(deployInfo.address != null && deployInfo.address.length > 0  ){
+    save(process.env.NETWORK, deployInfo);
+  }
+
+  printGasUsedOfUnits('stakeRegistry Deploy',tx2);
 
   const stake1Vault = await Stake1Vault.deploy();
-  await stake1Vault.deployed();
+  let tx3 = await stake1Vault.deployed();
   console.log("Stake1Vault:", stake1Vault.address);
 
+  deployInfo = {
+    name: "Stake1Vault",
+    address: stake1Vault.address
+  }
+  if(deployInfo.address != null && deployInfo.address.length > 0  ){
+    save(process.env.NETWORK, deployInfo);
+  }
+
+  printGasUsedOfUnits('Stake1Vault Deploy',tx3);
+
   const stakeVaultFactory = await StakeVaultFactory.deploy(stake1Vault.address);
-  await stakeVaultFactory.deployed();
+  let tx4 = await stakeVaultFactory.deployed();
   console.log("stakeVaultFactory:", stakeVaultFactory.address);
+  deployInfo = {
+    name: "StakeVaultFactory",
+    address: stakeVaultFactory.address
+  }
+  if(deployInfo.address != null && deployInfo.address.length > 0  ){
+    save(process.env.NETWORK, deployInfo);
+  }
+
+  printGasUsedOfUnits('StakeVaultFactory Deploy',tx4);
 
   const stake1Logic = await Stake1Logic.deploy();
-  await stake1Logic.deployed();
+  let tx5 = await stake1Logic.deployed();
   console.log("stake1Logic:", stake1Logic.address);
+  deployInfo = {
+    name: "Stake1Logic",
+    address: stake1Logic.address
+  }
+  if(deployInfo.address != null && deployInfo.address.length > 0  ){
+    save(process.env.NETWORK, deployInfo);
+  }
+
+  printGasUsedOfUnits('Stake1Logic Deploy',tx5);
 
   const stake1Proxy = await Stake1Proxy.deploy(stake1Logic.address);
-  await stake1Proxy.deployed();
+  let tx6 = await stake1Proxy.deployed();
   console.log("stake1Proxy:", stake1Proxy.address);
+
+  deployInfo = {
+    name: "Stake1Proxy",
+    address: stake1Proxy.address
+  }
+  if(deployInfo.address != null && deployInfo.address.length > 0  ){
+    save(process.env.NETWORK, deployInfo);
+  }
+
+  printGasUsedOfUnits('Stake1Proxy Deploy',tx6);
 
   let _implementation = await stake1Proxy.implementation(0);
   console.log("stake1Proxy implementation:", _implementation);
@@ -136,25 +223,20 @@ async function deployMain(defaultSender) {
   );
   console.log("stakeEntry:", stakeEntry.address);
 
+  // let out = {};
+  // out.TOS = tos.address;
+  // out.Stake1Proxy = stake1Proxy.address;
+  // out.Stake1Logic = stake1Logic.address;
+  // out.StakeRegistry = stakeRegistry.address;
+  // out.StakeTON = stakeTONLogic.address;
+  // out.StakeTONProxyFactory = stakeTONProxyFactory.address;
+  // out.StakeTONFactory = stakeTONFactory.address;
+  // out.StakeFactory = stakeFactory.address;
+  // out.Stake1Vault = stake1Vault.address;
+  // out.StakeVaultFactory = stakeVaultFactory.address;
+  // return out;
 
-  const out = {};
-  out.TOS = tos.address;
-  // out.StakeSimple = stakeSimple.address;
-  // out.StakeSimpleFactory = stakeSimpleFactory.address;
-  out.StakeTONLogic = stakeTONLogic.address;
-  out.StakeTONProxyFactory = stakeTONProxyFactory.address;
-  out.StakeTONFactory = stakeTONFactory.address;
-  //out.StakeDefiFactory = stakeDefiFactory.address;
-  //out.StakeUniswapV3Factory = stakeUniswapV3Factory.address;
-
-  out.StakeFactory = stakeFactory.address;
-  out.StakeRegistry = stakeRegistry.address;
-
-  out.Stake1Vault = stake1Vault.address;
-  out.StakeVaultFactory = stakeVaultFactory.address;
-  out.Stake1Logic = stake1Logic.address;
-  out.Stake1Proxy = stake1Proxy.address;
-  return out;
+  return null;
 }
 
 async function main() {
@@ -167,29 +249,46 @@ async function main() {
   contracts = await deployMain(deployer);
   console.log("contracts:", process.env.NETWORK, contracts);
 
-  const out = {};
-  out.TOS = contracts.TOS;
-  // out.StakeSimple = contracts.StakeSimple;
-  // out.StakeSimpleFactory = contracts.StakeSimpleFactory;
-  out.StakeTONLogic = contracts.StakeTONLogic;
-  out.StakeTONProxyFactory = contracts.StakeTONProxyFactory;
-  out.StakeTONFactory = contracts.StakeTONFactory;
-  //out.StakeUniswapV3Factory = contracts.StakeUniswapV3Factory;
-  //out.StakeDefiFactory = contracts.StakeDefiFactory;
-  out.StakeFactory = contracts.StakeFactory;
-  out.StakeRegistry = contracts.StakeRegistry;
-  out.Stake1Vault = contracts.Stake1Vault;
-  out.StakeVaultFactory = contracts.StakeVaultFactory;
-  out.Stake1Logic = contracts.Stake1Logic;
-  out.Stake1Proxy = contracts.Stake1Proxy;
 
-  out.TON = process.env.TON;
-  out.WTON = process.env.WTON;
-  out.DepositManager = process.env.DepositManager;
-  out.SeigManager = process.env.SeigManager;
-  out.SwapProxy = process.env.SwapProxy;
+  deployInfo = {
+    name: "TON",
+    address: process.env.TON
+  }
+  if(deployInfo.address != null && deployInfo.address.length > 0  ){
+    save(process.env.NETWORK, deployInfo);
+  }
 
-  save(process.env.NETWORK, out);
+  deployInfo = {
+    name: "WTON",
+    address: process.env.WTON
+  }
+  if(deployInfo.address != null && deployInfo.address.length > 0  ){
+    save(process.env.NETWORK, deployInfo);
+  }
+
+  deployInfo = {
+    name: "DepositManager",
+    address: process.env.DepositManager
+  }
+  if(deployInfo.address != null && deployInfo.address.length > 0  ){
+    save(process.env.NETWORK, deployInfo);
+  }
+
+  deployInfo = {
+    name: "SeigManager",
+    address: process.env.SeigManager
+  }
+  if(deployInfo.address != null && deployInfo.address.length > 0  ){
+    save(process.env.NETWORK, deployInfo);
+  }
+
+  deployInfo = {
+    name: "SwapProxy",
+    address: process.env.SwapProxy
+  }
+  if(deployInfo.address != null && deployInfo.address.length > 0  ){
+    save(process.env.NETWORK, deployInfo);
+  }
 }
 
 main()

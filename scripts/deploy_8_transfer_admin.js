@@ -12,6 +12,8 @@ const {
 
 require("dotenv").config();
 
+const { printGasUsedOfUnits } = require("./log_tx");
+
 
 const zeroAddress = "0x0000000000000000000000000000000000000000";
 
@@ -41,7 +43,7 @@ async function deployMain(defaultSender) {
   const uniswapRouter2 = process.env.UniswapRouter2;
 
   const stakeEntry = await ethers.getContractAt("Stake1Logic", proxy);
-  await stakeEntry.transferAdmin(ADMIN_ROLE, process.env.NEW_ADMIN);
+  await stakeEntry.transferAdmin(process.env.NEW_ADMIN);
   console.log("Stake1Proxy transferAdmin:  ", process.env.NEW_ADMIN );
 
 
@@ -56,18 +58,19 @@ async function deployMain(defaultSender) {
 
 
   const stakeRegistry = await ethers.getContractAt("StakeRegistry", registry);
-  await stakeRegistry.transferAdmin(ADMIN_ROLE, process.env.NEW_ADMIN);
+  let tx = await stakeRegistry.transferAdmin(process.env.NEW_ADMIN);
   console.log("stakeRegistry transferAdmin:  ", process.env.NEW_ADMIN );
+  printGasUsedOfUnits('StakeRegistry transferAdmin',tx);
 
   const stakeFactory = await ethers.getContractAt("StakeFactory", factory);
-  await stakeFactory.transferAdmin(ADMIN_ROLE, process.env.NEW_ADMIN);
+  tx = await stakeFactory.transferAdmin(process.env.NEW_ADMIN);
   console.log("stakeFactory transferAdmin:  ", process.env.NEW_ADMIN );
-
+  printGasUsedOfUnits('StakeFactory transferAdmin ',tx);
 
   const stakeVaultFactory = await ethers.getContractAt("StakeVaultFactory", vaultfactory);
-  await stakeVaultFactory.transferAdmin(ADMIN_ROLE, process.env.NEW_ADMIN);
+  tx = await stakeVaultFactory.transferAdmin(process.env.NEW_ADMIN);
   console.log("stakeFactory transferAdmin:  ", process.env.NEW_ADMIN );
-
+  printGasUsedOfUnits('StakeVaultFactory transferAdmin ',tx);
   return null;
 }
 

@@ -5,6 +5,8 @@ const save = require("./save_deployed_file");
 const loadDeployed = require("./load_deployed");
 //const loadDeployedInput = require("./load_deployed_input");
 
+const { printGasUsedOfUnits } = require("./log_tx");
+
 const {
   // padLeft,
   // toBN,

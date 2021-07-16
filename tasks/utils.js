@@ -55,5 +55,5 @@ module.exports = {
   TICK_SPACINGS,
   getMinTick,
   getMaxTick,
-  encodePath,
+  encodePath
 };
