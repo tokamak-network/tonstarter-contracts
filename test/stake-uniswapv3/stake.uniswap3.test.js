@@ -29,36 +29,24 @@ const {
   getMaxTick,
   encodePriceSqrt,
   // getMaxLiquidityPerTick,
-} = require("./uniswap-v3-stake/uniswap-v3-contracts");
+} = require("../uniswap-v3-stake/uniswap-v3-contracts");
 
 const {
   ICO20Contracts,
   Pharse2_ETHTOS_Staking,
   Pharse2_REWARD_PERBLOCK,
   HASH_Pharse2_ETHTOS_Staking
-  } = require("../utils/ico_test_deploy_ethers.js");
+  } = require("../../utils/ico_test_deploy_ethers.js");
 
 const {
   getAddresses,
   findSigner,
   setupContracts,
   mineBlocks,
-} = require("./hardhat-test/utils");
+} = require("../hardhat-test/utils");
 
 const Web3EthAbi = require('web3-eth-abi');
 const abiDecoder = require('abi-decoder');
-// const [
-//   candidate1,
-//   candidate2,
-//   candidate3,
-//   user1,
-//   user2,
-//   user3,
-//   user4,
-//   user5,
-//   operator1,
-//   operator2,
-// ] = accounts;
 
 let deployedUniswapV3;
 let ico20Contracts;
@@ -112,7 +100,9 @@ describe(" UniswapV3 Staking", function () {
   let tos, stakeregister, stakefactory, stake1proxy, stake1logic;
   let vault_phase1_eth, vault_phase1_ton, vault_phase1_tosethlp, vault_phase1_dev;
   let ton, wton, depositManager, seigManager;
-  let stakeEntry, stakeEntry2, layer2;
+  let stakeEntry, stakeEntry2, layer2, stakeUniswapV3Factory, stakeUniswapV3,
+      stake2Logic, stake2Vault, stakeVaultFactory;
+  let Stake2Logic, StakeUniswapV3, StakeUniswapV3Factory, Stake2Vault;
 
   const stakeType = "2"; // stake type for uniswapV3 stake
 
@@ -127,10 +117,10 @@ describe(" UniswapV3 Staking", function () {
     accountlist = await getAddresses();
 
     defaultSender = accountlist[0];
-    console.log('defaultSender', defaultSender);
-    //user1 = accounts[3];
     user1 = accountlist[1];
-      console.log('user1', user1);
+
+    sender = await ico20Contracts.findSigner(defaultSender);
+    tester = await ico20Contracts.findSigner(user1);
   });
 
   describe('# 1. Deploy UniswapV3', async function () {
@@ -155,6 +145,7 @@ describe(" UniswapV3 Staking", function () {
       ICOContractsDeployed = await ico20Contracts.initializeICO20Contracts(
         defaultSender
       );
+
     });
 
     it("tokamakContracts init  ", async function () {
@@ -184,9 +175,6 @@ describe(" UniswapV3 Staking", function () {
       stakefactory = cons.stakefactory;
       stake1proxy = cons.stake1proxy;
       stake1logic = cons.stake1logic;
-      stakeEntry2 = cons.stakeEntry2;
-
-      // console.log('stakeEntry2',stakeEntry2.address);
 
       await stakeregister.addDefiInfo(
         "UNISWAP_V3",
@@ -200,7 +188,64 @@ describe(" UniswapV3 Staking", function () {
     });
 
   });
+
+
+  describe('# 3. Regist Stake2Vault with phase=2 ', async function () {
+
+      it("1. addStake2LogicAndVault2Factory for UniswapV3 Staking", async function () {
+          this.timeout(1000000);
+
+          stakeEntry2 = await ico20Contracts.addStake2LogicAndVault2Factory(defaultSender)
+          const cons = await ico20Contracts.getICOContracts();
+          stake2logic = cons.stake2logic;
+          stakeUniswapV3Logic = cons.stakeUniswapV3Logic;
+          stakeCoinageFactory = cons.stakeCoinageFactory;
+          stakeUniswapV3Factory = cons.stakeUniswapV3Factory;
+          stakeVaultFactory = cons.stakeVaultFactory;
+          stake2vaultlogic = cons.stake2vaultlogic;
+      });
+
+  });
+
   /*
+  describe('# 4. Add Stake2Logic in Proxy (with phase=2)', async function () {
+      it("1. create Stake2Logic ", async function () {
+          this.timeout(1000000);
+          stake2Logic = await Stake2Logic.connect(sender).deploy();
+      });
+
+      it("2. Check onlyOwner Function : Revert when running by non-admin", async function() {
+          let _index = 2;
+          await expect(
+              stake1proxy.connect(tester).setImplementation(stake2Logic.address, _index, true)
+          ).to.be.revertedWith("Accessible: Caller is not an admin");
+
+          await expect(
+              stake1proxy.connect(tester).setAliveImplementation(stake2Logic.address, true, { from: user1 })
+          ).to.be.revertedWith("Accessible: Caller is not an admin");
+
+          await expect(
+              stake1proxy.connect(tester).setSelectorImplementations([_func1], stake2Logic.address, { from: user1 })
+          ).to.be.revertedWith("Accessible: Caller is not an admin");
+
+      });
+
+
+      it("3. setImplementation ", async function () {
+          this.timeout(1000000);
+          let _index = 2;
+          await stake1proxy.connect(sender).setImplementation(stake2Logic.address, _index, true );
+
+          expect(await stake1proxy.implementation(_index)).to.be.equal(stake2Logic.address);
+
+      });
+
+      it('4. setSelectorImplementations ', async function () {
+          await stake1proxy.connect(sender).setSelectorImplementations([_func1], stake2Logic.address);
+          expect(await stake1proxy.getSelectorImplementation(_func1)).to.be.equal(stake2Logic.address);
+      });
+  });
+
   describe('# 3. Set Uniswap V3 Pool', async function () {
 
     it("Create WETH-WTON Pool ", async function () {
@@ -239,18 +284,11 @@ describe(" UniswapV3 Staking", function () {
 
         let balance  = await stakeEntry2.balanceOf(wton.address, defaultSender);
 
-        // console.log('Pharse2_ETHTOS_Staking', Pharse2_ETHTOS_Staking );
-        // console.log('Pharse2_REWARD_PERBLOCK', Pharse2_REWARD_PERBLOCK );
-         const cons = await ico20Contracts.getICOContracts();
+        const cons = await ico20Contracts.getICOContracts();
         stakeVaultFactory = cons.stakeVaultFactory;
         stakeEntry2 = cons.stakeEntry2;
         tos = cons.tos;
         stakefactory = cons.stakefactory;
-
-        // let log1 = await stakeVaultFactory.vaultLogics(toBN("1"));
-        // let log2 = await stakeVaultFactory.vaultLogics(toBN("2"));
-          // console.log('log1',log1.toString());
-          // console.log('log2',log2.toString());
 
        let owner = await ico20Contracts.findSigner(defaultSender);
 
@@ -269,18 +307,13 @@ describe(" UniswapV3 Staking", function () {
         );
         const receipt = await tx.wait();
 
-
-        // console.log('receipt.logs',receipt.logs);
         for(let i=0; i< receipt.logs.length ;i++){
-          // if(tx.receipt.logs[i].event == "CreatedVault2"){
-          //      vaultAddress = tx.receipt.logs[i].args.vault;
-          // }
+
           if(receipt.logs[i].event == "CreatedStakeContract2"){
               vaultAddress = receipt.logs[i].args.vault;
               stakeContractAddress = receipt.logs[i].args.stakeContract;
           }
-          // console.log('vaultAddress',vaultAddress);
-          // console.log('stakeContractAddress',stakeContractAddress);
+
         }
         if(vaultAddress!=null){
             await tos.connect(owner).mint(
@@ -298,7 +331,6 @@ describe(" UniswapV3 Staking", function () {
             [token0, token1] = [tos, ton];
           }
 
-       // console.log('user1',user1);
         const sender = await ico20Contracts.findSigner(user1);
 
        // console.log('defaultSender',defaultSender);

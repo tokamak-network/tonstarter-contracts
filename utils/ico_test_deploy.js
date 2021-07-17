@@ -200,6 +200,7 @@ class ICO20Contracts {
     this.vault_phase1_dev = null;
     this.stakeEntry = null;
     this.stakeEntry2 = null;
+    this.stakeTONLogic = null;
 
     this.stakeVaultFactory = null;
 
@@ -364,7 +365,8 @@ class ICO20Contracts {
       stake2logic: this.stake2logic,
       stake2vaultlogic: this.stake2vaultlogic,
       stakeEntry2 : this.stakeEntry2,
-      stakeVaultFactory: this.stakeVaultFactory
+      stakeVaultFactory: this.stakeVaultFactory,
+      stakeTONLogic: this.stakeTONLogic
     };
     // console.log(' initializeICO20Contracts  :',returnData );
 
@@ -522,7 +524,8 @@ class ICO20Contracts {
       stakeUniswapV3Factory: this.stakeUniswapV3Factory,
       stakeTONfactory: this.stakeTONfactory,
       stakeSimpleFactory: this.stakeSimpleFactory,
-      stakeVaultFactory : this.stakeVaultFactory
+      stakeVaultFactory : this.stakeVaultFactory,
+      stakeTONLogic: this.stakeTONLogic
     };
   };
 

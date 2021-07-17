@@ -69,7 +69,8 @@ describe ("Upgradable Stake Contracts", function () {
   it('2. should create a vault', async function () {
 
     const HASH_Pharse1_ETH_Staking = keccak256("PHASE1_ETH_STAKING");
-
+    let phase = toBN('1');
+    let stakeType = toBN('0');
     const tx = await stakeEntry.createVault(
       zeroAddress, // ethers
       ethers.utils.parseUnits(Pharse1_ETH_Staking, 18),

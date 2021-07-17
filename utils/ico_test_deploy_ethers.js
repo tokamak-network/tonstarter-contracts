@@ -194,6 +194,7 @@ class ICO20Contracts {
     this.vault_phase1_tosethlp = null;
     this.vault_phase1_dev = null;
     this.stakeEntry = null;
+    this.stake2Vault = null;
 
     this.AbiObject = {
       TON: null,
@@ -262,7 +263,7 @@ class ICO20Contracts {
     this.tos = null;
     //this.stos = null;
     //this.stakeForSTOS = null;
-
+    this.stake2Vault = null;
 
     this.stakeVaultFactory = null;
     this.stakeSimpleFactory = null;
@@ -304,12 +305,12 @@ class ICO20Contracts {
     //StakeDefiFactory = await ethers.getContractFactory("StakeDefiFactory");
     //SwapProxy = await ethers.getContractFactory("SwapProxy");
 
-    StakeUniswapV3 = await ethers.getContractFactory("StakeUniswapV3");
-    StakeCoinageFactory = await ethers.getContractFactory("StakeCoinageFactory");
-    StakeUniswapV3Factory = await ethers.getContractFactory("StakeUniswapV3Factory");
+    // StakeUniswapV3 = await ethers.getContractFactory("StakeUniswapV3");
+    // StakeCoinageFactory = await ethers.getContractFactory("StakeCoinageFactory");
+    // StakeUniswapV3Factory = await ethers.getContractFactory("StakeUniswapV3Factory");
 
-    Stake2Logic = await ethers.getContractFactory("Stake2Logic");
-    Stake2VaultLogic = await ethers.getContractFactory("Stake2Vault");
+    //Stake2Logic = await ethers.getContractFactory("Stake2Logic");
+    //Stake2VaultLogic = await ethers.getContractFactory("Stake2Vault");
 
     //this.swapProxy = await SwapProxy.connect(owner).deploy();
 
@@ -332,6 +333,7 @@ class ICO20Contracts {
       this.stakeTONLogic.address
     );
 
+    /*
     //--for phase2
     //--set stakeUniswapV3
     this.stakeUniswapV3Logic = await StakeUniswapV3.connect(owner).deploy();
@@ -341,15 +343,20 @@ class ICO20Contracts {
         this.stakeCoinageFactory.address);
 
 
-    // this.stakeDefiFactory = await stakeDefiFactory.connect(
-    //   owner
-    // ).deploy(this.stakeSimple.address);
-
     this.stakefactory = await StakeFactory.connect(owner).deploy(
       this.stakeSimpleFactory.address,
       this.stakeTONfactory.address,
       this.stakeUniswapV3Factory.address
     );
+    */
+
+    this.stakefactory = await StakeFactory.connect(owner).deploy(
+      zeroAddress,
+      this.stakeTONfactory.address,
+      zeroAddress
+    );
+
+
     this.stake1logic = await Stake1Logic.connect(owner).deploy();
     this.stake1proxy = await Stake1Proxy.connect(owner).deploy(this.stake1logic.address);
 
@@ -360,13 +367,13 @@ class ICO20Contracts {
       this.stake1proxy.address
     );
 
-    this.stake2logic = await Stake2Logic.connect(owner).deploy();
-    this.stake2vaultlogic = await Stake2VaultLogic.connect(owner).deploy();
+    // this.stake2logic = await Stake2Logic.connect(owner).deploy();
+    // this.stake2vaultlogic = await Stake2VaultLogic.connect(owner).deploy();
 
-    this.stakeEntry2 = await ethers.getContractAt(
-      "Stake2Logic",
-      this.stake1proxy.address
-    );
+    // this.stakeEntry2 = await ethers.getContractAt(
+    //   "Stake2Logic",
+    //   this.stake1proxy.address
+    // );
 
 
     const returnData = {
@@ -597,7 +604,11 @@ class ICO20Contracts {
       stake1proxy: this.stake1proxy,
       stakeEntry: this.stakeEntry,
       stakeEntry2: this.stakeEntry2,
+      stake2logic: this.stake2logic,
+      stakeUniswapV3Logic: this.stakeUniswapV3Logic,
+      stakeCoinageFactory: this.stakeCoinageFactory,
       stakeUniswapV3Factory: this.stakeUniswapV3Factory,
+      stake2vaultlogic: this.stake2vaultlogic,
       stakeTONfactory: this.stakeTONfactory,
       stakeSimpleFactory: this.stakeSimpleFactory,
       stakeVaultFactory : this.stakeVaultFactory
@@ -704,6 +715,47 @@ class ICO20Contracts {
       .grantRole(ADMIN_ROLE, this.stake1proxy.address);
 
 
+    return this.stakeEntry;
+  };
+
+  addStake2LogicAndVault2Factory  = async function (owner1) {
+    let owner = await this.findSigner(owner1);
+    let stakeType = ethers.BigNumber.from("2");
+    let phase = ethers.BigNumber.from("2");
+    //=====================================
+    // 1. 볼트 컨트랙 만들기
+    // 1-1. 생성
+    Stake2VaultLogic = await ethers.getContractFactory("Stake2Vault");
+    this.stake2vaultlogic = await Stake2VaultLogic.connect(owner).deploy();
+    // 1-2. 볼트팩토리에 연결
+    this.stakeVaultFactory.connect(owner).setVaultLogicByPhase(phase, this.stake2vaultlogic.address);
+
+    //=====================================
+    // 2. 스테이크 컨트랙 만들기
+    // StakeType 에 따른 스테이크 컨트랙의 로직을 생성하여 지정하고 등록한다.
+    // 2-1. 생성
+    StakeUniswapV3 = await ethers.getContractFactory("StakeUniswapV3");
+    StakeCoinageFactory = await ethers.getContractFactory("StakeCoinageFactory");
+    StakeUniswapV3Factory = await ethers.getContractFactory("StakeUniswapV3Factory");
+
+    this.stakeUniswapV3Logic = await StakeUniswapV3.connect(owner).deploy();
+    this.stakeCoinageFactory = await StakeCoinageFactory.connect(owner).deploy();
+    this.stakeUniswapV3Factory = await StakeUniswapV3Factory.connect(owner).deploy(
+        this.stakeUniswapV3Logic.address,
+        this.stakeCoinageFactory.address);
+
+    // 2-2. 스테이크컨트랙에 연결
+    await this.stakeEntry.connect(owner).setFactoryByStakeType(
+        stakeType,
+        this.stakeUniswapV3Factory.address
+    );
+
+    //=====================================
+    // 3. 프로시에 해당 로직이 별도로 필요하면 로직을 만들어서 연결한다 .
+    // 3-1. 로직 생성
+    Stake2Logic = await ethers.getContractFactory("Stake2Logic");
+    this.stake2logic = await Stake2Logic.connect(owner).deploy();
+    // 3-2. 로직을 프록시에 연결
     // attach stake2logic
     let _func1 = Web3EthAbi.encodeFunctionSignature("balanceOf(address,address)") ;
     let _func2 = Web3EthAbi.encodeFunctionSignature("balanceOfTOS(address)") ;
@@ -714,17 +766,17 @@ class ICO20Contracts {
       this.stake2logic.address,
       ethers.BigNumber.from("1"), true);
 
-
     await this.stake1proxy
       .connect(owner)
       .setSelectorImplementations([_func1, _func2, _func3, _func4], this.stake2logic.address);
 
-    await this.stakeEntry2
-      .connect(owner)
-      .setVaultLogicByPhase(ethers.BigNumber.from("2"), this.stake2vaultlogic.address);
+    // 로직2로 연동하는 프록시 인터페이스 설정
+    this.stakeEntry2 = await ethers.getContractAt("Stake2Logic",this.stake1proxy.address);
 
-
-    return this.stakeEntry;
+    // await this.stakeEntry2
+    //   .connect(owner)
+    //   .setVaultLogicByPhase(ethers.BigNumber.from("2"), this.stake2vaultlogic.address);
+    return this.stakeEntry2 ;
   };
 
 }
