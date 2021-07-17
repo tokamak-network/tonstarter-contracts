@@ -13,7 +13,6 @@ import "../common/AccessibleCommon.sol";
 
 import "../stake/StakeTONStorage.sol";
 import "@uniswap/v3-periphery/contracts/interfaces/ISwapRouter.sol";
-import "@uniswap/v2-periphery/contracts/interfaces/IUniswapV2Router01.sol";
 
 interface IERC20BASE {
     function totalSupply() external view returns (uint256);
