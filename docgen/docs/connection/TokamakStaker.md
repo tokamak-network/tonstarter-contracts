@@ -20,8 +20,6 @@
 
 - [`exchangeWTONtoTOS(uint256 _amountIn, uint256 _amountOutMinimum, uint256 _deadline, uint160 _sqrtPriceLimitX96, uint256 _kind)`](#TokamakStaker-exchangeWTONtoTOS-uint256-uint256-uint256-uint160-uint256-)
 
-- [`exchangeWTONtoTOSv2(uint256 _amountIn, uint256 _amountOutMinimum, uint256 _deadline, uint256 _kind)`](#TokamakStaker-exchangeWTONtoTOSv2-uint256-uint256-uint256-uint256-)
-
 # Events:
 
 - [`SetRegistry(address registry)`](#TokamakStaker-SetRegistry-address-)
@@ -159,22 +157,6 @@ exchange holded WTON to TOS using uniswap
 ### Return Values:
 
 - amountOut the amount of exchanged out token
-
-###### TokamakStaker-exchangeWTONtoTOSv2-uint256-uint256-uint256-uint256-
-
-## Function `exchangeWTONtoTOSv2(uint256 _amountIn, uint256 _amountOutMinimum, uint256 _deadline, uint256 _kind)`
-
-exchange holded WTON to TOS using uniswap-v2
-
-### Parameters:
-
-- `_amountIn`: the input amount
-
-- `_amountOutMinimum`: the minimun output amount
-
-- `_deadline`: deadline
-
-- `_kind`: the function type, if 0, use exactInputSingle function, else if, use exactInput function
 
 ###### TokamakStaker-SetRegistry-address-
 

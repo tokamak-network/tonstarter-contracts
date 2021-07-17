@@ -76,9 +76,9 @@ set the implementation address and status of the proxy[index]
 
 - `newImplementation`: Address of the new implementation.
 
-- `_index`: index of proxy
+- `_index`: index
 
-- `_alive`: alive status
+- `_alive`: _alive
 
 ###### Stake1Proxy-setAliveImplementation-address-bool-
 

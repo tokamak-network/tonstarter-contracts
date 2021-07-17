@@ -10,8 +10,6 @@
 
 - [`exchangeWTONtoTOS(uint256 _amountIn, uint256 _amountOutMinimum, uint256 _deadline, uint160 sqrtPriceLimitX96, uint256 _kind)`](#IStakeTONTokamak-exchangeWTONtoTOS-uint256-uint256-uint256-uint160-uint256-)
 
-- [`exchangeWTONtoTOSv2(uint256 _amountIn, uint256 _amountOutMinimum, uint256 _deadline, uint256 _kind)`](#IStakeTONTokamak-exchangeWTONtoTOSv2-uint256-uint256-uint256-uint256-)
-
 ###### IStakeTONTokamak-tokamakStaking-address-uint256-
 
 ## Function `tokamakStaking(address _layer2, uint256 stakeAmount)`
@@ -71,26 +69,6 @@ exchange holded WTON to TOS using uniswap
 - `_deadline`: deadline
 
 - `sqrtPriceLimitX96`: sqrtPriceLimitX96
-
-- `_kind`: the function type, if 0, use exactInputSingle function, else if, use exactInput function
-
-### Return Values:
-
-- amountOut the amount of exchanged out token
-
-###### IStakeTONTokamak-exchangeWTONtoTOSv2-uint256-uint256-uint256-uint256-
-
-## Function `exchangeWTONtoTOSv2(uint256 _amountIn, uint256 _amountOutMinimum, uint256 _deadline, uint256 _kind)`
-
-exchange holded WTON to TOS using uniswap
-
-### Parameters:
-
-- `_amountIn`: the input amount
-
-- `_amountOutMinimum`: the minimun output amount
-
-- `_deadline`: deadline
 
 - `_kind`: the function type, if 0, use exactInputSingle function, else if, use exactInput function
 

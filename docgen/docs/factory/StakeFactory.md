@@ -44,9 +44,13 @@ Create a stake contract that calls the desired stake factory according to stakeT
 
 - `_addr`: array of [token, paytoken, vault, _defiAddr]
 
+        or when stakeTyoe ==2 , [tos,0 , vault, 0 ]
+
 - `registry`:  registry address
 
 - `_intdata`: array of [saleStartBlock, startBlock, periodBlocks]
+
+        or when stakeTyoe ==2 , [cap, rewardPerBlock, 0]
 
 ### Return Values:
 

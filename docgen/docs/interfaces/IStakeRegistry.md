@@ -18,6 +18,8 @@
 
 - [`stakeContractsOfVaultAll(address _vault)`](#IStakeRegistry-stakeContractsOfVaultAll-address-)
 
+- [`defiInfo(bytes32 _name)`](#IStakeRegistry-defiInfo-bytes32-)
+
 ###### IStakeRegistry-setTokamak-address-address-address-address-address-
 
 ## Function `setTokamak(address _ton, address _wton, address _depositManager, address _seigManager, address _swapProxy)`
@@ -125,3 +127,27 @@ No description
 ## Function `stakeContractsOfVaultAll(address _vault)`
 
 No description
+
+###### IStakeRegistry-defiInfo-bytes32-
+
+## Function `defiInfo(bytes32 _name)`
+
+view defi info
+
+### Parameters:
+
+- `_name`:  hash name : keccak256(abi.encodePacked(_name));
+
+### Return Values:
+
+- name  _name ex) UNISWAP_V3, UNISWAP_V3_token0_token1
+
+- router entry point of defi
+
+- ext1  additional variable . ex) positionManagerAddress in Uniswap V3
+
+- ext2  additional variable . ex) WETH Address in Uniswap V3
+
+- fee  fee
+
+- routerV2 In case of uniswap, router address of uniswapV2

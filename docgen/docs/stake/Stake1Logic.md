@@ -40,8 +40,6 @@
 
 - [`exchangeWTONtoTOS(address _stakeContract, uint256 amountIn, uint256 amountOutMinimum, uint256 deadline, uint160 sqrtPriceLimitX96, uint256 _type)`](#Stake1Logic-exchangeWTONtoTOS-address-uint256-uint256-uint256-uint160-uint256-)
 
-- [`exchangeWTONtoTOSv2(address _stakeContract, uint256 amountIn, uint256 amountOutMinimum, uint256 deadline, uint256 _type)`](#Stake1Logic-exchangeWTONtoTOSv2-address-uint256-uint256-uint256-uint256-)
-
 ###### Stake1Logic-upgradeStakeTo-address-address-
 
 ## Function `upgradeStakeTo(address _stakeProxy, address _implementation)`
@@ -317,25 +315,5 @@ this function used in StakeTON ( stakeType=0 )
 - `deadline`: deadline
 
 - `sqrtPriceLimitX96`: sqrtPriceLimitX96
-
-- `_type`: the function type, if 0, use exactInputSingle function, else if, use exactInput function
-
-###### Stake1Logic-exchangeWTONtoTOSv2-address-uint256-uint256-uint256-uint256-
-
-## Function `exchangeWTONtoTOSv2(address _stakeContract, uint256 amountIn, uint256 amountOutMinimum, uint256 deadline, uint256 _type)`
-
-Swap TON to TOS using uniswap v2
-
-this function used in StakeTON ( stakeType=0 )
-
-### Parameters:
-
-- `_stakeContract`: the stakeContract's address
-
-- `amountIn`: the input amount
-
-- `amountOutMinimum`: the minimun output amount
-
-- `deadline`: deadline
 
 - `_type`: the function type, if 0, use exactInputSingle function, else if, use exactInput function
