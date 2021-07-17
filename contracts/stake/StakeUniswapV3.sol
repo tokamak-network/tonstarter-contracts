@@ -8,7 +8,7 @@ import "@uniswap/v3-periphery/contracts/libraries/TransferHelper.sol";
 import "@uniswap/v3-periphery/contracts/base/Multicall.sol";
 import "@uniswap/v3-periphery/contracts/libraries/PoolAddress.sol";
 
-import '@openzeppelin/contracts/token/ERC721/IERC721.sol';
+import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "../interfaces/IStakeRegistry.sol";
 import "../interfaces/IStakeUniswapV3.sol";
 import "../interfaces/AutoRefactorCoinageI.sol";
@@ -247,16 +247,16 @@ contract StakeUniswapV3 is
             ,
             ,
             ,
+
         ) = nonfungiblePositionManager.positions(_tokenId);
 
         require(
             (token0 == poolToken0 && token1 == poolToken1) ||
-            (token0 == poolToken1 && token1 == poolToken0),
+                (token0 == poolToken1 && token1 == poolToken0),
             "StakeUniswapV3: pool's tokens are different"
         );
 
         require(liquidity > 0, "StakeUniswapV3: liquidity is zero");
-
 
         address poolAddress =
             PoolAddress.computeAddress(
@@ -310,7 +310,6 @@ contract StakeUniswapV3 is
         _stakedCoinageTokens.claimedAmount = 0;
         _stakedCoinageTokens.rewardNonLiquidityClaimAmount = 0;
 
-
         //StakedTotalTokenAmount
         LibUniswapV3Stake.StakedTotalTokenAmount storage _userTotalStaked =
             userTotalStaked[msg.sender];
@@ -329,7 +328,8 @@ contract StakeUniswapV3 is
     }
 
     function getClaimLiquidity(uint256 tokenId)
-        public view
+        public
+        view
         override
         returns (
             uint256 realReward,
@@ -434,13 +434,7 @@ contract StakeUniswapV3 is
         mintRewardBlockCoinage();
 
         totalStakedAmount -= _depositTokens.liquidity;
-        (
-            uint256 realReward,
-            ,
-            ,
-            ,
-
-        ) = getClaimLiquidity(tokenId);
+        (uint256 realReward, , , , ) = getClaimLiquidity(tokenId);
         if (realReward > 0) claim(tokenId);
         burnCoinage(msg.sender, _depositTokens.liquidity);
 
@@ -466,16 +460,20 @@ contract StakeUniswapV3 is
             delete userTotalStaked[msg.sender];
         }
 
-         nonfungiblePositionManager.safeTransferFrom(address(this), msg.sender, tokenId);
+        nonfungiblePositionManager.safeTransferFrom(
+            address(this),
+            msg.sender,
+            tokenId
+        );
 
         emit WithdrawalToken(msg.sender, tokenId);
     }
 
-
     /// @dev
     function getUserStakedTokenIds(address user)
         external
-        view override
+        view
+        override
         returns (uint256[] memory ids)
     {
         return userStakedTokenIds[user];
@@ -490,7 +488,8 @@ contract StakeUniswapV3 is
     /// @return secondsPL secondsPerLiquidityInsideInitialX128, secondsPerLiquidityInsideX128Las
     function getDepositToken(uint256 tokenId)
         external
-        view override
+        view
+        override
         returns (
             address poolAddress,
             int24[2] memory tick,
@@ -525,7 +524,8 @@ contract StakeUniswapV3 is
 
     function getUserStakedTotal(address user)
         external
-        view override
+        view
+        override
         returns (
             uint256 totalDepositAmount,
             uint256 totalClaimedAmount,
@@ -545,7 +545,8 @@ contract StakeUniswapV3 is
     /// @return return3  [totalStakers, totalStakedAmount, rewardClaimedTotal,rewardNonLiquidityClaimTotal]
     function infos()
         external
-        view override
+        view
+        override
         returns (
             address[4] memory,
             address[4] memory,
@@ -568,6 +569,4 @@ contract StakeUniswapV3 is
             ]
         );
     }
-
-
 }

@@ -44,8 +44,7 @@ contract Stake2VaultStorage is AccessibleCommon {
         _;
     }
     modifier nonZero(uint256 _value) {
-        require(_value > 0 , "Stake2VaultStorage: zero value");
+        require(_value > 0, "Stake2VaultStorage: zero value");
         _;
     }
-
 }

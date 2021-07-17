@@ -26,7 +26,5 @@ interface IStakeUniswapV3Proxy {
 
     function deployCoinage() external;
 
-    function setPool(
-        address[4] memory uniswapInfo
-    ) external;
+    function setPool(address[4] memory uniswapInfo) external;
 }

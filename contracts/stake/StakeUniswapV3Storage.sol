@@ -69,5 +69,4 @@ contract StakeUniswapV3Storage {
         require(_addr != address(0), "StakeUniswapV3Storage: zero address");
         _;
     }
-
 }

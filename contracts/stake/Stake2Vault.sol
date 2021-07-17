@@ -29,7 +29,12 @@ contract Stake2Vault is Stake2VaultStorage, IStake2Vault {
 
     /// @dev Sets TOS address
     /// @param _tos  TOS address
-    function setTOS(address _tos) external override onlyOwner nonZeroAddress(_tos) {
+    function setTOS(address _tos)
+        external
+        override
+        onlyOwner
+        nonZeroAddress(_tos)
+    {
         tos = _tos;
     }
 
@@ -43,22 +48,40 @@ contract Stake2Vault is Stake2VaultStorage, IStake2Vault {
     /// @dev change name
     /// @param _name   name
     function changeName(string memory _name) external override onlyOwner {
-        require(keccak256(abi.encodePacked(name)) != keccak256(abi.encodePacked(_name)), "Stake2Vault: changeName fails");
+        require(
+            keccak256(abi.encodePacked(name)) !=
+                keccak256(abi.encodePacked(_name)),
+            "Stake2Vault: changeName fails"
+        );
         name = _name;
     }
 
     /// @dev set stake address
     /// @param _stakeAddress  stake address
-    function setStakeAddress(address _stakeAddress) external override nonZeroAddress(_stakeAddress) onlyOwner {
-        require(stakeAddress != _stakeAddress, "Stake2Vault: setStakeAddress fails");
+    function setStakeAddress(address _stakeAddress)
+        external
+        override
+        nonZeroAddress(_stakeAddress)
+        onlyOwner
+    {
+        require(
+            stakeAddress != _stakeAddress,
+            "Stake2Vault: setStakeAddress fails"
+        );
         stakeAddress = _stakeAddress;
     }
 
-
     /// @dev set reward per block
     /// @param _rewardPerBlock  allocated reward amount
-    function setRewardPerBlock(uint256 _rewardPerBlock) external override onlyOwner {
-        require(_rewardPerBlock > 0 && rewardPerBlock != _rewardPerBlock, "Stake2Vault: setRewardPerBlock fails");
+    function setRewardPerBlock(uint256 _rewardPerBlock)
+        external
+        override
+        onlyOwner
+    {
+        require(
+            _rewardPerBlock > 0 && rewardPerBlock != _rewardPerBlock,
+            "Stake2Vault: setRewardPerBlock fails"
+        );
         rewardPerBlock = _rewardPerBlock;
     }
 
@@ -66,7 +89,6 @@ contract Stake2Vault is Stake2VaultStorage, IStake2Vault {
     /// @param to to address
     /// @param _amount the amount of withdrawal
     function withdraw(address to, uint256 _amount) external override onlyOwner {
-
         uint256 balanceOf = IERC20(tos).balanceOf(address(this));
         require(balanceOf >= _amount, "Stake2Vault: insuffient");
         require(
@@ -90,7 +112,10 @@ contract Stake2Vault is Stake2VaultStorage, IStake2Vault {
     {
         uint256 tosBalance = IERC20(tos).balanceOf(address(this));
         require(tosBalance >= _amount, "Stake1Vault: not enough balance");
-        require(stakeAddress == msg.sender || isAdmin(msg.sender), "Stake1Vault: not admin or stake contract");
+        require(
+            stakeAddress == msg.sender || isAdmin(msg.sender),
+            "Stake1Vault: not admin or stake contract"
+        );
         require(
             IERC20(tos).transfer(_to, _amount),
             "Stake1Vault: TOS transfer fail"
@@ -131,5 +156,4 @@ contract Stake2Vault is Stake2VaultStorage, IStake2Vault {
     {
         return ([tos, stakeAddress], cap, stakeType, rewardPerBlock, name);
     }
-
 }

@@ -5,7 +5,6 @@ pragma solidity ^0.7.6;
 //import "../libraries/LibTokenStake1.sol";
 
 interface IIStake2Vault {
-
     /// @dev claim function.
     /// @dev sender is a staking contract.
     /// @dev A function that pays the amount(_amount) to _to by the staking contract.
@@ -15,5 +14,5 @@ interface IIStake2Vault {
     /// @return true
     function claim(address _to, uint256 _amount) external returns (bool);
 
-    function rewardPerBlock() external returns (uint256) ;
+    function rewardPerBlock() external returns (uint256);
 }

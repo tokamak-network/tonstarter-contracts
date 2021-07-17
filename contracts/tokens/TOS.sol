@@ -92,7 +92,8 @@ contract TOS is ERC20, AccessiblePlusCommon, ITOS {
     ) external override {
         require(deadline >= block.timestamp, "TOS: permit EXPIRED");
 
-        bytes32 digest = hashPermit(owner, spender, value, deadline, nonces[owner]++);
+        bytes32 digest =
+            hashPermit(owner, spender, value, deadline, nonces[owner]++);
 
         require(owner != spender, "TOS: approval to current owner");
 

@@ -488,7 +488,6 @@ contract TokamakStaker is StakeTONStorage, AccessibleCommon, ITokamakStaker {
         emit ExchangedWTONtoTOS(msg.sender, _amountIn, amountOut);
     }
 
-
     /*
     function exactInputSingle(uint256 _amountIn, uint256 _amountOutMinimum, uint256 _deadline, uint256 _sqrtPriceLimitX96)
         external onlyOwner lock returns (uint256 amountOut)
@@ -557,5 +556,4 @@ contract TokamakStaker is StakeTONStorage, AccessibleCommon, ITokamakStaker {
         );
         amountOut = ISwapRouter(uniswapRouter).exactInput(params);
     }*/
-
 }

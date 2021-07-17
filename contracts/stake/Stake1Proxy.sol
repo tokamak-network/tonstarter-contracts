@@ -12,8 +12,7 @@ import "./StakeProxyStorage.sol";
 /// @title The proxy of TOS Plaform
 /// @notice Admin can createVault, createStakeContract.
 /// User can excute the tokamak staking function of each contract through this logic.
-contract Stake1Proxy is StakeProxyStorage, AccessibleCommon,  IStakeProxy  {
-
+contract Stake1Proxy is StakeProxyStorage, AccessibleCommon, IStakeProxy {
     event Upgraded(address indexed implementation, uint256 _index);
 
     /// @dev constructor of Stake1Proxy
@@ -68,7 +67,11 @@ contract Stake1Proxy is StakeProxyStorage, AccessibleCommon,  IStakeProxy  {
     /// @param newImplementation Address of the new implementation.
     /// @param _index index
     /// @param _alive _alive
-    function setImplementation(address newImplementation, uint256 _index, bool _alive) external override onlyOwner {
+    function setImplementation(
+        address newImplementation,
+        uint256 _index,
+        bool _alive
+    ) external override onlyOwner {
         _setImplementation(newImplementation, _index, _alive);
     }
 

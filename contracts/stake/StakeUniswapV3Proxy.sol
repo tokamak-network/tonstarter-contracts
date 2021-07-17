@@ -119,7 +119,7 @@ contract StakeUniswapV3Proxy is
             token == address(0),
             "StakeUniswapV3Proxy: already initialized"
         );
-        require(_addr[0] != address(0) , "StakeUniswapV3Proxy: setInit fail");
+        require(_addr[0] != address(0), "StakeUniswapV3Proxy: setInit fail");
         token = _addr[0];
         vault = _addr[2];
 
@@ -143,9 +143,7 @@ contract StakeUniswapV3Proxy is
     }
 
     // 사용자의 코인에이지의 리워드
-    function setPool(
-        address[4] memory uniswapInfo
-    )
+    function setPool(address[4] memory uniswapInfo)
         external
         override
         onlyOwner
@@ -154,10 +152,11 @@ contract StakeUniswapV3Proxy is
         nonZeroAddress(uniswapInfo[2])
         nonZeroAddress(uniswapInfo[3])
     {
-        nonfungiblePositionManager = INonfungiblePositionManager(uniswapInfo[0]);
+        nonfungiblePositionManager = INonfungiblePositionManager(
+            uniswapInfo[0]
+        );
         uniswapV3FactoryAddress = uniswapInfo[1];
         poolToken0 = uniswapInfo[2];
         poolToken0 = uniswapInfo[3];
     }
-
 }

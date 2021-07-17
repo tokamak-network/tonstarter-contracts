@@ -19,17 +19,16 @@ interface IStake2Vault {
 
     /// @dev set stake address
     /// @param _stakeAddress  stake address
-    function setStakeAddress(address _stakeAddress) external ;
+    function setStakeAddress(address _stakeAddress) external;
 
     /// @dev set reward per block
     /// @param _rewardPerBlock  allocated reward amount
     function setRewardPerBlock(uint256 _rewardPerBlock) external;
 
-
     /// @dev If the vault has more money than the reward to give, the owner can withdraw the remaining amount.
     /// @param to to address
     /// @param _amount the amount of withdrawal
-    function withdraw(address to, uint256 _amount) external ;
+    function withdraw(address to, uint256 _amount) external;
 
     /// @dev claim function.
     /// @dev sender is a staking contract.
@@ -60,5 +59,4 @@ interface IStake2Vault {
     /// @dev Returns Give the TOS balance stored in the vault
     /// @return the balance of TOS in this vault.
     function balanceTOSAvailableAmount() external view returns (uint256);
-
 }

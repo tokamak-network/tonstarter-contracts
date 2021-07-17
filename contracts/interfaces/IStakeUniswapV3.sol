@@ -38,7 +38,7 @@ interface IStakeUniswapV3 {
     //     string calldata defiInfoName
     // ) external;
 
-     /// @dev
+    /// @dev
     function getUserStakedTokenIds(address user)
         external
         view
@@ -61,7 +61,6 @@ interface IStakeUniswapV3 {
             uint256[6] memory args,
             uint160[2] memory secondsPL
         );
-
 
     function getUserStakedTotal(address user)
         external

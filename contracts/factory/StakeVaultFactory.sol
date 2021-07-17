@@ -5,6 +5,7 @@ import "../interfaces/IStakeVaultFactory.sol";
 import {StakeVaultProxy} from "../stake/StakeVaultProxy.sol";
 import {Stake2VaultProxy} from "../stake/Stake2VaultProxy.sol";
 import "../common/AccessibleCommon.sol";
+
 //import "hardhat/console.sol";
 
 /// @title A factory that creates a vault that hold reward
@@ -112,7 +113,10 @@ contract StakeVaultFactory is AccessibleCommon, IStakeVaultFactory {
         //console.log("create2 %s", vaultLogics[_phase] );
 
         Stake2VaultProxy proxy = new Stake2VaultProxy(vaultLogics[_phase]);
-        require(address(proxy) != address(0), "StakeVaultFactory: Stake2VaultProxy zero");
+        require(
+            address(proxy) != address(0),
+            "StakeVaultFactory: Stake2VaultProxy zero"
+        );
 
         proxy.initialize(
             _tos,
@@ -127,7 +131,5 @@ contract StakeVaultFactory is AccessibleCommon, IStakeVaultFactory {
         proxy.revokeRole(ADMIN_ROLE, address(this));
 
         return address(proxy);
-
     }
-
 }

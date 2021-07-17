@@ -111,7 +111,6 @@ contract Stake2VaultProxy is Stake2VaultStorage, ProxyBase, IStake2VaultProxy {
         );
         require(_cap > 0, "Stake1Vault: _cap is zero");
 
-
         tos = _tos;
         cap = _cap;
         stakeType = _stakeType;

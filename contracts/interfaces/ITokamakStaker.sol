@@ -60,5 +60,4 @@ interface ITokamakStaker {
         uint160 _sqrtPriceLimitX96,
         uint256 _kind
     ) external returns (uint256 amountOut);
-
 }

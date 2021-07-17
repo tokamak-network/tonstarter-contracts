@@ -24,10 +24,7 @@ contract StakeFactory is IStakeFactory, AccessibleCommon {
         address _stakeTONFactory,
         address _stakeUniswapV3Factory
     ) {
-        require(
-            _stakeTONFactory != address(0),
-            "StakeFactory: init fail"
-        );
+        require(_stakeTONFactory != address(0), "StakeFactory: init fail");
 
         factory[0] = _stakeTONFactory;
         //factory[1] = _stakeSimpleFactory;

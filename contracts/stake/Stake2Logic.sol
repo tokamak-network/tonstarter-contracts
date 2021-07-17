@@ -6,21 +6,18 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {IStake2Vault} from "../interfaces/IStake2Vault.sol";
 import "../common/AccessibleCommon.sol";
 import "./StakeProxyStorage.sol";
+
 // import "hardhat/console.sol";
 
 interface IIStakeUniswapV3 {
-    function setPool(
-        address[4] memory uniswapInfo
-    ) external;
+    function setPool(address[4] memory uniswapInfo) external;
 }
-
 
 /// @title The logic of TOS Plaform
 /// @notice Admin can createVault, createStakeContract.
 /// User can excute the tokamak staking function of each contract through this logic.
 
-contract Stake2Logic is StakeProxyStorage, AccessibleCommon, IStake2Logic{
-
+contract Stake2Logic is StakeProxyStorage, AccessibleCommon, IStake2Logic {
     // modifier nonZero(address _addr) {
     //     require(_addr != address(0), "Stake1Logic:zero address");
     //     _;
@@ -54,7 +51,7 @@ contract Stake2Logic is StakeProxyStorage, AccessibleCommon, IStake2Logic{
         nonZeroAddress(address(stakeVaultFactory))
         nonZeroAddress(_logic)
     {
-        stakeVaultFactory.setVaultLogicByPhase(_phase,_logic);
+        stakeVaultFactory.setVaultLogicByPhase(_phase, _logic);
     }
 
     /// @dev create vault2
@@ -73,12 +70,15 @@ contract Stake2Logic is StakeProxyStorage, AccessibleCommon, IStake2Logic{
         uint256 _stakeType,
         address[4] memory _uniswapInfo,
         string memory _name
-    ) external override onlyOwner
+    )
+        external
+        override
+        onlyOwner
         nonZeroAddress(address(stakeVaultFactory))
-        // nonZeroAddress(_uniswapInfo[0])
-        // nonZeroAddress(_uniswapInfo[1])
-        // nonZeroAddress(_uniswapInfo[2])
-        // nonZeroAddress(_uniswapInfo[3])
+    // nonZeroAddress(_uniswapInfo[0])
+    // nonZeroAddress(_uniswapInfo[1])
+    // nonZeroAddress(_uniswapInfo[2])
+    // nonZeroAddress(_uniswapInfo[3])
     {
         require(_phase == 2, "Stake1Logic: unsupported phase in vault2");
 
@@ -100,7 +100,6 @@ contract Stake2Logic is StakeProxyStorage, AccessibleCommon, IStake2Logic{
                 address(this)
             );
 
-
         require(vault != address(0), "Stake1Logic: vault2 is zero");
 
         uint256 phase = _phase;
@@ -109,7 +108,7 @@ contract Stake2Logic is StakeProxyStorage, AccessibleCommon, IStake2Logic{
         stakeRegistry.addVault(vault, phase, vaultName);
         emit CreatedVault2(vault, _uniswapInfo[0], cap);
 
-        address[4] memory _addr = [tos, address(0),vault, address(0)];
+        address[4] memory _addr = [tos, address(0), vault, address(0)];
         address _contract =
             stakeFactory.create(
                 stakeType,
@@ -125,7 +124,5 @@ contract Stake2Logic is StakeProxyStorage, AccessibleCommon, IStake2Logic{
         stakeRegistry.addStakeContract(vault, _contract);
 
         emit CreatedStakeContract2(vault, _contract, phase);
-
     }
-
 }
