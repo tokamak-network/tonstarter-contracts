@@ -13,6 +13,7 @@ const {
 
 
 require("dotenv").config();
+const saveVaultsParams = require("../scripts/save_deployed_vaults");
 const { printGasUsedOfUnits } = require("../scripts/log_tx");
 
 const zeroAddress = "0x0000000000000000000000000000000000000000";
@@ -33,6 +34,18 @@ const ton = loadDeployed(process.env.NETWORK, "TON");
 async function createValue(tonVault, paytoken) {
 
   const stakeEntry = await ethers.getContractAt("Stake1Logic", proxy);
+  let params =  [
+    paytoken,
+    toWei(tonVault.allocatedTOS, "ether"),
+    tonVault.saleStartBlock,
+    tonVault.stakeStartBlock,
+    tonVault.phase,
+    tonVault.hashName,
+    tonVault.type,
+    zeroAddress,
+    ''
+  ]
+
 
   const tx = await stakeEntry.createVault(
     paytoken,
@@ -46,6 +59,9 @@ async function createValue(tonVault, paytoken) {
   );
   await tx.wait();
   console.log("createValue tx:", tx.hash);
+
+  params[8]=tx.hash;
+  saveVaultsParams(process.env.NETWORK, tonVault.name, params);
   printGasUsedOfUnits('createVault',tx);
 }
 
@@ -72,6 +88,17 @@ async function createStakeContract(vaultAddress, periodBlock, name, paytoken) {
     console.error(error);
   }
 
+  let params =  [
+    1,
+    vaultAddress,
+    tostoken,
+    paytoken,
+    periodBlock,
+    name,
+    ''
+  ]
+  let _name = params[5].trim();
+
   const tx = await stakeEntry.createStakeContract(
     1,
     vaultAddress,
@@ -83,6 +110,10 @@ async function createStakeContract(vaultAddress, periodBlock, name, paytoken) {
   );
   await tx.wait();
   console.log("createStakeContract ", name, ",tx:", tx.hash);
+
+  params[6]=tx.hash;
+
+  saveVaultsParams(process.env.NETWORK, _name, params);
   printGasUsedOfUnits('createStakeContract '+ name, tx);
 
 }

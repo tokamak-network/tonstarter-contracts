@@ -10,10 +10,8 @@ const {
 } = require("web3-utils");
 
 require("dotenv").config();
-//const loadDeployedInitVariable = require("./load_deployed_init");
-const loadDeployed = require("./load_deployed");
 
-//const initialTotal = process.env.initialTotal + "." + "0".repeat(18);
+const loadDeployed = require("./load_deployed");
 
 const zeroAddress = "0x0000000000000000000000000000000000000000";
 const tostoken = loadDeployed(process.env.NETWORK, "TOS");
@@ -47,7 +45,6 @@ async function deployMain(defaultSender) {
   const StakeTONFactory = await ethers.getContractFactory("StakeTONFactory");
 
   //-------phase 2 -------------
-  //const StakeDefiFactory = await ethers.getContractFactory("StakeDefiFactory");
   const StakeUniswapV3Factory = await ethers.getContractFactory("StakeUniswapV3Factory");
   const Stake2Vault = await ethers.getContractFactory("Stake2Vault");
   const Stake2VaultProxy = await ethers.getContractFactory("Stake2VaultProxy");
@@ -57,14 +54,6 @@ async function deployMain(defaultSender) {
   const StakeCoinageFactory = await ethers.getContractFactory("StakeCoinageFactory");
   //--------------------
 
-/*
-  const stakeSimple = await StakeSimple.deploy();
-  const stakeSimpleFactory = await StakeSimpleFactory.deploy(
-    stakeSimple.address
-  );
-  await stakeSimpleFactory.deployed();
-  console.log("StakeSimpleFactory:", stakeSimpleFactory.address);
-  */
   let deployInfo = {name:'', address:''};
   const stakeTONLogic = await StakeTONLogic.deploy();
   let tx = await stakeTONLogic.deployed();

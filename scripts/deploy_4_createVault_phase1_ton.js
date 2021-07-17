@@ -74,6 +74,7 @@ async function main() {
     stakeStartBlock: stakeStartBlock,
     phase: 1,
     hashName : keccak256(process.env.PHASE1_TON_VAULT_NAME),
+    name: process.env.PHASE1_TON_VAULT_NAME,
     type: 0,
   }
 
