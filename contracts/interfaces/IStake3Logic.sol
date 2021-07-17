@@ -9,16 +9,6 @@ interface IStake3Logic {
     /// @param cap  allocated reward amount
     event CreatedVault(address indexed vault, address paytoken, uint256 cap);
 
-    /// @dev event on create stake contract in vault
-    /// @param vault the vault address
-    /// @param stakeContract the stake contract address created
-    /// @param phase the phase of TOS platform
-    event CreatedStakeContract(
-        address indexed vault,
-        address indexed stakeContract,
-        uint256 phase
-    );
-
     /// @dev create vault with particular vault's logic
     /// @param _paytoken the token used for staking by user
     /// @param _cap  allocated reward amount
