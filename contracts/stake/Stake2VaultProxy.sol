@@ -49,7 +49,7 @@ contract Stake2VaultProxy is Stake2VaultStorage, ProxyBase, IStake2VaultProxy {
 
     /// @dev receive ether
     receive() external payable {
-        _fallback();
+        revert("cannot receive Ether");
     }
 
     /// @dev fallback function , execute on undefined function call

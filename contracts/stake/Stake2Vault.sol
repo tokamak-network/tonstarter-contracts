@@ -25,7 +25,9 @@ contract Stake2Vault is Stake2VaultStorage, IStake2Vault {
     constructor() {}
 
     /// @dev receive function
-    receive() external payable {}
+    receive() external payable {
+        revert("cannot receive Ether");
+    }
 
     /// @dev Sets TOS address
     /// @param _tos  TOS address
