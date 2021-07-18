@@ -40,13 +40,6 @@ const {
 
 const periods = [
   {
-    name: process.env.PHASE1_TON_0_NAME,
-    period: process.env.PHASE1_TON_0_PERIOD,
-    startTime: process.env.PHASE1_TON_MINING_STARTTIME,
-    endTime: 0 ,
-    periodBlocks: 0
-  },
-  {
     name: process.env.PHASE1_TON_1_NAME,
     period: process.env.PHASE1_TON_1_PERIOD,
     startTime: process.env.PHASE1_TON_MINING_STARTTIME,
