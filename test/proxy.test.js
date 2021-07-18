@@ -192,6 +192,15 @@ describe("Stake1Proxy : Change Implementation", function () {
       );
     });
 
+    it("2. Vault cannot receive ETH ", async function () {
+      await expect(
+          vault_phase1_eth.sendTransaction({
+            from: defaultSender,
+            value: toWei(toBN('1'), "ether"),
+          })
+        ).to.be.revertedWith("cannot receive Ether");
+    });
+
   });
 
   describe('# 4. Call Stake2Logic ', async function () {

@@ -252,7 +252,17 @@ describe("StakeSimple : Stake with ETH", function () {
 
         });
 
-        it("2. createStakeContract ", async function () {
+        it("2. Vault cannot receive ETH ", async function () {
+            await expect(
+                vault_phase1_eth.sendTransaction({
+                    from: defaultSender,
+                    value: toWei(toBN('1'), "ether"),
+                })
+            ).to.be.revertedWith("cannot receive Ether");
+        });
+
+
+        it("3. createStakeContract ", async function () {
             let stakeType = toBN("1");
             let phase = toBN("3");
 
