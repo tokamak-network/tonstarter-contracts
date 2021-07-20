@@ -38,6 +38,40 @@ const {
   getEndTime
 } = require("../utils/deploy_common.js");
 
+
+// for rinkeby
+const periods = [
+  {
+    name: process.env.PHASE1_TON_01_NAME,
+    period: process.env.PHASE1_TON_01_PERIOD,
+    startTime: process.env.PHASE1_TON_MINING_STARTTIME,
+    endTime: 0 ,
+    periodBlocks: 0
+  },
+  {
+    name: process.env.PHASE1_TON_02_NAME,
+    period: process.env.PHASE1_TON_02_PERIOD,
+    startTime: process.env.PHASE1_TON_MINING_STARTTIME,
+    endTime: 0 ,
+    periodBlocks: 0
+  },
+  {
+    name: process.env.PHASE1_TON_03_NAME,
+    period: process.env.PHASE1_TON_03_PERIOD,
+    startTime: process.env.PHASE1_TON_MINING_STARTTIME,
+    endTime: 0,
+    periodBlocks: 0
+  },
+  {
+    name: process.env.PHASE1_TON_04_NAME,
+    period: process.env.PHASE1_TON_04_PERIOD,
+    startTime: process.env.PHASE1_TON_MINING_STARTTIME,
+    endTime: 0,
+    periodBlocks: 0
+  }
+];
+
+/* for mainnet
 const periods = [
   {
     name: process.env.PHASE1_TON_1_NAME,
@@ -75,6 +109,7 @@ const periods = [
     periodBlocks: 0
   },
 ];
+*/
 
 async function main() {
 
