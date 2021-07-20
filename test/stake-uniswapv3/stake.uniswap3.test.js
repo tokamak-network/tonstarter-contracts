@@ -1,6 +1,8 @@
 const { time, expectEvent } = require("@openzeppelin/test-helpers");
 const { ethers } = require("ethers");
 const utils = ethers.utils;
+//const SwapRouterJson = require("../../abis_uniswap3_periphery/ISwapRouter.json");
+const SwapRouterJson = require("@uniswap/v3-periphery/artifacts/contracts/SwapRouter.sol/SwapRouter.json");
 
 const {
   padLeft,
@@ -57,6 +59,7 @@ const zeroAddress = "0x0000000000000000000000000000000000000000";
 let vaultAddress = null;
 let stakeContractAddress = null;
 let deployer ;
+let tokenId_First;
 
 const createPool = async (token0, token1, nftPositionManager, sender ) => {
 
@@ -109,7 +112,7 @@ describe(" UniswapV3 Staking", function () {
   let setup;
   let nftPositionManager, weth;
   let accountlist;
-  let user1;
+  let user1, user2, user3;
   let defaultSender ;
 
   before(async () => {
@@ -118,6 +121,8 @@ describe(" UniswapV3 Staking", function () {
 
     defaultSender = accountlist[0];
     user1 = accountlist[1];
+    user2 = accountlist[2];
+    user3 = accountlist[3];
 
     sender = await ico20Contracts.findSigner(defaultSender);
     tester = await ico20Contracts.findSigner(user1);
@@ -323,27 +328,18 @@ describe(" UniswapV3 Staking", function () {
         }
     });
 
-    it("2. Create TON-TOS Pool of User  ", async function () {
+    it("2. Create WTON-TOS Pool of User  ", async function () {
         this.timeout(1000000);
 
-          let [token0, token1] = [ton, tos];
-          if (tos.address < ton.address) {
-            [token0, token1] = [tos, ton];
+          let [token0, token1] = [wton, tos];
+          if (tos.address < wton.address) {
+            [token0, token1] = [tos, wton];
           }
 
         const sender = await ico20Contracts.findSigner(user1);
 
        // console.log('defaultSender',defaultSender);
         const owner = await ico20Contracts.findSigner(defaultSender);
-
-          let sendAmountTOS = "300." + "0".repeat(18);
-          let sendAmountTON = "100." + "0".repeat(18);
-
-          await tos.connect(owner).mint(user1, utils.parseUnits(sendAmountTOS, 18) );
-          await ton.connect(owner).mint(user1, utils.parseUnits(sendAmountTON, 18) );
-
-          await tos.connect(sender).approve(deployedUniswapV3.nftPositionManager.address, utils.parseUnits(sendAmountTOS, 18) );
-          await ton.connect(sender).approve(deployedUniswapV3.nftPositionManager.address , utils.parseUnits(sendAmountTON, 18) );
 
          // let topic0= Web3EthAbi.encodeFunctionSignature("PoolCreated(address,address,uint24,int24,address)") ;
           let topic0 = ethers.utils.id("PoolCreated(address,address,uint24,int24,address)")
@@ -387,19 +383,44 @@ describe(" UniswapV3 Staking", function () {
 
      });
 
-     it("3. Mint Position ", async function () {
+     it("3. Mint Position WTON:TOS = 1:5 ", async function () {
 
         const sender = await ico20Contracts.findSigner(user1);
-        let [token0, token1] = [ton, tos];
-        if (tos.address < ton.address) {
-          [token0, token1] = [tos, ton];
+        const owner = await ico20Contracts.findSigner(defaultSender);
+        console.log('wton', wton.address );
+        console.log('tos', tos.address );
+
+        let [token0, token1] = [wton, tos];
+        if (tos.address < wton.address) {
+          [token0, token1] = [tos, wton];
         }
-        let sendAmountTOS = "300." + "0".repeat(18);
-        let sendAmountTON = "100." + "0".repeat(18);
+
+        let sendAmountWTON = "100." + "0".repeat(27);
+        let sendAmountTOS = "1000." + "0".repeat(18);
+
+
+
+        await tos.connect(owner).mint(user1, utils.parseUnits(sendAmountTOS, 18) );
+        await wton.connect(owner).mint(user1, utils.parseUnits(sendAmountWTON, 27) );
+
+
+        let balanceOfUserWTON = await wton.balanceOf(user1);
+        console.log('user1  balanceOfUserWTON', utils.formatUnits(balanceOfUserWTON, 27) ,' TON' );
+         let balanceOfUserTOS = await tos.balanceOf(user1);
+        console.log('user1  balanceOfUserTOS', utils.formatUnits(balanceOfUserTOS, 18) ,' TOS' );
+
+
+        await tos.connect(sender).approve(deployedUniswapV3.nftPositionManager.address, utils.parseUnits(sendAmountTOS, 18) );
+        await wton.connect(sender).approve(deployedUniswapV3.nftPositionManager.address , utils.parseUnits(sendAmountWTON, 27) );
 
         //pool_eth_tos_address
-        await mintPosition(token0.address, token1.address, utils.parseUnits(sendAmountTON, 18),
-            utils.parseUnits(sendAmountTOS, 18), deployedUniswapV3.nftPositionManager, sender );
+        await mintPosition(
+          token0.address,
+          token1.address,
+          utils.parseUnits(sendAmountWTON, 27),
+          utils.parseUnits(sendAmountTOS, 18),
+          deployedUniswapV3.nftPositionManager,
+          sender );
 
         let balanceOf = await deployedUniswapV3.nftPositionManager.balanceOf(sender.address);
         console.log('balanceOf', balanceOf.toString());
@@ -408,9 +429,150 @@ describe(" UniswapV3 Staking", function () {
         for(let i=0; i< len; i++){
             let tokenId = await deployedUniswapV3.nftPositionManager.tokenOfOwnerByIndex(sender.address, i );
             console.log('tokenId', tokenId.toString());
+
+            if(i==0) tokenId_First = tokenId;
         }
+
+
+        let balanceOfUserWTON2 = await wton.balanceOf(user1);
+        console.log('after mint : user1  balanceOfUserWTON', utils.formatUnits(balanceOfUserWTON2, 27) ,' TON' );
+         let balanceOfUserTOS2 = await tos.balanceOf(user1);
+        console.log('after mint : user1  balanceOfUserTOS', utils.formatUnits(balanceOfUserTOS2, 18) ,' TOS' );
+
+
      });
 
+
+    it("4. Effective Liquidity Of User1 ", async function () {
+        const giver = await ico20Contracts.findSigner(user1);
+        const owner = await ico20Contracts.findSigner(defaultSender);
+
+
+        let positionInfos = await deployedUniswapV3.nftPositionManager.positions(tokenId_First);
+        //console.log('positionInfos',positionInfos);
+        console.log('[tokenId: %s] liquidity: %s',tokenId_First.toString(), utils.formatUnits(positionInfos.liquidity)  ) ;
+        console.log(' token0: %s, token1: %s',positionInfos.token0 , positionInfos.token1) ;
+        console.log(' fee: %s ', positionInfos.fee.toString()) ;
+        console.log(' tickLower: %s, tickUpper: %s',positionInfos.tickLower.toString(), positionInfos.tickUpper.toString()) ;
+
+        /*
+        require(
+            (token0 == poolToken0 && token1 == poolToken1) ||
+                (token0 == poolToken1 && token1 == poolToken0),
+            "StakeUniswapV3: pool's tokens are different"
+        );
+
+        require(liquidity > 0, "StakeUniswapV3: liquidity is zero");
+
+        address poolAddress =
+            PoolAddress.computeAddress(
+                uniswapV3FactoryAddress,
+                PoolAddress.PoolKey({token0: token0, token1: token1, fee: fee})
+            );
+
+
+
+        (, secondsPerLiquidityInsideX128, ) = IUniswapV3Pool( _depositTokens.poolAddress)
+            .snapshotCumulativesInside(
+            _depositTokens.tickLower,
+            _depositTokens.tickUpper
+        );
+        */
+
+    });
+
+  /*
+    it("5. Swap TON to TOS by User2 ", async function () {
+        const swap_user = await ico20Contracts.findSigner(user2);
+        const owner = await ico20Contracts.findSigner(defaultSender);
+
+        let sendAmountTON = "1." + "0".repeat(18);
+        let oneTON = utils.parseUnits(sendAmountTON, 18) ;
+        await ton.connect(owner).mint(user2, oneTON);
+
+        let balanceOfUserTON = await ton.balanceOf(user2);
+        console.log('balanceOfUserTON', utils.formatUnits(balanceOfUserTON, 18) ,' TON' );
+         let balanceOfUserTOS = await tos.balanceOf(user2);
+        console.log('balanceOfUserTOS', utils.formatUnits(balanceOfUserTOS, 18) ,' TOS' );
+
+        // let oneWTON = ethers.BigNumber.from('100000000000000000000000000000');
+        // console.log('oneWTON',oneWTON.toString());
+
+        const tx = await ton.connect(swap_user).approve(deployedUniswapV3.swapRouter.address, oneTON, {
+          gasLimit: 10000000,
+          gasPrice: 5000000000,
+        });
+        await tx.wait();
+        console.log("approve tx:", tx.hash);
+
+        let deadline = Date.now()/1000 + 900;
+        deadline = parseInt(deadline);
+
+        let params = {
+                        tokenIn: ton.address,
+                        tokenOut: tos.address,
+                        fee: 3000,
+                        recipient: user2,
+                        deadline: deadline,
+                        amountIn:  oneTON,
+                        amountOutMinimum: ethers.BigNumber.from('0'),
+                        sqrtPriceLimitX96: ethers.BigNumber.from('0')
+                      };
+
+        const tx2 = await deployedUniswapV3.swapRouter.connect(swap_user).exactInputSingle(params, {
+          gasLimit: 10000000,
+          gasPrice: 5000000000,
+        });
+
+        await tx.wait();
+
+
+        let balanceOfUserTON2 = await ton.balanceOf(user2);
+        console.log('after swap : balanceOfUserTON', utils.formatUnits(balanceOfUserTON2, 18) ,' TON' );
+         let balanceOfUserTOS2 = await tos.balanceOf(user2);
+        console.log('after swap : balanceOfUserTOS', utils.formatUnits(balanceOfUserTOS2, 18) ,' TOS' );
+
+    });
+
+
+    it("4. Effective Liquidity Of User1 ", async function () {
+        const giver = await ico20Contracts.findSigner(user1);
+        const owner = await ico20Contracts.findSigner(defaultSender);
+
+
+        let positionInfos = await deployedUniswapV3.nftPositionManager.positions(tokenId_First);
+        console.log('positionInfos',positionInfos);
+        console.log('[tokenId: %s] liquidity: %s',tokenId_First.toString(), utils.formatUnits(positionInfos.liquidity, 18)  ) ;
+        console.log(' token0: %s, token1: %s',positionInfos.token0 , positionInfos.token1) ;
+        console.log(' fee: %s, token1: %s', positionInfos.fee.toString()) ;
+        console.log(' tickLower: %s, tickUpper: %s',positionInfos.tickLower.toString(), positionInfos.tickUpper.toString()) ;
+
+        / *
+        require(
+            (token0 == poolToken0 && token1 == poolToken1) ||
+                (token0 == poolToken1 && token1 == poolToken0),
+            "StakeUniswapV3: pool's tokens are different"
+        );
+
+        require(liquidity > 0, "StakeUniswapV3: liquidity is zero");
+
+        address poolAddress =
+            PoolAddress.computeAddress(
+                uniswapV3FactoryAddress,
+                PoolAddress.PoolKey({token0: token0, token1: token1, fee: fee})
+            );
+
+
+
+        (, secondsPerLiquidityInsideX128, ) = IUniswapV3Pool( _depositTokens.poolAddress)
+            .snapshotCumulativesInside(
+            _depositTokens.tickLower,
+            _depositTokens.tickUpper
+        );
+        * /
+
+    });
+    */
 
   });
 
