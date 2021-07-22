@@ -37,7 +37,7 @@ module.exports = {
       url: "http://localhost:8546",
       gas: 9500000,
       gasMultiplier: 100,
-      blockGasLimit: 124500000,
+      blockGasLimit: 1524500000,
       accounts: {
         mnemonic: process.env.MNEMONIC_HARDHAT,
         count: 30,
@@ -49,7 +49,7 @@ module.exports = {
     localhost: {
       gas: 9500000,
       gasMultiplier: 100,
-      blockGasLimit: 124500000,
+      blockGasLimit: 524500000,
       accounts: {
         mnemonic: process.env.MNEMONIC_HARDHAT,
         count: 30,

@@ -4,9 +4,57 @@ const NFTDescriptorLibraryJson = require("@uniswap/v3-periphery/artifacts/contra
 const NonfungiblePositionManagerJson = require("@uniswap/v3-periphery/artifacts/contracts/NonfungiblePositionManager.sol/NonfungiblePositionManager.json");
 const NonfungibleTokenPositionDescriptor = require("@uniswap/v3-periphery/artifacts/contracts/NonfungibleTokenPositionDescriptor.sol/NonfungibleTokenPositionDescriptor.json");
 const SwapRouterJson = require("@uniswap/v3-periphery/artifacts/contracts/SwapRouter.sol/SwapRouter.json");
+const PoolAddressJson = require("@uniswap/v3-periphery/artifacts/contracts/libraries/PoolAddress.sol/PoolAddress.json");
+
+const NonfungibleTokenPositionDescriptorJson = require("@uniswap/v3-periphery/artifacts/contracts/NonfungibleTokenPositionDescriptor.sol/NonfungibleTokenPositionDescriptor.json");
+
+const TickMathJson = require("./TickMath.json");
+
 const WETH9 = require("./weth/weth.json");
 const bn = require("bignumber.js");
 const linkLibraries = require("./linkLibraries");
+
+
+async function findSigner(address) {
+  const signers = await ethers.getSigners();
+  for (const signer of signers) {
+    if (signer.address === address) {
+      return signer;
+    }
+  }
+  throw Error("Address not found in Signers");
+}
+
+
+const getBlock = async () => {
+
+  let curBlockNumber = await ethers.provider.getBlockNumber();
+  let curBlock = await ethers.provider.getBlock(curBlockNumber);
+  return curBlock;
+};
+
+
+const deployTickMathLib = async () => {
+  const contract = await (
+    await ethers.getContractFactory(
+      TickMathJson.abi,
+      TickMathJson.bytecode
+    )
+  ).deploy();
+  const deployed = await contract.deployed();
+  return deployed;
+};
+
+const deployPoolAddressLib = async () => {
+  const contract = await (
+    await ethers.getContractFactory(
+      PoolAddressJson.abi,
+      PoolAddressJson.bytecode
+    )
+  ).deploy();
+  const deployed = await contract.deployed();
+  return deployed;
+};
 
 const deployWETH = async () => {
   const contract = await (
@@ -14,8 +62,8 @@ const deployWETH = async () => {
   ).deploy();
   return contract.deployed();
 };
-
-const deployCoreFactory = async () => {
+//deployCoreFactory
+const deployUniswapV3Factory = async () => {
   const contract = await (
     await ethers.getContractFactory(
       UniswapV3FactoryJson.abi,
@@ -86,15 +134,33 @@ const deployNFTPositionManager = async () => {
   return deployed;
 };
 
+
+// const deployNFTPositionDescriptor = async () => {
+//   const {  wethDeployed } = await getUniswapV3Contracts;
+//   const weth = await wethDeployed();
+//   const contract = await (
+//     await ethers.getContractFactory(
+//       NonfungibleTokenPositionDescriptorJson.abi,
+//       NonfungibleTokenPositionDescriptorJson.bytecode
+//     )
+//   ).deploy( weth.address );
+//   const deployed = await contract.deployed();
+//   return deployed;
+// };
+
 const getUniswapV3Contracts = (async () => {
   let coreFactoryContract = null;
   let swapRouterContract = null;
   let wethContract = null;
   let nftDescriptorContract = null;
   let nftPositionManager = null;
+  let poolAddressLib = null;
+  let tickMathLib = null;
+  //let nftPositionDescriptor = null;
+
   return {
     coreFactoryDeployed: async () => {
-      if (!coreFactoryContract) coreFactoryContract = await deployCoreFactory();
+      if (!coreFactoryContract) coreFactoryContract = await deployUniswapV3Factory();
       return coreFactoryContract;
     },
     swapRouterDeployed: async () => {
@@ -115,6 +181,21 @@ const getUniswapV3Contracts = (async () => {
         nftPositionManager = await deployNFTPositionManager();
       return nftPositionManager;
     },
+    poolAddressLibDeployed: async () => {
+      if (!poolAddressLib)
+        poolAddressLib = await deployPoolAddressLib();
+      return poolAddressLib;
+    },
+    tickMathLibDeployed: async () => {
+      if (!tickMathLib)
+        tickMathLib = await deployTickMathLib();
+      return tickMathLib;
+    },
+    // nftPositionDescriptorDeployed: async () => {
+    //   if (!nftPositionDescriptor)
+    //     nftPositionDescriptor = await deployNFTPositionDescriptor();
+    //   return nftPositionDescriptor;
+    // },
   };
 })();
 
@@ -126,13 +207,34 @@ const deployedUniswapV3Contracts = async (deployer) => {
     wethDeployed,
     nftDescriptorDeployed,
     nftPositionManagerDeployed,
+    poolAddressLibDeployed,
+    tickMathLibDeployed,
+    nftPositionDescriptorDeployed,
   } = await getUniswapV3Contracts;
   const coreFactory = await coreFactoryDeployed();
   const swapRouter = await swapRouterDeployed();
   const weth = await wethDeployed();
   const nftDescriptor = await nftDescriptorDeployed();
   const nftPositionManager = await nftPositionManagerDeployed();
-  return { coreFactory, swapRouter, weth, nftDescriptor, nftPositionManager };
+  const poolAddressLib = await poolAddressLibDeployed();
+  const tickMathLib = await tickMathLibDeployed();
+  //const nftPositionDescriptor  = await nftPositionDescriptorDeployed();
+  return { coreFactory, swapRouter, weth, nftDescriptor, nftPositionManager, poolAddressLib, tickMathLib };
+};
+
+const getUniswapV3Pool = async (poolAddress, deployer) => {
+
+  const uniswapV3Pool =  await ethers.getContractAt(
+      UniswapV3Pool.abi,
+      poolAddress,
+      deployer
+    );
+
+  // const uniswapV3Pool =  await ethers.getContractAt(
+  //     UniswapV3Pool.abi,
+  //     poolAddress
+  //   );
+  return uniswapV3Pool;
 };
 
 const getMinTick = (tickSpacing) =>
@@ -140,6 +242,17 @@ const getMinTick = (tickSpacing) =>
 
 const getMaxTick = (tickSpacing) =>
   Math.floor(887272 / tickSpacing) * tickSpacing;
+
+
+const getTick = (m, tickSpacing) =>
+  Math.ceil( (m*tickSpacing) / tickSpacing) * tickSpacing;
+
+const getNegativeOneTick = (tickSpacing) =>
+  Math.ceil( (-1*tickSpacing) / tickSpacing) * tickSpacing;
+
+const getPositiveOneMaxTick = (tickSpacing) =>
+  Math.floor( (1*tickSpacing) / tickSpacing) * tickSpacing;
+
 
 const encodePriceSqrt = (reserve1, reserve0) => {
   return new bn(reserve1.toString())
@@ -168,6 +281,38 @@ const TICK_SPACINGS = {
   [FeeAmount.HIGH]: 200,
 };
 
+
+
+const mintPosition2 =  async (
+    token0,
+    token1,
+    amount0Desired,
+    amount1Desired,
+    _nftPositionManager,
+    user1 ) => {
+
+      try{
+        const tx = await _nftPositionManager.connect(user1).mint({
+          token0,
+          token1,
+          fee: FeeAmount.MEDIUM,
+          tickLower: getNegativeOneTick(TICK_SPACINGS[FeeAmount.MEDIUM]),
+          tickUpper: getPositiveOneMaxTick(TICK_SPACINGS[FeeAmount.MEDIUM]),
+          amount0Desired,
+          amount1Desired,
+          amount0Min: 0,
+          amount1Min: 0,
+          recipient: user1.address,
+          deadline: 100000000000000
+        });
+        return await tx.wait();
+      }catch(err){
+          console.log('mintPosition2 err', err  );
+      }
+};
+
+
+
 module.exports = {
   deployedUniswapV3Contracts,
   getMinTick,
@@ -176,4 +321,10 @@ module.exports = {
   encodePriceSqrt,
   FeeAmount,
   TICK_SPACINGS,
+  getNegativeOneTick,
+  getPositiveOneMaxTick,
+  getUniswapV3Pool,
+  getBlock,
+  mintPosition2,
+  getTick
 };
