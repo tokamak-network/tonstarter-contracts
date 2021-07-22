@@ -100,9 +100,25 @@ Using the [hardhat-etherscan plugin](https://hardhat.org/plugins/nomiclabs-hardh
 
 `npx hardhat verify --network rinkeby <DEPLOYED ADDRESS>`
 
-### To do the tokamak ton integration test
-`git clone https://github.com/Onther-Tech/plasma-evm-contracts`
+### compile
+`git clone --recursive https://github.com/Onther-Tech/tonstarter-contracts.git`
+`git checkout develop`
+`npm run compile:uniswap3-core`
+`npm run compile:uniswap3-periphery`
 `npm run compile:plasma`
+`npm run compile:truffle`
+`npm install`
+
+
+### test
+`npm run test:proxy`
+`npm run test:stake.ton`
+`npm run test:stake.tokamak`
+`npm run test:uniswapv3`
+`npm run test:upgrade-stakeTON`
+`npm run test:stake.eth`
+
+
 
 ### lint
 `npm run lint`
