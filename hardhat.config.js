@@ -76,7 +76,7 @@ module.exports = {
       url: `https://mainnet.infura.io/v3/${process.env.InfuraKey}`,
       accounts: [`${TONSTARTER_DEPLOYER_PK}`],
       gasMultiplier: 1.25 ,
-      gasPrice: 30000000000,
+      gasPrice: 40000000000,
     },
   },
   etherscan: {
