@@ -99,7 +99,7 @@ contract LockTOS is ILockTOS, AccessControl {
     }
 
     /// @inheritdoc ILockTOS
-    function totalVoteWeightAt(uint256 _timestamp) override public view returns (int128) {
+    function totalSupplyAt(uint256 _timestamp) override public view returns (int128) {
         (bool success, Point memory point) = _findClosestPoint(pointHistory, _timestamp);
         if (!success) {
             return 0;
@@ -113,7 +113,7 @@ contract LockTOS is ILockTOS, AccessControl {
     }
 
     /// @inheritdoc ILockTOS
-    function totalVoteWeight() override external view returns (int128) {
+    function totalSupply() override external view returns (int128) {
         if (pointHistory.length == 0) {
             return 0;
         }
@@ -128,7 +128,7 @@ contract LockTOS is ILockTOS, AccessControl {
     }
 
     /// @inheritdoc ILockTOS
-    function voteWeightOfLockAt(address _addr, uint256 _lockId, uint256 _timestamp)
+    function balanceOfLockAt(address _addr, uint256 _lockId, uint256 _timestamp)
         override
         public
         view
@@ -147,7 +147,7 @@ contract LockTOS is ILockTOS, AccessControl {
     }
 
     /// @inheritdoc ILockTOS
-    function voteWeightOfLock(address _addr, uint256 _lockId) override public view returns (int128) {
+    function balanceOfLock(address _addr, uint256 _lockId) override public view returns (int128) {
         uint256 len = userPointHistory[_addr][_lockId].length;
         if (len == 0) {
             return 0;
@@ -163,20 +163,20 @@ contract LockTOS is ILockTOS, AccessControl {
     }
 
     /// @inheritdoc ILockTOS
-    function voteWeightOfAt(address _addr, uint256 _timestamp) override public view returns (int128 voteWeight) {
+    function balanceOfAt(address _addr, uint256 _timestamp) override public view returns (int128 balance) {
         uint256[] memory locks = userLocks[_addr];
         if (locks.length == 0) return 0;
         for (uint256 i = 0; i < locks.length; ++i) {
-            voteWeight += voteWeightOfLockAt(_addr, locks[i], _timestamp);
+            balance += balanceOfLockAt(_addr, locks[i], _timestamp);
         }
     }
 
     /// @inheritdoc ILockTOS
-    function voteWeightOf(address _addr) override public view returns (int128 voteWeight) {
+    function balanceOf(address _addr) override public view returns (int128 balance) {
         uint256[] memory locks = userLocks[_addr];
         if (locks.length == 0) return 0;
         for (uint256 i = 0; i < locks.length; ++i) {
-            voteWeight += voteWeightOfLock(_addr, locks[i]);
+            balance += balanceOfLock(_addr, locks[i]);
         }
     }
 

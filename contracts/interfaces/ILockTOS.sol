@@ -6,22 +6,22 @@ interface ILockTOS {
     function locksOf(address _addr) external view returns (uint256[] memory);
 
     /// @dev Total vote weight
-    function totalVoteWeight() external view returns (int128);
+    function totalSupply() external view returns (int128);
 
     /// @dev Total vote weight at `_timestamp`
-    function totalVoteWeightAt(uint256 _timestamp) external view returns (int128);
+    function totalSupplyAt(uint256 _timestamp) external view returns (int128);
 
     /// @dev Vote weight of lock at `_timestamp`
-    function voteWeightOfLockAt(address _addr, uint256 _lockId, uint256 _timestamp) external view returns (int128);
+    function balanceOfLockAt(address _addr, uint256 _lockId, uint256 _timestamp) external view returns (int128);
 
     /// @dev Vote weight of lock
-    function voteWeightOfLock(address _addr, uint256 _lockId) external view returns (int128);
+    function balanceOfLock(address _addr, uint256 _lockId) external view returns (int128);
 
     /// @dev Vote weight of a user at `_timestamp`
-    function voteWeightOfAt(address _addr, uint256 _timestamp) external view returns (int128);
+    function balanceOfAt(address _addr, uint256 _timestamp) external view returns (int128 balance);
 
     /// @dev Vote weight of a iser
-    function voteWeightOf(address _addr) external view returns (int128 voteWeight);
+    function balanceOf(address _addr) external view returns (int128 balance);
 
     /// @dev Increase amount
     function increaseAmount(uint256 _lockId, uint256 _value) external;
