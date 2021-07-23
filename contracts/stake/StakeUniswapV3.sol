@@ -68,6 +68,7 @@ contract StakeUniswapV3 is
         return rdiv(rmul(target, oldFactor), source);
     }
 
+    /*
     function mintRewardBlockCoinage() internal {
         if (block.number > coinageMintBlock) {
             uint256 rewardMintAmount =
@@ -94,6 +95,34 @@ contract StakeUniswapV3 is
             }
         }
     }
+    */
+
+    function miningCoinage() internal {
+        if (block.timestamp > coinageLastMintBlockTimetamp) {
+            uint256 rewardMintAmount =
+                ( block.timestamp - coinageLastMintBlockTimetamp ) * IIStake2Vault(vault).miningPerSecond();
+
+            if (rewardMintAmount > 0) {
+                uint256 prevTotalSupply =
+                    AutoRefactorCoinageI(coinage).totalSupply();
+                uint256 afterTotalSupply = prevTotalSupply + rewardMintAmount;
+                AutoRefactorCoinageI(coinage).setFactor(
+                    _calcNewFactor(
+                        prevTotalSupply,
+                        afterTotalSupply,
+                        AutoRefactorCoinageI(coinage).factor()
+                    )
+                );
+                AutoRefactorCoinageI(coinage).mint(
+                    msg.sender,
+                    rewardMintAmount * (10**9)
+                );
+
+                coinageLastMintBlockTimetamp = block.timestamp;
+            }
+        }
+    }
+
 
     function burnCoinage(address user, uint256 amount) internal {
         require(amount > 0, "StakeUniswapV3: amount is zero");
@@ -196,6 +225,271 @@ contract StakeUniswapV3 is
         }
     }
 
+
+    function stake(uint256 tokenId)
+        external
+        override
+        nonZeroAddress(token)
+        nonZeroAddress(vault)
+        nonZeroAddress(stakeRegistry)
+        nonZeroAddress(poolToken0)
+        nonZeroAddress(poolToken1)
+        nonZeroAddress(address(nonfungiblePositionManager))
+        nonZeroAddress(uniswapV3FactoryAddress)
+    {
+        require(
+            nonfungiblePositionManager.ownerOf(tokenId) == msg.sender,
+            "StakeUniswapV3: Caller is not tokenId's owner"
+        );
+        uint256 _tokenId = tokenId;
+
+        (
+            ,
+            ,
+            address token0,
+            address token1,
+            uint24 fee,
+            int24 tickLower,
+            int24 tickUpper,
+            uint128 liquidity,
+            ,
+            ,
+            uint128 tokensOwed0,
+            uint128 tokensOwed1
+        ) = nonfungiblePositionManager.positions(_tokenId);
+
+        require(
+            (token0 == poolToken0 && token1 == poolToken1) ||
+                (token0 == poolToken1 && token1 == poolToken0),
+            "StakeUniswapV3: pool's tokens are different"
+        );
+
+        //require(liquidity > 0, "StakeUniswapV3: liquidity is zero");
+
+        address poolAddress =
+            PoolAddress.computeAddress(
+                uniswapV3FactoryAddress,
+                PoolAddress.PoolKey({token0: token0, token1: token1, fee: fee})
+            );
+
+        require(
+            poolAddress != address(0),
+            "StakeUniswapV3: poolAddress is zero"
+        );
+
+        (uint160 sqrtPriceX96, int24 tick, , , , , bool unlocked) = IUniswapV3Pool(poolAddress).slot0();
+        require(unlocked, "StakeUniswapV3: pool is closed");
+        require(tickLower < tick && tick < tickUpper, "StakeUniswapV3: out of tick range");
+
+        (, uint160 secondsPerLiquidityInsideX128, uint32 secondsInside) =
+            IUniswapV3Pool(poolAddress).snapshotCumulativesInside(
+                tickLower,
+                tickUpper
+            );
+
+        uint256 tokenId_ = _tokenId;
+
+        nonfungiblePositionManager.transferFrom(
+            msg.sender,
+            address(this),
+            tokenId_
+        );
+
+        // save tokenid
+        userStakedTokenIds[msg.sender].push(tokenId_);
+
+        //depositTokens
+        LibUniswapV3Stake.StakeLiquidity storage _depositTokens = depositTokens[tokenId_];
+        _depositTokens.owner = msg.sender;
+        _depositTokens.idIndex = userStakedTokenIds[msg.sender].length;
+        _depositTokens.poolAddress = poolAddress;
+        _depositTokens.liquidity = liquidity;
+        _depositTokens.tickLower = tickLower;
+        _depositTokens.tickUpper = tickUpper;
+        _depositTokens.startTime = block.timestamp;
+        _depositTokens.endTime = 0;
+        _depositTokens.claimedTime = 0;
+        _depositTokens
+            .secondsPerLiquidityInsideX128Initial = secondsPerLiquidityInsideX128;
+        _depositTokens.secondsPerLiquidityInsideX128Last = 0;
+
+        //stakedCoinageTokens
+        LibUniswapV3Stake.StakedTokenAmount storage _stakedCoinageTokens =
+            stakedCoinageTokens[tokenId_];
+        _stakedCoinageTokens.amount = liquidity;
+        _stakedCoinageTokens.startBlock = block.number;
+        _stakedCoinageTokens.claimedBlock = 0;
+        _stakedCoinageTokens.claimedAmount = 0;
+        _stakedCoinageTokens.rewardNonLiquidityClaimAmount = 0;
+
+        //StakedTotalTokenAmount
+        LibUniswapV3Stake.StakedTotalTokenAmount storage _userTotalStaked =
+            userTotalStaked[msg.sender];
+        if (!_userTotalStaked.staked) totalStakers++;
+        _userTotalStaked.staked = true;
+        _userTotalStaked.totalDepositAmount += liquidity;
+
+        totalStakedAmount += liquidity;
+        //mint coinage of user amount
+        AutoRefactorCoinageI(coinage).mint(msg.sender, liquidity * (10**9));
+
+        // coinage update reward
+        miningCoinage();
+
+        emit Staked(msg.sender, liquidity);
+    }
+
+    function _modifyPosition(ModifyPositionParams memory params)
+        private
+        noDelegateCall
+        returns (
+            Position.Info storage position,
+            int256 amount0,
+            int256 amount1
+        )
+    {
+        checkTicks(params.tickLower, params.tickUpper);
+
+        Slot0 memory _slot0 = slot0; // SLOAD for gas optimization
+
+        position = _updatePosition(
+            params.owner,
+            params.tickLower,
+            params.tickUpper,
+            params.liquidityDelta,
+            _slot0.tick
+        );
+
+        if (params.liquidityDelta != 0) {
+            if (_slot0.tick < params.tickLower) {
+                // current tick is below the passed range; liquidity can only become in range by crossing from left to
+                // right, when we'll need _more_ token0 (it's becoming more valuable) so user must provide it
+                amount0 = SqrtPriceMath.getAmount0Delta(
+                    TickMath.getSqrtRatioAtTick(params.tickLower),
+                    TickMath.getSqrtRatioAtTick(params.tickUpper),
+                    params.liquidityDelta
+                );
+            } else if (_slot0.tick < params.tickUpper) {
+                // current tick is inside the passed range
+                uint128 liquidityBefore = liquidity; // SLOAD for gas optimization
+
+                // write an oracle entry
+                (slot0.observationIndex, slot0.observationCardinality) = observations.write(
+                    _slot0.observationIndex,
+                    _blockTimestamp(),
+                    _slot0.tick,
+                    liquidityBefore,
+                    _slot0.observationCardinality,
+                    _slot0.observationCardinalityNext
+                );
+
+                amount0 = SqrtPriceMath.getAmount0Delta(
+                    _slot0.sqrtPriceX96,
+                    TickMath.getSqrtRatioAtTick(params.tickUpper),
+                    params.liquidityDelta
+                );
+                amount1 = SqrtPriceMath.getAmount1Delta(
+                    TickMath.getSqrtRatioAtTick(params.tickLower),
+                    _slot0.sqrtPriceX96,
+                    params.liquidityDelta
+                );
+
+                liquidity = LiquidityMath.addDelta(liquidityBefore, params.liquidityDelta);
+            } else {
+                // current tick is above the passed range; liquidity can only become in range by crossing from right to
+                // left, when we'll need _more_ token1 (it's becoming more valuable) so user must provide it
+                amount1 = SqrtPriceMath.getAmount1Delta(
+                    TickMath.getSqrtRatioAtTick(params.tickLower),
+                    TickMath.getSqrtRatioAtTick(params.tickUpper),
+                    params.liquidityDelta
+                );
+            }
+        }
+    }
+
+
+    /// @dev Gets and updates a position with the given liquidity delta
+    /// @param owner the owner of the position
+    /// @param tickLower the lower tick of the position's tick range
+    /// @param tickUpper the upper tick of the position's tick range
+    /// @param tick the current tick, passed to avoid sloads
+    function _updatePosition(
+        address owner,
+        int24 tickLower,
+        int24 tickUpper,
+        int128 liquidityDelta,
+        int24 tick
+    ) private returns (Position.Info storage position) {
+        position = positions.get(owner, tickLower, tickUpper);
+
+        uint256 _feeGrowthGlobal0X128 = feeGrowthGlobal0X128; // SLOAD for gas optimization
+        uint256 _feeGrowthGlobal1X128 = feeGrowthGlobal1X128; // SLOAD for gas optimization
+
+        // if we need to update the ticks, do it
+        bool flippedLower;
+        bool flippedUpper;
+        if (liquidityDelta != 0) {
+            uint32 time = _blockTimestamp();
+            (int56 tickCumulative, uint160 secondsPerLiquidityCumulativeX128) =
+                observations.observeSingle(
+                    time,
+                    0,
+                    slot0.tick,
+                    slot0.observationIndex,
+                    liquidity,
+                    slot0.observationCardinality
+                );
+
+            flippedLower = ticks.update(
+                tickLower,
+                tick,
+                liquidityDelta,
+                _feeGrowthGlobal0X128,
+                _feeGrowthGlobal1X128,
+                secondsPerLiquidityCumulativeX128,
+                tickCumulative,
+                time,
+                false,
+                maxLiquidityPerTick
+            );
+            flippedUpper = ticks.update(
+                tickUpper,
+                tick,
+                liquidityDelta,
+                _feeGrowthGlobal0X128,
+                _feeGrowthGlobal1X128,
+                secondsPerLiquidityCumulativeX128,
+                tickCumulative,
+                time,
+                true,
+                maxLiquidityPerTick
+            );
+
+            if (flippedLower) {
+                tickBitmap.flipTick(tickLower, tickSpacing);
+            }
+            if (flippedUpper) {
+                tickBitmap.flipTick(tickUpper, tickSpacing);
+            }
+        }
+
+        (uint256 feeGrowthInside0X128, uint256 feeGrowthInside1X128) =
+            ticks.getFeeGrowthInside(tickLower, tickUpper, tick, _feeGrowthGlobal0X128, _feeGrowthGlobal1X128);
+
+        position.update(liquidityDelta, feeGrowthInside0X128, feeGrowthInside1X128);
+
+        // clear any tick data that is no longer needed
+        if (liquidityDelta < 0) {
+            if (flippedLower) {
+                ticks.clear(tickLower);
+            }
+            if (flippedUpper) {
+                ticks.clear(tickUpper);
+            }
+        }
+    }
+
+    /*
     /// @dev Stake TokenId
     /// @param tokenId  uniswapV3 LP token (ERC721)
     function stake(
@@ -322,10 +616,11 @@ contract StakeUniswapV3 is
         AutoRefactorCoinageI(coinage).mint(msg.sender, liquidity * (10**9));
 
         // coinage update reward
-        mintRewardBlockCoinage();
+        miningCoinage();
 
         emit Staked(msg.sender, liquidity);
     }
+    */
 
     function getClaimLiquidity(uint256 tokenId)
         public
@@ -382,7 +677,7 @@ contract StakeUniswapV3 is
         );
         // 사용자의 할당량의 원금에 대한 코인에이지의 리워드.
         // coinage update reward
-        mintRewardBlockCoinage();
+        miningCoinage();
 
         (
             uint256 realReward,
@@ -431,7 +726,7 @@ contract StakeUniswapV3 is
             "StakeUniswapV3: caller is not tokenId's staker"
         );
         // coinage update reward
-        mintRewardBlockCoinage();
+        miningCoinage();
 
         totalStakedAmount -= _depositTokens.liquidity;
         (uint256 realReward, , , , ) = getClaimLiquidity(tokenId);

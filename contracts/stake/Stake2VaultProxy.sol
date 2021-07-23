@@ -94,13 +94,13 @@ contract Stake2VaultProxy is Stake2VaultStorage, ProxyBase, IStake2VaultProxy {
     /// @param _stakefactory the factory address to create stakeContract
     /// @param _stakeType  Type of staking contract, 0 TON staking, 1 basic ERC20 staking, 2 UniswapV3  staking
     /// @param _cap  Maximum amount of rewards issued, allocated reward amount.
-    /// @param _rewardPerBlock  the reward per block
+    /// @param _miningPerSecond  the mining amount per second
     function initialize(
         address _tos,
         address _stakefactory,
         uint256 _stakeType,
         uint256 _cap,
-        uint256 _rewardPerBlock,
+        uint256 _miningPerSecond,
         string memory _name
     ) external override onlyOwner {
         require(tos == address(0), "Stake2VaultProxy: already initialized");
@@ -114,7 +114,7 @@ contract Stake2VaultProxy is Stake2VaultStorage, ProxyBase, IStake2VaultProxy {
         tos = _tos;
         cap = _cap;
         stakeType = _stakeType;
-        rewardPerBlock = _rewardPerBlock;
+        miningPerSecond = _miningPerSecond;
         name = _name;
         grantRole(ADMIN_ROLE, _stakefactory);
     }

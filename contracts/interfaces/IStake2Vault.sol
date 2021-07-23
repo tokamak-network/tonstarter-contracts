@@ -23,7 +23,12 @@ interface IStake2Vault {
 
     /// @dev set reward per block
     /// @param _rewardPerBlock  allocated reward amount
-    function setRewardPerBlock(uint256 _rewardPerBlock) external;
+    ///function setRewardPerBlock(uint256 _rewardPerBlock) external;
+
+    /// @dev set mining amount per second
+    /// @param _miningPerSecond  a mining amount per second
+    function setMiningAmountPerSecond(uint256 _miningPerSecond) external;
+
 
     /// @dev If the vault has more money than the reward to give, the owner can withdraw the remaining amount.
     /// @param to to address

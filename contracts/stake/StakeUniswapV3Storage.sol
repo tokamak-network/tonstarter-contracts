@@ -6,6 +6,7 @@ import "@uniswap/v3-periphery/contracts/interfaces/INonfungiblePositionManager.s
 
 /// @title The base storage of stakeContract
 contract StakeUniswapV3Storage {
+
     /// @dev reward token : TOS
     address public token;
 
@@ -48,8 +49,8 @@ contract StakeUniswapV3Storage {
     address public poolToken0;
     address public poolToken1;
 
-    /// @dev Rewards per second liquidity inside
-    //uint256 internal REWARDS_PER_SECOND = 10000000000000000;
+    /// @dev Rewards per second liquidity inside (3년간 8000000 TOS)
+    /// uint256 internal MINING_PER_SECOND = 84559445290038900;
 
     /// @dev UniswapV3 Nonfungible position manager
     INonfungiblePositionManager public nonfungiblePositionManager;
@@ -60,7 +61,12 @@ contract StakeUniswapV3Storage {
     /// @dev coinage for reward 리워드 계산을 위한 코인에이지
     address public coinage;
 
-    uint256 public coinageMintBlock;
+    /// @dev 초단위로 마이닝하는것은 어떨지.
+    uint256 public coinageLastMintBlockTimetamp;
+
+    /// @dev total tokenIds
+    uint256 public totalTokens;
+
 
     /// @dev 리워드는 할당되었는데, 유동성을 없어져서, 지불되지 못한 리워드양 .
     uint256 public rewardNonLiquidityClaimTotal;

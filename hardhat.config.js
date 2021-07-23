@@ -50,20 +50,8 @@ module.exports = {
       gas: 9500000,
       gasMultiplier: 100,
       blockGasLimit: 524500000,
-      accounts: {
-        mnemonic: process.env.MNEMONIC_HARDHAT,
-        count: 30,
-        initialIndex: 0,
-        accountsBalance: "10000000000000000000000",
-      },
     },
     hardhat: {
-      accounts: {
-        mnemonic: process.env.MNEMONIC_HARDHAT,
-        count: 30,
-        initialIndex: 0,
-        accountsBalance: "10000000000000000000000",
-      },
       chainId: 31337,
     },
     rinkeby: {

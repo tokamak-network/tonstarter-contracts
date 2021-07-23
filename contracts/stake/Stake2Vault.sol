@@ -75,7 +75,7 @@ contract Stake2Vault is Stake2VaultStorage, IStake2Vault {
 
     /// @dev set reward per block
     /// @param _rewardPerBlock  allocated reward amount
-    function setRewardPerBlock(uint256 _rewardPerBlock)
+   /* function setRewardPerBlock(uint256 _rewardPerBlock)
         external
         override
         onlyOwner
@@ -85,6 +85,20 @@ contract Stake2Vault is Stake2VaultStorage, IStake2Vault {
             "Stake2Vault: setRewardPerBlock fails"
         );
         rewardPerBlock = _rewardPerBlock;
+    }*/
+
+    /// @dev set mining amount per second
+    /// @param _miningPerSecond  a mining amount per second
+    function setMiningAmountPerSecond(uint256 _miningPerSecond)
+        external
+        override
+        onlyOwner
+    {
+        require(
+            _miningPerSecond > 0 && miningPerSecond != _miningPerSecond,
+            "Stake2Vault: setMiningAmountPerSecond fails"
+        );
+        miningPerSecond = _miningPerSecond;
     }
 
     /// @dev If the vault has more money than the reward to give, the owner can withdraw the remaining amount.
@@ -142,7 +156,7 @@ contract Stake2Vault is Stake2VaultStorage, IStake2Vault {
     /// @return return1 [tos, stakeAddress]
     /// @return return2 cap
     /// @return return3 stakeType
-    /// @return return4 rewardPerBlock
+    /// @return return4 miningPerSecond
     /// @return return5 name
     function infos()
         external
@@ -156,6 +170,6 @@ contract Stake2Vault is Stake2VaultStorage, IStake2Vault {
             string memory
         )
     {
-        return ([tos, stakeAddress], cap, stakeType, rewardPerBlock, name);
+        return ([tos, stakeAddress], cap, stakeType, miningPerSecond, name);
     }
 }

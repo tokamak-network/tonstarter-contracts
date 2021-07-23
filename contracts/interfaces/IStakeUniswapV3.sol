@@ -8,13 +8,16 @@ interface IStakeUniswapV3 {
     /// @param v the owner's signature - v
     /// @param r the owner's signature - r
     /// @param s the owner's signature - s
-    function stake(
-        uint256 tokenId,
-        uint256 deadline,
-        uint8 v,
-        bytes32 r,
-        bytes32 s
-    ) external;
+    // function stake(
+    //     uint256 tokenId,
+    //     uint256 deadline,
+    //     uint8 v,
+    //     bytes32 r,
+    //     bytes32 s
+    // ) external;
+
+    function stake(uint256 tokenId)
+        external;
 
     function getClaimLiquidity(uint256 tokenId)
         external

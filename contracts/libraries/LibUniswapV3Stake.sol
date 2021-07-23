@@ -15,6 +15,8 @@ library LibUniswapV3Stake {
         uint256 claimedTime;
         uint160 secondsPerLiquidityInsideX128Initial;
         uint160 secondsPerLiquidityInsideX128Last;
+        uint160 secondsInsideDeposit;
+        uint160 secondsInsideLast;
     }
 
     struct StakedTokenAmount {
