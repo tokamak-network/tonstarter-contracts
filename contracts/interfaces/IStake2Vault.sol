@@ -44,6 +44,16 @@ interface IStake2Vault {
     /// @return true
     function claim(address _to, uint256 _amount) external returns (bool);
 
+
+    /// @dev  a according to request from(staking contract)  the amount of mining is paid to to.
+    /// @param to the address that will receive the reward
+    /// @param minableAmount minable amount
+    /// @param miningAmount amount mined
+    /// @param nonMiningAmount Amount not mined
+    function claimMining(address to, uint256 minableAmount, uint256 miningAmount, uint256 nonMiningAmount)
+        external
+        returns (bool);
+
     /// @dev Give the infomation of this vault
     /// @return return1 [tos, stakeAddress]
     /// @return return2 cap

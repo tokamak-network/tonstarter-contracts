@@ -18,7 +18,7 @@ contract StakeTON_NEW is StakeTONStorage, AccessibleCommon, IStakeTON_NEW {
         revert("cannot stake Ether");
     }
 
-    function version() external view override returns (string memory){
+    function version() external pure override returns (string memory){
         return "new.1.0";
     }
 

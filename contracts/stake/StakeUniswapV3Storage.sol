@@ -17,7 +17,7 @@ contract StakeUniswapV3Storage {
     address public vault;
 
     /// @dev the total amount claimed
-    uint256 public rewardClaimedTotal;
+    uint256 public miningAmountTotal ; // rewardClaimedTotal; //miningAmount
 
     /// @dev the total staked amount
     uint256 public totalStakedAmount;
@@ -48,6 +48,7 @@ contract StakeUniswapV3Storage {
     /// @dev pools's token
     address public poolToken0;
     address public poolToken1;
+    address public poolAddress;
 
     /// @dev Rewards per second liquidity inside (3년간 8000000 TOS)
     /// uint256 internal MINING_PER_SECOND = 84559445290038900;
@@ -69,7 +70,7 @@ contract StakeUniswapV3Storage {
 
 
     /// @dev 리워드는 할당되었는데, 유동성을 없어져서, 지불되지 못한 리워드양 .
-    uint256 public rewardNonLiquidityClaimTotal;
+    uint256 public nonMiningAmountTotal; // rewardNonLiquidityClaimTotal;
 
     modifier nonZeroAddress(address _addr) {
         require(_addr != address(0), "StakeUniswapV3Storage: zero address");

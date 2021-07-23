@@ -2,19 +2,6 @@
 pragma solidity ^0.7.6;
 
 interface IStakeUniswapV3 {
-    /// @dev Stake amount
-    /// @param tokenId  uniswapV3 LP Token
-    /// @param deadline  the deadline that valid the owner's signature
-    /// @param v the owner's signature - v
-    /// @param r the owner's signature - r
-    /// @param s the owner's signature - s
-    // function stake(
-    //     uint256 tokenId,
-    //     uint256 deadline,
-    //     uint8 v,
-    //     bytes32 r,
-    //     bytes32 s
-    // ) external;
 
     function stake(uint256 tokenId)
         external;
@@ -22,11 +9,11 @@ interface IStakeUniswapV3 {
     function getClaimLiquidity(uint256 tokenId)
         external
         returns (
-            uint256 realReward,
-            uint256 unableClaimReward,
-            uint160 secondsPerLiquidityInsideX128,
+            uint256 miningAmount,
+            uint256 nonMiningAmount,
+            uint32 secondsInside,
             uint256 balanceCoinageOfUser,
-            uint256 _coinageReward
+            uint256 coinageReward
         );
 
     /// @dev withdraw

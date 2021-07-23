@@ -15,11 +15,13 @@ import "./Stake2VaultStorage.sol";
 contract Stake2Vault is Stake2VaultStorage, IStake2Vault {
     using SafeMath for uint256;
 
-    /// @dev event of according to request from(staking contract)  the amount of compensation is paid to to.
-    /// @param from the stakeContract address that call claim
+    /// @dev event of according to request from(staking contract)  the amount of mining is paid to to.
     /// @param to the address that will receive the reward
-    /// @param amount the amount of reward
-    event ClaimedReward(address indexed from, address to, uint256 amount);
+    /// @param minableAmount minable amount
+    /// @param miningAmount amount mined
+    /// @param nonMiningAmount Amount not mined
+    event ClaimedMining(address indexed to, uint256 minableAmount, uint256 miningAmount,  uint256 nonMiningAmount);
+    event Claimed(address indexed from, address to, uint256 amount);
 
     /// @dev constructor of Stake1Vault
     constructor() {}
@@ -113,13 +115,39 @@ contract Stake2Vault is Stake2VaultStorage, IStake2Vault {
         );
     }
 
-    /// @dev claim function.
-    /// @dev sender is a staking contract.
-    /// @dev A function that pays the amount(_amount) to _to by the staking contract.
-    /// @dev A function that _to claim the amount(_amount) from the staking contract and gets the tos in the vault.
-    /// @param _to a user that received reward
-    /// @param _amount the receiving amount
-    /// @return true
+    /// @dev  a according to request from(staking contract)  the amount of mining is paid to to.
+    /// @param to the address that will receive the reward
+    /// @param minableAmount minable amount
+    /// @param miningAmount amount mined
+    /// @param nonMiningAmount Amount not mined
+    function claimMining(address to, uint256 minableAmount, uint256 miningAmount, uint256 nonMiningAmount)
+        external
+        override
+        nonZero(minableAmount)
+        returns (bool)
+    {
+        require(stakeAddress == msg.sender, "Stake2Vault: sender is not stakeContract");
+        require(minableAmount == (miningAmount + nonMiningAmount) , "Stake2Vault: minable amount is not correct");
+
+        uint256 tosBalance = IERC20(tos).balanceOf(address(this));
+        require(tosBalance >= minableAmount, "Stake2Vault: not enough balance");
+
+        if(miningAmount > 0)
+            require(
+                IERC20(tos).transfer(to, miningAmount),
+                "Stake1Vault: TOS transfer fail"
+            );
+
+        if(nonMiningAmount > 0)
+            require(
+                ITOS(tos).burn(address(this), nonMiningAmount),
+                "Stake1Vault: TOS burn fail"
+            );
+
+        emit ClaimedMining(to, minableAmount, miningAmount, nonMiningAmount);
+        return true;
+    }
+
     function claim(address _to, uint256 _amount)
         external
         override
@@ -127,19 +155,19 @@ contract Stake2Vault is Stake2VaultStorage, IStake2Vault {
         returns (bool)
     {
         uint256 tosBalance = IERC20(tos).balanceOf(address(this));
-        require(tosBalance >= _amount, "Stake1Vault: not enough balance");
-        require(
-            stakeAddress == msg.sender || isAdmin(msg.sender),
-            "Stake1Vault: not admin or stake contract"
+        require(tosBalance >= _amount, "Stake2Vault: not enough balance");
+        require(isAdmin(msg.sender),
+            "Stake1Vault: not admin "
         );
         require(
             IERC20(tos).transfer(_to, _amount),
             "Stake1Vault: TOS transfer fail"
         );
 
-        emit ClaimedReward(msg.sender, _to, _amount);
+        emit Claimed(msg.sender, _to, _amount);
         return true;
     }
+
 
     /// @dev Returns Give the TOS balance stored in the vault
     /// @return the balance of TOS in this vault.

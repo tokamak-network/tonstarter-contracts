@@ -6,25 +6,23 @@ library LibUniswapV3Stake {
     struct StakeLiquidity {
         address owner;
         uint256 idIndex;
-        address poolAddress;
+        //address poolAddress;
         uint128 liquidity;
         int24 tickLower;
         int24 tickUpper;
         uint256 startTime;
         uint256 endTime;
         uint256 claimedTime;
-        uint160 secondsPerLiquidityInsideX128Initial;
-        uint160 secondsPerLiquidityInsideX128Last;
-        uint160 secondsInsideDeposit;
+        uint160 secondsInsideInitial;
         uint160 secondsInsideLast;
     }
 
     struct StakedTokenAmount {
         uint256 amount;
-        uint256 startBlock;
-        uint256 claimedBlock;
+        uint256 startTime;
+        uint256 claimedTime;
         uint256 claimedAmount;
-        uint256 rewardNonLiquidityClaimAmount;
+        uint256 nonMiningAmount;
     }
 
     struct StakedTotalTokenAmount {
