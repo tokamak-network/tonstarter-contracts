@@ -71,13 +71,13 @@ module.exports = {
       accounts: [`${ACCOUNT0_PK}`, `${ACCOUNT1_PK}`, `${ACCOUNT2_PK}`],
       gasMultiplier: 1.25 //,
       //gasPrice: 20000000000,
-    },/*
+    },
     mainnet: {
       url: `https://mainnet.infura.io/v3/${process.env.InfuraKey}`,
       accounts: [`${TONSTARTER_DEPLOYER_PK}`],
       gasMultiplier: 1.25 ,
-      gasPrice: 30000000000,
-    }, */
+      gasPrice: 40000000000,
+    },
   },
   etherscan: {
     apiKey: `${process.env.APIKey}`,

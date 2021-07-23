@@ -1,6 +1,5 @@
 # TONStarter Contracts
 
-
 ## Deployed on Mainnet
 
 * "TOS": "0x1b481bca7156E990E2d90d1EC556d929340E9fC3"
@@ -35,10 +34,6 @@
 
 * "SwapProxy": "0x30e65B3A6e6868F044944Aa0e9C5d52F8dcb138d"
 
-`Tag`: [deploy on mainnet](https://github.com/Onther-Tech/ico20-contracts/commit/f8d474a27cd33a0b17e34d04c81fd03e138d43e8)
-
-
-##
 
 ### Build Contracts with Truffle
 
