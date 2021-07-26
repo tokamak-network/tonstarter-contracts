@@ -6,6 +6,7 @@ require("@nomiclabs/hardhat-waffle");
 
 require("dotenv").config();
 
+require("./tasks/deploy-lock-tos-task");
 require("./tasks/uniswap-v3-approve-erc20-task");
 require("./tasks/uniswap-v3-create-pool-task");
 require("./tasks/uniswap-v3-increase-liquidity-task");
@@ -30,8 +31,9 @@ task("accounts", "Prints the list of accounts", async () => {
     console.log((await provider.getBalance(account.address)).toString());
   }
 });
+
 module.exports = {
-  defaultNetwork: "localhost",
+  defaultNetwork: "rinkeby",
   networks: {
     zenalocal: {
       url: "http://localhost:8546",
@@ -57,7 +59,7 @@ module.exports = {
         accountsBalance: "10000000000000000000000",
       },
     },
-    hardhat: {
+    /* hardhat: {
       accounts: {
         mnemonic: process.env.MNEMONIC_HARDHAT,
         count: 30,
@@ -65,9 +67,9 @@ module.exports = {
         accountsBalance: "10000000000000000000000",
       },
       chainId: 31337,
-    },
+    }, */
     rinkeby: {
-      url: `https://rinkeby.infura.io/v3/${process.env.InfuraKey}`,
+      url: "https://rinkeby.infura.io/v3/9cb35f5029cb4604b3b7c1b2e92c6ac9",
       accounts: [`${ACCOUNT0_PK}`, `${ACCOUNT1_PK}`, `${ACCOUNT2_PK}`],
       gasMultiplier: 1.25 //,
       //gasPrice: 20000000000,
@@ -75,7 +77,7 @@ module.exports = {
     mainnet: {
       url: `https://mainnet.infura.io/v3/${process.env.InfuraKey}`,
       accounts: [`${TONSTARTER_DEPLOYER_PK}`],
-      gasMultiplier: 1.25 ,
+      gasMultiplier: 1.25,
       gasPrice: 40000000000,
     },
   },
