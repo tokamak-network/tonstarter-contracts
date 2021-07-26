@@ -135,14 +135,16 @@ contract StakeUniswapV3Proxy is
             _coinageFactory() != address(0),
             "StakeUniswapV3Proxy: _coinageFactory is zero"
         );
-        coinage = IStakeCoinageFactory(_coinageFactory()).deploy();
+        coinage = IStakeCoinageFactory(_coinageFactory()).deploy(address(this));
+
         require(
             coinage != address(0),
             "StakeUniswapV3Proxy: deployed coinage is zero"
         );
     }
 
-    // 사용자의 코인에이지의 리워드
+    /// @dev set pool information
+    /// @param uniswapInfo [NonfungiblePositionManager,UniswapV3Factory,token0,token1]
     function setPool(address[4] memory uniswapInfo)
         external
         override
@@ -157,7 +159,7 @@ contract StakeUniswapV3Proxy is
         );
         uniswapV3FactoryAddress = uniswapInfo[1];
         poolToken0 = uniswapInfo[2];
-        poolToken0 = uniswapInfo[3];
+        poolToken1 = uniswapInfo[3];
 
     }
 }

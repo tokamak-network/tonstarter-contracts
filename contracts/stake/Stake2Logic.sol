@@ -56,7 +56,7 @@ contract Stake2Logic is StakeProxyStorage, AccessibleCommon, IStake2Logic {
 
     /// @dev create vault2
     /// @param _cap  allocated reward amount
-    /// @param _rewardPerBlock  the reward per block
+    /// @param _miningPerSecond  the mining per second
     /// @param _phase  phase of TOS platform
     /// @param _vaultName  vault's name's hash
     /// @param _stakeType  it's 2, StakeUniswapV3 staking type
@@ -64,7 +64,7 @@ contract Stake2Logic is StakeProxyStorage, AccessibleCommon, IStake2Logic {
     /// @param _name   name
     function createVault2(
         uint256 _cap,
-        uint256 _rewardPerBlock,
+        uint256 _miningPerSecond,
         uint256 _phase,
         bytes32 _vaultName,
         uint256 _stakeType,
@@ -84,18 +84,18 @@ contract Stake2Logic is StakeProxyStorage, AccessibleCommon, IStake2Logic {
 
         uint256 stakeType = _stakeType;
         uint256 cap = _cap;
-        uint256 rewardPerBlock = _rewardPerBlock;
+        uint256 miningPerSecond = _miningPerSecond;
 
         // console.log("tos %s", tos );
         // console.log("stakeFactory %s", address(stakeFactory) );
-        // console.log("rewardPerBlock %d , cap %d, stakeType %d ", rewardPerBlock, cap , stakeType);
+        // console.log("miningPerSecond %d , cap %d, stakeType %d ", miningPerSecond, cap , stakeType);
         // console.log("tos %s", tos );
 
         address vault =
             stakeVaultFactory.create2(
                 _phase,
                 [tos, address(stakeFactory)],
-                [stakeType, cap, rewardPerBlock],
+                [stakeType, cap, miningPerSecond],
                 _name,
                 address(this)
             );
@@ -114,7 +114,7 @@ contract Stake2Logic is StakeProxyStorage, AccessibleCommon, IStake2Logic {
                 stakeType,
                 _addr,
                 address(stakeRegistry),
-                [cap, rewardPerBlock, 0]
+                [cap, miningPerSecond, 0]
             );
         require(_contract != address(0), "Stake1Logic: vault2 deploy fail");
 
@@ -124,5 +124,16 @@ contract Stake2Logic is StakeProxyStorage, AccessibleCommon, IStake2Logic {
         stakeRegistry.addStakeContract(vault, _contract);
 
         emit CreatedStakeContract2(vault, _contract, phase);
+    }
+
+    /// @dev set pool information
+    /// @param uniswapInfo [NonfungiblePositionManager,UniswapV3Factory,token0,token1]
+    function setPool(address target, address[4] memory uniswapInfo)
+        external
+        override
+        onlyOwner
+        nonZeroAddress(target)
+    {
+        IIStakeUniswapV3(target).setPool(uniswapInfo);
     }
 }

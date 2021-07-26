@@ -2,5 +2,5 @@
 pragma solidity ^0.7.6;
 
 interface IStakeCoinageFactory {
-    function deploy() external returns (address);
+    function deploy(address owner) external returns (address);
 }

@@ -36,11 +36,18 @@ async function main() {
   const TOS = await ethers.getContractAt("TOS", tos);
   const WTON = await ethers.getContractAt(WTON1.abi, wton);
 
+    // let pooladdr = computePoolAddress(
+    //     UniswapV3Factory , [wton,tos],
+    //     utils.parseUnits('3000',0)
+    // );
+
+
     let pooladdr = computePoolAddress(
-        UniswapV3Factory , [wton,tos],
+        UniswapV3Factory , [tos, wton],
         utils.parseUnits('3000',0)
     );
-    console.log('pooladdr',pooladdr );
+
+    console.log('pooladdr',pooladdr.toLowerCase() );
 
 }
 

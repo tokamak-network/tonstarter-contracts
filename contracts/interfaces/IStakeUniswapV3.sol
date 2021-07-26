@@ -6,14 +6,18 @@ interface IStakeUniswapV3 {
     function stake(uint256 tokenId)
         external;
 
-    function getClaimLiquidity(uint256 tokenId)
+    function getMiningTokenId(uint256 tokenId)
         external
         returns (
             uint256 miningAmount,
             uint256 nonMiningAmount,
-            uint32 secondsInside,
-            uint256 balanceCoinageOfUser,
-            uint256 coinageReward
+            uint256 minableAmount,
+            uint160 secondsInside,
+            uint160 secondsInsideDiff,
+            uint256 liquidity,
+            uint256 balanceOfTokenIdRay,
+            uint256 minableAmountRay,
+            uint32 currentTime
         );
 
     /// @dev withdraw

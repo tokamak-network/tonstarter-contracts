@@ -40,4 +40,10 @@ interface IStake2Logic {
         address[4] memory _uniswapInfo,
         string memory _name
     ) external;
+
+    /// @dev set pool information
+    /// @param uniswapInfo [NonfungiblePositionManager,UniswapV3Factory,token0,token1]
+    function setPool(address target, address[4] memory uniswapInfo)
+        external;
+
 }

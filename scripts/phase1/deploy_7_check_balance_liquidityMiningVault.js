@@ -1,8 +1,8 @@
 const { BigNumber } = require("ethers");
 const { ethers, upgrades } = require("hardhat");
 const utils = ethers.utils;
-const save = require("./save_deployed_file");
-const loadDeployed = require("./load_deployed");
+const save = require("../save_deployed_file");
+const loadDeployed = require("../load_deployed");
 //const loadDeployedInitVariable = require("./load_deployed_init");
 
 const {
@@ -12,10 +12,10 @@ const {
 
 require("dotenv").config();
 
-const { printGasUsedOfUnits } = require("./log_tx");
+const { printGasUsedOfUnits } = require("../log_tx");
 
 
-const SimpleVault1 = require("../abis_vaults/vaults/SimpleVault.sol/SimpleVault.json");
+const SimpleVault1 = require("../../abis_vaults/vaults/SimpleVault.sol/SimpleVault.json");
 
 const zeroAddress = "0x0000000000000000000000000000000000000000";
 

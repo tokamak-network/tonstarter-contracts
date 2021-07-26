@@ -1,15 +1,14 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.7.6;
 
-import {AutoRefactorCoinageI} from "../interfaces/AutoRefactorCoinageI.sol";
+import {IAutoRefactorCoinageWithTokenId} from "../interfaces/IAutoRefactorCoinageWithTokenId.sol";
 import {DSMath} from "../libraries/DSMath.sol";
-import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "../common/AccessibleCommon.sol";
 
 /**
  * @dev Implementation of coin age token based on ERC20 of openzeppelin-solidity
  *
- * AutoRefactorCoinage stores `_totalSupply` and `_balances` as RAY BASED value,
+ * AutoRefactorCoinageWithTokenId stores `_totalSupply` and `_balances` as RAY BASED value,
  * `_allowances` as RAY FACTORED value.
  *
  * This takes public function (including _approve) parameters as RAY FACTORED value
@@ -19,19 +18,22 @@ import "../common/AccessibleCommon.sol";
  *
  *  factor increases exponentially for each block mined.
  */
-contract AutoRefactorCoinage is ERC20, DSMath, AccessibleCommon {
+contract AutoRefactorCoinageWithTokenId is DSMath, AccessibleCommon , IAutoRefactorCoinageWithTokenId{
     struct Balance {
         uint256 balance;
         uint256 refactoredCount;
         uint256 remain;
     }
+
+    // string public _name;
+    // string public _symbol;
     uint8 public decimal = 27;
     uint256 public REFACTOR_BOUNDARY = 10**28;
     uint256 public REFACTOR_DIVIDER = 2;
 
     uint256 public refactorCount;
 
-    mapping(address => Balance) public balances;
+    mapping(uint256 => Balance) public balances;
 
     Balance public _totalSupply;
 
@@ -41,29 +43,44 @@ contract AutoRefactorCoinage is ERC20, DSMath, AccessibleCommon {
 
     event FactorSet(uint256 previous, uint256 current, uint256 shiftCount);
 
-    modifier nonZero(address _addr) {
-        require(_addr != address(0), "AutoRefactorCoinage:zero address");
+    modifier nonZero(uint256 tokenId) {
+        require(tokenId != 0, "AutoRefactorCoinageWithTokenId:zero address");
+        _;
+    }
+    modifier nonZeroAddress(address account) {
+        require(account != address(0), "AutoRefactorCoinageWithTokenId:zero address");
         _;
     }
 
+    /// @dev event on mining
+    /// @param tokenOwner owner of tokenId
+    /// @param tokenId mining tokenId
+    /// @param amount  mined amount
+    event Mined(address indexed tokenOwner, uint256 indexed tokenId, uint256 amount);
+
+    /// @dev event on burn
+    /// @param tokenOwner owner of tokenId
+    /// @param tokenId mining tokenId
+    /// @param amount  mined amount
+    event Burned(address indexed tokenOwner, uint256 indexed tokenId, uint256 amount);
+
+
     constructor(
-        string memory name,
-        string memory symbol,
         uint256 initfactor
-    ) ERC20(name, symbol) {
+    ) {
         _factor = initfactor;
 
         //_factorIncrement = factorIncrement;
         //_lastBlock = block.number;
         //_transfersEnabled = transfersEnabled;
 
-        _setupDecimals(decimal);
+        //_setupDecimals(decimal);
 
         _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
         _setupRole(ADMIN_ROLE, msg.sender);
     }
 
-    function factor() public view returns (uint256) {
+    function factor() public view override returns (uint256) {
         uint256 result = _factor;
         for (uint256 i = 0; i < refactorCount; i++) {
             result = result * (REFACTOR_DIVIDER);
@@ -83,13 +100,13 @@ contract AutoRefactorCoinage is ERC20, DSMath, AccessibleCommon {
     /**
      * @dev See {IERC20-balanceOf}.
      */
-    function balanceOf(address account) public view override returns (uint256) {
-        Balance storage b = balances[account];
+    function balanceOf(uint256 tokenId) public view override returns (uint256) {
+        Balance storage b = balances[tokenId];
 
         return _applyFactor(b.balance, b.refactoredCount) + (b.remain);
     }
 
-    /** @dev Creates `amount` tokens and assigns them to `account`, increasing
+    /** @dev Creates `amount` tokens and assigns them to `tokenId`, increasing
      * the total supply.
      *
      * Emits a {Transfer} event with `from` set to the zero address.
@@ -98,14 +115,14 @@ contract AutoRefactorCoinage is ERC20, DSMath, AccessibleCommon {
      *
      * - `to` cannot be the zero address.
      */
-    function _mint(address account, uint256 amount) internal override {
+    function _mint(address tokenOwner, uint256 tokenId, uint256 amount) internal {
         require(
-            account != address(0),
-            "AutoRefactorCoinage: mint to the zero address"
+            tokenId != 0,
+            "AutoRefactorCoinageWithTokenId: mint to the zero tokenId"
         );
-        Balance storage b = balances[account];
+        Balance storage b = balances[tokenId];
 
-        uint256 currentBalance = balanceOf(account);
+        uint256 currentBalance = balanceOf(tokenId);
         uint256 newBalance = currentBalance + amount;
 
         uint256 rbAmount = _toRAYBased(newBalance);
@@ -113,28 +130,28 @@ contract AutoRefactorCoinage is ERC20, DSMath, AccessibleCommon {
         b.refactoredCount = refactorCount;
 
         addTotalSupply(amount);
-        emit Transfer(address(0), account, _toRAYFactored(rbAmount));
+        emit Mined(tokenOwner, tokenId, _toRAYFactored(rbAmount));
     }
 
     /**
-     * @dev Destroys `amount` tokens from `account`, reducing the
+     * @dev Destroys `amount` tokens from `tokenId`, reducing the
      * total supply.
      *
      * Emits a {Transfer} event with `to` set to the zero address.
      *
      * Requirements
      *
-     * - `account` cannot be the zero address.
-     * - `account` must have at least `amount` tokens.
+     * - `tokenId` cannot be the zero .
+     * - `tokenId` must have at least `amount` tokens.
      */
-    function _burn(address account, uint256 amount) internal override {
+    function _burn(address tokenOwner, uint256 tokenId, uint256 amount) internal {
         require(
-            account != address(0),
-            "AutoRefactorCoinage: burn from the zero address"
+            tokenId != 0,
+            "AutoRefactorCoinageWithTokenId: burn from the zero tokenId"
         );
-        Balance storage b = balances[account];
+        Balance storage b = balances[tokenId];
 
-        uint256 currentBalance = balanceOf(account);
+        uint256 currentBalance = balanceOf(tokenId);
         uint256 newBalance = currentBalance - amount;
 
         uint256 rbAmount = _toRAYBased(newBalance);
@@ -142,12 +159,9 @@ contract AutoRefactorCoinage is ERC20, DSMath, AccessibleCommon {
         b.refactoredCount = refactorCount;
 
         subTotalSupply(amount);
-        emit Transfer(account, address(0), _toRAYFactored(rbAmount));
+        emit Burned(tokenOwner, tokenId, _toRAYFactored(rbAmount));
     }
 
-    function _burnFrom(address account, uint256 amount) internal {
-        _burn(account, amount);
-    }
 
     // helpers
 
@@ -188,7 +202,7 @@ contract AutoRefactorCoinage is ERC20, DSMath, AccessibleCommon {
 
     // new
 
-    function setFactor(uint256 infactor) external onlyOwner returns (uint256) {
+    function setFactor(uint256 infactor) external override onlyOwner returns (uint256) {
         uint256 previous = _factor;
 
         uint256 count = 0;
@@ -224,42 +238,6 @@ contract AutoRefactorCoinage is ERC20, DSMath, AccessibleCommon {
         _totalSupply.refactoredCount = refactorCount;
     }
 
-    // unsupported functions
-
-    function transfer(address recipient, uint256 amount)
-        public
-        pure
-        override
-        returns (bool)
-    {
-        revert();
-    }
-
-    function allowance(address owner, address spender)
-        public
-        pure
-        override
-        returns (uint256)
-    {
-        return 0;
-    }
-
-    function approve(address spender, uint256 amount)
-        public
-        pure
-        override
-        returns (bool)
-    {
-        revert();
-    }
-
-    function transferFrom(
-        address sender,
-        address recipient,
-        uint256 amount
-    ) public pure override returns (bool) {
-        revert();
-    }
 
     /**
      * @dev See {ERC20-_mint}.
@@ -268,31 +246,15 @@ contract AutoRefactorCoinage is ERC20, DSMath, AccessibleCommon {
      *
      * - the caller must have the {MinterRole}.
      */
-    function mint(address account, uint256 amount)
-        public
+    function mint(address tokenOwner, uint256 tokenId, uint256 amount)
+        public override
         onlyOwner
-        nonZero(account)
+        nonZeroAddress(tokenOwner)
+        nonZero(tokenId)
         returns (bool)
     {
-        _mint(account, amount);
+        _mint(tokenOwner, tokenId, amount);
         return true;
-    }
-
-    function addMinter(address account) public onlyOwner nonZero(account) {
-        grantRole(MINTER_ROLE, account);
-    }
-
-    function renounceMinter() public onlyOwner {
-        renounceRole(MINTER_ROLE, msg.sender);
-    }
-
-    function transferOwnership(address newOwner)
-        public
-        onlyOwner
-        nonZero(newOwner)
-    {
-        grantRole(ADMIN_ROLE, newOwner);
-        renounceRole(ADMIN_ROLE, msg.sender);
     }
 
     /**
@@ -300,14 +262,15 @@ contract AutoRefactorCoinage is ERC20, DSMath, AccessibleCommon {
      *
      * See {ERC20-_burn}.
      */
-    function burn(uint256 amount) public onlyOwner {
-        _burn(msg.sender, amount);
+    function burn(address tokenOwner, uint256 tokenId, uint256 amount) public override onlyOwner {
+        if(amount > totalSupply()) _burn(tokenOwner, tokenId, totalSupply());
+        else _burn(tokenOwner, tokenId, amount);
     }
 
-    /**
-     * @dev See {ERC20-_burnFrom}.
-     */
-    function burnFrom(address account, uint256 amount) public onlyOwner {
-        _burnFrom(account, amount);
+    function burnTokenId(address tokenOwner, uint256 tokenId) public override onlyOwner {
+        uint256 amount = totalSupply();
+        if(amount < balanceOf(tokenId)) _burn(tokenOwner, tokenId, amount);
+        else _burn(tokenOwner, tokenId, balanceOf(tokenId));
     }
+
 }

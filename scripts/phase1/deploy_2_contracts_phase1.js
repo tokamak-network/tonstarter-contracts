@@ -1,8 +1,8 @@
 const { BigNumber } = require("ethers");
 const { ethers, upgrades } = require("hardhat");
 const utils = ethers.utils;
-const save = require("./save_deployed");
-const { printGasUsedOfUnits } = require("./log_tx");
+const save = require("../save_deployed");
+const { printGasUsedOfUnits } = require("../log_tx");
 
 const {
   toBN,
@@ -11,7 +11,7 @@ const {
 
 require("dotenv").config();
 
-const loadDeployed = require("./load_deployed");
+const loadDeployed = require("../load_deployed");
 
 const zeroAddress = "0x0000000000000000000000000000000000000000";
 const tostoken = loadDeployed(process.env.NETWORK, "TOS");

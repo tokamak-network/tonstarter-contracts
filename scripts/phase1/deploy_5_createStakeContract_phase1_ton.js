@@ -1,8 +1,8 @@
 const { BigNumber } = require("ethers");
 const { ethers, upgrades } = require("hardhat");
 const utils = ethers.utils;
-const save = require("./save_deployed_file");
-const loadDeployed = require("./load_deployed");
+const save = require("../save_deployed_file");
+const loadDeployed = require("../load_deployed");
 //const loadDeployedInput = require("./load_deployed_input");
 const {
   // padLeft,
@@ -16,7 +16,7 @@ const {
 
 require("dotenv").config();
 
-const { printGasUsedOfUnits } = require("./log_tx");
+const { printGasUsedOfUnits } = require("../log_tx");
 
 const zeroAddress = "0x0000000000000000000000000000000000000000";
 const ADMIN_ROLE = keccak256("ADMIN");
@@ -36,9 +36,9 @@ const {
   timeout,
   getPeriodBlockByTimes,
   getEndTime
-} = require("../utils/deploy_common.js");
+} = require("../../utils/deploy_common.js");
 
-
+/*
 // for rinkeby
 const periods = [
   {
@@ -70,8 +70,8 @@ const periods = [
     periodBlocks: 0
   }
 ];
-
-/* for mainnet
+*/
+//for mainnet
 const periods = [
   {
     name: process.env.PHASE1_TON_1_NAME,
@@ -109,7 +109,6 @@ const periods = [
     periodBlocks: 0
   },
 ];
-*/
 
 async function main() {
 

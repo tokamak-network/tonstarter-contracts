@@ -45,6 +45,13 @@ contract StakeUniswapV3Storage {
     /// @dev flag for pause proxy
     bool public pauseProxy;
 
+    /// @dev Start time is set when staking for the first time
+    uint256 public startTime;
+
+    /// @dev Mining interval can be given to save gas cost.
+    uint256 public miningIntervalSeconds;
+
+
     /// @dev pools's token
     address public poolToken0;
     address public poolToken1;
@@ -62,7 +69,7 @@ contract StakeUniswapV3Storage {
     /// @dev coinage for reward 리워드 계산을 위한 코인에이지
     address public coinage;
 
-    /// @dev 초단위로 마이닝하는것은 어떨지.
+    /// @dev  recently mined time (in seconds)
     uint256 public coinageLastMintBlockTimetamp;
 
     /// @dev total tokenIds

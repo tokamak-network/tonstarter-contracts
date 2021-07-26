@@ -74,4 +74,10 @@ interface IStake2Vault {
     /// @dev Returns Give the TOS balance stored in the vault
     /// @return the balance of TOS in this vault.
     function balanceTOSAvailableAmount() external view returns (uint256);
+
+    /// @dev Give all stakeContracts's addresses in this vault
+    /// @return all stakeContracts's addresses
+    // function stakeAddressesAll()
+    //     external
+    //     returns (address[] memory);
 }

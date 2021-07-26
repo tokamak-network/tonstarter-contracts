@@ -62,7 +62,7 @@ async function createValue(tonVault, paytoken) {
 
   params[8]=tx.hash;
   saveVaultsParams(process.env.NETWORK, tonVault.name, params);
-  printGasUsedOfUnits('createVault',tx);
+  printGasUsedOfUnits('createVault ',tx.hash);
 }
 
 async function createStakeContract(vaultAddress, periodBlock, name, paytoken) {
@@ -114,7 +114,7 @@ async function createStakeContract(vaultAddress, periodBlock, name, paytoken) {
   params[6]=tx.hash;
 
   saveVaultsParams(process.env.NETWORK, _name, params);
-  printGasUsedOfUnits('createStakeContract '+ name, tx);
+  printGasUsedOfUnits('createStakeContract '+ name, tx.hash);
 
 }
 

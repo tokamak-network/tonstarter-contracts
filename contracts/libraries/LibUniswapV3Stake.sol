@@ -10,17 +10,17 @@ library LibUniswapV3Stake {
         uint128 liquidity;
         int24 tickLower;
         int24 tickUpper;
-        uint256 startTime;
-        uint256 endTime;
-        uint256 claimedTime;
+        uint32 startTime;
+        uint32 endTime;
+        uint32 claimedTime;
         uint160 secondsInsideInitial;
         uint160 secondsInsideLast;
     }
 
     struct StakedTokenAmount {
         uint256 amount;
-        uint256 startTime;
-        uint256 claimedTime;
+        uint32 startTime;
+        uint32 claimedTime;
         uint256 claimedAmount;
         uint256 nonMiningAmount;
     }
@@ -28,7 +28,7 @@ library LibUniswapV3Stake {
     struct StakedTotalTokenAmount {
         bool staked;
         uint256 totalDepositAmount;
-        uint256 totalClaimedAmount;
-        uint256 totalUnableClaimAmount;
+        uint256 totalMiningAmount;
+        uint256 totalNonMiningAmount;
     }
 }

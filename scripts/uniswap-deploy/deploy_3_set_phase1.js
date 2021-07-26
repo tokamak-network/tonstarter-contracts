@@ -1,10 +1,10 @@
 const { BigNumber } = require("ethers");
 const { ethers, upgrades } = require("hardhat");
 const utils = ethers.utils;
-const save = require("./save_deployed_file");
-const loadDeployed = require("./load_deployed");
+const save = require("../save_deployed");
+const loadDeployed = require("../load_deployed");
 //const loadDeployedInitVariable = require("./load_deployed_init");
-const { printGasUsedOfUnits } = require("./log_tx");
+const { printGasUsedOfUnits } = require("../log_tx");
 
 const {
   toBN,
@@ -35,11 +35,12 @@ async function deployMain(defaultSender) {
   const [deployer, user1] = await ethers.getSigners();
   console.log("deployer:", deployer.address);
 
-  const uniswapRouter = process.env.UniswapRoute;
-  const uniswapNPM = process.env.NonfungiblePositionManager;
-  const uniswapFee = process.env.UniswapFee;
-  const uniswapWeth = process.env.WethAddress;
-  const uniswapRouter2 = process.env.UniswapRouter2;
+  const uniswapRouter = loadDeployed(process.env.NETWORK, "SwapRouter");
+  const uniswapNPM = loadDeployed(process.env.NETWORK, "NonfungiblePositionManager");
+  const uniswapFee = "3000";
+  const uniswapWeth = loadDeployed(process.env.NETWORK, "WETH9");
+  const uniswapRouter2 = loadDeployed(process.env.NETWORK, "SwapRouter");
+
 
   const stakeEntry = await ethers.getContractAt("Stake1Logic", tonproxy);
   console.log("stakeEntry:", stakeEntry.address);
