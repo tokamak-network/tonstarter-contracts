@@ -40,7 +40,7 @@ paytoken is the token that the user stakes.
 
 ## Function `cap()`
 
-allocated amount of tos
+allocated amount of TOS
 
 ###### IStakeVaultStorage-stakeType--
 

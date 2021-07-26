@@ -9,7 +9,7 @@ interface IStakeVaultStorage {
     /// @dev paytoken is the token that the user stakes.
     function paytoken() external view returns (address);
 
-    /// @dev allocated amount of tos
+    /// @dev allocated amount of TOS
     function cap() external view returns (uint256);
 
     /// @dev Operation type of staking amount

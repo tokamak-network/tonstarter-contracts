@@ -2,8 +2,6 @@
 
 - [`upgradeStakeTo(address _stakeProxy, address _implementation)`](#Stake1Logic-upgradeStakeTo-address-address-)
 
-- [`transferOwnership(address newOwner)`](#Stake1Logic-transferOwnership-address-)
-
 - [`grantRole(address target, bytes32 role, address account)`](#Stake1Logic-grantRole-address-bytes32-address-)
 
 - [`revokeRole(address target, bytes32 role, address account)`](#Stake1Logic-revokeRole-address-bytes32-address-)
@@ -14,11 +12,7 @@
 
 - [`setStakeFactory(address _stakeFactory)`](#Stake1Logic-setStakeFactory-address-)
 
-- [`setStakeTONFactory(address _stakeTONFactory)`](#Stake1Logic-setStakeTONFactory-address-)
-
-- [`setStakeSimpleFactory(address _stakeSimpleFactory)`](#Stake1Logic-setStakeSimpleFactory-address-)
-
-- [`setStakeDefiFactory(address _stakeDefiFactory)`](#Stake1Logic-setStakeDefiFactory-address-)
+- [`setFactoryByStakeType(uint256 _stakeType, address _factory)`](#Stake1Logic-setFactoryByStakeType-uint256-address-)
 
 - [`setStakeVaultFactory(address _stakeVaultFactory)`](#Stake1Logic-setStakeVaultFactory-address-)
 
@@ -34,7 +28,7 @@
 
 - [`stakeContractsOfVault(address _vault)`](#Stake1Logic-stakeContractsOfVault-address-)
 
-- [`vaultsOfPhase(uint256 _phaseIndex)`](#Stake1Logic-vaultsOfPhase-uint256-)
+- [`vaultsOfPhase(uint256 _phase)`](#Stake1Logic-vaultsOfPhase-uint256-)
 
 - [`tokamakStaking(address _stakeContract, address _layer2, uint256 stakeAmount)`](#Stake1Logic-tokamakStaking-address-address-uint256-)
 
@@ -45,20 +39,6 @@
 - [`tokamakProcessUnStaking(address _stakeContract, address _layer2)`](#Stake1Logic-tokamakProcessUnStaking-address-address-)
 
 - [`exchangeWTONtoTOS(address _stakeContract, uint256 amountIn, uint256 amountOutMinimum, uint256 deadline, uint160 sqrtPriceLimitX96, uint256 _type)`](#Stake1Logic-exchangeWTONtoTOS-address-uint256-uint256-uint256-uint160-uint256-)
-
-- [`exchangeWTONtoTOSv2(address _stakeContract, uint256 amountIn, uint256 amountOutMinimum, uint256 deadline, uint256 _type)`](#Stake1Logic-exchangeWTONtoTOSv2-address-uint256-uint256-uint256-uint256-)
-
-- [`vaultsOfPahse(uint256 _phase)`](#Stake1Logic-vaultsOfPahse-uint256-)
-
-# Events:
-
-- [`CreatedVault(address vault, address paytoken, uint256 cap)`](#Stake1Logic-CreatedVault-address-address-uint256-)
-
-- [`CreatedStakeContract(address vault, address stakeContract, uint256 phase)`](#Stake1Logic-CreatedStakeContract-address-address-uint256-)
-
-- [`ClosedSale(address vault)`](#Stake1Logic-ClosedSale-address-)
-
-- [`SetStakeRegistry(address stakeRegistry)`](#Stake1Logic-SetStakeRegistry-address-)
 
 ###### Stake1Logic-upgradeStakeTo-address-address-
 
@@ -71,16 +51,6 @@ upgrade to the logic of _stakeProxy
 - `_stakeProxy`: the StakeProxy address, it is stakeContract address in vault.
 
 - `_implementation`: new logic address
-
-###### Stake1Logic-transferOwnership-address-
-
-## Function `transferOwnership(address newOwner)`
-
-transfer Ownership
-
-### Parameters:
-
-- `newOwner`: new owner address
 
 ###### Stake1Logic-grantRole-address-bytes32-address-
 
@@ -140,35 +110,17 @@ Sets StakeFactory address
 
 - `_stakeFactory`: new StakeFactory address
 
-###### Stake1Logic-setStakeTONFactory-address-
+###### Stake1Logic-setFactoryByStakeType-uint256-address-
 
-## Function `setStakeTONFactory(address _stakeTONFactory)`
+## Function `setFactoryByStakeType(uint256 _stakeType, address _factory)`
 
-Sets StakeTONFactory address
-
-### Parameters:
-
-- `_stakeTONFactory`: new StakeTONFactory address
-
-###### Stake1Logic-setStakeSimpleFactory-address-
-
-## Function `setStakeSimpleFactory(address _stakeSimpleFactory)`
-
-Sets StakeSimpleFactory address
+Set factory address by StakeType
 
 ### Parameters:
 
-- `_stakeSimpleFactory`: new StakeSimpleFactory address
+- `_stakeType`: the stake type , 0:TON, 1: Simple, 2: UniswapV3LP
 
-###### Stake1Logic-setStakeDefiFactory-address-
-
-## Function `setStakeDefiFactory(address _stakeDefiFactory)`
-
-Sets StakeDefiFactory address
-
-### Parameters:
-
-- `_stakeDefiFactory`: new StakeDefiFactory address
+- `_factory`: the factory address
 
 ###### Stake1Logic-setStakeVaultFactory-address-
 
@@ -284,13 +236,13 @@ list of stakeContracts in vault
 
 ###### Stake1Logic-vaultsOfPhase-uint256-
 
-## Function `vaultsOfPhase(uint256 _phaseIndex)`
+## Function `vaultsOfPhase(uint256 _phase)`
 
-list of vaults in _phaseIndex phase
+list of vaults in _phase
 
 ### Parameters:
 
-- `_phaseIndex`: the phase number
+- `_phase`: the _phase number
 
 ###### Stake1Logic-tokamakStaking-address-address-uint256-
 
@@ -365,81 +317,3 @@ this function used in StakeTON ( stakeType=0 )
 - `sqrtPriceLimitX96`: sqrtPriceLimitX96
 
 - `_type`: the function type, if 0, use exactInputSingle function, else if, use exactInput function
-
-###### Stake1Logic-exchangeWTONtoTOSv2-address-uint256-uint256-uint256-uint256-
-
-## Function `exchangeWTONtoTOSv2(address _stakeContract, uint256 amountIn, uint256 amountOutMinimum, uint256 deadline, uint256 _type)`
-
-Swap TON to TOS using uniswap v2
-
-this function used in StakeTON ( stakeType=0 )
-
-### Parameters:
-
-- `_stakeContract`: the stakeContract's address
-
-- `amountIn`: the input amount
-
-- `amountOutMinimum`: the minimun output amount
-
-- `deadline`: deadline
-
-- `_type`: the function type, if 0, use exactInputSingle function, else if, use exactInput function
-
-###### Stake1Logic-vaultsOfPahse-uint256-
-
-## Function `vaultsOfPahse(uint256 _phase)`
-
-Get addresses of vaults of index phase
-
-### Parameters:
-
-- `_phase`: the pahse number
-
-###### Stake1Logic-CreatedVault-address-address-uint256-
-
-## Event `CreatedVault(address vault, address paytoken, uint256 cap)`
-
-event on create vault
-
-### Parameters:
-
-- `vault`: the vault address created
-
-- `paytoken`: the token used for staking by user
-
-- `cap`:  allocated reward amount
-
-###### Stake1Logic-CreatedStakeContract-address-address-uint256-
-
-## Event `CreatedStakeContract(address vault, address stakeContract, uint256 phase)`
-
-event on create stake contract in vault
-
-### Parameters:
-
-- `vault`: the vault address
-
-- `stakeContract`: the stake contract address created
-
-- `phase`: the phase of TOS platform
-
-###### Stake1Logic-ClosedSale-address-
-
-## Event `ClosedSale(address vault)`
-
-event on sale-closed
-
-### Parameters:
-
-- `vault`: the vault address
-
-###### Stake1Logic-SetStakeRegistry-address-
-
-## Event `SetStakeRegistry(address stakeRegistry)`
-
-event on setting stake registry
-
-### Parameters:
-
-- `stakeRegistry`: the stakeRegistry address

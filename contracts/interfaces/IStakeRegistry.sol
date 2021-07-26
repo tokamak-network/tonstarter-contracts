@@ -7,6 +7,7 @@ interface IStakeRegistry {
     /// @param _wton WTON address
     /// @param _depositManager DepositManager address
     /// @param _seigManager SeigManager address
+    /// @param _swapProxy Proxy address that can swap TON and WTON
     function setTokamak(
         address _ton,
         address _wton,
@@ -21,6 +22,7 @@ interface IStakeRegistry {
     /// @param _ex1  additional variable . ex) positionManagerAddress in Uniswap V3
     /// @param _ex2  additional variable . ex) WETH Address in Uniswap V3
     /// @param _fee  fee
+    /// @param _routerV2 In case of uniswap, router address of uniswapV2
     function addDefiInfo(
         string calldata _name,
         address _router,
@@ -88,4 +90,24 @@ interface IStakeRegistry {
         external
         view
         returns (address[] memory);
+
+    /// @dev view defi info
+    /// @param _name  hash name : keccak256(abi.encodePacked(_name));
+    /// @return name  _name ex) UNISWAP_V3, UNISWAP_V3_token0_token1
+    /// @return router entry point of defi
+    /// @return ext1  additional variable . ex) positionManagerAddress in Uniswap V3
+    /// @return ext2  additional variable . ex) WETH Address in Uniswap V3
+    /// @return fee  fee
+    /// @return routerV2 In case of uniswap, router address of uniswapV2
+
+    function defiInfo(bytes32 _name)
+        external
+        returns (
+            string calldata name,
+            address router,
+            address ext1,
+            address ext2,
+            uint256 fee,
+            address routerV2
+        );
 }

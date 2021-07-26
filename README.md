@@ -1,33 +1,92 @@
-# ICO2.0 Contracts
+# TONStarter Contracts
 
-## Using this Project
+## Deployed on Mainnet
 
-## Available Functionality
+* "TOS": "0x409c4D8cd5d2924b9bc5509230d16a61289c8153"
 
-### Build Contracts and Generate Typechain Typeings
+* "StakeTON": "0xD08C561507fD6F6Df662a239Bb49B8A773e6e411"
 
-`npm run compile`
+* "StakeTONProxyFactory": "0x4eA3C549C9A041Ad7B83003cd8572b9DBdeEC7F1"
+
+* "StakeTONFactory": "0x8Dde0854A6A6781720E0a4462a8648c89D861b16"
+
+* "StakeFactory": "0x942286FC535Cab49b7C8b650369305ba8b4a2e4c"
+
+* "StakeRegistry": "0x4Fa71D6964a97c043CA3103407e1B3CD6b5Ab367"
+
+* "Stake1Vault": "0xfE78C5A77323274A1afc6669C5ebd2494981ae8d"
+
+* "StakeVaultFactory": "0x0f559A3130e5390f59694ad931B04a5904b8C130"
+
+* "Stake1Logic": "0xcC0b93aF31d3c85416CbdF8Fc471C1D8da6768bb"
+
+* "Stake1Proxy": "0x8e539e29D80fd4cB3167409A82787f3B80bf9113"
+
+
+### USING TOKAMAK CONTRACTS
+
+* "TON": "0x2be5e8c109e2197D077D13A82dAead6a9b3433C5"
+
+* "WTON": "0xc4A11aaf6ea915Ed7Ac194161d2fC9384F15bff2"
+
+* "DepositManager": "0x56E465f654393fa48f007Ed7346105c7195CEe43"
+
+* "SeigManager": "0x710936500aC59e8551331871Cbad3D33d5e0D909"
+
+* "SwapProxy": "0x30e65B3A6e6868F044944Aa0e9C5d52F8dcb138d"
+
+
+### Build Contracts with Truffle
+
+`npm run compile:truffle`
+
+
+### Test Contracts with Truffle
+
+`npm run test:proxy`
+
+`npm run test:stake.eth`
+
+`npm run test:stake.ton`
+
+`npm run test:stake.tokamak`
+
+`npm run test:upgrade`
+
+`npm run test:factory`
 
 ### Deploy to Ethereum
 
 Create/modify network config in `hardhat.config.ts` and add API key and private key, then run:
 
-To deploy,
+* To deploy TOS ,
+*
 `npx hardhat run --network rinkeby scripts/deploy_1_tos.js`
+
+* To deploy phase1 contracts ,
+*
 `npx hardhat run --network rinkeby scripts/deploy_2_contracts.js`
 
-To set init storage,
+* To set init storage,
+*
 `npx hardhat run --network rinkeby scripts/deploy_3_set.js`
 
-To create vault,
-you write down StakeType with TON or ETH in deployed.networkname.input.json
-you write down VaultName in deployed.networkname.input.json
-then,
-`npx hardhat run --network rinkeby scripts/deploy_4_createVault.js`
-it will display tx, then you have to find vault address using tx on etherscan.
-you write down VaultAddress in deployed.networkname.input.json
+* To create vault,
+*
+you write down StakeType with TON or ETH in **deployed.networkname.input.json**
 
-To create stakeContract in vault,
+you write down VaultName in **deployed.networkname.input.json**
+then,
+
+`npx hardhat run --network rinkeby scripts/deploy_4_createVault.js`
+
+
+it will display tx, then you have to find vault address using tx on etherscan.
+**you write down VaultAddress in deployed.networkname.input.json**
+
+
+* To create stakeContract in vault,
+
 `npx hardhat run --network rinkeby scripts/deploy_5_createStakeContract.js`
 
 
@@ -37,9 +96,36 @@ Using the [hardhat-etherscan plugin](https://hardhat.org/plugins/nomiclabs-hardh
 
 `npx hardhat verify --network rinkeby <DEPLOYED ADDRESS>`
 
-### To do the tokamak ton integration test
-`git clone https://github.com/Onther-Tech/plasma-evm-contracts`
+### compile
+`git clone --recursive https://github.com/Onther-Tech/tonstarter-contracts.git`
+
+`git checkout develop`
+
+`npm run compile:uniswap3-core`
+
+`npm run compile:uniswap3-periphery`
+
 `npm run compile:plasma`
+
+`npm run compile:truffle`
+
+`npm install`
+
+
+### test
+`npm run test:proxy`
+
+`npm run test:stake.ton`
+
+`npm run test:stake.tokamak`
+
+`npm run test:uniswapv3`
+
+`npm run test:upgrade-stakeTON`
+
+`npm run test:stake.eth`
+
+
 
 ### lint
 `npm run lint`

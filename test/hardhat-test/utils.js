@@ -60,6 +60,8 @@ async function setupContracts(account) {
   const version = "1";
 
   const addresses = await getAddresses();
+  console.log("addresses ", addresses);
+
   const [
     candidate1,
     candidate2,
@@ -77,11 +79,13 @@ async function setupContracts(account) {
   const operators = [operator1, operator2];
 
   const deployer = await findSigner(account);
+  console.log("deployer ", deployer.address);
 
   const tos = await (await ethers.getContractFactory("TOS"))
     .connect(deployer)
     .deploy(name, symbol, version);
   await tos.deployed();
+  console.log("tos ", tos.address);
 
   const stakeRegistry = await (await ethers.getContractFactory("StakeRegistry"))
     .connect(deployer)
@@ -186,6 +190,7 @@ async function setupContracts(account) {
     .deploy(wton.address, layer2Registry.address, WITHDRAWAL_DELAY);
   await depositManager.deployed();
 
+
   const coinageFactory = await (
     await ethers.getContractFactory("CoinageFactory")
   )
@@ -193,6 +198,7 @@ async function setupContracts(account) {
     .deploy();
   await coinageFactory.deployed();
   console.log("hello0.5");
+
 
   const currentTime = await time.latest();
   console.log(currentTime.toString());

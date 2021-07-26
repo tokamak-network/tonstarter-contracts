@@ -2,8 +2,6 @@
 
 - [`constructor(address _logic)`](#StakeTONProxy-constructor-address-)
 
-- [`transferOwnership(address newOwner)`](#StakeTONProxy-transferOwnership-address-)
-
 - [`setProxyPause(bool _pause)`](#StakeTONProxy-setProxyPause-bool-)
 
 - [`upgradeTo(address impl)`](#StakeTONProxy-upgradeTo-address-)
@@ -35,16 +33,6 @@ the constructor of StakeTONProxy
 ### Parameters:
 
 - `_logic`: the logic address of StakeTONProxy
-
-###### StakeTONProxy-transferOwnership-address-
-
-## Function `transferOwnership(address newOwner)`
-
-transfer Ownership
-
-### Parameters:
-
-- `newOwner`: new owner address
 
 ###### StakeTONProxy-setProxyPause-bool-
 

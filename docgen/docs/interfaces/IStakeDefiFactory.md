@@ -1,10 +1,10 @@
 # Functions:
 
-- [`create(address[3] _addr, address _registry, uint256[3] _intdata, address owner)`](#IStakeDefiFactory-create-address-3--address-uint256-3--address-)
+- [`create(address[4] _addr, address _registry, uint256[3] _intdata, address owner)`](#IStakeDefiFactory-create-address-4--address-uint256-3--address-)
 
-###### IStakeDefiFactory-create-address-3--address-uint256-3--address-
+###### IStakeDefiFactory-create-address-4--address-uint256-3--address-
 
-## Function `create(address[3] _addr, address _registry, uint256[3] _intdata, address owner)`
+## Function `create(address[4] _addr, address _registry, uint256[3] _intdata, address owner)`
 
 Create a stake contract that can operate the staked amount as a DeFi project.
 

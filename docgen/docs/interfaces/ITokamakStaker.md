@@ -16,8 +16,6 @@
 
 - [`exchangeWTONtoTOS(uint256 _amountIn, uint256 _amountOutMinimum, uint256 _deadline, uint160 _sqrtPriceLimitX96, uint256 _kind)`](#ITokamakStaker-exchangeWTONtoTOS-uint256-uint256-uint256-uint160-uint256-)
 
-- [`exchangeWTONtoTOSv2(uint256 _amountIn, uint256 _amountOutMinimum, uint256 _deadline, uint256 _kind)`](#ITokamakStaker-exchangeWTONtoTOSv2-uint256-uint256-uint256-uint256-)
-
 ###### ITokamakStaker-setTokamakLayer2-address-
 
 ## Function `setTokamakLayer2(address _layer2)`
@@ -36,13 +34,15 @@ get the addresses yhat used in uniswap interfaces
 
 ### Return Values:
 
-- uniswapRouter the address of uniswapRouter
+- uniswapRouter the address of uniswapV3 Router
 
 - npm the address of positionManagerAddress
 
 - ext the address of ext
 
 - fee the amount of fee
+
+- uniswapV2Router uniswapV2 router address
 
 ###### ITokamakStaker-swapTONtoWTON-uint256-bool-
 
@@ -115,21 +115,5 @@ exchange holded WTON to TOS using uniswap-v3
 - `_deadline`: deadline
 
 - `_sqrtPriceLimitX96`: sqrtPriceLimitX96
-
-- `_kind`: the function type, if 0, use exactInputSingle function, else if, use exactInput function
-
-###### ITokamakStaker-exchangeWTONtoTOSv2-uint256-uint256-uint256-uint256-
-
-## Function `exchangeWTONtoTOSv2(uint256 _amountIn, uint256 _amountOutMinimum, uint256 _deadline, uint256 _kind)`
-
-exchange holded WTON to TOS using uniswap-v2
-
-### Parameters:
-
-- `_amountIn`: the input amount
-
-- `_amountOutMinimum`: the minimun output amount
-
-- `_deadline`: deadline
 
 - `_kind`: the function type, if 0, use exactInputSingle function, else if, use exactInput function

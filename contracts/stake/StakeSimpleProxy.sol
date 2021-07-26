@@ -3,38 +3,26 @@ pragma solidity ^0.7.6;
 //pragma abicoder v2;
 
 import "./Stake1Storage.sol";
-import "@openzeppelin/contracts/access/AccessControl.sol";
+import "../common/AccessibleCommon.sol";
+import "./ProxyBase.sol";
 
 /// @title Proxy for Simple Stake contracts
 /// @notice
-contract StakeSimpleProxy is Stake1Storage, AccessControl {
-    bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
-    address internal _implementation;
-    bool public pauseProxy;
-
+contract StakeSimpleProxy is Stake1Storage, AccessibleCommon, ProxyBase {
     event Upgraded(address indexed implementation);
 
-    modifier onlyOwner() {
-        require(
-            hasRole(ADMIN_ROLE, msg.sender),
-            "StakeSimpleProxy:not an admin"
-        );
-        _;
-    }
-
     constructor(address _logic) {
+        assert(
+            IMPLEMENTATION_SLOT ==
+                bytes32(uint256(keccak256("eip1967.proxy.implementation")) - 1)
+        );
+        require(_logic != address(0), "StakeSimpleProxy: logic is zero");
+
+        _setImplementation(_logic);
+
         _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
         _setupRole(ADMIN_ROLE, msg.sender);
         _setupRole(ADMIN_ROLE, address(this));
-        _implementation = _logic;
-    }
-
-    /// @dev transfer Ownership
-    /// @param newOwner new owner address
-    function transferOwnership(address newOwner) external onlyOwner {
-        require(msg.sender != newOwner, "StakeSimpleProxy:same owner");
-        grantRole(ADMIN_ROLE, newOwner);
-        revokeRole(ADMIN_ROLE, msg.sender);
     }
 
     /// @notice Set pause state
@@ -47,14 +35,14 @@ contract StakeSimpleProxy is Stake1Storage, AccessControl {
     /// @param impl New implementation contract address
     function upgradeTo(address impl) external onlyOwner {
         require(impl != address(0), "StakeSimpleProxy: input is zero");
-        require(_implementation != impl, "StakeSimpleProxy: same");
-        _implementation = impl;
+        require(_implementation() != impl, "StakeSimpleProxy: same");
+        _setImplementation(impl);
         emit Upgraded(impl);
     }
 
     /// @dev returns the implementation
     function implementation() public view returns (address) {
-        return _implementation;
+        return _implementation();
     }
 
     receive() external payable {
@@ -66,7 +54,7 @@ contract StakeSimpleProxy is Stake1Storage, AccessControl {
     }
 
     function _fallback() internal {
-        address _impl = implementation();
+        address _impl = _implementation();
         require(
             _impl != address(0) && !pauseProxy,
             "StakeSimpleProxy: impl is zero OR proxy is false"
@@ -97,12 +85,14 @@ contract StakeSimpleProxy is Stake1Storage, AccessControl {
     }
 
     /// @dev set initial storage
-    /// @param _addr the array addresses of token, paytoken, vault
+    /// @param _addr the array addresses of token, paytoken, vault, defiAddr
     /// @param _intdata the array valued of saleStartBlock, stakeStartBlock, periodBlocks
-    function setInit(address[3] memory _addr, uint256[3] memory _intdata)
-        external
-        onlyOwner
-    {
+    function setInit(
+        address[4] memory _addr,
+        address _registry,
+        uint256[3] memory _intdata
+    ) external onlyOwner {
+        require(token == address(0), "StakeSimpleProxy: already initialized");
         require(
             _addr[2] != address(0) && _intdata[0] < _intdata[1],
             "StakeSimpleProxy: setInit fail"
@@ -110,6 +100,9 @@ contract StakeSimpleProxy is Stake1Storage, AccessControl {
         token = _addr[0];
         paytoken = _addr[1];
         vault = _addr[2];
+        defiAddr = _addr[3];
+
+        stakeRegistry = _registry;
 
         saleStartBlock = _intdata[0];
         startBlock = _intdata[1];

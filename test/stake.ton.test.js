@@ -326,7 +326,7 @@ let stakeContractTokamak = [];
             stakeAmount,
             { from: user1 }
           )
-      ).to.be.revertedWith("TokamakStaker:not closed");
+      ).to.be.revertedWith("TokamakStaker: not closed");
 
     });
 
@@ -339,7 +339,7 @@ let stakeContractTokamak = [];
           wtonAmount,
           { from: user1 }
         )
-      ).to.be.revertedWith("TokamakStaker:different layer");
+      ).to.be.revertedWith("TokamakStaker: not closed");
     });
 
     it("4. If the sales closing function is not performed, cannot processWithdraw to Tokamak.", async function () {
@@ -349,7 +349,7 @@ let stakeContractTokamak = [];
           layer2.address,
           { from: user1 }
         )
-      ).to.be.revertedWith("TokamakStaker:different layer");
+      ).to.be.revertedWith("TokamakStaker: not closed");
     });
   });
 
@@ -522,6 +522,7 @@ let stakeContractTokamak = [];
     });
 
     it("2. can request withdrawal of a reward TON in tokamak.", async function () {
+      this.timeout(1000000);
       let i = 0;
       let wtonAmount = '1'+'0'.repeat(27);
       requestBlock = await time.latestBlock();
@@ -549,7 +550,7 @@ let stakeContractTokamak = [];
     });
 
     it("3. can\'t process withdrawal of a reward TON in tokamak unless pass the delay blocks", async function () {
-
+      this.timeout(1000000);
       await expect(
         stakeEntry.tokamakProcessUnStaking(
             stakeAddresses[0],
@@ -561,7 +562,7 @@ let stakeContractTokamak = [];
     });
 
     it("4. can process withdrawal of a reward TON in tokamak after passing the delay blocks", async function () {
-
+        this.timeout(1000000);
       let delayBlocks = requestBlock + parseInt(globalWithdrawalDelay.toString()) ;
       await time.advanceBlockTo(delayBlocks-1);
 
@@ -593,6 +594,7 @@ let stakeContractTokamak = [];
     });
 
     it("5. can request/process withdrawal of a whole amount staked in Tokamak.", async function () {
+      this.timeout(1000000);
       let delayBlocks = requestBlock + parseInt(globalWithdrawalDelay.toString()) + 5;
       await time.advanceBlockTo(delayBlocks);
       await ico20Contracts.updateRewardTokamak(layer2, operator1);
@@ -752,6 +754,7 @@ let stakeContractTokamak = [];
   describe('# 12. Function Test2 For Withdraw ', async function () {
 
     it('1. you cannot withdraw if don\'t unstaking a whole amount in tokamak.', async function () {
+      this.timeout(1000000);
       let i = 0;
       await ico20Contracts.updateRewardTokamak(layer2, operator1);
       const stakeContract1 = await StakeTON.at(stakeAddresses[i]);
@@ -761,7 +764,7 @@ let stakeContractTokamak = [];
     });
 
     it('2. unstaking a whole amount in tokamak.', async function () {
-
+      this.timeout(1000000);
       //-- tokamakRequestUnStakingAll
       stakeEndBlock = await vault_phase1_ton.stakeEndBlock();
       stakeEndBlock = parseInt(stakeEndBlock.toString())+1;

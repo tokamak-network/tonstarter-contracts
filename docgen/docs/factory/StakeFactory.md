@@ -1,20 +1,14 @@
 # Functions:
 
-- [`constructor(address _stakeSimpleFactory, address _stakeTONFactory, address _stakeDefiFactory)`](#StakeFactory-constructor-address-address-address-)
+- [`constructor(address _stakeSimpleFactory, address _stakeTONFactory, address _stakeUniswapV3Factory)`](#StakeFactory-constructor-address-address-address-)
 
-- [`transferOwnership(address newOwner)`](#StakeFactory-transferOwnership-address-)
-
-- [`setStakeSimpleFactory(address _stakeSimpleFactory)`](#StakeFactory-setStakeSimpleFactory-address-)
-
-- [`setStakeTONFactory(address _stakeTONFactory)`](#StakeFactory-setStakeTONFactory-address-)
-
-- [`setStakeDefiFactory(address _stakeDefiFactory)`](#StakeFactory-setStakeDefiFactory-address-)
+- [`setFactoryByStakeType(uint256 _stakeType, address _factory)`](#StakeFactory-setFactoryByStakeType-uint256-address-)
 
 - [`create(uint256 stakeType, address[4] _addr, address registry, uint256[3] _intdata)`](#StakeFactory-create-uint256-address-4--address-uint256-3--)
 
 ###### StakeFactory-constructor-address-address-address-
 
-## Function `constructor(address _stakeSimpleFactory, address _stakeTONFactory, address _stakeDefiFactory)`
+## Function `constructor(address _stakeSimpleFactory, address _stakeTONFactory, address _stakeUniswapV3Factory)`
 
 constructor of StakeFactory
 
@@ -24,47 +18,19 @@ constructor of StakeFactory
 
 - `_stakeTONFactory`: the logic address used in StakeTONFactory
 
-- `_stakeTONFactory`: the logic address used in StakeTONFactory
+- `_stakeUniswapV3Factory`: the logic address used in StakeUniswapV3Factory
 
-###### StakeFactory-transferOwnership-address-
+###### StakeFactory-setFactoryByStakeType-uint256-address-
 
-## Function `transferOwnership(address newOwner)`
+## Function `setFactoryByStakeType(uint256 _stakeType, address _factory)`
 
-transfer Ownership
-
-### Parameters:
-
-- `newOwner`: new owner address
-
-###### StakeFactory-setStakeSimpleFactory-address-
-
-## Function `setStakeSimpleFactory(address _stakeSimpleFactory)`
-
-Set StakeSimpleFactory address
+Set factory address by StakeType
 
 ### Parameters:
 
-- `_stakeSimpleFactory`: new StakeSimpleFactory address
+- `_stakeType`: the stake type , 0:TON, 1: Simple, 2: UniswapV3LP, may continue to be added.
 
-###### StakeFactory-setStakeTONFactory-address-
-
-## Function `setStakeTONFactory(address _stakeTONFactory)`
-
-Set StakeTONFactory address
-
-### Parameters:
-
-- `_stakeTONFactory`: new StakeTONFactory address
-
-###### StakeFactory-setStakeDefiFactory-address-
-
-## Function `setStakeDefiFactory(address _stakeDefiFactory)`
-
-Set StakeDefiFactory address
-
-### Parameters:
-
-- `_stakeDefiFactory`: new StakeDefiFactory address
+- `_factory`: the factory address
 
 ###### StakeFactory-create-uint256-address-4--address-uint256-3--
 
@@ -74,13 +40,17 @@ Create a stake contract that calls the desired stake factory according to stakeT
 
 ### Parameters:
 
-- `stakeType`: if 0, stakeTONFactory, else if 1 , stakeSimpleFactory , else if 2, stakeDefiFactory
+- `stakeType`: if 0, stakeTONFactory, else if 1 , stakeSimpleFactory , else if 2, stakeUniswapV3Factory
 
 - `_addr`: array of [token, paytoken, vault, _defiAddr]
+
+        or when stakeTyoe ==2 , [tos,0 , vault, 0 ]
 
 - `registry`:  registry address
 
 - `_intdata`: array of [saleStartBlock, startBlock, periodBlocks]
+
+        or when stakeTyoe ==2 , [cap, rewardPerBlock, 0]
 
 ### Return Values:
 

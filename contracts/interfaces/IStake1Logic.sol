@@ -2,7 +2,6 @@
 pragma solidity ^0.7.6;
 
 interface IStake1Logic {
-
     /// @dev event on create vault
     /// @param vault the vault address created
     /// @param paytoken the token used for staking by user
@@ -48,7 +47,8 @@ interface IStake1Logic {
     ) external;
 
     /// @dev Set factory address by StakeType
-    /// @param _stakeType the stake type , 0:TON, 1: Simple, 2: UniswapV3
+
+    /// @param _stakeType the stake type , 0:TON, 1: Simple, 2: UniswapV3LP
     /// @param _factory the factory address
     function setFactoryByStakeType(uint256 _stakeType, address _factory)
         external;
@@ -110,7 +110,7 @@ interface IStake1Logic {
         view
         returns (address[] memory);
 
-    /// @dev list of vaults in phase
+    /// @dev list of vaults in _phase
     /// @param _phase the phase number
     function vaultsOfPhase(uint256 _phase)
         external
@@ -165,6 +165,4 @@ interface IStake1Logic {
         uint160 sqrtPriceLimitX96,
         uint256 _type
     ) external returns (uint256 amountOut);
-
-
 }

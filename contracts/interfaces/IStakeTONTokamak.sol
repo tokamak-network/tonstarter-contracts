@@ -35,17 +35,4 @@ interface IStakeTONTokamak {
         uint160 sqrtPriceLimitX96,
         uint256 _kind
     ) external returns (uint256 amountOut);
-
-    /// @dev exchange holded WTON to TOS using uniswap
-    /// @param _amountIn the input amount
-    /// @param _amountOutMinimum the minimun output amount
-    /// @param _deadline deadline
-    /// @param _kind the function type, if 0, use exactInputSingle function, else if, use exactInput function
-    /// @return amountOut the amount of exchanged out token
-    function exchangeWTONtoTOSv2(
-        uint256 _amountIn,
-        uint256 _amountOutMinimum,
-        uint256 _deadline,
-        uint256 _kind
-    ) external returns (uint256 amountOut);
 }

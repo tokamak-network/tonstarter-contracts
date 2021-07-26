@@ -265,7 +265,7 @@ describe("TokamakStaker ", function () {
               tonAmount,
               { from: defaultSender }
             )
-      ).to.be.revertedWith("TokamakStaker:not closed");
+      ).to.be.revertedWith("TokamakStaker: not closed");
 
     });
 
@@ -278,7 +278,7 @@ describe("TokamakStaker ", function () {
           wtonAmount,
           { from: user1 }
         )
-      ).to.be.revertedWith("TokamakStaker:different layer");
+      ).to.be.revertedWith("TokamakStaker: not closed");
     });
 
     it("3. tokamakProcessUnStaking fails ", async function () {
@@ -288,7 +288,7 @@ describe("TokamakStaker ", function () {
           layer2.address,
           { from: user1 }
         )
-      ).to.be.revertedWith("TokamakStaker:different layer");
+      ).to.be.revertedWith("TokamakStaker: not closed");
     });
   });
 

@@ -7,28 +7,22 @@ import {IStakeFactory} from "../interfaces/IStakeFactory.sol";
 import {IStakeRegistry} from "../interfaces/IStakeRegistry.sol";
 import {IStake1Vault} from "../interfaces/IStake1Vault.sol";
 import {IStakeTONTokamak} from "../interfaces/IStakeTONTokamak.sol";
+import {IStakeUniswapV3} from "../interfaces/IStakeUniswapV3.sol";
 
-import "@openzeppelin/contracts/access/AccessControl.sol";
+import "../common/AccessibleCommon.sol";
+
 import "./StakeProxyStorage.sol";
 
 /// @title The logic of TOS Plaform
 /// @notice Admin can createVault, createStakeContract.
 /// User can excute the tokamak staking function of each contract through this logic.
-contract Stake1Logic is StakeProxyStorage, AccessControl, IStake1Logic {
-    bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
-    bytes32 public constant ZERO_HASH =
-        0x0000000000000000000000000000000000000000000000000000000000000000;
-
-    modifier onlyOwner() {
-        require(hasRole(ADMIN_ROLE, msg.sender), "");
-        _;
-    }
-
-    modifier nonZero(address _addr) {
+contract Stake1Logic is StakeProxyStorage, AccessibleCommon, IStake1Logic {
+    modifier nonZeroAddress(address _addr) {
         require(_addr != address(0), "Stake1Logic:zero address");
         _;
     }
-/*
+
+    /*
     /// @dev event on create vault
     /// @param vault the vault address created
     /// @param paytoken the token used for staking by user
@@ -54,10 +48,7 @@ contract Stake1Logic is StakeProxyStorage, AccessControl, IStake1Logic {
     event SetStakeRegistry(address stakeRegistry);
 */
 
-    constructor() {
-        _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
-        _setupRole(ADMIN_ROLE, msg.sender);
-    }
+    constructor() {}
 
     /// @dev upgrade to the logic of _stakeProxy
     /// @param _stakeProxy the StakeProxy address, it is stakeContract address in vault.
@@ -69,14 +60,6 @@ contract Stake1Logic is StakeProxyStorage, AccessControl, IStake1Logic {
         IProxy(_stakeProxy).upgradeTo(_implementation);
     }
 
-    /// @dev transfer Ownership
-    /// @param newOwner new owner address
-    function transferOwnership(address newOwner) external onlyOwner {
-        require(msg.sender != newOwner, "Stake1Logic: same owner");
-        grantRole(ADMIN_ROLE, newOwner);
-        revokeRole(ADMIN_ROLE, msg.sender);
-    }
-
     /// @dev grant the role to account in target
     /// @param target target address
     /// @param role  byte32 of role
@@ -86,15 +69,7 @@ contract Stake1Logic is StakeProxyStorage, AccessControl, IStake1Logic {
         bytes32 role,
         address account
     ) external onlyOwner {
-        (bool success, ) =
-            target.call(
-                abi.encodeWithSignature(
-                    "grantRole(bytes32,address)",
-                    role,
-                    account
-                )
-            );
-        require(success, "Stake1Logic: grantRole fail");
+        AccessControl(target).grantRole(role, account);
     }
 
     /// @dev revoke the role to account in target
@@ -106,20 +81,12 @@ contract Stake1Logic is StakeProxyStorage, AccessControl, IStake1Logic {
         bytes32 role,
         address account
     ) external onlyOwner {
-        (bool success, ) =
-            target.call(
-                abi.encodeWithSignature(
-                    "revokeRole(bytes32,address)",
-                    role,
-                    account
-                )
-            );
-        require(success, "Stake1Logic: revokeRole fail");
+        AccessControl(target).revokeRole(role, account);
     }
 
     /// @dev Sets TOS address
     /// @param _tos new TOS address
-    function setTOS(address _tos) public onlyOwner nonZero(_tos) {
+    function setTOS(address _tos) public onlyOwner nonZeroAddress(_tos) {
         tos = _tos;
     }
 
@@ -128,7 +95,7 @@ contract Stake1Logic is StakeProxyStorage, AccessControl, IStake1Logic {
     function setStakeRegistry(address _stakeRegistry)
         public
         onlyOwner
-        nonZero(_stakeRegistry)
+        nonZeroAddress(_stakeRegistry)
     {
         stakeRegistry = IStakeRegistry(_stakeRegistry);
         emit SetStakeRegistry(_stakeRegistry);
@@ -139,29 +106,29 @@ contract Stake1Logic is StakeProxyStorage, AccessControl, IStake1Logic {
     function setStakeFactory(address _stakeFactory)
         public
         onlyOwner
-        nonZero(_stakeFactory)
+        nonZeroAddress(_stakeFactory)
     {
         stakeFactory = IStakeFactory(_stakeFactory);
     }
 
     /// @dev Set factory address by StakeType
-    /// @param _stakeType the stake type , 0:TON, 1: Simple, 2: UniswapV3
+    /// @param _stakeType the stake type , 0:TON, 1: Simple, 2: UniswapV3LP
     /// @param _factory the factory address
     function setFactoryByStakeType(uint256 _stakeType, address _factory)
         external
         override
         onlyOwner
-        nonZero(address(stakeFactory))
+        nonZeroAddress(address(stakeFactory))
     {
-        stakeFactory.setFactoryByStakeType(_stakeType,_factory);
+        stakeFactory.setFactoryByStakeType(_stakeType, _factory);
     }
 
     /// @dev Sets StakeVaultFactory address
     /// @param _stakeVaultFactory new StakeVaultFactory address
     function setStakeVaultFactory(address _stakeVaultFactory)
-        public
+        external
         onlyOwner
-        nonZero(_stakeVaultFactory)
+        nonZeroAddress(_stakeVaultFactory)
     {
         stakeVaultFactory = IStakeVaultFactory(_stakeVaultFactory);
     }
@@ -188,10 +155,10 @@ contract Stake1Logic is StakeProxyStorage, AccessControl, IStake1Logic {
         external
         override
         onlyOwner
-        nonZero(_stakeVaultFactory)
-        nonZero(_ton)
-        nonZero(_wton)
-        nonZero(_depositManager)
+        nonZeroAddress(_stakeVaultFactory)
+        nonZeroAddress(_ton)
+        nonZeroAddress(_wton)
+        nonZeroAddress(_depositManager)
     {
         setTOS(_tos);
         setStakeRegistry(_stakeRegistry);
@@ -222,9 +189,10 @@ contract Stake1Logic is StakeProxyStorage, AccessControl, IStake1Logic {
         bytes32 _vaultName,
         uint256 _stakeType,
         address _defiAddr
-    ) external override onlyOwner nonZero(address(stakeVaultFactory)) {
+    ) external override onlyOwner nonZeroAddress(address(stakeVaultFactory)) {
         address vault =
             stakeVaultFactory.create(
+                _phase,
                 [tos, _paytoken, address(stakeFactory), _defiAddr],
                 [_stakeType, _cap, _saleStartBlock, _stakeStartBlock],
                 address(this)
@@ -312,14 +280,14 @@ contract Stake1Logic is StakeProxyStorage, AccessControl, IStake1Logic {
         external
         view
         override
-        nonZero(_vault)
+        nonZeroAddress(_vault)
         returns (address[] memory)
     {
         return IStake1Vault(_vault).stakeAddressesAll();
     }
 
-    /// @dev list of vaults in _phaseIndex phase
-    /// @param _phase the phase number
+    /// @dev list of vaults in _phase
+    /// @param _phase the _phase number
     function vaultsOfPhase(uint256 _phase)
         external
         view
@@ -398,29 +366,6 @@ contract Stake1Logic is StakeProxyStorage, AccessControl, IStake1Logic {
                 amountOutMinimum,
                 deadline,
                 sqrtPriceLimitX96,
-                _type
-            );
-    }
-
-    /// @dev Swap TON to TOS using uniswap v2
-    /// @dev this function used in StakeTON ( stakeType=0 )
-    /// @param _stakeContract the stakeContract's address
-    /// @param amountIn the input amount
-    /// @param amountOutMinimum the minimun output amount
-    /// @param deadline deadline
-    /// @param _type the function type, if 0, use exactInputSingle function, else if, use exactInput function
-    function exchangeWTONtoTOSv2(
-        address _stakeContract,
-        uint256 amountIn,
-        uint256 amountOutMinimum,
-        uint256 deadline,
-        uint256 _type
-    ) external returns (uint256 amountOut) {
-        return
-            IStakeTONTokamak(_stakeContract).exchangeWTONtoTOSv2(
-                amountIn,
-                amountOutMinimum,
-                deadline,
                 _type
             );
     }

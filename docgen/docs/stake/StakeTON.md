@@ -28,9 +28,7 @@ constructor of StakeTON
 
 ## Function `receive()`
 
-receive ether
-
-call stake function with msg.value
+This contract cannot stake Ether.
 
 ###### StakeTON-withdraw--
 

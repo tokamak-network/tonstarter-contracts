@@ -4,27 +4,6 @@ pragma abicoder v2;
 import "../libraries/LibTokenStake1.sol";
 
 interface IStake1Vault {
-    /// @dev Initializes all variables
-    /// @param _tos  TOS token address
-    /// @param _paytoken  Tokens staked by users, can be used as ERC20 tokens.
-    //                     (In case of ETH, input address(0))
-    /// @param _cap  Maximum amount of rewards issued, allocated reward amount.
-    /// @param _saleStartBlock  the sale start block
-    /// @param _stakeStartBlock  the staking start block
-    /// @param _stakefactory the factory address to create stakeContract
-    /// @param _stakeType  Type of staking contract, 0 TON staking, 1 basic ERC20 staking, 2 Defi linked staking
-    /// @param _defiAddr Used when an external address is required. default: address(0)
-    function initialize(
-        address _tos,
-        address _paytoken,
-        uint256 _cap,
-        uint256 _saleStartBlock,
-        uint256 _stakeStartBlock,
-        address _stakefactory,
-        uint256 _stakeType,
-        address _defiAddr
-    ) external;
-
     /// @dev Sets TOS address
     /// @param _tos  TOS address
     function setTOS(address _tos) external;
@@ -37,7 +16,7 @@ interface IStake1Vault {
     /// @param _defiAddr DeFi related address
     function setDefiAddr(address _defiAddr) external;
 
-    /// @dev If the vault has more money than the reward owed, the owner can withdraw the remaining amount.
+    /// @dev If the vault has more money than the reward to give, the owner can withdraw the remaining amount.
     /// @param _amount the amount of withdrawal
     function withdrawReward(uint256 _amount) external;
 
@@ -63,7 +42,7 @@ interface IStake1Vault {
     /// @return true
     function claim(address _to, uint256 _amount) external returns (bool);
 
-    /// @dev whether it is available to claim amount, if it is available , return the total reward amount
+    /// @dev Whether user(to) can receive a reward amount(_amount)
     /// @param _to  a staking contract.
     /// @param _amount the total reward amount of stakeContract
     /// @return true

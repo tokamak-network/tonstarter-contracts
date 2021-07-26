@@ -3,22 +3,19 @@ pragma solidity ^0.7.0;
 
 import "../interfaces/IStakeSimple.sol";
 import {IIStake1Vault} from "../interfaces/IIStake1Vault.sol";
-import {IIERC20} from "../interfaces/IIERC20.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "../libraries/LibTokenStake1.sol";
-import {SafeMath} from "../utils/math/SafeMath.sol";
-import "@openzeppelin/contracts/access/AccessControl.sol";
+import "@openzeppelin/contracts/math/SafeMath.sol";
+import "../common/AccessibleCommon.sol";
 import "../stake/Stake1Storage.sol";
+import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 
 /// @title Simple Stake Contract
 /// @notice Stake contracts can interact with the vault to claim tos tokens
-contract StakeSimple is Stake1Storage, AccessControl, IStakeSimple {
+contract StakeSimple is Stake1Storage, AccessibleCommon, IStakeSimple {
     using SafeMath for uint256;
-    bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
+    using SafeERC20 for IERC20;
 
-    modifier onlyOwner() {
-        require(hasRole(ADMIN_ROLE, msg.sender), "StakeSimple: not an admin");
-        _;
-    }
     modifier lock() {
         require(_lock == 0, "StakeSimple: LOCKED");
         _lock = 1;
@@ -43,53 +40,12 @@ contract StakeSimple is Stake1Storage, AccessControl, IStakeSimple {
     event Withdrawal(address indexed to, uint256 amount);
 
     /// @dev constructor of StakeSimple
-    constructor() {
-        _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
-        _setupRole(ADMIN_ROLE, msg.sender);
-    }
+    constructor() {}
 
     /// @dev receive ether
     /// @dev call stake function with msg.value
     receive() external payable {
         stake(msg.value);
-    }
-
-    /// @dev transfer Ownership
-    /// @param newOwner new owner address
-    function transferOwnership(address newOwner) external onlyOwner {
-        require(msg.sender != newOwner, "StakeSimple: same owner");
-        grantRole(ADMIN_ROLE, newOwner);
-        revokeRole(ADMIN_ROLE, msg.sender);
-    }
-
-    /// @dev Initialize
-    /// @param _token  the reward token address , It is TOS address.
-    /// @param _paytoken  Tokens staked by users, can be used as ERC20 tokens.
-    //                     (In case of ETH, input address(0))
-    /// @param _vault  the _ault's address
-    /// @param _saleStartBlock  the sale start block
-    /// @param _startBlock  the staking start block
-    /// @param _period the period that user can generate reward amount
-    function initialize(
-        address _token,
-        address _paytoken,
-        address _vault,
-        uint256 _saleStartBlock,
-        uint256 _startBlock,
-        uint256 _period
-    ) external override onlyOwner {
-        require(
-            _token != address(0) &&
-                _vault != address(0) &&
-                _saleStartBlock < _startBlock,
-            "StakeSimple: initialize zero"
-        );
-        token = _token;
-        paytoken = _paytoken;
-        vault = _vault;
-        saleStartBlock = _saleStartBlock;
-        startBlock = _startBlock;
-        endBlock = startBlock.add(_period);
     }
 
     /// @dev Stake amount
@@ -108,27 +64,19 @@ contract StakeSimple is Stake1Storage, AccessControl, IStakeSimple {
         require(!IIStake1Vault(vault).saleClosed(), "StakeSimple: not end");
 
         if (paytoken == address(0)) amount = msg.value;
-        else require(IIERC20(paytoken).balanceOf(msg.sender) >= amount, "StakeSimple: lack");
+        else require(IERC20(paytoken).balanceOf(msg.sender) >= amount, "lack");
 
         LibTokenStake1.StakedAmount storage staked = userStaked[msg.sender];
         if (staked.amount == 0) totalStakers = totalStakers.add(1);
 
         staked.amount = staked.amount.add(amount);
         totalStakedAmount = totalStakedAmount.add(amount);
-        if (paytoken != address(0)){
-            require(
-                IIERC20(paytoken).allowance(msg.sender, address(this)) >= amount,
-                "StakeSimple: allowance amount lack"
+        if (paytoken != address(0))
+            IERC20(paytoken).safeTransferFrom(
+                msg.sender,
+                address(this),
+                amount
             );
-            require(
-                IIERC20(paytoken).transferFrom(
-                    msg.sender,
-                    address(this),
-                    amount
-                ),
-                "StakeSimple: transferFrom fail"
-            );
-        }
 
         emit Staked(msg.sender, amount);
     }
@@ -141,7 +89,7 @@ contract StakeSimple is Stake1Storage, AccessControl, IStakeSimple {
         );
 
         LibTokenStake1.StakedAmount storage staked = userStaked[msg.sender];
-        require(staked.released == false, "StakeSimple: Already withdraw");
+        require(!staked.released, "StakeSimple: Already withdraw");
         require(
             staked.releasedAmount <= staked.amount,
             "StakeSimple: Amount wrong"
@@ -151,19 +99,16 @@ contract StakeSimple is Stake1Storage, AccessControl, IStakeSimple {
         staked.releasedBlock = block.number;
 
         uint256 amount = staked.amount;
-        staked.releasedAmount = staked.amount;
+        staked.releasedAmount = amount;
 
         // check if we send in ethers or in tokens
         if (paytoken == address(0)) {
             address payable self = address(uint160(address(this)));
-            require(self.balance >= amount);
+            require(self.balance >= amount, "StakeSimple: insuffient ETH");
             (bool success, ) = msg.sender.call{value: amount}("");
             require(success, "StakeSimple: withdraw failed.");
         } else {
-            require(
-                IIERC20(paytoken).transfer(msg.sender, amount),
-                "StakeSimple: transfer fail"
-            );
+            IERC20(paytoken).safeTransfer(msg.sender, amount);
         }
 
         emit Withdrawal(msg.sender, amount);
@@ -171,10 +116,7 @@ contract StakeSimple is Stake1Storage, AccessControl, IStakeSimple {
 
     /// @dev Claim for reward
     function claim() external override lock {
-        require(
-            IIStake1Vault(vault).saleClosed() == true,
-            "StakeSimple: not closed"
-        );
+        require(IIStake1Vault(vault).saleClosed(), "StakeSimple: not closed");
         uint256 rewardClaim = 0;
 
         LibTokenStake1.StakedAmount storage staked = userStaked[msg.sender];
@@ -195,7 +137,10 @@ contract StakeSimple is Stake1Storage, AccessControl, IStakeSimple {
         staked.claimedAmount = staked.claimedAmount.add(rewardClaim);
         rewardClaimedTotal = rewardClaimedTotal.add(rewardClaim);
 
-        require(IIStake1Vault(vault).claim(msg.sender, rewardClaim));
+        require(
+            IIStake1Vault(vault).claim(msg.sender, rewardClaim),
+            "StakeSimple: fail claim from vault"
+        );
 
         emit Claimed(msg.sender, rewardClaim, block.number);
     }
