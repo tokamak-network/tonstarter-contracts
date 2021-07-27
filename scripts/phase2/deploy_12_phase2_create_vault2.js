@@ -78,8 +78,8 @@ async function main() {
     ethers.BigNumber.from(vault.stakeType),
     [ process.env.NonfungiblePositionManager,
       process.env.coreFactory,
-      process.env.TON,
-      tostoken,
+      process.env.PHASE2_UNISWAPV3_POOL_TOKEN0,
+      process.env.PHASE2_UNISWAPV3_POOL_TOKEN1,
     ],
     vault.name
   );

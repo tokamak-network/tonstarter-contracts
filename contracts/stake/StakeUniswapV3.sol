@@ -276,6 +276,34 @@ contract StakeUniswapV3 is
 
     /// @dev stake tokenId of UniswapV3
     /// @param tokenId  tokenId
+    function stake(
+        uint256 tokenId,
+        uint256 deadline,
+        uint8 v,
+        bytes32 r,
+        bytes32 s
+    )
+        external
+         nonZeroAddress(token)
+        nonZeroAddress(vault)
+        nonZeroAddress(stakeRegistry)
+        nonZeroAddress(poolToken0)
+        nonZeroAddress(poolToken1)
+        nonZeroAddress(address(nonfungiblePositionManager))
+        nonZeroAddress(uniswapV3FactoryAddress)
+    {
+        require(
+            nonfungiblePositionManager.ownerOf(tokenId) == msg.sender,
+            "StakeUniswapV3: Caller is not tokenId's owner"
+        );
+
+        //nonfungiblePositionManager.permit(address(this), tokenId, deadline, v, r, s);
+
+        _stake(tokenId);
+    }
+
+    /// @dev stake tokenId of UniswapV3
+    /// @param tokenId  tokenId
     function stake(uint256 tokenId)
         external
         override
@@ -291,6 +319,13 @@ contract StakeUniswapV3 is
             nonfungiblePositionManager.ownerOf(tokenId) == msg.sender,
             "StakeUniswapV3: Caller is not tokenId's owner"
         );
+
+        _stake(tokenId);
+    }
+
+    function _stake(uint256 tokenId)
+        internal
+    {
         uint256 _tokenId = tokenId;
         (
             ,
@@ -346,7 +381,7 @@ contract StakeUniswapV3 is
             tokenId_
         );
 
-        // initial start time
+         // initial start time
         if(startTime == 0) startTime = block.timestamp;
 
 
@@ -390,6 +425,7 @@ contract StakeUniswapV3 is
 
         emit Staked(msg.sender, poolAddress, tokenId_, liquidity);
     }
+
 
 
     /// @dev The amount mined with the deposited liquidity is claimed and taken.

@@ -36,7 +36,7 @@ async function main() {
 
   console.log("Account balance:", (await deployer.getBalance()).toString());
 
-  const tokenId = ethers.BigNumber.from("3476");
+  const tokenId = ethers.BigNumber.from("3690");
 
   //================================================
   const stakeUniswapV3 = await ethers.getContractAt("StakeUniswapV3", process.env.PHASE2_STAKE_UNISWAPV3_ADDRESS);

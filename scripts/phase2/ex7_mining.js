@@ -47,6 +47,7 @@ async function main() {
 
   const tokenId3476 = ethers.BigNumber.from("3476");
   const tokenId3484 = ethers.BigNumber.from("3484");
+  const tokenId3690 = ethers.BigNumber.from("3690");
 
   let miningPerSecond =  await Stake2Vault.miningPerSecond();
   console.log("\n Stake2Vault miningPerSecond:",  utils.formatUnits(miningPerSecond.toString(), 18)  );
@@ -64,6 +65,10 @@ async function main() {
 
   let res4 =  await StakeUniswapV3.balanceOfCoinage(tokenId3484);
   console.log("\n StakeUniswapV3 balanceOfCoinage tokenId3484:", utils.formatUnits(res4.toString(), 27)  );
+
+
+  let res5 =  await StakeUniswapV3.balanceOfCoinage(tokenId3690);
+  console.log("\n StakeUniswapV3 balanceOfCoinage tokenId3690:", utils.formatUnits(res5.toString(), 27)  );
 
 
   console.log("\n =========== miningCoinage ");
@@ -87,6 +92,9 @@ async function main() {
  res4 =  await StakeUniswapV3.balanceOfCoinage(tokenId3484);
   console.log("\n StakeUniswapV3 balanceOfCoinage tokenId3484:", utils.formatUnits(res4.toString(), 27)  );
 
+
+  let res5 =  await StakeUniswapV3.balanceOfCoinage(tokenId3690);
+  console.log("\n StakeUniswapV3 balanceOfCoinage tokenId3690:", utils.formatUnits(res5.toString(), 27)  );
 
  }
 
