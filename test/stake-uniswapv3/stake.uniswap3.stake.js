@@ -367,7 +367,7 @@ describe(" UniswapV3 LP Staking", function () {
         // let sendAmountWTON = "1000." + "0".repeat(18);
         // let sendAmountTOS = "1000." + "0".repeat(18);
 
-        let sendAmountWTON = "50." + "0".repeat(18);
+        let sendAmountWTON = "500." + "0".repeat(18);
         let sendAmountTOS = "10000." + "0".repeat(18)
 
         const tx3 = await tos.connect(owner).mint(user1, utils.parseUnits(sendAmountTOS, 18) , {
