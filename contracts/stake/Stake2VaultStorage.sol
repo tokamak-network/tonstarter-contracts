@@ -15,13 +15,10 @@ contract Stake2VaultStorage is AccessibleCommon {
     /// @dev allocated amount of tos
     uint256 public cap;
 
-    /// @dev reward amount per block
-    //uint256 public rewardPerBlock;
-
-    /// @dev reward amount per second
+    /// @dev mining amount per second
     uint256 public miningPerSecond;
 
-    /// @dev Operation type of staking amount
+    /// @dev Operation type of staking
     uint256 public stakeType;
 
     /// @dev a stakeContract maintained by the vault

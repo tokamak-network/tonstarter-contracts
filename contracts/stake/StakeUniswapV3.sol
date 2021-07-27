@@ -18,8 +18,8 @@ import {DSMath} from "../libraries/DSMath.sol";
 import "../common/AccessibleCommon.sol";
 import "../stake/StakeUniswapV3Storage.sol";
 
-/// @title Simple Stake Contract
-/// @notice Stake contracts can interact with the vault to claim tos tokens
+/// @title StakeUniswapV3
+/// @notice Uniswap V3 Contract for staking LP and mining TOS
 contract StakeUniswapV3 is
     StakeUniswapV3Storage,
     AccessibleCommon,
@@ -64,13 +64,15 @@ contract StakeUniswapV3 is
 
     /// @dev event on staking
     /// @param to the sender
+    /// @param poolAddress the pool address of uniswapV3
+    /// @param tokenId the uniswapV3 Lp token
     /// @param amount the amount of staking
     event Staked(address indexed to, address indexed poolAddress, uint256 tokenId, uint256 amount);
 
     /// @dev event on claim
     /// @param to the sender
-    /// @param poolAddress pool address
-    /// @param tokenId tokenId
+    /// @param poolAddress the pool address of uniswapV3
+    /// @param tokenId the uniswapV3 Lp token
     /// @param miningAmount the amount of mining
     event Claimed(address indexed to, address poolAddress, uint256 tokenId,  uint256 miningAmount);
 
@@ -79,8 +81,21 @@ contract StakeUniswapV3 is
     /// @param tokenId the uniswapV3 Lp token
     event WithdrawalToken(address indexed to, uint256 tokenId);
 
+    /// @dev event on mining in coinage
+    /// @param curTime the current time
+    /// @param miningInterval mining period (sec)
+    /// @param miningAmount the mining amount
+    /// @param prevTotalSupply Total amount of coinage before mining
+    /// @param afterTotalSupply Total amount of coinage after being mined
+    /// @param factor coinage's Factor
     event MinedCoinage(uint256 curTime, uint256 miningInterval, uint256 miningAmount, uint256 prevTotalSupply , uint256 afterTotalSupply, uint256 factor);
 
+    /// @dev event on burning in coinage
+    /// @param curTime the current time
+    /// @param tokenId the token id
+    /// @param burningAmount the buring amount
+    /// @param prevTotalSupply Total amount of coinage before mining
+    /// @param afterTotalSupply Total amount of coinage after being mined
     event BurnedCoinage(uint256 curTime, uint256 tokenId, uint256 burningAmount, uint256 prevTotalSupply , uint256 afterTotalSupply);
 
     /// @dev constructor of StakeCoinage
@@ -96,6 +111,24 @@ contract StakeUniswapV3 is
         revert();
     }
 
+    /// @dev Mining interval setting (seconds)
+    /// @param _intervalSeconds the mining interval (sec)
+    function setMiningIntervalSeconds(
+        uint256  _intervalSeconds
+    ) external  onlyOwner {
+        miningIntervalSeconds = _intervalSeconds;
+    }
+
+    /// @dev reset coinage's last mining time variable for tes
+    function resetCoinageTime() external onlyOwner {
+        startTime = 0;
+        coinageLastMintBlockTimetamp = 0;
+    }
+
+    /// @dev calculate the factor of coinage
+    /// @param source tsource
+    /// @param target target
+    /// @param oldFactor oldFactor
     function _calcNewFactor(
         uint256 source,
         uint256 target,
@@ -104,27 +137,23 @@ contract StakeUniswapV3 is
         return rdiv(rmul(target, oldFactor), source);
     }
 
-    function setMiningIntervalSeconds(
-        uint256  _intervalSeconds
-    ) external  onlyOwner {
-        miningIntervalSeconds = _intervalSeconds;
+    /// @dev delete user's token storage of index place
+    /// @param _owner tokenId's owner
+    /// @param tokenId tokenId
+    /// @param _index owner's tokenId's index
+    function deleteUserToken(address _owner, uint256 tokenId, uint256 _index) internal {
+        uint256 _tokenid = userStakedTokenIds[_owner][_index];
+        require(_tokenid == tokenId, "StakeUniswapV3: deleteUserToken mismatch tokenId");
+        uint256 lastIndex = userStakedTokenIds[_owner].length - 1;
+        if (tokenId > 0 && _tokenid == tokenId) {
+            if (_index < lastIndex) {
+                userStakedTokenIds[_owner][_index] = userStakedTokenIds[_owner][lastIndex];
+            }
+            userStakedTokenIds[_owner].pop();
+        }
     }
 
-
-    function resetCoinageTime() external onlyOwner {
-        startTime = 0;
-        coinageLastMintBlockTimetamp = 0;
-    }
-
-
-    function totalSupplyCoinage() external view returns (uint256) {
-        return IAutoRefactorCoinageWithTokenId(coinage).totalSupply();
-    }
-
-    function balanceOfCoinage(uint256 tokenId) external view returns (uint256) {
-        return IAutoRefactorCoinageWithTokenId(coinage).balanceOf(tokenId);
-    }
-
+    /// @dev mining on coinage
     function miningCoinage() public lock {
         if(startTime == 0 ) return;
         if(coinageLastMintBlockTimetamp == 0) coinageLastMintBlockTimetamp = startTime;
@@ -150,32 +179,65 @@ contract StakeUniswapV3 is
         }
     }
 
-    /*
-    function burnCoinage(address user, uint256 tokenId, uint256 amountRay) internal {
-        require(amountRay > 0, "StakeUniswapV3: amount is zero");
-        require(
-            amountRay <= IAutoRefactorCoinageWithTokenId(coinage).balanceOf(tokenId),
-            "StakeUniswapV3: coinages's user's balanceOf is insufficent"
-        );
 
-        uint256 prevTotalSupply = IAutoRefactorCoinageWithTokenId(coinage).totalSupply();
-        IAutoRefactorCoinageWithTokenId(coinage).burn(user, tokenId, amountRay);
+    /// @dev view mining information of tokenId
+    /// @param tokenId  tokenId
+    function getMiningTokenId(uint256 tokenId)
+        public
+        view
+        override
+        nonZeroAddress(poolAddress)
+        returns (
+            uint256 miningAmount,
+            uint256 nonMiningAmount,
+            uint256 minableAmount,
+            uint160 secondsInside,
+            uint160 secondsInsideDiff,
+            uint256 liquidity,
+            uint256 balanceOfTokenIdRay,
+            uint256 minableAmountRay,
+            uint32 currentTime
+        )
+    {
+        if(startTime > 0) {
+            LibUniswapV3Stake.StakeLiquidity storage _depositTokens = depositTokens[tokenId];
+            liquidity = _depositTokens.liquidity ;
 
-        uint256 afterTotalSupply = IAutoRefactorCoinageWithTokenId(coinage).totalSupply();
+            currentTime = uint32(block.timestamp);
+            uint32 secondsAbsolute = 0;
 
-        // IAutoRefactorCoinageWithTokenId(coinage).setFactor(
-        //     _calcNewFactor(
-        //         prevTotalSupply,
-        //         afterTotalSupply,
-        //         IAutoRefactorCoinageWithTokenId(coinage).factor()
-        //     )
-        // );
+            if(_depositTokens.liquidity > 0){
+                (, , secondsInside ) = IUniswapV3Pool(poolAddress).snapshotCumulativesInside(_depositTokens.tickLower, _depositTokens.tickUpper);
 
-        emit BurnedCoinage(block.timestamp, tokenId, amountRay, prevTotalSupply, afterTotalSupply);
+                if(_depositTokens.claimedTime > 0) secondsAbsolute = currentTime - _depositTokens.claimedTime;
+                else secondsAbsolute = currentTime - _depositTokens.startTime;
+
+                if(_depositTokens.secondsInsideLast > 0) secondsInsideDiff = secondsInside - _depositTokens.secondsInsideLast;
+                else secondsInsideDiff = secondsInside - _depositTokens.secondsInsideInitial;
+
+                balanceOfTokenIdRay = IAutoRefactorCoinageWithTokenId(coinage).balanceOf(tokenId);
+                if(balanceOfTokenIdRay > 0 ) {
+
+                    if (balanceOfTokenIdRay > 0 && balanceOfTokenIdRay > (liquidity*(10**9)-10) ) {
+                        minableAmountRay = balanceOfTokenIdRay - (liquidity*(10**9)-10);
+                        minableAmount = minableAmountRay/(10**9);
+                    }
+                }
+                if(minableAmount > 0 && secondsAbsolute > 0 && secondsInsideDiff < secondsAbsolute ){
+                    if(secondsAbsolute >0 && secondsInsideDiff > 0 ) miningAmount = minableAmount * (secondsInsideDiff / secondsAbsolute);
+                    nonMiningAmount = minableAmount - miningAmount;
+
+                } else if(minableAmount > 0 &&  secondsAbsolute > 0){
+                    miningAmount = minableAmount;
+                }
+            }
+        }
     }
-    */
 
-    function setPoolAddress(uint256 tokenId) public
+    /// @dev With the given tokenId, information is retrieved from nonfungiblePositionManager,
+    ///      and the pool address is calculated and set.
+    /// @param tokenId  tokenId
+    function setPoolAddress(uint256 tokenId) external
         nonZeroAddress(token)
         nonZeroAddress(vault)
         nonZeroAddress(stakeRegistry)
@@ -212,6 +274,8 @@ contract StakeUniswapV3 is
             );
     }
 
+    /// @dev stake tokenId of UniswapV3
+    /// @param tokenId  tokenId
     function stake(uint256 tokenId)
         external
         override
@@ -311,83 +375,29 @@ contract StakeUniswapV3 is
         if (!_userTotalStaked.staked) totalStakers++;
         _userTotalStaked.staked = true;
         _userTotalStaked.totalDepositAmount += liquidity;
-        //totalMiningAmount
-        //totalNonMiningAmount
 
 
         //stakedCoinageTokens 토큰별로 코인에에지에 들어가는 정보
         LibUniswapV3Stake.StakedTokenAmount storage _stakedCoinageTokens = stakedCoinageTokens[tokenId_];
         _stakedCoinageTokens.amount = liquidity;
         _stakedCoinageTokens.startTime = uint32(block.timestamp);
-        // _stakedCoinageTokens.claimedTime = 0;
-        // _stakedCoinageTokens.claimedAmount = 0;
-        // _stakedCoinageTokens.nonMiningAmount = 0;
+
 
         //mint coinage of user amount
         IAutoRefactorCoinageWithTokenId(coinage).mint(msg.sender, tokenId_, liquidity * (10**9));
 
-        // coinage update reward
         //miningCoinage();
 
         emit Staked(msg.sender, poolAddress, tokenId_, liquidity);
     }
 
-    function getMiningTokenId(uint256 tokenId)
-        public
-        view
-        override
-        nonZeroAddress(poolAddress)
-        returns (
-            uint256 miningAmount,
-            uint256 nonMiningAmount,
-            uint256 minableAmount,
-            uint160 secondsInside,
-            uint160 secondsInsideDiff,
-            uint256 liquidity,
-            uint256 balanceOfTokenIdRay,
-            uint256 minableAmountRay,
-            uint32 currentTime
-        )
-    {
-        if(startTime > 0) {
-            LibUniswapV3Stake.StakeLiquidity storage _depositTokens = depositTokens[tokenId];
-            liquidity = _depositTokens.liquidity ;
 
-            currentTime = uint32(block.timestamp);
-            uint32 secondsAbsolute = 0;
-
-            if(_depositTokens.liquidity > 0){
-                (, , secondsInside ) = IUniswapV3Pool(poolAddress).snapshotCumulativesInside(_depositTokens.tickLower, _depositTokens.tickUpper);
-
-                if(_depositTokens.claimedTime > 0) secondsAbsolute = currentTime - _depositTokens.claimedTime;
-                else secondsAbsolute = currentTime - _depositTokens.startTime;
-
-                if(_depositTokens.secondsInsideLast > 0) secondsInsideDiff = secondsInside - _depositTokens.secondsInsideLast;
-                else secondsInsideDiff = secondsInside - _depositTokens.secondsInsideInitial;
-
-                balanceOfTokenIdRay = IAutoRefactorCoinageWithTokenId(coinage).balanceOf(tokenId);
-                if(balanceOfTokenIdRay > 0 ) {
-
-                    if (balanceOfTokenIdRay > 0 && balanceOfTokenIdRay > (liquidity*(10**9)-10) ) {
-                        minableAmountRay = balanceOfTokenIdRay - (liquidity*(10**9)-10);
-                        minableAmount = minableAmountRay/(10**9);
-                    }
-                }
-                if(minableAmount > 0 && secondsAbsolute > 0 && secondsInsideDiff < secondsAbsolute ){
-                    if(secondsAbsolute >0 && secondsInsideDiff > 0 ) miningAmount = minableAmount * (secondsInsideDiff / secondsAbsolute);
-                    nonMiningAmount = minableAmount - miningAmount;
-
-                } else if(minableAmount > 0 &&  secondsAbsolute > 0){
-                    miningAmount = minableAmount;
-                }
-            }
-        }
-    }
-
-
-    /// @dev Claim for reward
+    /// @dev The amount mined with the deposited liquidity is claimed and taken.
+    ///      The amount of mining taken is changed in proportion to the amount of time liquidity
+    ///       has been provided since recent mining
+    /// @param tokenId  tokenId
     function claim(uint256 tokenId)
-        public override
+        external override
     {
         LibUniswapV3Stake.StakeLiquidity storage _depositTokens = depositTokens[tokenId];
 
@@ -395,8 +405,7 @@ contract StakeUniswapV3 is
             _depositTokens.owner == msg.sender,
             "StakeUniswapV3: caller is not tokenId's staker"
         );
-        // 사용자의 할당량의 원금에 대한 코인에이지의 리워드.
-        // coinage update reward
+
         //miningCoinage();
 
         (
@@ -408,12 +417,11 @@ contract StakeUniswapV3 is
             uint256 minableAmountRay,
         ) = getMiningTokenId(tokenId);
 
-        require(miningAmount > 0, "StakeUniswapV3: miningAmount is zero");
+        require( miningAmount > 0, "StakeUniswapV3: miningAmount is zero");
 
         _depositTokens.claimedTime = uint32(block.timestamp);
         _depositTokens.secondsInsideLast = secondsInside;
 
-        //burnCoinage(msg.sender, tokenId, minableAmountRay);
         IAutoRefactorCoinageWithTokenId(coinage).burn(msg.sender, tokenId, minableAmountRay);
 
         // storage  stakedCoinageTokens
@@ -435,7 +443,11 @@ contract StakeUniswapV3 is
         emit Claimed(msg.sender, poolAddress, tokenId, miningAmount );
     }
 
-    /// @dev withdraw
+    /// @dev withdraw the deposited token.
+    ///      The amount mined with the deposited liquidity is claimed and taken.
+    ///      The amount of mining taken is changed in proportion to the amount of time liquidity
+    ///      has been provided since recent mining
+    /// @param tokenId  tokenId
     function withdraw(uint256 tokenId) external override {
         LibUniswapV3Stake.StakeLiquidity storage _depositTokens = depositTokens[tokenId];
         require(
@@ -462,11 +474,6 @@ contract StakeUniswapV3 is
 
         IAutoRefactorCoinageWithTokenId(coinage).burnTokenId(msg.sender, tokenId);
 
-        // uint256 amountTotal =  IAutoRefactorCoinageWithTokenId(coinage).totalSupply();
-        // uint256 amountBalanceOf =  IAutoRefactorCoinageWithTokenId(coinage).balanceOf(tokenId);
-        // if(amountTotal < amountBalanceOf) IAutoRefactorCoinageWithTokenId(coinage).burn(msg.sender, tokenId, amountTotal);
-        // else IAutoRefactorCoinageWithTokenId(coinage).burn(msg.sender, tokenId, amountBalanceOf);
-
         LibUniswapV3Stake.StakedTotalTokenAmount storage _userTotalStaked = userTotalStaked[msg.sender];
         _userTotalStaked.totalDepositAmount -= _depositTokens.liquidity;
 
@@ -491,7 +498,8 @@ contract StakeUniswapV3 is
         emit WithdrawalToken(msg.sender, tokenId);
     }
 
-    /// @dev
+    /// @dev Get the list of staked tokens of the user
+    /// @param user  user address
     function getUserStakedTokenIds(address user)
         external
         view
@@ -560,6 +568,13 @@ contract StakeUniswapV3 is
         );
     }
 
+    function totalSupplyCoinage() external view returns (uint256) {
+        return IAutoRefactorCoinageWithTokenId(coinage).totalSupply();
+    }
+
+    function balanceOfCoinage(uint256 tokenId) external view returns (uint256) {
+        return IAutoRefactorCoinageWithTokenId(coinage).balanceOf(tokenId);
+    }
     /// @dev Give the infomation of this stakeContracts
     /// @return return1  [token, vault, stakeRegistry, coinage]
     /// @return return2  [poolToken0, poolToken1, nonfungiblePositionManager, uniswapV3FactoryAddress]
@@ -592,7 +607,7 @@ contract StakeUniswapV3 is
     }
 
     function canMiningAmountTokenId(uint256 tokenId)
-        public
+        external
         view
         returns (uint256 balanceOfRayTokenId, uint256 minableAmountRay)
     {
@@ -604,20 +619,8 @@ contract StakeUniswapV3 is
         }
     }
 
-    function deleteUserToken(address _owner, uint256 tokenId, uint256 _index) internal {
-        uint256 _tokenid = userStakedTokenIds[_owner][_index];
-        require(_tokenid == tokenId, "StakeUniswapV3:deleteUserToken mismatch tokenId");
-        uint256 lastIndex = userStakedTokenIds[_owner].length - 1;
-        if (tokenId > 0 && _tokenid == tokenId) {
-            if (_index < lastIndex) {
-                userStakedTokenIds[_owner][_index] = userStakedTokenIds[_owner][lastIndex];
-            }
-            userStakedTokenIds[_owner].pop();
-        }
-    }
-
     function poolInfos()
-        public view
+        external view
         nonZeroAddress(poolAddress)
         returns
         (
@@ -641,7 +644,7 @@ contract StakeUniswapV3 is
 
     /// @param key hash(owner, tickLower, tickUpper)
     function poolPositions(bytes32 key)
-        public view
+        external view
         nonZeroAddress(poolAddress)
         returns
         (
@@ -660,7 +663,7 @@ contract StakeUniswapV3 is
     }
 
     function poolSlot0()
-        public view
+        external view
         nonZeroAddress(poolAddress)
         returns
         (
@@ -678,7 +681,7 @@ contract StakeUniswapV3 is
     }
 
     function npmPositions(uint256 _tokenId)
-        public view
+        external view
         nonZeroAddress(address(nonfungiblePositionManager))
         returns
         (
@@ -700,7 +703,7 @@ contract StakeUniswapV3 is
     }
 
     function snapshotCumulativesInside(int24 tickLower, int24 tickUpper)
-        public view
+        external view
         nonZeroAddress(poolAddress)
         returns (
             int56 tickCumulativeInside,

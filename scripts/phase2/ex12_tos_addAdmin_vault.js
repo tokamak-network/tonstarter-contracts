@@ -4,7 +4,7 @@ const utils = ethers.utils;
 const save = require("../save_deployed");
 const loadDeployed = require("../load_deployed");
 //const loadDeployedInput = require("./load_deployed_input");
-const NonfungiblePositionManagerJson = require("../../abis_uniswap3_periphery/NonfungiblePositionManager.json");
+
 const { printGasUsedOfUnits } = require("../log_tx");
 
 const {
@@ -23,47 +23,39 @@ require("dotenv").config();
 const zeroAddress = "0x0000000000000000000000000000000000000000";
 const ADMIN_ROLE = keccak256("ADMIN");
 
-const NonfungiblePositionManagerAddress = process.env.NonfungiblePositionManager;
+const tostoken = loadDeployed(process.env.NETWORK, "TOS");
 
 const proxy = loadDeployed(process.env.NETWORK, "Stake1Proxy");
 const ton = loadDeployed(process.env.NETWORK, "TON");
 
 async function main() {
 
-  const [deployer, user1, user2] = await ethers.getSigners();
+  const [deployer, user1] = await ethers.getSigners();
   const users = await ethers.getSigners();
   console.log("Deploying contracts with the account:", deployer.address, process.env.NETWORK);
 
   console.log("Account balance:", (await deployer.getBalance()).toString());
 
-  console.log("NonfungiblePositionManagerAddress:", NonfungiblePositionManagerAddress);
+  const tos = await ethers.getContractAt("TOS", tostoken);
+  console.log("tos:", tos.address);
 
-  const tokenId3476 = ethers.BigNumber.from("3476");
-  const tokenId3484 = ethers.BigNumber.from("3484");
-
-  let token = {
-    id: tokenId3476,
-    name: '3476',
-    sender : user1
-  }
-
-  // let token = {
-  //   id: tokenId3484,
-  //   name: '3484',
-  //   sender : user2
-  // }
-
-  const NPMContract = new ethers.Contract(
-    NonfungiblePositionManagerAddress,
-    NonfungiblePositionManagerJson.abi, ethers.provider);
   //================================================
-  console.log("NPMContract:", NPMContract.address);
-  let tx = await NPMContract.connect(token.sender).approve(
-    process.env.PHASE2_STAKE_UNISWAPV3_ADDRESS,
-    token.id
-  );
 
-  console.log("NPMContract.approve", tx.hash );
+  // let tx = await tos.addAdmin(process.env.PHASE2_LP_VAULT_ADDRESS);
+
+  // console.log("tos addAdmin", process.env.PHASE2_LP_VAULT_ADDRESS);
+  // await tx.wait();
+
+  // let res = await tos.isAdmin(deployer.address);
+  // console.log("tos isAdmin", deployer.address,  res );
+
+
+  // let res = await tos.grantRole(ADMIN_ROLE, process.env.PHASE2_LP_VAULT_ADDRESS);
+  // console.log("tos isAdmin", process.env.PHASE2_LP_VAULT_ADDRESS,  res );
+
+
+  let res1 = await tos.hasRole(ADMIN_ROLE, process.env.PHASE2_LP_VAULT_ADDRESS);
+  console.log("tos admin ", res1 );
 
 }
 

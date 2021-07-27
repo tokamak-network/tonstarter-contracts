@@ -16,23 +16,27 @@ contract StakeUniswapV3Storage {
     /// @dev A vault that holds tos rewards.
     address public vault;
 
-    /// @dev the total amount claimed
-    uint256 public miningAmountTotal ; // rewardClaimedTotal; //miningAmount
+    /// @dev the total minied amount
+    uint256 public miningAmountTotal ;
+
+    /// @dev Rewards have been allocated,
+    ///      but liquidity is lost, and burned amount .
+    uint256 public nonMiningAmountTotal;
 
     /// @dev the total staked amount
     uint256 public totalStakedAmount;
 
-    /// @dev stakes for user's tokenId
+    /// @dev user's tokenIds
     mapping(address => uint256[]) public userStakedTokenIds;
 
-    // 토큰아이디의 기본정보
+    /// @dev  Deposited token ID information
     mapping(uint256 => LibUniswapV3Stake.StakeLiquidity) public depositTokens;
 
-    //각 토큰아이디별로 디파짓정보
+    /// @dev Amount that Token ID put into Coinage
     mapping(uint256 => LibUniswapV3Stake.StakedTokenAmount)
         public stakedCoinageTokens;
 
-    // 유저의 모든 디파짓 토큰의 총 정보
+    /// @dev Total staked information of users
     mapping(address => LibUniswapV3Stake.StakedTotalTokenAmount)
         public userTotalStaked;
 
@@ -75,9 +79,8 @@ contract StakeUniswapV3Storage {
     /// @dev total tokenIds
     uint256 public totalTokens;
 
-
-    /// @dev 리워드는 할당되었는데, 유동성을 없어져서, 지불되지 못한 리워드양 .
-    uint256 public nonMiningAmountTotal; // rewardNonLiquidityClaimTotal;
+    ///@dev for migrate L2
+    bool public migratedL2;
 
     modifier nonZeroAddress(address _addr) {
         require(_addr != address(0), "StakeUniswapV3Storage: zero address");
