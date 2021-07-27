@@ -94,20 +94,20 @@ describe("LockTOS", function () {
     );
   });
 
-  it("should check vote weights now of ", async function () {
-    const totalVoteWeight = await lockTOS.voteWeightOf(user.address);
+  it("should check balances now of ", async function () {
+    const totalBalance = await lockTOS.balanceOf(user.address);
     const locksOf = await lockTOS.locksOf(user.address);
     for (let i = 0; i < locksOf.length; ++i) {
       userLockInfo[i].lockId = locksOf[i];
     }
 
     console.log("Current time: ", (await time.latest()).toString());
-    console.log("user total: ", totalVoteWeight.toString());
+    console.log("user total: ", totalBalance.toString());
     for (const info of userLockInfo) {
       const currentTime = parseInt(await time.latest());
       const { lockId, slope, bias, startTime } = info;
-      const voteWeight = await lockTOS.voteWeightOfLock(user.address, lockId);
-      console.log(`Vote Weight: ${voteWeight.toString()}, LockId: ${lockId}`);
+      const balance = await lockTOS.balanceOfLock(user.address, lockId);
+      console.log(`Vote Weight: ${balance.toString()}, LockId: ${lockId}`);
       console.log(
         `Estimated bias: ${bias - slope * (currentTime - startTime)}`
       );
@@ -121,38 +121,38 @@ describe("LockTOS", function () {
         await time.increase(time.duration.days(1));
         const { lockId } = info;
         const currentTime = parseInt(await time.latest());
-        const lockVoteWeight = (
-          await lockTOS.voteWeightOfLock(user.address, lockId)
+        const lockBalance = (
+          await lockTOS.balanceOfLock(user.address, lockId)
         ).toString();
         changes.push({
           lockId,
-          captureVoteWeight: lockVoteWeight,
+          captureBalance: lockBalance,
           captureTimestamp: currentTime,
         });
       }
     }
 
     for (const change of changes) {
-      const { lockId, captureTimestamp, captureVoteWeight } = change;
-      const lockVoteWeight = (
-        await lockTOS.voteWeightOfLockAt(user.address, lockId, captureTimestamp)
+      const { lockId, captureTimestamp, captureBalance } = change;
+      const lockBalance = (
+        await lockTOS.balanceOfLock(user.address, lockId, captureTimestamp)
       ).toString();
-      console.log({ lockVoteWeight, captureVoteWeight });
+      console.log({ lockBalance, captureBalance });
     }
   });
 
-  it("should check total vote weights now", async function () {
-    const totalVoteWeight = await lockTOS.totalVoteWeight();
-    console.log("Total vote weight: ", totalVoteWeight.toString());
+  it("should check total supply now", async function () {
+    const totalSupply = await lockTOS.totalSupply();
+    console.log("Total supply: ", totalSupply.toString());
   });
 
   it("should change time and check vote weights", async function () {
     for (const info of userLockInfo) {
       const { lockId } = info;
-      const voteWeight = await lockTOS.voteWeightOfLock(user.address, lockId);
+      const lockBalance = await lockTOS.balanceOfLock(user.address, lockId);
       await time.increaseTo();
 
-      console.log(`Vote Weight: ${voteWeight.toString()}, LockId: ${lockId}`);
+      console.log(`Vote Weight: ${lockBalance.toString()}, LockId: ${lockId}`);
     }
   });
 
@@ -162,7 +162,7 @@ describe("LockTOS", function () {
       const { lockId, lockedAmount } = info;
       accTos += lockedAmount;
       await (await lockTOS.withdraw(lockId)).wait();
-      expect(await lockTOS.voteWeightOf(user.address)).to.be.equal(accTos);
+      expect(await lockTOS.balanceOf(user.address)).to.be.equal(accTos);
     }
   });
 });
