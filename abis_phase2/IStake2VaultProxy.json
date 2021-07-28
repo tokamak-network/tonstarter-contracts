@@ -1,0 +1,1029 @@
+{
+  "contractName": "IStake2VaultProxy",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "bool",
+          "name": "_pause",
+          "type": "bool"
+        }
+      ],
+      "name": "setProxyPause",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "impl",
+          "type": "address"
+        }
+      ],
+      "name": "upgradeTo",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "implementation",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_tos",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "_stakefactory",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_stakeType",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_cap",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_rewardPerBlock",
+          "type": "uint256"
+        },
+        {
+          "internalType": "string",
+          "name": "_name",
+          "type": "string"
+        }
+      ],
+      "name": "initialize",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "metadata": "{\"compiler\":{\"version\":\"0.7.6+commit.7338295f\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[],\"name\":\"implementation\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_tos\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_stakefactory\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_stakeType\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_cap\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_rewardPerBlock\",\"type\":\"uint256\"},{\"internalType\":\"string\",\"name\":\"_name\",\"type\":\"string\"}],\"name\":\"initialize\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bool\",\"name\":\"_pause\",\"type\":\"bool\"}],\"name\":\"setProxyPause\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"impl\",\"type\":\"address\"}],\"name\":\"upgradeTo\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{\"implementation()\":{\"details\":\"view implementation address\",\"returns\":{\"_0\":\"the logic address\"}},\"initialize(address,address,uint256,uint256,uint256,string)\":{\"details\":\"set initial storage\",\"params\":{\"_cap\":\"Maximum amount of rewards issued, allocated reward amount.\",\"_name\":\"the name of stake contratc\",\"_rewardPerBlock\":\"the reward per block\",\"_stakeType\":\"Type of staking contract, 0 TON staking, 1 basic ERC20 staking, 2 UniswapV3  staking\",\"_stakefactory\":\"the factory address to create stakeContract\",\"_tos\":\"TOS token address\"}},\"setProxyPause(bool)\":{\"details\":\"Set pause state\",\"params\":{\"_pause\":\"true:pause or false:resume\"}},\"upgradeTo(address)\":{\"details\":\"Set implementation contract\",\"params\":{\"impl\":\"New implementation contract address\"}}},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"/Users/zena/ico2.0/ico20-contracts/contracts/interfaces/IStake2VaultProxy.sol\":\"IStake2VaultProxy\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":100},\"remappings\":[]},\"sources\":{\"/Users/zena/ico2.0/ico20-contracts/contracts/interfaces/IStake2VaultProxy.sol\":{\"keccak256\":\"0x55d236eee1974186e2f3f48be28c2d815f29595d961d1f12dfc7a79425ccc497\",\"license\":\"Unlicense\",\"urls\":[\"bzz-raw://71416f96223655108165c32f699ffdad37a7c74d44becc3ea430e046e0641b4c\",\"dweb:/ipfs/QmXtB6z5C6QhiZPXQ21y8AgN6kPdK7kbyn4kboP3sybJ9a\"]}},\"version\":1}",
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "immutableReferences": {},
+  "generatedSources": [],
+  "deployedGeneratedSources": [],
+  "sourceMap": "",
+  "deployedSourceMap": "",
+  "source": "//SPDX-License-Identifier: Unlicense\npragma solidity ^0.7.6;\n\ninterface IStake2VaultProxy {\n    /// @dev Set pause state\n    /// @param _pause true:pause or false:resume\n    function setProxyPause(bool _pause) external;\n\n    /// @dev Set implementation contract\n    /// @param impl New implementation contract address\n    function upgradeTo(address impl) external;\n\n    /// @dev view implementation address\n    /// @return the logic address\n    function implementation() external view returns (address);\n\n    /// @dev set initial storage\n    /// @param _tos  TOS token address\n    /// @param _stakefactory the factory address to create stakeContract\n    /// @param _stakeType  Type of staking contract, 0 TON staking, 1 basic ERC20 staking, 2 UniswapV3  staking\n    /// @param _cap  Maximum amount of rewards issued, allocated reward amount.\n    /// @param _rewardPerBlock  the reward per block\n    /// @param _name  the name of stake contratc\n    function initialize(\n        address _tos,\n        address _stakefactory,\n        uint256 _stakeType,\n        uint256 _cap,\n        uint256 _rewardPerBlock,\n        string memory _name\n    ) external;\n}\n",
+  "sourcePath": "/Users/zena/ico2.0/ico20-contracts/contracts/interfaces/IStake2VaultProxy.sol",
+  "ast": {
+    "absolutePath": "/Users/zena/ico2.0/ico20-contracts/contracts/interfaces/IStake2VaultProxy.sol",
+    "exportedSymbols": {
+      "IStake2VaultProxy": [
+        3739
+      ]
+    },
+    "id": 3740,
+    "license": "Unlicense",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 3704,
+        "literals": [
+          "solidity",
+          "^",
+          "0.7",
+          ".6"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "37:23:35"
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "fullyImplemented": false,
+        "id": 3739,
+        "linearizedBaseContracts": [
+          3739
+        ],
+        "name": "IStake2VaultProxy",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "documentation": {
+              "id": 3705,
+              "nodeType": "StructuredDocumentation",
+              "src": "96:73:35",
+              "text": "@dev Set pause state\n @param _pause true:pause or false:resume"
+            },
+            "functionSelector": "7cb00d25",
+            "id": 3710,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "setProxyPause",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 3708,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3707,
+                  "mutability": "mutable",
+                  "name": "_pause",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3710,
+                  "src": "197:11:35",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  },
+                  "typeName": {
+                    "id": 3706,
+                    "name": "bool",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "197:4:35",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "196:13:35"
+            },
+            "returnParameters": {
+              "id": 3709,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "218:0:35"
+            },
+            "scope": 3739,
+            "src": "174:45:35",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 3711,
+              "nodeType": "StructuredDocumentation",
+              "src": "225:92:35",
+              "text": "@dev Set implementation contract\n @param impl New implementation contract address"
+            },
+            "functionSelector": "3659cfe6",
+            "id": 3716,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "upgradeTo",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 3714,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3713,
+                  "mutability": "mutable",
+                  "name": "impl",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3716,
+                  "src": "341:12:35",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 3712,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "341:7:35",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "340:14:35"
+            },
+            "returnParameters": {
+              "id": 3715,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "363:0:35"
+            },
+            "scope": 3739,
+            "src": "322:42:35",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 3717,
+              "nodeType": "StructuredDocumentation",
+              "src": "370:70:35",
+              "text": "@dev view implementation address\n @return the logic address"
+            },
+            "functionSelector": "5c60da1b",
+            "id": 3722,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "implementation",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 3718,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "468:2:35"
+            },
+            "returnParameters": {
+              "id": 3721,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3720,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3722,
+                  "src": "494:7:35",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 3719,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "494:7:35",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "493:9:35"
+            },
+            "scope": 3739,
+            "src": "445:58:35",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 3723,
+              "nodeType": "StructuredDocumentation",
+              "src": "509:434:35",
+              "text": "@dev set initial storage\n @param _tos  TOS token address\n @param _stakefactory the factory address to create stakeContract\n @param _stakeType  Type of staking contract, 0 TON staking, 1 basic ERC20 staking, 2 UniswapV3  staking\n @param _cap  Maximum amount of rewards issued, allocated reward amount.\n @param _rewardPerBlock  the reward per block\n @param _name  the name of stake contratc"
+            },
+            "functionSelector": "b90a762a",
+            "id": 3738,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "initialize",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 3736,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3725,
+                  "mutability": "mutable",
+                  "name": "_tos",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3738,
+                  "src": "977:12:35",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 3724,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "977:7:35",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 3727,
+                  "mutability": "mutable",
+                  "name": "_stakefactory",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3738,
+                  "src": "999:21:35",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 3726,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "999:7:35",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 3729,
+                  "mutability": "mutable",
+                  "name": "_stakeType",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3738,
+                  "src": "1030:18:35",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 3728,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1030:7:35",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 3731,
+                  "mutability": "mutable",
+                  "name": "_cap",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3738,
+                  "src": "1058:12:35",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 3730,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1058:7:35",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 3733,
+                  "mutability": "mutable",
+                  "name": "_rewardPerBlock",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3738,
+                  "src": "1080:23:35",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 3732,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1080:7:35",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 3735,
+                  "mutability": "mutable",
+                  "name": "_name",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3738,
+                  "src": "1113:19:35",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_memory_ptr",
+                    "typeString": "string"
+                  },
+                  "typeName": {
+                    "id": 3734,
+                    "name": "string",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1113:6:35",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage_ptr",
+                      "typeString": "string"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "967:171:35"
+            },
+            "returnParameters": {
+              "id": 3737,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1147:0:35"
+            },
+            "scope": 3739,
+            "src": "948:200:35",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 3740,
+        "src": "62:1088:35"
+      }
+    ],
+    "src": "37:1114:35"
+  },
+  "legacyAST": {
+    "attributes": {
+      "absolutePath": "/Users/zena/ico2.0/ico20-contracts/contracts/interfaces/IStake2VaultProxy.sol",
+      "exportedSymbols": {
+        "IStake2VaultProxy": [
+          3739
+        ]
+      },
+      "license": "Unlicense"
+    },
+    "children": [
+      {
+        "attributes": {
+          "literals": [
+            "solidity",
+            "^",
+            "0.7",
+            ".6"
+          ]
+        },
+        "id": 3704,
+        "name": "PragmaDirective",
+        "src": "37:23:35"
+      },
+      {
+        "attributes": {
+          "abstract": false,
+          "baseContracts": [
+            null
+          ],
+          "contractDependencies": [
+            null
+          ],
+          "contractKind": "interface",
+          "fullyImplemented": false,
+          "linearizedBaseContracts": [
+            3739
+          ],
+          "name": "IStake2VaultProxy",
+          "scope": 3740
+        },
+        "children": [
+          {
+            "attributes": {
+              "functionSelector": "7cb00d25",
+              "implemented": false,
+              "isConstructor": false,
+              "kind": "function",
+              "modifiers": [
+                null
+              ],
+              "name": "setProxyPause",
+              "scope": 3739,
+              "stateMutability": "nonpayable",
+              "virtual": false,
+              "visibility": "external"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "text": "@dev Set pause state\n @param _pause true:pause or false:resume"
+                },
+                "id": 3705,
+                "name": "StructuredDocumentation",
+                "src": "96:73:35"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "_pause",
+                      "scope": 3710,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "bool",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "bool",
+                          "type": "bool"
+                        },
+                        "id": 3706,
+                        "name": "ElementaryTypeName",
+                        "src": "197:4:35"
+                      }
+                    ],
+                    "id": 3707,
+                    "name": "VariableDeclaration",
+                    "src": "197:11:35"
+                  }
+                ],
+                "id": 3708,
+                "name": "ParameterList",
+                "src": "196:13:35"
+              },
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 3709,
+                "name": "ParameterList",
+                "src": "218:0:35"
+              }
+            ],
+            "id": 3710,
+            "name": "FunctionDefinition",
+            "src": "174:45:35"
+          },
+          {
+            "attributes": {
+              "functionSelector": "3659cfe6",
+              "implemented": false,
+              "isConstructor": false,
+              "kind": "function",
+              "modifiers": [
+                null
+              ],
+              "name": "upgradeTo",
+              "scope": 3739,
+              "stateMutability": "nonpayable",
+              "virtual": false,
+              "visibility": "external"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "text": "@dev Set implementation contract\n @param impl New implementation contract address"
+                },
+                "id": 3711,
+                "name": "StructuredDocumentation",
+                "src": "225:92:35"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "impl",
+                      "scope": 3716,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "address",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "address",
+                          "stateMutability": "nonpayable",
+                          "type": "address"
+                        },
+                        "id": 3712,
+                        "name": "ElementaryTypeName",
+                        "src": "341:7:35"
+                      }
+                    ],
+                    "id": 3713,
+                    "name": "VariableDeclaration",
+                    "src": "341:12:35"
+                  }
+                ],
+                "id": 3714,
+                "name": "ParameterList",
+                "src": "340:14:35"
+              },
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 3715,
+                "name": "ParameterList",
+                "src": "363:0:35"
+              }
+            ],
+            "id": 3716,
+            "name": "FunctionDefinition",
+            "src": "322:42:35"
+          },
+          {
+            "attributes": {
+              "functionSelector": "5c60da1b",
+              "implemented": false,
+              "isConstructor": false,
+              "kind": "function",
+              "modifiers": [
+                null
+              ],
+              "name": "implementation",
+              "scope": 3739,
+              "stateMutability": "view",
+              "virtual": false,
+              "visibility": "external"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "text": "@dev view implementation address\n @return the logic address"
+                },
+                "id": 3717,
+                "name": "StructuredDocumentation",
+                "src": "370:70:35"
+              },
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 3718,
+                "name": "ParameterList",
+                "src": "468:2:35"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "",
+                      "scope": 3722,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "address",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "address",
+                          "stateMutability": "nonpayable",
+                          "type": "address"
+                        },
+                        "id": 3719,
+                        "name": "ElementaryTypeName",
+                        "src": "494:7:35"
+                      }
+                    ],
+                    "id": 3720,
+                    "name": "VariableDeclaration",
+                    "src": "494:7:35"
+                  }
+                ],
+                "id": 3721,
+                "name": "ParameterList",
+                "src": "493:9:35"
+              }
+            ],
+            "id": 3722,
+            "name": "FunctionDefinition",
+            "src": "445:58:35"
+          },
+          {
+            "attributes": {
+              "functionSelector": "b90a762a",
+              "implemented": false,
+              "isConstructor": false,
+              "kind": "function",
+              "modifiers": [
+                null
+              ],
+              "name": "initialize",
+              "scope": 3739,
+              "stateMutability": "nonpayable",
+              "virtual": false,
+              "visibility": "external"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "text": "@dev set initial storage\n @param _tos  TOS token address\n @param _stakefactory the factory address to create stakeContract\n @param _stakeType  Type of staking contract, 0 TON staking, 1 basic ERC20 staking, 2 UniswapV3  staking\n @param _cap  Maximum amount of rewards issued, allocated reward amount.\n @param _rewardPerBlock  the reward per block\n @param _name  the name of stake contratc"
+                },
+                "id": 3723,
+                "name": "StructuredDocumentation",
+                "src": "509:434:35"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "_tos",
+                      "scope": 3738,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "address",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "address",
+                          "stateMutability": "nonpayable",
+                          "type": "address"
+                        },
+                        "id": 3724,
+                        "name": "ElementaryTypeName",
+                        "src": "977:7:35"
+                      }
+                    ],
+                    "id": 3725,
+                    "name": "VariableDeclaration",
+                    "src": "977:12:35"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "_stakefactory",
+                      "scope": 3738,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "address",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "address",
+                          "stateMutability": "nonpayable",
+                          "type": "address"
+                        },
+                        "id": 3726,
+                        "name": "ElementaryTypeName",
+                        "src": "999:7:35"
+                      }
+                    ],
+                    "id": 3727,
+                    "name": "VariableDeclaration",
+                    "src": "999:21:35"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "_stakeType",
+                      "scope": 3738,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "uint256",
+                          "type": "uint256"
+                        },
+                        "id": 3728,
+                        "name": "ElementaryTypeName",
+                        "src": "1030:7:35"
+                      }
+                    ],
+                    "id": 3729,
+                    "name": "VariableDeclaration",
+                    "src": "1030:18:35"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "_cap",
+                      "scope": 3738,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "uint256",
+                          "type": "uint256"
+                        },
+                        "id": 3730,
+                        "name": "ElementaryTypeName",
+                        "src": "1058:7:35"
+                      }
+                    ],
+                    "id": 3731,
+                    "name": "VariableDeclaration",
+                    "src": "1058:12:35"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "_rewardPerBlock",
+                      "scope": 3738,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "uint256",
+                          "type": "uint256"
+                        },
+                        "id": 3732,
+                        "name": "ElementaryTypeName",
+                        "src": "1080:7:35"
+                      }
+                    ],
+                    "id": 3733,
+                    "name": "VariableDeclaration",
+                    "src": "1080:23:35"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "_name",
+                      "scope": 3738,
+                      "stateVariable": false,
+                      "storageLocation": "memory",
+                      "type": "string",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "string",
+                          "type": "string"
+                        },
+                        "id": 3734,
+                        "name": "ElementaryTypeName",
+                        "src": "1113:6:35"
+                      }
+                    ],
+                    "id": 3735,
+                    "name": "VariableDeclaration",
+                    "src": "1113:19:35"
+                  }
+                ],
+                "id": 3736,
+                "name": "ParameterList",
+                "src": "967:171:35"
+              },
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 3737,
+                "name": "ParameterList",
+                "src": "1147:0:35"
+              }
+            ],
+            "id": 3738,
+            "name": "FunctionDefinition",
+            "src": "948:200:35"
+          }
+        ],
+        "id": 3739,
+        "name": "ContractDefinition",
+        "src": "62:1088:35"
+      }
+    ],
+    "id": 3740,
+    "name": "SourceUnit",
+    "src": "37:1114:35"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.7.6+commit.7338295f.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "3.3.4",
+  "updatedAt": "2021-07-28T11:36:55.453Z",
+  "devdoc": {
+    "kind": "dev",
+    "methods": {
+      "implementation()": {
+        "details": "view implementation address",
+        "returns": {
+          "_0": "the logic address"
+        }
+      },
+      "initialize(address,address,uint256,uint256,uint256,string)": {
+        "details": "set initial storage",
+        "params": {
+          "_cap": "Maximum amount of rewards issued, allocated reward amount.",
+          "_name": "the name of stake contratc",
+          "_rewardPerBlock": "the reward per block",
+          "_stakeType": "Type of staking contract, 0 TON staking, 1 basic ERC20 staking, 2 UniswapV3  staking",
+          "_stakefactory": "the factory address to create stakeContract",
+          "_tos": "TOS token address"
+        }
+      },
+      "setProxyPause(bool)": {
+        "details": "Set pause state",
+        "params": {
+          "_pause": "true:pause or false:resume"
+        }
+      },
+      "upgradeTo(address)": {
+        "details": "Set implementation contract",
+        "params": {
+          "impl": "New implementation contract address"
+        }
+      }
+    },
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {},
+    "version": 1
+  }
+}
