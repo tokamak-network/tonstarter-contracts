@@ -5,9 +5,9 @@ import "@openzeppelin/contracts/math/Math.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 import "../interfaces/ILockTOS.sol";
+import "../interfaces/ITOS.sol";
 
-
-contract LockTOS is ILockTOS, AccessControl {
+contract LockTOS is ILockTOS {
     uint256 public constant ONE_WEEK = 1 weeks;
     uint256 public constant MAXTIME = 3 * (365 days); // 3 years
     uint256 public constant MULTIPLIER = 1e18;
@@ -42,7 +42,6 @@ contract LockTOS is ILockTOS, AccessControl {
     uint256 public phase3StartTime;
 
     constructor(address _tos, uint256 _phase3StartTime) {
-        _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
         tos = _tos;
         phase3StartTime = _phase3StartTime;
     }
@@ -53,7 +52,28 @@ contract LockTOS is ILockTOS, AccessControl {
     }
 
     /// @inheritdoc ILockTOS
-    function createLock(uint256 _value, uint256 _unlockTime) override external returns (uint256 lockId) {
+    function createLockPermit(
+        uint256 _value,
+        uint256 _unlockTime,
+        uint256 _deadline,
+        uint8 _v,
+        bytes32 _r,
+        bytes32 _s
+    ) override external returns (uint256 lockId) {
+        ITOS(tos).permit(
+            msg.sender,
+            address(this),
+            _value,
+            _deadline,
+            _v,
+            _r,
+            _s
+        );
+        createLock(_value, _unlockTime);
+    }
+
+    /// @inheritdoc ILockTOS
+    function createLock(uint256 _value, uint256 _unlockTime) override public returns (uint256 lockId) {
         require(_value > 0, "Value locked should be non-zero");
         require (_unlockTime > block.timestamp + ONE_WEEK, "Unlock time");
 
@@ -67,8 +87,8 @@ contract LockTOS is ILockTOS, AccessControl {
     /// @inheritdoc ILockTOS
     function increaseUnlockTime(uint256 _lockId, uint256 _unlockTime) override external {
         LockedBalance memory lock = lockedBalances[msg.sender][_lockId];
-        require (lock.end > block.timestamp, "Unlock time");
-        require (lock.end < _unlockTime, "Unlock time");
+        require (lock.end > block.timestamp, "Lock time already finished");
+        require (lock.end < _unlockTime, "New lock time must be greater");
         require(lock.amount > 0, "No existing locked TOS");
         _deposit(msg.sender, _lockId, 0, _unlockTime);
     }
@@ -77,8 +97,8 @@ contract LockTOS is ILockTOS, AccessControl {
     function withdraw(uint256 _lockId) override external {
         LockedBalance memory lockedOld = lockedBalances[msg.sender][_lockId];
         LockedBalance memory lockedNew = LockedBalance({amount: 0, start: 0, end: 0});
-        require(lockedOld.end < block.timestamp, "");
-        require(lockedOld.amount != 0, "");
+        require(lockedOld.end < block.timestamp, "Lock time not finished");
+        require(lockedOld.amount > 0, "Already withdrawn");
         _checkpoint(lockedNew, lockedOld);
         IERC20(tos).transferFrom(address(this), msg.sender, lockedOld.amount);
         lockedBalances[msg.sender][_lockId] = lockedNew;   
@@ -224,7 +244,8 @@ contract LockTOS is ILockTOS, AccessControl {
         _checkpoint(lockedNew, lockedOld);
 
         // Transfer tos
-        IERC20(tos).transferFrom(_addr, address(this), _value);
+        IERC20(tos).transferFrom(msg.sender, address(this), _value);
+        lockedBalances[_addr][_lockId] = lockedNew;
 
         // Save user point
         int128 userSlope = int128(lockedNew.amount * MULTIPLIER / MAXTIME);

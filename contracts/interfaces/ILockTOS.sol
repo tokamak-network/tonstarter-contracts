@@ -29,6 +29,16 @@ interface ILockTOS {
     /// @dev Deposits value for '_addr'
     function depositFor(address _addr, uint256 _lockId, uint256 _value) external;
 
+    /// @dev Create lock using permit
+    function createLockPermit(
+        uint256 _value,
+        uint256 _unlockTime,
+        uint256 _deadline,
+        uint8 _v,
+        bytes32 _r,
+        bytes32 _s
+    ) external returns (uint256 lockId);
+
     /// @dev Create lock
     function createLock(uint256 _value, uint256 _unlockTime) external returns (uint256 lockId);
 
