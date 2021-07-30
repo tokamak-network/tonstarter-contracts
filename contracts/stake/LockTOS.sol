@@ -1,4 +1,6 @@
+//SPDX-License-Identifier: Unlicense
 pragma solidity ^0.7.6;
+pragma abicoder v2;
 
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/math/Math.sol";
@@ -6,6 +8,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 import "../interfaces/ILockTOS.sol";
 import "../interfaces/ITOS.sol";
+
 
 contract LockTOS is ILockTOS {
     uint256 public constant ONE_WEEK = 1 weeks;
@@ -75,11 +78,11 @@ contract LockTOS is ILockTOS {
     /// @inheritdoc ILockTOS
     function createLock(uint256 _value, uint256 _unlockTime) override public returns (uint256 lockId) {
         require(_value > 0, "Value locked should be non-zero");
-        require (_unlockTime > block.timestamp + ONE_WEEK, "Unlock time");
+        require (_unlockTime > block.timestamp, "Unlock time");
 
         lockId = lockIdCounter ++;
 
-        uint256 unlockTime = (_unlockTime / ONE_WEEK) * ONE_WEEK;
+        uint256 unlockTime = ((_unlockTime + ONE_WEEK) / ONE_WEEK) * ONE_WEEK;
         _deposit(msg.sender, lockId, _value, unlockTime);
         userLocks[msg.sender].push(lockId);
     }
@@ -113,8 +116,7 @@ contract LockTOS is ILockTOS {
     function depositFor(address _addr, uint256 _lockId, uint256 _value) override public {
         require(_value > 0, "Value locked should be non-zero");
         LockedBalance memory locked = lockedBalances[_addr][_lockId];
-        require(locked.end > block.timestamp, "Withdraw old tokens");
-        require(locked.amount == 0, "Withdraw old tokens");
+        require(locked.end > block.timestamp, "Lock time is finished");
         _deposit(_addr, _lockId, _value, 0);
     }
 
@@ -203,6 +205,10 @@ contract LockTOS is ILockTOS {
     /// @inheritdoc ILockTOS
     function locksOf(address _addr) override public view returns (uint256[] memory) {
         return userLocks[_addr];
+    }
+
+    function pointHistoryOf(address _addr, uint256 _lockId) public view returns (Point[] memory) {
+        return userPointHistory[_addr][_lockId];
     }
 
     /// @dev Finds closest point

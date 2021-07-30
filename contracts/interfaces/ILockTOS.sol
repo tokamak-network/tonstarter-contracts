@@ -1,9 +1,13 @@
+//SPDX-License-Identifier: Unlicense
 pragma solidity ^0.7.6;
 
 
 interface ILockTOS {
     /// @dev Returns all locks of `_addr`
     function locksOf(address _addr) external view returns (uint256[] memory);
+    
+    /// @dev Returns all history of `_addr`
+    // function pointHistoryOf(address _addr, uint256 _lockId) external view returns (Point[] memory);
 
     /// @dev Total vote weight
     function totalSupply() external view returns (int128);
