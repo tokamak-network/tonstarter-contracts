@@ -14,16 +14,58 @@ const {
   setupContracts,
   mineBlocks,
 } = require("./utils");
-const { ethers } = require("hardhat");
+const { ethers, network } = require("hardhat");
 
 describe("LockTOS", function () {
   let admin, user, user2;
   let tos;
   let lockTOS;
+  let phase3StartTime;
   const userLockInfo = [];
   const MAXTIME = 94608000;
-
   const tosAmount = 1000000000;
+
+  // Helper functions
+  const findClosestPoint = (history, timestamp) => {
+    if (history.length === 0) {
+      return null;
+    }
+    let left = 0;
+    let right = history.length;
+    while (left + 1 < right) {
+      const mid = Math.floor((left + right) / 2);
+      if (history[mid].timestamp <= _timestamp) left = mid;
+      else right = mid;
+    }
+    return history[left];
+  };
+
+  const calculateBalanceOfLock = async (user, lockId, timestamp) => {
+    const userHistory = await lockTOS.pointHistoryOf(user.address, lockId);
+    const foundPoint = await findClosestPoint(userHistory, timestamp);
+    if (foundPoint == null) return 0;
+    const currentBias = foundPoint.slope * (timestamp - foundPoint.timestamp);
+    let boostValue = 1;
+    if (timestamp < phase3StartTime) {
+      boostValue = 2;
+    }
+    const MULTIPLIER = Math.pow(10, 18);
+    return Math.floor(
+      ((foundPoint.bias > currentBias ? foundPoint.bias - currentBias : 0) *
+        boostValue) /
+        MULTIPLIER
+    );
+  };
+
+  const calculateBalanceOfUser = async (user, timestamp) => {
+    const locks = await lockTOS.locksOf(user.address);
+    let accBalance = 0;
+    for (const lockId of locks) {
+      accBalance += await calculateBalanceOfLock(user, lockId, timestamp);
+    }
+    return accBalance;
+  };
+
   before(async () => {
     const addresses = await getAddresses();
     admin = await findSigner(addresses[0]);
@@ -36,7 +78,7 @@ describe("LockTOS", function () {
   });
 
   it("Deploy LockTOS", async function () {
-    const phase3StartTime = (await time.latest()) + time.duration.weeks(10);
+    phase3StartTime = (await time.latest()) + time.duration.weeks(10);
     lockTOS = await (
       await ethers.getContractFactory("LockTOS")
     ).deploy(tos.address, phase3StartTime);
@@ -52,8 +94,62 @@ describe("LockTOS", function () {
     await (await tos.connect(user).approve(lockTOS.address, amount)).wait();
   };
 
-  const createLock = async (user, amount, time) => {
-    await (await lockTOS.connect(user).createLock(amount, time)).wait();
+  const createLock = async (user, amount, unlockTime) => {
+    await (await lockTOS.connect(user).createLock(amount, unlockTime)).wait();
+  };
+
+  const createLockPermit = async (user, amount, unlockTime) => {
+    const nonce = parseInt(await tos.nonces(user.address));
+    const deadline = parseInt(await time.latest()) + 20;
+    const chainId = parseInt(await network.provider.send("eth_chainId")); // 31337 await ethers.Provider.getNetwork().chainId;
+    const hashPermit = await tos.hashPermit(
+      user.address,
+      lockTOS.address,
+      amount,
+      deadline,
+      nonce
+    );
+
+    console.log({ hashPermit });
+    const domain = {
+      chainId,
+      name: "TOS",
+      version: "1",
+      verifyingContract: tos.address,
+    };
+
+    const types = {
+      Message: [
+        { name: "owner", type: "address" },
+        { name: "spender", type: "address" },
+        { name: "value", type: "uint256" },
+        { name: "nonce", type: "uint256" },
+        { name: "deadline", type: "uint256" },
+      ],
+    };
+
+    const message = {
+      owner: user.address,
+      spender: lockTOS.address,
+      value: amount,
+      nonce,
+      deadline,
+    };
+
+    const signature = (
+      await user._signTypedData(domain, types, message)
+    ).substring(2);
+
+    const r = "0x" + signature.substring(0, 64);
+    const s = "0x" + signature.substring(64, 128);
+    const v = parseInt(signature.substring(128, 130), 16);
+
+    await (
+      await lockTOS
+        .connect(user)
+        .createLockPermit(amount, unlockTime, deadline, v, r, s)
+    ).wait();
+    console.log("done");
   };
 
   const generateCreateProcess = async ({
@@ -67,6 +163,7 @@ describe("LockTOS", function () {
     const bias = slope * lockedDuration;
     await approve(user, lockedAmount);
     await createLock(user, lockedAmount, endTime);
+    // await createLockPermit(user, lockedAmount, endTime);
     return { startTime, endTime, lockedAmount, bias, slope };
   };
 
@@ -76,6 +173,7 @@ describe("LockTOS", function () {
         user,
         lockedAmount: 300000000,
         lockedDuration: parseInt(time.duration.weeks(20)),
+        increase: [{ amount: 20000, after: time.duration.weeks(1) }],
       })
     );
     userLockInfo.push(
@@ -83,42 +181,55 @@ describe("LockTOS", function () {
         user,
         lockedAmount: 300000000,
         lockedDuration: parseInt(time.duration.weeks(5)),
+        increase: [{ amount: 10000, after: time.duration.weeks(1) }],
       })
     );
     userLockInfo.push(
       await generateCreateProcess({
         user,
-        lockedAmount: 300000000,
+        lockedAmount: 200000000,
         lockedDuration: parseInt(time.duration.years(3)),
+        increase: [{ amount: 10000, after: time.duration.weeks(1) }],
+      })
+    );
+    userLockInfo.push(
+      await generateCreateProcess({
+        user,
+        lockedAmount: 100000000,
+        lockedDuration: parseInt(time.duration.days(8)),
+        increase: null,
       })
     );
   });
 
   it("should check balances now of ", async function () {
-    const totalBalance = await lockTOS.balanceOf(user.address);
+    const totalBalance = parseInt(await lockTOS.balanceOf(user.address));
+    const estimatedTotalBalance = parseInt(
+      await calculateBalanceOfUser(user, parseInt(await time.latest()))
+    );
+    expect(totalBalance).to.equal(estimatedTotalBalance)
+
     const locksOf = await lockTOS.locksOf(user.address);
     for (let i = 0; i < locksOf.length; ++i) {
       userLockInfo[i].lockId = locksOf[i];
     }
 
-    console.log("Current time: ", (await time.latest()).toString());
-    console.log("user total: ", totalBalance.toString());
     for (const info of userLockInfo) {
       const currentTime = parseInt(await time.latest());
-      const { lockId, slope, bias, startTime } = info;
-      const balance = await lockTOS.balanceOfLock(user.address, lockId);
-      console.log(`Vote Weight: ${balance.toString()}, LockId: ${lockId}`);
-      console.log(
-        `Estimated bias: ${bias - slope * (currentTime - startTime)}`
+      const { lockId } = info;
+      const balance = parseInt(
+        await lockTOS.balanceOfLock(user.address, lockId)
       );
+      const estimate = await calculateBalanceOfLock(user, lockId, currentTime);
+      expect(balance).to.equal(estimate);
     }
   });
 
   it("should check history changes", async function () {
     const changes = [];
-    for (let it = 0; it < 5; ++it) {
+    for (let it = 0; it < 10; ++it) {
+      await time.increase(time.duration.weeks(1));
       for (const info of userLockInfo) {
-        await time.increase(time.duration.days(1));
         const { lockId } = info;
         const currentTime = parseInt(await time.latest());
         const lockBalance = (
@@ -135,9 +246,12 @@ describe("LockTOS", function () {
     for (const change of changes) {
       const { lockId, captureTimestamp, captureBalance } = change;
       const lockBalance = (
-        await lockTOS.balanceOfLock(user.address, lockId, captureTimestamp)
+        await lockTOS.balanceOfLockAt(user.address, lockId, captureTimestamp)
       ).toString();
-      console.log({ lockBalance, captureBalance });
+      expect(lockBalance).to.be.equal(captureBalance);
+
+      // const tosStaked = await lockTOS.lockedBalances(user.address, lockId);
+      // console.log({ tosStaked });
     }
   });
 
