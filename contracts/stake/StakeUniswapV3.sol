@@ -74,12 +74,12 @@ contract StakeUniswapV3 is
     /// @param poolAddress the pool address of uniswapV3
     /// @param tokenId the uniswapV3 Lp token
     /// @param miningAmount the amount of mining
-    event Claimed(address indexed to, address poolAddress, uint256 tokenId,  uint256 miningAmount);
+    event Claimed(address indexed to, address poolAddress, uint256 tokenId,  uint256 miningAmount, uint256 nonMiningAmount);
 
     /// @dev event on withdrawal
     /// @param to the sender
     /// @param tokenId the uniswapV3 Lp token
-    event WithdrawalToken(address indexed to, uint256 tokenId);
+    event WithdrawalToken(address indexed to, uint256 tokenId, uint256 miningAmount, uint256 nonMiningAmount);
 
     /// @dev event on mining in coinage
     /// @param curTime the current time
@@ -212,14 +212,16 @@ contract StakeUniswapV3 is
             uint256 liquidity,
             uint256 balanceOfTokenIdRay,
             uint256 minableAmountRay,
-            uint32 currentTime
+            uint160 secondsAbsolute160,
+            uint256 secondsInsideDiff256,
+            uint256 secondsAbsolute256
         )
     {
         if(stakeStartTime < block.timestamp && stakeStartTime < block.timestamp) {
             LibUniswapV3Stake.StakeLiquidity storage _depositTokens = depositTokens[tokenId];
             liquidity = _depositTokens.liquidity ;
-
-            currentTime = uint32(block.timestamp);
+            uint256 tokenId_ = tokenId;
+            uint32 currentTime = uint32(block.timestamp);
             uint32 secondsAbsolute = 0;
 
             if(_depositTokens.liquidity > 0){
@@ -231,16 +233,20 @@ contract StakeUniswapV3 is
                 if(_depositTokens.secondsInsideLast > 0) secondsInsideDiff = secondsInside - _depositTokens.secondsInsideLast;
                 else secondsInsideDiff = secondsInside - _depositTokens.secondsInsideInitial;
 
-                balanceOfTokenIdRay = IAutoRefactorCoinageWithTokenId(coinage).balanceOf(tokenId);
+                balanceOfTokenIdRay = IAutoRefactorCoinageWithTokenId(coinage).balanceOf(tokenId_);
                 if(balanceOfTokenIdRay > 0 ) {
-
                     if (balanceOfTokenIdRay > 0 && balanceOfTokenIdRay > liquidity*(10**9) ) {
                         minableAmountRay = balanceOfTokenIdRay - liquidity*(10**9);
                         minableAmount = minableAmountRay/(10**9);
                     }
                 }
-                if(minableAmount > 0 && secondsAbsolute > 0 && secondsInsideDiff < secondsAbsolute ){
-                    if(secondsAbsolute >0 && secondsInsideDiff > 0 ) miningAmount = minableAmount * (secondsInsideDiff / secondsAbsolute);
+
+                secondsAbsolute160 = uint160(secondsAbsolute);
+                secondsInsideDiff256 = uint256(secondsInsideDiff);
+                secondsAbsolute256 = uint256(secondsAbsolute160);
+
+                if(minableAmount > 0 && secondsAbsolute > 0 && secondsInsideDiff < secondsAbsolute160 ){
+                    if(secondsAbsolute > 0 && secondsInsideDiff > 0 ) miningAmount = minableAmount * secondsInsideDiff256 / secondsAbsolute256;
                     nonMiningAmount = minableAmount - miningAmount;
 
                 } else if(minableAmount > 0 &&  secondsAbsolute > 0){
@@ -419,7 +425,6 @@ contract StakeUniswapV3 is
         _depositTokens.tickLower = tickLower;
         _depositTokens.tickUpper = tickUpper;
         _depositTokens.startTime = uint32(block.timestamp);
-        _depositTokens.endTime = 0;
         _depositTokens.claimedTime = 0;
         _depositTokens.secondsInsideInitial = secondsInside;
         _depositTokens.secondsInsideLast = 0;
@@ -476,7 +481,7 @@ contract StakeUniswapV3 is
             uint256 minableAmount,
             uint160 secondsInside,
             ,,,
-            uint256 minableAmountRay,
+            uint256 minableAmountRay,,,
         ) = getMiningTokenId(tokenId);
 
         require( miningAmount > 0, "StakeUniswapV3: miningAmount is zero");
@@ -502,7 +507,7 @@ contract StakeUniswapV3 is
         nonMiningAmountTotal += nonMiningAmount;
 
         require(IIStake2Vault(vault).claimMining(msg.sender, minableAmount, miningAmount, nonMiningAmount));
-        emit Claimed(msg.sender, poolAddress, tokenId, miningAmount );
+        emit Claimed(msg.sender, poolAddress, tokenId, miningAmount, nonMiningAmount);
     }
 
     /// @dev withdraw the deposited token.
@@ -531,13 +536,20 @@ contract StakeUniswapV3 is
             ,
             ,
             ,
-            ,
+            ,,,
         ) = getMiningTokenId(tokenId);
 
         IAutoRefactorCoinageWithTokenId(coinage).burnTokenId(msg.sender, tokenId);
 
+        // storage  StakedTotalTokenAmount
         LibUniswapV3Stake.StakedTotalTokenAmount storage _userTotalStaked = userTotalStaked[msg.sender];
         _userTotalStaked.totalDepositAmount -= _depositTokens.liquidity;
+        _userTotalStaked.totalMiningAmount += miningAmount;
+        _userTotalStaked.totalNonMiningAmount += nonMiningAmount;
+
+        // total
+        miningAmountTotal += miningAmount;
+        nonMiningAmountTotal += nonMiningAmount;
 
         deleteUserToken(_depositTokens.owner, tokenId, _depositTokens.idIndex);
 
@@ -557,7 +569,7 @@ contract StakeUniswapV3 is
             tokenId
         );
 
-        emit WithdrawalToken(msg.sender, tokenId);
+        emit WithdrawalToken(msg.sender, tokenId, miningAmount, nonMiningAmount);
     }
 
     /// @dev Get the list of staked tokens of the user
@@ -576,7 +588,7 @@ contract StakeUniswapV3 is
     /// @return _poolAddress   poolAddress
     /// @return tick tick,
     /// @return liquidity liquidity,
-    /// @return args liquidity,  startTime, endTime, claimedTime, startBlock, claimedBlock, claimedAmount
+    /// @return args liquidity,  startTime, claimedTime, startBlock, claimedBlock, claimedAmount
     /// @return secondsPL secondsPerLiquidityInsideInitialX128, secondsPerLiquidityInsideX128Las
     function getDepositToken(uint256 tokenId)
         external
@@ -586,7 +598,7 @@ contract StakeUniswapV3 is
             address _poolAddress,
             int24[2] memory tick,
             uint128 liquidity,
-            uint256[6] memory args,
+            uint256[5] memory args,
             uint160[2] memory secondsPL
         )
     {
@@ -600,7 +612,6 @@ contract StakeUniswapV3 is
             _depositTokens.liquidity,
             [
                 _depositTokens.startTime,
-                _depositTokens.endTime,
                 _depositTokens.claimedTime,
                 _stakedCoinageTokens.startTime,
                 _stakedCoinageTokens.claimedTime,

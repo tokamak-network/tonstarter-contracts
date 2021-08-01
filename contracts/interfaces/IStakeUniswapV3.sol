@@ -17,7 +17,9 @@ interface IStakeUniswapV3 {
             uint256 liquidity,
             uint256 balanceOfTokenIdRay,
             uint256 minableAmountRay,
-            uint32 currentTime
+            uint160 secondsAbsolute160,
+            uint256 secondsInsideDiff256,
+            uint256 secondsAbsolute256
         );
 
     /// @dev withdraw
@@ -43,7 +45,7 @@ interface IStakeUniswapV3 {
     /// @return poolAddress   poolAddress
     /// @return tick tick,
     /// @return liquidity liquidity,
-    /// @return args liquidity,  startTime, endTime, claimedTime, startBlock, claimedBlock, claimedAmount
+    /// @return args liquidity,  startTime, claimedTime, startBlock, claimedBlock, claimedAmount
     /// @return secondsPL secondsPerLiquidityInsideInitialX128, secondsPerLiquidityInsideX128Las
     function getDepositToken(uint256 tokenId)
         external
@@ -52,7 +54,7 @@ interface IStakeUniswapV3 {
             address poolAddress,
             int24[2] memory tick,
             uint128 liquidity,
-            uint256[6] memory args,
+            uint256[5] memory args,
             uint160[2] memory secondsPL
         );
 

@@ -11,7 +11,7 @@ library LibUniswapV3Stake {
         int24 tickLower;
         int24 tickUpper;
         uint32 startTime;
-        uint32 endTime;
+        //uint32 endTime;
         uint32 claimedTime;
         uint160 secondsInsideInitial;
         uint160 secondsInsideLast;
