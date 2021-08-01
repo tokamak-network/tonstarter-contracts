@@ -5,7 +5,7 @@ var UniswapV3Pool_json_1 = require("@uniswap/v3-core/artifacts/contracts/Uniswap
 var ethers_1 = require("ethers");
 exports.POOL_BYTECODE_HASH = ethers_1.utils.keccak256(UniswapV3Pool_json_1.bytecode);
 function computePoolAddress(factoryAddress, _a, fee) {
-    console.log('_a',_a);
+    //console.log('_a',_a);
     var tokenA = _a[0], tokenB = _a[1];
     var _b = tokenA.toLowerCase() < tokenB.toLowerCase() ? [tokenA, tokenB] : [tokenB, tokenA], token0 = _b[0], token1 = _b[1];
     var constructorArgumentsEncoded = ethers_1.utils.defaultAbiCoder.encode(['address', 'address', 'uint24'], [token0, token1, fee]);

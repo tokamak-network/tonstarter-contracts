@@ -61,9 +61,9 @@ const PSEIG_RATE = _WTON("0.4");
 
 const TON_MINIMUM_STAKE_AMOUNT = _TON("1000");
 
-const name = "Fair Launchpad Dao";
+const name = "TONStarter";
 const symbol = "TOS";
-const version = "1";
+const version = "1.0";
 
 // ico2.0 contracts
 let StakeFactory,
@@ -105,18 +105,21 @@ let candidates, users, operators;
 let deployer;
 
 const initialTotal = "10000000000." + "0".repeat(18);
-const Pharse1_TON_Staking = "175000000." + "0".repeat(18);
-const Pharse1_ETH_Staking = "175000000." + "0".repeat(18);
-const Pharse1_TOSETHLP_Staking = "150000000." + "0".repeat(18);
-const Pharse1_DEV_Mining = "150000000." + "0".repeat(18);
-const Pharse2_ETHTOS_Staking = "150000000." + "0".repeat(18);
-const Pharse2_REWARD_PERBLOCK = "1.5" + "0".repeat(17);
+const PHASE1_TON_Staking = "175000000." + "0".repeat(18);
+const PHASE1_ETH_Staking = "175000000." + "0".repeat(18);
+const PHASE1_TOSETHLP_Staking = "150000000." + "0".repeat(18);
+const PHASE1_DEV_Mining = "150000000." + "0".repeat(18);
+//const PHASE2_ETHTOS_Staking = "8000000." + "0".repeat(18);
+const PHASE2_ETHTOS_Staking = "8000000";
 
-const HASH_Pharse2_ETHTOS_Staking = keccak256("PHASE2_ETHTOS_STAKING");
-const HASH_Pharse1_TON_Staking = keccak256("PHASE1_TON_STAKING");
-const HASH_Pharse1_ETH_Staking = keccak256("PHASE1_ETH_STAKING");
-const HASH_Pharse1_TOSETHLP_Staking = keccak256("PHASE1_TOSETHLP_Staking");
-const HASH_Pharse1_DEV_Mining = keccak256("PHASE1_DEV_Mining");
+const PHASE2_REWARD_PERBLOCK = "1.5" + "0".repeat(17);
+const PHASE2_MINING_PERSECOND= "84559445290038900" ;
+
+const HASH_PHASE2_ETHTOS_Staking = keccak256("PHASE2_ETHTOS_STAKING");
+const HASH_PHASE1_TON_Staking = keccak256("PHASE1_TON_STAKING");
+const HASH_PHASE1_ETH_Staking = keccak256("PHASE1_ETH_STAKING");
+const HASH_PHASE1_TOSETHLP_Staking = keccak256("PHASE1_TOSETHLP_Staking");
+const HASH_PHASE1_DEV_Mining = keccak256("PHASE1_DEV_Mining");
 
 
 // const deployTON = async () => {
@@ -757,10 +760,12 @@ class ICO20Contracts {
     this.stake2logic = await Stake2Logic.connect(owner).deploy();
     // 3-2. 로직을 프록시에 연결
     // attach stake2logic
-    let _func1 = Web3EthAbi.encodeFunctionSignature("balanceOf(address,address)") ;
-    let _func2 = Web3EthAbi.encodeFunctionSignature("balanceOfTOS(address)") ;
-    let _func3 = Web3EthAbi.encodeFunctionSignature("createVault2(uint256,uint256,uint256,bytes32,uint256,address[4],string)") ;
-    let _func4 = Web3EthAbi.encodeFunctionSignature("setVaultLogicByPhase(uint256,address)") ;
+    let _func1 = Web3EthAbi.encodeFunctionSignature("createVault2(uint256,uint256,uint256,bytes32,uint256,address[4],string)") ;
+    let _func2 = Web3EthAbi.encodeFunctionSignature("setVaultLogicByPhase(uint256,address)") ;
+    let _func3 = Web3EthAbi.encodeFunctionSignature("setPool(address,address[4])") ;
+    let _func4 = Web3EthAbi.encodeFunctionSignature("setMiningIntervalSeconds(address,uint256)") ;
+    let _func5 = Web3EthAbi.encodeFunctionSignature("resetCoinageTime(address)") ;
+    let _func6 = Web3EthAbi.encodeFunctionSignature("setStartTimeOfVault2(address,uint256)") ;
 
     await this.stake1proxy.connect(owner).setImplementation(
       this.stake2logic.address,
@@ -768,7 +773,7 @@ class ICO20Contracts {
 
     await this.stake1proxy
       .connect(owner)
-      .setSelectorImplementations([_func1, _func2, _func3, _func4], this.stake2logic.address);
+      .setSelectorImplementations([_func1, _func2, _func3, _func4, _func5, _func6], this.stake2logic.address);
 
     // 로직2로 연동하는 프록시 인터페이스 설정
     this.stakeEntry2 = await ethers.getContractAt("Stake2Logic",this.stake1proxy.address);
@@ -779,20 +784,27 @@ class ICO20Contracts {
     return this.stakeEntry2 ;
   };
 
+  getContract = async function (name , contractAddress, userAddress) {
+    let owner = await this.findSigner(userAddress);
+    let contract = await ethers.getContractAt(name,contractAddress);
+
+    return contract;
+  }
+
 }
 
 module.exports = {
   ICO20Contracts,
   initialTotal,
-  Pharse1_TON_Staking,
-  Pharse1_ETH_Staking,
-  Pharse1_TOSETHLP_Staking,
-  Pharse1_DEV_Mining,
-  Pharse2_ETHTOS_Staking,
-  Pharse2_REWARD_PERBLOCK,
-  HASH_Pharse1_TON_Staking,
-  HASH_Pharse1_ETH_Staking,
-  HASH_Pharse1_TOSETHLP_Staking,
-  HASH_Pharse1_DEV_Mining,
-  HASH_Pharse2_ETHTOS_Staking
+  PHASE1_TON_Staking,
+  PHASE1_ETH_Staking,
+  PHASE1_TOSETHLP_Staking,
+  PHASE1_DEV_Mining,
+  PHASE2_ETHTOS_Staking,
+  HASH_PHASE1_TON_Staking,
+  HASH_PHASE1_ETH_Staking,
+  HASH_PHASE1_TOSETHLP_Staking,
+  HASH_PHASE1_DEV_Mining,
+  HASH_PHASE2_ETHTOS_Staking,
+  PHASE2_MINING_PERSECOND
   };

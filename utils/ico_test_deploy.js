@@ -151,18 +151,18 @@ const TON_MINIMUM_STAKE_AMOUNT = _TON("1000");
 
 
 const initialTotal = "10000000000." + "0".repeat(18);
-const Pharse1_TON_Staking = "175000000." + "0".repeat(18);
-const Pharse1_ETH_Staking = "175000000." + "0".repeat(18);
-const Pharse1_TOSETHLP_Staking = "150000000." + "0".repeat(18);
-const Pharse1_DEV_Mining = "150000000." + "0".repeat(18);
-const Pharse2_ETHTOS_Staking = "150000000." + "0".repeat(18);
-const Pharse2_REWARD_PERBLOCK = "1.5" + "0".repeat(17);
+const PHASE1_TON_Staking = "175000000." + "0".repeat(18);
+const PHASE1_ETH_Staking = "175000000." + "0".repeat(18);
+const PHASE1_TOSETHLP_Staking = "150000000." + "0".repeat(18);
+const PHASE1_DEV_Mining = "150000000." + "0".repeat(18);
+const PHASE2_ETHTOS_Staking = "150000000." + "0".repeat(18);
+const PHASE2_REWARD_PERBLOCK = "1.5" + "0".repeat(17);
 
-const HASH_Pharse2_ETHTOS_Staking = keccak256("PHASE2_ETHTOS_STAKING");
-const HASH_Pharse1_TON_Staking = keccak256("PHASE1_TON_STAKING");
-const HASH_Pharse1_ETH_Staking = keccak256("PHASE1_ETH_STAKING");
-const HASH_Pharse1_TOSETHLP_Staking = keccak256("PHASE1_TOSETHLP_Staking");
-const HASH_Pharse1_DEV_Mining = keccak256("PHASE1_DEV_Mining");
+const HASH_PHASE2_ETHTOS_Staking = keccak256("PHASE2_ETHTOS_STAKING");
+const HASH_PHASE1_TON_Staking = keccak256("PHASE1_TON_STAKING");
+const HASH_PHASE1_ETH_Staking = keccak256("PHASE1_ETH_STAKING");
+const HASH_PHASE1_TOSETHLP_Staking = keccak256("PHASE1_TOSETHLP_Staking");
+const HASH_PHASE1_DEV_Mining = keccak256("PHASE1_DEV_Mining");
 
 
 class ICO20Contracts {
@@ -1161,15 +1161,15 @@ class ICO20Contracts {
 module.exports = {
   ICO20Contracts,
   initialTotal,
-  Pharse1_TON_Staking,
-  Pharse1_ETH_Staking,
-  Pharse1_TOSETHLP_Staking,
-  Pharse1_DEV_Mining,
-  Pharse2_ETHTOS_Staking,
-  Pharse2_REWARD_PERBLOCK,
-  HASH_Pharse1_TON_Staking,
-  HASH_Pharse1_ETH_Staking,
-  HASH_Pharse1_TOSETHLP_Staking,
-  HASH_Pharse1_DEV_Mining,
-  HASH_Pharse2_ETHTOS_Staking
+  PHASE1_TON_Staking,
+  PHASE1_ETH_Staking,
+  PHASE1_TOSETHLP_Staking,
+  PHASE1_DEV_Mining,
+  PHASE2_ETHTOS_Staking,
+  PHASE2_REWARD_PERBLOCK,
+  HASH_PHASE1_TON_Staking,
+  HASH_PHASE1_ETH_Staking,
+  HASH_PHASE1_TOSETHLP_Staking,
+  HASH_PHASE1_DEV_Mining,
+  HASH_PHASE2_ETHTOS_Staking
   };

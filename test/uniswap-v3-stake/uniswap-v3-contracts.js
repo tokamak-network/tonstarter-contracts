@@ -200,7 +200,7 @@ const getUniswapV3Contracts = (async () => {
 })();
 
 const deployedUniswapV3Contracts = async (deployer) => {
-  console.log({ getUniswapV3Contracts });
+  //console.log({ getUniswapV3Contracts });
   const {
     coreFactoryDeployed,
     swapRouterDeployed,
