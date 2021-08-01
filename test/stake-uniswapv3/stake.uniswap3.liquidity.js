@@ -766,6 +766,11 @@ describe(" StakeUniswapV3 ", function () {
         expect(await TestStakeUniswapV3.totalStakers()).to.be.equal(ethers.BigNumber.from('1'));
         expect(await TestStakeUniswapV3.totalTokens()).to.be.equal(ethers.BigNumber.from('1'));
         expect(await TestStakeUniswapV3.totalStakedAmount()).to.be.equal(totalStakedAmountBefore.add(depositToken.liquidity));
+
+        let coinageLastMintBlockTimetampAfter = await TestStakeUniswapV3.coinageLastMintBlockTimetamp();
+        tester1.miningTimeLast = coinageLastMintBlockTimetampAfter;
+        tester2.miningTimeLast = coinageLastMintBlockTimetampAfter;
+
       });
 
     it('7. stake : after approve tester2\'s token ', async () => {
@@ -800,6 +805,10 @@ describe(" StakeUniswapV3 ", function () {
       expect(await TestStakeUniswapV3.totalTokens()).to.be.equal(ethers.BigNumber.from('2'));
 
       expect(await TestStakeUniswapV3.totalStakedAmount()).to.be.equal(totalStakedAmountBefore.add(depositToken.liquidity));
+
+      let coinageLastMintBlockTimetampAfter = await TestStakeUniswapV3.coinageLastMintBlockTimetamp();
+      tester1.miningTimeLast = coinageLastMintBlockTimetampAfter;
+      tester2.miningTimeLast = coinageLastMintBlockTimetampAfter;
     });
 
     it('8. miningCoinage :  ', async () => {
@@ -903,6 +912,9 @@ describe(" StakeUniswapV3 ", function () {
       expect(vaultBalanceTOS).to.be.equal(vaultBalanceTOSAfter.add(minableAmount));
       expect(totalSupplyTOS).to.be.equal(totalSupplyTOSAfter.add(nonminingAmount));
 
+      let coinageLastMintBlockTimetampAfter = await TestStakeUniswapV3.coinageLastMintBlockTimetamp();
+      tester1.miningTimeLast = coinageLastMintBlockTimetampAfter;
+      tester2.miningTimeLast = coinageLastMintBlockTimetampAfter;
     });
 
     it('10. claim : tester2 ', async () => {
@@ -978,6 +990,10 @@ describe(" StakeUniswapV3 ", function () {
       let totalSupplyTOSAfter = await tos.totalSupply();
       expect(vaultBalanceTOS).to.be.equal(vaultBalanceTOSAfter.add(minableAmount));
       expect(totalSupplyTOS).to.be.equal(totalSupplyTOSAfter.add(nonminingAmount));
+
+      let coinageLastMintBlockTimetampAfter = await TestStakeUniswapV3.coinageLastMintBlockTimetamp();
+      tester1.miningTimeLast = coinageLastMintBlockTimetampAfter;
+      tester2.miningTimeLast = coinageLastMintBlockTimetampAfter;
     });
 
   });
@@ -1170,6 +1186,10 @@ describe(" StakeUniswapV3 ", function () {
       let totalSupplyTOSAfter = await tos.totalSupply();
       expect(vaultBalanceTOS).to.be.equal(vaultBalanceTOSAfter.add(minableAmount));
       expect(totalSupplyTOS).to.be.equal(totalSupplyTOSAfter.add(nonminingAmount));
+
+      let coinageLastMintBlockTimetampAfter = await TestStakeUniswapV3.coinageLastMintBlockTimetamp();
+      tester1.miningTimeLast = coinageLastMintBlockTimetampAfter;
+      tester2.miningTimeLast = coinageLastMintBlockTimetampAfter;
     });
 
   });
@@ -1280,7 +1300,7 @@ describe(" StakeUniswapV3 ", function () {
 
     });
 
-    it('2. check the minable amount case in partial liquidity ', async () => {
+    it('2. claim: check the minable amount case in partial liquidity ', async () => {
       this.timeout(1000000);
 
       let vaultBalanceTOS = await tos.balanceOf(vaultAddress);
@@ -1356,6 +1376,9 @@ describe(" StakeUniswapV3 ", function () {
       expect(vaultBalanceTOS).to.be.equal(vaultBalanceTOSAfter.add(minableAmount));
       expect(totalSupplyTOS).to.be.equal(totalSupplyTOSAfter.add(nonminingAmount));
 
+      let coinageLastMintBlockTimetampAfter = await TestStakeUniswapV3.coinageLastMintBlockTimetamp();
+      tester1.miningTimeLast = coinageLastMintBlockTimetampAfter;
+      tester2.miningTimeLast = coinageLastMintBlockTimetampAfter;
 
     });
 
@@ -1487,6 +1510,9 @@ describe(" StakeUniswapV3 ", function () {
         expect(miningAmountTotalAfter).to.be.equal(miningAmountTotalBefore.add(miningAmount));
         expect(nonMiningAmountTotalAfter).to.be.equal(nonMiningAmountTotalBefore.add(nonminingAmount));
 
+        let coinageLastMintBlockTimetampAfter = await TestStakeUniswapV3.coinageLastMintBlockTimetamp();
+        tester1.miningTimeLast = coinageLastMintBlockTimetampAfter;
+        tester2.miningTimeLast = coinageLastMintBlockTimetampAfter;
       });
 
       it('4. withdraw : tester2 ', async () => {
@@ -1577,6 +1603,9 @@ describe(" StakeUniswapV3 ", function () {
         expect(miningAmountTotalAfter).to.be.equal(miningAmountTotalBefore.add(miningAmount));
         expect(nonMiningAmountTotalAfter).to.be.equal(nonMiningAmountTotalBefore.add(nonminingAmount));
 
+        let coinageLastMintBlockTimetampAfter = await TestStakeUniswapV3.coinageLastMintBlockTimetamp();
+        tester1.miningTimeLast = coinageLastMintBlockTimetampAfter;
+        tester2.miningTimeLast = coinageLastMintBlockTimetampAfter;
       });
 
       it('5. check :  storage ', async () => {
@@ -1590,8 +1619,8 @@ describe(" StakeUniswapV3 ", function () {
         expect(totalStakedAmount).to.be.equal(ethers.BigNumber.from('0'));
         expect(totalTokens).to.be.equal(ethers.BigNumber.from('0'));
         expect(totalSupplyCoinage).to.be.equal(ethers.BigNumber.from('0'));
-        expect(balanceOfCoinageTester1).to.be.equal(ethers.BigNumber.from('0'));
-        expect(balanceOfCoinageTester2).to.be.equal(ethers.BigNumber.from('0'));
+        expect(balanceOfCoinageTester1.div(ethers.BigNumber.from(10**9)).toNumber()).to.be.equal(0);
+        expect(balanceOfCoinageTester2.div(ethers.BigNumber.from(10**9)).toNumber()).to.be.equal(0);
 
        });
     });

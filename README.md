@@ -59,6 +59,11 @@
 
 `npm run test:factory`
 
+`npm run test:uniswapv3-simple`
+
+`npm run test:uniswapv3-liquidity`
+
+
 ### Deploy to Ethereum
 
 Create/modify network config in `hardhat.config.ts` and add API key and private key, then run:

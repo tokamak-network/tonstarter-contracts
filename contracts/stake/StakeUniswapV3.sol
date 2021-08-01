@@ -74,11 +74,14 @@ contract StakeUniswapV3 is
     /// @param poolAddress the pool address of uniswapV3
     /// @param tokenId the uniswapV3 Lp token
     /// @param miningAmount the amount of mining
+    /// @param nonMiningAmount the amount of non-mining
     event Claimed(address indexed to, address poolAddress, uint256 tokenId,  uint256 miningAmount, uint256 nonMiningAmount);
 
     /// @dev event on withdrawal
     /// @param to the sender
     /// @param tokenId the uniswapV3 Lp token
+    /// @param miningAmount the amount of mining
+    /// @param nonMiningAmount the amount of non-mining
     event WithdrawalToken(address indexed to, uint256 tokenId, uint256 miningAmount, uint256 nonMiningAmount);
 
     /// @dev event on mining in coinage
@@ -164,13 +167,13 @@ contract StakeUniswapV3 is
         }
     }
 
-    /// @dev mining on coinage, 세일시작시간을 지나야하고, 스테이크시작시간을 지나야 하고, 볼트의마이닝 시작시간(세일시작시간) 지나고,
-    //                          마이닝 인터벌을 지나고, 현재 총액이 있어야 마이닝을 한다.
+    /// @dev mining on coinage, Mining conditions :  the sale start time must pass,
+    /// the stake start time must pass, the vault mining start time (sale start time) passes,
+    /// the mining interval passes, and the current total amount is not zero,
     function miningCoinage() public lock {
         if(saleStartTime == 0 || saleStartTime > block.timestamp) return;
         if(stakeStartTime == 0 || stakeStartTime > block.timestamp) return;
         if(IIStake2Vault(vault).miningStartTime() > block.timestamp) return;
-
 
         if(coinageLastMintBlockTimetamp == 0) coinageLastMintBlockTimetamp = stakeStartTime;
 
@@ -448,11 +451,10 @@ contract StakeUniswapV3 is
         _stakedCoinageTokens.amount = liquidity;
         _stakedCoinageTokens.startTime = uint32(block.timestamp);
 
+        miningCoinage();
 
         //mint coinage of user amount
         IAutoRefactorCoinageWithTokenId(coinage).mint(msg.sender, tokenId_, liquidity * (10**9));
-
-        //miningCoinage();
 
         emit Staked(msg.sender, poolAddress, tokenId_, liquidity);
     }
@@ -473,7 +475,7 @@ contract StakeUniswapV3 is
             "StakeUniswapV3: caller is not tokenId's staker"
         );
 
-        //miningCoinage();
+        miningCoinage();
 
         (
             uint256 miningAmount,
