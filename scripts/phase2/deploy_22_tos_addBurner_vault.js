@@ -39,36 +39,17 @@ async function main() {
   const tos = await ethers.getContractAt("TOS", tostoken);
   console.log("tos:", tos.address);
 
-
   //================================================
+  let tx = await tos.addBurner(process.env.PHASE2_LP_VAULT_ADDRESS);
+  console.log("tos addBurner to vault2", process.env.PHASE2_LP_VAULT_ADDRESS);
+  printGasUsedOfUnits('tos addBurner to vault2', tx.hash);
+  await tx.wait();
 
-  const StakeUniswapV3 = await ethers.getContractFactory("StakeUniswapV3");
+  let res = await tos.isBurner(process.env.PHASE2_LP_VAULT_ADDRESS);
+  console.log("tos isBurner", process.env.PHASE2_LP_VAULT_ADDRESS,  res );
 
-  let stakeUniswapV3 = await StakeUniswapV3.deploy();
-  tx =  await stakeUniswapV3.deployed();
-  console.log("StakeUniswapV3:", stakeUniswapV3.address);
-  console.log("StakeUniswapV3 deployed:", tx.hash);
 
-  /*
-  deployInfo = {
-    name: "StakeUniswapV3",
-    address: stakeUniswapV3.address
-  }
-  if(deployInfo.address != null && deployInfo.address.length > 0  ){
-    save(process.env.NETWORK, deployInfo);
-  }
-  printGasUsedOfUnits('StakeUniswapV3 Deploy',tx);
-  */
-
-  const Stake1Entry = await ethers.getContractAt("Stake1Logic",proxy);
-  tx =  await Stake1Entry.upgradeStakeTo(
-    process.env.PHASE2_STAKE_UNISWAPV3_ADDRESS,
-    stakeUniswapV3.address);
-  console.log("StakeUniswapV3 upgradeStakeTo:", tx.hash);
-
-   //=====================================
-
- }
+}
 
 main()
   .then(() => process.exit(0))

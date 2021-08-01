@@ -16,15 +16,15 @@ const {
 require("dotenv").config();
 
 const initialTotal = process.env.initialTotal + "." + "0".repeat(18);
-const Pharse1_TOTAL = process.env.Pharse1_TOTAL + "." + "0".repeat(18);
-const Pharse1_TON_Staking =
-  process.env.Pharse1_TON_Staking + "." + "0".repeat(18);
-const Pharse1_ETH_Staking =
-  process.env.Pharse1_ETH_Staking + "." + "0".repeat(18);
-const Pharse1_TOSETHLP_Staking =
-  process.env.Pharse1_TOSETHLP_Staking + "." + "0".repeat(18);
-const Pharse1_DEV_Mining =
-  process.env.Pharse1_DEV_Mining + "." + "0".repeat(18);
+const PHASE1_TOTAL = process.env.PHASE1_TOTAL + "." + "0".repeat(18);
+const PHASE1_TON_Staking =
+  process.env.PHASE1_TON_Staking + "." + "0".repeat(18);
+const PHASE1_ETH_Staking =
+  process.env.PHASE1_ETH_Staking + "." + "0".repeat(18);
+const PHASE1_TOSETHLP_Staking =
+  process.env.PHASE1_TOSETHLP_Staking + "." + "0".repeat(18);
+const PHASE1_DEV_Mining =
+  process.env.PHASE1_DEV_Mining + "." + "0".repeat(18);
 
 const zeroAddress = "0x0000000000000000000000000000000000000000";
 const sendAmountForTest = "10000";

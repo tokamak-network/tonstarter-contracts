@@ -30,7 +30,7 @@ const ton = loadDeployed(process.env.NETWORK, "TON");
 
 async function main() {
 
-  const [deployer, user1] = await ethers.getSigners();
+  const [deployer, user1, user2] = await ethers.getSigners();
   const users = await ethers.getSigners();
   console.log("Deploying contracts with the account:", deployer.address, process.env.NETWORK);
 
@@ -47,7 +47,22 @@ async function main() {
 
   const tokenId3476 = ethers.BigNumber.from("3476");
   const tokenId3484 = ethers.BigNumber.from("3484");
+
+  // wton-tos
   const tokenId3690 = ethers.BigNumber.from("3690");
+  const tokenId3880 = ethers.BigNumber.from("3880");
+
+  let token = {
+    id: tokenId3880,
+    name: '3880',
+    sender : user2
+  }
+
+  // let token = {
+  //   id: tokenId3690,
+  //   name: '3690',
+  //   sender : user1
+  // }
 
   let miningPerSecond =  await Stake2Vault.miningPerSecond();
   console.log("\n Stake2Vault miningPerSecond:",  utils.formatUnits(miningPerSecond.toString(), 18)  );
@@ -60,16 +75,11 @@ async function main() {
   let res2 =  await StakeUniswapV3.totalSupplyCoinage();
   console.log("\n StakeUniswapV3 totalSupplyCoinage:", utils.formatUnits(res2.toString(), 27)  );
 
-  let res3 =  await StakeUniswapV3.balanceOfCoinage(tokenId3476);
-  console.log("\n StakeUniswapV3 balanceOfCoinage tokenId3476:", utils.formatUnits(res3.toString(), 27)  );
+  let res3 =  await StakeUniswapV3.balanceOfCoinage(tokenId3690);
+  console.log("\n StakeUniswapV3 balanceOfCoinage tokenId3690:", utils.formatUnits(res3.toString(), 27)  );
 
-  let res4 =  await StakeUniswapV3.balanceOfCoinage(tokenId3484);
-  console.log("\n StakeUniswapV3 balanceOfCoinage tokenId3484:", utils.formatUnits(res4.toString(), 27)  );
-
-
-  let res5 =  await StakeUniswapV3.balanceOfCoinage(tokenId3690);
-  console.log("\n StakeUniswapV3 balanceOfCoinage tokenId3690:", utils.formatUnits(res5.toString(), 27)  );
-
+  let res4 =  await StakeUniswapV3.balanceOfCoinage(tokenId3880);
+  console.log("\n StakeUniswapV3 balanceOfCoinage tokenId3880:", utils.formatUnits(res4.toString(), 27)  );
 
   console.log("\n =========== miningCoinage ");
   let tx = await StakeUniswapV3.miningCoinage();
@@ -86,15 +96,12 @@ async function main() {
     }
   }
 
- res3 =  await StakeUniswapV3.balanceOfCoinage(tokenId3476);
-  console.log("\n StakeUniswapV3 balanceOfCoinage tokenId3476:", utils.formatUnits(res3.toString(), 27)  );
+ res3 =  await StakeUniswapV3.balanceOfCoinage(tokenId3690);
+  console.log("\n StakeUniswapV3 balanceOfCoinage tokenId3690:", utils.formatUnits(res3.toString(), 27)  );
 
- res4 =  await StakeUniswapV3.balanceOfCoinage(tokenId3484);
-  console.log("\n StakeUniswapV3 balanceOfCoinage tokenId3484:", utils.formatUnits(res4.toString(), 27)  );
+ res4 =  await StakeUniswapV3.balanceOfCoinage(tokenId3880);
+  console.log("\n StakeUniswapV3 balanceOfCoinage tokenId3880:", utils.formatUnits(res4.toString(), 27)  );
 
-
-  let res5 =  await StakeUniswapV3.balanceOfCoinage(tokenId3690);
-  console.log("\n StakeUniswapV3 balanceOfCoinage tokenId3690:", utils.formatUnits(res5.toString(), 27)  );
 
  }
 

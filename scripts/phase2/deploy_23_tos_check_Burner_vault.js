@@ -39,19 +39,11 @@ async function main() {
   const tos = await ethers.getContractAt("TOS", tostoken);
   console.log("tos:", tos.address);
 
-
   //================================================
 
-  let tx = await tos.connect(deployer).mint(
-    process.env.PHASE2_LP_VAULT_ADDRESS,
-    utils.parseUnits(process.env.PHASE2_UNISWAPV3_ALLOCATED, 18)
-  );
+  let res = await tos.isBurner(process.env.PHASE2_LP_VAULT_ADDRESS);
+  console.log("tos isBurner", process.env.PHASE2_LP_VAULT_ADDRESS,  res );
 
-  console.log("tos mint", process.env.PHASE2_LP_VAULT_ADDRESS);
-  await tx.wait();
-
-  let balance = await tos.balanceOf(process.env.PHASE2_LP_VAULT_ADDRESS);
-  console.log("tos balance",  utils.formatUnits(balance.toString(), 18) , 'TOS' );
 }
 
 main()

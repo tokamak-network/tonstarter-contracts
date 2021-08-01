@@ -24,9 +24,23 @@ const zeroAddress = "0x0000000000000000000000000000000000000000";
 const ADMIN_ROLE = keccak256("ADMIN");
 
 const tostoken = loadDeployed(process.env.NETWORK, "TOS");
+const registry = loadDeployed(process.env.NETWORK, "StakeRegistry");
+const factory = loadDeployed(process.env.NETWORK, "StakeFactory");
+const vaultFactory = loadDeployed(process.env.NETWORK, "StakeVaultFactory");
 
+const logic = loadDeployed(process.env.NETWORK, "Stake1Logic");
 const proxy = loadDeployed(process.env.NETWORK, "Stake1Proxy");
+const tonFactory = loadDeployed(process.env.NETWORK, "StakeTONFactory");
+
 const ton = loadDeployed(process.env.NETWORK, "TON");
+  /*
+const {
+  createValue,
+  createStakeContract,
+  timeout,
+  getPeriodBlockByTimes
+  } = require("../../utils/deploy_common.js");
+*/
 
 async function main() {
 
@@ -36,39 +50,29 @@ async function main() {
 
   console.log("Account balance:", (await deployer.getBalance()).toString());
 
-  const tos = await ethers.getContractAt("TOS", tostoken);
-  console.log("tos:", tos.address);
+  const stakeEntry2 = await ethers.getContractAt("Stake2Logic", proxy);
+  console.log("stakeEntry2:", stakeEntry2.address);
 
-
-  //================================================
-
-  const StakeUniswapV3 = await ethers.getContractFactory("StakeUniswapV3");
-
-  let stakeUniswapV3 = await StakeUniswapV3.deploy();
-  tx =  await stakeUniswapV3.deployed();
-  console.log("StakeUniswapV3:", stakeUniswapV3.address);
-  console.log("StakeUniswapV3 deployed:", tx.hash);
-
-  /*
-  deployInfo = {
-    name: "StakeUniswapV3",
-    address: stakeUniswapV3.address
+  let vault = {
+    address: process.env.PHASE2_LP_VAULT_ADDRESS,
+    startTime : process.env.PHASE2_WTONTOS_STARTTIME,
+    timestamp:0
   }
-  if(deployInfo.address != null && deployInfo.address.length > 0  ){
-    save(process.env.NETWORK, deployInfo);
-  }
-  printGasUsedOfUnits('StakeUniswapV3 Deploy',tx);
-  */
+  let startTime = new Date(vault.startTime).getTime();
+  vault.timestamp = Math.floor(startTime/1000);
 
-  const Stake1Entry = await ethers.getContractAt("Stake1Logic",proxy);
-  tx =  await Stake1Entry.upgradeStakeTo(
-    process.env.PHASE2_STAKE_UNISWAPV3_ADDRESS,
-    stakeUniswapV3.address);
-  console.log("StakeUniswapV3 upgradeStakeTo:", tx.hash);
+  console.log("setStartTimeOfVault2  ", vault );
 
-   //=====================================
+  let tx = await stakeEntry2.setStartTimeOfVault2(
+    vault.address,
+    vault.timestamp
+  );
 
- }
+  console.log("Phase2 setStartTimeOfVault2  ", tx.hash );
+  printGasUsedOfUnits('Phase2 setStartTimeOfVault2 ', tx.hash);
+
+
+}
 
 main()
   .then(() => process.exit(0))

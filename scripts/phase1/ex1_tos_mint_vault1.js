@@ -41,34 +41,18 @@ async function main() {
 
 
   //================================================
+  let vault = '0x8A3Bd92E58a6FBc988BA54944FE038F02D59eFD0';
+  let tx = await tos.connect(deployer).mint(
+    vault,
+    utils.parseUnits(process.env.PHASE1_TON_ALLOCATED, 18)
+  );
 
-  const StakeUniswapV3 = await ethers.getContractFactory("StakeUniswapV3");
+  console.log("tos mint", vault);
+  await tx.wait();
 
-  let stakeUniswapV3 = await StakeUniswapV3.deploy();
-  tx =  await stakeUniswapV3.deployed();
-  console.log("StakeUniswapV3:", stakeUniswapV3.address);
-  console.log("StakeUniswapV3 deployed:", tx.hash);
-
-  /*
-  deployInfo = {
-    name: "StakeUniswapV3",
-    address: stakeUniswapV3.address
-  }
-  if(deployInfo.address != null && deployInfo.address.length > 0  ){
-    save(process.env.NETWORK, deployInfo);
-  }
-  printGasUsedOfUnits('StakeUniswapV3 Deploy',tx);
-  */
-
-  const Stake1Entry = await ethers.getContractAt("Stake1Logic",proxy);
-  tx =  await Stake1Entry.upgradeStakeTo(
-    process.env.PHASE2_STAKE_UNISWAPV3_ADDRESS,
-    stakeUniswapV3.address);
-  console.log("StakeUniswapV3 upgradeStakeTo:", tx.hash);
-
-   //=====================================
-
- }
+  let balance = await tos.balanceOf(vault);
+  console.log("tos balance",  utils.formatUnits(balance.toString(), 18) , 'TOS' );
+}
 
 main()
   .then(() => process.exit(0))
