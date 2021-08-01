@@ -1,9 +1,9 @@
 # Functions:
 
-- [`deploy()`](#IStakeCoinageFactory-deploy--)
+- [`deploy(address owner)`](#IStakeCoinageFactory-deploy-address-)
 
-###### IStakeCoinageFactory-deploy--
+###### IStakeCoinageFactory-deploy-address-
 
-## Function `deploy()`
+## Function `deploy(address owner)`
 
 No description
