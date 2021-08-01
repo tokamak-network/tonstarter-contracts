@@ -98,9 +98,23 @@ contract Stake2Vault is Stake2VaultStorage, IStake2Vault {
     {
         require(
             _miningPerSecond > 0 && miningPerSecond != _miningPerSecond,
-            "Stake2Vault: setMiningAmountPerSecond fails"
+            "Stake2Vault: zero or same _miningPerSecond"
         );
         miningPerSecond = _miningPerSecond;
+    }
+
+    /// @dev set mining start time
+    /// @param _miningStartTime  mining start time
+    function setMiningStartTime(uint256 _miningStartTime)
+        external
+        override
+        onlyOwner
+    {
+        require(
+            _miningStartTime > 0 && miningStartTime != _miningStartTime,
+            "Stake2Vault: zero or same _miningStartTime"
+        );
+        miningStartTime = _miningStartTime;
     }
 
     /// @dev If the vault has more money than the reward to give, the owner can withdraw the remaining amount.
@@ -126,11 +140,18 @@ contract Stake2Vault is Stake2VaultStorage, IStake2Vault {
         nonZero(minableAmount)
         returns (bool)
     {
+        require(miningStartTime < block.timestamp, "Stake2Vault: miningStartTime has not passed");
         require(stakeAddress == msg.sender, "Stake2Vault: sender is not stakeContract");
         require(minableAmount == (miningAmount + nonMiningAmount) , "Stake2Vault: minable amount is not correct");
 
         uint256 tosBalance = IERC20(tos).balanceOf(address(this));
         require(tosBalance >= minableAmount, "Stake2Vault: not enough balance");
+
+        miningAmountTotal += miningAmount;
+        nonMiningAmountTotal += nonMiningAmount;
+        totalMinedAmount += minableAmount;
+        require( totalMinedAmount <= (block.timestamp - miningStartTime) * miningPerSecond,
+            "Stake2Vault: Exceeded the set mining amount");
 
         if(miningAmount > 0)
             require(

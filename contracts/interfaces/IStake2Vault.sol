@@ -21,6 +21,10 @@ interface IStake2Vault {
     /// @param _stakeAddress  stake address
     function setStakeAddress(address _stakeAddress) external;
 
+    /// @dev set mining start time
+    /// @param _miningStartTime  mining start time
+    function setMiningStartTime(uint256 _miningStartTime) external;
+
     /// @dev set reward per block
     /// @param _rewardPerBlock  allocated reward amount
     ///function setRewardPerBlock(uint256 _rewardPerBlock) external;

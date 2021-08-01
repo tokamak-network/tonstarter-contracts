@@ -49,8 +49,11 @@ contract StakeUniswapV3Storage {
     /// @dev flag for pause proxy
     bool public pauseProxy;
 
-    /// @dev Start time is set when staking for the first time
-    uint256 public startTime;
+    /// @dev stakeStartTime is set when staking for the first time
+    uint256 public stakeStartTime;
+
+    /// @dev saleStartTime
+    uint256 public saleStartTime;
 
     /// @dev Mining interval can be given to save gas cost.
     uint256 public miningIntervalSeconds;
@@ -60,6 +63,8 @@ contract StakeUniswapV3Storage {
     address public poolToken0;
     address public poolToken1;
     address public poolAddress;
+    uint256 public poolFee;
+
 
     /// @dev Rewards per second liquidity inside (3년간 8000000 TOS)
     /// uint256 internal MINING_PER_SECOND = 84559445290038900;

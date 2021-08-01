@@ -103,7 +103,8 @@ contract StakeUniswapV3 is
         _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
         _setupRole(ADMIN_ROLE, msg.sender);
 
-        miningIntervalSeconds = 13;
+        //miningIntervalSeconds = 13;
+        miningIntervalSeconds = 0;
     }
 
     /// @dev receive ether - revert
@@ -121,8 +122,16 @@ contract StakeUniswapV3 is
 
     /// @dev reset coinage's last mining time variable for tes
     function resetCoinageTime() external onlyOwner {
-        startTime = 0;
+        // saleStartTime = 0;
+        // stakeStartTime = 0;
         coinageLastMintBlockTimetamp = 0;
+    }
+    function setSaleStartTime(uint256 _saleStartTime) external onlyOwner {
+        require(
+            _saleStartTime > 0 && saleStartTime != _saleStartTime,
+            "StakeUniswapV3: zero or same _saleStartTime"
+        );
+        saleStartTime = _saleStartTime;
     }
 
     /// @dev calculate the factor of coinage
@@ -147,16 +156,23 @@ contract StakeUniswapV3 is
         uint256 lastIndex = userStakedTokenIds[_owner].length - 1;
         if (tokenId > 0 && _tokenid == tokenId) {
             if (_index < lastIndex) {
-                userStakedTokenIds[_owner][_index] = userStakedTokenIds[_owner][lastIndex];
+                uint256 tokenId_lastIndex = userStakedTokenIds[_owner][lastIndex];
+                userStakedTokenIds[_owner][_index] = tokenId_lastIndex;
+                depositTokens[tokenId_lastIndex].idIndex = _index;
             }
             userStakedTokenIds[_owner].pop();
         }
     }
 
-    /// @dev mining on coinage
+    /// @dev mining on coinage, 세일시작시간을 지나야하고, 스테이크시작시간을 지나야 하고, 볼트의마이닝 시작시간(세일시작시간) 지나고,
+    //                          마이닝 인터벌을 지나고, 현재 총액이 있어야 마이닝을 한다.
     function miningCoinage() public lock {
-        if(startTime == 0 ) return;
-        if(coinageLastMintBlockTimetamp == 0) coinageLastMintBlockTimetamp = startTime;
+        if(saleStartTime == 0 || saleStartTime > block.timestamp) return;
+        if(stakeStartTime == 0 || stakeStartTime > block.timestamp) return;
+        if(IIStake2Vault(vault).miningStartTime() > block.timestamp) return;
+
+
+        if(coinageLastMintBlockTimetamp == 0) coinageLastMintBlockTimetamp = stakeStartTime;
 
         if (block.timestamp > (coinageLastMintBlockTimetamp + miningIntervalSeconds) ) {
             uint256 miningInterval = block.timestamp - coinageLastMintBlockTimetamp;
@@ -199,7 +215,7 @@ contract StakeUniswapV3 is
             uint32 currentTime
         )
     {
-        if(startTime > 0) {
+        if(stakeStartTime < block.timestamp && stakeStartTime < block.timestamp) {
             LibUniswapV3Stake.StakeLiquidity storage _depositTokens = depositTokens[tokenId];
             liquidity = _depositTokens.liquidity ;
 
@@ -218,8 +234,8 @@ contract StakeUniswapV3 is
                 balanceOfTokenIdRay = IAutoRefactorCoinageWithTokenId(coinage).balanceOf(tokenId);
                 if(balanceOfTokenIdRay > 0 ) {
 
-                    if (balanceOfTokenIdRay > 0 && balanceOfTokenIdRay > (liquidity*(10**9)-10) ) {
-                        minableAmountRay = balanceOfTokenIdRay - (liquidity*(10**9)-10);
+                    if (balanceOfTokenIdRay > 0 && balanceOfTokenIdRay > liquidity*(10**9) ) {
+                        minableAmountRay = balanceOfTokenIdRay - liquidity*(10**9);
                         minableAmount = minableAmountRay/(10**9);
                     }
                 }
@@ -272,11 +288,12 @@ contract StakeUniswapV3 is
                 uniswapV3FactoryAddress,
                 PoolAddress.PoolKey({token0: token0, token1: token1, fee: fee})
             );
+        poolFee = fee;
     }
 
     /// @dev stake tokenId of UniswapV3
     /// @param tokenId  tokenId
-    function stake(
+    function stakePermit(
         uint256 tokenId,
         uint256 deadline,
         uint8 v,
@@ -293,11 +310,16 @@ contract StakeUniswapV3 is
         nonZeroAddress(uniswapV3FactoryAddress)
     {
         require(
+            saleStartTime < block.timestamp,
+            "StakeUniswapV3: available after saleStartTime"
+        );
+
+        require(
             nonfungiblePositionManager.ownerOf(tokenId) == msg.sender,
             "StakeUniswapV3: Caller is not tokenId's owner"
         );
 
-        //nonfungiblePositionManager.permit(address(this), tokenId, deadline, v, r, s);
+        nonfungiblePositionManager.permit(address(this), tokenId, deadline, v, r, s);
 
         _stake(tokenId);
     }
@@ -315,6 +337,11 @@ contract StakeUniswapV3 is
         nonZeroAddress(address(nonfungiblePositionManager))
         nonZeroAddress(uniswapV3FactoryAddress)
     {
+        require(
+            saleStartTime < block.timestamp,
+            "StakeUniswapV3: available after saleStartTime"
+        );
+
         require(
             nonfungiblePositionManager.ownerOf(tokenId) == msg.sender,
             "StakeUniswapV3: Caller is not tokenId's owner"
@@ -381,9 +408,8 @@ contract StakeUniswapV3 is
             tokenId_
         );
 
-         // initial start time
-        if(startTime == 0) startTime = block.timestamp;
-
+        // initial start time
+        if(stakeStartTime == 0) stakeStartTime = block.timestamp;
 
         //depositTokens 사용자가 디파짓한 토큰정보
         LibUniswapV3Stake.StakeLiquidity storage _depositTokens = depositTokens[tokenId_];
@@ -504,7 +530,7 @@ contract StakeUniswapV3 is
             ,
             ,
             ,
-            uint256 balanceOfTokenIdRay,
+            ,
             ,
         ) = getMiningTokenId(tokenId);
 
@@ -649,9 +675,10 @@ contract StakeUniswapV3 is
     {
         LibUniswapV3Stake.StakeLiquidity storage _depositTokens = depositTokens[tokenId];
 
-        uint256 balanceOfRayTokenId = IAutoRefactorCoinageWithTokenId(coinage).balanceOf(tokenId);
-        if (balanceOfRayTokenId > 0 && balanceOfRayTokenId > _depositTokens.liquidity*(10**9) ) {
-            minableAmountRay = balanceOfRayTokenId - _depositTokens.liquidity*(10**9);
+        balanceOfRayTokenId = IAutoRefactorCoinageWithTokenId(coinage).balanceOf(tokenId);
+
+        if (balanceOfRayTokenId > 0 && balanceOfRayTokenId > _depositTokens.liquidity*(10**9)  ) {
+            minableAmountRay = balanceOfRayTokenId - (_depositTokens.liquidity*(10**9));
         }
     }
 

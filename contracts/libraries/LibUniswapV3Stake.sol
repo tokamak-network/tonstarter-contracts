@@ -27,7 +27,7 @@ library LibUniswapV3Stake {
 
     struct StakedTotalTokenAmount {
         bool staked;
-        uint256 totalDepositAmount;
+        uint256 totalDepositAmount; // withdraw 할때 빼는데..맞는지..
         uint256 totalMiningAmount;
         uint256 totalNonMiningAmount;
     }

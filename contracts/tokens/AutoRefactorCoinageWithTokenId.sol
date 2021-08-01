@@ -263,6 +263,7 @@ contract AutoRefactorCoinageWithTokenId is DSMath, AccessibleCommon , IAutoRefac
      * See {ERC20-_burn}.
      */
     function burn(address tokenOwner, uint256 tokenId, uint256 amount) public override onlyOwner {
+        require(amount <= balanceOf(tokenId), "AutoRefactorCoinageWithTokenId: Insufficient balance of token ID");
         if(amount > totalSupply()) _burn(tokenOwner, tokenId, totalSupply());
         else _burn(tokenOwner, tokenId, amount);
     }
