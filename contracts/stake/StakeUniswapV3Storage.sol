@@ -6,7 +6,6 @@ import "@uniswap/v3-periphery/contracts/interfaces/INonfungiblePositionManager.s
 
 /// @title The base storage of stakeContract
 contract StakeUniswapV3Storage {
-
     /// @dev reward token : TOS
     address public token;
 
@@ -17,7 +16,7 @@ contract StakeUniswapV3Storage {
     address public vault;
 
     /// @dev the total minied amount
-    uint256 public miningAmountTotal ;
+    uint256 public miningAmountTotal;
 
     /// @dev Rewards have been allocated,
     ///      but liquidity is lost, and burned amount .
@@ -58,13 +57,11 @@ contract StakeUniswapV3Storage {
     /// @dev Mining interval can be given to save gas cost.
     uint256 public miningIntervalSeconds;
 
-
     /// @dev pools's token
     address public poolToken0;
     address public poolToken1;
     address public poolAddress;
     uint256 public poolFee;
-
 
     /// @dev Rewards per second liquidity inside (3년간 8000000 TOS)
     /// uint256 internal MINING_PER_SECOND = 84559445290038900;

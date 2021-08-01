@@ -43,15 +43,14 @@ interface IStake2Logic {
 
     /// @dev set pool information
     /// @param uniswapInfo [NonfungiblePositionManager,UniswapV3Factory,token0,token1]
-    function setPool(address target, address[4] memory uniswapInfo)
-        external;
+    function setPool(address target, address[4] memory uniswapInfo) external;
 
-    function setMiningIntervalSeconds(address target, uint256 miningIntervalSeconds)
-        external;
+    function setMiningIntervalSeconds(
+        address target,
+        uint256 miningIntervalSeconds
+    ) external;
 
-    function resetCoinageTime(address target)
-        external;
+    function resetCoinageTime(address target) external;
 
-    function setStartTimeOfVault2(address vault, uint256 startTime)
-        external;
+    function setStartTimeOfVault2(address vault, uint256 startTime) external;
 }

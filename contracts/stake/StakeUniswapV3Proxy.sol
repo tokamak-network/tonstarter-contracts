@@ -160,6 +160,5 @@ contract StakeUniswapV3Proxy is
         uniswapV3FactoryAddress = uniswapInfo[1];
         poolToken0 = uniswapInfo[2];
         poolToken1 = uniswapInfo[3];
-
     }
 }

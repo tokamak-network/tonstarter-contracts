@@ -2,9 +2,7 @@
 pragma solidity ^0.7.6;
 
 interface IStakeUniswapV3 {
-
-    function stake(uint256 tokenId)
-        external;
+    function stake(uint256 tokenId) external;
 
     function getMiningTokenId(uint256 tokenId)
         external

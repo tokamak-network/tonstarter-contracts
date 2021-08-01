@@ -20,7 +20,12 @@ contract Stake2Vault is Stake2VaultStorage, IStake2Vault {
     /// @param minableAmount minable amount
     /// @param miningAmount amount mined
     /// @param nonMiningAmount Amount not mined
-    event ClaimedMining(address indexed to, uint256 minableAmount, uint256 miningAmount,  uint256 nonMiningAmount);
+    event ClaimedMining(
+        address indexed to,
+        uint256 minableAmount,
+        uint256 miningAmount,
+        uint256 nonMiningAmount
+    );
     event Claimed(address indexed from, address to, uint256 amount);
 
     /// @dev constructor of Stake1Vault
@@ -77,7 +82,7 @@ contract Stake2Vault is Stake2VaultStorage, IStake2Vault {
 
     /// @dev set reward per block
     /// @param _rewardPerBlock  allocated reward amount
-   /* function setRewardPerBlock(uint256 _rewardPerBlock)
+    /* function setRewardPerBlock(uint256 _rewardPerBlock)
         external
         override
         onlyOwner
@@ -134,15 +139,24 @@ contract Stake2Vault is Stake2VaultStorage, IStake2Vault {
     /// @param minableAmount minable amount
     /// @param miningAmount amount mined
     /// @param nonMiningAmount Amount not mined
-    function claimMining(address to, uint256 minableAmount, uint256 miningAmount, uint256 nonMiningAmount)
-        external
-        override
-        nonZero(minableAmount)
-        returns (bool)
-    {
-        require(miningStartTime < block.timestamp, "Stake2Vault: miningStartTime has not passed");
-        require(stakeAddress == msg.sender, "Stake2Vault: sender is not stakeContract");
-        require(minableAmount == (miningAmount + nonMiningAmount) , "Stake2Vault: minable amount is not correct");
+    function claimMining(
+        address to,
+        uint256 minableAmount,
+        uint256 miningAmount,
+        uint256 nonMiningAmount
+    ) external override nonZero(minableAmount) returns (bool) {
+        require(
+            miningStartTime < block.timestamp,
+            "Stake2Vault: miningStartTime has not passed"
+        );
+        require(
+            stakeAddress == msg.sender,
+            "Stake2Vault: sender is not stakeContract"
+        );
+        require(
+            minableAmount == (miningAmount + nonMiningAmount),
+            "Stake2Vault: minable amount is not correct"
+        );
 
         uint256 tosBalance = IERC20(tos).balanceOf(address(this));
         require(tosBalance >= minableAmount, "Stake2Vault: not enough balance");
@@ -150,16 +164,19 @@ contract Stake2Vault is Stake2VaultStorage, IStake2Vault {
         miningAmountTotal += miningAmount;
         nonMiningAmountTotal += nonMiningAmount;
         totalMinedAmount += minableAmount;
-        require( totalMinedAmount <= (block.timestamp - miningStartTime) * miningPerSecond,
-            "Stake2Vault: Exceeded the set mining amount");
+        require(
+            totalMinedAmount <=
+                (block.timestamp - miningStartTime) * miningPerSecond,
+            "Stake2Vault: Exceeded the set mining amount"
+        );
 
-        if(miningAmount > 0)
+        if (miningAmount > 0)
             require(
                 IERC20(tos).transfer(to, miningAmount),
                 "Stake1Vault: TOS transfer fail"
             );
 
-        if(nonMiningAmount > 0)
+        if (nonMiningAmount > 0)
             require(
                 ITOS(tos).burn(address(this), nonMiningAmount),
                 "Stake1Vault: TOS burn fail"
@@ -177,9 +194,7 @@ contract Stake2Vault is Stake2VaultStorage, IStake2Vault {
     {
         uint256 tosBalance = IERC20(tos).balanceOf(address(this));
         require(tosBalance >= _amount, "Stake2Vault: not enough balance");
-        require(isAdmin(msg.sender),
-            "Stake1Vault: not admin "
-        );
+        require(isAdmin(msg.sender), "Stake1Vault: not admin ");
         require(
             IERC20(tos).transfer(_to, _amount),
             "Stake1Vault: TOS transfer fail"
@@ -188,7 +203,6 @@ contract Stake2Vault is Stake2VaultStorage, IStake2Vault {
         emit Claimed(msg.sender, _to, _amount);
         return true;
     }
-
 
     /// @dev Returns Give the TOS balance stored in the vault
     /// @return the balance of TOS in this vault.

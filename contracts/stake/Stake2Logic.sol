@@ -11,12 +11,14 @@ import "./StakeProxyStorage.sol";
 
 interface IIStakeUniswapV3 {
     function setPool(address[4] memory uniswapInfo) external;
+
     function setSaleStartTime(uint256 _saleStartTime) external;
-    function setMiningIntervalSeconds(
-        uint256  _intervalSeconds
-    ) external;
+
+    function setMiningIntervalSeconds(uint256 _intervalSeconds) external;
+
     function resetCoinageTime() external;
 }
+
 interface IIIStake2Vault {
     function stakeAddress() external view returns (address);
 }
@@ -146,13 +148,13 @@ contract Stake2Logic is StakeProxyStorage, AccessibleCommon, IStake2Logic {
         IIStakeUniswapV3(target).setPool(uniswapInfo);
     }
 
-    function setMiningIntervalSeconds(address target, uint256 miningIntervalSeconds)
-        external
-        override
-        onlyOwner
-        nonZeroAddress(target)
-    {
-        IIStakeUniswapV3(target).setMiningIntervalSeconds(miningIntervalSeconds);
+    function setMiningIntervalSeconds(
+        address target,
+        uint256 miningIntervalSeconds
+    ) external override onlyOwner nonZeroAddress(target) {
+        IIStakeUniswapV3(target).setMiningIntervalSeconds(
+            miningIntervalSeconds
+        );
     }
 
     function resetCoinageTime(address target)
@@ -171,7 +173,10 @@ contract Stake2Logic is StakeProxyStorage, AccessibleCommon, IStake2Logic {
         nonZeroAddress(vault)
     {
         address stakeAddress = IIIStake2Vault(vault).stakeAddress();
-        require(stakeAddress != address(0), "Stake2Logic: stakeAddress is zero");
+        require(
+            stakeAddress != address(0),
+            "Stake2Logic: stakeAddress is zero"
+        );
 
         IStake2Vault(vault).setMiningStartTime(startTime);
         IIStakeUniswapV3(stakeAddress).setSaleStartTime(startTime);

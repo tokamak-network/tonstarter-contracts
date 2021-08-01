@@ -28,7 +28,7 @@ contract Stake2VaultStorage is AccessibleCommon {
     address public stakeAddress;
 
     /// @dev the total amount transfered to miner
-     uint256 public miningAmountTotal ;
+    uint256 public miningAmountTotal;
 
     /// @dev Rewards have been allocated,
     ///      but liquidity is lost, and burned amount .

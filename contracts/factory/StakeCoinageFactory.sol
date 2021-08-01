@@ -1,7 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.7.6;
 
-import {AutoRefactorCoinageWithTokenId} from "../tokens/AutoRefactorCoinageWithTokenId.sol";
+import {
+    AutoRefactorCoinageWithTokenId
+} from "../tokens/AutoRefactorCoinageWithTokenId.sol";
 import {IStakeCoinageFactory} from "../interfaces/IStakeCoinageFactory.sol";
 
 contract StakeCoinageFactory is IStakeCoinageFactory {

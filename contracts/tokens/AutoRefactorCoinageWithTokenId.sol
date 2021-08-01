@@ -1,7 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.7.6;
 
-import {IAutoRefactorCoinageWithTokenId} from "../interfaces/IAutoRefactorCoinageWithTokenId.sol";
+import {
+    IAutoRefactorCoinageWithTokenId
+} from "../interfaces/IAutoRefactorCoinageWithTokenId.sol";
 import {DSMath} from "../libraries/DSMath.sol";
 import "../common/AccessibleCommon.sol";
 
@@ -18,7 +20,11 @@ import "../common/AccessibleCommon.sol";
  *
  *  factor increases exponentially for each block mined.
  */
-contract AutoRefactorCoinageWithTokenId is DSMath, AccessibleCommon , IAutoRefactorCoinageWithTokenId{
+contract AutoRefactorCoinageWithTokenId is
+    DSMath,
+    AccessibleCommon,
+    IAutoRefactorCoinageWithTokenId
+{
     struct Balance {
         uint256 balance;
         uint256 refactoredCount;
@@ -48,7 +54,10 @@ contract AutoRefactorCoinageWithTokenId is DSMath, AccessibleCommon , IAutoRefac
         _;
     }
     modifier nonZeroAddress(address account) {
-        require(account != address(0), "AutoRefactorCoinageWithTokenId:zero address");
+        require(
+            account != address(0),
+            "AutoRefactorCoinageWithTokenId:zero address"
+        );
         _;
     }
 
@@ -56,18 +65,23 @@ contract AutoRefactorCoinageWithTokenId is DSMath, AccessibleCommon , IAutoRefac
     /// @param tokenOwner owner of tokenId
     /// @param tokenId mining tokenId
     /// @param amount  mined amount
-    event Mined(address indexed tokenOwner, uint256 indexed tokenId, uint256 amount);
+    event Mined(
+        address indexed tokenOwner,
+        uint256 indexed tokenId,
+        uint256 amount
+    );
 
     /// @dev event on burn
     /// @param tokenOwner owner of tokenId
     /// @param tokenId mining tokenId
     /// @param amount  mined amount
-    event Burned(address indexed tokenOwner, uint256 indexed tokenId, uint256 amount);
+    event Burned(
+        address indexed tokenOwner,
+        uint256 indexed tokenId,
+        uint256 amount
+    );
 
-
-    constructor(
-        uint256 initfactor
-    ) {
+    constructor(uint256 initfactor) {
         _factor = initfactor;
 
         //_factorIncrement = factorIncrement;
@@ -115,7 +129,11 @@ contract AutoRefactorCoinageWithTokenId is DSMath, AccessibleCommon , IAutoRefac
      *
      * - `to` cannot be the zero address.
      */
-    function _mint(address tokenOwner, uint256 tokenId, uint256 amount) internal {
+    function _mint(
+        address tokenOwner,
+        uint256 tokenId,
+        uint256 amount
+    ) internal {
         require(
             tokenId != 0,
             "AutoRefactorCoinageWithTokenId: mint to the zero tokenId"
@@ -144,7 +162,11 @@ contract AutoRefactorCoinageWithTokenId is DSMath, AccessibleCommon , IAutoRefac
      * - `tokenId` cannot be the zero .
      * - `tokenId` must have at least `amount` tokens.
      */
-    function _burn(address tokenOwner, uint256 tokenId, uint256 amount) internal {
+    function _burn(
+        address tokenOwner,
+        uint256 tokenId,
+        uint256 amount
+    ) internal {
         require(
             tokenId != 0,
             "AutoRefactorCoinageWithTokenId: burn from the zero tokenId"
@@ -161,7 +183,6 @@ contract AutoRefactorCoinageWithTokenId is DSMath, AccessibleCommon , IAutoRefac
         subTotalSupply(amount);
         emit Burned(tokenOwner, tokenId, _toRAYFactored(rbAmount));
     }
-
 
     // helpers
 
@@ -202,7 +223,12 @@ contract AutoRefactorCoinageWithTokenId is DSMath, AccessibleCommon , IAutoRefac
 
     // new
 
-    function setFactor(uint256 infactor) external override onlyOwner returns (uint256) {
+    function setFactor(uint256 infactor)
+        external
+        override
+        onlyOwner
+        returns (uint256)
+    {
         uint256 previous = _factor;
 
         uint256 count = 0;
@@ -238,7 +264,6 @@ contract AutoRefactorCoinageWithTokenId is DSMath, AccessibleCommon , IAutoRefac
         _totalSupply.refactoredCount = refactorCount;
     }
 
-
     /**
      * @dev See {ERC20-_mint}.
      *
@@ -246,8 +271,13 @@ contract AutoRefactorCoinageWithTokenId is DSMath, AccessibleCommon , IAutoRefac
      *
      * - the caller must have the {MinterRole}.
      */
-    function mint(address tokenOwner, uint256 tokenId, uint256 amount)
-        public override
+    function mint(
+        address tokenOwner,
+        uint256 tokenId,
+        uint256 amount
+    )
+        public
+        override
         onlyOwner
         nonZeroAddress(tokenOwner)
         nonZero(tokenId)
@@ -262,16 +292,26 @@ contract AutoRefactorCoinageWithTokenId is DSMath, AccessibleCommon , IAutoRefac
      *
      * See {ERC20-_burn}.
      */
-    function burn(address tokenOwner, uint256 tokenId, uint256 amount) public override onlyOwner {
-        require(amount <= balanceOf(tokenId), "AutoRefactorCoinageWithTokenId: Insufficient balance of token ID");
-        if(amount > totalSupply()) _burn(tokenOwner, tokenId, totalSupply());
+    function burn(
+        address tokenOwner,
+        uint256 tokenId,
+        uint256 amount
+    ) public override onlyOwner {
+        require(
+            amount <= balanceOf(tokenId),
+            "AutoRefactorCoinageWithTokenId: Insufficient balance of token ID"
+        );
+        if (amount > totalSupply()) _burn(tokenOwner, tokenId, totalSupply());
         else _burn(tokenOwner, tokenId, amount);
     }
 
-    function burnTokenId(address tokenOwner, uint256 tokenId) public override onlyOwner {
+    function burnTokenId(address tokenOwner, uint256 tokenId)
+        public
+        override
+        onlyOwner
+    {
         uint256 amount = totalSupply();
-        if(amount < balanceOf(tokenId)) _burn(tokenOwner, tokenId, amount);
+        if (amount < balanceOf(tokenId)) _burn(tokenOwner, tokenId, amount);
         else _burn(tokenOwner, tokenId, balanceOf(tokenId));
     }
-
 }

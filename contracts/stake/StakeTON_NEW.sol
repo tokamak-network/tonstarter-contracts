@@ -9,7 +9,6 @@ import "./StakeTONStorage.sol";
 
 /// @dev Stake StakeTON_NEW for Testing
 contract StakeTON_NEW is StakeTONStorage, AccessibleCommon, IStakeTON_NEW {
-
     /// @dev constructor of StakeTON
     constructor() {}
 
@@ -18,12 +17,11 @@ contract StakeTON_NEW is StakeTONStorage, AccessibleCommon, IStakeTON_NEW {
         revert("cannot stake Ether");
     }
 
-    function version() external pure override returns (string memory){
+    function version() external pure override returns (string memory) {
         return "new.1.0";
     }
 
-    function getVaultAddress() external view override returns (address){
+    function getVaultAddress() external view override returns (address) {
         return vault;
     }
-
 }
