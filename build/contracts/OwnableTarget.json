@@ -26,15 +26,15 @@
       "type": "function"
     }
   ],
-  "metadata": "{\"compiler\":{\"version\":\"0.5.12+commit.7709ece9\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"constant\":false,\"inputs\":[],\"name\":\"renounceOwnership\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"transferOwnership\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/Users/kadyrbeknarmamatov/code/plasma-evm-contracts/contracts/stake/tokens/AuthController.sol\":\"OwnableTarget\"},\"evmVersion\":\"petersburg\",\"libraries\":{},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"/Users/kadyrbeknarmamatov/code/plasma-evm-contracts/contracts/stake/tokens/AuthController.sol\":{\"keccak256\":\"0x4f84a0aad0c17937104245de945d2885f46563cfc8613af411bacdac577cc5c8\",\"urls\":[\"bzz-raw://4d1e7a5849a58a6e3bbbf30f3c9f1b4ce6ba4c592decc4654b49d777f2419a38\",\"dweb:/ipfs/QmXDnxe4UTMRMZgow3Xys65KCdkwZWYBipLuNgKvzB9zRd\"]},\"/Users/kadyrbeknarmamatov/code/plasma-evm-contracts/node_modules/openzeppelin-solidity/contracts/GSN/Context.sol\":{\"keccak256\":\"0x90a3995645af7562d84b9d69363ffa5ae7217714ab61e951bf7bc450f40e4061\",\"urls\":[\"bzz-raw://216ef9d6b614db4eb46970b4e84903f2534a45572dd30a79f0041f1a5830f436\",\"dweb:/ipfs/QmNPrJ4MWKUAWzKXpUqeyKRUfosaoANZAqXgvepdrCwZAG\"]},\"/Users/kadyrbeknarmamatov/code/plasma-evm-contracts/node_modules/openzeppelin-solidity/contracts/ownership/Ownable.sol\":{\"keccak256\":\"0x6fb9d7889769d7cc161225f9ef7a90e468ba9788b253816f8d8b6894d3472c24\",\"urls\":[\"bzz-raw://cf4c00fc3c37cc5acf0c82ec6fd97bab67d72c2567fdc0ebf023d9c09b30a08e\",\"dweb:/ipfs/Qmb7TChG6DsEDX7LooJ4vmxot19f7VXX8S1zUGPeJTWbwZ\"]}},\"version\":1}",
+  "metadata": "{\"compiler\":{\"version\":\"0.5.12+commit.7709ece9\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"constant\":false,\"inputs\":[],\"name\":\"renounceOwnership\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"transferOwnership\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/Users/zena/ico2.0/ico20-contracts/plasma-evm-contracts/contracts/stake/tokens/AuthController.sol\":\"OwnableTarget\"},\"evmVersion\":\"petersburg\",\"libraries\":{},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"/Users/zena/ico2.0/ico20-contracts/plasma-evm-contracts/contracts/stake/tokens/AuthController.sol\":{\"keccak256\":\"0x4f84a0aad0c17937104245de945d2885f46563cfc8613af411bacdac577cc5c8\",\"urls\":[\"bzz-raw://4d1e7a5849a58a6e3bbbf30f3c9f1b4ce6ba4c592decc4654b49d777f2419a38\",\"dweb:/ipfs/QmXDnxe4UTMRMZgow3Xys65KCdkwZWYBipLuNgKvzB9zRd\"]},\"/Users/zena/ico2.0/ico20-contracts/plasma-evm-contracts/node_modules/openzeppelin-solidity/contracts/GSN/Context.sol\":{\"keccak256\":\"0x90a3995645af7562d84b9d69363ffa5ae7217714ab61e951bf7bc450f40e4061\",\"urls\":[\"bzz-raw://216ef9d6b614db4eb46970b4e84903f2534a45572dd30a79f0041f1a5830f436\",\"dweb:/ipfs/QmNPrJ4MWKUAWzKXpUqeyKRUfosaoANZAqXgvepdrCwZAG\"]},\"/Users/zena/ico2.0/ico20-contracts/plasma-evm-contracts/node_modules/openzeppelin-solidity/contracts/ownership/Ownable.sol\":{\"keccak256\":\"0x6fb9d7889769d7cc161225f9ef7a90e468ba9788b253816f8d8b6894d3472c24\",\"urls\":[\"bzz-raw://cf4c00fc3c37cc5acf0c82ec6fd97bab67d72c2567fdc0ebf023d9c09b30a08e\",\"dweb:/ipfs/Qmb7TChG6DsEDX7LooJ4vmxot19f7VXX8S1zUGPeJTWbwZ\"]}},\"version\":1}",
   "bytecode": "0x",
   "deployedBytecode": "0x",
   "sourceMap": "",
   "deployedSourceMap": "",
   "source": "pragma solidity ^0.5.12;\n\nimport { Ownable } from \"../../../node_modules/openzeppelin-solidity/contracts/ownership/Ownable.sol\";\n\n\ninterface MinterRoleRenounceTarget {\n  function renounceMinter() external;\n}\n\ninterface PauserRoleRenounceTarget {\n  function renouncePauser() external;\n}\n\ninterface OwnableTarget {\n  function renounceOwnership() external;\n  function transferOwnership(address newOwner) external;\n}\n\ncontract AuthController is Ownable {\n  function renounceMinter(address target) public onlyOwner {\n    MinterRoleRenounceTarget(target).renounceMinter();\n  }\n\n  function renouncePauser(address target) public onlyOwner {\n    PauserRoleRenounceTarget(target).renouncePauser();\n  }\n\n  function renounceOwnership(address target) public onlyOwner {\n    OwnableTarget(target).renounceOwnership();\n  }\n\n  function transferOwnership(address target, address newOwner) public onlyOwner {\n    OwnableTarget(target).transferOwnership(newOwner);\n  }\n}",
-  "sourcePath": "/Users/kadyrbeknarmamatov/code/plasma-evm-contracts/contracts/stake/tokens/AuthController.sol",
+  "sourcePath": "/Users/zena/ico2.0/ico20-contracts/plasma-evm-contracts/contracts/stake/tokens/AuthController.sol",
   "ast": {
-    "absolutePath": "/Users/kadyrbeknarmamatov/code/plasma-evm-contracts/contracts/stake/tokens/AuthController.sol",
+    "absolutePath": "/Users/zena/ico2.0/ico20-contracts/plasma-evm-contracts/contracts/stake/tokens/AuthController.sol",
     "exportedSymbols": {
       "AuthController": [
         15640
@@ -64,7 +64,7 @@
         "src": "0:24:41"
       },
       {
-        "absolutePath": "/Users/kadyrbeknarmamatov/code/plasma-evm-contracts/node_modules/openzeppelin-solidity/contracts/ownership/Ownable.sol",
+        "absolutePath": "/Users/zena/ico2.0/ico20-contracts/plasma-evm-contracts/node_modules/openzeppelin-solidity/contracts/ownership/Ownable.sol",
         "file": "../../../node_modules/openzeppelin-solidity/contracts/ownership/Ownable.sol",
         "id": 15561,
         "nodeType": "ImportDirective",
@@ -1030,7 +1030,7 @@
   },
   "legacyAST": {
     "attributes": {
-      "absolutePath": "/Users/kadyrbeknarmamatov/code/plasma-evm-contracts/contracts/stake/tokens/AuthController.sol",
+      "absolutePath": "/Users/zena/ico2.0/ico20-contracts/plasma-evm-contracts/contracts/stake/tokens/AuthController.sol",
       "exportedSymbols": {
         "AuthController": [
           15640
@@ -1063,7 +1063,7 @@
       {
         "attributes": {
           "SourceUnit": 19115,
-          "absolutePath": "/Users/kadyrbeknarmamatov/code/plasma-evm-contracts/node_modules/openzeppelin-solidity/contracts/ownership/Ownable.sol",
+          "absolutePath": "/Users/zena/ico2.0/ico20-contracts/plasma-evm-contracts/node_modules/openzeppelin-solidity/contracts/ownership/Ownable.sol",
           "file": "../../../node_modules/openzeppelin-solidity/contracts/ownership/Ownable.sol",
           "scope": 15641,
           "symbolAliases": [
@@ -2225,8 +2225,8 @@
     "version": "0.5.12+commit.7709ece9.Emscripten.clang"
   },
   "networks": {},
-  "schemaVersion": "3.4.0",
-  "updatedAt": "2021-05-04T08:39:28.632Z",
+  "schemaVersion": "3.3.4",
+  "updatedAt": "2021-04-29T14:50:18.256Z",
   "devdoc": {
     "methods": {}
   },

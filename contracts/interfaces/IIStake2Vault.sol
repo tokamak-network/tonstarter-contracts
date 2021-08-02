@@ -17,7 +17,12 @@ interface IIStake2Vault {
         uint256 nonMiningAmount
     ) external returns (bool);
 
+    /// @dev mining per second
     function miningPerSecond() external returns (uint256);
 
+    /// @dev mining start time
     function miningStartTime() external returns (uint256);
+
+    /// @dev mining end time
+    function miningEndTime() external returns (uint256);
 }

@@ -54,7 +54,7 @@
       "type": "function"
     }
   ],
-  "metadata": "{\"compiler\":{\"version\":\"0.7.6+commit.7338295f\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"stakeType\",\"type\":\"uint256\"},{\"internalType\":\"address[4]\",\"name\":\"_addr\",\"type\":\"address[4]\"},{\"internalType\":\"address\",\"name\":\"registry\",\"type\":\"address\"},{\"internalType\":\"uint256[3]\",\"name\":\"_intdata\",\"type\":\"uint256[3]\"}],\"name\":\"create\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_stakeType\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"_factory\",\"type\":\"address\"}],\"name\":\"setFactoryByStakeType\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{\"create(uint256,address[4],address,uint256[3])\":{\"details\":\"Create a stake contract that calls the desired stake factory according to stakeType\",\"params\":{\"_addr\":\"array of [token, paytoken, vault, _defiAddr]\",\"_intdata\":\"array of [saleStartBlock, startBlock, periodBlocks]\",\"registry\":\"registry address\",\"stakeType\":\"if 0, stakeTONFactory, else if 1 , stakeSimpleFactory , else if 2, stakeUniswapV3Factory\"},\"returns\":{\"_0\":\"contract address\"}},\"setFactoryByStakeType(uint256,address)\":{\"details\":\"Set factory address by StakeType\",\"params\":{\"_factory\":\"the factory address\",\"_stakeType\":\"the stake type , 0:TON, 1: Simple, 2: UniswapV3\"}}},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"/Users/zena/ico2.0/ico20-contracts/contracts/interfaces/IStakeFactory.sol\":\"IStakeFactory\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":100},\"remappings\":[]},\"sources\":{\"/Users/zena/ico2.0/ico20-contracts/contracts/interfaces/IStakeFactory.sol\":{\"keccak256\":\"0x249c9a51a8b7e2d64ead454a48e346f7693bb75b8302f9a7fffc6a02ca7dc974\",\"license\":\"Unlicense\",\"urls\":[\"bzz-raw://6a9764861a0f41fba6efdbd8e0700de3357db2281f72091eccfbe56ca6a29e5b\",\"dweb:/ipfs/QmWG27CSGfByoZgqwUrMp1pT5j1S63DNUUHy6wYHQQMtdR\"]}},\"version\":1}",
+  "metadata": "{\"compiler\":{\"version\":\"0.7.6+commit.7338295f\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"stakeType\",\"type\":\"uint256\"},{\"internalType\":\"address[4]\",\"name\":\"_addr\",\"type\":\"address[4]\"},{\"internalType\":\"address\",\"name\":\"registry\",\"type\":\"address\"},{\"internalType\":\"uint256[3]\",\"name\":\"_intdata\",\"type\":\"uint256[3]\"}],\"name\":\"create\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_stakeType\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"_factory\",\"type\":\"address\"}],\"name\":\"setFactoryByStakeType\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{\"create(uint256,address[4],address,uint256[3])\":{\"details\":\"Create a stake contract that calls the desired stake factory according to stakeType\",\"params\":{\"_addr\":\"array of [token, paytoken, vault, _defiAddr]\",\"_intdata\":\"array of [saleStartBlock, startBlock, periodBlocks]\",\"registry\":\"registry address\",\"stakeType\":\"if 0, stakeTONFactory, else if 1 , stakeSimpleFactory , else if 2, stakeUniswapV3Factory\"},\"returns\":{\"_0\":\"contract address\"}},\"setFactoryByStakeType(uint256,address)\":{\"details\":\"Set factory address by StakeType\",\"params\":{\"_factory\":\"the factory address\",\"_stakeType\":\"the stake type , 0:TON, 1: Simple, 2: UniswapV3LP\"}}},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"/Users/zena/ico2.0/ico20-contracts/contracts/interfaces/IStakeFactory.sol\":\"IStakeFactory\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":100},\"remappings\":[]},\"sources\":{\"/Users/zena/ico2.0/ico20-contracts/contracts/interfaces/IStakeFactory.sol\":{\"keccak256\":\"0x8cc549ba9683511cc5e513c946037e6e9826948b494aebb7b08a71f76edbdb2a\",\"license\":\"Unlicense\",\"urls\":[\"bzz-raw://4e749192d26e63df247a3611e7d431b66cb3e3df6c9e7d7839e6237b555a92a5\",\"dweb:/ipfs/QmaGFak6yWFEN4YW6atGFk2ykWcRKjwDWtVw9UmEcFyCCT\"]}},\"version\":1}",
   "bytecode": "0x",
   "deployedBytecode": "0x",
   "immutableReferences": {},
@@ -62,21 +62,21 @@
   "deployedGeneratedSources": [],
   "sourceMap": "",
   "deployedSourceMap": "",
-  "source": "//SPDX-License-Identifier: Unlicense\npragma solidity ^0.7.6;\n\ninterface IStakeFactory {\n\n    /// @dev Create a stake contract that calls the desired stake factory according to stakeType\n    /// @param stakeType if 0, stakeTONFactory, else if 1 , stakeSimpleFactory , else if 2, stakeUniswapV3Factory\n    /// @param _addr array of [token, paytoken, vault, _defiAddr]\n    /// @param registry  registry address\n    /// @param _intdata array of [saleStartBlock, startBlock, periodBlocks]\n    /// @return contract address\n    function create(\n        uint256 stakeType,\n        address[4] calldata _addr,\n        address registry,\n        uint256[3] calldata _intdata\n    ) external returns (address);\n\n    /// @dev Set factory address by StakeType\n    /// @param _stakeType the stake type , 0:TON, 1: Simple, 2: UniswapV3\n    /// @param _factory the factory address\n    function setFactoryByStakeType(uint256 _stakeType, address _factory) external;\n\n}\n",
+  "source": "//SPDX-License-Identifier: Unlicense\npragma solidity ^0.7.6;\n\ninterface IStakeFactory {\n    /// @dev Create a stake contract that calls the desired stake factory according to stakeType\n    /// @param stakeType if 0, stakeTONFactory, else if 1 , stakeSimpleFactory , else if 2, stakeUniswapV3Factory\n    /// @param _addr array of [token, paytoken, vault, _defiAddr]\n    /// @param registry  registry address\n    /// @param _intdata array of [saleStartBlock, startBlock, periodBlocks]\n    /// @return contract address\n    function create(\n        uint256 stakeType,\n        address[4] calldata _addr,\n        address registry,\n        uint256[3] calldata _intdata\n    ) external returns (address);\n\n    /// @dev Set factory address by StakeType\n    /// @param _stakeType the stake type , 0:TON, 1: Simple, 2: UniswapV3LP\n    /// @param _factory the factory address\n    function setFactoryByStakeType(uint256 _stakeType, address _factory)\n        external;\n}\n",
   "sourcePath": "/Users/zena/ico2.0/ico20-contracts/contracts/interfaces/IStakeFactory.sol",
   "ast": {
     "absolutePath": "/Users/zena/ico2.0/ico20-contracts/contracts/interfaces/IStakeFactory.sol",
     "exportedSymbols": {
       "IStakeFactory": [
-        3169
+        3903
       ]
     },
-    "id": 3170,
+    "id": 3904,
     "license": "Unlicense",
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 3142,
+        "id": 3876,
         "literals": [
           "solidity",
           "^",
@@ -84,7 +84,7 @@
           ".6"
         ],
         "nodeType": "PragmaDirective",
-        "src": "37:23:20"
+        "src": "37:23:33"
       },
       {
         "abstract": false,
@@ -92,39 +92,39 @@
         "contractDependencies": [],
         "contractKind": "interface",
         "fullyImplemented": false,
-        "id": 3169,
+        "id": 3903,
         "linearizedBaseContracts": [
-          3169
+          3903
         ],
         "name": "IStakeFactory",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
             "documentation": {
-              "id": 3143,
+              "id": 3877,
               "nodeType": "StructuredDocumentation",
-              "src": "93:423:20",
+              "src": "92:423:33",
               "text": "@dev Create a stake contract that calls the desired stake factory according to stakeType\n @param stakeType if 0, stakeTONFactory, else if 1 , stakeSimpleFactory , else if 2, stakeUniswapV3Factory\n @param _addr array of [token, paytoken, vault, _defiAddr]\n @param registry  registry address\n @param _intdata array of [saleStartBlock, startBlock, periodBlocks]\n @return contract address"
             },
             "functionSelector": "115c289b",
-            "id": 3160,
+            "id": 3894,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "create",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 3156,
+              "id": 3890,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 3145,
+                  "id": 3879,
                   "mutability": "mutable",
                   "name": "stakeType",
                   "nodeType": "VariableDeclaration",
-                  "scope": 3160,
-                  "src": "546:17:20",
+                  "scope": 3894,
+                  "src": "545:17:33",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -132,10 +132,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 3144,
+                    "id": 3878,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "546:7:20",
+                    "src": "545:7:33",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -145,12 +145,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 3149,
+                  "id": 3883,
                   "mutability": "mutable",
                   "name": "_addr",
                   "nodeType": "VariableDeclaration",
-                  "scope": 3160,
-                  "src": "573:25:20",
+                  "scope": 3894,
+                  "src": "572:25:33",
                   "stateVariable": false,
                   "storageLocation": "calldata",
                   "typeDescriptions": {
@@ -159,27 +159,27 @@
                   },
                   "typeName": {
                     "baseType": {
-                      "id": 3146,
+                      "id": 3880,
                       "name": "address",
                       "nodeType": "ElementaryTypeName",
-                      "src": "573:7:20",
+                      "src": "572:7:33",
                       "stateMutability": "nonpayable",
                       "typeDescriptions": {
                         "typeIdentifier": "t_address",
                         "typeString": "address"
                       }
                     },
-                    "id": 3148,
+                    "id": 3882,
                     "length": {
                       "hexValue": "34",
-                      "id": 3147,
+                      "id": 3881,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": true,
                       "kind": "number",
                       "lValueRequested": false,
                       "nodeType": "Literal",
-                      "src": "581:1:20",
+                      "src": "580:1:33",
                       "typeDescriptions": {
                         "typeIdentifier": "t_rational_4_by_1",
                         "typeString": "int_const 4"
@@ -187,7 +187,7 @@
                       "value": "4"
                     },
                     "nodeType": "ArrayTypeName",
-                    "src": "573:10:20",
+                    "src": "572:10:33",
                     "typeDescriptions": {
                       "typeIdentifier": "t_array$_t_address_$4_storage_ptr",
                       "typeString": "address[4]"
@@ -197,12 +197,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 3151,
+                  "id": 3885,
                   "mutability": "mutable",
                   "name": "registry",
                   "nodeType": "VariableDeclaration",
-                  "scope": 3160,
-                  "src": "608:16:20",
+                  "scope": 3894,
+                  "src": "607:16:33",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -210,10 +210,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 3150,
+                    "id": 3884,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "608:7:20",
+                    "src": "607:7:33",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -224,12 +224,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 3155,
+                  "id": 3889,
                   "mutability": "mutable",
                   "name": "_intdata",
                   "nodeType": "VariableDeclaration",
-                  "scope": 3160,
-                  "src": "634:28:20",
+                  "scope": 3894,
+                  "src": "633:28:33",
                   "stateVariable": false,
                   "storageLocation": "calldata",
                   "typeDescriptions": {
@@ -238,26 +238,26 @@
                   },
                   "typeName": {
                     "baseType": {
-                      "id": 3152,
+                      "id": 3886,
                       "name": "uint256",
                       "nodeType": "ElementaryTypeName",
-                      "src": "634:7:20",
+                      "src": "633:7:33",
                       "typeDescriptions": {
                         "typeIdentifier": "t_uint256",
                         "typeString": "uint256"
                       }
                     },
-                    "id": 3154,
+                    "id": 3888,
                     "length": {
                       "hexValue": "33",
-                      "id": 3153,
+                      "id": 3887,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": true,
                       "kind": "number",
                       "lValueRequested": false,
                       "nodeType": "Literal",
-                      "src": "642:1:20",
+                      "src": "641:1:33",
                       "typeDescriptions": {
                         "typeIdentifier": "t_rational_3_by_1",
                         "typeString": "int_const 3"
@@ -265,7 +265,7 @@
                       "value": "3"
                     },
                     "nodeType": "ArrayTypeName",
-                    "src": "634:10:20",
+                    "src": "633:10:33",
                     "typeDescriptions": {
                       "typeIdentifier": "t_array$_t_uint256_$3_storage_ptr",
                       "typeString": "uint256[3]"
@@ -274,20 +274,20 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "536:132:20"
+              "src": "535:132:33"
             },
             "returnParameters": {
-              "id": 3159,
+              "id": 3893,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 3158,
+                  "id": 3892,
                   "mutability": "mutable",
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 3160,
-                  "src": "687:7:20",
+                  "scope": 3894,
+                  "src": "686:7:33",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -295,10 +295,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 3157,
+                    "id": 3891,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "687:7:20",
+                    "src": "686:7:33",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -308,40 +308,40 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "686:9:20"
+              "src": "685:9:33"
             },
-            "scope": 3169,
-            "src": "521:175:20",
+            "scope": 3903,
+            "src": "520:175:33",
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "external"
           },
           {
             "documentation": {
-              "id": 3161,
+              "id": 3895,
               "nodeType": "StructuredDocumentation",
-              "src": "702:159:20",
-              "text": "@dev Set factory address by StakeType\n @param _stakeType the stake type , 0:TON, 1: Simple, 2: UniswapV3\n @param _factory the factory address"
+              "src": "701:161:33",
+              "text": "@dev Set factory address by StakeType\n @param _stakeType the stake type , 0:TON, 1: Simple, 2: UniswapV3LP\n @param _factory the factory address"
             },
             "functionSelector": "78e999b9",
-            "id": 3168,
+            "id": 3902,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "setFactoryByStakeType",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 3166,
+              "id": 3900,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 3163,
+                  "id": 3897,
                   "mutability": "mutable",
                   "name": "_stakeType",
                   "nodeType": "VariableDeclaration",
-                  "scope": 3168,
-                  "src": "897:18:20",
+                  "scope": 3902,
+                  "src": "898:18:33",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -349,10 +349,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 3162,
+                    "id": 3896,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "897:7:20",
+                    "src": "898:7:33",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -362,12 +362,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 3165,
+                  "id": 3899,
                   "mutability": "mutable",
                   "name": "_factory",
                   "nodeType": "VariableDeclaration",
-                  "scope": 3168,
-                  "src": "917:16:20",
+                  "scope": 3902,
+                  "src": "918:16:33",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -375,10 +375,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 3164,
+                    "id": 3898,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "917:7:20",
+                    "src": "918:7:33",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -388,33 +388,33 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "896:38:20"
+              "src": "897:38:33"
             },
             "returnParameters": {
-              "id": 3167,
+              "id": 3901,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "943:0:20"
+              "src": "952:0:33"
             },
-            "scope": 3169,
-            "src": "866:78:20",
+            "scope": 3903,
+            "src": "867:86:33",
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "external"
           }
         ],
-        "scope": 3170,
-        "src": "62:885:20"
+        "scope": 3904,
+        "src": "62:893:33"
       }
     ],
-    "src": "37:911:20"
+    "src": "37:919:33"
   },
   "legacyAST": {
     "attributes": {
       "absolutePath": "/Users/zena/ico2.0/ico20-contracts/contracts/interfaces/IStakeFactory.sol",
       "exportedSymbols": {
         "IStakeFactory": [
-          3169
+          3903
         ]
       },
       "license": "Unlicense"
@@ -429,9 +429,9 @@
             ".6"
           ]
         },
-        "id": 3142,
+        "id": 3876,
         "name": "PragmaDirective",
-        "src": "37:23:20"
+        "src": "37:23:33"
       },
       {
         "attributes": {
@@ -445,10 +445,10 @@
           "contractKind": "interface",
           "fullyImplemented": false,
           "linearizedBaseContracts": [
-            3169
+            3903
           ],
           "name": "IStakeFactory",
-          "scope": 3170
+          "scope": 3904
         },
         "children": [
           {
@@ -461,7 +461,7 @@
                 null
               ],
               "name": "create",
-              "scope": 3169,
+              "scope": 3903,
               "stateMutability": "nonpayable",
               "virtual": false,
               "visibility": "external"
@@ -471,9 +471,9 @@
                 "attributes": {
                   "text": "@dev Create a stake contract that calls the desired stake factory according to stakeType\n @param stakeType if 0, stakeTONFactory, else if 1 , stakeSimpleFactory , else if 2, stakeUniswapV3Factory\n @param _addr array of [token, paytoken, vault, _defiAddr]\n @param registry  registry address\n @param _intdata array of [saleStartBlock, startBlock, periodBlocks]\n @return contract address"
                 },
-                "id": 3143,
+                "id": 3877,
                 "name": "StructuredDocumentation",
-                "src": "93:423:20"
+                "src": "92:423:33"
               },
               {
                 "children": [
@@ -482,7 +482,7 @@
                       "constant": false,
                       "mutability": "mutable",
                       "name": "stakeType",
-                      "scope": 3160,
+                      "scope": 3894,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "uint256",
@@ -494,21 +494,21 @@
                           "name": "uint256",
                           "type": "uint256"
                         },
-                        "id": 3144,
+                        "id": 3878,
                         "name": "ElementaryTypeName",
-                        "src": "546:7:20"
+                        "src": "545:7:33"
                       }
                     ],
-                    "id": 3145,
+                    "id": 3879,
                     "name": "VariableDeclaration",
-                    "src": "546:17:20"
+                    "src": "545:17:33"
                   },
                   {
                     "attributes": {
                       "constant": false,
                       "mutability": "mutable",
                       "name": "_addr",
-                      "scope": 3160,
+                      "scope": 3894,
                       "stateVariable": false,
                       "storageLocation": "calldata",
                       "type": "address[4]",
@@ -526,9 +526,9 @@
                               "stateMutability": "nonpayable",
                               "type": "address"
                             },
-                            "id": 3146,
+                            "id": 3880,
                             "name": "ElementaryTypeName",
-                            "src": "573:7:20"
+                            "src": "572:7:33"
                           },
                           {
                             "attributes": {
@@ -541,26 +541,26 @@
                               "type": "int_const 4",
                               "value": "4"
                             },
-                            "id": 3147,
+                            "id": 3881,
                             "name": "Literal",
-                            "src": "581:1:20"
+                            "src": "580:1:33"
                           }
                         ],
-                        "id": 3148,
+                        "id": 3882,
                         "name": "ArrayTypeName",
-                        "src": "573:10:20"
+                        "src": "572:10:33"
                       }
                     ],
-                    "id": 3149,
+                    "id": 3883,
                     "name": "VariableDeclaration",
-                    "src": "573:25:20"
+                    "src": "572:25:33"
                   },
                   {
                     "attributes": {
                       "constant": false,
                       "mutability": "mutable",
                       "name": "registry",
-                      "scope": 3160,
+                      "scope": 3894,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "address",
@@ -573,21 +573,21 @@
                           "stateMutability": "nonpayable",
                           "type": "address"
                         },
-                        "id": 3150,
+                        "id": 3884,
                         "name": "ElementaryTypeName",
-                        "src": "608:7:20"
+                        "src": "607:7:33"
                       }
                     ],
-                    "id": 3151,
+                    "id": 3885,
                     "name": "VariableDeclaration",
-                    "src": "608:16:20"
+                    "src": "607:16:33"
                   },
                   {
                     "attributes": {
                       "constant": false,
                       "mutability": "mutable",
                       "name": "_intdata",
-                      "scope": 3160,
+                      "scope": 3894,
                       "stateVariable": false,
                       "storageLocation": "calldata",
                       "type": "uint256[3]",
@@ -604,9 +604,9 @@
                               "name": "uint256",
                               "type": "uint256"
                             },
-                            "id": 3152,
+                            "id": 3886,
                             "name": "ElementaryTypeName",
-                            "src": "634:7:20"
+                            "src": "633:7:33"
                           },
                           {
                             "attributes": {
@@ -619,24 +619,24 @@
                               "type": "int_const 3",
                               "value": "3"
                             },
-                            "id": 3153,
+                            "id": 3887,
                             "name": "Literal",
-                            "src": "642:1:20"
+                            "src": "641:1:33"
                           }
                         ],
-                        "id": 3154,
+                        "id": 3888,
                         "name": "ArrayTypeName",
-                        "src": "634:10:20"
+                        "src": "633:10:33"
                       }
                     ],
-                    "id": 3155,
+                    "id": 3889,
                     "name": "VariableDeclaration",
-                    "src": "634:28:20"
+                    "src": "633:28:33"
                   }
                 ],
-                "id": 3156,
+                "id": 3890,
                 "name": "ParameterList",
-                "src": "536:132:20"
+                "src": "535:132:33"
               },
               {
                 "children": [
@@ -645,7 +645,7 @@
                       "constant": false,
                       "mutability": "mutable",
                       "name": "",
-                      "scope": 3160,
+                      "scope": 3894,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "address",
@@ -658,24 +658,24 @@
                           "stateMutability": "nonpayable",
                           "type": "address"
                         },
-                        "id": 3157,
+                        "id": 3891,
                         "name": "ElementaryTypeName",
-                        "src": "687:7:20"
+                        "src": "686:7:33"
                       }
                     ],
-                    "id": 3158,
+                    "id": 3892,
                     "name": "VariableDeclaration",
-                    "src": "687:7:20"
+                    "src": "686:7:33"
                   }
                 ],
-                "id": 3159,
+                "id": 3893,
                 "name": "ParameterList",
-                "src": "686:9:20"
+                "src": "685:9:33"
               }
             ],
-            "id": 3160,
+            "id": 3894,
             "name": "FunctionDefinition",
-            "src": "521:175:20"
+            "src": "520:175:33"
           },
           {
             "attributes": {
@@ -687,7 +687,7 @@
                 null
               ],
               "name": "setFactoryByStakeType",
-              "scope": 3169,
+              "scope": 3903,
               "stateMutability": "nonpayable",
               "virtual": false,
               "visibility": "external"
@@ -695,11 +695,11 @@
             "children": [
               {
                 "attributes": {
-                  "text": "@dev Set factory address by StakeType\n @param _stakeType the stake type , 0:TON, 1: Simple, 2: UniswapV3\n @param _factory the factory address"
+                  "text": "@dev Set factory address by StakeType\n @param _stakeType the stake type , 0:TON, 1: Simple, 2: UniswapV3LP\n @param _factory the factory address"
                 },
-                "id": 3161,
+                "id": 3895,
                 "name": "StructuredDocumentation",
-                "src": "702:159:20"
+                "src": "701:161:33"
               },
               {
                 "children": [
@@ -708,7 +708,7 @@
                       "constant": false,
                       "mutability": "mutable",
                       "name": "_stakeType",
-                      "scope": 3168,
+                      "scope": 3902,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "uint256",
@@ -720,21 +720,21 @@
                           "name": "uint256",
                           "type": "uint256"
                         },
-                        "id": 3162,
+                        "id": 3896,
                         "name": "ElementaryTypeName",
-                        "src": "897:7:20"
+                        "src": "898:7:33"
                       }
                     ],
-                    "id": 3163,
+                    "id": 3897,
                     "name": "VariableDeclaration",
-                    "src": "897:18:20"
+                    "src": "898:18:33"
                   },
                   {
                     "attributes": {
                       "constant": false,
                       "mutability": "mutable",
                       "name": "_factory",
-                      "scope": 3168,
+                      "scope": 3902,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "address",
@@ -747,19 +747,19 @@
                           "stateMutability": "nonpayable",
                           "type": "address"
                         },
-                        "id": 3164,
+                        "id": 3898,
                         "name": "ElementaryTypeName",
-                        "src": "917:7:20"
+                        "src": "918:7:33"
                       }
                     ],
-                    "id": 3165,
+                    "id": 3899,
                     "name": "VariableDeclaration",
-                    "src": "917:16:20"
+                    "src": "918:16:33"
                   }
                 ],
-                "id": 3166,
+                "id": 3900,
                 "name": "ParameterList",
-                "src": "896:38:20"
+                "src": "897:38:33"
               },
               {
                 "attributes": {
@@ -768,24 +768,24 @@
                   ]
                 },
                 "children": [],
-                "id": 3167,
+                "id": 3901,
                 "name": "ParameterList",
-                "src": "943:0:20"
+                "src": "952:0:33"
               }
             ],
-            "id": 3168,
+            "id": 3902,
             "name": "FunctionDefinition",
-            "src": "866:78:20"
+            "src": "867:86:33"
           }
         ],
-        "id": 3169,
+        "id": 3903,
         "name": "ContractDefinition",
-        "src": "62:885:20"
+        "src": "62:893:33"
       }
     ],
-    "id": 3170,
+    "id": 3904,
     "name": "SourceUnit",
-    "src": "37:911:20"
+    "src": "37:919:33"
   },
   "compiler": {
     "name": "solc",
@@ -793,7 +793,7 @@
   },
   "networks": {},
   "schemaVersion": "3.3.4",
-  "updatedAt": "2021-06-19T02:31:50.130Z",
+  "updatedAt": "2021-08-02T05:01:31.199Z",
   "devdoc": {
     "kind": "dev",
     "methods": {
@@ -813,7 +813,7 @@
         "details": "Set factory address by StakeType",
         "params": {
           "_factory": "the factory address",
-          "_stakeType": "the stake type , 0:TON, 1: Simple, 2: UniswapV3"
+          "_stakeType": "the stake type , 0:TON, 1: Simple, 2: UniswapV3LP"
         }
       }
     },

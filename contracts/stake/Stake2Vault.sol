@@ -122,6 +122,20 @@ contract Stake2Vault is Stake2VaultStorage, IStake2Vault {
         miningStartTime = _miningStartTime;
     }
 
+    /// @dev set mining end time
+    /// @param _miningEndTime  mining end time
+    function setMiningEndTime(uint256 _miningEndTime)
+        external
+        override
+        onlyOwner
+    {
+        require(
+            _miningEndTime > 0 && miningEndTime != _miningEndTime,
+            "Stake2Vault: zero or same _miningEndTime"
+        );
+        miningEndTime = _miningEndTime;
+    }
+
     /// @dev If the vault has more money than the reward to give, the owner can withdraw the remaining amount.
     /// @param to to address
     /// @param _amount the amount of withdrawal
@@ -146,8 +160,8 @@ contract Stake2Vault is Stake2VaultStorage, IStake2Vault {
         uint256 nonMiningAmount
     ) external override nonZero(minableAmount) returns (bool) {
         require(
-            miningStartTime < block.timestamp,
-            "Stake2Vault: miningStartTime has not passed"
+            miningStartTime < block.timestamp && block.timestamp < miningEndTime,
+            "Stake2Vault: It is not a mining period"
         );
         require(
             stakeAddress == msg.sender,

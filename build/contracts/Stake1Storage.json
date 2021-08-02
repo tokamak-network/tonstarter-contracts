@@ -3,12 +3,51 @@
   "abi": [
     {
       "inputs": [],
+      "name": "defiAddr",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
       "name": "endBlock",
       "outputs": [
         {
           "internalType": "uint256",
           "name": "",
           "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "migratedL2",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "pauseProxy",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
         }
       ],
       "stateMutability": "view",
@@ -268,32 +307,32 @@
       "type": "function"
     }
   ],
-  "metadata": "{\"compiler\":{\"version\":\"0.7.6+commit.7338295f\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[],\"name\":\"endBlock\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"user\",\"type\":\"address\"}],\"name\":\"getUserStaked\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"claimedBlock\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"claimedAmount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"releasedBlock\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"releasedAmount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"releasedTOSAmount\",\"type\":\"uint256\"},{\"internalType\":\"bool\",\"name\":\"released\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"infos\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"},{\"internalType\":\"uint256[3]\",\"name\":\"\",\"type\":\"uint256[3]\"},{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"paytoken\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"rewardClaimedTotal\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"saleStartBlock\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"stakeRegistry\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"startBlock\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"token\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"totalStakedAmount\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"totalStakers\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"name\":\"userStaked\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"claimedBlock\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"claimedAmount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"releasedBlock\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"releasedAmount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"releasedTOSAmount\",\"type\":\"uint256\"},{\"internalType\":\"bool\",\"name\":\"released\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"vault\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{\"getUserStaked(address)\":{\"details\":\"user's staked information\"},\"infos()\":{\"details\":\"Give the infomation of this stakeContracts\",\"returns\":{\"_0\":\"paytoken, vault, [saleStartBlock, startBlock, endBlock], rewardClaimedTotal, totalStakedAmount, totalStakers\"}}},\"stateVariables\":{\"endBlock\":{\"details\":\"the staking end block.\"},\"paytoken\":{\"details\":\"paytoken is the token that the user stakes. ( if paytoken is ether, paytoken is address(0) )\"},\"rewardClaimedTotal\":{\"details\":\"the total amount claimed\"},\"saleStartBlock\":{\"details\":\"the start block for sale.\"},\"stakeRegistry\":{\"details\":\"registry\"},\"startBlock\":{\"details\":\"the staking start block, once staking starts, users can no longer apply for staking.\"},\"token\":{\"details\":\"reward token : TOS\"},\"totalStakedAmount\":{\"details\":\"the total staked amount\"},\"totalStakers\":{\"details\":\"total stakers\"},\"userStaked\":{\"details\":\"information staked by user\"},\"vault\":{\"details\":\"A vault that holds tos rewards.\"}},\"title\":\"The base storage of stakeContract\",\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"/Users/zena/ico2.0/ico20-contracts/contracts/stake/Stake1Storage.sol\":\"Stake1Storage\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":100},\"remappings\":[]},\"sources\":{\"/Users/zena/ico2.0/ico20-contracts/contracts/libraries/LibTokenStake1.sol\":{\"keccak256\":\"0xe91668b140ae7ca5bbe2f98c2b16af77cfaab5c4811f9c6f7f78be34b3a6822f\",\"license\":\"Unlicense\",\"urls\":[\"bzz-raw://832bf7455c482987c3a46de3aadc3e7b138cd49d81f255613424172ca35dbe45\",\"dweb:/ipfs/QmWTodT4AKEax47ZLSvLX9fARy587kboLKRx2JeRhxhFf9\"]},\"/Users/zena/ico2.0/ico20-contracts/contracts/stake/Stake1Storage.sol\":{\"keccak256\":\"0xd560ebc82d48e98765b957778381b926b8ef5e9e948e26f179c1f6e70f331316\",\"license\":\"Unlicense\",\"urls\":[\"bzz-raw://59ef093d8a1772f098db9c297ab9c960b58aefa866b48a955ac55e31b20e8bc2\",\"dweb:/ipfs/QmR5jKNtmgKq44fbFxcKPiBMg6aPw7Mgb7LN1svy7JHLDV\"]}},\"version\":1}",
-  "bytecode": "0x608060405234801561001057600080fd5b506103c9806100206000396000f3fe608060405234801561001057600080fd5b50600436106100bf5760003560e01c8063869890381161007c57806386989038146101225780639a88be2f1461012a578063acc3a93914610198578063b2d4d6a3146101f8578063dac3fc3f14610200578063fbfa77cf14610226578063fc0c546a1461022e576100bf565b8063083c6323146100c457806320027275146100de57806343b0934a146100e657806348cd4cb11461010a578063567e98f914610112578063683048351461011a575b600080fd5b6100cc610236565b60408051918252519081900360200190f35b6100cc61023c565b6100ee610242565b604080516001600160a01b039092168252519081900360200190f35b6100cc610251565b6100cc610257565b6100ee61025d565b6100cc61026c565b610132610272565b604080516001600160a01b0380891682528716602082015290810185606080838360005b8381101561016e578181015183820152602001610156565b50505050905001848152602001838152602001828152602001965050505050505060405180910390f35b6101be600480360360208110156101ae57600080fd5b50356001600160a01b03166102c8565b604080519788526020880196909652868601949094526060860192909252608085015260a0840152151560c0830152519081900360e00190f35b6100cc610308565b6101be6004803603602081101561021657600080fd5b50356001600160a01b031661030e565b6100ee610357565b6100ee610366565b60065481565b60045481565b6002546001600160a01b031681565b60055481565b60085481565b6001546001600160a01b031681565b600a5481565b60008061027d610375565b5050600254600354604080516060810182526004548152600554602082015260065491810191909152600754600854600a546001600160a01b03958616979590941695509193909290565b6009602052600090815260409020805460018201546002830154600384015460048501546005860154600690960154949593949293919290919060ff1687565b60075481565b6001600160a01b03166000908152600960205260409020805460018201546002830154600384015460048501546005860154600690960154949693959294919390929160ff1690565b6003546001600160a01b031681565b6000546001600160a01b031681565b6040518060600160405280600390602082028036833750919291505056fea2646970667358221220e733110c778d70ead0006a0ec54ed33f0ab7cae2d81501c21cc73f23a8cefc3f64736f6c63430007060033",
-  "deployedBytecode": "0x608060405234801561001057600080fd5b50600436106100bf5760003560e01c8063869890381161007c57806386989038146101225780639a88be2f1461012a578063acc3a93914610198578063b2d4d6a3146101f8578063dac3fc3f14610200578063fbfa77cf14610226578063fc0c546a1461022e576100bf565b8063083c6323146100c457806320027275146100de57806343b0934a146100e657806348cd4cb11461010a578063567e98f914610112578063683048351461011a575b600080fd5b6100cc610236565b60408051918252519081900360200190f35b6100cc61023c565b6100ee610242565b604080516001600160a01b039092168252519081900360200190f35b6100cc610251565b6100cc610257565b6100ee61025d565b6100cc61026c565b610132610272565b604080516001600160a01b0380891682528716602082015290810185606080838360005b8381101561016e578181015183820152602001610156565b50505050905001848152602001838152602001828152602001965050505050505060405180910390f35b6101be600480360360208110156101ae57600080fd5b50356001600160a01b03166102c8565b604080519788526020880196909652868601949094526060860192909252608085015260a0840152151560c0830152519081900360e00190f35b6100cc610308565b6101be6004803603602081101561021657600080fd5b50356001600160a01b031661030e565b6100ee610357565b6100ee610366565b60065481565b60045481565b6002546001600160a01b031681565b60055481565b60085481565b6001546001600160a01b031681565b600a5481565b60008061027d610375565b5050600254600354604080516060810182526004548152600554602082015260065491810191909152600754600854600a546001600160a01b03958616979590941695509193909290565b6009602052600090815260409020805460018201546002830154600384015460048501546005860154600690960154949593949293919290919060ff1687565b60075481565b6001600160a01b03166000908152600960205260409020805460018201546002830154600384015460048501546005860154600690960154949693959294919390929160ff1690565b6003546001600160a01b031681565b6000546001600160a01b031681565b6040518060600160405280600390602082028036833750919291505056fea2646970667358221220e733110c778d70ead0006a0ec54ed33f0ab7cae2d81501c21cc73f23a8cefc3f64736f6c63430007060033",
+  "metadata": "{\"compiler\":{\"version\":\"0.7.6+commit.7338295f\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[],\"name\":\"defiAddr\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"endBlock\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"user\",\"type\":\"address\"}],\"name\":\"getUserStaked\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"claimedBlock\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"claimedAmount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"releasedBlock\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"releasedAmount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"releasedTOSAmount\",\"type\":\"uint256\"},{\"internalType\":\"bool\",\"name\":\"released\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"infos\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"},{\"internalType\":\"uint256[3]\",\"name\":\"\",\"type\":\"uint256[3]\"},{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"migratedL2\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"pauseProxy\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"paytoken\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"rewardClaimedTotal\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"saleStartBlock\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"stakeRegistry\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"startBlock\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"token\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"totalStakedAmount\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"totalStakers\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"name\":\"userStaked\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"claimedBlock\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"claimedAmount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"releasedBlock\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"releasedAmount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"releasedTOSAmount\",\"type\":\"uint256\"},{\"internalType\":\"bool\",\"name\":\"released\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"vault\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{\"getUserStaked(address)\":{\"details\":\"user's staked information\"},\"infos()\":{\"details\":\"Give the infomation of this stakeContracts\",\"returns\":{\"_0\":\"paytoken, vault, [saleStartBlock, startBlock, endBlock], rewardClaimedTotal, totalStakedAmount, totalStakers\"}}},\"stateVariables\":{\"defiAddr\":{\"details\":\"extra address storage\"},\"endBlock\":{\"details\":\"the staking end block.\"},\"migratedL2\":{\"details\":\"for migrate L2\"},\"pauseProxy\":{\"details\":\"flag for pause proxy\"},\"paytoken\":{\"details\":\"paytoken is the token that the user stakes. ( if paytoken is ether, paytoken is address(0) )\"},\"rewardClaimedTotal\":{\"details\":\"the total amount claimed\"},\"saleStartBlock\":{\"details\":\"the start block for sale.\"},\"stakeRegistry\":{\"details\":\"registry\"},\"startBlock\":{\"details\":\"the staking start block, once staking starts, users can no longer apply for staking.\"},\"token\":{\"details\":\"reward token : TOS\"},\"totalStakedAmount\":{\"details\":\"the total staked amount\"},\"totalStakers\":{\"details\":\"total stakers\"},\"userStaked\":{\"details\":\"information staked by user\"},\"vault\":{\"details\":\"A vault that holds TOS rewards.\"}},\"title\":\"The base storage of stakeContract\",\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"/Users/zena/ico2.0/ico20-contracts/contracts/stake/Stake1Storage.sol\":\"Stake1Storage\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":100},\"remappings\":[]},\"sources\":{\"/Users/zena/ico2.0/ico20-contracts/contracts/libraries/LibTokenStake1.sol\":{\"keccak256\":\"0xe91668b140ae7ca5bbe2f98c2b16af77cfaab5c4811f9c6f7f78be34b3a6822f\",\"license\":\"Unlicense\",\"urls\":[\"bzz-raw://832bf7455c482987c3a46de3aadc3e7b138cd49d81f255613424172ca35dbe45\",\"dweb:/ipfs/QmWTodT4AKEax47ZLSvLX9fARy587kboLKRx2JeRhxhFf9\"]},\"/Users/zena/ico2.0/ico20-contracts/contracts/stake/Stake1Storage.sol\":{\"keccak256\":\"0x60c2e68d57053b3ff7b5f272bbdedf4da7f09cb7e38317b4177bbf0fc3e3d431\",\"license\":\"Unlicense\",\"urls\":[\"bzz-raw://6b1fa6ef6990559f2efe0c2eca06fd79c16d5eb083de6549d6199c3f0e616d11\",\"dweb:/ipfs/QmRNVw9vjfWSgj8hRBCdN7NYzwh8U2EaGXNiRr1J2cnra7\"]}},\"version\":1}",
+  "bytecode": "0x608060405234801561001057600080fd5b50610443806100206000396000f3fe608060405234801561001057600080fd5b50600436106100e05760003560e01c80639a88be2f116100875780639a88be2f146101675780639d84ca35146101d5578063a1f5f50e146101dd578063acc3a939146101e5578063b2d4d6a314610245578063dac3fc3f1461024d578063fbfa77cf14610273578063fc0c546a1461027b576100e0565b8063083c6323146100e557806320027275146100ff57806343b0934a1461010757806348cd4cb11461012b578063567e98f91461013357806363a8fd891461013b5780636830483514610157578063869890381461015f575b600080fd5b6100ed610283565b60408051918252519081900360200190f35b6100ed610289565b61010f61028f565b604080516001600160a01b039092168252519081900360200190f35b6100ed61029e565b6100ed6102a4565b6101436102aa565b604080519115158252519081900360200190f35b61010f6102b3565b6100ed6102c2565b61016f6102c8565b604080516001600160a01b0380891682528716602082015290810185606080838360005b838110156101ab578181015183820152602001610193565b50505050905001848152602001838152602001828152602001965050505050505060405180910390f35b61010f61031e565b610143610332565b61020b600480360360208110156101fb57600080fd5b50356001600160a01b0316610342565b604080519788526020880196909652868601949094526060860192909252608085015260a0840152151560c0830152519081900360e00190f35b6100ed610382565b61020b6004803603602081101561026357600080fd5b50356001600160a01b0316610388565b61010f6103d1565b61010f6103e0565b60065481565b60045481565b6002546001600160a01b031681565b60055481565b60085481565b600c5460ff1681565b6001546001600160a01b031681565b600a5481565b6000806102d36103ef565b5050600254600354604080516060810182526004548152600554602082015260065491810191909152600754600854600a546001600160a01b03958616979590941695509193909290565b600c5461010090046001600160a01b031681565b600c54600160a81b900460ff1681565b6009602052600090815260409020805460018201546002830154600384015460048501546005860154600690960154949593949293919290919060ff1687565b60075481565b6001600160a01b03166000908152600960205260409020805460018201546002830154600384015460048501546005860154600690960154949693959294919390929160ff1690565b6003546001600160a01b031681565b6000546001600160a01b031681565b6040518060600160405280600390602082028036833750919291505056fea2646970667358221220d855c110a022ff54d0b044b3ace212236b7e05d574d8b495f481dcbd37312b3d64736f6c63430007060033",
+  "deployedBytecode": "0x608060405234801561001057600080fd5b50600436106100e05760003560e01c80639a88be2f116100875780639a88be2f146101675780639d84ca35146101d5578063a1f5f50e146101dd578063acc3a939146101e5578063b2d4d6a314610245578063dac3fc3f1461024d578063fbfa77cf14610273578063fc0c546a1461027b576100e0565b8063083c6323146100e557806320027275146100ff57806343b0934a1461010757806348cd4cb11461012b578063567e98f91461013357806363a8fd891461013b5780636830483514610157578063869890381461015f575b600080fd5b6100ed610283565b60408051918252519081900360200190f35b6100ed610289565b61010f61028f565b604080516001600160a01b039092168252519081900360200190f35b6100ed61029e565b6100ed6102a4565b6101436102aa565b604080519115158252519081900360200190f35b61010f6102b3565b6100ed6102c2565b61016f6102c8565b604080516001600160a01b0380891682528716602082015290810185606080838360005b838110156101ab578181015183820152602001610193565b50505050905001848152602001838152602001828152602001965050505050505060405180910390f35b61010f61031e565b610143610332565b61020b600480360360208110156101fb57600080fd5b50356001600160a01b0316610342565b604080519788526020880196909652868601949094526060860192909252608085015260a0840152151560c0830152519081900360e00190f35b6100ed610382565b61020b6004803603602081101561026357600080fd5b50356001600160a01b0316610388565b61010f6103d1565b61010f6103e0565b60065481565b60045481565b6002546001600160a01b031681565b60055481565b60085481565b600c5460ff1681565b6001546001600160a01b031681565b600a5481565b6000806102d36103ef565b5050600254600354604080516060810182526004548152600554602082015260065491810191909152600754600854600a546001600160a01b03958616979590941695509193909290565b600c5461010090046001600160a01b031681565b600c54600160a81b900460ff1681565b6009602052600090815260409020805460018201546002830154600384015460048501546005860154600690960154949593949293919290919060ff1687565b60075481565b6001600160a01b03166000908152600960205260409020805460018201546002830154600384015460048501546005860154600690960154949693959294919390929160ff1690565b6003546001600160a01b031681565b6000546001600160a01b031681565b6040518060600160405280600390602082028036833750919291505056fea2646970667358221220d855c110a022ff54d0b044b3ace212236b7e05d574d8b495f481dcbd37312b3d64736f6c63430007060033",
   "immutableReferences": {},
   "generatedSources": [],
   "deployedGeneratedSources": [],
-  "sourceMap": "195:2304:33:-:0;;;;;;;;;;;;;;;;;;;",
-  "deployedSourceMap": "195:2304:33:-:0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;789:23;;;:::i;:::-;;;;;;;;;;;;;;;;587:29;;;:::i;446:23::-;;;:::i;:::-;;;;-1:-1:-1;;;;;446:23:33;;;;;;;;;;;;;;721:25;;;:::i;934:32::-;;;:::i;305:28::-;;;:::i;1112:27::-;;;:::i;2067:430::-;;;:::i;:::-;;;;-1:-1:-1;;;;;2067:430:33;;;;;;;;;;;;;;;;;;;-1:-1:-1;2067:430:33;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;1013:65;;;;;;;;;;;;;;;;-1:-1:-1;1013:65:33;-1:-1:-1;;;;;1013:65:33;;:::i;:::-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;857:33;;;:::i;1214:666::-;;;;;;;;;;;;;;;;-1:-1:-1;1214:666:33;-1:-1:-1;;;;;1214:666:33;;:::i;521:20::-;;;:::i;256:::-;;;:::i;789:23::-;;;;:::o;587:29::-;;;;:::o;446:23::-;;;-1:-1:-1;;;;;446:23:33;;:::o;721:25::-;;;;:::o;934:32::-;;;;:::o;305:28::-;;;-1:-1:-1;;;;;305:28:33;;:::o;1112:27::-;;;;:::o;2067:430::-;2144:7;2165;2186:17;;:::i;:::-;-1:-1:-1;;2312:8:33;;2334:5;;2291:199;;;;;;;;2354:14;;2291:199;;2370:10;;2291:199;;;;2382:8;;2291:199;;;;;;;2405:18;;2437:17;;2468:12;;-1:-1:-1;;;;;2312:8:33;;;;2334:5;;;;;-1:-1:-1;2291:199:33;;2405:18;;2468:12;2067:430::o;1013:65::-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;:::o;857:33::-;;;;:::o;1214:666::-;-1:-1:-1;;;;;1577:16:33;1311:14;1577:16;;;:10;:16;;;;;:23;;1614:29;;;;1657:30;;;;1701;;;;1745:31;;;;1790:34;;;;1838:25;;;;;1577:23;;1614:29;;1657:30;;1701;;1745:31;;1790:34;1838:25;;;1214:666::o;521:20::-;;;-1:-1:-1;;;;;521:20:33;;:::o;256:::-;;;-1:-1:-1;;;;;256:20:33;;:::o;-1:-1:-1:-;;;;;;;;;;;;;;;;;;;;;;;;:::o",
-  "source": "//SPDX-License-Identifier: Unlicense\npragma solidity ^0.7.6;\n\n//import \"../interfaces/IStake1Storage.sol\";\nimport \"../libraries/LibTokenStake1.sol\";\n\n/// @title The base storage of stakeContract\ncontract Stake1Storage {\n    /// @dev reward token : TOS\n    address public token;\n\n    /// @dev registry\n    address public stakeRegistry;\n\n    /// @dev paytoken is the token that the user stakes. ( if paytoken is ether, paytoken is address(0) )\n    address public paytoken;\n\n    /// @dev A vault that holds tos rewards.\n    address public vault;\n\n    /// @dev the start block for sale.\n    uint256 public saleStartBlock;\n\n    /// @dev the staking start block, once staking starts, users can no longer apply for staking.\n    uint256 public startBlock;\n\n    /// @dev the staking end block.\n    uint256 public endBlock;\n\n    /// @dev the total amount claimed\n    uint256 public rewardClaimedTotal;\n\n    /// @dev the total staked amount\n    uint256 public totalStakedAmount;\n\n    /// @dev information staked by user\n    mapping(address => LibTokenStake1.StakedAmount) public userStaked;\n\n    /// @dev total stakers\n    uint256 public totalStakers;\n\n    uint256 internal _lock;\n\n    /// @dev user's staked information\n    function getUserStaked(address user)\n        external\n        view\n        returns (\n            uint256 amount,\n            uint256 claimedBlock,\n            uint256 claimedAmount,\n            uint256 releasedBlock,\n            uint256 releasedAmount,\n            uint256 releasedTOSAmount,\n            bool released\n        )\n    {\n        return (\n            userStaked[user].amount,\n            userStaked[user].claimedBlock,\n            userStaked[user].claimedAmount,\n            userStaked[user].releasedBlock,\n            userStaked[user].releasedAmount,\n            userStaked[user].releasedTOSAmount,\n            userStaked[user].released\n        );\n    }\n\n    /// @dev Give the infomation of this stakeContracts\n    /// @return paytoken, vault, [saleStartBlock, startBlock, endBlock], rewardClaimedTotal, totalStakedAmount, totalStakers\n    function infos()\n        external\n        view\n        returns (\n            address,\n            address,\n            uint256[3] memory,\n            uint256,\n            uint256,\n            uint256\n        )\n    {\n        return (\n            paytoken,\n            vault,\n            [saleStartBlock, startBlock, endBlock],\n            rewardClaimedTotal,\n            totalStakedAmount,\n            totalStakers\n        );\n    }\n}\n",
+  "sourceMap": "150:2488:61:-:0;;;;;;;;;;;;;;;;;;;",
+  "deployedSourceMap": "150:2488:61:-:0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;744:23;;;:::i;:::-;;;;;;;;;;;;;;;;542:29;;;:::i;401:23::-;;;:::i;:::-;;;;-1:-1:-1;;;;;401:23:61;;;;;;;;;;;;;;676:25;;;:::i;889:32::-;;;:::i;1164:22::-;;;:::i;:::-;;;;;;;;;;;;;;;;;;260:28;;;:::i;1067:27::-;;;:::i;2206:430::-;;;:::i;:::-;;;;-1:-1:-1;;;;;2206:430:61;;;;;;;;;;;;;;;;;;;-1:-1:-1;2206:430:61;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;1228:23;;;:::i;1285:22::-;;;:::i;968:65::-;;;;;;;;;;;;;;;;-1:-1:-1;968:65:61;-1:-1:-1;;;;;968:65:61;;:::i;:::-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;812:33;;;:::i;1353:666::-;;;;;;;;;;;;;;;;-1:-1:-1;1353:666:61;-1:-1:-1;;;;;1353:666:61;;:::i;476:20::-;;;:::i;211:::-;;;:::i;744:23::-;;;;:::o;542:29::-;;;;:::o;401:23::-;;;-1:-1:-1;;;;;401:23:61;;:::o;676:25::-;;;;:::o;889:32::-;;;;:::o;1164:22::-;;;;;;:::o;260:28::-;;;-1:-1:-1;;;;;260:28:61;;:::o;1067:27::-;;;;:::o;2206:430::-;2283:7;2304;2325:17;;:::i;:::-;-1:-1:-1;;2451:8:61;;2473:5;;2430:199;;;;;;;;2493:14;;2430:199;;2509:10;;2430:199;;;;2521:8;;2430:199;;;;;;;2544:18;;2576:17;;2607:12;;-1:-1:-1;;;;;2451:8:61;;;;2473:5;;;;;-1:-1:-1;2430:199:61;;2544:18;;2607:12;2206:430::o;1228:23::-;;;;;;-1:-1:-1;;;;;1228:23:61;;:::o;1285:22::-;;;-1:-1:-1;;;1285:22:61;;;;;:::o;968:65::-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;:::o;812:33::-;;;;:::o;1353:666::-;-1:-1:-1;;;;;1716:16:61;1450:14;1716:16;;;:10;:16;;;;;:23;;1753:29;;;;1796:30;;;;1840;;;;1884:31;;;;1929:34;;;;1977:25;;;;;1716:23;;1753:29;;1796:30;;1840;;1884:31;;1929:34;1977:25;;;1353:666::o;476:20::-;;;-1:-1:-1;;;;;476:20:61;;:::o;211:::-;;;-1:-1:-1;;;;;211:20:61;;:::o;-1:-1:-1:-;;;;;;;;;;;;;;;;;;;;;;;;:::o",
+  "source": "//SPDX-License-Identifier: Unlicense\npragma solidity ^0.7.6;\n\nimport \"../libraries/LibTokenStake1.sol\";\n\n/// @title The base storage of stakeContract\ncontract Stake1Storage {\n    /// @dev reward token : TOS\n    address public token;\n\n    /// @dev registry\n    address public stakeRegistry;\n\n    /// @dev paytoken is the token that the user stakes. ( if paytoken is ether, paytoken is address(0) )\n    address public paytoken;\n\n    /// @dev A vault that holds TOS rewards.\n    address public vault;\n\n    /// @dev the start block for sale.\n    uint256 public saleStartBlock;\n\n    /// @dev the staking start block, once staking starts, users can no longer apply for staking.\n    uint256 public startBlock;\n\n    /// @dev the staking end block.\n    uint256 public endBlock;\n\n    /// @dev the total amount claimed\n    uint256 public rewardClaimedTotal;\n\n    /// @dev the total staked amount\n    uint256 public totalStakedAmount;\n\n    /// @dev information staked by user\n    mapping(address => LibTokenStake1.StakedAmount) public userStaked;\n\n    /// @dev total stakers\n    uint256 public totalStakers;\n\n    uint256 internal _lock;\n\n    /// @dev flag for pause proxy\n    bool public pauseProxy;\n\n    /// @dev extra address storage\n    address public defiAddr;\n\n    ///@dev for migrate L2\n    bool public migratedL2;\n\n    /// @dev user's staked information\n    function getUserStaked(address user)\n        external\n        view\n        returns (\n            uint256 amount,\n            uint256 claimedBlock,\n            uint256 claimedAmount,\n            uint256 releasedBlock,\n            uint256 releasedAmount,\n            uint256 releasedTOSAmount,\n            bool released\n        )\n    {\n        return (\n            userStaked[user].amount,\n            userStaked[user].claimedBlock,\n            userStaked[user].claimedAmount,\n            userStaked[user].releasedBlock,\n            userStaked[user].releasedAmount,\n            userStaked[user].releasedTOSAmount,\n            userStaked[user].released\n        );\n    }\n\n    /// @dev Give the infomation of this stakeContracts\n    /// @return paytoken, vault, [saleStartBlock, startBlock, endBlock], rewardClaimedTotal, totalStakedAmount, totalStakers\n    function infos()\n        external\n        view\n        returns (\n            address,\n            address,\n            uint256[3] memory,\n            uint256,\n            uint256,\n            uint256\n        )\n    {\n        return (\n            paytoken,\n            vault,\n            [saleStartBlock, startBlock, endBlock],\n            rewardClaimedTotal,\n            totalStakedAmount,\n            totalStakers\n        );\n    }\n}\n",
   "sourcePath": "/Users/zena/ico2.0/ico20-contracts/contracts/stake/Stake1Storage.sol",
   "ast": {
     "absolutePath": "/Users/zena/ico2.0/ico20-contracts/contracts/stake/Stake1Storage.sol",
     "exportedSymbols": {
       "LibTokenStake1": [
-        3624
+        5515
       ],
       "Stake1Storage": [
-        4520
+        6814
       ]
     },
-    "id": 4521,
+    "id": 6815,
     "license": "Unlicense",
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 4399,
+        "id": 6684,
         "literals": [
           "solidity",
           "^",
@@ -301,16 +340,16 @@
           ".6"
         ],
         "nodeType": "PragmaDirective",
-        "src": "37:23:33"
+        "src": "37:23:61"
       },
       {
         "absolutePath": "/Users/zena/ico2.0/ico20-contracts/contracts/libraries/LibTokenStake1.sol",
         "file": "../libraries/LibTokenStake1.sol",
-        "id": 4400,
+        "id": 6685,
         "nodeType": "ImportDirective",
-        "scope": 4521,
-        "sourceUnit": 3625,
-        "src": "107:41:33",
+        "scope": 6815,
+        "sourceUnit": 5516,
+        "src": "62:41:61",
         "symbolAliases": [],
         "unitAlias": ""
       },
@@ -320,15 +359,15 @@
         "contractDependencies": [],
         "contractKind": "contract",
         "documentation": {
-          "id": 4401,
+          "id": 6686,
           "nodeType": "StructuredDocumentation",
-          "src": "150:45:33",
+          "src": "105:45:61",
           "text": "@title The base storage of stakeContract"
         },
         "fullyImplemented": true,
-        "id": 4520,
+        "id": 6814,
         "linearizedBaseContracts": [
-          4520
+          6814
         ],
         "name": "Stake1Storage",
         "nodeType": "ContractDefinition",
@@ -336,18 +375,18 @@
           {
             "constant": false,
             "documentation": {
-              "id": 4402,
+              "id": 6687,
               "nodeType": "StructuredDocumentation",
-              "src": "224:27:33",
+              "src": "179:27:61",
               "text": "@dev reward token : TOS"
             },
             "functionSelector": "fc0c546a",
-            "id": 4404,
+            "id": 6689,
             "mutability": "mutable",
             "name": "token",
             "nodeType": "VariableDeclaration",
-            "scope": 4520,
-            "src": "256:20:33",
+            "scope": 6814,
+            "src": "211:20:61",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -355,10 +394,10 @@
               "typeString": "address"
             },
             "typeName": {
-              "id": 4403,
+              "id": 6688,
               "name": "address",
               "nodeType": "ElementaryTypeName",
-              "src": "256:7:33",
+              "src": "211:7:61",
               "stateMutability": "nonpayable",
               "typeDescriptions": {
                 "typeIdentifier": "t_address",
@@ -370,18 +409,18 @@
           {
             "constant": false,
             "documentation": {
-              "id": 4405,
+              "id": 6690,
               "nodeType": "StructuredDocumentation",
-              "src": "283:17:33",
+              "src": "238:17:61",
               "text": "@dev registry"
             },
             "functionSelector": "68304835",
-            "id": 4407,
+            "id": 6692,
             "mutability": "mutable",
             "name": "stakeRegistry",
             "nodeType": "VariableDeclaration",
-            "scope": 4520,
-            "src": "305:28:33",
+            "scope": 6814,
+            "src": "260:28:61",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -389,10 +428,10 @@
               "typeString": "address"
             },
             "typeName": {
-              "id": 4406,
+              "id": 6691,
               "name": "address",
               "nodeType": "ElementaryTypeName",
-              "src": "305:7:33",
+              "src": "260:7:61",
               "stateMutability": "nonpayable",
               "typeDescriptions": {
                 "typeIdentifier": "t_address",
@@ -404,18 +443,18 @@
           {
             "constant": false,
             "documentation": {
-              "id": 4408,
+              "id": 6693,
               "nodeType": "StructuredDocumentation",
-              "src": "340:101:33",
+              "src": "295:101:61",
               "text": "@dev paytoken is the token that the user stakes. ( if paytoken is ether, paytoken is address(0) )"
             },
             "functionSelector": "43b0934a",
-            "id": 4410,
+            "id": 6695,
             "mutability": "mutable",
             "name": "paytoken",
             "nodeType": "VariableDeclaration",
-            "scope": 4520,
-            "src": "446:23:33",
+            "scope": 6814,
+            "src": "401:23:61",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -423,10 +462,10 @@
               "typeString": "address"
             },
             "typeName": {
-              "id": 4409,
+              "id": 6694,
               "name": "address",
               "nodeType": "ElementaryTypeName",
-              "src": "446:7:33",
+              "src": "401:7:61",
               "stateMutability": "nonpayable",
               "typeDescriptions": {
                 "typeIdentifier": "t_address",
@@ -438,18 +477,18 @@
           {
             "constant": false,
             "documentation": {
-              "id": 4411,
+              "id": 6696,
               "nodeType": "StructuredDocumentation",
-              "src": "476:40:33",
-              "text": "@dev A vault that holds tos rewards."
+              "src": "431:40:61",
+              "text": "@dev A vault that holds TOS rewards."
             },
             "functionSelector": "fbfa77cf",
-            "id": 4413,
+            "id": 6698,
             "mutability": "mutable",
             "name": "vault",
             "nodeType": "VariableDeclaration",
-            "scope": 4520,
-            "src": "521:20:33",
+            "scope": 6814,
+            "src": "476:20:61",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -457,10 +496,10 @@
               "typeString": "address"
             },
             "typeName": {
-              "id": 4412,
+              "id": 6697,
               "name": "address",
               "nodeType": "ElementaryTypeName",
-              "src": "521:7:33",
+              "src": "476:7:61",
               "stateMutability": "nonpayable",
               "typeDescriptions": {
                 "typeIdentifier": "t_address",
@@ -472,18 +511,18 @@
           {
             "constant": false,
             "documentation": {
-              "id": 4414,
+              "id": 6699,
               "nodeType": "StructuredDocumentation",
-              "src": "548:34:33",
+              "src": "503:34:61",
               "text": "@dev the start block for sale."
             },
             "functionSelector": "20027275",
-            "id": 4416,
+            "id": 6701,
             "mutability": "mutable",
             "name": "saleStartBlock",
             "nodeType": "VariableDeclaration",
-            "scope": 4520,
-            "src": "587:29:33",
+            "scope": 6814,
+            "src": "542:29:61",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -491,10 +530,10 @@
               "typeString": "uint256"
             },
             "typeName": {
-              "id": 4415,
+              "id": 6700,
               "name": "uint256",
               "nodeType": "ElementaryTypeName",
-              "src": "587:7:33",
+              "src": "542:7:61",
               "typeDescriptions": {
                 "typeIdentifier": "t_uint256",
                 "typeString": "uint256"
@@ -505,18 +544,18 @@
           {
             "constant": false,
             "documentation": {
-              "id": 4417,
+              "id": 6702,
               "nodeType": "StructuredDocumentation",
-              "src": "623:93:33",
+              "src": "578:93:61",
               "text": "@dev the staking start block, once staking starts, users can no longer apply for staking."
             },
             "functionSelector": "48cd4cb1",
-            "id": 4419,
+            "id": 6704,
             "mutability": "mutable",
             "name": "startBlock",
             "nodeType": "VariableDeclaration",
-            "scope": 4520,
-            "src": "721:25:33",
+            "scope": 6814,
+            "src": "676:25:61",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -524,10 +563,10 @@
               "typeString": "uint256"
             },
             "typeName": {
-              "id": 4418,
+              "id": 6703,
               "name": "uint256",
               "nodeType": "ElementaryTypeName",
-              "src": "721:7:33",
+              "src": "676:7:61",
               "typeDescriptions": {
                 "typeIdentifier": "t_uint256",
                 "typeString": "uint256"
@@ -538,18 +577,18 @@
           {
             "constant": false,
             "documentation": {
-              "id": 4420,
+              "id": 6705,
               "nodeType": "StructuredDocumentation",
-              "src": "753:31:33",
+              "src": "708:31:61",
               "text": "@dev the staking end block."
             },
             "functionSelector": "083c6323",
-            "id": 4422,
+            "id": 6707,
             "mutability": "mutable",
             "name": "endBlock",
             "nodeType": "VariableDeclaration",
-            "scope": 4520,
-            "src": "789:23:33",
+            "scope": 6814,
+            "src": "744:23:61",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -557,10 +596,10 @@
               "typeString": "uint256"
             },
             "typeName": {
-              "id": 4421,
+              "id": 6706,
               "name": "uint256",
               "nodeType": "ElementaryTypeName",
-              "src": "789:7:33",
+              "src": "744:7:61",
               "typeDescriptions": {
                 "typeIdentifier": "t_uint256",
                 "typeString": "uint256"
@@ -571,18 +610,18 @@
           {
             "constant": false,
             "documentation": {
-              "id": 4423,
+              "id": 6708,
               "nodeType": "StructuredDocumentation",
-              "src": "819:33:33",
+              "src": "774:33:61",
               "text": "@dev the total amount claimed"
             },
             "functionSelector": "b2d4d6a3",
-            "id": 4425,
+            "id": 6710,
             "mutability": "mutable",
             "name": "rewardClaimedTotal",
             "nodeType": "VariableDeclaration",
-            "scope": 4520,
-            "src": "857:33:33",
+            "scope": 6814,
+            "src": "812:33:61",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -590,10 +629,10 @@
               "typeString": "uint256"
             },
             "typeName": {
-              "id": 4424,
+              "id": 6709,
               "name": "uint256",
               "nodeType": "ElementaryTypeName",
-              "src": "857:7:33",
+              "src": "812:7:61",
               "typeDescriptions": {
                 "typeIdentifier": "t_uint256",
                 "typeString": "uint256"
@@ -604,18 +643,18 @@
           {
             "constant": false,
             "documentation": {
-              "id": 4426,
+              "id": 6711,
               "nodeType": "StructuredDocumentation",
-              "src": "897:32:33",
+              "src": "852:32:61",
               "text": "@dev the total staked amount"
             },
             "functionSelector": "567e98f9",
-            "id": 4428,
+            "id": 6713,
             "mutability": "mutable",
             "name": "totalStakedAmount",
             "nodeType": "VariableDeclaration",
-            "scope": 4520,
-            "src": "934:32:33",
+            "scope": 6814,
+            "src": "889:32:61",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -623,10 +662,10 @@
               "typeString": "uint256"
             },
             "typeName": {
-              "id": 4427,
+              "id": 6712,
               "name": "uint256",
               "nodeType": "ElementaryTypeName",
-              "src": "934:7:33",
+              "src": "889:7:61",
               "typeDescriptions": {
                 "typeIdentifier": "t_uint256",
                 "typeString": "uint256"
@@ -637,50 +676,50 @@
           {
             "constant": false,
             "documentation": {
-              "id": 4429,
+              "id": 6714,
               "nodeType": "StructuredDocumentation",
-              "src": "973:35:33",
+              "src": "928:35:61",
               "text": "@dev information staked by user"
             },
             "functionSelector": "acc3a939",
-            "id": 4433,
+            "id": 6718,
             "mutability": "mutable",
             "name": "userStaked",
             "nodeType": "VariableDeclaration",
-            "scope": 4520,
-            "src": "1013:65:33",
+            "scope": 6814,
+            "src": "968:65:61",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
-              "typeIdentifier": "t_mapping$_t_address_$_t_struct$_StakedAmount_$3606_storage_$",
+              "typeIdentifier": "t_mapping$_t_address_$_t_struct$_StakedAmount_$5497_storage_$",
               "typeString": "mapping(address => struct LibTokenStake1.StakedAmount)"
             },
             "typeName": {
-              "id": 4432,
+              "id": 6717,
               "keyType": {
-                "id": 4430,
+                "id": 6715,
                 "name": "address",
                 "nodeType": "ElementaryTypeName",
-                "src": "1021:7:33",
+                "src": "976:7:61",
                 "typeDescriptions": {
                   "typeIdentifier": "t_address",
                   "typeString": "address"
                 }
               },
               "nodeType": "Mapping",
-              "src": "1013:47:33",
+              "src": "968:47:61",
               "typeDescriptions": {
-                "typeIdentifier": "t_mapping$_t_address_$_t_struct$_StakedAmount_$3606_storage_$",
+                "typeIdentifier": "t_mapping$_t_address_$_t_struct$_StakedAmount_$5497_storage_$",
                 "typeString": "mapping(address => struct LibTokenStake1.StakedAmount)"
               },
               "valueType": {
-                "id": 4431,
+                "id": 6716,
                 "name": "LibTokenStake1.StakedAmount",
                 "nodeType": "UserDefinedTypeName",
-                "referencedDeclaration": 3606,
-                "src": "1032:27:33",
+                "referencedDeclaration": 5497,
+                "src": "987:27:61",
                 "typeDescriptions": {
-                  "typeIdentifier": "t_struct$_StakedAmount_$3606_storage_ptr",
+                  "typeIdentifier": "t_struct$_StakedAmount_$5497_storage_ptr",
                   "typeString": "struct LibTokenStake1.StakedAmount"
                 }
               }
@@ -690,18 +729,18 @@
           {
             "constant": false,
             "documentation": {
-              "id": 4434,
+              "id": 6719,
               "nodeType": "StructuredDocumentation",
-              "src": "1085:22:33",
+              "src": "1040:22:61",
               "text": "@dev total stakers"
             },
             "functionSelector": "86989038",
-            "id": 4436,
+            "id": 6721,
             "mutability": "mutable",
             "name": "totalStakers",
             "nodeType": "VariableDeclaration",
-            "scope": 4520,
-            "src": "1112:27:33",
+            "scope": 6814,
+            "src": "1067:27:61",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -709,10 +748,10 @@
               "typeString": "uint256"
             },
             "typeName": {
-              "id": 4435,
+              "id": 6720,
               "name": "uint256",
               "nodeType": "ElementaryTypeName",
-              "src": "1112:7:33",
+              "src": "1067:7:61",
               "typeDescriptions": {
                 "typeIdentifier": "t_uint256",
                 "typeString": "uint256"
@@ -722,12 +761,12 @@
           },
           {
             "constant": false,
-            "id": 4438,
+            "id": 6723,
             "mutability": "mutable",
             "name": "_lock",
             "nodeType": "VariableDeclaration",
-            "scope": 4520,
-            "src": "1146:22:33",
+            "scope": 6814,
+            "src": "1101:22:61",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -735,10 +774,10 @@
               "typeString": "uint256"
             },
             "typeName": {
-              "id": 4437,
+              "id": 6722,
               "name": "uint256",
               "nodeType": "ElementaryTypeName",
-              "src": "1146:7:33",
+              "src": "1101:7:61",
               "typeDescriptions": {
                 "typeIdentifier": "t_uint256",
                 "typeString": "uint256"
@@ -747,10 +786,110 @@
             "visibility": "internal"
           },
           {
+            "constant": false,
+            "documentation": {
+              "id": 6724,
+              "nodeType": "StructuredDocumentation",
+              "src": "1130:29:61",
+              "text": "@dev flag for pause proxy"
+            },
+            "functionSelector": "63a8fd89",
+            "id": 6726,
+            "mutability": "mutable",
+            "name": "pauseProxy",
+            "nodeType": "VariableDeclaration",
+            "scope": 6814,
+            "src": "1164:22:61",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_bool",
+              "typeString": "bool"
+            },
+            "typeName": {
+              "id": 6725,
+              "name": "bool",
+              "nodeType": "ElementaryTypeName",
+              "src": "1164:4:61",
+              "typeDescriptions": {
+                "typeIdentifier": "t_bool",
+                "typeString": "bool"
+              }
+            },
+            "visibility": "public"
+          },
+          {
+            "constant": false,
+            "documentation": {
+              "id": 6727,
+              "nodeType": "StructuredDocumentation",
+              "src": "1193:30:61",
+              "text": "@dev extra address storage"
+            },
+            "functionSelector": "9d84ca35",
+            "id": 6729,
+            "mutability": "mutable",
+            "name": "defiAddr",
+            "nodeType": "VariableDeclaration",
+            "scope": 6814,
+            "src": "1228:23:61",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_address",
+              "typeString": "address"
+            },
+            "typeName": {
+              "id": 6728,
+              "name": "address",
+              "nodeType": "ElementaryTypeName",
+              "src": "1228:7:61",
+              "stateMutability": "nonpayable",
+              "typeDescriptions": {
+                "typeIdentifier": "t_address",
+                "typeString": "address"
+              }
+            },
+            "visibility": "public"
+          },
+          {
+            "constant": false,
+            "documentation": {
+              "id": 6730,
+              "nodeType": "StructuredDocumentation",
+              "src": "1258:22:61",
+              "text": "@dev for migrate L2"
+            },
+            "functionSelector": "a1f5f50e",
+            "id": 6732,
+            "mutability": "mutable",
+            "name": "migratedL2",
+            "nodeType": "VariableDeclaration",
+            "scope": 6814,
+            "src": "1285:22:61",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_bool",
+              "typeString": "bool"
+            },
+            "typeName": {
+              "id": 6731,
+              "name": "bool",
+              "nodeType": "ElementaryTypeName",
+              "src": "1285:4:61",
+              "typeDescriptions": {
+                "typeIdentifier": "t_bool",
+                "typeString": "bool"
+              }
+            },
+            "visibility": "public"
+          },
+          {
             "body": {
-              "id": 4488,
+              "id": 6782,
               "nodeType": "Block",
-              "src": "1546:334:33",
+              "src": "1685:334:61",
               "statements": [
                 {
                   "expression": {
@@ -758,25 +897,25 @@
                       {
                         "expression": {
                           "baseExpression": {
-                            "id": 4458,
+                            "id": 6752,
                             "name": "userStaked",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 4433,
-                            "src": "1577:10:33",
+                            "referencedDeclaration": 6718,
+                            "src": "1716:10:61",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_mapping$_t_address_$_t_struct$_StakedAmount_$3606_storage_$",
+                              "typeIdentifier": "t_mapping$_t_address_$_t_struct$_StakedAmount_$5497_storage_$",
                               "typeString": "mapping(address => struct LibTokenStake1.StakedAmount storage ref)"
                             }
                           },
-                          "id": 4460,
+                          "id": 6754,
                           "indexExpression": {
-                            "id": 4459,
+                            "id": 6753,
                             "name": "user",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 4441,
-                            "src": "1588:4:33",
+                            "referencedDeclaration": 6735,
+                            "src": "1727:4:61",
                             "typeDescriptions": {
                               "typeIdentifier": "t_address",
                               "typeString": "address"
@@ -787,21 +926,21 @@
                           "isPure": false,
                           "lValueRequested": false,
                           "nodeType": "IndexAccess",
-                          "src": "1577:16:33",
+                          "src": "1716:16:61",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_struct$_StakedAmount_$3606_storage",
+                            "typeIdentifier": "t_struct$_StakedAmount_$5497_storage",
                             "typeString": "struct LibTokenStake1.StakedAmount storage ref"
                           }
                         },
-                        "id": 4461,
+                        "id": 6755,
                         "isConstant": false,
                         "isLValue": true,
                         "isPure": false,
                         "lValueRequested": false,
                         "memberName": "amount",
                         "nodeType": "MemberAccess",
-                        "referencedDeclaration": 3593,
-                        "src": "1577:23:33",
+                        "referencedDeclaration": 5484,
+                        "src": "1716:23:61",
                         "typeDescriptions": {
                           "typeIdentifier": "t_uint256",
                           "typeString": "uint256"
@@ -810,25 +949,25 @@
                       {
                         "expression": {
                           "baseExpression": {
-                            "id": 4462,
+                            "id": 6756,
                             "name": "userStaked",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 4433,
-                            "src": "1614:10:33",
+                            "referencedDeclaration": 6718,
+                            "src": "1753:10:61",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_mapping$_t_address_$_t_struct$_StakedAmount_$3606_storage_$",
+                              "typeIdentifier": "t_mapping$_t_address_$_t_struct$_StakedAmount_$5497_storage_$",
                               "typeString": "mapping(address => struct LibTokenStake1.StakedAmount storage ref)"
                             }
                           },
-                          "id": 4464,
+                          "id": 6758,
                           "indexExpression": {
-                            "id": 4463,
+                            "id": 6757,
                             "name": "user",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 4441,
-                            "src": "1625:4:33",
+                            "referencedDeclaration": 6735,
+                            "src": "1764:4:61",
                             "typeDescriptions": {
                               "typeIdentifier": "t_address",
                               "typeString": "address"
@@ -839,21 +978,21 @@
                           "isPure": false,
                           "lValueRequested": false,
                           "nodeType": "IndexAccess",
-                          "src": "1614:16:33",
+                          "src": "1753:16:61",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_struct$_StakedAmount_$3606_storage",
+                            "typeIdentifier": "t_struct$_StakedAmount_$5497_storage",
                             "typeString": "struct LibTokenStake1.StakedAmount storage ref"
                           }
                         },
-                        "id": 4465,
+                        "id": 6759,
                         "isConstant": false,
                         "isLValue": true,
                         "isPure": false,
                         "lValueRequested": false,
                         "memberName": "claimedBlock",
                         "nodeType": "MemberAccess",
-                        "referencedDeclaration": 3595,
-                        "src": "1614:29:33",
+                        "referencedDeclaration": 5486,
+                        "src": "1753:29:61",
                         "typeDescriptions": {
                           "typeIdentifier": "t_uint256",
                           "typeString": "uint256"
@@ -862,25 +1001,25 @@
                       {
                         "expression": {
                           "baseExpression": {
-                            "id": 4466,
+                            "id": 6760,
                             "name": "userStaked",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 4433,
-                            "src": "1657:10:33",
+                            "referencedDeclaration": 6718,
+                            "src": "1796:10:61",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_mapping$_t_address_$_t_struct$_StakedAmount_$3606_storage_$",
+                              "typeIdentifier": "t_mapping$_t_address_$_t_struct$_StakedAmount_$5497_storage_$",
                               "typeString": "mapping(address => struct LibTokenStake1.StakedAmount storage ref)"
                             }
                           },
-                          "id": 4468,
+                          "id": 6762,
                           "indexExpression": {
-                            "id": 4467,
+                            "id": 6761,
                             "name": "user",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 4441,
-                            "src": "1668:4:33",
+                            "referencedDeclaration": 6735,
+                            "src": "1807:4:61",
                             "typeDescriptions": {
                               "typeIdentifier": "t_address",
                               "typeString": "address"
@@ -891,21 +1030,21 @@
                           "isPure": false,
                           "lValueRequested": false,
                           "nodeType": "IndexAccess",
-                          "src": "1657:16:33",
+                          "src": "1796:16:61",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_struct$_StakedAmount_$3606_storage",
+                            "typeIdentifier": "t_struct$_StakedAmount_$5497_storage",
                             "typeString": "struct LibTokenStake1.StakedAmount storage ref"
                           }
                         },
-                        "id": 4469,
+                        "id": 6763,
                         "isConstant": false,
                         "isLValue": true,
                         "isPure": false,
                         "lValueRequested": false,
                         "memberName": "claimedAmount",
                         "nodeType": "MemberAccess",
-                        "referencedDeclaration": 3597,
-                        "src": "1657:30:33",
+                        "referencedDeclaration": 5488,
+                        "src": "1796:30:61",
                         "typeDescriptions": {
                           "typeIdentifier": "t_uint256",
                           "typeString": "uint256"
@@ -914,25 +1053,25 @@
                       {
                         "expression": {
                           "baseExpression": {
-                            "id": 4470,
+                            "id": 6764,
                             "name": "userStaked",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 4433,
-                            "src": "1701:10:33",
+                            "referencedDeclaration": 6718,
+                            "src": "1840:10:61",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_mapping$_t_address_$_t_struct$_StakedAmount_$3606_storage_$",
+                              "typeIdentifier": "t_mapping$_t_address_$_t_struct$_StakedAmount_$5497_storage_$",
                               "typeString": "mapping(address => struct LibTokenStake1.StakedAmount storage ref)"
                             }
                           },
-                          "id": 4472,
+                          "id": 6766,
                           "indexExpression": {
-                            "id": 4471,
+                            "id": 6765,
                             "name": "user",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 4441,
-                            "src": "1712:4:33",
+                            "referencedDeclaration": 6735,
+                            "src": "1851:4:61",
                             "typeDescriptions": {
                               "typeIdentifier": "t_address",
                               "typeString": "address"
@@ -943,21 +1082,21 @@
                           "isPure": false,
                           "lValueRequested": false,
                           "nodeType": "IndexAccess",
-                          "src": "1701:16:33",
+                          "src": "1840:16:61",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_struct$_StakedAmount_$3606_storage",
+                            "typeIdentifier": "t_struct$_StakedAmount_$5497_storage",
                             "typeString": "struct LibTokenStake1.StakedAmount storage ref"
                           }
                         },
-                        "id": 4473,
+                        "id": 6767,
                         "isConstant": false,
                         "isLValue": true,
                         "isPure": false,
                         "lValueRequested": false,
                         "memberName": "releasedBlock",
                         "nodeType": "MemberAccess",
-                        "referencedDeclaration": 3599,
-                        "src": "1701:30:33",
+                        "referencedDeclaration": 5490,
+                        "src": "1840:30:61",
                         "typeDescriptions": {
                           "typeIdentifier": "t_uint256",
                           "typeString": "uint256"
@@ -966,25 +1105,25 @@
                       {
                         "expression": {
                           "baseExpression": {
-                            "id": 4474,
+                            "id": 6768,
                             "name": "userStaked",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 4433,
-                            "src": "1745:10:33",
+                            "referencedDeclaration": 6718,
+                            "src": "1884:10:61",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_mapping$_t_address_$_t_struct$_StakedAmount_$3606_storage_$",
+                              "typeIdentifier": "t_mapping$_t_address_$_t_struct$_StakedAmount_$5497_storage_$",
                               "typeString": "mapping(address => struct LibTokenStake1.StakedAmount storage ref)"
                             }
                           },
-                          "id": 4476,
+                          "id": 6770,
                           "indexExpression": {
-                            "id": 4475,
+                            "id": 6769,
                             "name": "user",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 4441,
-                            "src": "1756:4:33",
+                            "referencedDeclaration": 6735,
+                            "src": "1895:4:61",
                             "typeDescriptions": {
                               "typeIdentifier": "t_address",
                               "typeString": "address"
@@ -995,21 +1134,21 @@
                           "isPure": false,
                           "lValueRequested": false,
                           "nodeType": "IndexAccess",
-                          "src": "1745:16:33",
+                          "src": "1884:16:61",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_struct$_StakedAmount_$3606_storage",
+                            "typeIdentifier": "t_struct$_StakedAmount_$5497_storage",
                             "typeString": "struct LibTokenStake1.StakedAmount storage ref"
                           }
                         },
-                        "id": 4477,
+                        "id": 6771,
                         "isConstant": false,
                         "isLValue": true,
                         "isPure": false,
                         "lValueRequested": false,
                         "memberName": "releasedAmount",
                         "nodeType": "MemberAccess",
-                        "referencedDeclaration": 3601,
-                        "src": "1745:31:33",
+                        "referencedDeclaration": 5492,
+                        "src": "1884:31:61",
                         "typeDescriptions": {
                           "typeIdentifier": "t_uint256",
                           "typeString": "uint256"
@@ -1018,25 +1157,25 @@
                       {
                         "expression": {
                           "baseExpression": {
-                            "id": 4478,
+                            "id": 6772,
                             "name": "userStaked",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 4433,
-                            "src": "1790:10:33",
+                            "referencedDeclaration": 6718,
+                            "src": "1929:10:61",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_mapping$_t_address_$_t_struct$_StakedAmount_$3606_storage_$",
+                              "typeIdentifier": "t_mapping$_t_address_$_t_struct$_StakedAmount_$5497_storage_$",
                               "typeString": "mapping(address => struct LibTokenStake1.StakedAmount storage ref)"
                             }
                           },
-                          "id": 4480,
+                          "id": 6774,
                           "indexExpression": {
-                            "id": 4479,
+                            "id": 6773,
                             "name": "user",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 4441,
-                            "src": "1801:4:33",
+                            "referencedDeclaration": 6735,
+                            "src": "1940:4:61",
                             "typeDescriptions": {
                               "typeIdentifier": "t_address",
                               "typeString": "address"
@@ -1047,21 +1186,21 @@
                           "isPure": false,
                           "lValueRequested": false,
                           "nodeType": "IndexAccess",
-                          "src": "1790:16:33",
+                          "src": "1929:16:61",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_struct$_StakedAmount_$3606_storage",
+                            "typeIdentifier": "t_struct$_StakedAmount_$5497_storage",
                             "typeString": "struct LibTokenStake1.StakedAmount storage ref"
                           }
                         },
-                        "id": 4481,
+                        "id": 6775,
                         "isConstant": false,
                         "isLValue": true,
                         "isPure": false,
                         "lValueRequested": false,
                         "memberName": "releasedTOSAmount",
                         "nodeType": "MemberAccess",
-                        "referencedDeclaration": 3603,
-                        "src": "1790:34:33",
+                        "referencedDeclaration": 5494,
+                        "src": "1929:34:61",
                         "typeDescriptions": {
                           "typeIdentifier": "t_uint256",
                           "typeString": "uint256"
@@ -1070,25 +1209,25 @@
                       {
                         "expression": {
                           "baseExpression": {
-                            "id": 4482,
+                            "id": 6776,
                             "name": "userStaked",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 4433,
-                            "src": "1838:10:33",
+                            "referencedDeclaration": 6718,
+                            "src": "1977:10:61",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_mapping$_t_address_$_t_struct$_StakedAmount_$3606_storage_$",
+                              "typeIdentifier": "t_mapping$_t_address_$_t_struct$_StakedAmount_$5497_storage_$",
                               "typeString": "mapping(address => struct LibTokenStake1.StakedAmount storage ref)"
                             }
                           },
-                          "id": 4484,
+                          "id": 6778,
                           "indexExpression": {
-                            "id": 4483,
+                            "id": 6777,
                             "name": "user",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 4441,
-                            "src": "1849:4:33",
+                            "referencedDeclaration": 6735,
+                            "src": "1988:4:61",
                             "typeDescriptions": {
                               "typeIdentifier": "t_address",
                               "typeString": "address"
@@ -1099,72 +1238,72 @@
                           "isPure": false,
                           "lValueRequested": false,
                           "nodeType": "IndexAccess",
-                          "src": "1838:16:33",
+                          "src": "1977:16:61",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_struct$_StakedAmount_$3606_storage",
+                            "typeIdentifier": "t_struct$_StakedAmount_$5497_storage",
                             "typeString": "struct LibTokenStake1.StakedAmount storage ref"
                           }
                         },
-                        "id": 4485,
+                        "id": 6779,
                         "isConstant": false,
                         "isLValue": true,
                         "isPure": false,
                         "lValueRequested": false,
                         "memberName": "released",
                         "nodeType": "MemberAccess",
-                        "referencedDeclaration": 3605,
-                        "src": "1838:25:33",
+                        "referencedDeclaration": 5496,
+                        "src": "1977:25:61",
                         "typeDescriptions": {
                           "typeIdentifier": "t_bool",
                           "typeString": "bool"
                         }
                       }
                     ],
-                    "id": 4486,
+                    "id": 6780,
                     "isConstant": false,
                     "isInlineArray": false,
                     "isLValue": false,
                     "isPure": false,
                     "lValueRequested": false,
                     "nodeType": "TupleExpression",
-                    "src": "1563:310:33",
+                    "src": "1702:310:61",
                     "typeDescriptions": {
                       "typeIdentifier": "t_tuple$_t_uint256_$_t_uint256_$_t_uint256_$_t_uint256_$_t_uint256_$_t_uint256_$_t_bool_$",
                       "typeString": "tuple(uint256,uint256,uint256,uint256,uint256,uint256,bool)"
                     }
                   },
-                  "functionReturnParameters": 4457,
-                  "id": 4487,
+                  "functionReturnParameters": 6751,
+                  "id": 6781,
                   "nodeType": "Return",
-                  "src": "1556:317:33"
+                  "src": "1695:317:61"
                 }
               ]
             },
             "documentation": {
-              "id": 4439,
+              "id": 6733,
               "nodeType": "StructuredDocumentation",
-              "src": "1175:34:33",
+              "src": "1314:34:61",
               "text": "@dev user's staked information"
             },
             "functionSelector": "dac3fc3f",
-            "id": 4489,
+            "id": 6783,
             "implemented": true,
             "kind": "function",
             "modifiers": [],
             "name": "getUserStaked",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 4442,
+              "id": 6736,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 4441,
+                  "id": 6735,
                   "mutability": "mutable",
                   "name": "user",
                   "nodeType": "VariableDeclaration",
-                  "scope": 4489,
-                  "src": "1237:12:33",
+                  "scope": 6783,
+                  "src": "1376:12:61",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1172,10 +1311,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 4440,
+                    "id": 6734,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1237:7:33",
+                    "src": "1376:7:61",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -1185,20 +1324,20 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "1236:14:33"
+              "src": "1375:14:61"
             },
             "returnParameters": {
-              "id": 4457,
+              "id": 6751,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 4444,
+                  "id": 6738,
                   "mutability": "mutable",
                   "name": "amount",
                   "nodeType": "VariableDeclaration",
-                  "scope": 4489,
-                  "src": "1311:14:33",
+                  "scope": 6783,
+                  "src": "1450:14:61",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1206,10 +1345,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 4443,
+                    "id": 6737,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1311:7:33",
+                    "src": "1450:7:61",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -1219,12 +1358,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 4446,
+                  "id": 6740,
                   "mutability": "mutable",
                   "name": "claimedBlock",
                   "nodeType": "VariableDeclaration",
-                  "scope": 4489,
-                  "src": "1339:20:33",
+                  "scope": 6783,
+                  "src": "1478:20:61",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1232,10 +1371,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 4445,
+                    "id": 6739,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1339:7:33",
+                    "src": "1478:7:61",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -1245,12 +1384,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 4448,
+                  "id": 6742,
                   "mutability": "mutable",
                   "name": "claimedAmount",
                   "nodeType": "VariableDeclaration",
-                  "scope": 4489,
-                  "src": "1373:21:33",
+                  "scope": 6783,
+                  "src": "1512:21:61",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1258,10 +1397,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 4447,
+                    "id": 6741,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1373:7:33",
+                    "src": "1512:7:61",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -1271,12 +1410,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 4450,
+                  "id": 6744,
                   "mutability": "mutable",
                   "name": "releasedBlock",
                   "nodeType": "VariableDeclaration",
-                  "scope": 4489,
-                  "src": "1408:21:33",
+                  "scope": 6783,
+                  "src": "1547:21:61",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1284,10 +1423,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 4449,
+                    "id": 6743,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1408:7:33",
+                    "src": "1547:7:61",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -1297,12 +1436,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 4452,
+                  "id": 6746,
                   "mutability": "mutable",
                   "name": "releasedAmount",
                   "nodeType": "VariableDeclaration",
-                  "scope": 4489,
-                  "src": "1443:22:33",
+                  "scope": 6783,
+                  "src": "1582:22:61",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1310,10 +1449,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 4451,
+                    "id": 6745,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1443:7:33",
+                    "src": "1582:7:61",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -1323,12 +1462,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 4454,
+                  "id": 6748,
                   "mutability": "mutable",
                   "name": "releasedTOSAmount",
                   "nodeType": "VariableDeclaration",
-                  "scope": 4489,
-                  "src": "1479:25:33",
+                  "scope": 6783,
+                  "src": "1618:25:61",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1336,10 +1475,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 4453,
+                    "id": 6747,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1479:7:33",
+                    "src": "1618:7:61",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -1349,12 +1488,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 4456,
+                  "id": 6750,
                   "mutability": "mutable",
                   "name": "released",
                   "nodeType": "VariableDeclaration",
-                  "scope": 4489,
-                  "src": "1518:13:33",
+                  "scope": 6783,
+                  "src": "1657:13:61",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1362,10 +1501,10 @@
                     "typeString": "bool"
                   },
                   "typeName": {
-                    "id": 4455,
+                    "id": 6749,
                     "name": "bool",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1518:4:33",
+                    "src": "1657:4:61",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bool",
                       "typeString": "bool"
@@ -1374,42 +1513,42 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "1297:244:33"
+              "src": "1436:244:61"
             },
-            "scope": 4520,
-            "src": "1214:666:33",
+            "scope": 6814,
+            "src": "1353:666:61",
             "stateMutability": "view",
             "virtual": false,
             "visibility": "external"
           },
           {
             "body": {
-              "id": 4518,
+              "id": 6812,
               "nodeType": "Block",
-              "src": "2281:216:33",
+              "src": "2420:216:61",
               "statements": [
                 {
                   "expression": {
                     "components": [
                       {
-                        "id": 4507,
+                        "id": 6801,
                         "name": "paytoken",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 4410,
-                        "src": "2312:8:33",
+                        "referencedDeclaration": 6695,
+                        "src": "2451:8:61",
                         "typeDescriptions": {
                           "typeIdentifier": "t_address",
                           "typeString": "address"
                         }
                       },
                       {
-                        "id": 4508,
+                        "id": 6802,
                         "name": "vault",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 4413,
-                        "src": "2334:5:33",
+                        "referencedDeclaration": 6698,
+                        "src": "2473:5:61",
                         "typeDescriptions": {
                           "typeIdentifier": "t_address",
                           "typeString": "address"
@@ -1418,143 +1557,143 @@
                       {
                         "components": [
                           {
-                            "id": 4509,
+                            "id": 6803,
                             "name": "saleStartBlock",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 4416,
-                            "src": "2354:14:33",
+                            "referencedDeclaration": 6701,
+                            "src": "2493:14:61",
                             "typeDescriptions": {
                               "typeIdentifier": "t_uint256",
                               "typeString": "uint256"
                             }
                           },
                           {
-                            "id": 4510,
+                            "id": 6804,
                             "name": "startBlock",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 4419,
-                            "src": "2370:10:33",
+                            "referencedDeclaration": 6704,
+                            "src": "2509:10:61",
                             "typeDescriptions": {
                               "typeIdentifier": "t_uint256",
                               "typeString": "uint256"
                             }
                           },
                           {
-                            "id": 4511,
+                            "id": 6805,
                             "name": "endBlock",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 4422,
-                            "src": "2382:8:33",
+                            "referencedDeclaration": 6707,
+                            "src": "2521:8:61",
                             "typeDescriptions": {
                               "typeIdentifier": "t_uint256",
                               "typeString": "uint256"
                             }
                           }
                         ],
-                        "id": 4512,
+                        "id": 6806,
                         "isConstant": false,
                         "isInlineArray": true,
                         "isLValue": false,
                         "isPure": false,
                         "lValueRequested": false,
                         "nodeType": "TupleExpression",
-                        "src": "2353:38:33",
+                        "src": "2492:38:61",
                         "typeDescriptions": {
                           "typeIdentifier": "t_array$_t_uint256_$3_memory_ptr",
                           "typeString": "uint256[3] memory"
                         }
                       },
                       {
-                        "id": 4513,
+                        "id": 6807,
                         "name": "rewardClaimedTotal",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 4425,
-                        "src": "2405:18:33",
+                        "referencedDeclaration": 6710,
+                        "src": "2544:18:61",
                         "typeDescriptions": {
                           "typeIdentifier": "t_uint256",
                           "typeString": "uint256"
                         }
                       },
                       {
-                        "id": 4514,
+                        "id": 6808,
                         "name": "totalStakedAmount",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 4428,
-                        "src": "2437:17:33",
+                        "referencedDeclaration": 6713,
+                        "src": "2576:17:61",
                         "typeDescriptions": {
                           "typeIdentifier": "t_uint256",
                           "typeString": "uint256"
                         }
                       },
                       {
-                        "id": 4515,
+                        "id": 6809,
                         "name": "totalStakers",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 4436,
-                        "src": "2468:12:33",
+                        "referencedDeclaration": 6721,
+                        "src": "2607:12:61",
                         "typeDescriptions": {
                           "typeIdentifier": "t_uint256",
                           "typeString": "uint256"
                         }
                       }
                     ],
-                    "id": 4516,
+                    "id": 6810,
                     "isConstant": false,
                     "isInlineArray": false,
                     "isLValue": false,
                     "isPure": false,
                     "lValueRequested": false,
                     "nodeType": "TupleExpression",
-                    "src": "2298:192:33",
+                    "src": "2437:192:61",
                     "typeDescriptions": {
                       "typeIdentifier": "t_tuple$_t_address_$_t_address_$_t_array$_t_uint256_$3_memory_ptr_$_t_uint256_$_t_uint256_$_t_uint256_$",
                       "typeString": "tuple(address,address,uint256[3] memory,uint256,uint256,uint256)"
                     }
                   },
-                  "functionReturnParameters": 4506,
-                  "id": 4517,
+                  "functionReturnParameters": 6800,
+                  "id": 6811,
                   "nodeType": "Return",
-                  "src": "2291:199:33"
+                  "src": "2430:199:61"
                 }
               ]
             },
             "documentation": {
-              "id": 4490,
+              "id": 6784,
               "nodeType": "StructuredDocumentation",
-              "src": "1886:176:33",
+              "src": "2025:176:61",
               "text": "@dev Give the infomation of this stakeContracts\n @return paytoken, vault, [saleStartBlock, startBlock, endBlock], rewardClaimedTotal, totalStakedAmount, totalStakers"
             },
             "functionSelector": "9a88be2f",
-            "id": 4519,
+            "id": 6813,
             "implemented": true,
             "kind": "function",
             "modifiers": [],
             "name": "infos",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 4491,
+              "id": 6785,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "2081:2:33"
+              "src": "2220:2:61"
             },
             "returnParameters": {
-              "id": 4506,
+              "id": 6800,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 4493,
+                  "id": 6787,
                   "mutability": "mutable",
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 4519,
-                  "src": "2144:7:33",
+                  "scope": 6813,
+                  "src": "2283:7:61",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1562,10 +1701,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 4492,
+                    "id": 6786,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "2144:7:33",
+                    "src": "2283:7:61",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -1576,12 +1715,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 4495,
+                  "id": 6789,
                   "mutability": "mutable",
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 4519,
-                  "src": "2165:7:33",
+                  "scope": 6813,
+                  "src": "2304:7:61",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1589,10 +1728,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 4494,
+                    "id": 6788,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "2165:7:33",
+                    "src": "2304:7:61",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -1603,12 +1742,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 4499,
+                  "id": 6793,
                   "mutability": "mutable",
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 4519,
-                  "src": "2186:17:33",
+                  "scope": 6813,
+                  "src": "2325:17:61",
                   "stateVariable": false,
                   "storageLocation": "memory",
                   "typeDescriptions": {
@@ -1617,26 +1756,26 @@
                   },
                   "typeName": {
                     "baseType": {
-                      "id": 4496,
+                      "id": 6790,
                       "name": "uint256",
                       "nodeType": "ElementaryTypeName",
-                      "src": "2186:7:33",
+                      "src": "2325:7:61",
                       "typeDescriptions": {
                         "typeIdentifier": "t_uint256",
                         "typeString": "uint256"
                       }
                     },
-                    "id": 4498,
+                    "id": 6792,
                     "length": {
                       "hexValue": "33",
-                      "id": 4497,
+                      "id": 6791,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": true,
                       "kind": "number",
                       "lValueRequested": false,
                       "nodeType": "Literal",
-                      "src": "2194:1:33",
+                      "src": "2333:1:61",
                       "typeDescriptions": {
                         "typeIdentifier": "t_rational_3_by_1",
                         "typeString": "int_const 3"
@@ -1644,7 +1783,7 @@
                       "value": "3"
                     },
                     "nodeType": "ArrayTypeName",
-                    "src": "2186:10:33",
+                    "src": "2325:10:61",
                     "typeDescriptions": {
                       "typeIdentifier": "t_array$_t_uint256_$3_storage_ptr",
                       "typeString": "uint256[3]"
@@ -1654,12 +1793,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 4501,
+                  "id": 6795,
                   "mutability": "mutable",
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 4519,
-                  "src": "2217:7:33",
+                  "scope": 6813,
+                  "src": "2356:7:61",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1667,10 +1806,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 4500,
+                    "id": 6794,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "2217:7:33",
+                    "src": "2356:7:61",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -1680,12 +1819,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 4503,
+                  "id": 6797,
                   "mutability": "mutable",
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 4519,
-                  "src": "2238:7:33",
+                  "scope": 6813,
+                  "src": "2377:7:61",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1693,10 +1832,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 4502,
+                    "id": 6796,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "2238:7:33",
+                    "src": "2377:7:61",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -1706,12 +1845,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 4505,
+                  "id": 6799,
                   "mutability": "mutable",
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 4519,
-                  "src": "2259:7:33",
+                  "scope": 6813,
+                  "src": "2398:7:61",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1719,10 +1858,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 4504,
+                    "id": 6798,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "2259:7:33",
+                    "src": "2398:7:61",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -1731,30 +1870,30 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "2130:146:33"
+              "src": "2269:146:61"
             },
-            "scope": 4520,
-            "src": "2067:430:33",
+            "scope": 6814,
+            "src": "2206:430:61",
             "stateMutability": "view",
             "virtual": false,
             "visibility": "external"
           }
         ],
-        "scope": 4521,
-        "src": "195:2304:33"
+        "scope": 6815,
+        "src": "150:2488:61"
       }
     ],
-    "src": "37:2463:33"
+    "src": "37:2602:61"
   },
   "legacyAST": {
     "attributes": {
       "absolutePath": "/Users/zena/ico2.0/ico20-contracts/contracts/stake/Stake1Storage.sol",
       "exportedSymbols": {
         "LibTokenStake1": [
-          3624
+          5515
         ],
         "Stake1Storage": [
-          4520
+          6814
         ]
       },
       "license": "Unlicense"
@@ -1769,24 +1908,24 @@
             ".6"
           ]
         },
-        "id": 4399,
+        "id": 6684,
         "name": "PragmaDirective",
-        "src": "37:23:33"
+        "src": "37:23:61"
       },
       {
         "attributes": {
-          "SourceUnit": 3625,
+          "SourceUnit": 5516,
           "absolutePath": "/Users/zena/ico2.0/ico20-contracts/contracts/libraries/LibTokenStake1.sol",
           "file": "../libraries/LibTokenStake1.sol",
-          "scope": 4521,
+          "scope": 6815,
           "symbolAliases": [
             null
           ],
           "unitAlias": ""
         },
-        "id": 4400,
+        "id": 6685,
         "name": "ImportDirective",
-        "src": "107:41:33"
+        "src": "62:41:61"
       },
       {
         "attributes": {
@@ -1800,19 +1939,19 @@
           "contractKind": "contract",
           "fullyImplemented": true,
           "linearizedBaseContracts": [
-            4520
+            6814
           ],
           "name": "Stake1Storage",
-          "scope": 4521
+          "scope": 6815
         },
         "children": [
           {
             "attributes": {
               "text": "@title The base storage of stakeContract"
             },
-            "id": 4401,
+            "id": 6686,
             "name": "StructuredDocumentation",
-            "src": "150:45:33"
+            "src": "105:45:61"
           },
           {
             "attributes": {
@@ -1820,7 +1959,7 @@
               "functionSelector": "fc0c546a",
               "mutability": "mutable",
               "name": "token",
-              "scope": 4520,
+              "scope": 6814,
               "stateVariable": true,
               "storageLocation": "default",
               "type": "address",
@@ -1833,22 +1972,22 @@
                   "stateMutability": "nonpayable",
                   "type": "address"
                 },
-                "id": 4403,
+                "id": 6688,
                 "name": "ElementaryTypeName",
-                "src": "256:7:33"
+                "src": "211:7:61"
               },
               {
                 "attributes": {
                   "text": "@dev reward token : TOS"
                 },
-                "id": 4402,
+                "id": 6687,
                 "name": "StructuredDocumentation",
-                "src": "224:27:33"
+                "src": "179:27:61"
               }
             ],
-            "id": 4404,
+            "id": 6689,
             "name": "VariableDeclaration",
-            "src": "256:20:33"
+            "src": "211:20:61"
           },
           {
             "attributes": {
@@ -1856,7 +1995,7 @@
               "functionSelector": "68304835",
               "mutability": "mutable",
               "name": "stakeRegistry",
-              "scope": 4520,
+              "scope": 6814,
               "stateVariable": true,
               "storageLocation": "default",
               "type": "address",
@@ -1869,22 +2008,22 @@
                   "stateMutability": "nonpayable",
                   "type": "address"
                 },
-                "id": 4406,
+                "id": 6691,
                 "name": "ElementaryTypeName",
-                "src": "305:7:33"
+                "src": "260:7:61"
               },
               {
                 "attributes": {
                   "text": "@dev registry"
                 },
-                "id": 4405,
+                "id": 6690,
                 "name": "StructuredDocumentation",
-                "src": "283:17:33"
+                "src": "238:17:61"
               }
             ],
-            "id": 4407,
+            "id": 6692,
             "name": "VariableDeclaration",
-            "src": "305:28:33"
+            "src": "260:28:61"
           },
           {
             "attributes": {
@@ -1892,7 +2031,7 @@
               "functionSelector": "43b0934a",
               "mutability": "mutable",
               "name": "paytoken",
-              "scope": 4520,
+              "scope": 6814,
               "stateVariable": true,
               "storageLocation": "default",
               "type": "address",
@@ -1905,22 +2044,22 @@
                   "stateMutability": "nonpayable",
                   "type": "address"
                 },
-                "id": 4409,
+                "id": 6694,
                 "name": "ElementaryTypeName",
-                "src": "446:7:33"
+                "src": "401:7:61"
               },
               {
                 "attributes": {
                   "text": "@dev paytoken is the token that the user stakes. ( if paytoken is ether, paytoken is address(0) )"
                 },
-                "id": 4408,
+                "id": 6693,
                 "name": "StructuredDocumentation",
-                "src": "340:101:33"
+                "src": "295:101:61"
               }
             ],
-            "id": 4410,
+            "id": 6695,
             "name": "VariableDeclaration",
-            "src": "446:23:33"
+            "src": "401:23:61"
           },
           {
             "attributes": {
@@ -1928,7 +2067,7 @@
               "functionSelector": "fbfa77cf",
               "mutability": "mutable",
               "name": "vault",
-              "scope": 4520,
+              "scope": 6814,
               "stateVariable": true,
               "storageLocation": "default",
               "type": "address",
@@ -1941,22 +2080,22 @@
                   "stateMutability": "nonpayable",
                   "type": "address"
                 },
-                "id": 4412,
+                "id": 6697,
                 "name": "ElementaryTypeName",
-                "src": "521:7:33"
+                "src": "476:7:61"
               },
               {
                 "attributes": {
-                  "text": "@dev A vault that holds tos rewards."
+                  "text": "@dev A vault that holds TOS rewards."
                 },
-                "id": 4411,
+                "id": 6696,
                 "name": "StructuredDocumentation",
-                "src": "476:40:33"
+                "src": "431:40:61"
               }
             ],
-            "id": 4413,
+            "id": 6698,
             "name": "VariableDeclaration",
-            "src": "521:20:33"
+            "src": "476:20:61"
           },
           {
             "attributes": {
@@ -1964,7 +2103,7 @@
               "functionSelector": "20027275",
               "mutability": "mutable",
               "name": "saleStartBlock",
-              "scope": 4520,
+              "scope": 6814,
               "stateVariable": true,
               "storageLocation": "default",
               "type": "uint256",
@@ -1976,22 +2115,22 @@
                   "name": "uint256",
                   "type": "uint256"
                 },
-                "id": 4415,
+                "id": 6700,
                 "name": "ElementaryTypeName",
-                "src": "587:7:33"
+                "src": "542:7:61"
               },
               {
                 "attributes": {
                   "text": "@dev the start block for sale."
                 },
-                "id": 4414,
+                "id": 6699,
                 "name": "StructuredDocumentation",
-                "src": "548:34:33"
+                "src": "503:34:61"
               }
             ],
-            "id": 4416,
+            "id": 6701,
             "name": "VariableDeclaration",
-            "src": "587:29:33"
+            "src": "542:29:61"
           },
           {
             "attributes": {
@@ -1999,7 +2138,7 @@
               "functionSelector": "48cd4cb1",
               "mutability": "mutable",
               "name": "startBlock",
-              "scope": 4520,
+              "scope": 6814,
               "stateVariable": true,
               "storageLocation": "default",
               "type": "uint256",
@@ -2011,22 +2150,22 @@
                   "name": "uint256",
                   "type": "uint256"
                 },
-                "id": 4418,
+                "id": 6703,
                 "name": "ElementaryTypeName",
-                "src": "721:7:33"
+                "src": "676:7:61"
               },
               {
                 "attributes": {
                   "text": "@dev the staking start block, once staking starts, users can no longer apply for staking."
                 },
-                "id": 4417,
+                "id": 6702,
                 "name": "StructuredDocumentation",
-                "src": "623:93:33"
+                "src": "578:93:61"
               }
             ],
-            "id": 4419,
+            "id": 6704,
             "name": "VariableDeclaration",
-            "src": "721:25:33"
+            "src": "676:25:61"
           },
           {
             "attributes": {
@@ -2034,7 +2173,7 @@
               "functionSelector": "083c6323",
               "mutability": "mutable",
               "name": "endBlock",
-              "scope": 4520,
+              "scope": 6814,
               "stateVariable": true,
               "storageLocation": "default",
               "type": "uint256",
@@ -2046,22 +2185,22 @@
                   "name": "uint256",
                   "type": "uint256"
                 },
-                "id": 4421,
+                "id": 6706,
                 "name": "ElementaryTypeName",
-                "src": "789:7:33"
+                "src": "744:7:61"
               },
               {
                 "attributes": {
                   "text": "@dev the staking end block."
                 },
-                "id": 4420,
+                "id": 6705,
                 "name": "StructuredDocumentation",
-                "src": "753:31:33"
+                "src": "708:31:61"
               }
             ],
-            "id": 4422,
+            "id": 6707,
             "name": "VariableDeclaration",
-            "src": "789:23:33"
+            "src": "744:23:61"
           },
           {
             "attributes": {
@@ -2069,7 +2208,7 @@
               "functionSelector": "b2d4d6a3",
               "mutability": "mutable",
               "name": "rewardClaimedTotal",
-              "scope": 4520,
+              "scope": 6814,
               "stateVariable": true,
               "storageLocation": "default",
               "type": "uint256",
@@ -2081,22 +2220,22 @@
                   "name": "uint256",
                   "type": "uint256"
                 },
-                "id": 4424,
+                "id": 6709,
                 "name": "ElementaryTypeName",
-                "src": "857:7:33"
+                "src": "812:7:61"
               },
               {
                 "attributes": {
                   "text": "@dev the total amount claimed"
                 },
-                "id": 4423,
+                "id": 6708,
                 "name": "StructuredDocumentation",
-                "src": "819:33:33"
+                "src": "774:33:61"
               }
             ],
-            "id": 4425,
+            "id": 6710,
             "name": "VariableDeclaration",
-            "src": "857:33:33"
+            "src": "812:33:61"
           },
           {
             "attributes": {
@@ -2104,7 +2243,7 @@
               "functionSelector": "567e98f9",
               "mutability": "mutable",
               "name": "totalStakedAmount",
-              "scope": 4520,
+              "scope": 6814,
               "stateVariable": true,
               "storageLocation": "default",
               "type": "uint256",
@@ -2116,22 +2255,22 @@
                   "name": "uint256",
                   "type": "uint256"
                 },
-                "id": 4427,
+                "id": 6712,
                 "name": "ElementaryTypeName",
-                "src": "934:7:33"
+                "src": "889:7:61"
               },
               {
                 "attributes": {
                   "text": "@dev the total staked amount"
                 },
-                "id": 4426,
+                "id": 6711,
                 "name": "StructuredDocumentation",
-                "src": "897:32:33"
+                "src": "852:32:61"
               }
             ],
-            "id": 4428,
+            "id": 6713,
             "name": "VariableDeclaration",
-            "src": "934:32:33"
+            "src": "889:32:61"
           },
           {
             "attributes": {
@@ -2139,7 +2278,7 @@
               "functionSelector": "acc3a939",
               "mutability": "mutable",
               "name": "userStaked",
-              "scope": 4520,
+              "scope": 6814,
               "stateVariable": true,
               "storageLocation": "default",
               "type": "mapping(address => struct LibTokenStake1.StakedAmount)",
@@ -2156,37 +2295,37 @@
                       "name": "address",
                       "type": "address"
                     },
-                    "id": 4430,
+                    "id": 6715,
                     "name": "ElementaryTypeName",
-                    "src": "1021:7:33"
+                    "src": "976:7:61"
                   },
                   {
                     "attributes": {
                       "name": "LibTokenStake1.StakedAmount",
-                      "referencedDeclaration": 3606,
+                      "referencedDeclaration": 5497,
                       "type": "struct LibTokenStake1.StakedAmount"
                     },
-                    "id": 4431,
+                    "id": 6716,
                     "name": "UserDefinedTypeName",
-                    "src": "1032:27:33"
+                    "src": "987:27:61"
                   }
                 ],
-                "id": 4432,
+                "id": 6717,
                 "name": "Mapping",
-                "src": "1013:47:33"
+                "src": "968:47:61"
               },
               {
                 "attributes": {
                   "text": "@dev information staked by user"
                 },
-                "id": 4429,
+                "id": 6714,
                 "name": "StructuredDocumentation",
-                "src": "973:35:33"
+                "src": "928:35:61"
               }
             ],
-            "id": 4433,
+            "id": 6718,
             "name": "VariableDeclaration",
-            "src": "1013:65:33"
+            "src": "968:65:61"
           },
           {
             "attributes": {
@@ -2194,7 +2333,7 @@
               "functionSelector": "86989038",
               "mutability": "mutable",
               "name": "totalStakers",
-              "scope": 4520,
+              "scope": 6814,
               "stateVariable": true,
               "storageLocation": "default",
               "type": "uint256",
@@ -2206,29 +2345,29 @@
                   "name": "uint256",
                   "type": "uint256"
                 },
-                "id": 4435,
+                "id": 6720,
                 "name": "ElementaryTypeName",
-                "src": "1112:7:33"
+                "src": "1067:7:61"
               },
               {
                 "attributes": {
                   "text": "@dev total stakers"
                 },
-                "id": 4434,
+                "id": 6719,
                 "name": "StructuredDocumentation",
-                "src": "1085:22:33"
+                "src": "1040:22:61"
               }
             ],
-            "id": 4436,
+            "id": 6721,
             "name": "VariableDeclaration",
-            "src": "1112:27:33"
+            "src": "1067:27:61"
           },
           {
             "attributes": {
               "constant": false,
               "mutability": "mutable",
               "name": "_lock",
-              "scope": 4520,
+              "scope": 6814,
               "stateVariable": true,
               "storageLocation": "default",
               "type": "uint256",
@@ -2240,14 +2379,120 @@
                   "name": "uint256",
                   "type": "uint256"
                 },
-                "id": 4437,
+                "id": 6722,
                 "name": "ElementaryTypeName",
-                "src": "1146:7:33"
+                "src": "1101:7:61"
               }
             ],
-            "id": 4438,
+            "id": 6723,
             "name": "VariableDeclaration",
-            "src": "1146:22:33"
+            "src": "1101:22:61"
+          },
+          {
+            "attributes": {
+              "constant": false,
+              "functionSelector": "63a8fd89",
+              "mutability": "mutable",
+              "name": "pauseProxy",
+              "scope": 6814,
+              "stateVariable": true,
+              "storageLocation": "default",
+              "type": "bool",
+              "visibility": "public"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "name": "bool",
+                  "type": "bool"
+                },
+                "id": 6725,
+                "name": "ElementaryTypeName",
+                "src": "1164:4:61"
+              },
+              {
+                "attributes": {
+                  "text": "@dev flag for pause proxy"
+                },
+                "id": 6724,
+                "name": "StructuredDocumentation",
+                "src": "1130:29:61"
+              }
+            ],
+            "id": 6726,
+            "name": "VariableDeclaration",
+            "src": "1164:22:61"
+          },
+          {
+            "attributes": {
+              "constant": false,
+              "functionSelector": "9d84ca35",
+              "mutability": "mutable",
+              "name": "defiAddr",
+              "scope": 6814,
+              "stateVariable": true,
+              "storageLocation": "default",
+              "type": "address",
+              "visibility": "public"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "name": "address",
+                  "stateMutability": "nonpayable",
+                  "type": "address"
+                },
+                "id": 6728,
+                "name": "ElementaryTypeName",
+                "src": "1228:7:61"
+              },
+              {
+                "attributes": {
+                  "text": "@dev extra address storage"
+                },
+                "id": 6727,
+                "name": "StructuredDocumentation",
+                "src": "1193:30:61"
+              }
+            ],
+            "id": 6729,
+            "name": "VariableDeclaration",
+            "src": "1228:23:61"
+          },
+          {
+            "attributes": {
+              "constant": false,
+              "functionSelector": "a1f5f50e",
+              "mutability": "mutable",
+              "name": "migratedL2",
+              "scope": 6814,
+              "stateVariable": true,
+              "storageLocation": "default",
+              "type": "bool",
+              "visibility": "public"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "name": "bool",
+                  "type": "bool"
+                },
+                "id": 6731,
+                "name": "ElementaryTypeName",
+                "src": "1285:4:61"
+              },
+              {
+                "attributes": {
+                  "text": "@dev for migrate L2"
+                },
+                "id": 6730,
+                "name": "StructuredDocumentation",
+                "src": "1258:22:61"
+              }
+            ],
+            "id": 6732,
+            "name": "VariableDeclaration",
+            "src": "1285:22:61"
           },
           {
             "attributes": {
@@ -2259,7 +2504,7 @@
                 null
               ],
               "name": "getUserStaked",
-              "scope": 4520,
+              "scope": 6814,
               "stateMutability": "view",
               "virtual": false,
               "visibility": "external"
@@ -2269,9 +2514,9 @@
                 "attributes": {
                   "text": "@dev user's staked information"
                 },
-                "id": 4439,
+                "id": 6733,
                 "name": "StructuredDocumentation",
-                "src": "1175:34:33"
+                "src": "1314:34:61"
               },
               {
                 "children": [
@@ -2280,7 +2525,7 @@
                       "constant": false,
                       "mutability": "mutable",
                       "name": "user",
-                      "scope": 4489,
+                      "scope": 6783,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "address",
@@ -2293,19 +2538,19 @@
                           "stateMutability": "nonpayable",
                           "type": "address"
                         },
-                        "id": 4440,
+                        "id": 6734,
                         "name": "ElementaryTypeName",
-                        "src": "1237:7:33"
+                        "src": "1376:7:61"
                       }
                     ],
-                    "id": 4441,
+                    "id": 6735,
                     "name": "VariableDeclaration",
-                    "src": "1237:12:33"
+                    "src": "1376:12:61"
                   }
                 ],
-                "id": 4442,
+                "id": 6736,
                 "name": "ParameterList",
-                "src": "1236:14:33"
+                "src": "1375:14:61"
               },
               {
                 "children": [
@@ -2314,7 +2559,7 @@
                       "constant": false,
                       "mutability": "mutable",
                       "name": "amount",
-                      "scope": 4489,
+                      "scope": 6783,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "uint256",
@@ -2326,21 +2571,21 @@
                           "name": "uint256",
                           "type": "uint256"
                         },
-                        "id": 4443,
+                        "id": 6737,
                         "name": "ElementaryTypeName",
-                        "src": "1311:7:33"
+                        "src": "1450:7:61"
                       }
                     ],
-                    "id": 4444,
+                    "id": 6738,
                     "name": "VariableDeclaration",
-                    "src": "1311:14:33"
+                    "src": "1450:14:61"
                   },
                   {
                     "attributes": {
                       "constant": false,
                       "mutability": "mutable",
                       "name": "claimedBlock",
-                      "scope": 4489,
+                      "scope": 6783,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "uint256",
@@ -2352,21 +2597,21 @@
                           "name": "uint256",
                           "type": "uint256"
                         },
-                        "id": 4445,
+                        "id": 6739,
                         "name": "ElementaryTypeName",
-                        "src": "1339:7:33"
+                        "src": "1478:7:61"
                       }
                     ],
-                    "id": 4446,
+                    "id": 6740,
                     "name": "VariableDeclaration",
-                    "src": "1339:20:33"
+                    "src": "1478:20:61"
                   },
                   {
                     "attributes": {
                       "constant": false,
                       "mutability": "mutable",
                       "name": "claimedAmount",
-                      "scope": 4489,
+                      "scope": 6783,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "uint256",
@@ -2378,21 +2623,21 @@
                           "name": "uint256",
                           "type": "uint256"
                         },
-                        "id": 4447,
+                        "id": 6741,
                         "name": "ElementaryTypeName",
-                        "src": "1373:7:33"
+                        "src": "1512:7:61"
                       }
                     ],
-                    "id": 4448,
+                    "id": 6742,
                     "name": "VariableDeclaration",
-                    "src": "1373:21:33"
+                    "src": "1512:21:61"
                   },
                   {
                     "attributes": {
                       "constant": false,
                       "mutability": "mutable",
                       "name": "releasedBlock",
-                      "scope": 4489,
+                      "scope": 6783,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "uint256",
@@ -2404,21 +2649,21 @@
                           "name": "uint256",
                           "type": "uint256"
                         },
-                        "id": 4449,
+                        "id": 6743,
                         "name": "ElementaryTypeName",
-                        "src": "1408:7:33"
+                        "src": "1547:7:61"
                       }
                     ],
-                    "id": 4450,
+                    "id": 6744,
                     "name": "VariableDeclaration",
-                    "src": "1408:21:33"
+                    "src": "1547:21:61"
                   },
                   {
                     "attributes": {
                       "constant": false,
                       "mutability": "mutable",
                       "name": "releasedAmount",
-                      "scope": 4489,
+                      "scope": 6783,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "uint256",
@@ -2430,21 +2675,21 @@
                           "name": "uint256",
                           "type": "uint256"
                         },
-                        "id": 4451,
+                        "id": 6745,
                         "name": "ElementaryTypeName",
-                        "src": "1443:7:33"
+                        "src": "1582:7:61"
                       }
                     ],
-                    "id": 4452,
+                    "id": 6746,
                     "name": "VariableDeclaration",
-                    "src": "1443:22:33"
+                    "src": "1582:22:61"
                   },
                   {
                     "attributes": {
                       "constant": false,
                       "mutability": "mutable",
                       "name": "releasedTOSAmount",
-                      "scope": 4489,
+                      "scope": 6783,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "uint256",
@@ -2456,21 +2701,21 @@
                           "name": "uint256",
                           "type": "uint256"
                         },
-                        "id": 4453,
+                        "id": 6747,
                         "name": "ElementaryTypeName",
-                        "src": "1479:7:33"
+                        "src": "1618:7:61"
                       }
                     ],
-                    "id": 4454,
+                    "id": 6748,
                     "name": "VariableDeclaration",
-                    "src": "1479:25:33"
+                    "src": "1618:25:61"
                   },
                   {
                     "attributes": {
                       "constant": false,
                       "mutability": "mutable",
                       "name": "released",
-                      "scope": 4489,
+                      "scope": 6783,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "bool",
@@ -2482,25 +2727,25 @@
                           "name": "bool",
                           "type": "bool"
                         },
-                        "id": 4455,
+                        "id": 6749,
                         "name": "ElementaryTypeName",
-                        "src": "1518:4:33"
+                        "src": "1657:4:61"
                       }
                     ],
-                    "id": 4456,
+                    "id": 6750,
                     "name": "VariableDeclaration",
-                    "src": "1518:13:33"
+                    "src": "1657:13:61"
                   }
                 ],
-                "id": 4457,
+                "id": 6751,
                 "name": "ParameterList",
-                "src": "1297:244:33"
+                "src": "1436:244:61"
               },
               {
                 "children": [
                   {
                     "attributes": {
-                      "functionReturnParameters": 4457
+                      "functionReturnParameters": 6751
                     },
                     "children": [
                       {
@@ -2520,7 +2765,7 @@
                               "isPure": false,
                               "lValueRequested": false,
                               "member_name": "amount",
-                              "referencedDeclaration": 3593,
+                              "referencedDeclaration": 5484,
                               "type": "uint256"
                             },
                             "children": [
@@ -2538,36 +2783,36 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 4433,
+                                      "referencedDeclaration": 6718,
                                       "type": "mapping(address => struct LibTokenStake1.StakedAmount storage ref)",
                                       "value": "userStaked"
                                     },
-                                    "id": 4458,
+                                    "id": 6752,
                                     "name": "Identifier",
-                                    "src": "1577:10:33"
+                                    "src": "1716:10:61"
                                   },
                                   {
                                     "attributes": {
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 4441,
+                                      "referencedDeclaration": 6735,
                                       "type": "address",
                                       "value": "user"
                                     },
-                                    "id": 4459,
+                                    "id": 6753,
                                     "name": "Identifier",
-                                    "src": "1588:4:33"
+                                    "src": "1727:4:61"
                                   }
                                 ],
-                                "id": 4460,
+                                "id": 6754,
                                 "name": "IndexAccess",
-                                "src": "1577:16:33"
+                                "src": "1716:16:61"
                               }
                             ],
-                            "id": 4461,
+                            "id": 6755,
                             "name": "MemberAccess",
-                            "src": "1577:23:33"
+                            "src": "1716:23:61"
                           },
                           {
                             "attributes": {
@@ -2576,7 +2821,7 @@
                               "isPure": false,
                               "lValueRequested": false,
                               "member_name": "claimedBlock",
-                              "referencedDeclaration": 3595,
+                              "referencedDeclaration": 5486,
                               "type": "uint256"
                             },
                             "children": [
@@ -2594,36 +2839,36 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 4433,
+                                      "referencedDeclaration": 6718,
                                       "type": "mapping(address => struct LibTokenStake1.StakedAmount storage ref)",
                                       "value": "userStaked"
                                     },
-                                    "id": 4462,
+                                    "id": 6756,
                                     "name": "Identifier",
-                                    "src": "1614:10:33"
+                                    "src": "1753:10:61"
                                   },
                                   {
                                     "attributes": {
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 4441,
+                                      "referencedDeclaration": 6735,
                                       "type": "address",
                                       "value": "user"
                                     },
-                                    "id": 4463,
+                                    "id": 6757,
                                     "name": "Identifier",
-                                    "src": "1625:4:33"
+                                    "src": "1764:4:61"
                                   }
                                 ],
-                                "id": 4464,
+                                "id": 6758,
                                 "name": "IndexAccess",
-                                "src": "1614:16:33"
+                                "src": "1753:16:61"
                               }
                             ],
-                            "id": 4465,
+                            "id": 6759,
                             "name": "MemberAccess",
-                            "src": "1614:29:33"
+                            "src": "1753:29:61"
                           },
                           {
                             "attributes": {
@@ -2632,7 +2877,7 @@
                               "isPure": false,
                               "lValueRequested": false,
                               "member_name": "claimedAmount",
-                              "referencedDeclaration": 3597,
+                              "referencedDeclaration": 5488,
                               "type": "uint256"
                             },
                             "children": [
@@ -2650,36 +2895,36 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 4433,
+                                      "referencedDeclaration": 6718,
                                       "type": "mapping(address => struct LibTokenStake1.StakedAmount storage ref)",
                                       "value": "userStaked"
                                     },
-                                    "id": 4466,
+                                    "id": 6760,
                                     "name": "Identifier",
-                                    "src": "1657:10:33"
+                                    "src": "1796:10:61"
                                   },
                                   {
                                     "attributes": {
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 4441,
+                                      "referencedDeclaration": 6735,
                                       "type": "address",
                                       "value": "user"
                                     },
-                                    "id": 4467,
+                                    "id": 6761,
                                     "name": "Identifier",
-                                    "src": "1668:4:33"
+                                    "src": "1807:4:61"
                                   }
                                 ],
-                                "id": 4468,
+                                "id": 6762,
                                 "name": "IndexAccess",
-                                "src": "1657:16:33"
+                                "src": "1796:16:61"
                               }
                             ],
-                            "id": 4469,
+                            "id": 6763,
                             "name": "MemberAccess",
-                            "src": "1657:30:33"
+                            "src": "1796:30:61"
                           },
                           {
                             "attributes": {
@@ -2688,7 +2933,7 @@
                               "isPure": false,
                               "lValueRequested": false,
                               "member_name": "releasedBlock",
-                              "referencedDeclaration": 3599,
+                              "referencedDeclaration": 5490,
                               "type": "uint256"
                             },
                             "children": [
@@ -2706,36 +2951,36 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 4433,
+                                      "referencedDeclaration": 6718,
                                       "type": "mapping(address => struct LibTokenStake1.StakedAmount storage ref)",
                                       "value": "userStaked"
                                     },
-                                    "id": 4470,
+                                    "id": 6764,
                                     "name": "Identifier",
-                                    "src": "1701:10:33"
+                                    "src": "1840:10:61"
                                   },
                                   {
                                     "attributes": {
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 4441,
+                                      "referencedDeclaration": 6735,
                                       "type": "address",
                                       "value": "user"
                                     },
-                                    "id": 4471,
+                                    "id": 6765,
                                     "name": "Identifier",
-                                    "src": "1712:4:33"
+                                    "src": "1851:4:61"
                                   }
                                 ],
-                                "id": 4472,
+                                "id": 6766,
                                 "name": "IndexAccess",
-                                "src": "1701:16:33"
+                                "src": "1840:16:61"
                               }
                             ],
-                            "id": 4473,
+                            "id": 6767,
                             "name": "MemberAccess",
-                            "src": "1701:30:33"
+                            "src": "1840:30:61"
                           },
                           {
                             "attributes": {
@@ -2744,7 +2989,7 @@
                               "isPure": false,
                               "lValueRequested": false,
                               "member_name": "releasedAmount",
-                              "referencedDeclaration": 3601,
+                              "referencedDeclaration": 5492,
                               "type": "uint256"
                             },
                             "children": [
@@ -2762,36 +3007,36 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 4433,
+                                      "referencedDeclaration": 6718,
                                       "type": "mapping(address => struct LibTokenStake1.StakedAmount storage ref)",
                                       "value": "userStaked"
                                     },
-                                    "id": 4474,
+                                    "id": 6768,
                                     "name": "Identifier",
-                                    "src": "1745:10:33"
+                                    "src": "1884:10:61"
                                   },
                                   {
                                     "attributes": {
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 4441,
+                                      "referencedDeclaration": 6735,
                                       "type": "address",
                                       "value": "user"
                                     },
-                                    "id": 4475,
+                                    "id": 6769,
                                     "name": "Identifier",
-                                    "src": "1756:4:33"
+                                    "src": "1895:4:61"
                                   }
                                 ],
-                                "id": 4476,
+                                "id": 6770,
                                 "name": "IndexAccess",
-                                "src": "1745:16:33"
+                                "src": "1884:16:61"
                               }
                             ],
-                            "id": 4477,
+                            "id": 6771,
                             "name": "MemberAccess",
-                            "src": "1745:31:33"
+                            "src": "1884:31:61"
                           },
                           {
                             "attributes": {
@@ -2800,7 +3045,7 @@
                               "isPure": false,
                               "lValueRequested": false,
                               "member_name": "releasedTOSAmount",
-                              "referencedDeclaration": 3603,
+                              "referencedDeclaration": 5494,
                               "type": "uint256"
                             },
                             "children": [
@@ -2818,36 +3063,36 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 4433,
+                                      "referencedDeclaration": 6718,
                                       "type": "mapping(address => struct LibTokenStake1.StakedAmount storage ref)",
                                       "value": "userStaked"
                                     },
-                                    "id": 4478,
+                                    "id": 6772,
                                     "name": "Identifier",
-                                    "src": "1790:10:33"
+                                    "src": "1929:10:61"
                                   },
                                   {
                                     "attributes": {
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 4441,
+                                      "referencedDeclaration": 6735,
                                       "type": "address",
                                       "value": "user"
                                     },
-                                    "id": 4479,
+                                    "id": 6773,
                                     "name": "Identifier",
-                                    "src": "1801:4:33"
+                                    "src": "1940:4:61"
                                   }
                                 ],
-                                "id": 4480,
+                                "id": 6774,
                                 "name": "IndexAccess",
-                                "src": "1790:16:33"
+                                "src": "1929:16:61"
                               }
                             ],
-                            "id": 4481,
+                            "id": 6775,
                             "name": "MemberAccess",
-                            "src": "1790:34:33"
+                            "src": "1929:34:61"
                           },
                           {
                             "attributes": {
@@ -2856,7 +3101,7 @@
                               "isPure": false,
                               "lValueRequested": false,
                               "member_name": "released",
-                              "referencedDeclaration": 3605,
+                              "referencedDeclaration": 5496,
                               "type": "bool"
                             },
                             "children": [
@@ -2874,56 +3119,56 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 4433,
+                                      "referencedDeclaration": 6718,
                                       "type": "mapping(address => struct LibTokenStake1.StakedAmount storage ref)",
                                       "value": "userStaked"
                                     },
-                                    "id": 4482,
+                                    "id": 6776,
                                     "name": "Identifier",
-                                    "src": "1838:10:33"
+                                    "src": "1977:10:61"
                                   },
                                   {
                                     "attributes": {
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 4441,
+                                      "referencedDeclaration": 6735,
                                       "type": "address",
                                       "value": "user"
                                     },
-                                    "id": 4483,
+                                    "id": 6777,
                                     "name": "Identifier",
-                                    "src": "1849:4:33"
+                                    "src": "1988:4:61"
                                   }
                                 ],
-                                "id": 4484,
+                                "id": 6778,
                                 "name": "IndexAccess",
-                                "src": "1838:16:33"
+                                "src": "1977:16:61"
                               }
                             ],
-                            "id": 4485,
+                            "id": 6779,
                             "name": "MemberAccess",
-                            "src": "1838:25:33"
+                            "src": "1977:25:61"
                           }
                         ],
-                        "id": 4486,
+                        "id": 6780,
                         "name": "TupleExpression",
-                        "src": "1563:310:33"
+                        "src": "1702:310:61"
                       }
                     ],
-                    "id": 4487,
+                    "id": 6781,
                     "name": "Return",
-                    "src": "1556:317:33"
+                    "src": "1695:317:61"
                   }
                 ],
-                "id": 4488,
+                "id": 6782,
                 "name": "Block",
-                "src": "1546:334:33"
+                "src": "1685:334:61"
               }
             ],
-            "id": 4489,
+            "id": 6783,
             "name": "FunctionDefinition",
-            "src": "1214:666:33"
+            "src": "1353:666:61"
           },
           {
             "attributes": {
@@ -2935,7 +3180,7 @@
                 null
               ],
               "name": "infos",
-              "scope": 4520,
+              "scope": 6814,
               "stateMutability": "view",
               "virtual": false,
               "visibility": "external"
@@ -2945,9 +3190,9 @@
                 "attributes": {
                   "text": "@dev Give the infomation of this stakeContracts\n @return paytoken, vault, [saleStartBlock, startBlock, endBlock], rewardClaimedTotal, totalStakedAmount, totalStakers"
                 },
-                "id": 4490,
+                "id": 6784,
                 "name": "StructuredDocumentation",
-                "src": "1886:176:33"
+                "src": "2025:176:61"
               },
               {
                 "attributes": {
@@ -2956,9 +3201,9 @@
                   ]
                 },
                 "children": [],
-                "id": 4491,
+                "id": 6785,
                 "name": "ParameterList",
-                "src": "2081:2:33"
+                "src": "2220:2:61"
               },
               {
                 "children": [
@@ -2967,7 +3212,7 @@
                       "constant": false,
                       "mutability": "mutable",
                       "name": "",
-                      "scope": 4519,
+                      "scope": 6813,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "address",
@@ -2980,21 +3225,21 @@
                           "stateMutability": "nonpayable",
                           "type": "address"
                         },
-                        "id": 4492,
+                        "id": 6786,
                         "name": "ElementaryTypeName",
-                        "src": "2144:7:33"
+                        "src": "2283:7:61"
                       }
                     ],
-                    "id": 4493,
+                    "id": 6787,
                     "name": "VariableDeclaration",
-                    "src": "2144:7:33"
+                    "src": "2283:7:61"
                   },
                   {
                     "attributes": {
                       "constant": false,
                       "mutability": "mutable",
                       "name": "",
-                      "scope": 4519,
+                      "scope": 6813,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "address",
@@ -3007,21 +3252,21 @@
                           "stateMutability": "nonpayable",
                           "type": "address"
                         },
-                        "id": 4494,
+                        "id": 6788,
                         "name": "ElementaryTypeName",
-                        "src": "2165:7:33"
+                        "src": "2304:7:61"
                       }
                     ],
-                    "id": 4495,
+                    "id": 6789,
                     "name": "VariableDeclaration",
-                    "src": "2165:7:33"
+                    "src": "2304:7:61"
                   },
                   {
                     "attributes": {
                       "constant": false,
                       "mutability": "mutable",
                       "name": "",
-                      "scope": 4519,
+                      "scope": 6813,
                       "stateVariable": false,
                       "storageLocation": "memory",
                       "type": "uint256[3]",
@@ -3038,9 +3283,9 @@
                               "name": "uint256",
                               "type": "uint256"
                             },
-                            "id": 4496,
+                            "id": 6790,
                             "name": "ElementaryTypeName",
-                            "src": "2186:7:33"
+                            "src": "2325:7:61"
                           },
                           {
                             "attributes": {
@@ -3053,26 +3298,26 @@
                               "type": "int_const 3",
                               "value": "3"
                             },
-                            "id": 4497,
+                            "id": 6791,
                             "name": "Literal",
-                            "src": "2194:1:33"
+                            "src": "2333:1:61"
                           }
                         ],
-                        "id": 4498,
+                        "id": 6792,
                         "name": "ArrayTypeName",
-                        "src": "2186:10:33"
+                        "src": "2325:10:61"
                       }
                     ],
-                    "id": 4499,
+                    "id": 6793,
                     "name": "VariableDeclaration",
-                    "src": "2186:17:33"
+                    "src": "2325:17:61"
                   },
                   {
                     "attributes": {
                       "constant": false,
                       "mutability": "mutable",
                       "name": "",
-                      "scope": 4519,
+                      "scope": 6813,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "uint256",
@@ -3084,21 +3329,21 @@
                           "name": "uint256",
                           "type": "uint256"
                         },
-                        "id": 4500,
+                        "id": 6794,
                         "name": "ElementaryTypeName",
-                        "src": "2217:7:33"
+                        "src": "2356:7:61"
                       }
                     ],
-                    "id": 4501,
+                    "id": 6795,
                     "name": "VariableDeclaration",
-                    "src": "2217:7:33"
+                    "src": "2356:7:61"
                   },
                   {
                     "attributes": {
                       "constant": false,
                       "mutability": "mutable",
                       "name": "",
-                      "scope": 4519,
+                      "scope": 6813,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "uint256",
@@ -3110,21 +3355,21 @@
                           "name": "uint256",
                           "type": "uint256"
                         },
-                        "id": 4502,
+                        "id": 6796,
                         "name": "ElementaryTypeName",
-                        "src": "2238:7:33"
+                        "src": "2377:7:61"
                       }
                     ],
-                    "id": 4503,
+                    "id": 6797,
                     "name": "VariableDeclaration",
-                    "src": "2238:7:33"
+                    "src": "2377:7:61"
                   },
                   {
                     "attributes": {
                       "constant": false,
                       "mutability": "mutable",
                       "name": "",
-                      "scope": 4519,
+                      "scope": 6813,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "uint256",
@@ -3136,25 +3381,25 @@
                           "name": "uint256",
                           "type": "uint256"
                         },
-                        "id": 4504,
+                        "id": 6798,
                         "name": "ElementaryTypeName",
-                        "src": "2259:7:33"
+                        "src": "2398:7:61"
                       }
                     ],
-                    "id": 4505,
+                    "id": 6799,
                     "name": "VariableDeclaration",
-                    "src": "2259:7:33"
+                    "src": "2398:7:61"
                   }
                 ],
-                "id": 4506,
+                "id": 6800,
                 "name": "ParameterList",
-                "src": "2130:146:33"
+                "src": "2269:146:61"
               },
               {
                 "children": [
                   {
                     "attributes": {
-                      "functionReturnParameters": 4506
+                      "functionReturnParameters": 6800
                     },
                     "children": [
                       {
@@ -3172,26 +3417,26 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 4410,
+                              "referencedDeclaration": 6695,
                               "type": "address",
                               "value": "paytoken"
                             },
-                            "id": 4507,
+                            "id": 6801,
                             "name": "Identifier",
-                            "src": "2312:8:33"
+                            "src": "2451:8:61"
                           },
                           {
                             "attributes": {
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 4413,
+                              "referencedDeclaration": 6698,
                               "type": "address",
                               "value": "vault"
                             },
-                            "id": 4508,
+                            "id": 6802,
                             "name": "Identifier",
-                            "src": "2334:5:33"
+                            "src": "2473:5:61"
                           },
                           {
                             "attributes": {
@@ -3208,113 +3453,113 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 4416,
+                                  "referencedDeclaration": 6701,
                                   "type": "uint256",
                                   "value": "saleStartBlock"
                                 },
-                                "id": 4509,
+                                "id": 6803,
                                 "name": "Identifier",
-                                "src": "2354:14:33"
+                                "src": "2493:14:61"
                               },
                               {
                                 "attributes": {
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 4419,
+                                  "referencedDeclaration": 6704,
                                   "type": "uint256",
                                   "value": "startBlock"
                                 },
-                                "id": 4510,
+                                "id": 6804,
                                 "name": "Identifier",
-                                "src": "2370:10:33"
+                                "src": "2509:10:61"
                               },
                               {
                                 "attributes": {
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 4422,
+                                  "referencedDeclaration": 6707,
                                   "type": "uint256",
                                   "value": "endBlock"
                                 },
-                                "id": 4511,
+                                "id": 6805,
                                 "name": "Identifier",
-                                "src": "2382:8:33"
+                                "src": "2521:8:61"
                               }
                             ],
-                            "id": 4512,
+                            "id": 6806,
                             "name": "TupleExpression",
-                            "src": "2353:38:33"
+                            "src": "2492:38:61"
                           },
                           {
                             "attributes": {
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 4425,
+                              "referencedDeclaration": 6710,
                               "type": "uint256",
                               "value": "rewardClaimedTotal"
                             },
-                            "id": 4513,
+                            "id": 6807,
                             "name": "Identifier",
-                            "src": "2405:18:33"
+                            "src": "2544:18:61"
                           },
                           {
                             "attributes": {
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 4428,
+                              "referencedDeclaration": 6713,
                               "type": "uint256",
                               "value": "totalStakedAmount"
                             },
-                            "id": 4514,
+                            "id": 6808,
                             "name": "Identifier",
-                            "src": "2437:17:33"
+                            "src": "2576:17:61"
                           },
                           {
                             "attributes": {
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 4436,
+                              "referencedDeclaration": 6721,
                               "type": "uint256",
                               "value": "totalStakers"
                             },
-                            "id": 4515,
+                            "id": 6809,
                             "name": "Identifier",
-                            "src": "2468:12:33"
+                            "src": "2607:12:61"
                           }
                         ],
-                        "id": 4516,
+                        "id": 6810,
                         "name": "TupleExpression",
-                        "src": "2298:192:33"
+                        "src": "2437:192:61"
                       }
                     ],
-                    "id": 4517,
+                    "id": 6811,
                     "name": "Return",
-                    "src": "2291:199:33"
+                    "src": "2430:199:61"
                   }
                 ],
-                "id": 4518,
+                "id": 6812,
                 "name": "Block",
-                "src": "2281:216:33"
+                "src": "2420:216:61"
               }
             ],
-            "id": 4519,
+            "id": 6813,
             "name": "FunctionDefinition",
-            "src": "2067:430:33"
+            "src": "2206:430:61"
           }
         ],
-        "id": 4520,
+        "id": 6814,
         "name": "ContractDefinition",
-        "src": "195:2304:33"
+        "src": "150:2488:61"
       }
     ],
-    "id": 4521,
+    "id": 6815,
     "name": "SourceUnit",
-    "src": "37:2463:33"
+    "src": "37:2602:61"
   },
   "compiler": {
     "name": "solc",
@@ -3322,7 +3567,7 @@
   },
   "networks": {},
   "schemaVersion": "3.3.4",
-  "updatedAt": "2021-06-21T02:58:01.233Z",
+  "updatedAt": "2021-08-02T05:01:31.246Z",
   "devdoc": {
     "kind": "dev",
     "methods": {
@@ -3337,8 +3582,17 @@
       }
     },
     "stateVariables": {
+      "defiAddr": {
+        "details": "extra address storage"
+      },
       "endBlock": {
         "details": "the staking end block."
+      },
+      "migratedL2": {
+        "details": "for migrate L2"
+      },
+      "pauseProxy": {
+        "details": "flag for pause proxy"
       },
       "paytoken": {
         "details": "paytoken is the token that the user stakes. ( if paytoken is ether, paytoken is address(0) )"
@@ -3368,7 +3622,7 @@
         "details": "information staked by user"
       },
       "vault": {
-        "details": "A vault that holds tos rewards."
+        "details": "A vault that holds TOS rewards."
       }
     },
     "title": "The base storage of stakeContract",

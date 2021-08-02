@@ -211,7 +211,8 @@ contract StakeUniswapV3 is
     function miningCoinage() public lock {
         if (saleStartTime == 0 || saleStartTime > block.timestamp) return;
         if (stakeStartTime == 0 || stakeStartTime > block.timestamp) return;
-        if (IIStake2Vault(vault).miningStartTime() > block.timestamp) return;
+        if (IIStake2Vault(vault).miningStartTime() > block.timestamp ||
+            IIStake2Vault(vault).miningEndTime() < block.timestamp ) return;
 
         if (coinageLastMintBlockTimetamp == 0)
             coinageLastMintBlockTimetamp = stakeStartTime;
@@ -400,6 +401,11 @@ contract StakeUniswapV3 is
         );
 
         require(
+            block.timestamp < IIStake2Vault(vault).miningEndTime(),
+            "StakeUniswapV3: end mining period"
+        );
+
+        require(
             nonfungiblePositionManager.ownerOf(tokenId) == msg.sender,
             "StakeUniswapV3: Caller is not tokenId's owner"
         );
@@ -433,7 +439,10 @@ contract StakeUniswapV3 is
             saleStartTime < block.timestamp,
             "StakeUniswapV3: available after saleStartTime"
         );
-
+        require(
+            block.timestamp < IIStake2Vault(vault).miningEndTime(),
+            "StakeUniswapV3: end mining period"
+        );
         require(
             nonfungiblePositionManager.ownerOf(tokenId) == msg.sender,
             "StakeUniswapV3: Caller is not tokenId's owner"

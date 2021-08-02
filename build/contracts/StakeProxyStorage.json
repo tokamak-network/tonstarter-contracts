@@ -2,6 +2,25 @@
   "contractName": "StakeProxyStorage",
   "abi": [
     {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "name": "aliveImplementation",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
       "inputs": [],
       "name": "depositManager",
       "outputs": [
@@ -16,7 +35,58 @@
     },
     {
       "inputs": [],
+      "name": "pauseProxy",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "proxyImplementation",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
       "name": "seigManager",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes4",
+          "name": "",
+          "type": "bytes4"
+        }
+      ],
+      "name": "selectorImplementation",
       "outputs": [
         {
           "internalType": "address",
@@ -106,38 +176,38 @@
       "type": "function"
     }
   ],
-  "metadata": "{\"compiler\":{\"version\":\"0.7.6+commit.7338295f\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[],\"name\":\"depositManager\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"seigManager\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"stakeFactory\",\"outputs\":[{\"internalType\":\"contract IStakeFactory\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"stakeRegistry\",\"outputs\":[{\"internalType\":\"contract IStakeRegistry\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"stakeVaultFactory\",\"outputs\":[{\"internalType\":\"contract IStakeVaultFactory\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"ton\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"tos\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"wton\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"stateVariables\":{\"depositManager\":{\"details\":\"Depositmanager address in Tokamak\"},\"seigManager\":{\"details\":\"SeigManager address in Tokamak\"},\"stakeFactory\":{\"details\":\"stakeFactory\"},\"stakeRegistry\":{\"details\":\"stakeRegistry\"},\"stakeVaultFactory\":{\"details\":\"stakeVaultFactory\"},\"ton\":{\"details\":\"TON address in Tokamak\"},\"tos\":{\"details\":\"TOS address\"},\"wton\":{\"details\":\"WTON address in Tokamak\"}},\"title\":\"The storage of StakeProxy\",\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"/Users/zena/ico2.0/ico20-contracts/contracts/stake/StakeProxyStorage.sol\":\"StakeProxyStorage\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":100},\"remappings\":[]},\"sources\":{\"/Users/zena/ico2.0/ico20-contracts/contracts/interfaces/IStakeFactory.sol\":{\"keccak256\":\"0x249c9a51a8b7e2d64ead454a48e346f7693bb75b8302f9a7fffc6a02ca7dc974\",\"license\":\"Unlicense\",\"urls\":[\"bzz-raw://6a9764861a0f41fba6efdbd8e0700de3357db2281f72091eccfbe56ca6a29e5b\",\"dweb:/ipfs/QmWG27CSGfByoZgqwUrMp1pT5j1S63DNUUHy6wYHQQMtdR\"]},\"/Users/zena/ico2.0/ico20-contracts/contracts/interfaces/IStakeRegistry.sol\":{\"keccak256\":\"0x2e7c54aa72c42952e33cd8f99f4454db8b60ab388bc6eb4114f5a3237913aec2\",\"license\":\"Unlicense\",\"urls\":[\"bzz-raw://795d97a0465f92f011bd0c22f143954a5244ceb4c65e517bb27ececc6f8ea01f\",\"dweb:/ipfs/QmRqCNsvHC6S7wsWMVhugB7WHeXuGQej2WdDiKmBLv9mjv\"]},\"/Users/zena/ico2.0/ico20-contracts/contracts/interfaces/IStakeVaultFactory.sol\":{\"keccak256\":\"0xe547a51e352ba60d4a9211281c037214d35c966a8ef6ee8e155d68773ede2dcd\",\"license\":\"Unlicense\",\"urls\":[\"bzz-raw://0779b9b4c36099f1f7bc33c3d52f90d5acff40af7ca0c3e81d4a5985c8bcb667\",\"dweb:/ipfs/QmRk1sLfixwaLnyBK8t2rGNkHR3duMEHjjYViGvBUKCCX7\"]},\"/Users/zena/ico2.0/ico20-contracts/contracts/stake/StakeProxyStorage.sol\":{\"keccak256\":\"0x2786b6e18a976c644ec66331f3ba11f79b924215aa1c6781672eae2007ee8383\",\"license\":\"Unlicense\",\"urls\":[\"bzz-raw://7a48c5b4d4090dfa65cd045d1b3bbde83fb11cfa08b7a58f481297855bc1f158\",\"dweb:/ipfs/QmSHjPNe8pSZFizbTXcSt4VEo4pKXtyBXRR95QVTPhr5Pz\"]}},\"version\":1}",
-  "bytecode": "0x608060405234801561001057600080fd5b50610187806100206000396000f3fe608060405234801561001057600080fd5b50600436106100785760003560e01c8063683048351461007d5780636af8da27146100a15780636c7ac9d8146100a95780636fb7f558146100b157806389f395de146100b95780638d62d949146100c1578063cc48b947146100c9578063dd196f18146100d1575b600080fd5b6100856100d9565b604080516001600160a01b039092168252519081900360200190f35b6100856100e8565b6100856100f7565b610085610106565b610085610115565b610085610124565b610085610133565b610085610142565b6000546001600160a01b031681565b6002546001600160a01b031681565b6006546001600160a01b031681565b6007546001600160a01b031681565b6003546001600160a01b031681565b6005546001600160a01b031681565b6004546001600160a01b031681565b6001546001600160a01b03168156fea26469706673582212206536e89411770883a39cc812573f9166fc7354d53c81fb339df8962c42bc2e9764736f6c63430007060033",
-  "deployedBytecode": "0x608060405234801561001057600080fd5b50600436106100785760003560e01c8063683048351461007d5780636af8da27146100a15780636c7ac9d8146100a95780636fb7f558146100b157806389f395de146100b95780638d62d949146100c1578063cc48b947146100c9578063dd196f18146100d1575b600080fd5b6100856100d9565b604080516001600160a01b039092168252519081900360200190f35b6100856100e8565b6100856100f7565b610085610106565b610085610115565b610085610124565b610085610133565b610085610142565b6000546001600160a01b031681565b6002546001600160a01b031681565b6006546001600160a01b031681565b6007546001600160a01b031681565b6003546001600160a01b031681565b6005546001600160a01b031681565b6004546001600160a01b031681565b6001546001600160a01b03168156fea26469706673582212206536e89411770883a39cc812573f9166fc7354d53c81fb339df8962c42bc2e9764736f6c63430007060033",
+  "metadata": "{\"compiler\":{\"version\":\"0.7.6+commit.7338295f\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"name\":\"aliveImplementation\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"depositManager\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"pauseProxy\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"proxyImplementation\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"seigManager\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes4\",\"name\":\"\",\"type\":\"bytes4\"}],\"name\":\"selectorImplementation\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"stakeFactory\",\"outputs\":[{\"internalType\":\"contract IStakeFactory\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"stakeRegistry\",\"outputs\":[{\"internalType\":\"contract IStakeRegistry\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"stakeVaultFactory\",\"outputs\":[{\"internalType\":\"contract IStakeVaultFactory\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"ton\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"tos\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"wton\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"stateVariables\":{\"depositManager\":{\"details\":\"Depositmanager address in Tokamak\"},\"pauseProxy\":{\"details\":\"flag for pause proxy\"},\"proxyImplementation\":{\"details\":\"implementation of proxy index\"},\"seigManager\":{\"details\":\"SeigManager address in Tokamak\"},\"stakeFactory\":{\"details\":\"stakeFactory\"},\"stakeRegistry\":{\"details\":\"stakeRegistry\"},\"stakeVaultFactory\":{\"details\":\"stakeVaultFactory\"},\"ton\":{\"details\":\"TON address in Tokamak\"},\"tos\":{\"details\":\"TOS address\"},\"wton\":{\"details\":\"WTON address in Tokamak\"}},\"title\":\"The storage of StakeProxy\",\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"/Users/zena/ico2.0/ico20-contracts/contracts/stake/StakeProxyStorage.sol\":\"StakeProxyStorage\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":100},\"remappings\":[]},\"sources\":{\"/Users/zena/ico2.0/ico20-contracts/contracts/interfaces/IStakeFactory.sol\":{\"keccak256\":\"0x8cc549ba9683511cc5e513c946037e6e9826948b494aebb7b08a71f76edbdb2a\",\"license\":\"Unlicense\",\"urls\":[\"bzz-raw://4e749192d26e63df247a3611e7d431b66cb3e3df6c9e7d7839e6237b555a92a5\",\"dweb:/ipfs/QmaGFak6yWFEN4YW6atGFk2ykWcRKjwDWtVw9UmEcFyCCT\"]},\"/Users/zena/ico2.0/ico20-contracts/contracts/interfaces/IStakeRegistry.sol\":{\"keccak256\":\"0xba25e949ea7674e53f3327eaac5284958c2b298e6f6ed99ed8c339640ec82511\",\"license\":\"Unlicense\",\"urls\":[\"bzz-raw://f4fed812b216930ea9386ae5069a60081f19091c819d6d9c00eaef0dbbe1b063\",\"dweb:/ipfs/QmQHpNByRKfN6r2Cqe555jD9xcA8Bm7F3LPtPfL4s9hZnh\"]},\"/Users/zena/ico2.0/ico20-contracts/contracts/interfaces/IStakeVaultFactory.sol\":{\"keccak256\":\"0xa62de6cf1793938ad16c22dbe026f9e32e638e996dfb002c32269edf797df511\",\"license\":\"Unlicense\",\"urls\":[\"bzz-raw://e4098240adfd4dc1e784c12e9e7385a7346843e1cae590bc7e48f05b764c9535\",\"dweb:/ipfs/QmVYT3PYdPLPQAoZUFzhLXQXXdfBoKev9RAWcdUzxSquy8\"]},\"/Users/zena/ico2.0/ico20-contracts/contracts/stake/StakeProxyStorage.sol\":{\"keccak256\":\"0x24f5b174e385e3ce432aac4de6071d1f08d59c29eaed157bd9eb8dede3e76589\",\"license\":\"Unlicense\",\"urls\":[\"bzz-raw://29294bd827a45d165e1c2fb7504175a1df9eef9d032f01675f69c1d186b39842\",\"dweb:/ipfs/QmQjY8pAELg9tbbS47UjF7fUFCSs1THtuficEUVxShXd9B\"]}},\"version\":1}",
+  "bytecode": "0x608060405234801561001057600080fd5b506102a4806100206000396000f3fe608060405234801561001057600080fd5b50600436106100b45760003560e01c80636fb7f558116100715780636fb7f5581461015657806389f395de1461015e5780638d62d94914610166578063b911135f1461016e578063cc48b9471461018b578063dd196f1814610193576100b4565b806350d2a276146100b9578063550d01a3146100fc57806363a8fd8914610136578063683048351461013e5780636af8da27146101465780636c7ac9d81461014e575b600080fd5b6100e0600480360360208110156100cf57600080fd5b50356001600160e01b03191661019b565b604080516001600160a01b039092168252519081900360200190f35b6101226004803603602081101561011257600080fd5b50356001600160a01b03166101b6565b604080519115158252519081900360200190f35b6101226101cb565b6100e06101db565b6100e06101ea565b6100e06101f9565b6100e0610208565b6100e0610217565b6100e0610226565b6100e06004803603602081101561018457600080fd5b5035610235565b6100e0610250565b6100e061025f565b600a602052600090815260409020546001600160a01b031681565b60096020526000908152604090205460ff1681565b600754600160a01b900460ff1681565b6000546001600160a01b031681565b6002546001600160a01b031681565b6006546001600160a01b031681565b6007546001600160a01b031681565b6003546001600160a01b031681565b6005546001600160a01b031681565b6008602052600090815260409020546001600160a01b031681565b6004546001600160a01b031681565b6001546001600160a01b03168156fea2646970667358221220eb2046f3f38f65450650abe0a915ad5c5e41029ed7c611da12709280b75a7b7464736f6c63430007060033",
+  "deployedBytecode": "0x608060405234801561001057600080fd5b50600436106100b45760003560e01c80636fb7f558116100715780636fb7f5581461015657806389f395de1461015e5780638d62d94914610166578063b911135f1461016e578063cc48b9471461018b578063dd196f1814610193576100b4565b806350d2a276146100b9578063550d01a3146100fc57806363a8fd8914610136578063683048351461013e5780636af8da27146101465780636c7ac9d81461014e575b600080fd5b6100e0600480360360208110156100cf57600080fd5b50356001600160e01b03191661019b565b604080516001600160a01b039092168252519081900360200190f35b6101226004803603602081101561011257600080fd5b50356001600160a01b03166101b6565b604080519115158252519081900360200190f35b6101226101cb565b6100e06101db565b6100e06101ea565b6100e06101f9565b6100e0610208565b6100e0610217565b6100e0610226565b6100e06004803603602081101561018457600080fd5b5035610235565b6100e0610250565b6100e061025f565b600a602052600090815260409020546001600160a01b031681565b60096020526000908152604090205460ff1681565b600754600160a01b900460ff1681565b6000546001600160a01b031681565b6002546001600160a01b031681565b6006546001600160a01b031681565b6007546001600160a01b031681565b6003546001600160a01b031681565b6005546001600160a01b031681565b6008602052600090815260409020546001600160a01b031681565b6004546001600160a01b031681565b6001546001600160a01b03168156fea2646970667358221220eb2046f3f38f65450650abe0a915ad5c5e41029ed7c611da12709280b75a7b7464736f6c63430007060033",
   "immutableReferences": {},
   "generatedSources": [],
   "deployedGeneratedSources": [],
-  "sourceMap": "350:579:44:-:0;;;;;;;;;;;;;;;;;;;",
-  "deployedSourceMap": "350:579:44:-:0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;410:35;;;:::i;:::-;;;;-1:-1:-1;;;;;410:35:44;;;;;;;;;;;;;;549:43;;;:::i;820:29::-;;;:::i;900:26::-;;;:::i;624:18::-;;;:::i;747:19::-;;;:::i;685:18::-;;;:::i;478:33::-;;;:::i;410:35::-;;;-1:-1:-1;;;;;410:35:44;;:::o;549:43::-;;;-1:-1:-1;;;;;549:43:44;;:::o;820:29::-;;;-1:-1:-1;;;;;820:29:44;;:::o;900:26::-;;;-1:-1:-1;;;;;900:26:44;;:::o;624:18::-;;;-1:-1:-1;;;;;624:18:44;;:::o;747:19::-;;;-1:-1:-1;;;;;747:19:44;;:::o;685:18::-;;;-1:-1:-1;;;;;685:18:44;;:::o;478:33::-;;;-1:-1:-1;;;;;478:33:44;;:::o",
-  "source": "//SPDX-License-Identifier: Unlicense\npragma solidity ^0.7.6;\n\n//import \"../interfaces/IStakeProxyStorage.sol\";\nimport {IStakeFactory} from \"../interfaces/IStakeFactory.sol\";\nimport {IStakeRegistry} from \"../interfaces/IStakeRegistry.sol\";\nimport {IStakeVaultFactory} from \"../interfaces/IStakeVaultFactory.sol\";\n\n/// @title The storage of StakeProxy\ncontract StakeProxyStorage {\n    /// @dev stakeRegistry\n    IStakeRegistry public stakeRegistry;\n\n    /// @dev stakeFactory\n    IStakeFactory public stakeFactory;\n\n    /// @dev stakeVaultFactory\n    IStakeVaultFactory public stakeVaultFactory;\n\n    /// @dev TOS address\n    address public tos;\n\n    /// @dev TON address in Tokamak\n    address public ton;\n\n    /// @dev WTON address in Tokamak\n    address public wton;\n\n    /// @dev Depositmanager address in Tokamak\n    address public depositManager;\n\n    /// @dev SeigManager address in Tokamak\n    address public seigManager;\n}\n",
+  "sourceMap": "350:867:69:-:0;;;;;;;;;;;;;;;;;;;",
+  "deployedSourceMap": "350:867:69:-:0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;1158:56;;;;;;;;;;;;;;;;-1:-1:-1;1158:56:69;-1:-1:-1;;;;;;1158:56:69;;:::i;:::-;;;;-1:-1:-1;;;;;1158:56:69;;;;;;;;;;;;;;1100:51;;;;;;;;;;;;;;;;-1:-1:-1;1100:51:69;-1:-1:-1;;;;;1100:51:69;;:::i;:::-;;;;;;;;;;;;;;;;;;967:22;;;:::i;410:35::-;;;:::i;549:43::-;;;:::i;820:29::-;;;:::i;900:26::-;;;:::i;624:18::-;;;:::i;747:19::-;;;:::i;1039:54::-;;;;;;;;;;;;;;;;-1:-1:-1;1039:54:69;;:::i;685:18::-;;;:::i;478:33::-;;;:::i;1158:56::-;;;;;;;;;;;;-1:-1:-1;;;;;1158:56:69;;:::o;1100:51::-;;;;;;;;;;;;;;;:::o;967:22::-;;;-1:-1:-1;;;967:22:69;;;;;:::o;410:35::-;;;-1:-1:-1;;;;;410:35:69;;:::o;549:43::-;;;-1:-1:-1;;;;;549:43:69;;:::o;820:29::-;;;-1:-1:-1;;;;;820:29:69;;:::o;900:26::-;;;-1:-1:-1;;;;;900:26:69;;:::o;624:18::-;;;-1:-1:-1;;;;;624:18:69;;:::o;747:19::-;;;-1:-1:-1;;;;;747:19:69;;:::o;1039:54::-;;;;;;;;;;;;-1:-1:-1;;;;;1039:54:69;;:::o;685:18::-;;;-1:-1:-1;;;;;685:18:69;;:::o;478:33::-;;;-1:-1:-1;;;;;478:33:69;;:::o",
+  "source": "//SPDX-License-Identifier: Unlicense\npragma solidity ^0.7.6;\n\n//import \"../interfaces/IStakeProxyStorage.sol\";\nimport {IStakeFactory} from \"../interfaces/IStakeFactory.sol\";\nimport {IStakeRegistry} from \"../interfaces/IStakeRegistry.sol\";\nimport {IStakeVaultFactory} from \"../interfaces/IStakeVaultFactory.sol\";\n\n/// @title The storage of StakeProxy\ncontract StakeProxyStorage {\n    /// @dev stakeRegistry\n    IStakeRegistry public stakeRegistry;\n\n    /// @dev stakeFactory\n    IStakeFactory public stakeFactory;\n\n    /// @dev stakeVaultFactory\n    IStakeVaultFactory public stakeVaultFactory;\n\n    /// @dev TOS address\n    address public tos;\n\n    /// @dev TON address in Tokamak\n    address public ton;\n\n    /// @dev WTON address in Tokamak\n    address public wton;\n\n    /// @dev Depositmanager address in Tokamak\n    address public depositManager;\n\n    /// @dev SeigManager address in Tokamak\n    address public seigManager;\n\n    /// @dev flag for pause proxy\n    bool public pauseProxy;\n\n    /// @dev implementation of proxy index\n    mapping(uint256 => address) public proxyImplementation;\n\n    mapping(address => bool) public aliveImplementation;\n\n    mapping(bytes4 => address) public selectorImplementation;\n}\n",
   "sourcePath": "/Users/zena/ico2.0/ico20-contracts/contracts/stake/StakeProxyStorage.sol",
   "ast": {
     "absolutePath": "/Users/zena/ico2.0/ico20-contracts/contracts/stake/StakeProxyStorage.sol",
     "exportedSymbols": {
       "IStakeFactory": [
-        3169
+        3903
       ],
       "IStakeRegistry": [
-        3328
+        4119
       ],
       "IStakeVaultFactory": [
-        3618
+        4553
       ],
       "StakeProxyStorage": [
-        6662
+        9454
       ]
     },
-    "id": 6663,
+    "id": 9455,
     "license": "Unlicense",
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 6630,
+        "id": 9406,
         "literals": [
           "solidity",
           "^",
@@ -145,24 +215,24 @@
           ".6"
         ],
         "nodeType": "PragmaDirective",
-        "src": "37:23:44"
+        "src": "37:23:69"
       },
       {
         "absolutePath": "/Users/zena/ico2.0/ico20-contracts/contracts/interfaces/IStakeFactory.sol",
         "file": "../interfaces/IStakeFactory.sol",
-        "id": 6632,
+        "id": 9408,
         "nodeType": "ImportDirective",
-        "scope": 6663,
-        "sourceUnit": 3170,
-        "src": "111:62:44",
+        "scope": 9455,
+        "sourceUnit": 3904,
+        "src": "111:62:69",
         "symbolAliases": [
           {
             "foreign": {
-              "id": 6631,
+              "id": 9407,
               "name": "IStakeFactory",
               "nodeType": "Identifier",
               "overloadedDeclarations": [],
-              "src": "119:13:44",
+              "src": "119:13:69",
               "typeDescriptions": {}
             }
           }
@@ -172,19 +242,19 @@
       {
         "absolutePath": "/Users/zena/ico2.0/ico20-contracts/contracts/interfaces/IStakeRegistry.sol",
         "file": "../interfaces/IStakeRegistry.sol",
-        "id": 6634,
+        "id": 9410,
         "nodeType": "ImportDirective",
-        "scope": 6663,
-        "sourceUnit": 3329,
-        "src": "174:64:44",
+        "scope": 9455,
+        "sourceUnit": 4120,
+        "src": "174:64:69",
         "symbolAliases": [
           {
             "foreign": {
-              "id": 6633,
+              "id": 9409,
               "name": "IStakeRegistry",
               "nodeType": "Identifier",
               "overloadedDeclarations": [],
-              "src": "182:14:44",
+              "src": "182:14:69",
               "typeDescriptions": {}
             }
           }
@@ -194,19 +264,19 @@
       {
         "absolutePath": "/Users/zena/ico2.0/ico20-contracts/contracts/interfaces/IStakeVaultFactory.sol",
         "file": "../interfaces/IStakeVaultFactory.sol",
-        "id": 6636,
+        "id": 9412,
         "nodeType": "ImportDirective",
-        "scope": 6663,
-        "sourceUnit": 3619,
-        "src": "239:72:44",
+        "scope": 9455,
+        "sourceUnit": 4554,
+        "src": "239:72:69",
         "symbolAliases": [
           {
             "foreign": {
-              "id": 6635,
+              "id": 9411,
               "name": "IStakeVaultFactory",
               "nodeType": "Identifier",
               "overloadedDeclarations": [],
-              "src": "247:18:44",
+              "src": "247:18:69",
               "typeDescriptions": {}
             }
           }
@@ -219,15 +289,15 @@
         "contractDependencies": [],
         "contractKind": "contract",
         "documentation": {
-          "id": 6637,
+          "id": 9413,
           "nodeType": "StructuredDocumentation",
-          "src": "313:37:44",
+          "src": "313:37:69",
           "text": "@title The storage of StakeProxy"
         },
         "fullyImplemented": true,
-        "id": 6662,
+        "id": 9454,
         "linearizedBaseContracts": [
-          6662
+          9454
         ],
         "name": "StakeProxyStorage",
         "nodeType": "ContractDefinition",
@@ -235,32 +305,32 @@
           {
             "constant": false,
             "documentation": {
-              "id": 6638,
+              "id": 9414,
               "nodeType": "StructuredDocumentation",
-              "src": "383:22:44",
+              "src": "383:22:69",
               "text": "@dev stakeRegistry"
             },
             "functionSelector": "68304835",
-            "id": 6640,
+            "id": 9416,
             "mutability": "mutable",
             "name": "stakeRegistry",
             "nodeType": "VariableDeclaration",
-            "scope": 6662,
-            "src": "410:35:44",
+            "scope": 9454,
+            "src": "410:35:69",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
-              "typeIdentifier": "t_contract$_IStakeRegistry_$3328",
+              "typeIdentifier": "t_contract$_IStakeRegistry_$4119",
               "typeString": "contract IStakeRegistry"
             },
             "typeName": {
-              "id": 6639,
+              "id": 9415,
               "name": "IStakeRegistry",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 3328,
-              "src": "410:14:44",
+              "referencedDeclaration": 4119,
+              "src": "410:14:69",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_IStakeRegistry_$3328",
+                "typeIdentifier": "t_contract$_IStakeRegistry_$4119",
                 "typeString": "contract IStakeRegistry"
               }
             },
@@ -269,32 +339,32 @@
           {
             "constant": false,
             "documentation": {
-              "id": 6641,
+              "id": 9417,
               "nodeType": "StructuredDocumentation",
-              "src": "452:21:44",
+              "src": "452:21:69",
               "text": "@dev stakeFactory"
             },
             "functionSelector": "dd196f18",
-            "id": 6643,
+            "id": 9419,
             "mutability": "mutable",
             "name": "stakeFactory",
             "nodeType": "VariableDeclaration",
-            "scope": 6662,
-            "src": "478:33:44",
+            "scope": 9454,
+            "src": "478:33:69",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
-              "typeIdentifier": "t_contract$_IStakeFactory_$3169",
+              "typeIdentifier": "t_contract$_IStakeFactory_$3903",
               "typeString": "contract IStakeFactory"
             },
             "typeName": {
-              "id": 6642,
+              "id": 9418,
               "name": "IStakeFactory",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 3169,
-              "src": "478:13:44",
+              "referencedDeclaration": 3903,
+              "src": "478:13:69",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_IStakeFactory_$3169",
+                "typeIdentifier": "t_contract$_IStakeFactory_$3903",
                 "typeString": "contract IStakeFactory"
               }
             },
@@ -303,32 +373,32 @@
           {
             "constant": false,
             "documentation": {
-              "id": 6644,
+              "id": 9420,
               "nodeType": "StructuredDocumentation",
-              "src": "518:26:44",
+              "src": "518:26:69",
               "text": "@dev stakeVaultFactory"
             },
             "functionSelector": "6af8da27",
-            "id": 6646,
+            "id": 9422,
             "mutability": "mutable",
             "name": "stakeVaultFactory",
             "nodeType": "VariableDeclaration",
-            "scope": 6662,
-            "src": "549:43:44",
+            "scope": 9454,
+            "src": "549:43:69",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
-              "typeIdentifier": "t_contract$_IStakeVaultFactory_$3618",
+              "typeIdentifier": "t_contract$_IStakeVaultFactory_$4553",
               "typeString": "contract IStakeVaultFactory"
             },
             "typeName": {
-              "id": 6645,
+              "id": 9421,
               "name": "IStakeVaultFactory",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 3618,
-              "src": "549:18:44",
+              "referencedDeclaration": 4553,
+              "src": "549:18:69",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_IStakeVaultFactory_$3618",
+                "typeIdentifier": "t_contract$_IStakeVaultFactory_$4553",
                 "typeString": "contract IStakeVaultFactory"
               }
             },
@@ -337,18 +407,18 @@
           {
             "constant": false,
             "documentation": {
-              "id": 6647,
+              "id": 9423,
               "nodeType": "StructuredDocumentation",
-              "src": "599:20:44",
+              "src": "599:20:69",
               "text": "@dev TOS address"
             },
             "functionSelector": "89f395de",
-            "id": 6649,
+            "id": 9425,
             "mutability": "mutable",
             "name": "tos",
             "nodeType": "VariableDeclaration",
-            "scope": 6662,
-            "src": "624:18:44",
+            "scope": 9454,
+            "src": "624:18:69",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -356,10 +426,10 @@
               "typeString": "address"
             },
             "typeName": {
-              "id": 6648,
+              "id": 9424,
               "name": "address",
               "nodeType": "ElementaryTypeName",
-              "src": "624:7:44",
+              "src": "624:7:69",
               "stateMutability": "nonpayable",
               "typeDescriptions": {
                 "typeIdentifier": "t_address",
@@ -371,18 +441,18 @@
           {
             "constant": false,
             "documentation": {
-              "id": 6650,
+              "id": 9426,
               "nodeType": "StructuredDocumentation",
-              "src": "649:31:44",
+              "src": "649:31:69",
               "text": "@dev TON address in Tokamak"
             },
             "functionSelector": "cc48b947",
-            "id": 6652,
+            "id": 9428,
             "mutability": "mutable",
             "name": "ton",
             "nodeType": "VariableDeclaration",
-            "scope": 6662,
-            "src": "685:18:44",
+            "scope": 9454,
+            "src": "685:18:69",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -390,10 +460,10 @@
               "typeString": "address"
             },
             "typeName": {
-              "id": 6651,
+              "id": 9427,
               "name": "address",
               "nodeType": "ElementaryTypeName",
-              "src": "685:7:44",
+              "src": "685:7:69",
               "stateMutability": "nonpayable",
               "typeDescriptions": {
                 "typeIdentifier": "t_address",
@@ -405,18 +475,18 @@
           {
             "constant": false,
             "documentation": {
-              "id": 6653,
+              "id": 9429,
               "nodeType": "StructuredDocumentation",
-              "src": "710:32:44",
+              "src": "710:32:69",
               "text": "@dev WTON address in Tokamak"
             },
             "functionSelector": "8d62d949",
-            "id": 6655,
+            "id": 9431,
             "mutability": "mutable",
             "name": "wton",
             "nodeType": "VariableDeclaration",
-            "scope": 6662,
-            "src": "747:19:44",
+            "scope": 9454,
+            "src": "747:19:69",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -424,10 +494,10 @@
               "typeString": "address"
             },
             "typeName": {
-              "id": 6654,
+              "id": 9430,
               "name": "address",
               "nodeType": "ElementaryTypeName",
-              "src": "747:7:44",
+              "src": "747:7:69",
               "stateMutability": "nonpayable",
               "typeDescriptions": {
                 "typeIdentifier": "t_address",
@@ -439,18 +509,18 @@
           {
             "constant": false,
             "documentation": {
-              "id": 6656,
+              "id": 9432,
               "nodeType": "StructuredDocumentation",
-              "src": "773:42:44",
+              "src": "773:42:69",
               "text": "@dev Depositmanager address in Tokamak"
             },
             "functionSelector": "6c7ac9d8",
-            "id": 6658,
+            "id": 9434,
             "mutability": "mutable",
             "name": "depositManager",
             "nodeType": "VariableDeclaration",
-            "scope": 6662,
-            "src": "820:29:44",
+            "scope": 9454,
+            "src": "820:29:69",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -458,10 +528,10 @@
               "typeString": "address"
             },
             "typeName": {
-              "id": 6657,
+              "id": 9433,
               "name": "address",
               "nodeType": "ElementaryTypeName",
-              "src": "820:7:44",
+              "src": "820:7:69",
               "stateMutability": "nonpayable",
               "typeDescriptions": {
                 "typeIdentifier": "t_address",
@@ -473,18 +543,18 @@
           {
             "constant": false,
             "documentation": {
-              "id": 6659,
+              "id": 9435,
               "nodeType": "StructuredDocumentation",
-              "src": "856:39:44",
+              "src": "856:39:69",
               "text": "@dev SeigManager address in Tokamak"
             },
             "functionSelector": "6fb7f558",
-            "id": 6661,
+            "id": 9437,
             "mutability": "mutable",
             "name": "seigManager",
             "nodeType": "VariableDeclaration",
-            "scope": 6662,
-            "src": "900:26:44",
+            "scope": 9454,
+            "src": "900:26:69",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -492,40 +562,219 @@
               "typeString": "address"
             },
             "typeName": {
-              "id": 6660,
+              "id": 9436,
               "name": "address",
               "nodeType": "ElementaryTypeName",
-              "src": "900:7:44",
+              "src": "900:7:69",
               "stateMutability": "nonpayable",
               "typeDescriptions": {
                 "typeIdentifier": "t_address",
                 "typeString": "address"
+              }
+            },
+            "visibility": "public"
+          },
+          {
+            "constant": false,
+            "documentation": {
+              "id": 9438,
+              "nodeType": "StructuredDocumentation",
+              "src": "933:29:69",
+              "text": "@dev flag for pause proxy"
+            },
+            "functionSelector": "63a8fd89",
+            "id": 9440,
+            "mutability": "mutable",
+            "name": "pauseProxy",
+            "nodeType": "VariableDeclaration",
+            "scope": 9454,
+            "src": "967:22:69",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_bool",
+              "typeString": "bool"
+            },
+            "typeName": {
+              "id": 9439,
+              "name": "bool",
+              "nodeType": "ElementaryTypeName",
+              "src": "967:4:69",
+              "typeDescriptions": {
+                "typeIdentifier": "t_bool",
+                "typeString": "bool"
+              }
+            },
+            "visibility": "public"
+          },
+          {
+            "constant": false,
+            "documentation": {
+              "id": 9441,
+              "nodeType": "StructuredDocumentation",
+              "src": "996:38:69",
+              "text": "@dev implementation of proxy index"
+            },
+            "functionSelector": "b911135f",
+            "id": 9445,
+            "mutability": "mutable",
+            "name": "proxyImplementation",
+            "nodeType": "VariableDeclaration",
+            "scope": 9454,
+            "src": "1039:54:69",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_mapping$_t_uint256_$_t_address_$",
+              "typeString": "mapping(uint256 => address)"
+            },
+            "typeName": {
+              "id": 9444,
+              "keyType": {
+                "id": 9442,
+                "name": "uint256",
+                "nodeType": "ElementaryTypeName",
+                "src": "1047:7:69",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                }
+              },
+              "nodeType": "Mapping",
+              "src": "1039:27:69",
+              "typeDescriptions": {
+                "typeIdentifier": "t_mapping$_t_uint256_$_t_address_$",
+                "typeString": "mapping(uint256 => address)"
+              },
+              "valueType": {
+                "id": 9443,
+                "name": "address",
+                "nodeType": "ElementaryTypeName",
+                "src": "1058:7:69",
+                "stateMutability": "nonpayable",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_address",
+                  "typeString": "address"
+                }
+              }
+            },
+            "visibility": "public"
+          },
+          {
+            "constant": false,
+            "functionSelector": "550d01a3",
+            "id": 9449,
+            "mutability": "mutable",
+            "name": "aliveImplementation",
+            "nodeType": "VariableDeclaration",
+            "scope": 9454,
+            "src": "1100:51:69",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_mapping$_t_address_$_t_bool_$",
+              "typeString": "mapping(address => bool)"
+            },
+            "typeName": {
+              "id": 9448,
+              "keyType": {
+                "id": 9446,
+                "name": "address",
+                "nodeType": "ElementaryTypeName",
+                "src": "1108:7:69",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_address",
+                  "typeString": "address"
+                }
+              },
+              "nodeType": "Mapping",
+              "src": "1100:24:69",
+              "typeDescriptions": {
+                "typeIdentifier": "t_mapping$_t_address_$_t_bool_$",
+                "typeString": "mapping(address => bool)"
+              },
+              "valueType": {
+                "id": 9447,
+                "name": "bool",
+                "nodeType": "ElementaryTypeName",
+                "src": "1119:4:69",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_bool",
+                  "typeString": "bool"
+                }
+              }
+            },
+            "visibility": "public"
+          },
+          {
+            "constant": false,
+            "functionSelector": "50d2a276",
+            "id": 9453,
+            "mutability": "mutable",
+            "name": "selectorImplementation",
+            "nodeType": "VariableDeclaration",
+            "scope": 9454,
+            "src": "1158:56:69",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_mapping$_t_bytes4_$_t_address_$",
+              "typeString": "mapping(bytes4 => address)"
+            },
+            "typeName": {
+              "id": 9452,
+              "keyType": {
+                "id": 9450,
+                "name": "bytes4",
+                "nodeType": "ElementaryTypeName",
+                "src": "1166:6:69",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_bytes4",
+                  "typeString": "bytes4"
+                }
+              },
+              "nodeType": "Mapping",
+              "src": "1158:26:69",
+              "typeDescriptions": {
+                "typeIdentifier": "t_mapping$_t_bytes4_$_t_address_$",
+                "typeString": "mapping(bytes4 => address)"
+              },
+              "valueType": {
+                "id": 9451,
+                "name": "address",
+                "nodeType": "ElementaryTypeName",
+                "src": "1176:7:69",
+                "stateMutability": "nonpayable",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_address",
+                  "typeString": "address"
+                }
               }
             },
             "visibility": "public"
           }
         ],
-        "scope": 6663,
-        "src": "350:579:44"
+        "scope": 9455,
+        "src": "350:867:69"
       }
     ],
-    "src": "37:893:44"
+    "src": "37:1181:69"
   },
   "legacyAST": {
     "attributes": {
       "absolutePath": "/Users/zena/ico2.0/ico20-contracts/contracts/stake/StakeProxyStorage.sol",
       "exportedSymbols": {
         "IStakeFactory": [
-          3169
+          3903
         ],
         "IStakeRegistry": [
-          3328
+          4119
         ],
         "IStakeVaultFactory": [
-          3618
+          4553
         ],
         "StakeProxyStorage": [
-          6662
+          9454
         ]
       },
       "license": "Unlicense"
@@ -540,16 +789,16 @@
             ".6"
           ]
         },
-        "id": 6630,
+        "id": 9406,
         "name": "PragmaDirective",
-        "src": "37:23:44"
+        "src": "37:23:69"
       },
       {
         "attributes": {
-          "SourceUnit": 3170,
+          "SourceUnit": 3904,
           "absolutePath": "/Users/zena/ico2.0/ico20-contracts/contracts/interfaces/IStakeFactory.sol",
           "file": "../interfaces/IStakeFactory.sol",
-          "scope": 6663,
+          "scope": 9455,
           "symbolAliases": [
             {
               "foreign": {
@@ -559,24 +808,24 @@
                   ],
                   "value": "IStakeFactory"
                 },
-                "id": 6631,
+                "id": 9407,
                 "name": "Identifier",
-                "src": "119:13:44"
+                "src": "119:13:69"
               }
             }
           ],
           "unitAlias": ""
         },
-        "id": 6632,
+        "id": 9408,
         "name": "ImportDirective",
-        "src": "111:62:44"
+        "src": "111:62:69"
       },
       {
         "attributes": {
-          "SourceUnit": 3329,
+          "SourceUnit": 4120,
           "absolutePath": "/Users/zena/ico2.0/ico20-contracts/contracts/interfaces/IStakeRegistry.sol",
           "file": "../interfaces/IStakeRegistry.sol",
-          "scope": 6663,
+          "scope": 9455,
           "symbolAliases": [
             {
               "foreign": {
@@ -586,24 +835,24 @@
                   ],
                   "value": "IStakeRegistry"
                 },
-                "id": 6633,
+                "id": 9409,
                 "name": "Identifier",
-                "src": "182:14:44"
+                "src": "182:14:69"
               }
             }
           ],
           "unitAlias": ""
         },
-        "id": 6634,
+        "id": 9410,
         "name": "ImportDirective",
-        "src": "174:64:44"
+        "src": "174:64:69"
       },
       {
         "attributes": {
-          "SourceUnit": 3619,
+          "SourceUnit": 4554,
           "absolutePath": "/Users/zena/ico2.0/ico20-contracts/contracts/interfaces/IStakeVaultFactory.sol",
           "file": "../interfaces/IStakeVaultFactory.sol",
-          "scope": 6663,
+          "scope": 9455,
           "symbolAliases": [
             {
               "foreign": {
@@ -613,17 +862,17 @@
                   ],
                   "value": "IStakeVaultFactory"
                 },
-                "id": 6635,
+                "id": 9411,
                 "name": "Identifier",
-                "src": "247:18:44"
+                "src": "247:18:69"
               }
             }
           ],
           "unitAlias": ""
         },
-        "id": 6636,
+        "id": 9412,
         "name": "ImportDirective",
-        "src": "239:72:44"
+        "src": "239:72:69"
       },
       {
         "attributes": {
@@ -637,19 +886,19 @@
           "contractKind": "contract",
           "fullyImplemented": true,
           "linearizedBaseContracts": [
-            6662
+            9454
           ],
           "name": "StakeProxyStorage",
-          "scope": 6663
+          "scope": 9455
         },
         "children": [
           {
             "attributes": {
               "text": "@title The storage of StakeProxy"
             },
-            "id": 6637,
+            "id": 9413,
             "name": "StructuredDocumentation",
-            "src": "313:37:44"
+            "src": "313:37:69"
           },
           {
             "attributes": {
@@ -657,7 +906,7 @@
               "functionSelector": "68304835",
               "mutability": "mutable",
               "name": "stakeRegistry",
-              "scope": 6662,
+              "scope": 9454,
               "stateVariable": true,
               "storageLocation": "default",
               "type": "contract IStakeRegistry",
@@ -667,25 +916,25 @@
               {
                 "attributes": {
                   "name": "IStakeRegistry",
-                  "referencedDeclaration": 3328,
+                  "referencedDeclaration": 4119,
                   "type": "contract IStakeRegistry"
                 },
-                "id": 6639,
+                "id": 9415,
                 "name": "UserDefinedTypeName",
-                "src": "410:14:44"
+                "src": "410:14:69"
               },
               {
                 "attributes": {
                   "text": "@dev stakeRegistry"
                 },
-                "id": 6638,
+                "id": 9414,
                 "name": "StructuredDocumentation",
-                "src": "383:22:44"
+                "src": "383:22:69"
               }
             ],
-            "id": 6640,
+            "id": 9416,
             "name": "VariableDeclaration",
-            "src": "410:35:44"
+            "src": "410:35:69"
           },
           {
             "attributes": {
@@ -693,7 +942,7 @@
               "functionSelector": "dd196f18",
               "mutability": "mutable",
               "name": "stakeFactory",
-              "scope": 6662,
+              "scope": 9454,
               "stateVariable": true,
               "storageLocation": "default",
               "type": "contract IStakeFactory",
@@ -703,25 +952,25 @@
               {
                 "attributes": {
                   "name": "IStakeFactory",
-                  "referencedDeclaration": 3169,
+                  "referencedDeclaration": 3903,
                   "type": "contract IStakeFactory"
                 },
-                "id": 6642,
+                "id": 9418,
                 "name": "UserDefinedTypeName",
-                "src": "478:13:44"
+                "src": "478:13:69"
               },
               {
                 "attributes": {
                   "text": "@dev stakeFactory"
                 },
-                "id": 6641,
+                "id": 9417,
                 "name": "StructuredDocumentation",
-                "src": "452:21:44"
+                "src": "452:21:69"
               }
             ],
-            "id": 6643,
+            "id": 9419,
             "name": "VariableDeclaration",
-            "src": "478:33:44"
+            "src": "478:33:69"
           },
           {
             "attributes": {
@@ -729,7 +978,7 @@
               "functionSelector": "6af8da27",
               "mutability": "mutable",
               "name": "stakeVaultFactory",
-              "scope": 6662,
+              "scope": 9454,
               "stateVariable": true,
               "storageLocation": "default",
               "type": "contract IStakeVaultFactory",
@@ -739,25 +988,25 @@
               {
                 "attributes": {
                   "name": "IStakeVaultFactory",
-                  "referencedDeclaration": 3618,
+                  "referencedDeclaration": 4553,
                   "type": "contract IStakeVaultFactory"
                 },
-                "id": 6645,
+                "id": 9421,
                 "name": "UserDefinedTypeName",
-                "src": "549:18:44"
+                "src": "549:18:69"
               },
               {
                 "attributes": {
                   "text": "@dev stakeVaultFactory"
                 },
-                "id": 6644,
+                "id": 9420,
                 "name": "StructuredDocumentation",
-                "src": "518:26:44"
+                "src": "518:26:69"
               }
             ],
-            "id": 6646,
+            "id": 9422,
             "name": "VariableDeclaration",
-            "src": "549:43:44"
+            "src": "549:43:69"
           },
           {
             "attributes": {
@@ -765,7 +1014,7 @@
               "functionSelector": "89f395de",
               "mutability": "mutable",
               "name": "tos",
-              "scope": 6662,
+              "scope": 9454,
               "stateVariable": true,
               "storageLocation": "default",
               "type": "address",
@@ -778,22 +1027,22 @@
                   "stateMutability": "nonpayable",
                   "type": "address"
                 },
-                "id": 6648,
+                "id": 9424,
                 "name": "ElementaryTypeName",
-                "src": "624:7:44"
+                "src": "624:7:69"
               },
               {
                 "attributes": {
                   "text": "@dev TOS address"
                 },
-                "id": 6647,
+                "id": 9423,
                 "name": "StructuredDocumentation",
-                "src": "599:20:44"
+                "src": "599:20:69"
               }
             ],
-            "id": 6649,
+            "id": 9425,
             "name": "VariableDeclaration",
-            "src": "624:18:44"
+            "src": "624:18:69"
           },
           {
             "attributes": {
@@ -801,7 +1050,7 @@
               "functionSelector": "cc48b947",
               "mutability": "mutable",
               "name": "ton",
-              "scope": 6662,
+              "scope": 9454,
               "stateVariable": true,
               "storageLocation": "default",
               "type": "address",
@@ -814,22 +1063,22 @@
                   "stateMutability": "nonpayable",
                   "type": "address"
                 },
-                "id": 6651,
+                "id": 9427,
                 "name": "ElementaryTypeName",
-                "src": "685:7:44"
+                "src": "685:7:69"
               },
               {
                 "attributes": {
                   "text": "@dev TON address in Tokamak"
                 },
-                "id": 6650,
+                "id": 9426,
                 "name": "StructuredDocumentation",
-                "src": "649:31:44"
+                "src": "649:31:69"
               }
             ],
-            "id": 6652,
+            "id": 9428,
             "name": "VariableDeclaration",
-            "src": "685:18:44"
+            "src": "685:18:69"
           },
           {
             "attributes": {
@@ -837,7 +1086,7 @@
               "functionSelector": "8d62d949",
               "mutability": "mutable",
               "name": "wton",
-              "scope": 6662,
+              "scope": 9454,
               "stateVariable": true,
               "storageLocation": "default",
               "type": "address",
@@ -850,22 +1099,22 @@
                   "stateMutability": "nonpayable",
                   "type": "address"
                 },
-                "id": 6654,
+                "id": 9430,
                 "name": "ElementaryTypeName",
-                "src": "747:7:44"
+                "src": "747:7:69"
               },
               {
                 "attributes": {
                   "text": "@dev WTON address in Tokamak"
                 },
-                "id": 6653,
+                "id": 9429,
                 "name": "StructuredDocumentation",
-                "src": "710:32:44"
+                "src": "710:32:69"
               }
             ],
-            "id": 6655,
+            "id": 9431,
             "name": "VariableDeclaration",
-            "src": "747:19:44"
+            "src": "747:19:69"
           },
           {
             "attributes": {
@@ -873,7 +1122,7 @@
               "functionSelector": "6c7ac9d8",
               "mutability": "mutable",
               "name": "depositManager",
-              "scope": 6662,
+              "scope": 9454,
               "stateVariable": true,
               "storageLocation": "default",
               "type": "address",
@@ -886,22 +1135,22 @@
                   "stateMutability": "nonpayable",
                   "type": "address"
                 },
-                "id": 6657,
+                "id": 9433,
                 "name": "ElementaryTypeName",
-                "src": "820:7:44"
+                "src": "820:7:69"
               },
               {
                 "attributes": {
                   "text": "@dev Depositmanager address in Tokamak"
                 },
-                "id": 6656,
+                "id": 9432,
                 "name": "StructuredDocumentation",
-                "src": "773:42:44"
+                "src": "773:42:69"
               }
             ],
-            "id": 6658,
+            "id": 9434,
             "name": "VariableDeclaration",
-            "src": "820:29:44"
+            "src": "820:29:69"
           },
           {
             "attributes": {
@@ -909,7 +1158,7 @@
               "functionSelector": "6fb7f558",
               "mutability": "mutable",
               "name": "seigManager",
-              "scope": 6662,
+              "scope": 9454,
               "stateVariable": true,
               "storageLocation": "default",
               "type": "address",
@@ -922,32 +1171,215 @@
                   "stateMutability": "nonpayable",
                   "type": "address"
                 },
-                "id": 6660,
+                "id": 9436,
                 "name": "ElementaryTypeName",
-                "src": "900:7:44"
+                "src": "900:7:69"
               },
               {
                 "attributes": {
                   "text": "@dev SeigManager address in Tokamak"
                 },
-                "id": 6659,
+                "id": 9435,
                 "name": "StructuredDocumentation",
-                "src": "856:39:44"
+                "src": "856:39:69"
               }
             ],
-            "id": 6661,
+            "id": 9437,
             "name": "VariableDeclaration",
-            "src": "900:26:44"
+            "src": "900:26:69"
+          },
+          {
+            "attributes": {
+              "constant": false,
+              "functionSelector": "63a8fd89",
+              "mutability": "mutable",
+              "name": "pauseProxy",
+              "scope": 9454,
+              "stateVariable": true,
+              "storageLocation": "default",
+              "type": "bool",
+              "visibility": "public"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "name": "bool",
+                  "type": "bool"
+                },
+                "id": 9439,
+                "name": "ElementaryTypeName",
+                "src": "967:4:69"
+              },
+              {
+                "attributes": {
+                  "text": "@dev flag for pause proxy"
+                },
+                "id": 9438,
+                "name": "StructuredDocumentation",
+                "src": "933:29:69"
+              }
+            ],
+            "id": 9440,
+            "name": "VariableDeclaration",
+            "src": "967:22:69"
+          },
+          {
+            "attributes": {
+              "constant": false,
+              "functionSelector": "b911135f",
+              "mutability": "mutable",
+              "name": "proxyImplementation",
+              "scope": 9454,
+              "stateVariable": true,
+              "storageLocation": "default",
+              "type": "mapping(uint256 => address)",
+              "visibility": "public"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "type": "mapping(uint256 => address)"
+                },
+                "children": [
+                  {
+                    "attributes": {
+                      "name": "uint256",
+                      "type": "uint256"
+                    },
+                    "id": 9442,
+                    "name": "ElementaryTypeName",
+                    "src": "1047:7:69"
+                  },
+                  {
+                    "attributes": {
+                      "name": "address",
+                      "stateMutability": "nonpayable",
+                      "type": "address"
+                    },
+                    "id": 9443,
+                    "name": "ElementaryTypeName",
+                    "src": "1058:7:69"
+                  }
+                ],
+                "id": 9444,
+                "name": "Mapping",
+                "src": "1039:27:69"
+              },
+              {
+                "attributes": {
+                  "text": "@dev implementation of proxy index"
+                },
+                "id": 9441,
+                "name": "StructuredDocumentation",
+                "src": "996:38:69"
+              }
+            ],
+            "id": 9445,
+            "name": "VariableDeclaration",
+            "src": "1039:54:69"
+          },
+          {
+            "attributes": {
+              "constant": false,
+              "functionSelector": "550d01a3",
+              "mutability": "mutable",
+              "name": "aliveImplementation",
+              "scope": 9454,
+              "stateVariable": true,
+              "storageLocation": "default",
+              "type": "mapping(address => bool)",
+              "visibility": "public"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "type": "mapping(address => bool)"
+                },
+                "children": [
+                  {
+                    "attributes": {
+                      "name": "address",
+                      "type": "address"
+                    },
+                    "id": 9446,
+                    "name": "ElementaryTypeName",
+                    "src": "1108:7:69"
+                  },
+                  {
+                    "attributes": {
+                      "name": "bool",
+                      "type": "bool"
+                    },
+                    "id": 9447,
+                    "name": "ElementaryTypeName",
+                    "src": "1119:4:69"
+                  }
+                ],
+                "id": 9448,
+                "name": "Mapping",
+                "src": "1100:24:69"
+              }
+            ],
+            "id": 9449,
+            "name": "VariableDeclaration",
+            "src": "1100:51:69"
+          },
+          {
+            "attributes": {
+              "constant": false,
+              "functionSelector": "50d2a276",
+              "mutability": "mutable",
+              "name": "selectorImplementation",
+              "scope": 9454,
+              "stateVariable": true,
+              "storageLocation": "default",
+              "type": "mapping(bytes4 => address)",
+              "visibility": "public"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "type": "mapping(bytes4 => address)"
+                },
+                "children": [
+                  {
+                    "attributes": {
+                      "name": "bytes4",
+                      "type": "bytes4"
+                    },
+                    "id": 9450,
+                    "name": "ElementaryTypeName",
+                    "src": "1166:6:69"
+                  },
+                  {
+                    "attributes": {
+                      "name": "address",
+                      "stateMutability": "nonpayable",
+                      "type": "address"
+                    },
+                    "id": 9451,
+                    "name": "ElementaryTypeName",
+                    "src": "1176:7:69"
+                  }
+                ],
+                "id": 9452,
+                "name": "Mapping",
+                "src": "1158:26:69"
+              }
+            ],
+            "id": 9453,
+            "name": "VariableDeclaration",
+            "src": "1158:56:69"
           }
         ],
-        "id": 6662,
+        "id": 9454,
         "name": "ContractDefinition",
-        "src": "350:579:44"
+        "src": "350:867:69"
       }
     ],
-    "id": 6663,
+    "id": 9455,
     "name": "SourceUnit",
-    "src": "37:893:44"
+    "src": "37:1181:69"
   },
   "compiler": {
     "name": "solc",
@@ -955,13 +1387,19 @@
   },
   "networks": {},
   "schemaVersion": "3.3.4",
-  "updatedAt": "2021-06-19T02:31:50.200Z",
+  "updatedAt": "2021-08-02T05:01:31.324Z",
   "devdoc": {
     "kind": "dev",
     "methods": {},
     "stateVariables": {
       "depositManager": {
         "details": "Depositmanager address in Tokamak"
+      },
+      "pauseProxy": {
+        "details": "flag for pause proxy"
+      },
+      "proxyImplementation": {
+        "details": "implementation of proxy index"
       },
       "seigManager": {
         "details": "SeigManager address in Tokamak"

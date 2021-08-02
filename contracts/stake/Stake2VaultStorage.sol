@@ -18,6 +18,9 @@ contract Stake2VaultStorage is AccessibleCommon {
     /// @dev mining start time
     uint256 public miningStartTime;
 
+    /// @dev mining end time
+    uint256 public miningEndTime;
+
     /// @dev mining amount per second
     uint256 public miningPerSecond;
 
