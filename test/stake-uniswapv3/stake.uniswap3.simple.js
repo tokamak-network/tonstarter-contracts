@@ -321,9 +321,20 @@ describe(" StakeUniswapV3 ", function () {
       let startTime = new Date().getTime();
       startTime = Math.floor(startTime/1000);
       startTime = parseInt(startTime);
+
+      let period = 60*60*2;
+      let endTime = startTime + period;
+
       await stakeEntry2.setStartTimeOfVault2(vaultAddress, startTime);
       let miningStartTime = await TestStake2Vault.miningStartTime();
       expect(miningStartTime.toString()).to.be.equal(startTime +'');
+
+
+      await stakeEntry2.setEndTimeOfVault2(vaultAddress, endTime);
+      let miningEndTime = await TestStake2Vault.miningEndTime();
+      expect(miningEndTime).to.be.equal(
+        miningStartTime.add(ethers.BigNumber.from(period+''))
+        );
 
       TestStakeUniswapV3 = await ico20Contracts.getContract(
         "StakeUniswapV3",

@@ -56,10 +56,16 @@ async function main() {
   let vault = {
     address: process.env.PHASE2_LP_VAULT_ADDRESS,
     startTime : process.env.PHASE2_WTONTOS_STARTTIME,
-    timestamp:0
+    timestamp:0,
+    endTime: process.env.PHASE2_WTONTOS_ENDTIME,
+    timestampEnd:0,
   }
   let startTime = new Date(vault.startTime).getTime();
   vault.timestamp = Math.floor(startTime/1000);
+
+  let endTime = new Date(vault.endTime).getTime();
+  vault.timestampEnd = Math.floor(endTime/1000);
+
 
   console.log("setStartTimeOfVault2  ", vault );
 
@@ -71,6 +77,12 @@ async function main() {
   console.log("Phase2 setStartTimeOfVault2  ", tx.hash );
   printGasUsedOfUnits('Phase2 setStartTimeOfVault2 ', tx.hash);
 
+  let tx1 = await stakeEntry2.setEndTimeOfVault2(
+    vault.address,
+    vault.timestampEnd
+  );
+  console.log("Phase2 setEndTimeOfVault2  ", tx1.hash );
+  printGasUsedOfUnits('Phase2 setEndTimeOfVault2 ', tx1.hash);
 
 }
 

@@ -56,7 +56,7 @@ async function main() {
   let _func4 = Web3EthAbi.encodeFunctionSignature("setMiningIntervalSeconds(address,uint256)") ;
   let _func5 = Web3EthAbi.encodeFunctionSignature("resetCoinageTime(address)") ;
   let _func6 = Web3EthAbi.encodeFunctionSignature("setStartTimeOfVault2(address,uint256)") ;
-
+  let _func7 = Web3EthAbi.encodeFunctionSignature("setEndTimeOfVault2(address,uint256)") ;
   // console.log('balanceOf(address,address)',_func1);
   // console.log('balanceOfTOS(address)',_func2);
   // console.log('createVault2',_func3);
@@ -73,7 +73,7 @@ async function main() {
   //=====================================
 
   tx =  await Stake1Proxy.setSelectorImplementations(
-        [_func1, _func2, _func3, _func4, _func5, _func6],
+        [_func1, _func2, _func3, _func4, _func5, _func6, _func7],
         Stake2LogicAddress);
   console.log("Stake2Logic setSelectorImplementations: " );
   printGasUsedOfUnits('Stake2Logic setSelectorImplementations', tx.hash);

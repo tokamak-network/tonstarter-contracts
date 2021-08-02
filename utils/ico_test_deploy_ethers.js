@@ -765,6 +765,7 @@ class ICO20Contracts {
     let _func4 = Web3EthAbi.encodeFunctionSignature("setMiningIntervalSeconds(address,uint256)") ;
     let _func5 = Web3EthAbi.encodeFunctionSignature("resetCoinageTime(address)") ;
     let _func6 = Web3EthAbi.encodeFunctionSignature("setStartTimeOfVault2(address,uint256)") ;
+    let _func7 = Web3EthAbi.encodeFunctionSignature("setEndTimeOfVault2(address,uint256)") ;
 
     await this.stake1proxy.connect(owner).setImplementation(
       this.stake2logic.address,
@@ -772,7 +773,7 @@ class ICO20Contracts {
 
     await this.stake1proxy
       .connect(owner)
-      .setSelectorImplementations([_func1, _func2, _func3, _func4, _func5, _func6], this.stake2logic.address);
+      .setSelectorImplementations([_func1, _func2, _func3, _func4, _func5, _func6, _func7], this.stake2logic.address);
 
     // 로직2로 연동하는 프록시 인터페이스 설정
     this.stakeEntry2 = await ethers.getContractAt("Stake2Logic",this.stake1proxy.address);

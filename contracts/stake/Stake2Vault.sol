@@ -80,20 +80,6 @@ contract Stake2Vault is Stake2VaultStorage, IStake2Vault {
         stakeAddress = _stakeAddress;
     }
 
-    /// @dev set reward per block
-    /// @param _rewardPerBlock  allocated reward amount
-    /* function setRewardPerBlock(uint256 _rewardPerBlock)
-        external
-        override
-        onlyOwner
-    {
-        require(
-            _rewardPerBlock > 0 && rewardPerBlock != _rewardPerBlock,
-            "Stake2Vault: setRewardPerBlock fails"
-        );
-        rewardPerBlock = _rewardPerBlock;
-    }*/
-
     /// @dev set mining amount per second
     /// @param _miningPerSecond  a mining amount per second
     function setMiningAmountPerSecond(uint256 _miningPerSecond)
@@ -160,7 +146,8 @@ contract Stake2Vault is Stake2VaultStorage, IStake2Vault {
         uint256 nonMiningAmount
     ) external override nonZero(minableAmount) returns (bool) {
         require(
-            miningStartTime < block.timestamp && block.timestamp < miningEndTime,
+            miningStartTime < block.timestamp &&
+                block.timestamp < miningEndTime,
             "Stake2Vault: It is not a mining period"
         );
         require(

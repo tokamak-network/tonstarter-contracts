@@ -39,19 +39,6 @@ contract Stake2Logic is StakeProxyStorage, AccessibleCommon, IStake2Logic {
 
     constructor() {}
 
-    /*
-    function balanceOf(address token, address target)
-        external
-        view
-        returns (uint256)
-    {
-        return IERC20(token).balanceOf(target);
-    }
-
-    function balanceOfTOS(address target) external view returns (uint256) {
-        return IERC20(tos).balanceOf(target);
-    }
-    */
     /// @dev Set stakeVaultLogic address by _phase
     /// @param _phase the stake type
     /// @param _logic the vault logic address
@@ -138,6 +125,7 @@ contract Stake2Logic is StakeProxyStorage, AccessibleCommon, IStake2Logic {
     }
 
     /// @dev set pool information
+    /// @param target  target address
     /// @param uniswapInfo [NonfungiblePositionManager,UniswapV3Factory,token0,token1]
     function setPool(address target, address[4] memory uniswapInfo)
         external
@@ -148,6 +136,9 @@ contract Stake2Logic is StakeProxyStorage, AccessibleCommon, IStake2Logic {
         IIStakeUniswapV3(target).setPool(uniswapInfo);
     }
 
+    /// @dev Mining interval setting (seconds)
+    /// @param target  target address
+    /// @param miningIntervalSeconds the mining interval (sec)
     function setMiningIntervalSeconds(
         address target,
         uint256 miningIntervalSeconds
@@ -157,6 +148,8 @@ contract Stake2Logic is StakeProxyStorage, AccessibleCommon, IStake2Logic {
         );
     }
 
+    /// @dev reset coinage's last mining time variable for tes
+    /// @param target  target address
     function resetCoinageTime(address target)
         external
         override
@@ -166,6 +159,9 @@ contract Stake2Logic is StakeProxyStorage, AccessibleCommon, IStake2Logic {
         IIStakeUniswapV3(target).resetCoinageTime();
     }
 
+    /// @dev set the start time of vault2
+    /// @param vault  a vault address
+    /// @param startTime  mining start time
     function setStartTimeOfVault2(address vault, uint256 startTime)
         external
         override
@@ -180,5 +176,17 @@ contract Stake2Logic is StakeProxyStorage, AccessibleCommon, IStake2Logic {
 
         IStake2Vault(vault).setMiningStartTime(startTime);
         IIStakeUniswapV3(stakeAddress).setSaleStartTime(startTime);
+    }
+
+    /// @dev set mining end time
+    /// @param vault  a vault address
+    /// @param endTime  mining end time
+    function setEndTimeOfVault2(address vault, uint256 endTime)
+        external
+        override
+        onlyOwner
+        nonZeroAddress(vault)
+    {
+        IStake2Vault(vault).setMiningEndTime(endTime);
     }
 }
