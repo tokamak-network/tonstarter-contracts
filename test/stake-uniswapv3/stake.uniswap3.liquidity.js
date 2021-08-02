@@ -107,6 +107,17 @@ let tester2 = {
   miningTimeLast: 0
 }
 
+function getAlignedPair(_token0, _token1) {
+  let token0 = _token0;
+  let token1 = _token1;
+  if (token0 > token1) {
+    token0 = _token1
+    token1 = _token0
+  }
+
+  return [token0, token1]
+}
+
 describe(" StakeUniswapV3 ", function () {
   let sender;
   let usersInfo;
@@ -359,12 +370,7 @@ describe(" StakeUniswapV3 ", function () {
       let code = await sender.provider.getCode(expectedAddress)
       expect(code).to.eq('0x');
 
-      let token0 = wton.address
-      let token1 = tos.address
-      if (token0 > token1) {
-        token0 = tos.address
-        token1 = wton.address
-      }
+      const [token0, token1] = getAlignedPair(wton.address, tos.address)
 
       await deployedUniswapV3.coreFactory.connect(sender).createPool(token0, token1, FeeAmount.MEDIUM)
       await timeout(10);
@@ -386,15 +392,8 @@ describe(" StakeUniswapV3 ", function () {
     it('2. createAndInitializePoolIfNecessary ', async () => {
         this.timeout(1000000);
         //await timeout(5);
-        console.log('createAndInitializePoolIfNecessary start ');
 
-        let token0 = wton.address
-        let token1 = tos.address
-        if (token0 > token1) {
-          token0 = tos.address
-          token1 = wton.address
-        }
-
+        const [token0, token1] = getAlignedPair(wton.address, tos.address)
         await deployedUniswapV3.nftPositionManager.connect(sender).createAndInitializePoolIfNecessary(
           token0,
           token1,
@@ -402,7 +401,6 @@ describe(" StakeUniswapV3 ", function () {
           sqrtPrice
         )
 
-        console.log('createAndInitializePoolIfNecessary end');
         //await timeout(10);
      });
 
@@ -441,9 +439,10 @@ describe(" StakeUniswapV3 ", function () {
         let tester = tester1;
 
         await timeout(5);
+        const [token0, token1] = getAlignedPair(wton.address, tos.address)
         await deployedUniswapV3.nftPositionManager.connect(tester.account).mint({
-          token0: wton.address,
-          token1: tos.address,
+          token0: token0,
+          token1: token1,
           tickLower: getNegativeOneTick(TICK_SPACINGS[FeeAmount.MEDIUM]),
           tickUpper: getPositiveOneMaxTick(TICK_SPACINGS[FeeAmount.MEDIUM]),
           fee: FeeAmount.MEDIUM,
@@ -511,9 +510,10 @@ describe(" StakeUniswapV3 ", function () {
         this.timeout(1000000);
         let tester = tester2 ;
         //await timeout(1);
+        const [token0, token1] = getAlignedPair(wton.address, tos.address)
         await deployedUniswapV3.nftPositionManager.connect(tester.account).mint({
-          token0: wton.address,
-          token1: tos.address,
+          token0: token0,
+          token1: token1,
           tickLower: getNegativeOneTick(TICK_SPACINGS[FeeAmount.MEDIUM]),
           tickUpper: getPositiveOneMaxTick(TICK_SPACINGS[FeeAmount.MEDIUM]),
           fee: FeeAmount.MEDIUM,
