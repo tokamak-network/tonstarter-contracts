@@ -91,8 +91,10 @@ let tester1 = {
   amount0Desired: null,
   amount1Desired: null,
   tokens: [],
+  positions:[],
   wtonbalanceBefore:0,
-  tosbalanceBefore:0
+  tosbalanceBefore:0,
+  miningTimeLast: 0
 }
 let tester2 = {
   account: null,
@@ -101,8 +103,10 @@ let tester2 = {
   amount0Desired: null,
   amount1Desired: null,
   tokens: [],
+  positions:[],
   wtonbalanceBefore:0,
-  tosbalanceBefore:0
+  tosbalanceBefore:0,
+  miningTimeLast: 0
 }
 
 describe(" StakeUniswapV3 ", function () {
@@ -124,6 +128,9 @@ describe(" StakeUniswapV3 ", function () {
   let defaultSender ;
   let owner  ;
   let sqrtPrice ;
+
+  let swapAmountWTON, swapAmountTOS , remainMiningTotal ;
+  remainMiningTotal = ethers.BigNumber.from('0');
 
   before(async () => {
     ico20Contracts = new ICO20Contracts();
@@ -309,22 +316,30 @@ describe(" StakeUniswapV3 ", function () {
 
     });
 
-     it("2. setStartTimeOfVault2", async function () {
-        this.timeout(1000000);
-        let startTime = new Date().getTime();
-        startTime = Math.floor(startTime/1000);
-        startTime = parseInt(startTime);
-        await stakeEntry2.setStartTimeOfVault2(vaultAddress, startTime);
-        let miningStartTime = await TestStake2Vault.miningStartTime();
-        expect(miningStartTime.toString()).to.be.equal(startTime +'');
+    it("2. setStartTimeOfVault2", async function () {
+      this.timeout(1000000);
+      let startTime = new Date().getTime();
+      startTime = Math.floor(startTime/1000);
+      startTime = parseInt(startTime);
+      await stakeEntry2.setStartTimeOfVault2(vaultAddress, startTime);
+      let miningStartTime = await TestStake2Vault.miningStartTime();
+      expect(miningStartTime.toString()).to.be.equal(startTime +'');
 
-        TestStakeUniswapV3 = await ico20Contracts.getContract(
-          "StakeUniswapV3",
-          stakeContractAddress,
-          owner.address
-        );
-        let saleStartTime = await TestStakeUniswapV3.saleStartTime();
-        expect(saleStartTime.toString()).to.be.equal(startTime +'');
+      TestStakeUniswapV3 = await ico20Contracts.getContract(
+        "StakeUniswapV3",
+        stakeContractAddress,
+        owner.address
+      );
+      let saleStartTime = await TestStakeUniswapV3.saleStartTime();
+      expect(saleStartTime.toString()).to.be.equal(startTime +'');
+    });
+
+    it("3. tos.addBunner to vault", async function () {
+        this.timeout(1000000);
+
+        let tx = await tos.addBurner(vaultAddress);
+        await tx.wait();
+        expect(await tos.isBurner(vaultAddress)).to.be.equal(true);
      });
   });
 
@@ -350,7 +365,7 @@ describe(" StakeUniswapV3 ", function () {
 
       await pool.connect(sender).initialize(sqrtPrice);
 
-      await timeout(5);
+      await timeout(10);
       code = await sender.provider.getCode(expectedAddress)
       expect(code).to.not.eq('0x')
 
@@ -440,6 +455,8 @@ describe(" StakeUniswapV3 ", function () {
         for(let i=0; i < len; i++){
             let tokenId = await deployedUniswapV3.nftPositionManager.tokenOfOwnerByIndex(tester.account.address, i );
             tester.tokens.push(tokenId);
+            let position = await deployedUniswapV3.nftPositionManager.positions(tokenId);
+            tester.positions.push(position);
         }
         expect(tester.tokens.length).to.be.equal(1);
      });
@@ -503,6 +520,8 @@ describe(" StakeUniswapV3 ", function () {
         for(let i=0; i < len; i++){
             let tokenId = await deployedUniswapV3.nftPositionManager.tokenOfOwnerByIndex(tester.account.address, i );
             tester.tokens.push(tokenId);
+            let position = await deployedUniswapV3.nftPositionManager.positions(tokenId);
+            tester.positions.push(position);
         }
         expect(tester.tokens.length).to.be.equal(1);
 
@@ -538,12 +557,6 @@ describe(" StakeUniswapV3 ", function () {
 
     });
 
-    // it('2. stake : Fail when the current tick is outside the range provided by the token', async () => {
-
-    // });
-    // it('3. stake : Fail when pool is locked', async () => {
-
-    // });
     it('3. stake : tester1', async () => {
       this.timeout(1000000);
       let tester = tester1;
@@ -580,6 +593,11 @@ describe(" StakeUniswapV3 ", function () {
       expect(await TestStakeUniswapV3.totalStakers()).to.be.equal(ethers.BigNumber.from('1'));
       expect(await TestStakeUniswapV3.totalTokens()).to.be.equal(ethers.BigNumber.from('1'));
       expect(await TestStakeUniswapV3.totalStakedAmount()).to.be.equal(totalStakedAmountBefore.add(depositToken.liquidity));
+
+      let coinageLastMintBlockTimetampAfter = await TestStakeUniswapV3.coinageLastMintBlockTimetamp();
+      tester1.miningTimeLast = coinageLastMintBlockTimetampAfter;
+      tester2.miningTimeLast = coinageLastMintBlockTimetampAfter;
+
     });
 
 
@@ -599,11 +617,6 @@ describe(" StakeUniswapV3 ", function () {
       let depositToken = await TestStakeUniswapV3.depositTokens(tester.tokens[0]);
       let coinageToken = await TestStakeUniswapV3.stakedCoinageTokens(tester.tokens[0]);
       let userTotalStaked = await TestStakeUniswapV3.userTotalStaked(tester.account.address);
-      //let totalStakedAmountAfter = await TestStakeUniswapV3.totalStakedAmount();
-      // console.log('depositToken owner',depositToken.owner );
-      // console.log('depositToken startTime',depositToken.startTime );
-      // console.log('depositToken secondsInsideInitial',depositToken.secondsInsideInitial);
-      // console.log('depositToken secondsInsideLast',depositToken.secondsInsideLast );
 
       expect(depositToken.owner).to.be.equal(tester.account.address);
 
@@ -619,15 +632,12 @@ describe(" StakeUniswapV3 ", function () {
       expect(await TestStakeUniswapV3.totalTokens()).to.be.equal(ethers.BigNumber.from('2'));
 
       expect(await TestStakeUniswapV3.totalStakedAmount()).to.be.equal(totalStakedAmountBefore.add(depositToken.liquidity));
+
+      let coinageLastMintBlockTimetampAfter = await TestStakeUniswapV3.coinageLastMintBlockTimetamp();
+      tester1.miningTimeLast = coinageLastMintBlockTimetampAfter;
+      tester2.miningTimeLast = coinageLastMintBlockTimetampAfter;
+
     });
-
-
-    // it('3. stakePermit : if sig is wrong , fail ', async () => {
-
-    // });
-
-    // it('4. stakePermit   ', async () => {
-    // });
 
     it('5. miningCoinage :  ', async () => {
       this.timeout(1000000);
@@ -640,148 +650,176 @@ describe(" StakeUniswapV3 ", function () {
       let coinageLastMintBlockTimetampAfter = await TestStakeUniswapV3.coinageLastMintBlockTimetamp();
       expect(canBalanceAfter.balanceOfRayTokenId).to.be.above(canBalanceBefore.balanceOfRayTokenId);
       expect(coinageLastMintBlockTimetampBefore).to.be.lt(coinageLastMintBlockTimetampAfter);
+
+      tester1.miningTimeLast = coinageLastMintBlockTimetampAfter;
+      tester2.miningTimeLast = coinageLastMintBlockTimetampAfter;
+
     });
 
     it('6. claim : tester1 ', async () => {
       this.timeout(1000000);
       let tester = tester1;
-      let vaultAddressBalance = await tos.balanceOf(vaultAddress);
-      // console.log('vaultAddressBalance',utils.formatUnits(vaultAddressBalance.toString(), 18) );
+      let vaultBalanceTOS = await tos.balanceOf(vaultAddress);
+      let totalSupplyTOS = await tos.totalSupply();
+
+      let miningAmount = ethers.BigNumber.from('0');
+      let nonminingAmount = ethers.BigNumber.from('0');
 
       let tosBalanceBefore = await tos.balanceOf(tester.account.address);
       let miningInfosBefore = await TestStakeUniswapV3.getMiningTokenId(tester.tokens[0]);
-      expect(miningInfosBefore.miningAmount).to.be.above(ethers.BigNumber.from('0'));
 
-      // expect(miningInfosBefore.minableAmount.add(ethers.BigNumber.from('1'))).to.be.lte(
-      //   miningInfosBefore.secondsInsideDiff.mul(ethers.BigNumber.from(PHASE2_MINING_PERSECOND+''))
-      // );
-      let minableAmount = miningInfosBefore.minableAmount.toString();
+      expect(miningInfosBefore.miningAmount).to.be.equal(
+        ethers.BigNumber.from(miningInfosBefore.minableAmount.toString())
+        .mul(ethers.BigNumber.from(miningInfosBefore.secondsInsideDiff256.toString()))
+        .div(ethers.BigNumber.from(miningInfosBefore.secondsAbsolute256.toString()))
+      );
+      expect(miningInfosBefore.nonMiningAmount).to.be.equal(
+        ethers.BigNumber.from(miningInfosBefore.minableAmount.toString())
+        .sub(ethers.BigNumber.from(miningInfosBefore.miningAmount.toString()))
+      );
+      expect(miningInfosBefore.minableAmount).to.be.above(ethers.BigNumber.from('0'));
 
-      // console.log('miningInfosBefore miningAmount',miningInfosBefore.miningAmount.toString());
-      // console.log('miningInfosBefore nonMiningAmount',miningInfosBefore.nonMiningAmount.toString());
-      // console.log('miningInfosBefore minableAmount',miningInfosBefore.minableAmount.toString());
-      // console.log('miningInfosBefore secondsInside',miningInfosBefore.secondsInside.toString());
-      // console.log('miningInfosBefore secondsInsideDiff',miningInfosBefore.secondsInsideDiff.toString());
-      // console.log('miningInfosBefore liquidity',miningInfosBefore.liquidity.toString());
-      // console.log('miningInfosBefore balanceOfTokenIdRay',miningInfosBefore.balanceOfTokenIdRay.toString());
-      // console.log('miningInfosBefore minableAmountRay',miningInfosBefore.minableAmountRay.toString());
-      // console.log('miningInfosBefore currentTime',miningInfosBefore.currentTime );
+      let coinageTokenBefore = await TestStakeUniswapV3.stakedCoinageTokens(tester.tokens[0]);
 
-      await TestStakeUniswapV3.connect(tester.account).claim(tester.tokens[0]);
+      let depositToken = await TestStakeUniswapV3.depositTokens(tester.tokens[0]);
+      expect(miningInfosBefore.minableAmount).to.be.above(ethers.BigNumber.from('0'));
+
+
+      let tx = await TestStakeUniswapV3.connect(tester.account).claim(tester.tokens[0]);
+      const receipt = await tx.wait();
+
+      for(let i=0; i< receipt.events.length ;i++){
+        //console.log('receipt.events[i].event',i, receipt.events[i].event);
+        if(receipt.events[i].event == "Claimed" && receipt.events[i].args!=null){
+            let miningAmount1 = receipt.events[i].args.miningAmount;
+            let nonMiningAmount1 = receipt.events[i].args.nonMiningAmount;
+
+            miningAmount = miningAmount.add(miningAmount1);
+            nonminingAmount = nonminingAmount.add(nonMiningAmount1);
+        }
+      }
+      let minableAmount = miningAmount.add(nonminingAmount);
 
       let tosBalanceAfter = await tos.balanceOf(tester.account.address);
       let miningInfosAfter = await TestStakeUniswapV3.getMiningTokenId(tester.tokens[0]);
-
-      // console.log('miningInfosAfter miningAmount',miningInfosAfter.miningAmount.toString());
-      // console.log('miningInfosAfter nonMiningAmount',miningInfosAfter.nonMiningAmount.toString());
-      // console.log('miningInfosAfter minableAmount',miningInfosAfter.minableAmount.toString());
-      // console.log('miningInfosAfter secondsInside',miningInfosAfter.secondsInside.toString());
-      // console.log('miningInfosAfter secondsInsideDiff',miningInfosAfter.secondsInsideDiff.toString());
-      // console.log('miningInfosAfter liquidity',miningInfosAfter.liquidity.toString());
-      // console.log('miningInfosAfter balanceOfTokenIdRay',miningInfosAfter.balanceOfTokenIdRay.toString());
-      // console.log('miningInfosAfter minableAmountRay',miningInfosAfter.minableAmountRay.toString());
-      // console.log('miningInfosAfter currentTime',miningInfosAfter.currentTime );
-
-      // 마이닝하고 나면 마이닝 할수있는 금액은 0이된다.
       expect(miningInfosAfter.miningAmount).to.be.equal(ethers.BigNumber.from('0'));
-      // 토스잔액은 마이닝된 금액이 더해진다.
-      expect(tosBalanceBefore.add(miningInfosBefore.miningAmount))
-        .to.be.equal(tosBalanceAfter);
+      expect(miningInfosAfter.nonMiningAmount).to.be.equal(ethers.BigNumber.from('0'));
+      expect(miningInfosAfter.minableAmount).to.be.equal(ethers.BigNumber.from('0'));
 
-      let depositToken = await TestStakeUniswapV3.depositTokens(tester.tokens[0]);
+      expect(tosBalanceBefore.add(miningAmount)).to.be.equal(tosBalanceAfter);
+
+      depositToken = await TestStakeUniswapV3.depositTokens(tester.tokens[0]);
       let coinageToken = await TestStakeUniswapV3.stakedCoinageTokens(tester.tokens[0]);
       let userTotalStaked = await TestStakeUniswapV3.userTotalStaked(tester.account.address);
 
 
-      // console.log('depositToken claimedTime',depositToken.claimedTime );
-      // console.log('depositToken secondsInsideInitial',depositToken.secondsInsideInitial);
-      // console.log('depositToken secondsInsideLast',depositToken.secondsInsideLast );
+      expect(coinageToken.claimedAmount.sub(coinageTokenBefore.claimedAmount))
+        .to.be.equal(miningAmount);
+      expect(coinageToken.nonMiningAmount.sub(coinageTokenBefore.nonMiningAmount))
+        .to.be.equal(nonminingAmount);
+
+      expect(depositToken.claimedTime).to.be.equal(coinageToken.claimedTime);
+      expect(userTotalStaked.totalMiningAmount).to.be.equal(coinageToken.claimedAmount);
+      expect(userTotalStaked.totalNonMiningAmount).to.be.equal(coinageToken.nonMiningAmount);
 
       let secondDiff = depositToken.secondsInsideLast-depositToken.secondsInsideInitial;
       let miningAmountForSecondDiff = secondDiff*PHASE2_MINING_PERSECOND;
 
-      // console.log('miningAmountForSecondDiff',miningAmountForSecondDiff );
-      // console.log('userTotalStaked totalDepositAmount',userTotalStaked.totalDepositAmount.toString() );
-      // console.log('userTotalStaked totalMiningAmount',userTotalStaked.totalMiningAmount.toString() );
-      // console.log('userTotalStaked totalNonMiningAmount',userTotalStaked.totalNonMiningAmount.toString() );
+      expect(minableAmount).to.be.lte(ethers.BigNumber.from(miningAmountForSecondDiff+''));
+      remainMiningTotal = remainMiningTotal.sub(minableAmount);
 
-      // console.log('coinageToken claimedAmount',coinageToken.claimedAmount.toString() );
-      // console.log('coinageToken nonMiningAmount',coinageToken.nonMiningAmount.toString() );
+      let vaultBalanceTOSAfter = await tos.balanceOf(vaultAddress);
+      let totalSupplyTOSAfter = await tos.totalSupply();
+      expect(vaultBalanceTOS).to.be.equal(vaultBalanceTOSAfter.add(minableAmount));
+      expect(totalSupplyTOS).to.be.equal(totalSupplyTOSAfter.add(nonminingAmount));
 
-      // 마이닝가능금액은 유동성을 제공한 초*초당마이닝 양보다 작다. 마이닝금액을 다른 사람과 같이 나눠가지므로,
-      expect(ethers.BigNumber.from(minableAmount)).to.be.lte(ethers.BigNumber.from(miningAmountForSecondDiff+''));
-      // 디파짓 클래임타임과 코인에이지 클래임타임은 같다.
-      expect(depositToken.claimedTime).to.be.equal(coinageToken.claimedTime);
-      // 나의 총 마이닝 금액은 코인에이지에서 마이닝한 금액이다.
-      expect(userTotalStaked.totalMiningAmount).to.be.equal(coinageToken.claimedAmount);
-      // 나의 총 마이닝 못한 금액은 코인에이지에서 마이닝 못한 금액이다.
-      expect(userTotalStaked.totalNonMiningAmount).to.be.equal(coinageToken.nonMiningAmount);
-
+      let coinageLastMintBlockTimetampAfter = await TestStakeUniswapV3.coinageLastMintBlockTimetamp();
+      tester1.miningTimeLast = coinageLastMintBlockTimetampAfter;
+      tester2.miningTimeLast = coinageLastMintBlockTimetampAfter;
     });
 
     it('7. claim : tester2 ', async () => {
       this.timeout(1000000);
       let tester = tester2;
-      let vaultAddressBalance = await tos.balanceOf(vaultAddress);
+      let vaultBalanceTOS = await tos.balanceOf(vaultAddress);
+      let totalSupplyTOS = await tos.totalSupply();
+      let miningAmount = ethers.BigNumber.from('0');
+      let nonminingAmount = ethers.BigNumber.from('0');
 
       let tosBalanceBefore = await tos.balanceOf(tester.account.address);
       let miningInfosBefore = await TestStakeUniswapV3.getMiningTokenId(tester.tokens[0]);
 
-      // console.log('miningInfosBefore miningAmount',miningInfosBefore.miningAmount.toString());
-      // console.log('miningInfosBefore nonMiningAmount',miningInfosBefore.nonMiningAmount.toString());
-      // console.log('miningInfosBefore minableAmount',miningInfosBefore.minableAmount.toString());
-      // console.log('miningInfosBefore secondsInside',miningInfosBefore.secondsInside.toString());
-      // console.log('miningInfosBefore secondsInsideDiff',miningInfosBefore.secondsInsideDiff.toString());
-      // console.log('miningInfosBefore liquidity',miningInfosBefore.liquidity.toString());
-      // console.log('miningInfosBefore balanceOfTokenIdRay',miningInfosBefore.balanceOfTokenIdRay.toString());
-      // console.log('miningInfosBefore minableAmountRay',miningInfosBefore.minableAmountRay.toString());
-      // console.log('miningInfosBefore currentTime',miningInfosBefore.currentTime );
+      expect(miningInfosBefore.miningAmount).to.be.equal(
+        ethers.BigNumber.from(miningInfosBefore.minableAmount.toString())
+        .mul(ethers.BigNumber.from(miningInfosBefore.secondsInsideDiff256.toString()))
+        .div(ethers.BigNumber.from(miningInfosBefore.secondsAbsolute256.toString()))
+      );
+      expect(miningInfosBefore.nonMiningAmount).to.be.equal(
+        ethers.BigNumber.from(miningInfosBefore.minableAmount.toString())
+        .sub(ethers.BigNumber.from(miningInfosBefore.miningAmount.toString()))
+      );
+      expect(miningInfosBefore.minableAmount).to.be.above(ethers.BigNumber.from('0'));
 
-      // 클래임하기 전에는 마이닝 가능금액이 0보다 크다.
-      expect(miningInfosBefore.miningAmount).to.be.above(ethers.BigNumber.from('0'));
+      let coinageTokenBefore = await TestStakeUniswapV3.stakedCoinageTokens(tester.tokens[0]);
 
-      // expect(miningInfosBefore.minableAmount.add(ethers.BigNumber.from('1'))).to.be.lte(
-      //   miningInfosBefore.secondsInsideDiff.mul(ethers.BigNumber.from(PHASE2_MINING_PERSECOND+''))
-      // );
-      let minableAmount = miningInfosBefore.minableAmount.toString();
+      let depositToken = await TestStakeUniswapV3.depositTokens(tester.tokens[0]);
 
-      await TestStakeUniswapV3.connect(tester.account).claim(tester.tokens[0]);
+      // expect(miningInfosBefore.miningAmount).to.be.above(ethers.BigNumber.from('0'));
+      // expect(miningInfosBefore.nonMiningAmount).to.be.above(ethers.BigNumber.from('0'));
+      expect(miningInfosBefore.minableAmount).to.be.above(ethers.BigNumber.from('0'));
+
+
+      let tx = await TestStakeUniswapV3.connect(tester.account).claim(tester.tokens[0]);
+      const receipt = await tx.wait();
+
+      for(let i=0; i< receipt.events.length ;i++){
+        //console.log('receipt.events[i].event',i, receipt.events[i].event);
+        if(receipt.events[i].event == "Claimed" && receipt.events[i].args!=null){
+            let miningAmount1 = receipt.events[i].args.miningAmount;
+            let nonMiningAmount1 = receipt.events[i].args.nonMiningAmount;
+
+            miningAmount = miningAmount.add(miningAmount1);
+            nonminingAmount = nonminingAmount.add(nonMiningAmount1);
+        }
+      }
+      let minableAmount = miningAmount.add(nonminingAmount);
 
       let tosBalanceAfter = await tos.balanceOf(tester.account.address);
       let miningInfosAfter = await TestStakeUniswapV3.getMiningTokenId(tester.tokens[0]);
-
-      // 클래임을 하고 난후의 마이닝 금액은 0이 된다.
       expect(miningInfosAfter.miningAmount).to.be.equal(ethers.BigNumber.from('0'));
-      expect(tosBalanceBefore.add(miningInfosBefore.miningAmount))
-        .to.be.equal(tosBalanceAfter);
+      expect(miningInfosAfter.nonMiningAmount).to.be.equal(ethers.BigNumber.from('0'));
+      expect(miningInfosAfter.minableAmount).to.be.equal(ethers.BigNumber.from('0'));
 
-      let depositToken = await TestStakeUniswapV3.depositTokens(tester.tokens[0]);
+      expect(tosBalanceBefore.add(miningAmount)).to.be.equal(tosBalanceAfter);
+
+      depositToken = await TestStakeUniswapV3.depositTokens(tester.tokens[0]);
       let coinageToken = await TestStakeUniswapV3.stakedCoinageTokens(tester.tokens[0]);
       let userTotalStaked = await TestStakeUniswapV3.userTotalStaked(tester.account.address);
 
-      // console.log('depositToken claimedTime',depositToken.claimedTime );
-      // console.log('depositToken secondsInsideInitial',depositToken.secondsInsideInitial.toString());
-      // console.log('depositToken secondsInsideLast',depositToken.secondsInsideLast.toString() );
 
-      let secondDiff = ethers.BigNumber.from(depositToken.secondsInsideLast.toString())
-        .sub(ethers.BigNumber.from(depositToken.secondsInsideInitial.toString()));
+      expect(coinageToken.claimedAmount.sub(coinageTokenBefore.claimedAmount))
+        .to.be.equal(miningAmount);
+      expect(coinageToken.nonMiningAmount.sub(coinageTokenBefore.nonMiningAmount))
+        .to.be.equal(nonminingAmount);
 
-      //console.log('secondDiff',secondDiff.toNumber() , 'PHASE2_MINING_PERSECOND :', PHASE2_MINING_PERSECOND );
-      let miningAmountForSecondDiff = secondDiff.toNumber() * PHASE2_MINING_PERSECOND;
-
-      // console.log('miningAmountForSecondDiff',miningAmountForSecondDiff );
-      // console.log('userTotalStaked totalDepositAmount',userTotalStaked.totalDepositAmount.toString() );
-      // console.log('userTotalStaked totalMiningAmount',userTotalStaked.totalMiningAmount.toString() );
-      // console.log('userTotalStaked totalNonMiningAmount',userTotalStaked.totalNonMiningAmount.toString() );
-
-      // console.log('coinageToken claimedAmount',coinageToken.claimedAmount.toString() );
-      // console.log('coinageToken nonMiningAmount',coinageToken.nonMiningAmount.toString() );
-
-      expect(ethers.BigNumber.from(minableAmount)).to.be.lte(ethers.BigNumber.from(miningAmountForSecondDiff+''));
       expect(depositToken.claimedTime).to.be.equal(coinageToken.claimedTime);
       expect(userTotalStaked.totalMiningAmount).to.be.equal(coinageToken.claimedAmount);
       expect(userTotalStaked.totalNonMiningAmount).to.be.equal(coinageToken.nonMiningAmount);
 
+      let secondDiff = depositToken.secondsInsideLast-depositToken.secondsInsideInitial;
+      let miningAmountForSecondDiff = secondDiff*PHASE2_MINING_PERSECOND;
+
+      expect(minableAmount).to.be.lte(ethers.BigNumber.from(miningAmountForSecondDiff+''));
+      remainMiningTotal = remainMiningTotal.sub(minableAmount);
+
+      let vaultBalanceTOSAfter = await tos.balanceOf(vaultAddress);
+      let totalSupplyTOSAfter = await tos.totalSupply();
+      expect(vaultBalanceTOS).to.be.equal(vaultBalanceTOSAfter.add(minableAmount));
+      expect(totalSupplyTOS).to.be.equal(totalSupplyTOSAfter.add(nonminingAmount));
+
+      let coinageLastMintBlockTimetampAfter = await TestStakeUniswapV3.coinageLastMintBlockTimetamp();
+      tester1.miningTimeLast = coinageLastMintBlockTimetampAfter;
+      tester2.miningTimeLast = coinageLastMintBlockTimetampAfter;
     });
 
     it('8. miningCoinage :  ', async () => {
@@ -790,16 +828,17 @@ describe(" StakeUniswapV3 ", function () {
       let coinageLastMintBlockTimetampBefore = await TestStakeUniswapV3.coinageLastMintBlockTimetamp();
       let canBalanceBefore = await TestStakeUniswapV3.canMiningAmountTokenId(tester1.tokens[0]);
 
-      // 마이닝
       await TestStakeUniswapV3.connect(tester1.account).miningCoinage();
 
       let canBalanceAfter = await TestStakeUniswapV3.canMiningAmountTokenId(tester1.tokens[0]);
       let coinageLastMintBlockTimetampAfter = await TestStakeUniswapV3.coinageLastMintBlockTimetamp();
 
-      //마이닝을 하면, 마이닝 가능 금액이 늘어난다.
       expect(canBalanceAfter.balanceOfRayTokenId).to.be.above(canBalanceBefore.balanceOfRayTokenId);
-      // 마이닝을 하면 코인에이지의 최근 마이닝한 타임이 증가된다.
       expect(coinageLastMintBlockTimetampBefore).to.be.lt(coinageLastMintBlockTimetampAfter);
+
+      tester1.miningTimeLast = coinageLastMintBlockTimetampAfter;
+      tester2.miningTimeLast = coinageLastMintBlockTimetampAfter;
+
     });
 
     it('9. withdraw : tester1 ', async () => {
@@ -814,18 +853,7 @@ describe(" StakeUniswapV3 ", function () {
       let depositTokenBefore = await TestStakeUniswapV3.depositTokens(tester.tokens[0]);
 
       let miningInfosBefore = await TestStakeUniswapV3.getMiningTokenId(tester.tokens[0]);
-      // console.log('miningInfosBefore miningAmount',miningInfosBefore.miningAmount.toString());
-      // console.log('miningInfosBefore nonMiningAmount',miningInfosBefore.nonMiningAmount.toString());
-      // console.log('miningInfosBefore minableAmount',miningInfosBefore.minableAmount.toString());
-      // console.log('miningInfosBefore secondsInside',miningInfosBefore.secondsInside.toString());
-      // console.log('miningInfosBefore secondsInsideDiff',miningInfosBefore.secondsInsideDiff.toString());
-      // console.log('miningInfosBefore liquidity',miningInfosBefore.liquidity.toString());
-      // console.log('miningInfosBefore balanceOfTokenIdRay',miningInfosBefore.balanceOfTokenIdRay.toString());
-      // console.log('miningInfosBefore minableAmountRay',miningInfosBefore.minableAmountRay.toString());
-      // console.log('miningInfosBefore currentTime',miningInfosBefore.currentTime );
 
-
-      // 인출전 마이닝금액은 0보다 크다.
       expect(miningInfosBefore.miningAmount).to.be.above(ethers.BigNumber.from('0'));
 
 
@@ -835,7 +863,7 @@ describe(" StakeUniswapV3 ", function () {
       let coinageToken = await TestStakeUniswapV3.stakedCoinageTokens(tester.tokens[0]);
       let userTotalStaked = await TestStakeUniswapV3.userTotalStaked(tester.account.address);
 
-      // 예치토큰 정보가 초기화가 된다.
+
       expect(depositToken.owner).to.be.equal(zeroAddress);
       expect(depositToken.liquidity).to.be.equal(ethers.BigNumber.from('0'));
       expect(depositToken.startTime).to.be.equal(ethers.BigNumber.from('0'));
@@ -843,9 +871,9 @@ describe(" StakeUniswapV3 ", function () {
       expect(coinageToken.startTime).to.be.equal(ethers.BigNumber.from('0'));
       expect(coinageToken.claimedAmount).to.be.equal(ethers.BigNumber.from('0'));
 
-      // 사용자의 예치토큰이 없으면 staked 는 false 가 된다.
+
       expect(userTotalStaked.staked).to.be.equal(false);
-      // 사용자의 총 예치금액이 0이 된다.
+
       expect(userTotalStaked.totalDepositAmount).to.be.equal(ethers.BigNumber.from('0'));
 
       let totalStakedAmountAfter = await TestStakeUniswapV3.totalStakedAmount();
@@ -853,26 +881,14 @@ describe(" StakeUniswapV3 ", function () {
       let miningAmountTotalAfter = await TestStakeUniswapV3.miningAmountTotal();
       let nonMiningAmountTotalAfter = await TestStakeUniswapV3.nonMiningAmountTotal();
 
-      // console.log('miningInfosBefore miningAmount',miningInfosBefore.miningAmount.toString());
-      // console.log('miningInfosBefore nonMiningAmount',miningInfosBefore.nonMiningAmount.toString());
 
-      // 총 스테이크 금액에서 인출금액이 감소된다.
       expect(totalStakedAmountAfter).to.be.equal(totalStakedAmountBefore.sub(depositTokenBefore.liquidity));
-      // 총 토큰수에서 1이 감소된다.
-      expect(totalTokensAfter).to.be.equal(totalTokensBefore.sub(ethers.BigNumber.from('1')));
-      //expect(miningAmountTotalAfter).to.be.equal(miningAmountTotalBefore.add(miningInfosBefore.miningAmount));
-      //expect(nonMiningAmountTotalAfter).to.be.equal(nonMiningAmountTotalBefore.add(miningInfosBefore.nonMiningAmount));
-      // console.log('miningAmountTotalAfter',miningAmountTotalAfter.toString());
-      // console.log('miningAmountTotalBefore',miningAmountTotalBefore.toString());
-      // console.log('miningInfosBefore.miningAmount',miningInfosBefore.miningAmount.toString());
 
-      // console.log('nonMiningAmountTotalAfter',nonMiningAmountTotalAfter.toString());
-      // console.log('nonMiningAmountTotalBefore',nonMiningAmountTotalBefore.toString());
-      // console.log('miningInfosBefore.nonMiningAmount',miningInfosBefore.nonMiningAmount.toString());
+      expect(totalTokensAfter).to.be.equal(totalTokensBefore.sub(ethers.BigNumber.from('1')));
 
       let miningInfosAfter = await TestStakeUniswapV3.getMiningTokenId(tester.tokens[0]);
 
-      // 토큰의 마이닝할 수 있는 정보가 초기화가 된다.
+
       expect(miningInfosAfter.miningAmount).to.be.equal(ethers.BigNumber.from('0'));
       expect(miningInfosAfter.nonMiningAmount).to.be.equal(ethers.BigNumber.from('0'));
       expect(miningInfosAfter.minableAmount).to.be.equal(ethers.BigNumber.from('0'));
@@ -891,18 +907,7 @@ describe(" StakeUniswapV3 ", function () {
       let depositTokenBefore = await TestStakeUniswapV3.depositTokens(tester.tokens[0]);
 
       let miningInfosBefore = await TestStakeUniswapV3.getMiningTokenId(tester.tokens[0]);
-      // console.log('miningInfosBefore miningAmount',miningInfosBefore.miningAmount.toString());
-      // console.log('miningInfosBefore nonMiningAmount',miningInfosBefore.nonMiningAmount.toString());
-      // console.log('miningInfosBefore minableAmount',miningInfosBefore.minableAmount.toString());
-      // console.log('miningInfosBefore secondsInside',miningInfosBefore.secondsInside.toString());
-      // console.log('miningInfosBefore secondsInsideDiff',miningInfosBefore.secondsInsideDiff.toString());
-      // console.log('miningInfosBefore liquidity',miningInfosBefore.liquidity.toString());
-      // console.log('miningInfosBefore balanceOfTokenIdRay',miningInfosBefore.balanceOfTokenIdRay.toString());
-      // console.log('miningInfosBefore minableAmountRay',miningInfosBefore.minableAmountRay.toString());
-      // console.log('miningInfosBefore currentTime',miningInfosBefore.currentTime );
 
-
-      // 인출전 마이닝금액은 0보다 크다.
       expect(miningInfosBefore.miningAmount).to.be.above(ethers.BigNumber.from('0'));
 
 
@@ -912,7 +917,7 @@ describe(" StakeUniswapV3 ", function () {
       let coinageToken = await TestStakeUniswapV3.stakedCoinageTokens(tester.tokens[0]);
       let userTotalStaked = await TestStakeUniswapV3.userTotalStaked(tester.account.address);
 
-      // 예치토큰 정보가 초기화가 된다.
+
       expect(depositToken.owner).to.be.equal(zeroAddress);
       expect(depositToken.liquidity).to.be.equal(ethers.BigNumber.from('0'));
       expect(depositToken.startTime).to.be.equal(ethers.BigNumber.from('0'));
@@ -920,9 +925,9 @@ describe(" StakeUniswapV3 ", function () {
       expect(coinageToken.startTime).to.be.equal(ethers.BigNumber.from('0'));
       expect(coinageToken.claimedAmount).to.be.equal(ethers.BigNumber.from('0'));
 
-      // 사용자의 예치토큰이 없으면 staked 는 false 가 된다.
+
       expect(userTotalStaked.staked).to.be.equal(false);
-      // 사용자의 총 예치금액이 0이 된다.
+
       expect(userTotalStaked.totalDepositAmount).to.be.equal(ethers.BigNumber.from('0'));
 
       let totalStakedAmountAfter = await TestStakeUniswapV3.totalStakedAmount();
@@ -930,25 +935,13 @@ describe(" StakeUniswapV3 ", function () {
       let miningAmountTotalAfter = await TestStakeUniswapV3.miningAmountTotal();
       let nonMiningAmountTotalAfter = await TestStakeUniswapV3.nonMiningAmountTotal();
 
-      // console.log('miningInfosBefore miningAmount',miningInfosBefore.miningAmount.toString());
-      // console.log('miningInfosBefore nonMiningAmount',miningInfosBefore.nonMiningAmount.toString());
-
-      // 총 스테이크 금액에서 인출금액이 감소된다.
       expect(totalStakedAmountAfter).to.be.equal(totalStakedAmountBefore.sub(depositTokenBefore.liquidity));
-      // 총 토큰수에서 1이 감소된다.
+
       expect(totalTokensAfter).to.be.equal(totalTokensBefore.sub(ethers.BigNumber.from('1')));
-
-      // console.log('miningAmountTotalAfter',miningAmountTotalAfter.toString());
-      // console.log('miningAmountTotalBefore',miningAmountTotalBefore.toString());
-      // console.log('miningInfosBefore.miningAmount',miningInfosBefore.miningAmount.toString());
-
-      // console.log('nonMiningAmountTotalAfter',nonMiningAmountTotalAfter.toString());
-      // console.log('nonMiningAmountTotalBefore',nonMiningAmountTotalBefore.toString());
-      // console.log('miningInfosBefore.nonMiningAmount',miningInfosBefore.nonMiningAmount.toString());
 
       let miningInfosAfter = await TestStakeUniswapV3.getMiningTokenId(tester.tokens[0]);
 
-      // 토큰의 마이닝할 수 있는 정보가 초기화가 된다.
+
       expect(miningInfosAfter.miningAmount).to.be.equal(ethers.BigNumber.from('0'));
       expect(miningInfosAfter.nonMiningAmount).to.be.equal(ethers.BigNumber.from('0'));
       expect(miningInfosAfter.minableAmount).to.be.equal(ethers.BigNumber.from('0'));

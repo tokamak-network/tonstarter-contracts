@@ -413,7 +413,6 @@ class ICO20Contracts {
 
   initializePlasmaEvmContracts = async function (owner1) {
 
-
     let owner = await this.findSigner(owner1);
 
     // this = self;

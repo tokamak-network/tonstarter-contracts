@@ -185,8 +185,8 @@ describe(" StakeUniswapV3 ", function () {
       this.timeout(1000000);
       TokamakContractsDeployed =
         await ico20Contracts.initializePlasmaEvmContracts(defaultSender);
-
       const cons = await ico20Contracts.getPlasamContracts();
+
       ton = cons.ton;
       wton = cons.wton;
       depositManager = cons.depositManager;
