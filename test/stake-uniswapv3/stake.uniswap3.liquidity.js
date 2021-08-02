@@ -359,7 +359,14 @@ describe(" StakeUniswapV3 ", function () {
       let code = await sender.provider.getCode(expectedAddress)
       expect(code).to.eq('0x');
 
-      await deployedUniswapV3.coreFactory.connect(sender).createPool(wton.address, tos.address, FeeAmount.MEDIUM)
+      let token0 = wton.address
+      let token1 = tos.address
+      if (token0 > token1) {
+        token0 = tos.address
+        token1 = wton.address
+      }
+
+      await deployedUniswapV3.coreFactory.connect(sender).createPool(token0, token1, FeeAmount.MEDIUM)
       await timeout(10);
 
       const pool = new ethers.Contract(expectedAddress, IUniswapV3PoolABI.abi, sender)
@@ -381,9 +388,16 @@ describe(" StakeUniswapV3 ", function () {
         //await timeout(5);
         console.log('createAndInitializePoolIfNecessary start ');
 
+        let token0 = wton.address
+        let token1 = tos.address
+        if (token0 > token1) {
+          token0 = tos.address
+          token1 = wton.address
+        }
+
         await deployedUniswapV3.nftPositionManager.connect(sender).createAndInitializePoolIfNecessary(
-          wton.address,
-          tos.address,
+          token0,
+          token1,
           FeeAmount.MEDIUM,
           sqrtPrice
         )
