@@ -57,7 +57,7 @@ contract LockTOS is ILockTOS {
     /// @inheritdoc ILockTOS
     function createLockPermit(
         uint256 _value,
-        uint256 _unlockTime,
+        uint256 _unlockWeeks,
         uint256 _deadline,
         uint8 _v,
         bytes32 _r,
@@ -72,28 +72,33 @@ contract LockTOS is ILockTOS {
             _r,
             _s
         );
-        createLock(_value, _unlockTime);
+        createLock(_value, _unlockWeeks);
     }
 
     /// @inheritdoc ILockTOS
-    function createLock(uint256 _value, uint256 _unlockTime) override public returns (uint256 lockId) {
+    function createLock(uint256 _value, uint256 _unlockWeeks) override public returns (uint256 lockId) {
         require(_value > 0, "Value locked should be non-zero");
-        require (_unlockTime > block.timestamp, "Unlock time");
+        require (_unlockWeeks > 0, "Unlock period less than a week");
 
         lockId = lockIdCounter ++;
 
-        uint256 unlockTime = ((_unlockTime + ONE_WEEK) / ONE_WEEK) * ONE_WEEK;
+        uint256 unlockTime = block.timestamp + _unlockWeeks * ONE_WEEK;
+        unlockTime = (unlockTime / ONE_WEEK) * ONE_WEEK;
         _deposit(msg.sender, lockId, _value, unlockTime);
         userLocks[msg.sender].push(lockId);
     }
 
     /// @inheritdoc ILockTOS
-    function increaseUnlockTime(uint256 _lockId, uint256 _unlockTime) override external {
+    function increaseUnlockTime(uint256 _lockId, uint256 _unlockWeeks) override external {
+        require (_unlockWeeks > 0, "Unlock period less than a week");
         LockedBalance memory lock = lockedBalances[msg.sender][_lockId];
+
+        uint256 unlockTime = lock.end + _unlockWeeks * ONE_WEEK;
+        unlockTime = (unlockTime / ONE_WEEK) * ONE_WEEK;
         require (lock.end > block.timestamp, "Lock time already finished");
-        require (lock.end < _unlockTime, "New lock time must be greater");
+        require (lock.end < unlockTime, "New lock time must be greater");
         require(lock.amount > 0, "No existing locked TOS");
-        _deposit(msg.sender, _lockId, 0, _unlockTime);
+        _deposit(msg.sender, _lockId, 0, unlockTime);
     }
 
     /// @inheritdoc ILockTOS
@@ -103,7 +108,7 @@ contract LockTOS is ILockTOS {
         require(lockedOld.end < block.timestamp, "Lock time not finished");
         require(lockedOld.amount > 0, "Already withdrawn");
         _checkpoint(lockedNew, lockedOld);
-        IERC20(tos).transferFrom(address(this), msg.sender, lockedOld.amount);
+        IERC20(tos).transfer(msg.sender, lockedOld.amount);
         lockedBalances[msg.sender][_lockId] = lockedNew;   
     }
 
@@ -116,6 +121,7 @@ contract LockTOS is ILockTOS {
     function depositFor(address _addr, uint256 _lockId, uint256 _value) override public {
         require(_value > 0, "Value locked should be non-zero");
         LockedBalance memory locked = lockedBalances[_addr][_lockId];
+        require(locked.start > 0, "Lock does not exist");
         require(locked.end > block.timestamp, "Lock time is finished");
         _deposit(_addr, _lockId, _value, 0);
     }
@@ -231,7 +237,10 @@ contract LockTOS is ILockTOS {
                 right = mid;
             }
         }
-        return (true, _history[left]);
+        if (_history[left].timestamp <= _timestamp) {
+            return (true, _history[left]);
+        }
+        return (false, point);
     }
 
     /// @dev Deposit
@@ -239,14 +248,17 @@ contract LockTOS is ILockTOS {
         LockedBalance memory lockedOld = lockedBalances[_addr][_lockId];
         LockedBalance memory lockedNew = LockedBalance({
             amount: lockedOld.amount,
-            start: block.timestamp,
+            start: lockedOld.start,
             end: lockedOld.end
         });
-
         lockedNew.amount += _value;
         if (_unlockTime > 0) {
             lockedNew.end = _unlockTime;
         }
+        if (lockedNew.start == 0) {
+            lockedNew.start = block.timestamp;
+        }
+
         _checkpoint(lockedNew, lockedOld);
 
         // Transfer tos
@@ -274,7 +286,7 @@ contract LockTOS is ILockTOS {
         SlopeChange memory changeOld = SlopeChange({slope: 0, bias: 0, changeTime: 0});
 
         if (lockedNew.end > timestamp && lockedNew.amount > 0) {
-            changeNew.slope = int128(lockedNew.amount / MAXTIME);
+            changeNew.slope = int128(lockedNew.amount * MULTIPLIER / MAXTIME);
             changeNew.bias = changeNew.slope * int128(lockedNew.end - timestamp);
             changeNew.changeTime = lockedNew.end;
         }
