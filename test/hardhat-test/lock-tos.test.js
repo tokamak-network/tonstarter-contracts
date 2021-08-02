@@ -46,7 +46,7 @@ describe("LockTOS", function () {
     if (foundPoint == null) return 0;
     const currentBias = foundPoint.slope * (timestamp - foundPoint.timestamp);
     let boostValue = 1;
-    if (timestamp < phase3StartTime) {
+    if (timestamp < parseInt(phase3StartTime)) {
       boostValue = 2;
     }
     const MULTIPLIER = Math.pow(10, 18);
@@ -152,67 +152,82 @@ describe("LockTOS", function () {
     console.log("done");
   };
 
-  const generateCreateProcess = async ({
+  const generateCreatLockData = async ({
     user,
     lockedAmount,
     lockedDuration,
+    updates,
   }) => {
     const startTime = parseInt(await time.latest());
-    const endTime = startTime + lockedDuration;
-    const slope = lockedAmount / MAXTIME;
-    const bias = slope * lockedDuration;
+    const endTime = startTime + lockedDuration * 7 * 24 * 60 * 60;
     await approve(user, lockedAmount);
-    await createLock(user, lockedAmount, endTime);
+    await createLock(user, lockedAmount, lockedDuration);
     // await createLockPermit(user, lockedAmount, endTime);
-    return { startTime, endTime, lockedAmount, bias, slope };
+
+    return { startTime, endTime, lockedAmount, updates };
   };
 
   it("should create locks for user", async function () {
     userLockInfo.push(
-      await generateCreateProcess({
-        user,
-        lockedAmount: 300000000,
-        lockedDuration: parseInt(time.duration.weeks(20)),
-        increase: [{ amount: 20000, after: time.duration.weeks(1) }],
-      })
-    );
-    userLockInfo.push(
-      await generateCreateProcess({
-        user,
-        lockedAmount: 300000000,
-        lockedDuration: parseInt(time.duration.weeks(5)),
-        increase: [{ amount: 10000, after: time.duration.weeks(1) }],
-      })
-    );
-    userLockInfo.push(
-      await generateCreateProcess({
-        user,
-        lockedAmount: 200000000,
-        lockedDuration: parseInt(time.duration.years(3)),
-        increase: [{ amount: 10000, after: time.duration.weeks(1) }],
-      })
-    );
-    userLockInfo.push(
-      await generateCreateProcess({
+      await generateCreatLockData({
         user,
         lockedAmount: 100000000,
-        lockedDuration: parseInt(time.duration.days(8)),
-        increase: null,
+        lockedDuration: 1, // 1 week
+        updates: [{}], // empty object for record
+      })
+    );
+    userLockInfo.push(
+      await generateCreatLockData({
+        user,
+        lockedAmount: 300000000,
+        lockedDuration: 20, // 20 weeks
+        updates: [
+          {},
+          { amount: 20000 },
+          { amount: 10000 },
+          { amount: 30000 },
+          { unlockTime: 3 },
+        ],
+      })
+    );
+    userLockInfo.push(
+      await generateCreatLockData({
+        user,
+        lockedAmount: 300000000,
+        lockedDuration: 5, // 5 weeks
+        updates: [{}, { amount: 10000 }],
+      })
+    );
+    userLockInfo.push(
+      await generateCreatLockData({
+        user,
+        lockedAmount: 200000000,
+        lockedDuration: 157, // around 3 years
+        updates: [
+          {},
+          { unlockTime: 4 },
+          { amount: 20000 },
+          { amount: 4000 },
+          { unlockTime: 2 }, // 2 weeks
+        ],
       })
     );
   });
 
-  it("should check balances now of ", async function () {
+  it("should get all locks and asign", async function () {
+    const locksOf = await lockTOS.locksOf(user.address);
+    expect(locksOf.length).to.equal(userLockInfo.length);
+    for (let i = 0; i < locksOf.length; ++i) {
+      userLockInfo[i].lockId = locksOf[i];
+    }
+  });
+
+  it("should check balances now of user ", async function () {
     const totalBalance = parseInt(await lockTOS.balanceOf(user.address));
     const estimatedTotalBalance = parseInt(
       await calculateBalanceOfUser(user, parseInt(await time.latest()))
     );
-    expect(totalBalance).to.equal(estimatedTotalBalance)
-
-    const locksOf = await lockTOS.locksOf(user.address);
-    for (let i = 0; i < locksOf.length; ++i) {
-      userLockInfo[i].lockId = locksOf[i];
-    }
+    expect(totalBalance).to.equal(estimatedTotalBalance);
 
     for (const info of userLockInfo) {
       const currentTime = parseInt(await time.latest());
@@ -223,23 +238,53 @@ describe("LockTOS", function () {
       const estimate = await calculateBalanceOfLock(user, lockId, currentTime);
       expect(balance).to.equal(estimate);
     }
+
+    // Balance in the beginning
+    for (const info of userLockInfo) {
+      const { lockId } = info;
+      const lock = await lockTOS.lockedBalances(user.address, lockId);
+      const balance = parseInt(
+        await lockTOS.balanceOfLockAt(user.address, lockId, lock.start)
+      );
+      const estimate = await calculateBalanceOfLock(user, lockId, lock.start);
+      expect(balance).to.equal(estimate);
+    }
   });
 
+  let startTime;
   it("should check history changes", async function () {
     const changes = [];
+    startTime = parseInt(await time.latest());
+
     for (let it = 0; it < 10; ++it) {
-      await time.increase(time.duration.weeks(1));
       for (const info of userLockInfo) {
-        const { lockId } = info;
-        const currentTime = parseInt(await time.latest());
-        const lockBalance = (
-          await lockTOS.balanceOfLock(user.address, lockId)
-        ).toString();
-        changes.push({
-          lockId,
-          captureBalance: lockBalance,
-          captureTimestamp: currentTime,
-        });
+        const { lockId, updates } = info;
+        for (const { amount, unlockTime } of updates) {
+          const lock = await lockTOS.lockedBalances(user.address, lockId);
+          lock.end = parseInt(lock.end.toString());
+          if (amount) {
+            if (parseInt(await time.latest()) + 1000 < parseInt(lock.end)) {
+              await tos.connect(user).approve(lockTOS.address, amount);
+              await lockTOS.connect(user).increaseAmount(lockId, amount);
+            }
+          }
+          if (unlockTime) {
+            if (parseInt(await time.latest()) + 1000 < parseInt(lock.end)) {
+              await lockTOS
+                .connect(user)
+                .increaseUnlockTime(lockId, unlockTime);
+            }
+          }
+          await time.increase(time.duration.weeks(1));
+
+          changes.push({
+            lockId,
+            captureBalance: (
+              await lockTOS.balanceOfLock(user.address, lockId)
+            ).toString(),
+            captureTimestamp: parseInt(await time.latest()),
+          });
+        }
       }
     }
 
@@ -249,34 +294,36 @@ describe("LockTOS", function () {
         await lockTOS.balanceOfLockAt(user.address, lockId, captureTimestamp)
       ).toString();
       expect(lockBalance).to.be.equal(captureBalance);
-
-      // const tosStaked = await lockTOS.lockedBalances(user.address, lockId);
-      // console.log({ tosStaked });
     }
   });
 
   it("should check total supply now", async function () {
-    const totalSupply = await lockTOS.totalSupply();
-    console.log("Total supply: ", totalSupply.toString());
-  });
-
-  it("should change time and check vote weights", async function () {
-    for (const info of userLockInfo) {
-      const { lockId } = info;
-      const lockBalance = await lockTOS.balanceOfLock(user.address, lockId);
-      await time.increaseTo();
-
-      console.log(`Vote Weight: ${lockBalance.toString()}, LockId: ${lockId}`);
+    const now = parseInt(await time.latest());
+    for (
+      let cur = startTime;
+      cur <= now;
+      cur += parseInt(time.duration.weeks(1))
+    ) {
+      const totalSupplyAt = parseInt(await lockTOS.totalSupplyAt(cur));
+      expect(totalSupplyAt).to.greaterThan(0);
     }
   });
 
   it("should withdraw for user", async function () {
     let accTos = 0;
+    const initialBalance = parseInt(await tos.balanceOf(user.address));
     for (const info of userLockInfo) {
-      const { lockId, lockedAmount } = info;
-      accTos += lockedAmount;
-      await (await lockTOS.withdraw(lockId)).wait();
-      expect(await lockTOS.balanceOf(user.address)).to.be.equal(accTos);
+      const { lockId } = info;
+      const lock = await lockTOS.lockedBalances(user.address, lockId);
+      if (parseInt(lock.end) > parseInt(await time.latest())) {
+        await time.increaseTo(parseInt(lock.end));
+      }
+
+      accTos += parseInt(lock.amount);
+      await (await lockTOS.connect(user).withdraw(lockId)).wait();
+      expect((await tos.balanceOf(user.address)) - initialBalance).to.be.equal(
+        accTos
+      );
     }
   });
 });
