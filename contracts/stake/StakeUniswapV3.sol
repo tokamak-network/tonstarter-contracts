@@ -133,7 +133,7 @@ contract StakeUniswapV3 is
         _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
         _setupRole(ADMIN_ROLE, msg.sender);
 
-        miningIntervalSeconds = 0;
+        miningIntervalSeconds = 13;
     }
 
     /// @dev receive ether - revert
@@ -648,6 +648,8 @@ contract StakeUniswapV3 is
             _depositTokens.owner == msg.sender,
             "StakeUniswapV3: caller is not tokenId's staker"
         );
+
+        miningCoinage();
 
         if (totalStakedAmount >= _depositTokens.liquidity)
             totalStakedAmount -= _depositTokens.liquidity;
