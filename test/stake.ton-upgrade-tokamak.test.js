@@ -86,6 +86,7 @@ const testClaimBlock = [20, 60];
 let saleStartBlock = 100;
 let salePeriod = 50;
 let stakingPeriod = 100;
+let totalStakedAmount = [];
 
 const zeroAddress = "0x0000000000000000000000000000000000000000";
 
@@ -248,26 +249,40 @@ describe("TokamakStaker ", function () {
             user2,
             toWei(testUser2StakingAmount[i], "ether")
           );
+
+          let contract = await StakeTON.at(stakeAddresses[i]);
+          let amount = await contract.totalStakedAmount();
+          totalStakedAmount.push(amount);
         }
       }
-
-      // 스테이크 컨트랙의 스테이크드양을 확인
-
     });
     it("8. StakeTONUpgrade Deploy", async function () {
       stakeTONUpgrade = await StakeTONUpgrade.new({ from: defaultSender });
+      expect(stakeTONUpgrade.address).to.not.eq(zeroAddress);
     });
 
-    it("8. Stake TON Upgrade ", async function () {
+    it("9. StakeTON upgradeStakeTo ", async function () {
       this.timeout(1000000);
-
 
       for (let i = 0; i < stakeAddresses.length; i++) {
         if (stakeAddresses[i] != null) {
 
-          await stakeEntry.upgradeStakeTo(stakeAddresses[i],
+          await stakeEntry.upgradeStakeTo(stakeAddresses[i],stakeTONUpgrade.address);
 
-          const stakeContract = await StakeTON.at(stakeAddresses[i]);
+          let contract = await StakeTONUpgrade.at(stakeAddresses[i]);
+          let amount = await contract.totalStakedAmount();
+
+          expect(totalStakedAmount[i].toString()).to.be.equal(amount.toString());
+        }
+      }
+    });
+
+    it("10. StakeTONUpgrade stake ", async function () {
+      this.timeout(1000000);
+
+      for (let i = 0; i < stakeAddresses.length; i++) {
+        if (stakeAddresses[i] != null) {
+          let sum = toBN('0');
 
           await ico20Contracts.stake(
             stakeAddresses[i],
@@ -279,10 +294,18 @@ describe("TokamakStaker ", function () {
             user2,
             toWei(testUser2StakingAmount[i], "ether")
           );
+          sum = sum.add(toBN(toWei(testUser1StakingAmount[i], "ether"))).add(toBN(toWei(testUser2StakingAmount[i], "ether")));
+
+          let contract = await StakeTONUpgrade.at(stakeAddresses[i]);
+          let amount = await contract.totalStakedAmount();
+
+          expect(toBN(totalStakedAmount[i]).toString()).to.be.equal(
+            toBN(amount).sub(sum).toString());
+
+          totalStakedAmount[i] = amount;
         }
       }
     });
-
 
   });
 
@@ -357,7 +380,6 @@ describe("TokamakStaker ", function () {
           await expect(toBN(stakeContractTokamak[i].stakeOf).div(toBN(10**9)).toString())
             .to.be.bignumber.equal(
               toBN(stakeContractTokamak[i].stakedTotal.toString()));
-
         }
       }
     });
@@ -391,11 +413,17 @@ describe("TokamakStaker ", function () {
           stakeAddresses[i]
         );
 
-        let amountOfStake = stakeOfPrev.sub(remainAmount);
+        let contract = await StakeTONUpgrade.at(stakeAddresses[i]);
+        let toTokamak = await contract.toTokamak();
+        let totalStakedAmount = await contract.totalStakedAmount();
+
+        let amountOfStake1 = stakeOfPrev.sub(remainAmount);
+        let amountOfStake = stakeOfPrev.sub(toTokamak);
+
         await stakeEntry.tokamakRequestUnStaking(
           stakeAddresses[i],
           layer2.address,
-          amountOfStake,
+          amountOfStake1,
           { from: defaultSender }
         );
 
@@ -403,16 +431,21 @@ describe("TokamakStaker ", function () {
           layer2.address,
           stakeAddresses[i]
         );
+
+        await expect(toBN(stakeOf).div(toBN(10**9)).toString())
+            .to.be.bignumber.equal(toBN(totalStakedAmount).toString());
+
         stakeContractTokamak[i].stakeOf = stakeOf;
 
         const pendingOf = await depositManager.pendingUnstaked(
           layer2.address,
           stakeAddresses[i]
         );
+
         stakeContractTokamak[i].pendingOf = pendingOf;
 
-        await expect(toBN(pendingOf).toString())
-            .to.be.bignumber.equal(toBN(amountOfStake).toString());
+        await expect(toBN(totalStakedAmount).toString())
+            .to.be.bignumber.lt(toBN(pendingOf).add(toBN(stakeOf)).div(toBN(10**9)).toString());
 
         // await expect(toBN(stakeOf).toString()).to.be.bignumber.equal(remainAmount.toString());
 

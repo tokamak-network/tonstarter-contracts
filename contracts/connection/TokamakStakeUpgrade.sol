@@ -321,8 +321,9 @@ contract TokamakStakeUpgrade is StakeTONStorage, AccessibleCommon, ITokamakStake
         uint256 principalAmount = totalStakedAmount.mul(10**9);
 
         uint256 availableAmount = 0;
-        if(principalAmount > 0 && principalAmount < stakeOf)
-            availableAmount = stakeOf.sub(principalAmount);
+        if(principalAmount > 0 && principalAmount < stakeOf.sub(100)){
+            availableAmount = stakeOf.sub(principalAmount).sub(100);
+        }
 
         require(availableAmount > 0, "TokamakStaker: no withdraw-able amount not yet");
 
@@ -367,12 +368,14 @@ contract TokamakStakeUpgrade is StakeTONStorage, AccessibleCommon, ITokamakStake
         uint256 globalWithdrawalDelay =
             IIDepositManager(depositManager).globalWithdrawalDelay();
 
-        uint256 interval = 6170; // 60*60*24/14
         uint256 stakeOf = IISeigManager(seigManager).stakeOf(
                 _layer2,
                 address(this)
             );
         require(stakeOf > 0, "TokamakStaker: stakeOf is zero");
+
+        uint256 interval = globalWithdrawalDelay / 14;
+
         require(
             block.number > endBlock.sub(globalWithdrawalDelay).sub(interval),
             "TokamakStaker:The executable block has not passed"
@@ -393,7 +396,7 @@ contract TokamakStakeUpgrade is StakeTONStorage, AccessibleCommon, ITokamakStake
         if(tokamakLayer2 != address(0) && tokamakLayer2 == _layer2){
 
             uint256 globalWithdrawalDelay = IIDepositManager(depositManager).globalWithdrawalDelay();
-            uint256 interval = 6170; // 60*60*24/14
+            uint256 interval = globalWithdrawalDelay / 14;
             uint256 stakeOf = IISeigManager(seigManager).stakeOf(
                 _layer2,
                 address(this)
