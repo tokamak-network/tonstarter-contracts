@@ -306,8 +306,7 @@ contract StakeUniswapV3 is
                         secondsInside -
                         _depositTokens.secondsInsideInitial;
 
-                balanceOfTokenIdRay = IAutoRefactorCoinageWithTokenId(coinage)
-                    .balanceOf(tokenId_);
+                balanceOfTokenIdRay = IAutoRefactorCoinageWithTokenId(coinage).balanceOf(tokenId_);
                 if (balanceOfTokenIdRay > 0) {
                     if (
                         balanceOfTokenIdRay > 0 &&
@@ -550,14 +549,14 @@ contract StakeUniswapV3 is
         _stakedCoinageTokens.amount = liquidity;
         _stakedCoinageTokens.startTime = uint32(block.timestamp);
 
-        miningCoinage();
-
         //mint coinage of user amount
         IAutoRefactorCoinageWithTokenId(coinage).mint(
             msg.sender,
             tokenId_,
             liquidity * (10**9)
         );
+
+        miningCoinage();
 
         emit Staked(msg.sender, poolAddress, tokenId_, liquidity);
     }
@@ -649,7 +648,7 @@ contract StakeUniswapV3 is
             "StakeUniswapV3: caller is not tokenId's staker"
         );
 
-        miningCoinage();
+        // miningCoinage();
 
         if (totalStakedAmount >= _depositTokens.liquidity)
             totalStakedAmount -= _depositTokens.liquidity;
