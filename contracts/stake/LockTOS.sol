@@ -81,9 +81,9 @@ contract LockTOS is ILockTOS {
         require (_unlockWeeks > 0, "Unlock period less than a week");
 
         lockId = lockIdCounter ++;
-
         uint256 unlockTime = block.timestamp + _unlockWeeks * ONE_WEEK;
         unlockTime = (unlockTime / ONE_WEEK) * ONE_WEEK;
+        require(unlockTime - block.timestamp < MAXTIME, "Max unlock time is 3 years");
         _deposit(msg.sender, lockId, _value, unlockTime);
         userLocks[msg.sender].push(lockId);
     }
@@ -91,10 +91,11 @@ contract LockTOS is ILockTOS {
     /// @inheritdoc ILockTOS
     function increaseUnlockTime(uint256 _lockId, uint256 _unlockWeeks) override external {
         require (_unlockWeeks > 0, "Unlock period less than a week");
-        LockedBalance memory lock = lockedBalances[msg.sender][_lockId];
 
+        LockedBalance memory lock = lockedBalances[msg.sender][_lockId];
         uint256 unlockTime = lock.end + _unlockWeeks * ONE_WEEK;
         unlockTime = (unlockTime / ONE_WEEK) * ONE_WEEK;
+        require(unlockTime - lock.start < MAXTIME, "Max unlock time is 3 years");
         require (lock.end > block.timestamp, "Lock time already finished");
         require (lock.end < unlockTime, "New lock time must be greater");
         require(lock.amount > 0, "No existing locked TOS");
@@ -105,9 +106,11 @@ contract LockTOS is ILockTOS {
     function withdraw(uint256 _lockId) override external {
         LockedBalance memory lockedOld = lockedBalances[msg.sender][_lockId];
         LockedBalance memory lockedNew = LockedBalance({amount: 0, start: 0, end: 0});
+        require(lockedOld.start > 0, "Lock does not exist");
         require(lockedOld.end < block.timestamp, "Lock time not finished");
         require(lockedOld.amount > 0, "Already withdrawn");
         _checkpoint(lockedNew, lockedOld);
+        
         IERC20(tos).transfer(msg.sender, lockedOld.amount);
         lockedBalances[msg.sender][_lockId] = lockedNew;   
     }
@@ -132,12 +135,8 @@ contract LockTOS is ILockTOS {
         if (!success) {
             return 0;
         }
-        int128 boostValue = 1;
-        if (block.timestamp < phase3StartTime) {
-            boostValue = 2;
-        }
         int128 currentBias = point.slope * int128(_timestamp - point.timestamp);
-        return (point.bias > currentBias ? point.bias - currentBias : 0) * boostValue / int128(MULTIPLIER);
+        return (point.bias > currentBias ? point.bias - currentBias : 0) / int128(MULTIPLIER);
     }
 
     /// @inheritdoc ILockTOS
@@ -148,11 +147,7 @@ contract LockTOS is ILockTOS {
 
         Point memory point = pointHistory[pointHistory.length - 1];
         int128 currentBias = point.slope * int128(block.timestamp - point.timestamp);
-        int128 boostValue = 1;
-        if (block.timestamp < phase3StartTime) {
-            boostValue = 2;
-        }
-        return (point.bias > currentBias ? point.bias - currentBias : 0) * boostValue / int128(MULTIPLIER);
+        return (point.bias > currentBias ? point.bias - currentBias : 0) / int128(MULTIPLIER);
     }
 
     /// @inheritdoc ILockTOS
@@ -167,11 +162,7 @@ contract LockTOS is ILockTOS {
             return 0;
         }
         int128 currentBias = point.slope * int128(_timestamp - point.timestamp);
-        int128 boostValue = 1;
-        if (_timestamp < phase3StartTime) {
-            boostValue = 2;
-        }
-        return (point.bias > currentBias ? point.bias - currentBias : 0) * boostValue / int128(MULTIPLIER);
+        return (point.bias > currentBias ? point.bias - currentBias : 0) / int128(MULTIPLIER);
     }
 
     /// @inheritdoc ILockTOS
@@ -183,11 +174,7 @@ contract LockTOS is ILockTOS {
 
         Point memory point = userPointHistory[_addr][_lockId][len - 1];
         int128 currentBias = point.slope * int128(block.timestamp - point.timestamp);
-        int128 boostValue = 1;
-        if (block.timestamp < phase3StartTime) {
-            boostValue = 2;
-        }
-        return (point.bias > currentBias ? point.bias - currentBias : 0) * boostValue / int128(MULTIPLIER);
+        return (point.bias > currentBias ? point.bias - currentBias : 0) / int128(MULTIPLIER);
     }
 
     /// @inheritdoc ILockTOS
@@ -251,6 +238,7 @@ contract LockTOS is ILockTOS {
             start: lockedOld.start,
             end: lockedOld.end
         });
+
         lockedNew.amount += _value;
         if (_unlockTime > 0) {
             lockedNew.end = _unlockTime;
@@ -268,10 +256,9 @@ contract LockTOS is ILockTOS {
         // Save user point
         int128 userSlope = int128(lockedNew.amount * MULTIPLIER / MAXTIME);
         int128 userBias = userSlope * int128(lockedNew.end - block.timestamp);
-
         Point memory userPoint = Point({
             timestamp: block.timestamp,
-            slope: userSlope,
+            slope: userSlope * (block.timestamp <= phase3StartTime ? 2 : 1), // Boost slope if staked before phase3
             bias: userBias
         });
         userPointHistory[_addr][_lockId].push(userPoint);
@@ -291,7 +278,7 @@ contract LockTOS is ILockTOS {
             changeNew.changeTime = lockedNew.end;
         }
         if (lockedOld.end > timestamp && lockedOld.amount > 0) {
-            changeOld.slope = int128(lockedNew.amount / MAXTIME);
+            changeOld.slope = int128(lockedNew.amount * MULTIPLIER / MAXTIME);
             changeOld.bias = changeOld.slope * int128(lockedNew.end - timestamp);
             changeOld.changeTime = lockedNew.end;
         }

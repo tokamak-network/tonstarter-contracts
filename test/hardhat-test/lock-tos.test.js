@@ -45,14 +45,9 @@ describe("LockTOS", function () {
     const foundPoint = await findClosestPoint(userHistory, timestamp);
     if (foundPoint == null) return 0;
     const currentBias = foundPoint.slope * (timestamp - foundPoint.timestamp);
-    let boostValue = 1;
-    if (timestamp < parseInt(phase3StartTime)) {
-      boostValue = 2;
-    }
     const MULTIPLIER = Math.pow(10, 18);
     return Math.floor(
-      ((foundPoint.bias > currentBias ? foundPoint.bias - currentBias : 0) *
-        boostValue) /
+      (foundPoint.bias > currentBias ? foundPoint.bias - currentBias : 0) /
         MULTIPLIER
     );
   };
@@ -202,7 +197,7 @@ describe("LockTOS", function () {
       await generateCreatLockData({
         user,
         lockedAmount: 200000000,
-        lockedDuration: 157, // around 3 years
+        lockedDuration: 156, // around 3 years
         updates: [
           {},
           { unlockTime: 4 },
@@ -263,16 +258,23 @@ describe("LockTOS", function () {
           const lock = await lockTOS.lockedBalances(user.address, lockId);
           lock.end = parseInt(lock.end.toString());
           if (amount) {
-            if (parseInt(await time.latest()) + 1000 < parseInt(lock.end)) {
+            if (parseInt(await time.latest()) < parseInt(lock.end)) {
               await tos.connect(user).approve(lockTOS.address, amount);
               await lockTOS.connect(user).increaseAmount(lockId, amount);
             }
           }
           if (unlockTime) {
-            if (parseInt(await time.latest()) + 1000 < parseInt(lock.end)) {
-              await lockTOS
-                .connect(user)
-                .increaseUnlockTime(lockId, unlockTime);
+            if (parseInt(await time.latest()) < parseInt(lock.end)) {
+              const newTime =
+                parseInt(lock.end) + unlockTime * 7 * 24 * 60 * 60;
+              if (
+                newTime - parseInt(lock.start) <
+                parseInt(time.duration.weeks(155))
+              ) {
+                await lockTOS
+                  .connect(user)
+                  .increaseUnlockTime(lockId, unlockTime);
+              }
             }
           }
           await time.increase(time.duration.weeks(1));
