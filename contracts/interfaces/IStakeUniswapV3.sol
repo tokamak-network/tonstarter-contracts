@@ -220,6 +220,6 @@ interface IStakeUniswapV3 {
             uint32 curTimestamps
         );
 
-    /// @dev stake end time
-    function stakeEndTime() external returns (uint256 endTime);
+    /// @dev mining end time
+    function miningEndTime() external view returns (uint256 endTime);
 }

@@ -237,15 +237,16 @@ contract Stake2Vault is Stake2VaultStorage, IStake2Vault {
         return ([tos, stakeAddress], cap, stakeType, miningPerSecond, name);
     }
 
-    //// @dev Give all stakeContracts's addresses in this vault
-    //// @return all stakeContracts's addresses
-    // function stakeAddressesAll()
-    //     external
-    //     view
-    //     override
-    //     returns (address[] memory)
-    // {
-    //         address[] memory addr;
-    //         return addr;
-    // }
+    /// @dev Give all stakeContracts's addresses in this vault
+    /// @return all stakeContracts's addresses
+    function stakeAddressesAll()
+        external
+        view
+        override
+        returns (address[] memory)
+    {
+        address[] memory addr;
+        addr[0] = stakeAddress;
+        return addr;
+    }
 }

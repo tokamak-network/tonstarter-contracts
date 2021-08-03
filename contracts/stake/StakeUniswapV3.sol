@@ -1030,9 +1030,10 @@ contract StakeUniswapV3 is
         );
     }
 
-    /// @dev stake end time
-    function stakeEndTime()
+    /// @dev mining end time
+    function miningEndTime()
         external
+        view
         override
         nonZeroAddress(vault)
         returns (uint256)

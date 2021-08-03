@@ -82,7 +82,5 @@ interface IStake2Vault {
 
     /// @dev Give all stakeContracts's addresses in this vault
     /// @return all stakeContracts's addresses
-    // function stakeAddressesAll()
-    //     external
-    //     returns (address[] memory);
+    function stakeAddressesAll() external view returns (address[] memory);
 }
