@@ -333,17 +333,18 @@ contract TokamakStakeUpgrade is StakeTONStorage, AccessibleCommon, ITokamakStake
 
     /// @dev  Check whether unstaking is possible in layer2
     /// @param _layer2 the layer2 address in tokamak
+    /// @return canUnStakingAmount available unStaking amount
     function canTokamakRequestUnStaking(address _layer2)
-        external view returns (bool can){
+        external view returns (uint256 canUnStakingAmount){
 
-        can = false;
+        canUnStakingAmount = 0;
         if(tokamakLayer2 != address(0) && tokamakLayer2 == _layer2){
             uint256 stakeOf = IISeigManager(seigManager).stakeOf(
                 _layer2,
                 address(this)
             );
             if(stakeOf > 0 && totalStakedAmount > 0 && totalStakedAmount.mul(10**9) < stakeOf){
-                can = true;
+                canUnStakingAmount = stakeOf.sub(totalStakedAmount.mul(10**9));
             }
         }
     }
@@ -384,6 +385,7 @@ contract TokamakStakeUpgrade is StakeTONStorage, AccessibleCommon, ITokamakStake
 
     /// @dev  Check whether unstakingAll is possible in layer2
     /// @param _layer2 the layer2 address in tokamak
+    /// @return can whether can tokamakRequestUnStakingAll
     function canTokamakRequestUnStakingAll(address _layer2)
         external view returns (bool can){
 
