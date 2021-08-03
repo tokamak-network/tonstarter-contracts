@@ -388,7 +388,8 @@ contract StakeUniswapV3 is
         bytes32 r,
         bytes32 s
     )
-        external override
+        external
+        override
         nonZeroAddress(token)
         nonZeroAddress(vault)
         nonZeroAddress(stakeRegistry)
@@ -843,7 +844,8 @@ contract StakeUniswapV3 is
     /// @return minableAmountRay  minable amount of tokenId with ray unit
     function canMiningAmountTokenId(uint256 tokenId)
         external
-        view override
+        view
+        override
         returns (uint256 balanceOfRayTokenId, uint256 minableAmountRay)
     {
         LibUniswapV3Stake.StakeLiquidity storage _depositTokens =
@@ -872,7 +874,8 @@ contract StakeUniswapV3 is
     /// @return liquidity  pool's liquidity
     function poolInfos()
         external
-        view override
+        view
+        override
         nonZeroAddress(poolAddress)
         returns (
             address factory,
@@ -902,7 +905,8 @@ contract StakeUniswapV3 is
     /// @return tokensOwed1  key's tokensOwed1
     function poolPositions(bytes32 key)
         external
-        view override
+        view
+        override
         nonZeroAddress(poolAddress)
         returns (
             uint128 _liquidity,
@@ -931,7 +935,8 @@ contract StakeUniswapV3 is
     /// @return unlocked  Whether the pool is currently locked to reentrancy
     function poolSlot0()
         external
-        view override
+        view
+        override
         nonZeroAddress(poolAddress)
         returns (
             uint160 sqrtPriceX96,
@@ -970,7 +975,8 @@ contract StakeUniswapV3 is
     /// @return tokensOwed1  The uncollected amount of token1 owed to the position as of the last computation
     function npmPositions(uint256 _tokenId)
         external
-        view override
+        view
+        override
         nonZeroAddress(address(nonfungiblePositionManager))
         returns (
             uint96 nonce,
@@ -999,7 +1005,8 @@ contract StakeUniswapV3 is
     /// @return curTimestamps  current Timestamps
     function snapshotCumulativesInside(int24 tickLower, int24 tickUpper)
         external
-        view override
+        view
+        override
         nonZeroAddress(poolAddress)
         returns (
             int56 tickCumulativeInside,
@@ -1032,5 +1039,4 @@ contract StakeUniswapV3 is
     {
         return IIStake2Vault(vault).miningEndTime();
     }
-
 }

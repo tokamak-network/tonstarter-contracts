@@ -2,7 +2,6 @@
 pragma solidity ^0.7.6;
 
 interface IStakeUniswapV3 {
-
     /// @dev stake tokenId of UniswapV3
     /// @param tokenId  tokenId
     /// @param deadline the deadline that valid the owner's signature
@@ -15,7 +14,7 @@ interface IStakeUniswapV3 {
         uint8 v,
         bytes32 r,
         bytes32 s
-    )  external;
+    ) external;
 
     /// @dev stake tokenId of UniswapV3
     /// @param tokenId  tokenId
@@ -222,8 +221,5 @@ interface IStakeUniswapV3 {
         );
 
     /// @dev stake end time
-    function stakeEndTime()
-        external
-        returns (uint256 endTime);
-
+    function stakeEndTime() external returns (uint256 endTime);
 }
