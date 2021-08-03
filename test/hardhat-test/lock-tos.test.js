@@ -96,55 +96,43 @@ describe("LockTOS", function () {
   const createLockPermit = async (user, amount, unlockTime) => {
     const nonce = parseInt(await tos.nonces(user.address));
     const deadline = parseInt(await time.latest()) + 20;
-    const chainId = parseInt(await network.provider.send("eth_chainId")); // 31337 await ethers.Provider.getNetwork().chainId;
-    const hashPermit = await tos.hashPermit(
-      user.address,
-      lockTOS.address,
-      amount,
-      deadline,
-      nonce
+    const rawSignature = await user._signTypedData(
+      {
+        chainId: parseInt(await network.provider.send("eth_chainId")),
+        name: "TOS",
+        version: "1",
+        verifyingContract: tos.address,
+      },
+      {
+        Permit: [
+          { name: "owner", type: "address" },
+          { name: "spender", type: "address" },
+          { name: "value", type: "uint256" },
+          { name: "nonce", type: "uint256" },
+          { name: "deadline", type: "uint256" },
+        ],
+      },
+      {
+        owner: user.address,
+        spender: lockTOS.address,
+        value: amount,
+        nonce,
+        deadline,
+      }
     );
-
-    console.log({ hashPermit });
-    const domain = {
-      chainId,
-      name: "TOS",
-      version: "1",
-      verifyingContract: tos.address,
-    };
-
-    const types = {
-      Message: [
-        { name: "owner", type: "address" },
-        { name: "spender", type: "address" },
-        { name: "value", type: "uint256" },
-        { name: "nonce", type: "uint256" },
-        { name: "deadline", type: "uint256" },
-      ],
-    };
-
-    const message = {
-      owner: user.address,
-      spender: lockTOS.address,
-      value: amount,
-      nonce,
-      deadline,
-    };
-
-    const signature = (
-      await user._signTypedData(domain, types, message)
-    ).substring(2);
-
-    const r = "0x" + signature.substring(0, 64);
-    const s = "0x" + signature.substring(64, 128);
-    const v = parseInt(signature.substring(128, 130), 16);
-
+    const signature = ethers.utils.splitSignature(rawSignature);
     await (
       await lockTOS
         .connect(user)
-        .createLockPermit(amount, unlockTime, deadline, v, r, s)
+        .createLockPermit(
+          amount,
+          unlockTime,
+          deadline,
+          signature.v,
+          signature.r,
+          signature.s
+        )
     ).wait();
-    console.log("done");
   };
 
   const generateCreatLockData = async ({
@@ -155,9 +143,9 @@ describe("LockTOS", function () {
   }) => {
     const startTime = parseInt(await time.latest());
     const endTime = startTime + lockedDuration * 7 * 24 * 60 * 60;
-    await approve(user, lockedAmount);
-    await createLock(user, lockedAmount, lockedDuration);
-    // await createLockPermit(user, lockedAmount, endTime);
+    // await approve(user, lockedAmount);
+    // await createLock(user, lockedAmount, lockedDuration);
+    await createLockPermit(user, lockedAmount, lockedDuration);
 
     return { startTime, endTime, lockedAmount, updates };
   };
@@ -197,7 +185,7 @@ describe("LockTOS", function () {
       await generateCreatLockData({
         user,
         lockedAmount: 200000000,
-        lockedDuration: 156, // around 3 years
+        lockedDuration: 155, // around 3 years
         updates: [
           {},
           { unlockTime: 4 },
