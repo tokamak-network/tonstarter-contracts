@@ -56,22 +56,23 @@ async function main() {
   const tokenId3690 = ethers.BigNumber.from("3690");
   const tokenId3880 = ethers.BigNumber.from("3880");
 
-  let token = {
-    id: tokenId3690,
-    name: '3690',
-    sender : user1
-  }
   // let token = {
-  //   id: tokenId3880,
-  //   name: '3880',
-  //   sender : user2
-  // }
+  //   id: tokenId3690,
+  //   name: '3690',
+  //   sender : user1
+  //}
+  let token = {
+    id: tokenId3880,
+    name: '3880',
+    sender : user2
+  }
 
   const NPMContract = new ethers.Contract(
     NonfungiblePositionManagerAddress,
     NonfungiblePositionManagerJson.abi, ethers.provider);
-  //================================================
+
   console.log("NPMContract:", NPMContract.address);
+
   let tx = await NPMContract.connect(token.sender).approve(
     process.env.PHASE2_STAKE_UNISWAPV3_ADDRESS,
     token.id
