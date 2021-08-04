@@ -46,7 +46,7 @@ async function main() {
   await tx.wait();
 
   console.log("stakeUniswapV3 setPoolAddress", tx.hash);
-  printGasUsedOfUnits('stakeUniswapV3 setPoolAddress', tx.hash);
+  printGasUsedOfUnits('stakeUniswapV3 setPoolAddress', tx);
 
 }
 

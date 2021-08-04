@@ -43,9 +43,9 @@ async function main() {
   let tx = await tos.addBurner(process.env.PHASE2_LP_VAULT_ADDRESS);
 
   await tx.wait();
-
   console.log("tos addBurner to vault2", process.env.PHASE2_LP_VAULT_ADDRESS);
-  printGasUsedOfUnits('tos addBurner to vault2', tx.hash);
+  printGasUsedOfUnits('tos addBurner to vault2', tx);
+
 
 
   let res = await tos.isBurner(process.env.PHASE2_LP_VAULT_ADDRESS);

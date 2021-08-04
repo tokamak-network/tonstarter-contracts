@@ -75,7 +75,7 @@ async function main() {
   );
   await tx.wait();
   console.log("Phase2 setStartTimeOfVault2  ", tx.hash );
-  printGasUsedOfUnits('Phase2 setStartTimeOfVault2 ', tx.hash);
+  printGasUsedOfUnits('Phase2 setStartTimeOfVault2 ', tx);
 
   let tx1 = await stakeEntry2.setEndTimeOfVault2(
     vault.address,
@@ -83,7 +83,7 @@ async function main() {
   );
   await tx1.wait();
   console.log("Phase2 setEndTimeOfVault2  ", tx1.hash );
-  printGasUsedOfUnits('Phase2 setEndTimeOfVault2 ', tx1.hash);
+  printGasUsedOfUnits('Phase2 setEndTimeOfVault2 ', tx1 );
 
 }
 

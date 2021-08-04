@@ -50,7 +50,7 @@ async function main() {
   console.log("tos mint", process.env.PHASE2_LP_VAULT_ADDRESS);
 
   console.log("tos mint to vault2 ", tx.hash );
-  printGasUsedOfUnits('tos mint to vault2 ', tx.hash);
+  printGasUsedOfUnits('tos mint to vault2 ', tx);
 
 
   let balance = await tos.balanceOf(process.env.PHASE2_LP_VAULT_ADDRESS);
