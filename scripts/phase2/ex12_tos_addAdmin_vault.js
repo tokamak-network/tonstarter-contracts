@@ -52,7 +52,7 @@ async function main() {
 
   let res = await tos.grantRole(ADMIN_ROLE, process.env.PHASE2_LP_VAULT_ADDRESS);
   console.log("tos isAdmin", process.env.PHASE2_LP_VAULT_ADDRESS,  res );
-
+  await res.wait();
 
   let res1 = await tos.hasRole(ADMIN_ROLE, process.env.PHASE2_LP_VAULT_ADDRESS);
   console.log("tos admin ", res1 );

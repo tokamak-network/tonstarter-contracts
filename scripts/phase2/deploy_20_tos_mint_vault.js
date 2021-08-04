@@ -46,14 +46,11 @@ async function main() {
     process.env.PHASE2_LP_VAULT_ADDRESS,
     utils.parseUnits(process.env.PHASE2_UNISWAPV3_ALLOCATED, 18)
   );
-
+  await tx.wait();
   console.log("tos mint", process.env.PHASE2_LP_VAULT_ADDRESS);
 
   console.log("tos mint to vault2 ", tx.hash );
   printGasUsedOfUnits('tos mint to vault2 ', tx.hash);
-
-
-  await tx.wait();
 
 
   let balance = await tos.balanceOf(process.env.PHASE2_LP_VAULT_ADDRESS);

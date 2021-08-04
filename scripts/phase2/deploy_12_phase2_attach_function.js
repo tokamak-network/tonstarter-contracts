@@ -63,20 +63,25 @@ async function main() {
   // console.log('setVaultLogicByPhase',_func4);
   // console.log('setPool',_func5);
 
-  tx =  await Stake1Proxy.setImplementation(
+  let tx1 =  await Stake1Proxy.setImplementation(
     Stake2LogicAddress,
     ethers.BigNumber.from("1"),
     true);
 
+  await tx1.wait();
+
   console.log("Stake2Logic setImplementation: " );
-  printGasUsedOfUnits('Stake2Logic setImplementation',tx.hash );
+  printGasUsedOfUnits('Stake2Logic setImplementation',tx1.hash );
   //=====================================
 
-  tx =  await Stake1Proxy.setSelectorImplementations(
+  let tx2 =  await Stake1Proxy.setSelectorImplementations(
         [_func1, _func2, _func3, _func4, _func5, _func6, _func7],
         Stake2LogicAddress);
+
+  await tx2.wait();
+
   console.log("Stake2Logic setSelectorImplementations: " );
-  printGasUsedOfUnits('Stake2Logic setSelectorImplementations', tx.hash);
+  printGasUsedOfUnits('Stake2Logic setSelectorImplementations', tx2.hash);
 
 
   console.log("finish phase2-functions-setting");

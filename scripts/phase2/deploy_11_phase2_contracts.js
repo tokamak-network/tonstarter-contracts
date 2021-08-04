@@ -174,11 +174,14 @@ async function addStake2LogicAndVault2Factory() {
   const Stake1Proxy = await ethers.getContractAt("Stake1Proxy", proxy);
   console.log("Stake1Proxy:", Stake1Proxy.address);
 
-  tx =  await Stake1Proxy.setAliveImplementation(
+  let tx0 =  await Stake1Proxy.setAliveImplementation(
     stake2logic.address,
     true);
+
+  await tx0.wait();
+
   console.log("Stake2Logic setAliveImplementation: " );
-  printGasUsedOfUnits('Stake2Logic setAliveImplementation',tx.hash );
+  printGasUsedOfUnits('Stake2Logic setAliveImplementation',tx0.hash );
 
 }
 

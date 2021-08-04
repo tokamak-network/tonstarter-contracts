@@ -73,7 +73,7 @@ async function main() {
     vault.address,
     vault.timestamp
   );
-
+  await tx.wait();
   console.log("Phase2 setStartTimeOfVault2  ", tx.hash );
   printGasUsedOfUnits('Phase2 setStartTimeOfVault2 ', tx.hash);
 
@@ -81,6 +81,7 @@ async function main() {
     vault.address,
     vault.timestampEnd
   );
+  await tx1.wait();
   console.log("Phase2 setEndTimeOfVault2  ", tx1.hash );
   printGasUsedOfUnits('Phase2 setEndTimeOfVault2 ', tx1.hash);
 
