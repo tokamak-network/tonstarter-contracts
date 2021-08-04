@@ -755,10 +755,9 @@ contract StakeUniswapV3 is
             depositTokens[tokenId];
         LibUniswapV3Stake.StakedTokenAmount memory _stakedCoinageTokens =
             stakedCoinageTokens[tokenId];
-        _poolAddress = poolAddress;
 
         return (
-            _poolAddress,
+            poolAddress,
             [_depositTokens.tickLower, _depositTokens.tickUpper],
             _depositTokens.liquidity,
             [
