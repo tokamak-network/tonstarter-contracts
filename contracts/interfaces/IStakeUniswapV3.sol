@@ -223,5 +223,5 @@ interface IStakeUniswapV3 {
     function miningEndTime() external view returns (uint256 endTime);
 
     /// @dev get price
-    function getPrice() external view returns (uint256 price);
+    function getPrice(uint256 decimals) external view returns (uint256 price);
 }

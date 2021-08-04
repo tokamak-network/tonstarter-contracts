@@ -9,6 +9,7 @@ const {
 const StakeUniswapV3 = require("@uniswap/v3-periphery/artifacts/contracts/libraries/PoolAddress.sol/PoolAddress.json");
 const IUniswapV3PoolABI = require("@uniswap/v3-core/artifacts/contracts/interfaces/IUniswapV3Pool.sol/IUniswapV3Pool.json");
 
+const JSBI = require('jsbi');
 const BN = require("bn.js");
 const chai = require("chai");
 const { solidity } = require("ethereum-waffle");
@@ -373,7 +374,7 @@ describe(" StakeUniswapV3 ", function () {
       expect(saleStartTime.toString()).to.be.equal(startTime + "");
     });
 
-    it("3. tos.addBunner to vault", async function () {
+    it("3. tos.addBurner to vault", async function () {
       this.timeout(1000000);
 
       const tx = await tos.addBurner(vaultAddress);
@@ -659,6 +660,7 @@ describe(" StakeUniswapV3 ", function () {
       expect(tester2.positions.length).to.be.above(0);
       expect(slot0.tick).to.be.above(tester2.positions[0].tickLower);
       expect(slot0.tick).to.be.below(tester2.positions[0].tickUpper);
+
     });
 
     it("5. approve  : tester1 ", async () => {
@@ -737,7 +739,7 @@ describe(" StakeUniswapV3 ", function () {
     });
   });
 
-  describe("# 7. StakeUniswapV3 Of TONStarter : fail stake", () => {
+  describe("# 7. StakeUniswapV3 Of TONStarter : set & fail stake", () => {
     it("1. setMiningIntervalSeconds ", async () => {
       this.timeout(1000000);
 
@@ -759,7 +761,23 @@ describe(" StakeUniswapV3 ", function () {
       );
     });
 
-    it("2. stake : Fail when the current tick is outside the range provided by the token", async () => {
+    it("2. setPoolAddress ", async () => {
+      this.timeout(1000000);
+      const tester = tester1;
+      TestStakeUniswapV3 = await ico20Contracts.getContract(
+        "StakeUniswapV3",
+        stakeContractAddress,
+        tester.account.address
+      );
+
+      await TestStakeUniswapV3.connect(tester.account).setPoolAddress(tester.tokens[0]);
+      let pool = await TestStakeUniswapV3.poolAddress();
+      //console.log('pool', pool);
+      expect(pool).to.be.equal(pool_wton_tos_address);
+
+    });
+
+    it("3. stake : Fail when the current tick is outside the range provided by the token", async () => {
       this.timeout(1000000);
       await expect(
         TestStakeUniswapV3.connect(tester1.account).stake(tester1.tokens[0])
@@ -787,6 +805,34 @@ describe(" StakeUniswapV3 ", function () {
       else expect(slot0.tick).to.be.above(tester.positions[0].tickLower);
       // console.log('tester.positions[0].tickLower',tester.positions[0].tickLower.toString());
       // console.log('tester.positions[0].tickUpper',tester.positions[0].tickUpper.toString());
+
+      let poolSlot0 =  await TestStakeUniswapV3.poolSlot0();
+      expect(poolSlot0.sqrtPriceX96).to.be.equal(slot0.sqrtPriceX96);
+      expect(poolSlot0.tick).to.be.equal(slot0.tick);
+      expect(poolSlot0.observationIndex).to.be.equal(slot0.observationIndex);
+      expect(poolSlot0.observationCardinality).to.be.equal(slot0.observationCardinality);
+      expect(poolSlot0.observationCardinalityNext).to.be.equal(slot0.observationCardinalityNext);
+      expect(poolSlot0.feeProtocol).to.be.equal(slot0.feeProtocol);
+      expect(poolSlot0.unlocked).to.be.equal(slot0.unlocked);
+
+      /*
+      let decimal_token0 = 1e27;
+      let decimal_token1 = 1e18;
+      let decimal_token1_1 = 18;
+      let TOKEN0="WTON";
+      if(tester.positions[0].token0 == tos.address) {
+        decimal_token0 = 1e18;
+        decimal_token1 = 1e27;
+        decimal_token1_1 = 27;
+        TOKEN0="TOS";
+      }
+
+      //var number_1 = JSBI.BigInt(poolSlot0.sqrtPriceX96*poolSlot0.sqrtPriceX96*decimal_token0/decimal_token1/JSBI.BigInt(2)**(JSBI.BigInt(192)));
+      var number_1 = JSBI.BigInt(slot0.sqrtPriceX96*slot0.sqrtPriceX96*decimal_token1/JSBI.BigInt(2)**(JSBI.BigInt(192)));
+      console.log(TOKEN0 ,' 1 : ',number_1.toString());
+      let getPrice =  await TestStakeUniswapV3.getPrice(ethers.utils.parseUnits("1", 18))
+      console.log('getPrice',getPrice.toString());
+      */
     });
 
     it("2. approve  : tester1 ", async () => {
@@ -863,6 +909,27 @@ describe(" StakeUniswapV3 ", function () {
       // expect(tester2.positions.length).to.be.above(0);
       // expect(slot0.tick).to.be.above(tester2.positions[0].tickLower);
       // expect(slot0.tick).to.be.below(tester2.positions[0].tickUpper);
+
+      /*
+      let decimal_token0 = 1e27;
+      let decimal_token1 = 1e18;
+      let decimal_token1_1 = 18;
+      let TOKEN0="WTON";
+
+      if(tester.positions[0].token0 == tos.address) {
+        decimal_token0 = 1e18;
+        decimal_token1 = 1e27;
+        decimal_token1_1 = 27;
+        TOKEN0="TOS";
+      }
+      //var number_1 = JSBI.BigInt(poolSlot0.sqrtPriceX96*poolSlot0.sqrtPriceX96*decimal_token0/decimal_token1/JSBI.BigInt(2)**(JSBI.BigInt(192)));
+
+      var number_1 = JSBI.BigInt(slot0.sqrtPriceX96*slot0.sqrtPriceX96*decimal_token1/JSBI.BigInt(2)**(JSBI.BigInt(192)));
+
+      console.log(TOKEN0, ' 1 : ',number_1.toString());
+      let getPrice =  await TestStakeUniswapV3.getPrice(ethers.utils.parseUnits("1", 18))
+      console.log('getPrice',getPrice.toString());
+      */
     });
 
     it("5. stake : fail stake without approve token", async () => {
@@ -1147,6 +1214,9 @@ describe(" StakeUniswapV3 ", function () {
         await TestStakeUniswapV3.coinageLastMintBlockTimetamp();
       tester1.miningTimeLast = coinageLastMintBlockTimetampAfter;
       tester2.miningTimeLast = coinageLastMintBlockTimetampAfter;
+
+      //
+
     });
 
     it("10. claim : tester2 ", async () => {
@@ -1252,13 +1322,13 @@ describe(" StakeUniswapV3 ", function () {
         coinageToken.nonMiningAmount
       );
 
-      const secondDiff =
-        depositToken.secondsInsideLast - depositToken.secondsInsideInitial;
-      const miningAmountForSecondDiff = secondDiff * PHASE2_MINING_PERSECOND;
+      // const secondDiff =
+      //   depositToken.secondsInsideLast - depositToken.secondsInsideInitial;
+      // const miningAmountForSecondDiff = secondDiff * PHASE2_MINING_PERSECOND;
 
-      expect(minableAmount).to.be.lte(
-        ethers.BigNumber.from(miningAmountForSecondDiff + "")
-      );
+      // expect(minableAmount).to.be.lte(
+      //   ethers.BigNumber.from(miningAmountForSecondDiff + "")
+      // );
       remainMiningTotal = remainMiningTotal.sub(minableAmount);
 
       const vaultBalanceTOSAfter = await tos.balanceOf(vaultAddress);

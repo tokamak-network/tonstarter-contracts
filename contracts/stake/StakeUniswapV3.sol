@@ -369,6 +369,8 @@ contract StakeUniswapV3 is
                 (token0 == poolToken1 && token1 == poolToken0),
             "StakeUniswapV3: pool's tokens are different"
         );
+        poolToken0 = token0;
+        poolToken1 = token1;
 
         poolAddress = PoolAddress.computeAddress(
             uniswapV3FactoryAddress,
@@ -1054,7 +1056,7 @@ contract StakeUniswapV3 is
     }
 
     /// @dev get price
-    function getPrice()
+    function getPrice(uint256 decimals)
         external
         view
         override
@@ -1063,8 +1065,9 @@ contract StakeUniswapV3 is
     {
         (uint160 sqrtPriceX96, , , , , , ) =
             IUniswapV3Pool(poolAddress).slot0();
+
         return
-            uint256(sqrtPriceX96).mul(uint256(sqrtPriceX96)).mul(1e18) >>
+            uint256(sqrtPriceX96).mul(uint256(sqrtPriceX96)).mul(decimals) >>
             (96 * 2);
     }
 }

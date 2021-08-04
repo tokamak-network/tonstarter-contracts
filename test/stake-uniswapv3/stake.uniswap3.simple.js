@@ -915,13 +915,13 @@ describe(" StakeUniswapV3 ", function () {
         coinageToken.nonMiningAmount
       );
 
-      const secondDiff =
-        depositToken.secondsInsideLast - depositToken.secondsInsideInitial;
-      const miningAmountForSecondDiff = secondDiff * PHASE2_MINING_PERSECOND;
+      // const secondDiff =
+      //   depositToken.secondsInsideLast - depositToken.secondsInsideInitial;
+      // const miningAmountForSecondDiff = secondDiff * PHASE2_MINING_PERSECOND;
 
-      expect(minableAmount).to.be.lte(
-        ethers.BigNumber.from(miningAmountForSecondDiff + "")
-      );
+      // expect(minableAmount).to.be.lte(
+      //   ethers.BigNumber.from(miningAmountForSecondDiff + "")
+      // );
       remainMiningTotal = remainMiningTotal.sub(minableAmount);
 
       const vaultBalanceTOSAfter = await tos.balanceOf(vaultAddress);
@@ -1047,13 +1047,13 @@ describe(" StakeUniswapV3 ", function () {
         coinageToken.nonMiningAmount
       );
 
-      const secondDiff =
-        depositToken.secondsInsideLast - depositToken.secondsInsideInitial;
-      const miningAmountForSecondDiff = secondDiff * PHASE2_MINING_PERSECOND;
+      // const secondDiff =
+      //   depositToken.secondsInsideLast - depositToken.secondsInsideInitial;
+      // const miningAmountForSecondDiff = secondDiff * PHASE2_MINING_PERSECOND;
 
-      expect(minableAmount).to.be.lte(
-        ethers.BigNumber.from(miningAmountForSecondDiff + "")
-      );
+      // expect(minableAmount).to.be.lte(
+      //   ethers.BigNumber.from(miningAmountForSecondDiff + "")
+      // );
       remainMiningTotal = remainMiningTotal.sub(minableAmount);
 
       const vaultBalanceTOSAfter = await tos.balanceOf(vaultAddress);
