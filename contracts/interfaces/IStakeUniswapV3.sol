@@ -29,12 +29,11 @@ interface IStakeUniswapV3 {
             uint256 nonMiningAmount,
             uint256 minableAmount,
             uint160 secondsInside,
-            uint160 secondsInsideDiff,
+            uint256 secondsInsideDiff256,
             uint256 liquidity,
             uint256 balanceOfTokenIdRay,
             uint256 minableAmountRay,
-            uint160 secondsAbsolute160,
-            uint256 secondsInsideDiff256,
+            uint256 secondsInside256,
             uint256 secondsAbsolute256
         );
 
@@ -222,4 +221,7 @@ interface IStakeUniswapV3 {
 
     /// @dev mining end time
     function miningEndTime() external view returns (uint256 endTime);
+
+    /// @dev get price
+    function getPrice() external view returns (uint256 price);
 }

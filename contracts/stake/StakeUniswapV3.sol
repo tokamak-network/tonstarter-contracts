@@ -15,6 +15,8 @@ import "../libraries/LibTokenStake1.sol";
 import {DSMath} from "../libraries/DSMath.sol";
 import "../common/AccessibleCommon.sol";
 import "../stake/StakeUniswapV3Storage.sol";
+import "@openzeppelin/contracts/math/SafeMath.sol";
+import "../libraries/SafeMath32.sol";
 
 /// @title StakeUniswapV3
 /// @notice Uniswap V3 Contract for staking LP and mining TOS
@@ -24,6 +26,9 @@ contract StakeUniswapV3 is
     IStakeUniswapV3,
     DSMath
 {
+    using SafeMath for uint256;
+    using SafeMath32 for uint32;
+
     struct PositionInfo {
         // the amount of liquidity owned by this position
         uint128 liquidity;
@@ -221,18 +226,18 @@ contract StakeUniswapV3 is
 
         if (
             block.timestamp >
-            (coinageLastMintBlockTimetamp + miningIntervalSeconds)
+            (coinageLastMintBlockTimetamp.add(miningIntervalSeconds))
         ) {
             uint256 miningInterval =
-                block.timestamp - coinageLastMintBlockTimetamp;
+                block.timestamp.sub(coinageLastMintBlockTimetamp);
             uint256 miningAmount =
-                miningInterval * IIStake2Vault(vault).miningPerSecond();
+                miningInterval.mul(IIStake2Vault(vault).miningPerSecond());
             uint256 prevTotalSupply =
                 IAutoRefactorCoinageWithTokenId(coinage).totalSupply();
 
             if (miningAmount > 0 && prevTotalSupply > 0) {
                 uint256 afterTotalSupply =
-                    prevTotalSupply + miningAmount * (10**9);
+                    prevTotalSupply.add(miningAmount.mul(10**9));
                 uint256 factor =
                     IAutoRefactorCoinageWithTokenId(coinage).setFactor(
                         _calcNewFactor(
@@ -267,12 +272,11 @@ contract StakeUniswapV3 is
             uint256 nonMiningAmount,
             uint256 minableAmount,
             uint160 secondsInside,
-            uint160 secondsInsideDiff,
+            uint256 secondsInsideDiff256,
             uint256 liquidity,
             uint256 balanceOfTokenIdRay,
             uint256 minableAmountRay,
-            uint160 secondsAbsolute160,
-            uint256 secondsInsideDiff256,
+            uint256 secondsInside256,
             uint256 secondsAbsolute256
         )
     {
@@ -282,61 +286,59 @@ contract StakeUniswapV3 is
             LibUniswapV3Stake.StakeLiquidity storage _depositTokens =
                 depositTokens[tokenId];
             liquidity = _depositTokens.liquidity;
-            uint256 tokenId_ = tokenId;
-            uint32 currentTime = uint32(block.timestamp);
+
             uint32 secondsAbsolute = 0;
+            balanceOfTokenIdRay = IAutoRefactorCoinageWithTokenId(coinage)
+                .balanceOf(tokenId);
 
-            if (_depositTokens.liquidity > 0) {
-                (, , secondsInside) = IUniswapV3Pool(poolAddress)
-                    .snapshotCumulativesInside(
-                    _depositTokens.tickLower,
-                    _depositTokens.tickUpper
-                );
-
-                if (_depositTokens.claimedTime > 0)
-                    secondsAbsolute = currentTime - _depositTokens.claimedTime;
-                else secondsAbsolute = currentTime - _depositTokens.startTime;
-
-                if (_depositTokens.secondsInsideLast > 0)
-                    secondsInsideDiff =
-                        secondsInside -
-                        _depositTokens.secondsInsideLast;
-                else
-                    secondsInsideDiff =
-                        secondsInside -
-                        _depositTokens.secondsInsideInitial;
-
-                balanceOfTokenIdRay = IAutoRefactorCoinageWithTokenId(coinage)
-                    .balanceOf(tokenId_);
-                if (balanceOfTokenIdRay > 0) {
-                    if (
-                        balanceOfTokenIdRay > 0 &&
-                        balanceOfTokenIdRay > liquidity * (10**9)
-                    ) {
-                        minableAmountRay =
-                            balanceOfTokenIdRay -
-                            liquidity *
-                            (10**9);
-                        minableAmount = minableAmountRay / (10**9);
-                    }
+            if (_depositTokens.liquidity > 0 && balanceOfTokenIdRay > 0) {
+                if (balanceOfTokenIdRay > liquidity.mul(10**9)) {
+                    minableAmountRay = balanceOfTokenIdRay.sub(
+                        liquidity.mul(10**9)
+                    );
+                    minableAmount = minableAmountRay.div(10**9);
                 }
+                if (minableAmount > 0) {
+                    (, , secondsInside) = IUniswapV3Pool(poolAddress)
+                        .snapshotCumulativesInside(
+                        _depositTokens.tickLower,
+                        _depositTokens.tickUpper
+                    );
+                    secondsInside256 = uint256(secondsInside);
 
-                secondsAbsolute160 = uint160(secondsAbsolute);
-                secondsInsideDiff256 = uint256(secondsInsideDiff);
-                secondsAbsolute256 = uint256(secondsAbsolute160);
+                    if (_depositTokens.claimedTime > 0)
+                        secondsAbsolute = uint32(block.timestamp).sub(
+                            _depositTokens.claimedTime
+                        );
+                    else
+                        secondsAbsolute = uint32(block.timestamp).sub(
+                            _depositTokens.startTime
+                        );
+                    secondsAbsolute256 = uint256(secondsAbsolute);
 
-                if (
-                    minableAmount > 0 &&
-                    secondsAbsolute > 0 &&
-                    secondsInsideDiff < secondsAbsolute160
-                ) {
-                    if (secondsAbsolute > 0 && secondsInsideDiff > 0)
-                        miningAmount =
-                            (minableAmount * secondsInsideDiff256) /
-                            secondsAbsolute256;
-                    nonMiningAmount = minableAmount - miningAmount;
-                } else if (minableAmount > 0 && secondsAbsolute > 0) {
-                    miningAmount = minableAmount;
+                    if (secondsAbsolute > 0) {
+                        if (_depositTokens.secondsInsideLast > 0) {
+                            secondsInsideDiff256 = secondsInside256.sub(
+                                uint256(_depositTokens.secondsInsideLast)
+                            );
+                        } else {
+                            secondsInsideDiff256 = secondsInside256.sub(
+                                uint256(_depositTokens.secondsInsideInitial)
+                            );
+                        }
+
+                        if (
+                            secondsInsideDiff256 < secondsAbsolute256 &&
+                            secondsInsideDiff256 > 0
+                        ) {
+                            miningAmount = minableAmount
+                                .mul(secondsInsideDiff256)
+                                .div(secondsAbsolute256);
+                            nonMiningAmount = minableAmount.sub(miningAmount);
+                        } else {
+                            miningAmount = minableAmount;
+                        }
+                    }
                 }
             }
         }
@@ -534,18 +536,17 @@ contract StakeUniswapV3 is
         // save tokenid
         userStakedTokenIds[msg.sender].push(tokenId_);
 
-        // 풀에 총 디파짓 되는 정보
-        totalStakedAmount += liquidity;
-        totalTokens++;
+        totalStakedAmount = totalStakedAmount.add(liquidity);
+        totalTokens = totalTokens.add(1);
 
-        //StakedTotalTokenAmount 사용자가 총 디파짓한 정보
         LibUniswapV3Stake.StakedTotalTokenAmount storage _userTotalStaked =
             userTotalStaked[msg.sender];
-        if (!_userTotalStaked.staked) totalStakers++;
+        if (!_userTotalStaked.staked) totalStakers = totalStakers.add(1);
         _userTotalStaked.staked = true;
-        _userTotalStaked.totalDepositAmount += liquidity;
+        _userTotalStaked.totalDepositAmount = _userTotalStaked
+            .totalDepositAmount
+            .add(liquidity);
 
-        //stakedCoinageTokens 토큰별로 코인에에지에 들어가는 정보
         LibUniswapV3Stake.StakedTokenAmount storage _stakedCoinageTokens =
             stakedCoinageTokens[tokenId_];
         _stakedCoinageTokens.amount = liquidity;
@@ -557,7 +558,7 @@ contract StakeUniswapV3 is
         IAutoRefactorCoinageWithTokenId(coinage).mint(
             msg.sender,
             tokenId_,
-            liquidity * (10**9)
+            uint256(liquidity).mul(10**9)
         );
 
         emit Staked(msg.sender, poolAddress, tokenId_, liquidity);
@@ -588,7 +589,6 @@ contract StakeUniswapV3 is
             ,
             uint256 minableAmountRay,
             ,
-            ,
 
         ) = getMiningTokenId(tokenId);
 
@@ -607,18 +607,26 @@ contract StakeUniswapV3 is
         LibUniswapV3Stake.StakedTokenAmount storage _stakedCoinageTokens =
             stakedCoinageTokens[tokenId];
         _stakedCoinageTokens.claimedTime = uint32(block.timestamp);
-        _stakedCoinageTokens.claimedAmount += miningAmount;
-        _stakedCoinageTokens.nonMiningAmount += nonMiningAmount;
+        _stakedCoinageTokens.claimedAmount = _stakedCoinageTokens
+            .claimedAmount
+            .add(miningAmount);
+        _stakedCoinageTokens.nonMiningAmount = _stakedCoinageTokens
+            .nonMiningAmount
+            .add(nonMiningAmount);
 
         // storage  StakedTotalTokenAmount
         LibUniswapV3Stake.StakedTotalTokenAmount storage _userTotalStaked =
             userTotalStaked[msg.sender];
-        _userTotalStaked.totalMiningAmount += miningAmount;
-        _userTotalStaked.totalNonMiningAmount += nonMiningAmount;
+        _userTotalStaked.totalMiningAmount = _userTotalStaked
+            .totalMiningAmount
+            .add(miningAmount);
+        _userTotalStaked.totalNonMiningAmount = _userTotalStaked
+            .totalNonMiningAmount
+            .add(nonMiningAmount);
 
         // total
-        miningAmountTotal += miningAmount;
-        nonMiningAmountTotal += nonMiningAmount;
+        miningAmountTotal = miningAmountTotal.add(miningAmount);
+        nonMiningAmountTotal = nonMiningAmountTotal.add(nonMiningAmount);
 
         require(
             IIStake2Vault(vault).claimMining(
@@ -653,15 +661,14 @@ contract StakeUniswapV3 is
         miningCoinage();
 
         if (totalStakedAmount >= _depositTokens.liquidity)
-            totalStakedAmount -= _depositTokens.liquidity;
+            totalStakedAmount = totalStakedAmount.sub(_depositTokens.liquidity);
 
-        if (totalTokens > 0) totalTokens--;
+        if (totalTokens > 0) totalTokens = totalTokens.sub(1);
 
         (
             uint256 miningAmount,
             uint256 nonMiningAmount,
             uint256 minableAmount,
-            ,
             ,
             ,
             ,
@@ -679,13 +686,19 @@ contract StakeUniswapV3 is
         // storage  StakedTotalTokenAmount
         LibUniswapV3Stake.StakedTotalTokenAmount storage _userTotalStaked =
             userTotalStaked[msg.sender];
-        _userTotalStaked.totalDepositAmount -= _depositTokens.liquidity;
-        _userTotalStaked.totalMiningAmount += miningAmount;
-        _userTotalStaked.totalNonMiningAmount += nonMiningAmount;
+        _userTotalStaked.totalDepositAmount = _userTotalStaked
+            .totalDepositAmount
+            .sub(_depositTokens.liquidity);
+        _userTotalStaked.totalMiningAmount = _userTotalStaked
+            .totalMiningAmount
+            .add(miningAmount);
+        _userTotalStaked.totalNonMiningAmount = _userTotalStaked
+            .totalNonMiningAmount
+            .add(nonMiningAmount);
 
         // total
-        miningAmountTotal += miningAmount;
-        nonMiningAmountTotal += nonMiningAmount;
+        miningAmountTotal = miningAmountTotal.add(miningAmount);
+        nonMiningAmountTotal = nonMiningAmountTotal.add(nonMiningAmount);
 
         deleteUserToken(_depositTokens.owner, tokenId, _depositTokens.idIndex);
 
@@ -693,7 +706,7 @@ contract StakeUniswapV3 is
         delete stakedCoinageTokens[tokenId];
 
         if (_userTotalStaked.totalDepositAmount == 0) {
-            totalStakers--;
+            totalStakers = totalStakers.sub(1);
             delete userTotalStaked[msg.sender];
         }
 
@@ -855,11 +868,11 @@ contract StakeUniswapV3 is
 
         if (
             balanceOfRayTokenId > 0 &&
-            balanceOfRayTokenId > _depositTokens.liquidity * (10**9)
+            balanceOfRayTokenId > uint256(_depositTokens.liquidity).mul(10**9)
         ) {
-            minableAmountRay =
-                balanceOfRayTokenId -
-                (_depositTokens.liquidity * (10**9));
+            minableAmountRay = balanceOfRayTokenId.sub(
+                uint256(_depositTokens.liquidity).mul(10**9)
+            );
         }
     }
 
@@ -1038,5 +1051,20 @@ contract StakeUniswapV3 is
         returns (uint256)
     {
         return IIStake2Vault(vault).miningEndTime();
+    }
+
+    /// @dev get price
+    function getPrice()
+        external
+        view
+        override
+        nonZeroAddress(poolAddress)
+        returns (uint256 price)
+    {
+        (uint160 sqrtPriceX96, , , , , , ) =
+            IUniswapV3Pool(poolAddress).slot0();
+        return
+            uint256(sqrtPriceX96).mul(uint256(sqrtPriceX96)).mul(1e18) >>
+            (96 * 2);
     }
 }
