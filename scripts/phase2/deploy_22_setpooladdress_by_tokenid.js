@@ -36,7 +36,7 @@ async function main() {
 
   console.log("Account balance:", (await deployer.getBalance()).toString());
 
-  const tokenId = ethers.BigNumber.from("3690");
+  const tokenId = ethers.BigNumber.from(process.env.PHASE2_UNISWAPV3_POOL_TOKENID);
 
   //================================================
   const stakeUniswapV3 = await ethers.getContractAt("StakeUniswapV3", process.env.PHASE2_STAKE_UNISWAPV3_ADDRESS);
@@ -45,7 +45,6 @@ async function main() {
   let tx = await stakeUniswapV3.connect(user1).setPoolAddress(tokenId);
   console.log("stakeUniswapV3 setPoolAddress", tx.hash);
   printGasUsedOfUnits('stakeUniswapV3 setPoolAddress', tx.hash);
-
 
 }
 

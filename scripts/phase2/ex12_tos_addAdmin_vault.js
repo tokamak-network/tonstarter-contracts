@@ -50,8 +50,8 @@ async function main() {
   // console.log("tos isAdmin", deployer.address,  res );
 
 
-  // let res = await tos.grantRole(ADMIN_ROLE, process.env.PHASE2_LP_VAULT_ADDRESS);
-  // console.log("tos isAdmin", process.env.PHASE2_LP_VAULT_ADDRESS,  res );
+  let res = await tos.grantRole(ADMIN_ROLE, process.env.PHASE2_LP_VAULT_ADDRESS);
+  console.log("tos isAdmin", process.env.PHASE2_LP_VAULT_ADDRESS,  res );
 
 
   let res1 = await tos.hasRole(ADMIN_ROLE, process.env.PHASE2_LP_VAULT_ADDRESS);
