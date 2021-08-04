@@ -74,6 +74,7 @@ async function addStake2LogicAndVault2Factory() {
   // 1-2. 볼트팩토리에 연결
   tx = await stakeVaultFactory.setVaultLogicByPhase(phase, stake2vaultlogic.address);
   console.log("stakeVaultFactory setVaultLogicByPhase:", tx.hash);
+  printGasUsedOfUnits('stakeVaultFactory setVaultLogicByPhase:',tx);
 
   //=====================================
   // 2. 스테이크 컨트랙 만들기
@@ -145,7 +146,7 @@ async function addStake2LogicAndVault2Factory() {
       stakeType,
       stakeUniswapV3Factory.address
   );
-  printGasUsedOfUnits('stakeProxy setFactoryByStakeType',tx.hash);
+  printGasUsedOfUnits('stakeProxy setFactoryByStakeType',tx);
 
 
   //=====================================
@@ -178,7 +179,7 @@ async function addStake2LogicAndVault2Factory() {
     stake2logic.address,
     true);
   console.log("Stake2Logic setAliveImplementation: " );
-  printGasUsedOfUnits('Stake2Logic setAliveImplementation',tx.hash );
+  printGasUsedOfUnits('Stake2Logic setAliveImplementation',tx );
 
 }
 

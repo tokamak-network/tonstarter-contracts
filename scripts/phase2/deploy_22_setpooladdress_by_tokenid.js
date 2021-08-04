@@ -44,7 +44,7 @@ async function main() {
 
   let tx = await stakeUniswapV3.connect(user1).setPoolAddress(tokenId);
   console.log("stakeUniswapV3 setPoolAddress", tx.hash);
-  printGasUsedOfUnits('stakeUniswapV3 setPoolAddress', tx.hash);
+  printGasUsedOfUnits('stakeUniswapV3 setPoolAddress', tx);
 
 
 }

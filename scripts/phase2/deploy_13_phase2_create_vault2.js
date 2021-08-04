@@ -84,9 +84,8 @@ async function main() {
     vault.name
   );
 
-
   console.log("Phase2 CreateVault2 & Create StakeUniswapV3  ", tx.hash );
-  printGasUsedOfUnits('Phase2 CreateVault2 & Create StakeUniswapV3', tx.hash);
+  printGasUsedOfUnits('Phase2 CreateVault2 & Create StakeUniswapV3', tx);
 
 
 }
