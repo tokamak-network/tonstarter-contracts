@@ -21,6 +21,8 @@ const logic = loadDeployed(process.env.NETWORK, "Stake1Logic");
 const proxy = loadDeployed(process.env.NETWORK, "Stake1Proxy");
 const ton = loadDeployed(process.env.NETWORK, "TON");
 
+const StakeTONUpgrade = loadDeployed(process.env.NETWORK, "StakeTONUpgrade");
+
 
 async function deployMain(defaultSender) {
   const [deployer, user1] = await ethers.getSigners();
@@ -29,22 +31,15 @@ async function deployMain(defaultSender) {
   const tos = await ethers.getContractAt("TOS", TOS_Address);
   console.log("tos:", tos.address);
 
-  const StakeTONUpgrade = await ethers.getContractFactory("StakeTONUpgrade");
+  const stakeEntry = await ethers.getContractAt("Stake1Logic", proxy);
+  console.log("stakeEntry:", stakeEntry.address);
 
-  let deployInfo = {name:'', address:''};
+  let tx2 = await stakeEntry.upgradeStakeTo(process.env.PHASE1_TON_3_ADDRESS, StakeTONUpgrade);
+  await tx2.wait();
 
-  const stakeTONUpgrade = await StakeTONUpgrade.deploy();
-  let tx  = await stakeTONUpgrade.deployed();
-  console.log("StakeTONUpgrade:", stakeTONUpgrade.address);
+  console.log("upgradeStakeTo PHASE1_TON_3_ADDRESS", tx2.hash);
+  printGasUsedOfUnits('upgradeStakeTo PHASE1_TON_3_ADDRESS',tx2);
 
-  deployInfo = {
-    name: "StakeTONUpgrade",
-    address: stakeTONUpgrade.address
-  }
-  if(deployInfo.address != null && deployInfo.address.length > 0  ){
-    save(process.env.NETWORK, deployInfo);
-  }
-  printGasUsedOfUnits('StakeTONUpgrade Deploy',tx);
   return null;
 }
 

@@ -17,9 +17,13 @@ const zeroAddress = "0x0000000000000000000000000000000000000000";
 const tostoken = loadDeployed(process.env.NETWORK, "TOS");
 const proxy = loadDeployed(process.env.NETWORK, "Stake1Proxy");
 
-async function deployMain(defaultSender) {
+async function deployMain() {
   const [deployer, user1] = await ethers.getSigners();
 
+  const stakeEntry = await ethers.getContractAt("Stake1Logic", proxy);
+  console.log("stakeEntry:", stakeEntry.address);
+  let isAdmin = await stakeEntry.isAdmin(deployer.address);
+  console.log("isAdmin:", deployer.address, isAdmin);
   return null;
 }
 
@@ -30,7 +34,7 @@ async function main() {
 
   console.log("Account balance:", (await deployer.getBalance()).toString() +"\n");
 
-
+  await deployMain();
 }
 
 main()
