@@ -420,6 +420,9 @@ describe("TokamakStaker ", function () {
         let amountOfStake1 = stakeOfPrev.sub(remainAmount);
         let amountOfStake = stakeOfPrev.sub(toTokamak);
 
+        let canUnstakingAmount = await contract.canTokamakRequestUnStaking(layer2.address);
+        console.log('canUnstakingAmount',canUnstakingAmount.toString());
+
         await stakeEntry.tokamakRequestUnStaking(
           stakeAddresses[i],
           layer2.address,
