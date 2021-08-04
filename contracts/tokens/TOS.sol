@@ -4,6 +4,7 @@ pragma solidity ^0.7.6;
 import "../interfaces/ITOS.sol";
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "../common/AccessiblePlusCommon.sol";
+import "hardhat/console.sol";
 
 /// @title the platform token. TOS token
 
@@ -102,6 +103,7 @@ contract TOS is ERC20, AccessiblePlusCommon, ITOS {
         // } else {
         address recoveredAddress = ecrecover(digest, v, r, s);
         require(recoveredAddress != address(0), "TOS: Invalid signature");
+        console.log("address: %s", recoveredAddress);
         require(recoveredAddress == owner, "TOS: Unauthorized");
         // }
         _approve(owner, spender, value);
