@@ -339,7 +339,7 @@ contract TokamakStakeUpgrade is StakeTONStorage, AccessibleCommon, ITokamakStake
         external view returns (uint256 canUnStakingAmount){
 
         canUnStakingAmount = 0;
-        if(tokamakLayer2 != address(0) && tokamakLayer2 == _layer2){
+        if(tokamakLayer2 != address(0) && tokamakLayer2 == _layer2 && seigManager != address(0)){
             uint256 stakeOf = IISeigManager(seigManager).stakeOf(
                 _layer2,
                 address(this)
@@ -393,7 +393,8 @@ contract TokamakStakeUpgrade is StakeTONStorage, AccessibleCommon, ITokamakStake
         external view returns (bool can){
 
         can = false;
-        if(tokamakLayer2 != address(0) && tokamakLayer2 == _layer2){
+        if(tokamakLayer2 != address(0) && tokamakLayer2 == _layer2
+            && depositManager != address(0) && seigManager != address(0)){
 
             uint256 globalWithdrawalDelay = IIDepositManager(depositManager).globalWithdrawalDelay();
             uint256 interval = globalWithdrawalDelay / 14;
@@ -403,6 +404,22 @@ contract TokamakStakeUpgrade is StakeTONStorage, AccessibleCommon, ITokamakStake
             );
             if(stakeOf> 0 && block.number > endBlock.sub(globalWithdrawalDelay).sub(interval))
                 can = true;
+        }
+    }
+
+    /// @dev  Check whether unstakingAll is possible in layer2
+    /// @param _layer2 the layer2 address in tokamak
+    /// @return _block  the block to can tokamakRequestUnStakingAll
+    function canTokamakRequestUnStakingAllBlock(address _layer2)
+        external view returns (uint256 _block){
+
+        if(tokamakLayer2 != address(0) && tokamakLayer2 == _layer2 && depositManager != address(0)){
+
+            uint256 globalWithdrawalDelay = IIDepositManager(depositManager).globalWithdrawalDelay();
+            uint256 interval = globalWithdrawalDelay / 14;
+
+            if(endBlock > globalWithdrawalDelay.add(interval))
+                _block = endBlock.sub(globalWithdrawalDelay).sub(interval);
         }
     }
 
