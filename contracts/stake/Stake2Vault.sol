@@ -146,8 +146,7 @@ contract Stake2Vault is Stake2VaultStorage, IStake2Vault {
         uint256 nonMiningAmount
     ) external override nonZero(minableAmount) returns (bool) {
         require(
-            miningStartTime < block.timestamp &&
-                block.timestamp < miningEndTime,
+            miningStartTime < block.timestamp,
             "Stake2Vault: It is not a mining period"
         );
         require(
