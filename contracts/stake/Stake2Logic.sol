@@ -78,7 +78,7 @@ contract Stake2Logic is StakeProxyStorage, AccessibleCommon, IStake2Logic {
     // nonZeroAddress(_uniswapInfo[2])
     // nonZeroAddress(_uniswapInfo[3])
     {
-        require(_phase == 2, "Stake1Logic: unsupported phase in vault2");
+        require(_phase == 2 && _stakeType == 2 , "Stake1Logic: unsupported phase in vault2");
 
         uint256 stakeType = _stakeType;
         uint256 cap = _cap;
