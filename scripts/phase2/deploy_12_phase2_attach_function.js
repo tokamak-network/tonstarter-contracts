@@ -68,16 +68,16 @@ async function main() {
     ethers.BigNumber.from("1"),
     true);
 
-  console.log("Stake2Logic setImplementation: " , tx.hash);
-  printGasUsedOfUnits('Stake2Logic setImplementation', tx);
+  console.log("Stake2Logic setImplementation: " , tx1.hash);
+  printGasUsedOfUnits('Stake2Logic setImplementation', tx1);
   //=====================================
 
   let tx2 =  await Stake1Proxy.setSelectorImplementations(
         [_func1, _func2, _func3, _func4, _func5, _func6, _func7],
         Stake2LogicAddress);
 
-  console.log("Stake2Logic setSelectorImplementations: " , tx.hash);
-  printGasUsedOfUnits('Stake2Logic setSelectorImplementations', tx);
+  console.log("Stake2Logic setSelectorImplementations: " , tx2.hash);
+  printGasUsedOfUnits('Stake2Logic setSelectorImplementations', tx2);
 
 
   console.log("finish phase2-functions-setting");
