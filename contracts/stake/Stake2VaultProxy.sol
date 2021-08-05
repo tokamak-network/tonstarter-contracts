@@ -24,7 +24,6 @@ contract Stake2VaultProxy is Stake2VaultStorage, ProxyBase, IStake2VaultProxy {
 
         _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
         _setupRole(ADMIN_ROLE, msg.sender);
-        _setupRole(ADMIN_ROLE, address(this));
     }
 
     /// @notice Set pause state
