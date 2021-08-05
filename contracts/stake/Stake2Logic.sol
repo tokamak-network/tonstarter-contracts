@@ -78,7 +78,7 @@ contract Stake2Logic is StakeProxyStorage, AccessibleCommon, IStake2Logic {
     // nonZeroAddress(_uniswapInfo[2])
     // nonZeroAddress(_uniswapInfo[3])
     {
-        require(_phase == 2 && _stakeType == 2 , "Stake1Logic: unsupported phase in vault2");
+        require(_phase == 2 && _stakeType == 2 , "Stake2Logic: unsupported phase in vault2");
 
         uint256 stakeType = _stakeType;
         uint256 cap = _cap;
@@ -98,7 +98,7 @@ contract Stake2Logic is StakeProxyStorage, AccessibleCommon, IStake2Logic {
                 address(this)
             );
 
-        require(vault != address(0), "Stake1Logic: vault2 is zero");
+        require(vault != address(0), "Stake2Logic: vault2 is zero");
 
         uint256 phase = _phase;
         bytes32 vaultName = _vaultName;
@@ -114,7 +114,7 @@ contract Stake2Logic is StakeProxyStorage, AccessibleCommon, IStake2Logic {
                 address(stakeRegistry),
                 [cap, miningPerSecond, 0]
             );
-        require(_contract != address(0), "Stake1Logic: vault2 deploy fail");
+        require(_contract != address(0), "Stake2Logic: vault2 deploy fail");
 
         address[4] memory uniswapInfo = _uniswapInfo;
         IIStakeUniswapV3(_contract).setPool(uniswapInfo);

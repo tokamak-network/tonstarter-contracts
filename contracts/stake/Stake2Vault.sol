@@ -173,13 +173,13 @@ contract Stake2Vault is Stake2VaultStorage, IStake2Vault {
         if (miningAmount > 0)
             require(
                 IERC20(tos).transfer(to, miningAmount),
-                "Stake1Vault: TOS transfer fail"
+                "Stake2Vault: TOS transfer fail"
             );
 
         if (nonMiningAmount > 0)
             require(
                 ITOS(tos).burn(address(this), nonMiningAmount),
-                "Stake1Vault: TOS burn fail"
+                "Stake2Vault: TOS burn fail"
             );
 
         emit ClaimedMining(to, minableAmount, miningAmount, nonMiningAmount);
@@ -194,10 +194,10 @@ contract Stake2Vault is Stake2VaultStorage, IStake2Vault {
     {
         uint256 tosBalance = IERC20(tos).balanceOf(address(this));
         require(tosBalance >= _amount, "Stake2Vault: not enough balance");
-        require(isAdmin(msg.sender), "Stake1Vault: not admin ");
+        require(isAdmin(msg.sender), "Stake2Vault: not admin ");
         require(
             IERC20(tos).transfer(_to, _amount),
-            "Stake1Vault: TOS transfer fail"
+            "Stake2Vault: TOS transfer fail"
         );
 
         emit Claimed(msg.sender, _to, _amount);
