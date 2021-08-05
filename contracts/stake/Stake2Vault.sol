@@ -189,12 +189,12 @@ contract Stake2Vault is Stake2VaultStorage, IStake2Vault {
     function claim(address _to, uint256 _amount)
         external
         override
+        onlyOwner
         nonZero(_amount)
         returns (bool)
     {
         uint256 tosBalance = IERC20(tos).balanceOf(address(this));
         require(tosBalance >= _amount, "Stake2Vault: not enough balance");
-        require(isAdmin(msg.sender), "Stake2Vault: not admin ");
         require(
             IERC20(tos).transfer(_to, _amount),
             "Stake2Vault: TOS transfer fail"
