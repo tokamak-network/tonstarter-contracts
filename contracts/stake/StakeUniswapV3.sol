@@ -660,7 +660,7 @@ contract StakeUniswapV3 is
             "StakeUniswapV3: caller is not tokenId's staker"
         );
 
-        miningCoinage();
+        //miningCoinage();
 
         if (totalStakedAmount >= _depositTokens.liquidity)
             totalStakedAmount = totalStakedAmount.sub(_depositTokens.liquidity);
