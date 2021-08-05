@@ -73,9 +73,7 @@ async function main() {
   let tx = await stakeEntry2.createVault2(
     utils.parseUnits(vault.allocatedTOS, 18),
     utils.parseUnits(vault.miningPerSecond, 0),
-    ethers.BigNumber.from(vault.phase),
     keccak256(vault.name),
-    ethers.BigNumber.from(vault.stakeType),
     [ process.env.NonfungiblePositionManager,
       process.env.coreFactory,
       process.env.PHASE2_UNISWAPV3_POOL_TOKEN0,

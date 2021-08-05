@@ -55,17 +55,13 @@ contract Stake2Logic is StakeProxyStorage, AccessibleCommon, IStake2Logic {
     /// @dev create vault2
     /// @param _cap  allocated reward amount
     /// @param _miningPerSecond  the mining per second
-    /// @param _phase  phase of TOS platform
     /// @param _vaultName  vault's name's hash
-    /// @param _stakeType  it's 2, StakeUniswapV3 staking type
     /// @param _uniswapInfo  npm, poolFactory, token0, token1
     /// @param _name   name
     function createVault2(
         uint256 _cap,
         uint256 _miningPerSecond,
-        uint256 _phase,
         bytes32 _vaultName,
-        uint256 _stakeType,
         address[4] memory _uniswapInfo,
         string memory _name
     )
@@ -78,9 +74,8 @@ contract Stake2Logic is StakeProxyStorage, AccessibleCommon, IStake2Logic {
     // nonZeroAddress(_uniswapInfo[2])
     // nonZeroAddress(_uniswapInfo[3])
     {
-        require(_phase == 2 && _stakeType == 2 , "Stake2Logic: unsupported phase in vault2");
-
-        uint256 stakeType = _stakeType;
+        uint256 _phase = 2;
+        uint256 stakeType = 2;
         uint256 cap = _cap;
         uint256 miningPerSecond = _miningPerSecond;
 
