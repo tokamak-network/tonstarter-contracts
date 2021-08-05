@@ -33,14 +33,6 @@ const proxy = loadDeployed(process.env.NETWORK, "Stake1Proxy");
 const tonFactory = loadDeployed(process.env.NETWORK, "StakeTONFactory");
 
 const ton = loadDeployed(process.env.NETWORK, "TON");
-  /*
-const {
-  createValue,
-  createStakeContract,
-  timeout,
-  getPeriodBlockByTimes
-  } = require("../../utils/deploy_common.js");
-*/
 
 async function main() {
 
@@ -53,37 +45,24 @@ async function main() {
   const stakeEntry2 = await ethers.getContractAt("Stake2Logic", proxy);
   console.log("stakeEntry2:", stakeEntry2.address);
 
-   /// @dev create vault2
-    /// @param _cap  allocated reward amount
-    /// @param _miningPerSecond  the mining per second
-    /// @param _phase  phase of TOS platform
-    /// @param _vaultName  vault's name's hash
-    /// @param _stakeType  it's 2, StakeUniswapV3 staking type
-    /// @param _uniswapInfo  npm, poolFactory, token0, token1
-    /// @param _name   name
-  const vault = {
-    allocatedTOS: process.env.PHASE2_UNISWAPV3_ALLOCATED,
-    miningPerSecond: process.env.PHASE2_MINING_PER_SECOND,
-    phase: "2",
-    name: process.env.PHASE2_LP_NAME,
-    stakeType: "2",
+  let vault = {
+    address: process.env.PHASE2_LP_VAULT_ADDRESS,
+    startTime : process.env.PHASE2_WTONTOS_STARTTIME,
+    timestamp:0,
+    endTime: process.env.PHASE2_WTONTOS_ENDTIME,
+    timestampEnd:0,
   }
-  console.log('pahse2 vault : ', vault);
 
-  let tx = await stakeEntry2.createVault2(
-    utils.parseUnits(vault.allocatedTOS, 18),
-    utils.parseUnits(vault.miningPerSecond, 0),
-    [ process.env.NonfungiblePositionManager,
-      process.env.coreFactory,
-      process.env.PHASE2_UNISWAPV3_POOL_TOKEN0,
-      process.env.PHASE2_UNISWAPV3_POOL_TOKEN1,
-    ],
-    vault.name
+  let endTime = new Date(vault.endTime).getTime();
+  vault.timestampEnd = Math.floor(endTime/1000);
+
+  let tx1 = await stakeEntry2.setEndTimeOfVault2(
+    vault.address,
+    vault.timestampEnd
   );
-
-  console.log("Phase2 CreateVault2 & Create StakeUniswapV3  ", tx.hash );
-  printGasUsedOfUnits('Phase2 CreateVault2 & Create StakeUniswapV3', tx);
-
+  await tx1.wait();
+  console.log("Phase2 setEndTimeOfVault2  ", tx1.hash );
+  printGasUsedOfUnits('Phase2 setEndTimeOfVault2 ', tx1 );
 
 }
 

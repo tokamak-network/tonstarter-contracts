@@ -62,17 +62,17 @@ async function main() {
   const tokenId3690 = ethers.BigNumber.from("3690");
   const tokenId3880 = ethers.BigNumber.from("3880");
 
-  let token = {
-    id: tokenId3880,
-    name: '3880',
-    sender : user2
-  }
-
   // let token = {
-  //   id: tokenId3690,
-  //   name: '3690',
-  //   sender : user1
+  //   id: tokenId3880,
+  //   name: '3880',
+  //   sender : user2
   // }
+
+  let token = {
+    id: tokenId3690,
+    name: '3690',
+    sender : user1
+  }
 
    let res0 =  await StakeUniswapV3.depositTokens(token.id);
     console.log("\n StakeUniswapV3 depositTokens:",  token.id.toString(),
@@ -105,12 +105,11 @@ async function main() {
       '\n nonMiningAmount:',utils.formatUnits(res.nonMiningAmount.toString(), 18),
       '\n minableAmount:',utils.formatUnits(res.minableAmount.toString(), 18),
       '\n secondsInside:',res.secondsInside.toString(),
-      '\n secondsInsideDiff:',res.secondsInsideDiff.toString(),
+      '\n secondsInsideDiff256:',res.secondsInsideDiff256.toString(),
       '\n liquidity:',res.liquidity.toString(),
       '\n balanceOfTokenIdRay:', utils.formatUnits(res.balanceOfTokenIdRay.toString(), 27),
       '\n minableAmountRay:', utils.formatUnits(res.minableAmountRay.toString(), 27),
-      '\n secondsAbsolute160:',res.secondsAbsolute160.toString(),
-      '\n secondsInsideDiff256:',res.secondsInsideDiff256.toString(),
+      '\n secondsInside256:',res.secondsInside256.toString(),
       '\n secondsAbsolute256:',res.secondsAbsolute256.toString()
       );
   }

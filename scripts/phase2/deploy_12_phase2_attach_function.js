@@ -50,7 +50,7 @@ async function main() {
   // console.log("Stake2Logic:", Stake2Logic.address);
 
   // attach stake2logic
-  let _func1 = Web3EthAbi.encodeFunctionSignature("createVault2(uint256,uint256,bytes32,address[4],string)") ;
+  let _func1 = Web3EthAbi.encodeFunctionSignature("createVault2(uint256,uint256,address[4],string)") ;
   let _func2 = Web3EthAbi.encodeFunctionSignature("setVaultLogicByPhase(uint256,address)") ;
   let _func3 = Web3EthAbi.encodeFunctionSignature("setPool(address,address[4])") ;
   let _func4 = Web3EthAbi.encodeFunctionSignature("setMiningIntervalSeconds(address,uint256)") ;

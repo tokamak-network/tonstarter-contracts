@@ -47,7 +47,7 @@ async function main() {
 
   let _func1 = web3.eth.abi.encodeFunctionSignature("stakeContractsOfVault(address)") ;
   let _func2 = web3.eth.abi.encodeFunctionSignature("vaultsOfPhase(uint256)") ;
-  let _func3 = web3.eth.abi.encodeFunctionSignature("createVault2(uint256,uint256,bytes32,address[4],string)") ;
+  let _func3 = web3.eth.abi.encodeFunctionSignature("createVault2(uint256,uint256,address[4],string)") ;
   let _func4 = web3.eth.abi.encodeFunctionSignature("setVaultLogicByPhase(uint256,address)") ;
 
 

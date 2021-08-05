@@ -58,7 +58,6 @@ async function main() {
   let tx = await stakeEntry2.createVault2(
     allocateAmount,
     miningPerSecond,
-    VAULT_NAME,
     [ NonfungiblePositionManager,
       UniswapV3Factory,
       weth9,

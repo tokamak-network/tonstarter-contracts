@@ -188,7 +188,7 @@ async function addStake2LogicAndVault2Factory() {
   // attach stake2logic
   let _func1 = Web3EthAbi.encodeFunctionSignature("balanceOf(address,address)") ;
   let _func2 = Web3EthAbi.encodeFunctionSignature("balanceOfTOS(address)") ;
-  let _func3 = Web3EthAbi.encodeFunctionSignature("createVault2(uint256,uint256,bytes32,address[4],string)") ;
+  let _func3 = Web3EthAbi.encodeFunctionSignature("createVault2(uint256,uint256,address[4],string)") ;
   let _func4 = Web3EthAbi.encodeFunctionSignature("setVaultLogicByPhase(uint256,address)") ;
 
   tx =  await Stake1Proxy.setImplementation(

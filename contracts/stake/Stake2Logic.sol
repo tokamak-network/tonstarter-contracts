@@ -55,13 +55,11 @@ contract Stake2Logic is StakeProxyStorage, AccessibleCommon, IStake2Logic {
     /// @dev create vault2
     /// @param _cap  allocated reward amount
     /// @param _miningPerSecond  the mining per second
-    /// @param _vaultName  vault's name's hash
     /// @param _uniswapInfo  npm, poolFactory, token0, token1
     /// @param _name   name
     function createVault2(
         uint256 _cap,
         uint256 _miningPerSecond,
-        bytes32 _vaultName,
         address[4] memory _uniswapInfo,
         string memory _name
     )
@@ -69,13 +67,10 @@ contract Stake2Logic is StakeProxyStorage, AccessibleCommon, IStake2Logic {
         override
         onlyOwner
         nonZeroAddress(address(stakeVaultFactory))
-    // nonZeroAddress(_uniswapInfo[0])
-    // nonZeroAddress(_uniswapInfo[1])
-    // nonZeroAddress(_uniswapInfo[2])
-    // nonZeroAddress(_uniswapInfo[3])
     {
         uint256 _phase = 2;
         uint256 stakeType = 2;
+        bytes32 vaultName = keccak256(abi.encodePacked(_name));
         uint256 cap = _cap;
         uint256 miningPerSecond = _miningPerSecond;
 
@@ -96,7 +91,6 @@ contract Stake2Logic is StakeProxyStorage, AccessibleCommon, IStake2Logic {
         require(vault != address(0), "Stake2Logic: vault2 is zero");
 
         uint256 phase = _phase;
-        bytes32 vaultName = _vaultName;
 
         stakeRegistry.addVault(vault, phase, vaultName);
         emit CreatedVault2(vault, _uniswapInfo[0], cap);
