@@ -154,19 +154,19 @@ contract Stake2Vault is Stake2VaultStorage, IStake2Vault {
             "Stake2Vault: sender is not stakeContract"
         );
         require(
-            minableAmount == (miningAmount + nonMiningAmount),
+            minableAmount == miningAmount.add(nonMiningAmount)  ,
             "Stake2Vault: minable amount is not correct"
         );
 
         uint256 tosBalance = IERC20(tos).balanceOf(address(this));
         require(tosBalance >= minableAmount, "Stake2Vault: not enough balance");
 
-        miningAmountTotal += miningAmount;
-        nonMiningAmountTotal += nonMiningAmount;
-        totalMinedAmount += minableAmount;
+        miningAmountTotal = miningAmountTotal.add(miningAmount);
+        nonMiningAmountTotal = nonMiningAmountTotal.add(nonMiningAmount);
+        totalMinedAmount = totalMinedAmount.add(minableAmount);
         require(
             totalMinedAmount <=
-                (block.timestamp - miningStartTime) * miningPerSecond,
+                (block.timestamp.sub(miningStartTime)).mul(miningPerSecond) ,
             "Stake2Vault: Exceeded the set mining amount"
         );
 
