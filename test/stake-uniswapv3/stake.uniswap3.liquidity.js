@@ -1748,9 +1748,55 @@ describe(" StakeUniswapV3 ", function () {
       remainMiningTotal = remainMiningTotal.add(
         diffTimeMining.mul(utils.parseUnits(PHASE2_MINING_PERSECOND, 0))
       );
+
     });
 
-    it("3. claim: check the minable amount case in partial liquidity ", async () => {
+    it("3. check expected mining amount :  ", async () => {
+      this.timeout(1000000);
+      await timeout(10);
+      const coinageLastMintBlockTimetampBefore =
+        await TestStakeUniswapV3.coinageLastMintBlockTimetamp();
+      const canBalanceBefore = await TestStakeUniswapV3.canMiningAmountTokenId(
+        tester1.tokens[0]
+      );
+      expect(coinageLastMintBlockTimetampBefore).to.be.equal(
+        tester1.miningTimeLast
+      );
+
+      ethers.provider.send("evm_increaseTime", [26])   // add 26 seconds
+      ethers.provider.send("evm_mine")      // mine the next block
+
+      let currentliquidityTokenId = await TestStakeUniswapV3.connect(tester1.account).currentliquidityTokenId(
+        tester1.tokens[0],
+        coinageLastMintBlockTimetampBefore+50
+      );
+
+      let currentCoinageBalanceTokenId = await TestStakeUniswapV3.connect(tester1.account).currentCoinageBalanceTokenId(
+        tester1.tokens[0],
+        coinageLastMintBlockTimetampBefore+50
+      );
+
+      let expectedInfo = await TestStakeUniswapV3.connect(tester1.account).expectedPlusClaimableAmount(
+        tester1.tokens[0],
+        coinageLastMintBlockTimetampBefore+50
+      );
+
+      expect(expectedInfo.miningAmount).to.be.above(
+        ethers.BigNumber.from("0")
+      );
+      expect(expectedInfo.minableAmount).to.be.above(
+        ethers.BigNumber.from("0")
+      );
+
+      let miningPerSecond = await TestStake2Vault.miningPerSecond();
+
+      expect(expectedInfo.minableAmount).to.be.below(
+        ethers.BigNumber.from("26").mul(miningPerSecond)
+      );
+
+    });
+
+    it("4. claim: check the minable amount case in partial liquidity ", async () => {
       this.timeout(1000000);
 
       const vaultBalanceTOS = await tos.balanceOf(vaultAddress);
@@ -2435,7 +2481,11 @@ describe(" StakeUniswapV3 ", function () {
 
       expect(totalStakedAmount).to.be.equal(ethers.BigNumber.from("0"));
       expect(totalTokens).to.be.equal(ethers.BigNumber.from("0"));
-      expect(totalSupplyCoinage).to.be.equal(ethers.BigNumber.from("0"));
+
+      expect(
+        totalSupplyCoinage.div(ethers.BigNumber.from(10 ** 9)).toNumber()
+      ).to.be.equal(0);
+
       expect(
         balanceOfCoinageTester1.div(ethers.BigNumber.from(10 ** 9)).toNumber()
       ).to.be.equal(0);

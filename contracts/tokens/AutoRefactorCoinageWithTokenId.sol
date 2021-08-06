@@ -37,13 +37,13 @@ contract AutoRefactorCoinageWithTokenId is
     uint256 public REFACTOR_BOUNDARY = 10**28;
     uint256 public REFACTOR_DIVIDER = 2;
 
-    uint256 public refactorCount;
+    uint256 public override refactorCount;
 
     mapping(uint256 => Balance) public balances;
 
     Balance public _totalSupply;
 
-    uint256 public _factor;
+    uint256 public override _factor;
 
     bool internal _transfersEnabled;
 
@@ -313,5 +313,16 @@ contract AutoRefactorCoinageWithTokenId is
         uint256 amount = totalSupply();
         if (amount < balanceOf(tokenId)) _burn(tokenOwner, tokenId, amount);
         else _burn(tokenOwner, tokenId, balanceOf(tokenId));
+    }
+
+    function balancesTokenId(uint256 tokenId)
+        public view override
+        returns (uint256 balance, uint256 refactoredCount, uint256 remain)
+    {
+        return (
+            balances[tokenId].balance,
+            balances[tokenId].refactoredCount,
+            balances[tokenId].remain
+        );
     }
 }

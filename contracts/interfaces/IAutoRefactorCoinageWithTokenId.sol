@@ -3,8 +3,13 @@ pragma solidity ^0.7.6;
 
 interface IAutoRefactorCoinageWithTokenId {
     function factor() external view returns (uint256);
+    function _factor() external view returns (uint256);
+    function refactorCount() external view returns (uint256);
+    function balancesTokenId(uint256 tokenId)
+        external view
+        returns (uint256 balance, uint256 refactoredCount, uint256 remain);
 
-    function setFactor(uint256 _factor) external returns (uint256);
+    function setFactor(uint256 factor_) external returns (uint256);
 
     function burn(
         address tokenOwner,

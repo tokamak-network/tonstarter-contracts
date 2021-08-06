@@ -57,6 +57,11 @@ contract StakeUniswapV3 is
         // whether the pool is locked
         bool unlocked;
     }
+    struct Balance {
+        uint256 balance;
+        uint256 refactoredCount;
+        uint256 remain;
+    }
 
     modifier lock() {
         require(_lock == 0, "StakeUniswapV3: LOCKED");
@@ -1070,4 +1075,159 @@ contract StakeUniswapV3 is
             uint256(sqrtPriceX96).mul(uint256(sqrtPriceX96)).mul(decimals) >>
             (96 * 2);
     }
+
+
+    /// @dev current liquidity time of tokenId
+    function currentliquidityTokenId(uint256 tokenId, uint256 expectBlocktimestamp)
+        public
+        view
+        nonZeroAddress(poolAddress)
+        returns (
+            uint256 secondsAbsolute,
+            uint256 secondsInsideDiff256,
+            uint256 liquidity
+        )
+    {
+        if(stakeStartTime > 0){
+            uint256 expectTime = expectBlocktimestamp;
+            if(expectBlocktimestamp > block.timestamp ) expectTime = block.timestamp;
+
+            LibUniswapV3Stake.StakeLiquidity storage _depositTokens = depositTokens[tokenId];
+            (, ,uint160 secondsInside) = IUniswapV3Pool(poolAddress)
+                    .snapshotCumulativesInside(
+                    _depositTokens.tickLower,
+                    _depositTokens.tickUpper
+                );
+
+            liquidity = (uint256)(_depositTokens.liquidity);
+
+
+            if (_depositTokens.claimedTime > 0){
+                secondsAbsolute = expectTime.sub((uint256)(_depositTokens.claimedTime));
+            }
+            else{
+                secondsAbsolute = expectTime.sub((uint256)(_depositTokens.startTime));
+            }
+
+            if (secondsAbsolute > 0) {
+                if (_depositTokens.secondsInsideLast > 0) {
+                    secondsInsideDiff256 = uint256(secondsInside).sub(
+                        uint256(_depositTokens.secondsInsideLast)
+                    );
+                } else {
+                    secondsInsideDiff256 = uint256(secondsInside).sub(
+                        uint256(_depositTokens.secondsInsideInitial)
+                    );
+                }
+            }
+        }
+    }
+
+    /// @dev current liquidity time of tokenId
+    function currentCoinageBalanceTokenId(uint256 tokenId, uint256 expectBlocktimestamp)
+        public
+        view
+        nonZeroAddress(poolAddress)
+        returns (
+            uint256 currentTotalCoinage,
+            uint256 afterTotalCoinage,
+            uint256 afterBalanceTokenId
+        )
+    {
+        if(stakeStartTime > 0){
+            uint256 expectTime = expectBlocktimestamp;
+            if(expectBlocktimestamp > block.timestamp ) expectTime = block.timestamp;
+
+            currentTotalCoinage = IAutoRefactorCoinageWithTokenId(coinage).totalSupply();
+            (uint256 balance, uint256 refactoredCount, uint256 remain) = IAutoRefactorCoinageWithTokenId(coinage).balancesTokenId(tokenId);
+
+
+            uint256 coinageLastMintTime = coinageLastMintBlockTimetamp;
+            if (coinageLastMintTime == 0) coinageLastMintTime = stakeStartTime;
+
+            uint256 addIntervalTime = expectTime.sub(coinageLastMintTime);
+            if(miningIntervalSeconds > 0 && addIntervalTime > miningIntervalSeconds) addIntervalTime = addIntervalTime.sub(miningIntervalSeconds);
+
+            uint256 addAmountCoinage = addIntervalTime.mul(IIStake2Vault(vault).miningPerSecond());
+            afterTotalCoinage = currentTotalCoinage.add(addAmountCoinage.mul(10**9));
+
+            uint256 infactor = _calcNewFactor(currentTotalCoinage, afterTotalCoinage, IAutoRefactorCoinageWithTokenId(coinage).factor());
+
+            uint256 count = 0;
+            uint256 f = infactor;
+            for (; f >= 10**28; f = f.div(2)) {
+                count = count.add(1);
+            }
+            afterBalanceTokenId = applyCoinageFactor(balance, refactoredCount, f, count);
+            afterBalanceTokenId = afterBalanceTokenId.add(remain);
+        }
+    }
+
+    /// @dev expected claimable amount
+    function expectedPlusClaimableAmount(uint256 tokenId, uint256 expectBlocktimestamp)
+        external
+        view
+        nonZeroAddress(poolAddress)
+        returns (
+            uint256 miningAmount,
+            uint256 nonMiningAmount,
+            uint256 minableAmount,
+            uint256 minableAmountRay
+        )
+    {
+        if(stakeStartTime > 0){
+            //uint256 tokenId_ = tokenId;
+            uint256 expectTime = block.timestamp;
+            if(expectBlocktimestamp < expectTime
+            && expectBlocktimestamp > coinageLastMintBlockTimetamp ) expectTime = expectBlocktimestamp;
+
+            (
+                uint256 secondsAbsolute,
+                uint256 secondsInsideDiff256,
+                uint256 liquidity
+            ) = currentliquidityTokenId(tokenId, expectTime);
+
+            ( , ,
+                uint256 afterBalanceTokenId
+            ) = currentCoinageBalanceTokenId(tokenId, expectTime);
+
+            if ( liquidity > 0
+                && afterBalanceTokenId > liquidity.mul(10**9) ){
+                minableAmountRay = afterBalanceTokenId.sub(liquidity.mul(10**9));
+                minableAmount = minableAmountRay.div(10**9);
+            }
+            if (minableAmount > 0 &&  secondsAbsolute  > 0 ) {
+                if (
+                    secondsInsideDiff256 <  secondsAbsolute  &&
+                    secondsInsideDiff256 > 0
+                ) {
+                    miningAmount = minableAmount
+                        .mul(secondsInsideDiff256)
+                        .div(secondsAbsolute);
+                    nonMiningAmount = minableAmount.sub(miningAmount);
+                } else {
+                    miningAmount = minableAmount;
+                }
+            }
+        }
+    }
+
+    function applyCoinageFactor(uint256 v, uint256 refactoredCount, uint256 _factor, uint256 refactorCount)
+        internal
+        pure
+        returns (uint256)
+    {
+        if (v == 0) {
+            return 0;
+        }
+
+        v = rmul2(v, _factor);
+
+        for (uint256 i = refactoredCount; i < refactorCount; i++) {
+            v = v * (2);
+        }
+
+        return v;
+    }
+
 }
