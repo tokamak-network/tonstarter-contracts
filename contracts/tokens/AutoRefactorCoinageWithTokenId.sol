@@ -316,8 +316,14 @@ contract AutoRefactorCoinageWithTokenId is
     }
 
     function balancesTokenId(uint256 tokenId)
-        public view override
-        returns (uint256 balance, uint256 refactoredCount, uint256 remain)
+        public
+        view
+        override
+        returns (
+            uint256 balance,
+            uint256 refactoredCount,
+            uint256 remain
+        )
     {
         return (
             balances[tokenId].balance,

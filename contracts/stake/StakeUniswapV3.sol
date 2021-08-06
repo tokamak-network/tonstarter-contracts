@@ -57,11 +57,6 @@ contract StakeUniswapV3 is
         // whether the pool is locked
         bool unlocked;
     }
-    struct Balance {
-        uint256 balance;
-        uint256 refactoredCount;
-        uint256 remain;
-    }
 
     modifier lock() {
         require(_lock == 0, "StakeUniswapV3: LOCKED");
@@ -665,7 +660,7 @@ contract StakeUniswapV3 is
             "StakeUniswapV3: caller is not tokenId's staker"
         );
 
-        //miningCoinage();
+        miningCoinage();
 
         if (totalStakedAmount >= _depositTokens.liquidity)
             totalStakedAmount = totalStakedAmount.sub(_depositTokens.liquidity);
@@ -1061,6 +1056,7 @@ contract StakeUniswapV3 is
     }
 
     /// @dev get price
+    /// @param decimals pool's token1's decimals (ex. 1e18)
     function getPrice(uint256 decimals)
         external
         view
@@ -1076,134 +1072,211 @@ contract StakeUniswapV3 is
             (96 * 2);
     }
 
-
-    /// @dev current liquidity time of tokenId
-    function currentliquidityTokenId(uint256 tokenId, uint256 expectBlocktimestamp)
+    /// @dev Time to provide token liquidity (in seconds)
+    /// @param tokenId token id
+    /// @param expectBlocktimestamp The specific time you want to know (It must be greater than the last mining time.)
+    function currentliquidityTokenId(
+        uint256 tokenId,
+        uint256 expectBlocktimestamp
+    )
         public
         view
+        override
         nonZeroAddress(poolAddress)
         returns (
             uint256 secondsAbsolute,
             uint256 secondsInsideDiff256,
-            uint256 liquidity
+            uint256 expectTime
         )
     {
-        if(stakeStartTime > 0){
-            uint256 expectTime = expectBlocktimestamp;
-            if(expectBlocktimestamp > block.timestamp ) expectTime = block.timestamp;
+        secondsAbsolute = 0;
+        secondsInsideDiff256 = 0;
+        expectTime = 0;
 
-            LibUniswapV3Stake.StakeLiquidity storage _depositTokens = depositTokens[tokenId];
-            (, ,uint160 secondsInside) = IUniswapV3Pool(poolAddress)
-                    .snapshotCumulativesInside(
+        if (
+            stakeStartTime > 0 &&
+            expectBlocktimestamp > coinageLastMintBlockTimetamp
+        ) {
+            expectTime = expectBlocktimestamp;
+
+            LibUniswapV3Stake.StakeLiquidity storage _depositTokens =
+                depositTokens[tokenId];
+            (, , uint160 secondsInside) =
+                IUniswapV3Pool(poolAddress).snapshotCumulativesInside(
                     _depositTokens.tickLower,
                     _depositTokens.tickUpper
                 );
 
-            liquidity = (uint256)(_depositTokens.liquidity);
-
-
-            if (_depositTokens.claimedTime > 0){
-                secondsAbsolute = expectTime.sub((uint256)(_depositTokens.claimedTime));
-            }
-            else{
-                secondsAbsolute = expectTime.sub((uint256)(_depositTokens.startTime));
-            }
-
-            if (secondsAbsolute > 0) {
-                if (_depositTokens.secondsInsideLast > 0) {
-                    secondsInsideDiff256 = uint256(secondsInside).sub(
-                        uint256(_depositTokens.secondsInsideLast)
+            if (
+                expectTime > _depositTokens.claimedTime &&
+                expectTime > _depositTokens.startTime
+            ) {
+                if (_depositTokens.claimedTime > 0) {
+                    secondsAbsolute = expectTime.sub(
+                        (uint256)(_depositTokens.claimedTime)
                     );
                 } else {
-                    secondsInsideDiff256 = uint256(secondsInside).sub(
-                        uint256(_depositTokens.secondsInsideInitial)
+                    secondsAbsolute = expectTime.sub(
+                        (uint256)(_depositTokens.startTime)
                     );
+                }
+
+                if (secondsAbsolute > 0) {
+                    if (_depositTokens.secondsInsideLast > 0) {
+                        secondsInsideDiff256 = uint256(secondsInside).sub(
+                            uint256(_depositTokens.secondsInsideLast)
+                        );
+                    } else {
+                        secondsInsideDiff256 = uint256(secondsInside).sub(
+                            uint256(_depositTokens.secondsInsideInitial)
+                        );
+                    }
                 }
             }
         }
     }
 
-    /// @dev current liquidity time of tokenId
-    function currentCoinageBalanceTokenId(uint256 tokenId, uint256 expectBlocktimestamp)
+    /// @dev Time to provide token liquidity (in seconds)
+    /// @param tokenId token id
+    /// @param expectBlocktimestamp The specific time you want to know (It must be greater than the last mining time.)
+    function currentCoinageBalanceTokenId(
+        uint256 tokenId,
+        uint256 expectBlocktimestamp
+    )
         public
         view
+        override
         nonZeroAddress(poolAddress)
         returns (
             uint256 currentTotalCoinage,
             uint256 afterTotalCoinage,
-            uint256 afterBalanceTokenId
+            uint256 afterBalanceTokenId,
+            uint256 expectTime,
+            uint256 addIntervalTime
         )
     {
-        if(stakeStartTime > 0){
-            uint256 expectTime = expectBlocktimestamp;
-            if(expectBlocktimestamp > block.timestamp ) expectTime = block.timestamp;
+        currentTotalCoinage = 0;
+        afterTotalCoinage = 0;
+        afterBalanceTokenId = 0;
+        expectTime = 0;
+        addIntervalTime = 0;
 
-            currentTotalCoinage = IAutoRefactorCoinageWithTokenId(coinage).totalSupply();
-            (uint256 balance, uint256 refactoredCount, uint256 remain) = IAutoRefactorCoinageWithTokenId(coinage).balancesTokenId(tokenId);
+        if (
+            stakeStartTime > 0 &&
+            expectBlocktimestamp > coinageLastMintBlockTimetamp
+        ) {
+            expectTime = expectBlocktimestamp;
 
+            uint256 miningEndTime_ = IIStake2Vault(vault).miningEndTime();
+            if (expectTime > miningEndTime_) expectTime = miningEndTime_;
+
+            currentTotalCoinage = IAutoRefactorCoinageWithTokenId(coinage)
+                .totalSupply();
+            (uint256 balance, uint256 refactoredCount, uint256 remain) =
+                IAutoRefactorCoinageWithTokenId(coinage).balancesTokenId(
+                    tokenId
+                );
 
             uint256 coinageLastMintTime = coinageLastMintBlockTimetamp;
             if (coinageLastMintTime == 0) coinageLastMintTime = stakeStartTime;
 
-            uint256 addIntervalTime = expectTime.sub(coinageLastMintTime);
-            if(miningIntervalSeconds > 0 && addIntervalTime > miningIntervalSeconds) addIntervalTime = addIntervalTime.sub(miningIntervalSeconds);
+            addIntervalTime = expectTime.sub(coinageLastMintTime);
+            if (
+                miningIntervalSeconds > 0 &&
+                addIntervalTime > miningIntervalSeconds
+            ) addIntervalTime = addIntervalTime.sub(miningIntervalSeconds);
 
-            uint256 addAmountCoinage = addIntervalTime.mul(IIStake2Vault(vault).miningPerSecond());
-            afterTotalCoinage = currentTotalCoinage.add(addAmountCoinage.mul(10**9));
+            if (addIntervalTime > 0) {
+                uint256 miningPerSecond_ =
+                    IIStake2Vault(vault).miningPerSecond();
+                uint256 addAmountCoinage =
+                    addIntervalTime.mul(miningPerSecond_);
+                afterTotalCoinage = currentTotalCoinage.add(
+                    addAmountCoinage.mul(10**9)
+                );
+                uint256 factor_ =
+                    IAutoRefactorCoinageWithTokenId(coinage).factor();
+                uint256 infactor =
+                    _calcNewFactor(
+                        currentTotalCoinage,
+                        afterTotalCoinage,
+                        factor_
+                    );
 
-            uint256 infactor = _calcNewFactor(currentTotalCoinage, afterTotalCoinage, IAutoRefactorCoinageWithTokenId(coinage).factor());
+                uint256 count = 0;
+                uint256 f = infactor;
+                for (; f >= 10**28; f = f.div(2)) {
+                    count = count.add(1);
+                }
+                uint256 afterBalanceTokenId_ =
+                    applyCoinageFactor(balance, refactoredCount, f, count);
 
-            uint256 count = 0;
-            uint256 f = infactor;
-            for (; f >= 10**28; f = f.div(2)) {
-                count = count.add(1);
+                afterBalanceTokenId = afterBalanceTokenId_.add(remain);
             }
-            afterBalanceTokenId = applyCoinageFactor(balance, refactoredCount, f, count);
-            afterBalanceTokenId = afterBalanceTokenId.add(remain);
         }
     }
 
-    /// @dev expected claimable amount
-    function expectedPlusClaimableAmount(uint256 tokenId, uint256 expectBlocktimestamp)
+    /// @dev Estimated additional claimable amount on a specific time
+    /// @param tokenId token id
+    /// @param expectBlocktimestamp The specific time you want to know (It must be greater than the last mining time.)
+    function expectedPlusClaimableAmount(
+        uint256 tokenId,
+        uint256 expectBlocktimestamp
+    )
         external
         view
+        override
         nonZeroAddress(poolAddress)
         returns (
             uint256 miningAmount,
             uint256 nonMiningAmount,
             uint256 minableAmount,
-            uint256 minableAmountRay
+            uint256 minableAmountRay,
+            uint256 expectTime
         )
     {
-        if(stakeStartTime > 0){
-            //uint256 tokenId_ = tokenId;
-            uint256 expectTime = block.timestamp;
-            if(expectBlocktimestamp < expectTime
-            && expectBlocktimestamp > coinageLastMintBlockTimetamp ) expectTime = expectBlocktimestamp;
+        miningAmount = 0;
+        nonMiningAmount = 0;
+        minableAmount = 0;
+        minableAmountRay = 0;
+        expectTime = 0;
+
+        if (
+            stakeStartTime > 0 &&
+            expectBlocktimestamp > coinageLastMintBlockTimetamp
+        ) {
+            expectTime = expectBlocktimestamp;
+            uint256 afterBalanceTokenId = 0;
+            uint256 secondsAbsolute = 0;
+            uint256 secondsInsideDiff256 = 0;
+
+            uint256 currentBalanceOfTokenId = IAutoRefactorCoinageWithTokenId(coinage).balanceOf(tokenId);
 
             (
-                uint256 secondsAbsolute,
-                uint256 secondsInsideDiff256,
-                uint256 liquidity
+                secondsAbsolute,
+                secondsInsideDiff256,
             ) = currentliquidityTokenId(tokenId, expectTime);
 
-            ( , ,
-                uint256 afterBalanceTokenId
-            ) = currentCoinageBalanceTokenId(tokenId, expectTime);
+            (, , afterBalanceTokenId, , ) = currentCoinageBalanceTokenId(
+                tokenId,
+                expectTime
+            );
 
-            if ( liquidity > 0
-                && afterBalanceTokenId > liquidity.mul(10**9) ){
-                minableAmountRay = afterBalanceTokenId.sub(liquidity.mul(10**9));
+            if (
+                currentBalanceOfTokenId > 0 &&
+                afterBalanceTokenId > currentBalanceOfTokenId
+            ) {
+                minableAmountRay = afterBalanceTokenId.sub(currentBalanceOfTokenId);
                 minableAmount = minableAmountRay.div(10**9);
             }
-            if (minableAmount > 0 &&  secondsAbsolute  > 0 ) {
+            if (minableAmount > 0 && secondsAbsolute > 0) {
                 if (
-                    secondsInsideDiff256 <  secondsAbsolute  &&
+                    secondsInsideDiff256 < secondsAbsolute &&
                     secondsInsideDiff256 > 0
                 ) {
-                    miningAmount = minableAmount
-                        .mul(secondsInsideDiff256)
-                        .div(secondsAbsolute);
+                    miningAmount = minableAmount.mul(secondsInsideDiff256).div(
+                        secondsAbsolute
+                    );
                     nonMiningAmount = minableAmount.sub(miningAmount);
                 } else {
                     miningAmount = minableAmount;
@@ -1212,11 +1285,12 @@ contract StakeUniswapV3 is
         }
     }
 
-    function applyCoinageFactor(uint256 v, uint256 refactoredCount, uint256 _factor, uint256 refactorCount)
-        internal
-        pure
-        returns (uint256)
-    {
+    function applyCoinageFactor(
+        uint256 v,
+        uint256 refactoredCount,
+        uint256 _factor,
+        uint256 refactorCount
+    ) internal pure returns (uint256) {
         if (v == 0) {
             return 0;
         }
@@ -1229,5 +1303,4 @@ contract StakeUniswapV3 is
 
         return v;
     }
-
 }

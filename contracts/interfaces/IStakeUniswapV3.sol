@@ -224,4 +224,44 @@ interface IStakeUniswapV3 {
 
     /// @dev get price
     function getPrice(uint256 decimals) external view returns (uint256 price);
+
+    function currentliquidityTokenId(
+        uint256 tokenId,
+        uint256 expectBlocktimestamp
+    )
+        external
+        view
+        returns (
+            uint256 secondsAbsolute,
+            uint256 secondsInsideDiff256,
+            uint256 expectTime
+        );
+
+    function currentCoinageBalanceTokenId(
+        uint256 tokenId,
+        uint256 expectBlocktimestamp
+    )
+        external
+        view
+        returns (
+            uint256 currentTotalCoinage,
+            uint256 afterTotalCoinage,
+            uint256 afterBalanceTokenId,
+            uint256 expectTime,
+            uint256 addIntervalTime
+        );
+
+    function expectedPlusClaimableAmount(
+        uint256 tokenId,
+        uint256 expectBlocktimestamp
+    )
+        external
+        view
+        returns (
+            uint256 miningAmount,
+            uint256 nonMiningAmount,
+            uint256 minableAmount,
+            uint256 minableAmountRay,
+            uint256 expectTime
+        );
 }

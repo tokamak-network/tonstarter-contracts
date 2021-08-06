@@ -154,7 +154,7 @@ contract Stake2Vault is Stake2VaultStorage, IStake2Vault {
             "Stake2Vault: sender is not stakeContract"
         );
         require(
-            minableAmount == miningAmount.add(nonMiningAmount)  ,
+            minableAmount == miningAmount.add(nonMiningAmount),
             "Stake2Vault: minable amount is not correct"
         );
 
@@ -166,7 +166,7 @@ contract Stake2Vault is Stake2VaultStorage, IStake2Vault {
         totalMinedAmount = totalMinedAmount.add(minableAmount);
         require(
             totalMinedAmount <=
-                (block.timestamp.sub(miningStartTime)).mul(miningPerSecond) ,
+                (block.timestamp.sub(miningStartTime)).mul(miningPerSecond),
             "Stake2Vault: Exceeded the set mining amount"
         );
 

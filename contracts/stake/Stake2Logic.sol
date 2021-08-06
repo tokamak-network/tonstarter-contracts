@@ -62,12 +62,7 @@ contract Stake2Logic is StakeProxyStorage, AccessibleCommon, IStake2Logic {
         uint256 _miningPerSecond,
         address[4] memory _uniswapInfo,
         string memory _name
-    )
-        external
-        override
-        onlyOwner
-        nonZeroAddress(address(stakeVaultFactory))
-    {
+    ) external override onlyOwner nonZeroAddress(address(stakeVaultFactory)) {
         uint256 _phase = 2;
         uint256 stakeType = 2;
         bytes32 vaultName = keccak256(abi.encodePacked(_name));
