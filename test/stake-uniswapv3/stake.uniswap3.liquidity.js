@@ -1763,23 +1763,53 @@ describe(" StakeUniswapV3 ", function () {
         tester1.miningTimeLast
       );
 
-      ethers.provider.send("evm_increaseTime", [26])   // add 26 seconds
+      let interval = 50;
+
+      let currentTime = new Date().getTime();
+      currentTime = Math.floor(currentTime/1000);
+      // console.log('currentTime', currentTime.toString());
+      // console.log('coinageLastMintBlockTimetampBefore', coinageLastMintBlockTimetampBefore.toString());
+
+
+      let miningPerSecond = await TestStake2Vault.miningPerSecond();
+      let miningEndTime  = await TestStake2Vault.miningEndTime();
+      // console.log('miningPerSecond', miningPerSecond.toString());
+      // console.log('miningEndTime', miningEndTime.toString());
+
+      ethers.provider.send("evm_increaseTime", [interval])   // add 26 seconds
       ethers.provider.send("evm_mine")      // mine the next block
 
       let currentliquidityTokenId = await TestStakeUniswapV3.connect(tester1.account).currentliquidityTokenId(
         tester1.tokens[0],
-        coinageLastMintBlockTimetampBefore+50
+        coinageLastMintBlockTimetampBefore.add(ethers.BigNumber.from(interval))
       );
+
+      // console.log('currentliquidityTokenId.secondsAbsolute', currentliquidityTokenId.secondsAbsolute.toString());
+      // console.log('currentliquidityTokenId.secondsInsideDiff256', currentliquidityTokenId.secondsInsideDiff256.toString());
+      // console.log('currentliquidityTokenId.liquidity', currentliquidityTokenId.liquidity.toString());
+      // console.log('currentliquidityTokenId.expectTime', currentliquidityTokenId.expectTime.toString());
 
       let currentCoinageBalanceTokenId = await TestStakeUniswapV3.connect(tester1.account).currentCoinageBalanceTokenId(
         tester1.tokens[0],
-        coinageLastMintBlockTimetampBefore+50
+        coinageLastMintBlockTimetampBefore.add(ethers.BigNumber.from(interval))
       );
+
+      // console.log('currentCoinageBalanceTokenId.currentTotalCoinage', currentCoinageBalanceTokenId.currentTotalCoinage.toString());
+      // console.log('currentCoinageBalanceTokenId.afterTotalCoinage', currentCoinageBalanceTokenId.afterTotalCoinage.toString());
+      // console.log('currentCoinageBalanceTokenId.afterBalanceTokenId', currentCoinageBalanceTokenId.afterBalanceTokenId.toString());
+      // console.log('currentCoinageBalanceTokenId.expectTime', currentCoinageBalanceTokenId.expectTime.toString());
+      // console.log('currentCoinageBalanceTokenId.addIntervalTime', currentCoinageBalanceTokenId.addIntervalTime.toString());
 
       let expectedInfo = await TestStakeUniswapV3.connect(tester1.account).expectedPlusClaimableAmount(
         tester1.tokens[0],
-        coinageLastMintBlockTimetampBefore+50
+        coinageLastMintBlockTimetampBefore.add(ethers.BigNumber.from(interval))
       );
+
+      // console.log('expectedInfo.miningAmount', expectedInfo.miningAmount.toString());
+      // console.log('expectedInfo.nonMiningAmount', expectedInfo.nonMiningAmount.toString());
+      // console.log('expectedInfo.minableAmount', expectedInfo.minableAmount.toString());
+      // console.log('expectedInfo.minableAmountRay', expectedInfo.minableAmountRay.toString());
+      // console.log('expectedInfo.expectTime', expectedInfo.expectTime.toString());
 
       expect(expectedInfo.miningAmount).to.be.above(
         ethers.BigNumber.from("0")
@@ -1788,10 +1818,8 @@ describe(" StakeUniswapV3 ", function () {
         ethers.BigNumber.from("0")
       );
 
-      let miningPerSecond = await TestStake2Vault.miningPerSecond();
-
       expect(expectedInfo.minableAmount).to.be.below(
-        ethers.BigNumber.from("26").mul(miningPerSecond)
+        ethers.BigNumber.from(interval).mul(miningPerSecond)
       );
 
     });

@@ -62,17 +62,17 @@ async function main() {
   const tokenId3690 = ethers.BigNumber.from("3690");
   const tokenId3880 = ethers.BigNumber.from("3880");
 
-  // let token = {
-  //   id: tokenId3880,
-  //   name: '3880',
-  //   sender : user2
-  // }
-
   let token = {
-    id: tokenId3690,
-    name: '3690',
-    sender : user1
+    id: tokenId3880,
+    name: '3880',
+    sender : user2
   }
+
+  // let token = {
+  //   id: tokenId3690,
+  //   name: '3690',
+  //   sender : user1
+  // }
 
    let res0 =  await StakeUniswapV3.depositTokens(token.id);
     console.log("\n StakeUniswapV3 depositTokens:",  token.id.toString(),
