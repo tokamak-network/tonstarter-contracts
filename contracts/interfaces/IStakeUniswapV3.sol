@@ -102,15 +102,6 @@ interface IStakeUniswapV3 {
             uint256[4] memory
         );
 
-    /// @dev minable amount of tokenId
-    /// @dev tokenId tokenId
-    /// @return balanceOfRayTokenId  balanceOf of tokenId with ray unit
-    /// @return minableAmountRay  minable amount of tokenId with ray unit
-    function canMiningAmountTokenId(uint256 tokenId)
-        external
-        view
-        returns (uint256 balanceOfRayTokenId, uint256 minableAmountRay);
-
     /// @dev pool's infos
     /// @return factory  pool's factory address
     /// @return token0  token0 address
@@ -220,11 +211,20 @@ interface IStakeUniswapV3 {
         );
 
     /// @dev mining end time
+    /// @return endTime mining end time
     function miningEndTime() external view returns (uint256 endTime);
 
     /// @dev get price
+    /// @param decimals pool's token1's decimals (ex. 1e18)
+    /// @return price price
     function getPrice(uint256 decimals) external view returns (uint256 price);
 
+    /// @dev Liquidity provision time (seconds) at a specific point in time since the token was recently mined
+    /// @param tokenId token id
+    /// @param expectBlocktimestamp The specific time you want to know (It must be greater than the last mining time.) set it to the current time.
+    /// @return secondsAbsolute Absolute duration (in seconds) from the latest mining to the time of expectTime
+    /// @return secondsInsideDiff256 The time (in seconds) that the token ID provided liquidity from the last claim (or staking time) to the present time.
+    /// @return expectTime time used in the calculation
     function currentliquidityTokenId(
         uint256 tokenId,
         uint256 expectBlocktimestamp
@@ -237,6 +237,14 @@ interface IStakeUniswapV3 {
             uint256 expectTime
         );
 
+    /// @dev Coinage balance information that tokens can receive in the future
+    /// @param tokenId token id
+    /// @param expectBlocktimestamp The specific time you want to know (It must be greater than the last mining time.)
+    /// @return currentTotalCoinage Current Coinage Total Balance
+    /// @return afterTotalCoinage Total balance of Coinage at a future point in time
+    /// @return afterBalanceTokenId The total balance of the coin age of the token at a future time
+    /// @return expectTime future time
+    /// @return addIntervalTime Duration (in seconds) between the future time and the recent mining time
     function currentCoinageBalanceTokenId(
         uint256 tokenId,
         uint256 expectBlocktimestamp
@@ -251,6 +259,14 @@ interface IStakeUniswapV3 {
             uint256 addIntervalTime
         );
 
+    /// @dev Estimated additional claimable amount on a specific time
+    /// @param tokenId token id
+    /// @param expectBlocktimestamp The specific time you want to know (It must be greater than the last mining time.)
+    /// @return miningAmount Amount you can claim
+    /// @return nonMiningAmount The amount that burn without receiving a claim
+    /// @return minableAmount Total amount of mining allocated at the time of claim
+    /// @return minableAmountRay Total amount of mining allocated at the time of claim (ray unit)
+    /// @return expectTime time used in the calculation
     function expectedPlusClaimableAmount(
         uint256 tokenId,
         uint256 expectBlocktimestamp

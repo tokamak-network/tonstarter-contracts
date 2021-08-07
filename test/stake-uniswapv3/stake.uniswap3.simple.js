@@ -784,19 +784,19 @@ describe(" StakeUniswapV3 ", function () {
       this.timeout(1000000);
       const coinageLastMintBlockTimetampBefore =
         await TestStakeUniswapV3.coinageLastMintBlockTimetamp();
-      const canBalanceBefore = await TestStakeUniswapV3.canMiningAmountTokenId(
+      const canBalanceBefore = await TestStakeUniswapV3.balanceOfCoinage(
         tester1.tokens[0]
       );
 
       await TestStakeUniswapV3.connect(tester1.account).miningCoinage();
 
-      const canBalanceAfter = await TestStakeUniswapV3.canMiningAmountTokenId(
+      const canBalanceAfter = await TestStakeUniswapV3.balanceOfCoinage(
         tester1.tokens[0]
       );
       const coinageLastMintBlockTimetampAfter =
         await TestStakeUniswapV3.coinageLastMintBlockTimetamp();
-      expect(canBalanceAfter.balanceOfRayTokenId).to.be.above(
-        canBalanceBefore.balanceOfRayTokenId
+      expect(canBalanceAfter).to.be.above(
+        canBalanceBefore
       );
       expect(coinageLastMintBlockTimetampBefore).to.be.lt(
         coinageLastMintBlockTimetampAfter
@@ -1073,20 +1073,20 @@ describe(" StakeUniswapV3 ", function () {
       await timeout(5);
       const coinageLastMintBlockTimetampBefore =
         await TestStakeUniswapV3.coinageLastMintBlockTimetamp();
-      const canBalanceBefore = await TestStakeUniswapV3.canMiningAmountTokenId(
+      const canBalanceBefore = await TestStakeUniswapV3.balanceOfCoinage(
         tester1.tokens[0]
       );
 
       await TestStakeUniswapV3.connect(tester1.account).miningCoinage();
 
-      const canBalanceAfter = await TestStakeUniswapV3.canMiningAmountTokenId(
+      const canBalanceAfter = await TestStakeUniswapV3.balanceOfCoinage(
         tester1.tokens[0]
       );
       const coinageLastMintBlockTimetampAfter =
         await TestStakeUniswapV3.coinageLastMintBlockTimetamp();
 
-      expect(canBalanceAfter.balanceOfRayTokenId).to.be.above(
-        canBalanceBefore.balanceOfRayTokenId
+      expect(canBalanceAfter).to.be.above(
+        canBalanceBefore
       );
       expect(coinageLastMintBlockTimetampBefore).to.be.lt(
         coinageLastMintBlockTimetampAfter
