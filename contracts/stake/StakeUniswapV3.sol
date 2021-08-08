@@ -138,7 +138,7 @@ contract StakeUniswapV3 is
         _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
         _setupRole(ADMIN_ROLE, msg.sender);
 
-        miningIntervalSeconds = 13;
+        miningIntervalSeconds = 15;
     }
 
     /// @dev receive ether - revert
@@ -461,6 +461,12 @@ contract StakeUniswapV3 is
     /// @dev stake tokenId of UniswapV3
     /// @param tokenId  tokenId
     function _stake(uint256 tokenId) internal {
+
+        LibUniswapV3Stake.StakeLiquidity storage _depositTokens =
+            depositTokens[tokenId];
+
+        require(_depositTokens.owner == address(0), "StakeUniswapV3: Already staked");
+
         uint256 _tokenId = tokenId;
         (
             ,
@@ -513,17 +519,9 @@ contract StakeUniswapV3 is
 
         uint256 tokenId_ = _tokenId;
 
-        nonfungiblePositionManager.transferFrom(
-            msg.sender,
-            address(this),
-            tokenId_
-        );
-
         // initial start time
         if (stakeStartTime == 0) stakeStartTime = block.timestamp;
 
-        LibUniswapV3Stake.StakeLiquidity storage _depositTokens =
-            depositTokens[tokenId_];
         _depositTokens.owner = msg.sender;
         _depositTokens.idIndex = userStakedTokenIds[msg.sender].length;
         _depositTokens.liquidity = liquidity;
@@ -533,6 +531,12 @@ contract StakeUniswapV3 is
         _depositTokens.claimedTime = 0;
         _depositTokens.secondsInsideInitial = secondsInside;
         _depositTokens.secondsInsideLast = 0;
+
+        nonfungiblePositionManager.transferFrom(
+            msg.sender,
+            address(this),
+            tokenId_
+        );
 
         // save tokenid
         userStakedTokenIds[msg.sender].push(tokenId_);
