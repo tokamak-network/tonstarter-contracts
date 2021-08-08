@@ -2,19 +2,19 @@
 pragma solidity ^0.7.6;
 
 library LibUniswapV3Stake {
-    // withdraw 시에 delete => 웹페이지에서 withdraw
+
     struct StakeLiquidity {
         address owner;
         uint256 idIndex;
-        //address poolAddress;
         uint128 liquidity;
         int24 tickLower;
         int24 tickUpper;
         uint32 startTime;
-        //uint32 endTime;
         uint32 claimedTime;
         uint160 secondsInsideInitial;
         uint160 secondsInsideLast;
+        bool claimLock;
+        bool withdraw;
     }
 
     struct StakedTokenAmount {
@@ -27,7 +27,7 @@ library LibUniswapV3Stake {
 
     struct StakedTotalTokenAmount {
         bool staked;
-        uint256 totalDepositAmount; // withdraw 할때 빼는데..맞는지..
+        uint256 totalDepositAmount;
         uint256 totalMiningAmount;
         uint256 totalNonMiningAmount;
     }

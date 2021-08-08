@@ -88,4 +88,10 @@ contract StakeUniswapV3Storage {
         require(_addr != address(0), "StakeUniswapV3Storage: zero address");
         _;
     }
+    modifier lock() {
+        require(_lock == 0, "StakeUniswapV3Storage: LOCKED");
+        _lock = 1;
+        _;
+        _lock = 0;
+    }
 }

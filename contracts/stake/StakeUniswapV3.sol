@@ -2,16 +2,14 @@
 pragma solidity ^0.7.6;
 
 import "@uniswap/v3-core/contracts/interfaces/IUniswapV3Pool.sol";
-import "@uniswap/v3-periphery/contracts/interfaces/INonfungiblePositionManager.sol";
-import "@uniswap/v3-periphery/contracts/libraries/TransferHelper.sol";
+//import "@uniswap/v3-periphery/contracts/interfaces/INonfungiblePositionManager.sol";
+//import "@uniswap/v3-periphery/contracts/libraries/TransferHelper.sol";
 import "@uniswap/v3-periphery/contracts/libraries/PoolAddress.sol";
 
-import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
-import "../interfaces/IStakeRegistry.sol";
+//import "../interfaces/IStakeRegistry.sol";
 import "../interfaces/IStakeUniswapV3.sol";
 import "../interfaces/IAutoRefactorCoinageWithTokenId.sol";
 import "../interfaces/IIStake2Vault.sol";
-import "../libraries/LibTokenStake1.sol";
 import {DSMath} from "../libraries/DSMath.sol";
 import "../common/AccessibleCommon.sol";
 import "../stake/StakeUniswapV3Storage.sol";
@@ -56,13 +54,6 @@ contract StakeUniswapV3 is
         uint8 feeProtocol;
         // whether the pool is locked
         bool unlocked;
-    }
-
-    modifier lock() {
-        require(_lock == 0, "StakeUniswapV3: LOCKED");
-        _lock = 1;
-        _;
-        _lock = 0;
     }
 
     /// @dev event on staking
@@ -157,8 +148,6 @@ contract StakeUniswapV3 is
 
     /// @dev reset coinage's last mining time variable for tes
     function resetCoinageTime() external onlyOwner {
-        // saleStartTime = 0;
-        // stakeStartTime = 0;
         coinageLastMintBlockTimetamp = 0;
     }
 
@@ -196,9 +185,9 @@ contract StakeUniswapV3 is
         uint256 _tokenid = userStakedTokenIds[_owner][_index];
         require(
             _tokenid == tokenId,
-            "StakeUniswapV3: deleteUserToken mismatch tokenId"
+            "StakeUniswapV3: mismatch token"
         );
-        uint256 lastIndex = userStakedTokenIds[_owner].length - 1;
+        uint256 lastIndex = (userStakedTokenIds[_owner].length).sub(1);
         if (tokenId > 0 && _tokenid == tokenId) {
             if (_index < lastIndex) {
                 uint256 tokenId_lastIndex =
@@ -359,7 +348,7 @@ contract StakeUniswapV3 is
     {
         require(
             poolAddress == address(0),
-            "StakeUniswapV3: already set poolAddress"
+            "StakeUniswapV3: already set"
         );
         (, , address token0, address token1, uint24 fee, , , , , , , ) =
             nonfungiblePositionManager.positions(tokenId);
@@ -367,7 +356,7 @@ contract StakeUniswapV3 is
         require(
             (token0 == poolToken0 && token1 == poolToken1) ||
                 (token0 == poolToken1 && token1 == poolToken0),
-            "StakeUniswapV3: pool's tokens are different"
+            "StakeUniswapV3: different token"
         );
         poolToken0 = token0;
         poolToken1 = token1;
@@ -404,17 +393,17 @@ contract StakeUniswapV3 is
     {
         require(
             saleStartTime < block.timestamp,
-            "StakeUniswapV3: available after saleStartTime"
+            "StakeUniswapV3: before start"
         );
 
         require(
             block.timestamp < IIStake2Vault(vault).miningEndTime(),
-            "StakeUniswapV3: end mining period"
+            "StakeUniswapV3: end mining"
         );
 
         require(
             nonfungiblePositionManager.ownerOf(tokenId) == msg.sender,
-            "StakeUniswapV3: Caller is not tokenId's owner"
+            "StakeUniswapV3: not owner"
         );
 
         nonfungiblePositionManager.permit(
@@ -444,15 +433,15 @@ contract StakeUniswapV3 is
     {
         require(
             saleStartTime < block.timestamp,
-            "StakeUniswapV3: available after saleStartTime"
+            "StakeUniswapV3: before start"
         );
         require(
             block.timestamp < IIStake2Vault(vault).miningEndTime(),
-            "StakeUniswapV3: end mining period"
+            "StakeUniswapV3: end mining"
         );
         require(
             nonfungiblePositionManager.ownerOf(tokenId) == msg.sender,
-            "StakeUniswapV3: Caller is not tokenId's owner"
+            "StakeUniswapV3: not owner"
         );
 
         _stake(tokenId);
@@ -486,10 +475,10 @@ contract StakeUniswapV3 is
         require(
             (token0 == poolToken0 && token1 == poolToken1) ||
                 (token0 == poolToken1 && token1 == poolToken0),
-            "StakeUniswapV3: pool's tokens are different"
+            "StakeUniswapV3: different token"
         );
 
-        require(liquidity > 0, "StakeUniswapV3: liquidity is zero");
+        require(liquidity > 0, "StakeUniswapV3: zero liquidity");
 
         if (poolAddress == address(0)) {
             poolAddress = PoolAddress.computeAddress(
@@ -500,12 +489,12 @@ contract StakeUniswapV3 is
 
         require(
             poolAddress != address(0),
-            "StakeUniswapV3: poolAddress is zero"
+            "StakeUniswapV3: zero poolAddress"
         );
 
         (, int24 tick, , , , , bool unlocked) =
             IUniswapV3Pool(poolAddress).slot0();
-        require(unlocked, "StakeUniswapV3: pool is closed");
+        require(unlocked, "StakeUniswapV3: unlocked pool");
         require(
             tickLower < tick && tick < tickUpper,
             "StakeUniswapV3: out of tick range"
@@ -579,13 +568,16 @@ contract StakeUniswapV3 is
 
         require(
             _depositTokens.owner == msg.sender,
-            "StakeUniswapV3: caller is not tokenId's staker"
+            "StakeUniswapV3: not staker"
         );
 
         require(
             _depositTokens.claimedTime < uint32(block.timestamp.sub(miningIntervalSeconds)),
-            "StakeUniswapV3: already claimed. wait some more time."
+            "StakeUniswapV3: already claimed"
         );
+
+        require(_depositTokens.claimLock == false, "StakeUniswapV3: claiming");
+        _depositTokens.claimLock = true;
 
         miningCoinage();
 
@@ -602,7 +594,7 @@ contract StakeUniswapV3 is
 
         ) = getMiningTokenId(tokenId);
 
-        require(miningAmount > 0, "StakeUniswapV3: miningAmount is zero");
+        require(miningAmount > 0, "StakeUniswapV3: zero miningAmount");
 
         _depositTokens.claimedTime = uint32(block.timestamp);
         _depositTokens.secondsInsideLast = secondsInside;
@@ -646,6 +638,8 @@ contract StakeUniswapV3 is
                 nonMiningAmount
             )
         );
+
+        _depositTokens.claimLock = false;
         emit Claimed(
             msg.sender,
             poolAddress,
@@ -665,8 +659,11 @@ contract StakeUniswapV3 is
             depositTokens[tokenId];
         require(
             _depositTokens.owner == msg.sender,
-            "StakeUniswapV3: caller is not tokenId's staker"
+            "StakeUniswapV3: not staker"
         );
+
+        require(_depositTokens.withdraw == false,"StakeUniswapV3: withdrawing");
+        _depositTokens.withdraw = true;
 
         miningCoinage();
 
@@ -859,35 +856,7 @@ contract StakeUniswapV3 is
             ]
         );
     }
-
     /*
-    /// @dev minable amount of tokenId
-    /// @dev tokenId tokenId
-    /// @return balanceOfRayTokenId  balanceOf of tokenId with ray unit
-    /// @return minableAmountRay  minable amount of tokenId with ray unit
-    function canMiningAmountTokenId(uint256 tokenId)
-        external
-        view
-        override
-        returns (uint256 balanceOfRayTokenId, uint256 minableAmountRay)
-    {
-        LibUniswapV3Stake.StakeLiquidity storage _depositTokens =
-            depositTokens[tokenId];
-
-        balanceOfRayTokenId = IAutoRefactorCoinageWithTokenId(coinage)
-            .balanceOf(tokenId);
-
-        if (
-            balanceOfRayTokenId > 0 &&
-            balanceOfRayTokenId > uint256(_depositTokens.liquidity).mul(10**9)
-        ) {
-            minableAmountRay = balanceOfRayTokenId.sub(
-                uint256(_depositTokens.liquidity).mul(10**9)
-            );
-        }
-    }
-    */
-
     /// @dev pool's infos
     /// @return factory  pool's factory address
     /// @return token0  token0 address
@@ -919,7 +888,8 @@ contract StakeUniswapV3 is
         tickSpacing = IUniswapV3Pool(poolAddress).tickSpacing();
         maxLiquidityPerTick = IUniswapV3Pool(poolAddress).maxLiquidityPerTick();
     }
-
+    */
+    /*
     /// @dev key's info
     /// @param key hash(owner, tickLower, tickUpper)
     /// @return _liquidity  key's liquidity
@@ -948,6 +918,7 @@ contract StakeUniswapV3 is
             tokensOwed1
         ) = IUniswapV3Pool(poolAddress).positions(key);
     }
+    */
 
     /// @dev pool's slot0 (current position)
     /// @return sqrtPriceX96  The current price of the pool as a sqrt(token1/token0) Q64.96 value
@@ -983,6 +954,7 @@ contract StakeUniswapV3 is
         ) = IUniswapV3Pool(poolAddress).slot0();
     }
 
+    /*
     /// @dev _tokenId's position
     /// @param _tokenId  tokenId
     /// @return nonce  the nonce for permits
@@ -1019,7 +991,8 @@ contract StakeUniswapV3 is
     {
         return nonfungiblePositionManager.positions(_tokenId);
     }
-
+    */
+    /*
     /// @dev snapshotCumulativesInside
     /// @param tickLower  The lower tick of the range
     /// @param tickUpper  The upper tick of the range
@@ -1053,7 +1026,7 @@ contract StakeUniswapV3 is
             tickUpper
         );
     }
-
+    */
     /// @dev mining end time
     /// @return endTime mining end time
     function miningEndTime()

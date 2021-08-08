@@ -2024,7 +2024,7 @@ describe(" StakeUniswapV3 ", function () {
       this.timeout(1000000);
       await expect(
         TestStakeUniswapV3.connect(tester1.account).stake(tester1.tokens[0])
-      ).to.be.revertedWith("StakeUniswapV3: end mining period");
+      ).to.be.revertedWith("StakeUniswapV3: end mining");
     });
 
     it("5. miningCoinage :  ", async () => {

@@ -101,7 +101,7 @@ interface IStakeUniswapV3 {
             address[4] memory,
             uint256[4] memory
         );
-
+    /*
     /// @dev pool's infos
     /// @return factory  pool's factory address
     /// @return token0  token0 address
@@ -140,6 +140,7 @@ interface IStakeUniswapV3 {
             uint128 tokensOwed0,
             uint128 tokensOwed1
         );
+    */
 
     /// @dev pool's slot0 (current position)
     /// @return sqrtPriceX96  The current price of the pool as a sqrt(token1/token0) Q64.96 value
@@ -161,7 +162,7 @@ interface IStakeUniswapV3 {
             uint8 feeProtocol,
             bool unlocked
         );
-
+    /*
     /// @dev _tokenId's position
     /// @param _tokenId  tokenId
     /// @return nonce  the nonce for permits
@@ -209,7 +210,7 @@ interface IStakeUniswapV3 {
             uint32 secondsInside,
             uint32 curTimestamps
         );
-
+    */
     /// @dev mining end time
     /// @return endTime mining end time
     function miningEndTime() external view returns (uint256 endTime);
