@@ -587,8 +587,6 @@ contract StakeUniswapV3 is
             "StakeUniswapV3: already claimed. wait some more time."
         );
 
-        _depositTokens.claimedTime = uint32(block.timestamp);
-
         miningCoinage();
 
         (
@@ -606,6 +604,7 @@ contract StakeUniswapV3 is
 
         require(miningAmount > 0, "StakeUniswapV3: miningAmount is zero");
 
+        _depositTokens.claimedTime = uint32(block.timestamp);
         _depositTokens.secondsInsideLast = secondsInside;
 
         IAutoRefactorCoinageWithTokenId(coinage).burn(
