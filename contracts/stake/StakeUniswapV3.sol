@@ -183,10 +183,7 @@ contract StakeUniswapV3 is
         uint256 _index
     ) internal {
         uint256 _tokenid = userStakedTokenIds[_owner][_index];
-        require(
-            _tokenid == tokenId,
-            "StakeUniswapV3: mismatch token"
-        );
+        require(_tokenid == tokenId, "StakeUniswapV3: mismatch token");
         uint256 lastIndex = (userStakedTokenIds[_owner].length).sub(1);
         if (tokenId > 0 && _tokenid == tokenId) {
             if (_index < lastIndex) {
@@ -346,10 +343,7 @@ contract StakeUniswapV3 is
         nonZeroAddress(address(nonfungiblePositionManager))
         nonZeroAddress(uniswapV3FactoryAddress)
     {
-        require(
-            poolAddress == address(0),
-            "StakeUniswapV3: already set"
-        );
+        require(poolAddress == address(0), "StakeUniswapV3: already set");
         (, , address token0, address token1, uint24 fee, , , , , , , ) =
             nonfungiblePositionManager.positions(tokenId);
 
@@ -450,11 +444,13 @@ contract StakeUniswapV3 is
     /// @dev stake tokenId of UniswapV3
     /// @param tokenId  tokenId
     function _stake(uint256 tokenId) internal {
-
         LibUniswapV3Stake.StakeLiquidity storage _depositTokens =
             depositTokens[tokenId];
 
-        require(_depositTokens.owner == address(0), "StakeUniswapV3: Already staked");
+        require(
+            _depositTokens.owner == address(0),
+            "StakeUniswapV3: Already staked"
+        );
 
         uint256 _tokenId = tokenId;
         (
@@ -487,10 +483,7 @@ contract StakeUniswapV3 is
             );
         }
 
-        require(
-            poolAddress != address(0),
-            "StakeUniswapV3: zero poolAddress"
-        );
+        require(poolAddress != address(0), "StakeUniswapV3: zero poolAddress");
 
         (, int24 tick, , , , , bool unlocked) =
             IUniswapV3Pool(poolAddress).slot0();
@@ -572,7 +565,8 @@ contract StakeUniswapV3 is
         );
 
         require(
-            _depositTokens.claimedTime < uint32(block.timestamp.sub(miningIntervalSeconds)),
+            _depositTokens.claimedTime <
+                uint32(block.timestamp.sub(miningIntervalSeconds)),
             "StakeUniswapV3: already claimed"
         );
 
@@ -662,7 +656,10 @@ contract StakeUniswapV3 is
             "StakeUniswapV3: not staker"
         );
 
-        require(_depositTokens.withdraw == false,"StakeUniswapV3: withdrawing");
+        require(
+            _depositTokens.withdraw == false,
+            "StakeUniswapV3: withdrawing"
+        );
         _depositTokens.withdraw = true;
 
         miningCoinage();
@@ -856,6 +853,7 @@ contract StakeUniswapV3 is
             ]
         );
     }
+
     /*
     /// @dev pool's infos
     /// @return factory  pool's factory address

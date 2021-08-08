@@ -101,6 +101,7 @@ interface IStakeUniswapV3 {
             address[4] memory,
             uint256[4] memory
         );
+
     /*
     /// @dev pool's infos
     /// @return factory  pool's factory address
@@ -162,6 +163,7 @@ interface IStakeUniswapV3 {
             uint8 feeProtocol,
             bool unlocked
         );
+
     /*
     /// @dev _tokenId's position
     /// @param _tokenId  tokenId

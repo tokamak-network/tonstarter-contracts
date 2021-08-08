@@ -2,7 +2,6 @@
 pragma solidity ^0.7.6;
 
 library LibUniswapV3Stake {
-
     struct StakeLiquidity {
         address owner;
         uint256 idIndex;
