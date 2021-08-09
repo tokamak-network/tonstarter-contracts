@@ -321,8 +321,10 @@ contract StakeUniswapV3 is
                                 .mul(secondsInsideDiff256)
                                 .div(secondsAbsolute256);
                             nonMiningAmount = minableAmount.sub(miningAmount);
-                        } else {
+                        } else if(secondsInsideDiff256 > 0){
                             miningAmount = minableAmount;
+                        } else {
+                            nonMiningAmount = minableAmount;
                         }
                     }
                 }
@@ -1269,7 +1271,7 @@ contract StakeUniswapV3 is
                 );
                 minableAmount = minableAmountRay.div(10**9);
             }
-            if (minableAmount > 0 && secondsAbsolute > 0) {
+            if (minableAmount > 0 && secondsAbsolute > 0 && secondsInsideDiff256 > 0 ) {
                 if (
                     secondsInsideDiff256 < secondsAbsolute &&
                     secondsInsideDiff256 > 0
@@ -1281,6 +1283,8 @@ contract StakeUniswapV3 is
                 } else {
                     miningAmount = minableAmount;
                 }
+            } else if(secondsInsideDiff256 == 0){
+                nonMiningAmount = minableAmount;
             }
         }
     }
