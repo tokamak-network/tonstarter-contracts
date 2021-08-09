@@ -288,12 +288,10 @@ describe(" StakeUniswapV3 ", function () {
         .createVault2(
           utils.parseUnits(PHASE2_ETHTOS_Staking, 18),
           utils.parseUnits(PHASE2_MINING_PERSECOND, 0),
-          [
             deployedUniswapV3.nftPositionManager.address,
             deployedUniswapV3.coreFactory.address,
             wton.address,
             tos.address,
-          ],
           "UniswapV3"
         );
       const receipt = await tx.wait();
@@ -341,6 +339,11 @@ describe(" StakeUniswapV3 ", function () {
         stakeContractAddress
       );
       expect(await TestStake2Vault.tos()).to.be.equal(tos.address);
+
+      let addrArray = await TestStake2Vault.stakeAddressesAll();
+      expect(addrArray.length).to.be.equal(1);
+      expect(addrArray[0]).to.be.equal(stakeContractAddress);
+
     });
 
     it("2. setStartTimeOfVault2", async function () {
@@ -761,13 +764,16 @@ describe(" StakeUniswapV3 ", function () {
     it("2. setPoolAddress ", async () => {
       this.timeout(1000000);
       const tester = tester1;
-      TestStakeUniswapV3 = await ico20Contracts.getContract(
-        "StakeUniswapV3",
-        stakeContractAddress,
-        tester.account.address
-      );
 
-      await TestStakeUniswapV3.connect(tester.account).setPoolAddress(tester.tokens[0]);
+      await ico20Contracts.stakeEntry2
+        .connect(owner)
+        .setPoolAddressWithTokenId(
+          stakeContractAddress,
+          tester.tokens[0]
+        );
+
+      //await TestStakeUniswapV3.connect(tester.account).setPoolAddress(tester.tokens[0]);
+
       let pool = await TestStakeUniswapV3.poolAddress();
       //console.log('pool', pool);
       expect(pool).to.be.equal(pool_wton_tos_address);

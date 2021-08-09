@@ -25,13 +25,19 @@ interface IStake2Logic {
 
     /// @dev create vault2
     /// @param _cap  allocated reward amount
-    /// @param _rewardPerBlock  the reward per block
-    /// @param _uniswapInfo  npm, pool, token0, token1
+    /// @param _miningPerSecond  the mining per second
+    /// @param _NonfungiblePositionManager  NonfungiblePositionManager of uniswapV3
+    /// @param _UniswapV3Factory  UniswapV3Factory of uniswapV3
+    /// @param _token0  token0 address
+    /// @param _token1  token1 address
     /// @param _name   name
     function createVault2(
         uint256 _cap,
-        uint256 _rewardPerBlock,
-        address[4] memory _uniswapInfo,
+        uint256 _miningPerSecond,
+        address _NonfungiblePositionManager,
+        address _UniswapV3Factory,
+        address _token0,
+        address _token1,
         string memory _name
     ) external;
 
@@ -39,6 +45,12 @@ interface IStake2Logic {
     /// @param target  target address
     /// @param uniswapInfo [NonfungiblePositionManager,UniswapV3Factory,token0,token1]
     function setPool(address target, address[4] memory uniswapInfo) external;
+
+    /// @dev set pool address with tokenId
+    /// @param target  target address
+    /// @param tokenId  tokenId
+    function setPoolAddressWithTokenId(address target, uint256 tokenId)
+        external;
 
     /// @dev Mining interval setting (seconds)
     /// @param target  target address

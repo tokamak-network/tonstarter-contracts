@@ -294,12 +294,10 @@ describe(" StakeUniswapV3 ", function () {
         .createVault2(
           utils.parseUnits(PHASE2_ETHTOS_Staking, 18),
           utils.parseUnits(PHASE2_MINING_PERSECOND, 0),
-          [
             deployedUniswapV3.nftPositionManager.address,
             deployedUniswapV3.coreFactory.address,
             wton.address,
             tos.address,
-          ],
           "UniswapV3"
         );
       const receipt = await tx.wait();

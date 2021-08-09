@@ -244,7 +244,7 @@ contract Stake2Vault is Stake2VaultStorage, IStake2Vault {
         override
         returns (address[] memory)
     {
-        address[] memory addr;
+        address[] memory addr = new address[](1);
         addr[0] = stakeAddress;
         return addr;
     }

@@ -759,13 +759,14 @@ class ICO20Contracts {
     this.stake2logic = await Stake2Logic.connect(owner).deploy();
     // 3-2. 로직을 프록시에 연결
     // attach stake2logic
-    let _func1 = Web3EthAbi.encodeFunctionSignature("createVault2(uint256,uint256,address[4],string)") ;
+    let _func1 = Web3EthAbi.encodeFunctionSignature("createVault2(uint256,uint256,address,address,address,address,string)") ;
     let _func2 = Web3EthAbi.encodeFunctionSignature("setVaultLogicByPhase(uint256,address)") ;
     let _func3 = Web3EthAbi.encodeFunctionSignature("setPool(address,address[4])") ;
     let _func4 = Web3EthAbi.encodeFunctionSignature("setMiningIntervalSeconds(address,uint256)") ;
     let _func5 = Web3EthAbi.encodeFunctionSignature("resetCoinageTime(address)") ;
     let _func6 = Web3EthAbi.encodeFunctionSignature("setStartTimeOfVault2(address,uint256)") ;
     let _func7 = Web3EthAbi.encodeFunctionSignature("setEndTimeOfVault2(address,uint256)") ;
+    let _func8 = Web3EthAbi.encodeFunctionSignature("setPoolAddressWithTokenId(address,uint256)") ;
 
     await this.stake1proxy.connect(owner).setImplementation(
       this.stake2logic.address,
@@ -773,7 +774,7 @@ class ICO20Contracts {
 
     await this.stake1proxy
       .connect(owner)
-      .setSelectorImplementations([_func1, _func2, _func3, _func4, _func5, _func6, _func7], this.stake2logic.address);
+      .setSelectorImplementations([_func1, _func2, _func3, _func4, _func5, _func6, _func7, _func8], this.stake2logic.address);
 
     // 로직2로 연동하는 프록시 인터페이스 설정
     this.stakeEntry2 = await ethers.getContractAt("Stake2Logic",this.stake1proxy.address);

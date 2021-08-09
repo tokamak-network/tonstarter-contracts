@@ -58,11 +58,10 @@ async function main() {
   let tx = await stakeEntry2.createVault2(
     allocateAmount,
     miningPerSecond,
-    [ NonfungiblePositionManager,
+    NonfungiblePositionManager,
       UniswapV3Factory,
       weth9,
       tostoken,
-    ],
     "UniswapV3 WETH-TOS"
   );
   const receipt = await tx.wait();

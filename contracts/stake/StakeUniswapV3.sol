@@ -335,6 +335,7 @@ contract StakeUniswapV3 is
     /// @param tokenId  tokenId
     function setPoolAddress(uint256 tokenId)
         external
+        onlyOwner
         nonZeroAddress(token)
         nonZeroAddress(vault)
         nonZeroAddress(stakeRegistry)

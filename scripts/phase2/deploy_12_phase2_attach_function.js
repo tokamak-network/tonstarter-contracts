@@ -50,18 +50,23 @@ async function main() {
   // console.log("Stake2Logic:", Stake2Logic.address);
 
   // attach stake2logic
-  let _func1 = Web3EthAbi.encodeFunctionSignature("createVault2(uint256,uint256,address[4],string)") ;
+  let _func1 = Web3EthAbi.encodeFunctionSignature("createVault2(uint256,uint256,address,address,address,address,string)") ;
   let _func2 = Web3EthAbi.encodeFunctionSignature("setVaultLogicByPhase(uint256,address)") ;
   let _func3 = Web3EthAbi.encodeFunctionSignature("setPool(address,address[4])") ;
   let _func4 = Web3EthAbi.encodeFunctionSignature("setMiningIntervalSeconds(address,uint256)") ;
   let _func5 = Web3EthAbi.encodeFunctionSignature("resetCoinageTime(address)") ;
   let _func6 = Web3EthAbi.encodeFunctionSignature("setStartTimeOfVault2(address,uint256)") ;
   let _func7 = Web3EthAbi.encodeFunctionSignature("setEndTimeOfVault2(address,uint256)") ;
-  // console.log('balanceOf(address,address)',_func1);
-  // console.log('balanceOfTOS(address)',_func2);
-  // console.log('createVault2',_func3);
-  // console.log('setVaultLogicByPhase',_func4);
-  // console.log('setPool',_func5);
+  let _func8 = Web3EthAbi.encodeFunctionSignature("setPoolAddressWithTokenId(address,uint256)") ;
+
+  console.log('createVault2',_func1);
+  console.log('setVaultLogicByPhase',_func2);
+  console.log('setPool',_func3);
+  console.log('setMiningIntervalSeconds',_func4);
+  console.log('resetCoinageTime',_func5);
+  console.log('setStartTimeOfVault2',_func6);
+  console.log('setEndTimeOfVault2',_func7);
+  console.log('setPoolAddressWithTokenId',_func8);
 
   let tx1 =  await Stake1Proxy.setImplementation(
     Stake2LogicAddress,
@@ -73,7 +78,7 @@ async function main() {
   //=====================================
 
   let tx2 =  await Stake1Proxy.setSelectorImplementations(
-        [_func1, _func2, _func3, _func4, _func5, _func6, _func7],
+        [_func1, _func2, _func3, _func4, _func5, _func6, _func7, _func8],
         Stake2LogicAddress);
 
   console.log("Stake2Logic setSelectorImplementations: " , tx2.hash);

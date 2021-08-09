@@ -7,8 +7,6 @@ import {IStake2Vault} from "../interfaces/IStake2Vault.sol";
 import "../common/AccessibleCommon.sol";
 import "./StakeProxyStorage.sol";
 
-// import "hardhat/console.sol";
-
 interface IIStakeUniswapV3 {
     function setPool(address[4] memory uniswapInfo) external;
 
@@ -17,6 +15,8 @@ interface IIStakeUniswapV3 {
     function setMiningIntervalSeconds(uint256 _intervalSeconds) external;
 
     function resetCoinageTime() external;
+
+    function setPoolAddress(uint256 tokenId) external;
 }
 
 interface IIIStake2Vault {
@@ -28,10 +28,11 @@ interface IIIStake2Vault {
 /// User can excute the tokamak staking function of each contract through this logic.
 
 contract Stake2Logic is StakeProxyStorage, AccessibleCommon, IStake2Logic {
-    // modifier nonZero(address _addr) {
-    //     require(_addr != address(0), "Stake1Logic:zero address");
-    //     _;
-    // }
+    modifier nonZero(uint256 _value) {
+        require(_value > 0, "Stake2Logic: zero");
+        _;
+    }
+
     modifier nonZeroAddress(address _addr) {
         require(_addr != address(0), "Stake2Logic: zero address");
         _;
@@ -55,12 +56,18 @@ contract Stake2Logic is StakeProxyStorage, AccessibleCommon, IStake2Logic {
     /// @dev create vault2
     /// @param _cap  allocated reward amount
     /// @param _miningPerSecond  the mining per second
-    /// @param _uniswapInfo  npm, poolFactory, token0, token1
+    /// @param _NonfungiblePositionManager  NonfungiblePositionManager of uniswapV3
+    /// @param _UniswapV3Factory  UniswapV3Factory of uniswapV3
+    /// @param _token0  token0 address
+    /// @param _token1  token1 address
     /// @param _name   name
     function createVault2(
         uint256 _cap,
         uint256 _miningPerSecond,
-        address[4] memory _uniswapInfo,
+        address _NonfungiblePositionManager,
+        address _UniswapV3Factory,
+        address _token0,
+        address _token1,
         string memory _name
     ) external override onlyOwner nonZeroAddress(address(stakeVaultFactory)) {
         uint256 _phase = 2;
@@ -86,9 +93,11 @@ contract Stake2Logic is StakeProxyStorage, AccessibleCommon, IStake2Logic {
         require(vault != address(0), "Stake2Logic: vault2 is zero");
 
         uint256 phase = _phase;
+        address[4] memory uniswapInfo =
+            [_NonfungiblePositionManager, _UniswapV3Factory, _token0, _token1];
 
         stakeRegistry.addVault(vault, phase, vaultName);
-        emit CreatedVault2(vault, _uniswapInfo[0], cap);
+        emit CreatedVault2(vault, _NonfungiblePositionManager, cap);
 
         address[4] memory _addr = [tos, address(0), vault, address(0)];
         address _contract =
@@ -100,7 +109,6 @@ contract Stake2Logic is StakeProxyStorage, AccessibleCommon, IStake2Logic {
             );
         require(_contract != address(0), "Stake2Logic: vault2 deploy fail");
 
-        address[4] memory uniswapInfo = _uniswapInfo;
         IIStakeUniswapV3(_contract).setPool(uniswapInfo);
         IStake2Vault(vault).setStakeAddress(_contract);
         stakeRegistry.addStakeContract(vault, _contract);
@@ -118,6 +126,19 @@ contract Stake2Logic is StakeProxyStorage, AccessibleCommon, IStake2Logic {
         nonZeroAddress(target)
     {
         IIStakeUniswapV3(target).setPool(uniswapInfo);
+    }
+
+    /// @dev set pool address with tokenId
+    /// @param target  target address
+    /// @param tokenId  tokenId
+    function setPoolAddressWithTokenId(address target, uint256 tokenId)
+        external
+        override
+        onlyOwner
+        nonZeroAddress(target)
+        nonZero(tokenId)
+    {
+        IIStakeUniswapV3(target).setPoolAddress(tokenId);
     }
 
     /// @dev Mining interval setting (seconds)

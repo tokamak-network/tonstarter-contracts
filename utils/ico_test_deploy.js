@@ -311,7 +311,7 @@ class ICO20Contracts {
     // attach stake2logic
     let _func1 = web3.eth.abi.encodeFunctionSignature("balanceOf(address,address)") ;
     let _func2 = web3.eth.abi.encodeFunctionSignature("balanceOfTOS(address)") ;
-    let _func3 = web3.eth.abi.encodeFunctionSignature("createVault2(uint256,uint256,address[4],string)") ;
+    let _func3 = web3.eth.abi.encodeFunctionSignature("createVault2(uint256,uint256,address,address,address,address,string)") ;
     let _func4 = web3.eth.abi.encodeFunctionSignature("setVaultLogicByPhase(uint256,address)") ;
 
     this.stake2logic = await Stake2Logic.new({ from: owner });
@@ -619,7 +619,7 @@ class ICO20Contracts {
     // attach stake2logic
     let _func1 = web3.eth.abi.encodeFunctionSignature("balanceOf(address,address)") ;
     let _func2 = web3.eth.abi.encodeFunctionSignature("balanceOfTOS(address)") ;
-    let _func3 = web3.eth.abi.encodeFunctionSignature("createVault2(uint256,uint256,address[4],string)") ;
+    let _func3 = web3.eth.abi.encodeFunctionSignature("createVault2(uint256,uint256,address,address,address,address,string)") ;
     let _func4 = web3.eth.abi.encodeFunctionSignature("setVaultLogicByPhase(uint256,address)") ;
     await this.stake1proxy.setImplementation(this.stake2logic.address, 1, true, { from: owner });
     await this.stake1proxy.setSelectorImplementations([_func1, _func2, _func3, _func4], this.stake2logic.address, { from: owner });

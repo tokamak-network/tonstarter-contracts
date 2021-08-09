@@ -33,14 +33,8 @@ const proxy = loadDeployed(process.env.NETWORK, "Stake1Proxy");
 const tonFactory = loadDeployed(process.env.NETWORK, "StakeTONFactory");
 
 const ton = loadDeployed(process.env.NETWORK, "TON");
-  /*
-const {
-  createValue,
-  createStakeContract,
-  timeout,
-  getPeriodBlockByTimes
-  } = require("../../utils/deploy_common.js");
-*/
+
+const Stake2LogicAddress = loadDeployed(process.env.NETWORK, "Stake2Logic");
 
 async function main() {
 
@@ -50,39 +44,25 @@ async function main() {
 
   console.log("Account balance:", (await deployer.getBalance()).toString());
 
-  const stakeEntry2 = await ethers.getContractAt("Stake2Logic", proxy);
-  console.log("stakeEntry2:", stakeEntry2.address);
 
-   /// @dev create vault2
-    /// @param _cap  allocated reward amount
-    /// @param _miningPerSecond  the mining per second
-    /// @param _phase  phase of TOS platform
-    /// @param _vaultName  vault's name's hash
-    /// @param _stakeType  it's 2, StakeUniswapV3 staking type
-    /// @param _uniswapInfo  npm, poolFactory, token0, token1
-    /// @param _name   name
-  const vault = {
-    allocatedTOS: process.env.PHASE2_UNISWAPV3_ALLOCATED,
-    miningPerSecond: process.env.PHASE2_MINING_PER_SECOND,
-    phase: "2",
-    name: process.env.PHASE2_LP_NAME,
-    stakeType: "2",
-  }
-  console.log('pahse2 vault : ', vault);
+  // attach stake2logic
+  let _func1 = Web3EthAbi.encodeFunctionSignature("createVault2(uint256,uint256,address,address,address,address,string)") ;
+  let _func2 = Web3EthAbi.encodeFunctionSignature("setVaultLogicByPhase(uint256,address)") ;
+  let _func3 = Web3EthAbi.encodeFunctionSignature("setPool(address,address[4])") ;
+  let _func4 = Web3EthAbi.encodeFunctionSignature("setMiningIntervalSeconds(address,uint256)") ;
+  let _func5 = Web3EthAbi.encodeFunctionSignature("resetCoinageTime(address)") ;
+  let _func6 = Web3EthAbi.encodeFunctionSignature("setStartTimeOfVault2(address,uint256)") ;
+  let _func7 = Web3EthAbi.encodeFunctionSignature("setEndTimeOfVault2(address,uint256)") ;
+  let _func8 = Web3EthAbi.encodeFunctionSignature("setPoolAddressWithTokenId(address,uint256)") ;
 
-  let tx = await stakeEntry2.createVault2(
-    utils.parseUnits(vault.allocatedTOS, 18),
-    utils.parseUnits(vault.miningPerSecond, 0),
-    process.env.NonfungiblePositionManager,
-    process.env.coreFactory,
-    process.env.PHASE2_UNISWAPV3_POOL_TOKEN0,
-    process.env.PHASE2_UNISWAPV3_POOL_TOKEN1,
-    vault.name
-  );
-
-  console.log("Phase2 CreateVault2 & Create StakeUniswapV3  ", tx.hash );
-  printGasUsedOfUnits('Phase2 CreateVault2 & Create StakeUniswapV3', tx);
-
+  console.log('createVault2',_func1);
+  console.log('setVaultLogicByPhase',_func2);
+  console.log('setPool',_func3);
+  console.log('setMiningIntervalSeconds',_func4);
+  console.log('resetCoinageTime',_func5);
+  console.log('setStartTimeOfVault2',_func6);
+  console.log('setEndTimeOfVault2',_func7);
+  console.log('setPoolAddressWithTokenId',_func8);
 
 }
 

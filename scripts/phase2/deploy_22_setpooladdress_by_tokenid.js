@@ -39,14 +39,25 @@ async function main() {
   const tokenId = ethers.BigNumber.from(process.env.PHASE2_UNISWAPV3_POOL_TOKENID);
 
   //================================================
+
+  const stakeEntry2 = await ethers.getContractAt("Stake2Logic", proxy);
+  console.log("stakeEntry2:", stakeEntry2.address);
+  /*
   const stakeUniswapV3 = await ethers.getContractAt("StakeUniswapV3", process.env.PHASE2_STAKE_UNISWAPV3_ADDRESS);
   console.log("stakeUniswapV3:", stakeUniswapV3.address);
 
   let tx = await stakeUniswapV3.connect(user1).setPoolAddress(tokenId);
   await tx.wait();
+  */
 
-  console.log("stakeUniswapV3 setPoolAddress", tx.hash);
-  printGasUsedOfUnits('stakeUniswapV3 setPoolAddress', tx);
+  let tx = await stakeEntry2.setPoolAddressWithTokenId(
+    process.env.PHASE2_STAKE_UNISWAPV3_ADDRESS,
+    tokenId
+  );
+  await tx.wait();
+
+  console.log("stakeUniswapV3 setPoolAddressWithTokenId", tx.hash);
+  printGasUsedOfUnits('stakeUniswapV3 setPoolAddressWithTokenId', tx);
 
 }
 
