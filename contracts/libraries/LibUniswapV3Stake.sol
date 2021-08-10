@@ -2,33 +2,32 @@
 pragma solidity ^0.7.6;
 
 library LibUniswapV3Stake {
-    // withdraw 시에 delete => 웹페이지에서 withdraw
     struct StakeLiquidity {
         address owner;
         uint256 idIndex;
-        address poolAddress;
         uint128 liquidity;
         int24 tickLower;
         int24 tickUpper;
-        uint256 startTime;
-        uint256 endTime;
-        uint256 claimedTime;
-        uint160 secondsPerLiquidityInsideX128Initial;
-        uint160 secondsPerLiquidityInsideX128Last;
+        uint32 startTime;
+        uint32 claimedTime;
+        uint160 secondsInsideInitial;
+        uint160 secondsInsideLast;
+        bool claimLock;
+        bool withdraw;
     }
 
     struct StakedTokenAmount {
         uint256 amount;
-        uint256 startBlock;
-        uint256 claimedBlock;
+        uint32 startTime;
+        uint32 claimedTime;
         uint256 claimedAmount;
-        uint256 rewardNonLiquidityClaimAmount;
+        uint256 nonMiningAmount;
     }
 
     struct StakedTotalTokenAmount {
         bool staked;
         uint256 totalDepositAmount;
-        uint256 totalClaimedAmount;
-        uint256 totalUnableClaimAmount;
+        uint256 totalMiningAmount;
+        uint256 totalNonMiningAmount;
     }
 }

@@ -15,11 +15,18 @@ import "./Stake2VaultStorage.sol";
 contract Stake2Vault is Stake2VaultStorage, IStake2Vault {
     using SafeMath for uint256;
 
-    /// @dev event of according to request from(staking contract)  the amount of compensation is paid to to.
-    /// @param from the stakeContract address that call claim
+    /// @dev event of according to request from(staking contract)  the amount of mining is paid to to.
     /// @param to the address that will receive the reward
-    /// @param amount the amount of reward
-    event ClaimedReward(address indexed from, address to, uint256 amount);
+    /// @param minableAmount minable amount
+    /// @param miningAmount amount mined
+    /// @param nonMiningAmount Amount not mined
+    event ClaimedMining(
+        address indexed to,
+        uint256 minableAmount,
+        uint256 miningAmount,
+        uint256 nonMiningAmount
+    );
+    event Claimed(address indexed from, address to, uint256 amount);
 
     /// @dev constructor of Stake1Vault
     constructor() {}
@@ -73,18 +80,46 @@ contract Stake2Vault is Stake2VaultStorage, IStake2Vault {
         stakeAddress = _stakeAddress;
     }
 
-    /// @dev set reward per block
-    /// @param _rewardPerBlock  allocated reward amount
-    function setRewardPerBlock(uint256 _rewardPerBlock)
+    /// @dev set mining amount per second
+    /// @param _miningPerSecond  a mining amount per second
+    function setMiningAmountPerSecond(uint256 _miningPerSecond)
         external
         override
         onlyOwner
     {
         require(
-            _rewardPerBlock > 0 && rewardPerBlock != _rewardPerBlock,
-            "Stake2Vault: setRewardPerBlock fails"
+            _miningPerSecond > 0 && miningPerSecond != _miningPerSecond,
+            "Stake2Vault: zero or same _miningPerSecond"
         );
-        rewardPerBlock = _rewardPerBlock;
+        miningPerSecond = _miningPerSecond;
+    }
+
+    /// @dev set mining start time
+    /// @param _miningStartTime  mining start time
+    function setMiningStartTime(uint256 _miningStartTime)
+        external
+        override
+        onlyOwner
+    {
+        require(
+            _miningStartTime > 0 && miningStartTime != _miningStartTime,
+            "Stake2Vault: zero or same _miningStartTime"
+        );
+        miningStartTime = _miningStartTime;
+    }
+
+    /// @dev set mining end time
+    /// @param _miningEndTime  mining end time
+    function setMiningEndTime(uint256 _miningEndTime)
+        external
+        override
+        onlyOwner
+    {
+        require(
+            _miningEndTime > 0 && miningEndTime != _miningEndTime,
+            "Stake2Vault: zero or same _miningEndTime"
+        );
+        miningEndTime = _miningEndTime;
     }
 
     /// @dev If the vault has more money than the reward to give, the owner can withdraw the remaining amount.
@@ -99,31 +134,73 @@ contract Stake2Vault is Stake2VaultStorage, IStake2Vault {
         );
     }
 
-    /// @dev claim function.
-    /// @dev sender is a staking contract.
-    /// @dev A function that pays the amount(_amount) to _to by the staking contract.
-    /// @dev A function that _to claim the amount(_amount) from the staking contract and gets the tos in the vault.
-    /// @param _to a user that received reward
-    /// @param _amount the receiving amount
-    /// @return true
+    /// @dev  a according to request from(staking contract)  the amount of mining is paid to to.
+    /// @param to the address that will receive the reward
+    /// @param minableAmount minable amount
+    /// @param miningAmount amount mined
+    /// @param nonMiningAmount Amount not mined
+    function claimMining(
+        address to,
+        uint256 minableAmount,
+        uint256 miningAmount,
+        uint256 nonMiningAmount
+    ) external override nonZero(minableAmount) returns (bool) {
+        require(
+            miningStartTime < block.timestamp,
+            "Stake2Vault: It is not a mining period"
+        );
+        require(
+            stakeAddress == msg.sender,
+            "Stake2Vault: sender is not stakeContract"
+        );
+        require(
+            minableAmount == miningAmount.add(nonMiningAmount),
+            "Stake2Vault: minable amount is not correct"
+        );
+
+        uint256 tosBalance = IERC20(tos).balanceOf(address(this));
+        require(tosBalance >= minableAmount, "Stake2Vault: not enough balance");
+
+        miningAmountTotal = miningAmountTotal.add(miningAmount);
+        nonMiningAmountTotal = nonMiningAmountTotal.add(nonMiningAmount);
+        totalMinedAmount = totalMinedAmount.add(minableAmount);
+        require(
+            totalMinedAmount <=
+                (block.timestamp.sub(miningStartTime)).mul(miningPerSecond),
+            "Stake2Vault: Exceeded the set mining amount"
+        );
+
+        if (miningAmount > 0)
+            require(
+                IERC20(tos).transfer(to, miningAmount),
+                "Stake2Vault: TOS transfer fail"
+            );
+
+        if (nonMiningAmount > 0)
+            require(
+                ITOS(tos).burn(address(this), nonMiningAmount),
+                "Stake2Vault: TOS burn fail"
+            );
+
+        emit ClaimedMining(to, minableAmount, miningAmount, nonMiningAmount);
+        return true;
+    }
+
     function claim(address _to, uint256 _amount)
         external
         override
+        onlyOwner
         nonZero(_amount)
         returns (bool)
     {
         uint256 tosBalance = IERC20(tos).balanceOf(address(this));
-        require(tosBalance >= _amount, "Stake1Vault: not enough balance");
-        require(
-            stakeAddress == msg.sender || isAdmin(msg.sender),
-            "Stake1Vault: not admin or stake contract"
-        );
+        require(tosBalance >= _amount, "Stake2Vault: not enough balance");
         require(
             IERC20(tos).transfer(_to, _amount),
-            "Stake1Vault: TOS transfer fail"
+            "Stake2Vault: TOS transfer fail"
         );
 
-        emit ClaimedReward(msg.sender, _to, _amount);
+        emit Claimed(msg.sender, _to, _amount);
         return true;
     }
 
@@ -142,7 +219,7 @@ contract Stake2Vault is Stake2VaultStorage, IStake2Vault {
     /// @return return1 [tos, stakeAddress]
     /// @return return2 cap
     /// @return return3 stakeType
-    /// @return return4 rewardPerBlock
+    /// @return return4 miningPerSecond
     /// @return return5 name
     function infos()
         external
@@ -156,6 +233,19 @@ contract Stake2Vault is Stake2VaultStorage, IStake2Vault {
             string memory
         )
     {
-        return ([tos, stakeAddress], cap, stakeType, rewardPerBlock, name);
+        return ([tos, stakeAddress], cap, stakeType, miningPerSecond, name);
+    }
+
+    /// @dev Give all stakeContracts's addresses in this vault
+    /// @return all stakeContracts's addresses
+    function stakeAddressesAll()
+        external
+        view
+        override
+        returns (address[] memory)
+    {
+        address[] memory addr = new address[](1);
+        addr[0] = stakeAddress;
+        return addr;
     }
 }

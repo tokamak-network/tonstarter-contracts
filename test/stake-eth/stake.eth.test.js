@@ -36,14 +36,14 @@ const { getSignature, signatureValidTime, timeout } = require("../common");
 const {
   ICO20Contracts,
   initialTotal,
-  Pharse1_TON_Staking,
-  Pharse1_ETH_Staking,
-  Pharse1_TOSETHLP_Staking,
-  Pharse1_DEV_Mining,
-  HASH_Pharse1_TON_Staking,
-  HASH_Pharse1_ETH_Staking,
-  HASH_Pharse1_TOSETHLP_Staking,
-  HASH_Pharse1_DEV_Mining
+  PHASE1_TON_Staking,
+  PHASE1_ETH_Staking,
+  PHASE1_TOSETHLP_Staking,
+  PHASE1_DEV_Mining,
+  HASH_PHASE1_TON_Staking,
+  HASH_PHASE1_ETH_Staking,
+  HASH_PHASE1_TOSETHLP_Staking,
+  HASH_PHASE1_DEV_Mining
   } = require("../../utils/ico_test_deploy.js");
 
 let ico20Contracts;
@@ -216,16 +216,16 @@ describe("StakeSimple : Stake with ETH", function () {
                 console.log(`\n\nCurrent block: ${current} `);
                 console.log(" saleStartBlock ", saleStartBlock);
                 console.log(" stakeStartBlock ", stakeStartBlock);
-                console.log(" Pharse1_ETH_Staking ", Pharse1_ETH_Staking);
+                console.log(" PHASE1_ETH_Staking ", PHASE1_ETH_Staking);
             }
 
             const tx = await stake3Entry.createdVaultWithLogicIndex(
                 zeroAddress,
-                utils.parseUnits(Pharse1_ETH_Staking, 18),
+                utils.parseUnits(PHASE1_ETH_Staking, 18),
                 toBN(saleStartBlock),
                 toBN(stakeStartBlock),
                 phase,
-                HASH_Pharse1_ETH_Staking,
+                HASH_PHASE1_ETH_Staking,
                 stakeType,
                 zeroAddress,
                 ligicVaultIndexInFactory,
@@ -244,11 +244,11 @@ describe("StakeSimple : Stake with ETH", function () {
 
             await tos.mint(
                 vault_phase1_eth.address,
-                utils.parseUnits(Pharse1_ETH_Staking, 18),
+                utils.parseUnits(PHASE1_ETH_Staking, 18),
                 { from: defaultSender }
             );
 
-            expect((await tos.balanceOf(vault_phase1_eth.address)).toString()).to.be.equal(utils.parseUnits(Pharse1_ETH_Staking, 18).toString());
+            expect((await tos.balanceOf(vault_phase1_eth.address)).toString()).to.be.equal(utils.parseUnits(PHASE1_ETH_Staking, 18).toString());
 
         });
 

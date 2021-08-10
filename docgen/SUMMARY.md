@@ -6,7 +6,6 @@
     * [AccessiblePlusCommon](docs/common/AccessiblePlusCommon.md)
   * connection
     * [TokamakStaker](docs/connection/TokamakStaker.md)
-    * artifacts
   * factory
     * [StakeCoinageFactory](docs/factory/StakeCoinageFactory.md)
     * [StakeDefiFactory](docs/factory/StakeDefiFactory.md)
@@ -16,9 +15,8 @@
     * [StakeTONProxyFactory](docs/factory/StakeTONProxyFactory.md)
     * [StakeUniswapV3Factory](docs/factory/StakeUniswapV3Factory.md)
     * [StakeVaultFactory](docs/factory/StakeVaultFactory.md)
-    * artifacts
   * interfaces
-    * [AutoRefactorCoinageI](docs/interfaces/AutoRefactorCoinageI.md)
+    * [IAutoRefactorCoinageWithTokenId](docs/interfaces/IAutoRefactorCoinageWithTokenId.md)
     * [IDepositManager](docs/interfaces/IDepositManager.md)
     * [IDeveloperVault](docs/interfaces/IDeveloperVault.md)
     * [IIDepositManager](docs/interfaces/IIDepositManager.md)
@@ -34,6 +32,7 @@
     * [IStake2Logic](docs/interfaces/IStake2Logic.md)
     * [IStake2Vault](docs/interfaces/IStake2Vault.md)
     * [IStake2VaultProxy](docs/interfaces/IStake2VaultProxy.md)
+    * [IStake3Logic](docs/interfaces/IStake3Logic.md)
     * [IStakeCoinageFactory](docs/interfaces/IStakeCoinageFactory.md)
     * [IStakeContractFactory](docs/interfaces/IStakeContractFactory.md)
     * [IStakeDefiFactory](docs/interfaces/IStakeDefiFactory.md)
@@ -47,6 +46,7 @@
     * [IStakeTONProxyFactory](docs/interfaces/IStakeTONProxyFactory.md)
     * [IStakeTONStorage](docs/interfaces/IStakeTONStorage.md)
     * [IStakeTONTokamak](docs/interfaces/IStakeTONTokamak.md)
+    * [IStakeTON_NEW](docs/interfaces/IStakeTON_NEW.md)
     * [IStakeUniswapV3](docs/interfaces/IStakeUniswapV3.md)
     * [IStakeUniswapV3Factory](docs/interfaces/IStakeUniswapV3Factory.md)
     * [IStakeUniswapV3Proxy](docs/interfaces/IStakeUniswapV3Proxy.md)
@@ -73,6 +73,7 @@
     * [Stake2Vault](docs/stake/Stake2Vault.md)
     * [Stake2VaultProxy](docs/stake/Stake2VaultProxy.md)
     * [Stake2VaultStorage](docs/stake/Stake2VaultStorage.md)
+    * [Stake3Logic](docs/stake/Stake3Logic.md)
     * [StakeDefiProxy](docs/stake/StakeDefiProxy.md)
     * [StakeProxyStorage](docs/stake/StakeProxyStorage.md)
     * [StakeRegistry](docs/stake/StakeRegistry.md)
@@ -81,13 +82,14 @@
     * [StakeTON](docs/stake/StakeTON.md)
     * [StakeTONProxy](docs/stake/StakeTONProxy.md)
     * [StakeTONStorage](docs/stake/StakeTONStorage.md)
+    * [StakeTON_NEW](docs/stake/StakeTON_NEW.md)
     * [StakeUniswapV3](docs/stake/StakeUniswapV3.md)
     * [StakeUniswapV3Proxy](docs/stake/StakeUniswapV3Proxy.md)
     * [StakeUniswapV3Storage](docs/stake/StakeUniswapV3Storage.md)
     * [StakeVaultProxy](docs/stake/StakeVaultProxy.md)
     * [StakeVaultStorage](docs/stake/StakeVaultStorage.md)
-    * artifacts
   * tokens
-    * [AutoRefactorCoinage](docs/tokens/AutoRefactorCoinage.md)
+    * [AutoRefactorCoinageWithTokenId](docs/tokens/AutoRefactorCoinageWithTokenId.md)
     * [OnApprove](docs/tokens/OnApprove.md)
     * [TOS](docs/tokens/TOS.md)
+    * [WETH9](docs/tokens/WETH9.md)

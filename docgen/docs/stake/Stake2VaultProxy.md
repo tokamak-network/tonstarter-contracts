@@ -12,7 +12,7 @@
 
 - [`fallback()`](#Stake2VaultProxy-fallback--)
 
-- [`initialize(address _tos, address _stakefactory, uint256 _stakeType, uint256 _cap, uint256 _rewardPerBlock, string _name)`](#Stake2VaultProxy-initialize-address-address-uint256-uint256-uint256-string-)
+- [`initialize(address _tos, address _stakefactory, uint256 _stakeType, uint256 _cap, uint256 _miningPerSecond, string _name)`](#Stake2VaultProxy-initialize-address-address-uint256-uint256-uint256-string-)
 
 # Events:
 
@@ -68,7 +68,7 @@ fallback function , execute on undefined function call
 
 ###### Stake2VaultProxy-initialize-address-address-uint256-uint256-uint256-string-
 
-## Function `initialize(address _tos, address _stakefactory, uint256 _stakeType, uint256 _cap, uint256 _rewardPerBlock, string _name)`
+## Function `initialize(address _tos, address _stakefactory, uint256 _stakeType, uint256 _cap, uint256 _miningPerSecond, string _name)`
 
 set initial storage
 
@@ -82,7 +82,7 @@ set initial storage
 
 - `_cap`:  Maximum amount of rewards issued, allocated reward amount.
 
-- `_rewardPerBlock`:  the reward per block
+- `_miningPerSecond`:  the mining amount per second
 
 ###### Stake2VaultProxy-Upgraded-address-
 

@@ -104,7 +104,11 @@ No description
 
 ## Function `setPool(address[4] uniswapInfo)`
 
-No description
+set pool information
+
+### Parameters:
+
+- `uniswapInfo`: [NonfungiblePositionManager,UniswapV3Factory,token0,token1]
 
 ###### StakeUniswapV3Proxy-Upgraded-address-
 

@@ -10,7 +10,7 @@ const { ICO20Contracts } = require("../utils/ico_test_deploy.js");
 const { ethers } = require("ethers");
 const { toBN, toWei, keccak256, fromWei } = require("web3-utils");
 
-const Pharse1_ETH_Staking = "175000000." + "0".repeat(18);
+const PHASE1_ETH_Staking = "175000000." + "0".repeat(18);
 const zeroAddress = "0x0000000000000000000000000000000000000000";
 
 const Stake1Vault = contract.fromArtifact("Stake1Vault");
@@ -85,22 +85,22 @@ describe ("Stake1Logic : Upgradable Stake Contracts", function () {
 
   it('3. createVault', async function () {
 
-    const HASH_Pharse1_ETH_Staking = keccak256("PHASE1_ETH_STAKING");
+    const HASH_PHASE1_ETH_Staking = keccak256("PHASE1_ETH_STAKING");
 
     const tx = await stakeEntry.createVault(
       zeroAddress, // ethers
-      ethers.utils.parseUnits(Pharse1_ETH_Staking, 18),
+      ethers.utils.parseUnits(PHASE1_ETH_Staking, 18),
       toBN(saleStartBlock),
       toBN(stakeStartBlock),
       toBN('1'),
-      HASH_Pharse1_ETH_Staking,
+      HASH_PHASE1_ETH_Staking,
       toBN('1'),
       zeroAddress
       , { from: defaultSender });
 
     const stakeVaultAddress = tx.receipt.logs[tx.receipt.logs.length - 1].args.vault;
     Vault = await Stake1Vault.at(stakeVaultAddress, { from: defaultSender });
-    await ICO20Instances.tos.mint(Vault.address, ethers.utils.parseUnits(Pharse1_ETH_Staking, 18), { from: defaultSender });
+    await ICO20Instances.tos.mint(Vault.address, ethers.utils.parseUnits(PHASE1_ETH_Staking, 18), { from: defaultSender });
   });
 
 
