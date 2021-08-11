@@ -15,14 +15,30 @@ contract Stake2VaultStorage is AccessibleCommon {
     /// @dev allocated amount of tos
     uint256 public cap;
 
-    /// @dev reward amount per block
-    uint256 public rewardPerBlock;
+    /// @dev mining start time
+    uint256 public miningStartTime;
 
-    /// @dev Operation type of staking amount
+    /// @dev mining end time
+    uint256 public miningEndTime;
+
+    /// @dev mining amount per second
+    uint256 public miningPerSecond;
+
+    /// @dev Operation type of staking
     uint256 public stakeType;
 
     /// @dev a stakeContract maintained by the vault
     address public stakeAddress;
+
+    /// @dev the total amount transfered to miner
+    uint256 public miningAmountTotal;
+
+    /// @dev Rewards have been allocated,
+    ///      but liquidity is lost, and burned amount .
+    uint256 public nonMiningAmountTotal;
+
+    /// @dev the total mined amount
+    uint256 public totalMinedAmount;
 
     uint256 private _lock;
 

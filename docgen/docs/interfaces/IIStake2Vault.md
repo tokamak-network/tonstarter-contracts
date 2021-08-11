@@ -1,29 +1,35 @@
 # Functions:
 
-- [`claim(address _to, uint256 _amount)`](#IIStake2Vault-claim-address-uint256-)
+- [`claimMining(address to, uint256 minableAmount, uint256 miningAmount, uint256 nonMiningAmount)`](#IIStake2Vault-claimMining-address-uint256-uint256-uint256-)
 
-- [`rewardPerBlock()`](#IIStake2Vault-rewardPerBlock--)
+- [`miningPerSecond()`](#IIStake2Vault-miningPerSecond--)
 
-###### IIStake2Vault-claim-address-uint256-
+- [`miningStartTime()`](#IIStake2Vault-miningStartTime--)
 
-## Function `claim(address _to, uint256 _amount)`
+###### IIStake2Vault-claimMining-address-uint256-uint256-uint256-
 
-claim function.
+## Function `claimMining(address to, uint256 minableAmount, uint256 miningAmount, uint256 nonMiningAmount)`
 
-sender is a staking contract.
-
-A function that pays the amount(_amount) to _to by the staking contract.
-
-A function that _to claim the amount(_amount) from the staking contract and gets the TOS in the vault.
+ of according to request from(staking contract)  the amount of mining is paid to to.
 
 ### Parameters:
 
-- `_to`: a user that received reward
+- `to`: the address that will receive the reward
 
-- `_amount`: the receiving amount
+- `minableAmount`: minable amount
 
-###### IIStake2Vault-rewardPerBlock--
+- `miningAmount`: amount mined
 
-## Function `rewardPerBlock()`
+- `nonMiningAmount`: Amount not mined
+
+###### IIStake2Vault-miningPerSecond--
+
+## Function `miningPerSecond()`
+
+No description
+
+###### IIStake2Vault-miningStartTime--
+
+## Function `miningStartTime()`
 
 No description

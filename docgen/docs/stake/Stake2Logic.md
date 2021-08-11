@@ -1,24 +1,16 @@
 # Functions:
 
-- [`balanceOf(address token, address target)`](#Stake2Logic-balanceOf-address-address-)
-
-- [`balanceOfTOS(address target)`](#Stake2Logic-balanceOfTOS-address-)
-
 - [`setVaultLogicByPhase(uint256 _phase, address _logic)`](#Stake2Logic-setVaultLogicByPhase-uint256-address-)
 
-- [`createVault2(uint256 _cap, uint256 _rewardPerBlock, uint256 _phase, bytes32 _vaultName, uint256 _stakeType, address[4] _uniswapInfo, string _name)`](#Stake2Logic-createVault2-uint256-uint256-uint256-bytes32-uint256-address-4--string-)
+- [`createVault2(uint256 _cap, uint256 _miningPerSecond, uint256 _phase, bytes32 _vaultName, uint256 _stakeType, address[4] _uniswapInfo, string _name)`](#Stake2Logic-createVault2-uint256-uint256-uint256-bytes32-uint256-address-4--string-)
 
-###### Stake2Logic-balanceOf-address-address-
+- [`setPool(address target, address[4] uniswapInfo)`](#Stake2Logic-setPool-address-address-4--)
 
-## Function `balanceOf(address token, address target)`
+- [`setMiningIntervalSeconds(address target, uint256 miningIntervalSeconds)`](#Stake2Logic-setMiningIntervalSeconds-address-uint256-)
 
-No description
+- [`resetCoinageTime(address target)`](#Stake2Logic-resetCoinageTime-address-)
 
-###### Stake2Logic-balanceOfTOS-address-
-
-## Function `balanceOfTOS(address target)`
-
-No description
+- [`setStartTimeOfVault2(address vault, uint256 startTime)`](#Stake2Logic-setStartTimeOfVault2-address-uint256-)
 
 ###### Stake2Logic-setVaultLogicByPhase-uint256-address-
 
@@ -34,7 +26,7 @@ Set stakeVaultLogic address by _phase
 
 ###### Stake2Logic-createVault2-uint256-uint256-uint256-bytes32-uint256-address-4--string-
 
-## Function `createVault2(uint256 _cap, uint256 _rewardPerBlock, uint256 _phase, bytes32 _vaultName, uint256 _stakeType, address[4] _uniswapInfo, string _name)`
+## Function `createVault2(uint256 _cap, uint256 _miningPerSecond, uint256 _phase, bytes32 _vaultName, uint256 _stakeType, address[4] _uniswapInfo, string _name)`
 
 create vault2
 
@@ -42,7 +34,7 @@ create vault2
 
 - `_cap`:  allocated reward amount
 
-- `_rewardPerBlock`:  the reward per block
+- `_miningPerSecond`:  the mining per second
 
 - `_phase`:  phase of TOS platform
 
@@ -53,3 +45,31 @@ create vault2
 - `_uniswapInfo`:  npm, poolFactory, token0, token1
 
 - `_name`:   name
+
+###### Stake2Logic-setPool-address-address-4--
+
+## Function `setPool(address target, address[4] uniswapInfo)`
+
+set pool information
+
+### Parameters:
+
+- `uniswapInfo`: [NonfungiblePositionManager,UniswapV3Factory,token0,token1]
+
+###### Stake2Logic-setMiningIntervalSeconds-address-uint256-
+
+## Function `setMiningIntervalSeconds(address target, uint256 miningIntervalSeconds)`
+
+No description
+
+###### Stake2Logic-resetCoinageTime-address-
+
+## Function `resetCoinageTime(address target)`
+
+No description
+
+###### Stake2Logic-setStartTimeOfVault2-address-uint256-
+
+## Function `setStartTimeOfVault2(address vault, uint256 startTime)`
+
+No description
