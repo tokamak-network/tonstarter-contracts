@@ -60,7 +60,6 @@ async function setupContracts(account) {
   const version = "1";
 
   const addresses = await getAddresses();
-  console.log("addresses ", addresses);
 
   const [
     candidate1,
@@ -289,6 +288,7 @@ async function setupContracts(account) {
     .deploy();
 
   return {
+    ton,
     tos,
     stakeRegistry,
     stakeSimple,

@@ -1,13 +1,15 @@
-//SPDX-License-Identifier: Unlicense
+// SPDX-License-Identifier: Unlicense
 pragma solidity ^0.7.6;
 pragma abicoder v2;
 
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/math/Math.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "hardhat/console.sol";
 
 import "../interfaces/ILockTOS.sol";
 import "../interfaces/ITOS.sol";
+import "../libraries/LibLockTOS.sol";
 
 
 contract LockTOS is ILockTOS {
@@ -15,29 +17,11 @@ contract LockTOS is ILockTOS {
     uint256 public constant MAXTIME = 3 * (365 days); // 3 years
     uint256 public constant MULTIPLIER = 1e18;
 
-    struct Point {
-        int256 bias;
-        int256 slope;
-        uint256 timestamp;
-    }
+    LibLockTOS.Point[] private pointHistory;
+    mapping (uint256 => LibLockTOS.Point[]) public lockPointHistory;
+    mapping (address => mapping(uint256 =>LibLockTOS.LockedBalance)) public lockedBalances;
 
-    struct LockedBalance {
-        uint256 start;
-        uint256 end;
-        uint256 amount;
-    }
-
-    struct SlopeChange {
-        int256 bias;
-        int256 slope;
-        uint256 changeTime;
-    }
-
-    Point[] private pointHistory;
-    mapping (uint256 => Point[]) public userPointHistory;
-    mapping (address => mapping(uint256 => LockedBalance)) public lockedBalances;
-
-    mapping (uint256 => LockedBalance) public allLocks;
+    mapping (uint256 =>LibLockTOS.LockedBalance) public allLocks;
     mapping (address => uint256[]) public userLocks;
     mapping (uint256 => int256) public slopeChanges;
     address public tos;
@@ -93,7 +77,7 @@ contract LockTOS is ILockTOS {
     function increaseUnlockTime(uint256 _lockId, uint256 _unlockWeeks) override external {
         require (_unlockWeeks > 0, "Unlock period less than a week");
 
-        LockedBalance memory lock = lockedBalances[msg.sender][_lockId];
+       LibLockTOS.LockedBalance memory lock = lockedBalances[msg.sender][_lockId];
         uint256 unlockTime = lock.end + _unlockWeeks * ONE_WEEK;
         unlockTime = (unlockTime / ONE_WEEK) * ONE_WEEK;
         require(unlockTime - lock.start < MAXTIME, "Max unlock time is 3 years");
@@ -105,8 +89,8 @@ contract LockTOS is ILockTOS {
 
     /// @inheritdoc ILockTOS
     function withdraw(uint256 _lockId) override external {
-        LockedBalance memory lockedOld = lockedBalances[msg.sender][_lockId];
-        LockedBalance memory lockedNew = LockedBalance({amount: 0, start: 0, end: 0});
+       LibLockTOS.LockedBalance memory lockedOld = lockedBalances[msg.sender][_lockId];
+       LibLockTOS.LockedBalance memory lockedNew =LibLockTOS.LockedBalance({amount: 0, start: 0, end: 0});
         require(lockedOld.start > 0, "Lock does not exist");
         require(lockedOld.end < block.timestamp, "Lock time not finished");
         require(lockedOld.amount > 0, "Already withdrawn");
@@ -124,31 +108,36 @@ contract LockTOS is ILockTOS {
     /// @inheritdoc ILockTOS
     function depositFor(address _addr, uint256 _lockId, uint256 _value) override public {
         require(_value > 0, "Value locked should be non-zero");
-        LockedBalance memory locked = lockedBalances[_addr][_lockId];
+       LibLockTOS.LockedBalance memory locked = lockedBalances[_addr][_lockId];
         require(locked.start > 0, "Lock does not exist");
         require(locked.end > block.timestamp, "Lock time is finished");
         _deposit(_addr, _lockId, _value, 0);
     }
 
     /// @inheritdoc ILockTOS
-    function totalSupplyAt(uint256 _timestamp) override public view returns (int256) {
-        (bool success, Point memory point) = _findClosestPoint(pointHistory, _timestamp);
+    function totalSupplyAt(uint256 _timestamp) override public view returns (uint256) {
+        console.log("Total supply at: %d", _timestamp);
+        for (uint256 i = 0; i < pointHistory.length; ++i) {
+            console.log("Point bias: %d, slope: %d, time: %d", uint256(pointHistory[i].bias) / MULTIPLIER, uint256(pointHistory[i].slope)  / MULTIPLIER, pointHistory[i].timestamp);
+        }
+        (bool success, LibLockTOS.Point memory point) = _findClosestPoint(pointHistory, _timestamp);
         if (!success) {
             return 0;
         }
         int256 currentBias = point.slope * int256(_timestamp - point.timestamp);
-        return (point.bias > currentBias ? point.bias - currentBias : 0) / int256(MULTIPLIER);
+        console.log("currentBias: %d, bias: %d", uint256(currentBias) / MULTIPLIER, uint256(point.bias)  / MULTIPLIER);
+        return uint256(point.bias > currentBias ? point.bias - currentBias : 0) / MULTIPLIER;
     }
 
     /// @inheritdoc ILockTOS
-    function totalSupply() override external view returns (int256) {
+    function totalSupply() override external view returns (uint256) {
         if (pointHistory.length == 0) {
             return 0;
         }
 
-        Point memory point = pointHistory[pointHistory.length - 1];
+        LibLockTOS.Point memory point = pointHistory[pointHistory.length - 1];
         int256 currentBias = point.slope * int256(block.timestamp - point.timestamp);
-        return (point.bias > currentBias ? point.bias - currentBias : 0) / int256(MULTIPLIER);
+        return uint256(point.bias > currentBias ? point.bias - currentBias : 0) / MULTIPLIER;
     }
 
     /// @inheritdoc ILockTOS
@@ -156,30 +145,35 @@ contract LockTOS is ILockTOS {
         override
         public
         view
-        returns (int256)
+        returns (uint256)
     {
-        (bool success, Point memory point) = _findClosestPoint(userPointHistory[_lockId], _timestamp);
+        console.log("balanceOfLockAt at: %d", _timestamp);
+        for (uint256 i = 0; i < lockPointHistory[_lockId].length; ++i) {
+            console.log("Point bias: %d, slope: %d, time: %d", uint256(lockPointHistory[_lockId][i].bias)  / MULTIPLIER, uint256(lockPointHistory[_lockId][i].slope)  / MULTIPLIER, lockPointHistory[_lockId][i].timestamp);
+        }
+        (bool success, LibLockTOS.Point memory point) = _findClosestPoint(lockPointHistory[_lockId], _timestamp);
         if (!success) {
             return 0;
         }
         int256 currentBias = point.slope * int256(_timestamp - point.timestamp);
-        return (point.bias > currentBias ? point.bias - currentBias : 0) / int256(MULTIPLIER);
+        console.log("currentBias: %d, bias: %d", uint256(currentBias) / MULTIPLIER, uint256(point.bias) / MULTIPLIER);
+        return uint256(point.bias > currentBias ? point.bias - currentBias : 0) / MULTIPLIER;
     }
 
     /// @inheritdoc ILockTOS
-    function balanceOfLock(uint256 _lockId) override public view returns (int256) {
-        uint256 len = userPointHistory[_lockId].length;
+    function balanceOfLock(uint256 _lockId) override public view returns (uint256) {
+        uint256 len = lockPointHistory[_lockId].length;
         if (len == 0) {
             return 0;
         }
 
-        Point memory point = userPointHistory[_lockId][len - 1];
+        LibLockTOS.Point memory point = lockPointHistory[_lockId][len - 1];
         int256 currentBias = point.slope * int256(block.timestamp - point.timestamp);
-        return (point.bias > currentBias ? point.bias - currentBias : 0) / int256(MULTIPLIER);
+        return uint256(point.bias > currentBias ? point.bias - currentBias : 0) / MULTIPLIER;
     }
 
     /// @inheritdoc ILockTOS
-    function balanceOfAt(address _addr, uint256 _timestamp) override public view returns (int256 balance) {
+    function balanceOfAt(address _addr, uint256 _timestamp) override public view returns (uint256 balance) {
         uint256[] memory locks = userLocks[_addr];
         if (locks.length == 0) return 0;
         for (uint256 i = 0; i < locks.length; ++i) {
@@ -188,7 +182,7 @@ contract LockTOS is ILockTOS {
     }
 
     /// @inheritdoc ILockTOS
-    function balanceOf(address _addr) override public view returns (int256 balance) {
+    function balanceOf(address _addr) override public view returns (uint256 balance) {
         uint256[] memory locks = userLocks[_addr];
         if (locks.length == 0) return 0;
         for (uint256 i = 0; i < locks.length; ++i) {
@@ -215,15 +209,15 @@ contract LockTOS is ILockTOS {
         return userLocks[_addr];
     }
 
-    function pointHistoryOf(uint256 _lockId) public view returns (Point[] memory) {
-        return userPointHistory[_lockId];
+    function pointHistoryOf(uint256 _lockId) override public view returns (LibLockTOS.Point[] memory) {
+        return lockPointHistory[_lockId];
     }
 
     /// @dev Finds closest point
-    function _findClosestPoint(Point[] storage _history, uint256 _timestamp)
+    function _findClosestPoint(LibLockTOS.Point[] storage _history, uint256 _timestamp)
         internal
         view
-        returns (bool success, Point memory point)
+        returns (bool success, LibLockTOS.Point memory point)
     {
         if (_history.length == 0) {
             return (false, point);
@@ -239,6 +233,7 @@ contract LockTOS is ILockTOS {
                 right = mid;
             }
         }
+        console.log("Found: %d", _history[left].timestamp);
         if (_history[left].timestamp <= _timestamp) {
             return (true, _history[left]);
         }
@@ -247,8 +242,8 @@ contract LockTOS is ILockTOS {
 
     /// @dev Deposit
     function _deposit(address _addr, uint256 _lockId, uint256 _value, uint256 _unlockTime) internal {
-        LockedBalance memory lockedOld = lockedBalances[_addr][_lockId];
-        LockedBalance memory lockedNew = LockedBalance({
+       LibLockTOS.LockedBalance memory lockedOld = lockedBalances[_addr][_lockId];
+       LibLockTOS.LockedBalance memory lockedNew = LibLockTOS.LockedBalance({
             amount: lockedOld.amount,
             start: lockedOld.start,
             end: lockedOld.end
@@ -272,21 +267,24 @@ contract LockTOS is ILockTOS {
         // Save user point
         int256 userSlope = int256(lockedNew.amount * MULTIPLIER / MAXTIME);
         int256 userBias = userSlope * int256(lockedNew.end - block.timestamp);
-        Point memory userPoint = Point({
+        LibLockTOS.Point memory userPoint = LibLockTOS.Point({
             timestamp: block.timestamp,
-            slope: userSlope * (block.timestamp <= phase3StartTime ? 2 : 1), // Boost slope if staked before phase3
+            slope: userSlope, //* (block.timestamp <= phase3StartTime ? 2 : 1), // Boost slope if staked before phase3
             bias: userBias
         });
-        userPointHistory[_lockId].push(userPoint);
+        lockPointHistory[_lockId].push(userPoint);
     }
 
-
-
     /// @dev Apply changes
-    function _checkpoint(LockedBalance memory lockedNew, LockedBalance memory lockedOld) internal {
+    function _checkpoint(
+        LibLockTOS.LockedBalance memory lockedNew,
+        LibLockTOS.LockedBalance memory lockedOld
+    )
+        internal 
+    {
         uint256 timestamp = block.timestamp;
-        SlopeChange memory changeNew = SlopeChange({slope: 0, bias: 0, changeTime: 0});
-        SlopeChange memory changeOld = SlopeChange({slope: 0, bias: 0, changeTime: 0});
+        LibLockTOS.SlopeChange memory changeNew = LibLockTOS.SlopeChange({slope: 0, bias: 0, changeTime: 0});
+        LibLockTOS.SlopeChange memory changeOld = LibLockTOS.SlopeChange({slope: 0, bias: 0, changeTime: 0});
 
         if (lockedNew.end > timestamp && lockedNew.amount > 0) {
             changeNew.slope = int256(lockedNew.amount * MULTIPLIER / MAXTIME);
@@ -294,30 +292,30 @@ contract LockTOS is ILockTOS {
             changeNew.changeTime = lockedNew.end;
         }
         if (lockedOld.end > timestamp && lockedOld.amount > 0) {
-            changeOld.slope = int256(lockedNew.amount * MULTIPLIER / MAXTIME);
-            changeOld.bias = changeOld.slope * int256(lockedNew.end - timestamp);
-            changeOld.changeTime = lockedNew.end;
+            changeOld.slope = int256(lockedOld.amount * MULTIPLIER / MAXTIME);
+            changeOld.bias = changeOld.slope * int256(lockedOld.end - timestamp);
+            changeOld.changeTime = lockedOld.end;
         }
 
         // Record history gaps
-        Point memory currentWeekPoint = _recordHistoryPoints();
+        LibLockTOS.Point memory currentWeekPoint = _recordHistoryPoints();
         currentWeekPoint.bias += (changeNew.bias - changeOld.bias);
         currentWeekPoint.slope += (changeNew.slope - changeOld.slope);
         currentWeekPoint.bias = currentWeekPoint.bias > 0 ? currentWeekPoint.bias : 0;
         currentWeekPoint.slope = currentWeekPoint.slope > 0 ? currentWeekPoint.slope : 0;
-        pointHistory.push(currentWeekPoint);
-
+        pointHistory[pointHistory.length - 1] = currentWeekPoint;
+        
         // Update slope changes
         _updateSlopeChanges(changeNew, changeOld);
     }
 
     /// @dev Fill the gaps
-    function _recordHistoryPoints() internal returns (Point memory lastWeek) {
+    function _recordHistoryPoints() internal returns (LibLockTOS.Point memory lastWeek) {
         uint256 timestamp = block.timestamp;
         if (pointHistory.length > 0) {
             lastWeek = pointHistory[pointHistory.length - 1];
         } else {
-            lastWeek = Point({bias: 0, slope: 0, timestamp: timestamp});
+            lastWeek = LibLockTOS.Point({bias: 0, slope: 0, timestamp: timestamp});
         }
 
         uint256 pointTimestampIterator = (lastWeek.timestamp / ONE_WEEK) * ONE_WEEK;
@@ -326,6 +324,7 @@ contract LockTOS is ILockTOS {
 
             int256 deltaSlope = slopeChanges[pointTimestampIterator];
             uint256 deltaTime = pointTimestampIterator - lastWeek.timestamp;
+            console.log("delta slope: %d, delta time: %d", uint256(deltaSlope), deltaTime);
             lastWeek.bias -= lastWeek.slope * int256(deltaTime);
             lastWeek.slope += deltaSlope;
             lastWeek.bias = lastWeek.bias > 0 ? lastWeek.bias : 0;
@@ -337,16 +336,12 @@ contract LockTOS is ILockTOS {
     }
 
     /// @dev Update slope changes
-    function _updateSlopeChanges(SlopeChange memory changeNew, SlopeChange memory changeOld) internal {
-        int256 deltaSlopeNew = 0;
+    function _updateSlopeChanges(
+        LibLockTOS.SlopeChange memory changeNew,
+        LibLockTOS.SlopeChange memory changeOld
+    ) internal {
+        int256 deltaSlopeNew = slopeChanges[changeNew.changeTime];
         int256 deltaSlopeOld = slopeChanges[changeOld.changeTime];
-        if (changeNew.changeTime != 0) {
-            if (changeNew.changeTime == changeOld.changeTime) {
-                deltaSlopeNew = deltaSlopeOld;
-            } else {
-                deltaSlopeNew = slopeChanges[changeNew.changeTime];
-            }
-        }
         if (changeOld.changeTime > block.timestamp) {
             deltaSlopeOld += changeOld.slope;
             if (changeOld.changeTime == changeNew.changeTime) {
@@ -354,7 +349,7 @@ contract LockTOS is ILockTOS {
             }
             slopeChanges[changeOld.changeTime] = deltaSlopeOld;
         }
-        if (changeNew.changeTime > block.timestamp &&changeNew.changeTime > changeOld.changeTime) {
+        if (changeNew.changeTime > block.timestamp && changeNew.changeTime > changeOld.changeTime) {
             deltaSlopeNew -= changeNew.slope;
             slopeChanges[changeNew.changeTime] = deltaSlopeNew;
         }
