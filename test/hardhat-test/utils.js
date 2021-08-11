@@ -62,7 +62,6 @@ async function setupContracts(account) {
   const version = "1";
 
   const addresses = await getAddresses();
-  console.log("addresses ", addresses);
 
   const [
     candidate1,
@@ -81,13 +80,11 @@ async function setupContracts(account) {
   const operators = [operator1, operator2];
 
   const deployer = await findSigner(account);
-  console.log("deployer ", deployer.address);
 
   const tos = await (await ethers.getContractFactory("TOS"))
     .connect(deployer)
     .deploy(name, symbol, version);
   await tos.deployed();
-  console.log("tos ", tos.address);
 
   const stakeRegistry = await (await ethers.getContractFactory("StakeRegistry"))
     .connect(deployer)
@@ -177,7 +174,7 @@ async function setupContracts(account) {
     .connect(deployer)
     .deploy(ton.address);
   await wton.deployed();
-  console.log("hello0");
+
   const layer2Registry = await (
     await ethers.getContractFactory("Layer2Registry")
   )
@@ -199,16 +196,12 @@ async function setupContracts(account) {
     .connect(deployer)
     .deploy();
   await coinageFactory.deployed();
-  console.log("hello0.5");
-
 
   const currentTime = await time.latest();
-  console.log(currentTime.toString());
   const daoVault = await (await ethers.getContractFactory("DAOVault"))
     .connect(deployer)
     .deploy(wton.address, currentTime.toString());
   await daoVault.deployed();
-  console.log("hello0.7");
 
   const seigManager = await (await ethers.getContractFactory("SeigManager"))
     .connect(deployer)
@@ -221,7 +214,6 @@ async function setupContracts(account) {
       coinageFactory.address
     );
   await seigManager.deployed();
-  console.log("hello1");
 
   const powerTON = await (await ethers.getContractFactory("PowerTON"))
     .connect(deployer)
@@ -266,7 +258,6 @@ async function setupContracts(account) {
         .transfer(account, TON_INITIAL_HOLDERS.toFixed(TON_UNIT))
     )
   );
-  console.log("hello3");
 
   await Promise.all(
     users.map((account) =>
@@ -299,6 +290,7 @@ async function setupContracts(account) {
     .deploy();
 
   return {
+    ton,
     tos,
     stakeRegistry,
     stakeSimple,
