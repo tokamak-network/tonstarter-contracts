@@ -22,6 +22,7 @@ const {
 } = require("./helpers/lock-tos-helper");
 
 describe("LockTOSDividend", function () {
+  const ONE_WEEK = parseInt(time.duration.weeks(1));
   let lockTOS, dividend; // contracts
   let admin, user1, user2; // users
   let tos, ton; // coins
@@ -146,8 +147,6 @@ describe("LockTOSDividend", function () {
         await time.increase(time.duration.weeks(weekIncrease));
       }
       await approveTON(account, amount);
-
-      const timestamp = parseInt(await time.latest());
       await distributeTON(account, amount);
     }
   });
@@ -172,36 +171,43 @@ describe("LockTOSDividend", function () {
     for (
       let currentTime = initialTime, i = 0;
       currentTime <= now;
-      currentTime += parseInt(time.duration.weeks(1)), i += 1
+      currentTime += ONE_WEEK, i += 1
     ) {
+      await (await lockTOS.connect(admin).globalCheckpoint()).wait(); // update history
+
       const tokensPerWeek = parseInt(
         await dividend.tokensPerWeekAt(ton.address, currentTime)
       );
-      //  console.log({ tokensPerWeek });
       expect(tokensPerWeek).to.be.equal(expected[i].tokensPerWeek);
-      const acc = 0;
+
+      let accum = 0;
       for (const { account } of accounts) {
         const claimable = parseInt(
           await dividend
             .connect(account)
             .claimableForPeriod(
               ton.address,
-              currentTime - parseInt(time.duration.days(5)),
-              currentTime + parseInt(time.duration.days(5))
+              currentTime,
+              currentTime + ONE_WEEK
             )
         );
-        // console.log({ currentTime });
-        console.log({ claimable });
+        accum += claimable;
       }
-      console.log("");
+
+      if (expected[i].tokensPerWeek > 0) {
+        expect(accum).to.be.closeTo(expected[i].tokensPerWeek, 1000);
+      }
     }
   });
 
   it("should claim for a user", async function () {
-    await dividend.connect(user1).claim(ton.address);
-    console.log(parseInt(await ton.balanceOf(user1.address)));
+    await (await dividend.connect(user1).claim(ton.address)).wait();
+    const balance1 = parseInt(await ton.balanceOf(user1.address));
 
-    await dividend.connect(user2).claim(ton.address);
-    console.log(parseInt(await ton.balanceOf(user2.address)));
+    await (await dividend.connect(user2).claim(ton.address)).wait();
+    const balance2 = parseInt(await ton.balanceOf(user2.address));
+
+    const totalAmountDistributed = 5000000 + 6000000 + 4000000 + 3000000;
+    expect(balance1 + balance2).to.be.closeTo(totalAmountDistributed, 1000);
   });
 });

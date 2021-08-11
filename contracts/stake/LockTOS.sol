@@ -5,7 +5,6 @@ pragma abicoder v2;
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/math/Math.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "hardhat/console.sol";
 
 import "../interfaces/ILockTOS.sol";
 import "../interfaces/ITOS.sol";
@@ -116,16 +115,11 @@ contract LockTOS is ILockTOS {
 
     /// @inheritdoc ILockTOS
     function totalSupplyAt(uint256 _timestamp) override public view returns (uint256) {
-        console.log("Total supply at: %d", _timestamp);
-        for (uint256 i = 0; i < pointHistory.length; ++i) {
-            console.log("Point bias: %d, slope: %d, time: %d", uint256(pointHistory[i].bias) / MULTIPLIER, uint256(pointHistory[i].slope)  / MULTIPLIER, pointHistory[i].timestamp);
-        }
         (bool success, LibLockTOS.Point memory point) = _findClosestPoint(pointHistory, _timestamp);
         if (!success) {
             return 0;
         }
         int256 currentBias = point.slope * int256(_timestamp - point.timestamp);
-        console.log("currentBias: %d, bias: %d", uint256(currentBias) / MULTIPLIER, uint256(point.bias)  / MULTIPLIER);
         return uint256(point.bias > currentBias ? point.bias - currentBias : 0) / MULTIPLIER;
     }
 
@@ -147,16 +141,11 @@ contract LockTOS is ILockTOS {
         view
         returns (uint256)
     {
-        console.log("balanceOfLockAt at: %d", _timestamp);
-        for (uint256 i = 0; i < lockPointHistory[_lockId].length; ++i) {
-            console.log("Point bias: %d, slope: %d, time: %d", uint256(lockPointHistory[_lockId][i].bias)  / MULTIPLIER, uint256(lockPointHistory[_lockId][i].slope)  / MULTIPLIER, lockPointHistory[_lockId][i].timestamp);
-        }
         (bool success, LibLockTOS.Point memory point) = _findClosestPoint(lockPointHistory[_lockId], _timestamp);
         if (!success) {
             return 0;
         }
         int256 currentBias = point.slope * int256(_timestamp - point.timestamp);
-        console.log("currentBias: %d, bias: %d", uint256(currentBias) / MULTIPLIER, uint256(point.bias) / MULTIPLIER);
         return uint256(point.bias > currentBias ? point.bias - currentBias : 0) / MULTIPLIER;
     }
 
@@ -233,7 +222,7 @@ contract LockTOS is ILockTOS {
                 right = mid;
             }
         }
-        console.log("Found: %d", _history[left].timestamp);
+
         if (_history[left].timestamp <= _timestamp) {
             return (true, _history[left]);
         }
@@ -324,7 +313,6 @@ contract LockTOS is ILockTOS {
 
             int256 deltaSlope = slopeChanges[pointTimestampIterator];
             uint256 deltaTime = pointTimestampIterator - lastWeek.timestamp;
-            console.log("delta slope: %d, delta time: %d", uint256(deltaSlope), deltaTime);
             lastWeek.bias -= lastWeek.slope * int256(deltaTime);
             lastWeek.slope += deltaSlope;
             lastWeek.bias = lastWeek.bias > 0 ? lastWeek.bias : 0;

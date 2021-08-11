@@ -7,7 +7,6 @@ import "@openzeppelin/contracts/math/Math.sol";
 import "../interfaces/ILockTOSDividend.sol";
 import "../interfaces/ILockTOS.sol";
 import "../libraries/LibLockTOSDividend.sol";
-import "hardhat/console.sol";
 
 contract LockTOSDividend is ILockTOSDividend {
     uint256 public constant ONE_WEEK = 1 weeks;
@@ -138,7 +137,6 @@ contract LockTOSDividend is ILockTOSDividend {
             uint256 lockId = userLocks[i];
             amountToClaim += _canClaim(distr, lockId, epochStart, epochEnd);
         }
-        console.log("amount to claim: %d", amountToClaim);
         return amountToClaim;
     } 
 
@@ -150,7 +148,6 @@ contract LockTOSDividend is ILockTOSDividend {
         for (uint256 i = 0; i < userLocks.length; ++i) {
             amountToClaim += _recordClaim(_token, userLocks[i], weeklyEpoch);
         }
-        console.log("amount to claim: %d", amountToClaim);
         if (amountToClaim > 0) {
             IERC20(_token).transfer(msg.sender, amountToClaim);   
         }
@@ -166,7 +163,6 @@ contract LockTOSDividend is ILockTOSDividend {
     ) internal returns (uint256 amountToClaim) {
         LibLockTOSDividend.Distribution storage distr = distributions[_token];
         amountToClaim = _canClaim(distr, _lockId, distr.claimStartWeeklyEpoch[_lockId], _weeklyEpoch);
-        console.log("amount to claim: %d", amountToClaim);
 
         distr.claimStartWeeklyEpoch[_lockId] = _weeklyEpoch + 1;
         distr.totalDistribution -= amountToClaim;
@@ -185,8 +181,6 @@ contract LockTOSDividend is ILockTOSDividend {
         uint256 epochIterator = Math.max(_startEpoch, getWeeklyEpoch(start));
         uint256 epochLimit = Math.min(_endEpoch, getWeeklyEpoch(end));
 
-        console.log("start: %d", epochIterator);
-        console.log("end: %d", epochLimit);
         uint256 accumulated = 0;
         while (epochIterator <= epochLimit) {
             uint256 timestamp = (genesis + epochIterator * ONE_WEEK) + ONE_WEEK;
@@ -195,7 +189,6 @@ contract LockTOSDividend is ILockTOSDividend {
             if (balance > 0 && supply > 0) {
                 accumulated += _distr.tokensPerWeek[epochIterator] * balance / supply;
             }
-            console.log("balance: %d, supply: %d, timestamp: %d", balance, supply, timestamp);
             epochIterator += 1;
         }
         return accumulated;
