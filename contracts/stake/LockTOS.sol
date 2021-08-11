@@ -258,7 +258,7 @@ contract LockTOS is ILockTOS {
         int256 userBias = userSlope * int256(lockedNew.end - block.timestamp);
         LibLockTOS.Point memory userPoint = LibLockTOS.Point({
             timestamp: block.timestamp,
-            slope: userSlope, //* (block.timestamp <= phase3StartTime ? 2 : 1), // Boost slope if staked before phase3
+            slope: userSlope * (block.timestamp <= phase3StartTime ? 2 : 1), // Boost slope if staked before phase3
             bias: userBias
         });
         lockPointHistory[_lockId].push(userPoint);
