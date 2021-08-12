@@ -5,13 +5,19 @@ pragma abicoder v2;
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/math/Math.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/math/SafeMath.sol";
+import "@openzeppelin/contracts/utils/SafeCast.sol";
 
 import "../interfaces/ILockTOS.sol";
 import "../interfaces/ITOS.sol";
 import "../libraries/LibLockTOS.sol";
+import "../common/AccessibleCommon.sol";
 
 
-contract LockTOS is ILockTOS {
+contract LockTOS is ILockTOS, AccessibleCommon {
+    using SafeMath for uint256;
+    using SafeCast for uint256;
+
     uint256 public constant ONE_WEEK = 1 weeks;
     uint256 public constant MAXTIME = 3 * (365 days); // 3 years
     uint256 public constant MULTIPLIER = 1e18;
@@ -20,16 +26,38 @@ contract LockTOS is ILockTOS {
     mapping (uint256 => LibLockTOS.Point[]) public lockPointHistory;
     mapping (address => mapping(uint256 =>LibLockTOS.LockedBalance)) public lockedBalances;
 
-    mapping (uint256 =>LibLockTOS.LockedBalance) public allLocks;
+    mapping (uint256 => LibLockTOS.LockedBalance) public allLocks;
     mapping (address => uint256[]) public userLocks;
     mapping (uint256 => int256) public slopeChanges;
+    mapping (uint256 => bool) public inUse;
+
     address public tos;
     uint256 public lockIdCounter = 1;
     uint256 public phase3StartTime;
+    uint256 internal free = 1;
 
+    event CreateLock(uint256 lockId, uint256 value, uint256 unlockTime);
+    event IncreaseAmount(uint256 lockId, uint256 value);
+    event IncreaseUnlockTime(uint256 lockId, uint256 unlockTime);
+    event DepositFor(uint256 lockId, uint256 value);
 
-    constructor(address _tos, uint256 _phase3StartTime) {
+    constructor(address _admin, address _tos, uint256 _phase3StartTime) {
+        _setupRole(ADMIN_ROLE, _admin);
+
         tos = _tos;
+        phase3StartTime = _phase3StartTime;
+    }
+
+    /// @dev Check if a functions is used or not
+    modifier ifFree {
+        require(free == 1, "LockId is already in use");
+        free = 0;
+        _;
+        free = 1;
+    }
+
+    /// @inheritdoc ILockTOS
+    function setPhase3StartTime(uint256 _phase3StartTime)  override external onlyOwner {
         phase3StartTime = _phase3StartTime;
     }
 
@@ -56,7 +84,7 @@ contract LockTOS is ILockTOS {
             _r,
             _s
         );
-        createLock(_value, _unlockWeeks);
+        lockId = createLock(_value, _unlockWeeks);
     }
 
     /// @inheritdoc ILockTOS
@@ -65,38 +93,42 @@ contract LockTOS is ILockTOS {
         require (_unlockWeeks > 0, "Unlock period less than a week");
 
         lockId = lockIdCounter ++;
-        uint256 unlockTime = block.timestamp + _unlockWeeks * ONE_WEEK;
-        unlockTime = (unlockTime / ONE_WEEK) * ONE_WEEK;
+        uint256 unlockTime = block.timestamp.add(_unlockWeeks.mul(ONE_WEEK));
+        unlockTime = unlockTime.div(ONE_WEEK).mul(ONE_WEEK);
         require(unlockTime - block.timestamp < MAXTIME, "Max unlock time is 3 years");
         _deposit(msg.sender, lockId, _value, unlockTime);
         userLocks[msg.sender].push(lockId);
+
+        emit CreateLock(lockId, _value, unlockTime);
     }
 
     /// @inheritdoc ILockTOS
     function increaseUnlockTime(uint256 _lockId, uint256 _unlockWeeks) override external {
         require (_unlockWeeks > 0, "Unlock period less than a week");
 
-       LibLockTOS.LockedBalance memory lock = lockedBalances[msg.sender][_lockId];
-        uint256 unlockTime = lock.end + _unlockWeeks * ONE_WEEK;
-        unlockTime = (unlockTime / ONE_WEEK) * ONE_WEEK;
+        LibLockTOS.LockedBalance memory lock = lockedBalances[msg.sender][_lockId];
+        uint256 unlockTime = lock.end.add(_unlockWeeks.mul(ONE_WEEK));
+        unlockTime = unlockTime.div(ONE_WEEK).mul(ONE_WEEK);
         require(unlockTime - lock.start < MAXTIME, "Max unlock time is 3 years");
         require (lock.end > block.timestamp, "Lock time already finished");
         require (lock.end < unlockTime, "New lock time must be greater");
         require(lock.amount > 0, "No existing locked TOS");
         _deposit(msg.sender, _lockId, 0, unlockTime);
+
+        emit IncreaseUnlockTime(_lockId, unlockTime);
     }
 
     /// @inheritdoc ILockTOS
-    function withdraw(uint256 _lockId) override external {
-       LibLockTOS.LockedBalance memory lockedOld = lockedBalances[msg.sender][_lockId];
-       LibLockTOS.LockedBalance memory lockedNew =LibLockTOS.LockedBalance({amount: 0, start: 0, end: 0});
+    function withdraw(uint256 _lockId) override external ifFree {
+        LibLockTOS.LockedBalance memory lockedOld = lockedBalances[msg.sender][_lockId];
+        LibLockTOS.LockedBalance memory lockedNew = LibLockTOS.LockedBalance({amount: 0, start: 0, end: 0});
         require(lockedOld.start > 0, "Lock does not exist");
         require(lockedOld.end < block.timestamp, "Lock time not finished");
         require(lockedOld.amount > 0, "Already withdrawn");
         _checkpoint(lockedNew, lockedOld);
         
-        IERC20(tos).transfer(msg.sender, lockedOld.amount);
         lockedBalances[msg.sender][_lockId] = lockedNew;   
+        IERC20(tos).transfer(msg.sender, lockedOld.amount);
     }
 
     /// @inheritdoc ILockTOS
@@ -107,10 +139,12 @@ contract LockTOS is ILockTOS {
     /// @inheritdoc ILockTOS
     function depositFor(address _addr, uint256 _lockId, uint256 _value) override public {
         require(_value > 0, "Value locked should be non-zero");
-       LibLockTOS.LockedBalance memory locked = lockedBalances[_addr][_lockId];
+        LibLockTOS.LockedBalance memory locked = lockedBalances[_addr][_lockId];
         require(locked.start > 0, "Lock does not exist");
         require(locked.end > block.timestamp, "Lock time is finished");
         _deposit(_addr, _lockId, _value, 0);
+
+        emit DepositFor(_lockId, _value);
     }
 
     /// @inheritdoc ILockTOS
@@ -119,8 +153,8 @@ contract LockTOS is ILockTOS {
         if (!success) {
             return 0;
         }
-        int256 currentBias = point.slope * int256(_timestamp - point.timestamp);
-        return uint256(point.bias > currentBias ? point.bias - currentBias : 0) / MULTIPLIER;
+        int256 currentBias = point.slope * (_timestamp.toInt256() - point.timestamp.toInt256());
+        return uint256(point.bias > currentBias ? point.bias - currentBias : 0).div(MULTIPLIER);
     }
 
     /// @inheritdoc ILockTOS
@@ -130,8 +164,8 @@ contract LockTOS is ILockTOS {
         }
 
         LibLockTOS.Point memory point = pointHistory[pointHistory.length - 1];
-        int256 currentBias = point.slope * int256(block.timestamp - point.timestamp);
-        return uint256(point.bias > currentBias ? point.bias - currentBias : 0) / MULTIPLIER;
+        int256 currentBias = point.slope * (block.timestamp.toInt256() - point.timestamp.toInt256());
+        return uint256(point.bias > currentBias ? point.bias - currentBias : 0).div(MULTIPLIER);
     }
 
     /// @inheritdoc ILockTOS
@@ -145,8 +179,8 @@ contract LockTOS is ILockTOS {
         if (!success) {
             return 0;
         }
-        int256 currentBias = point.slope * int256(_timestamp - point.timestamp);
-        return uint256(point.bias > currentBias ? point.bias - currentBias : 0) / MULTIPLIER;
+        int256 currentBias = point.slope * (_timestamp.toInt256() - point.timestamp.toInt256());
+        return uint256(point.bias > currentBias ? point.bias - currentBias : 0).div(MULTIPLIER);
     }
 
     /// @inheritdoc ILockTOS
@@ -157,8 +191,8 @@ contract LockTOS is ILockTOS {
         }
 
         LibLockTOS.Point memory point = lockPointHistory[_lockId][len - 1];
-        int256 currentBias = point.slope * int256(block.timestamp - point.timestamp);
-        return uint256(point.bias > currentBias ? point.bias - currentBias : 0) / MULTIPLIER;
+        int256 currentBias = point.slope * (block.timestamp.toInt256() - point.timestamp.toInt256());
+        return uint256(point.bias > currentBias ? point.bias - currentBias : 0).div(MULTIPLIER);
     }
 
     /// @inheritdoc ILockTOS
@@ -179,7 +213,7 @@ contract LockTOS is ILockTOS {
         }
     }
 
-
+    /// @inheritdoc ILockTOS
     function locksInfo(uint256 _lockId)
         override
         public
@@ -215,7 +249,7 @@ contract LockTOS is ILockTOS {
         uint256 left = 0;
         uint256  right = _history.length;
         while (left + 1 < right) {
-            uint256 mid = (left + right) / 2;
+            uint256 mid = left.add(right).div(2);
             if (_history[mid].timestamp <= _timestamp) {
                 left = mid;
             } else {
@@ -230,7 +264,7 @@ contract LockTOS is ILockTOS {
     }
 
     /// @dev Deposit
-    function _deposit(address _addr, uint256 _lockId, uint256 _value, uint256 _unlockTime) internal {
+    function _deposit(address _addr, uint256 _lockId, uint256 _value, uint256 _unlockTime) internal ifFree {
        LibLockTOS.LockedBalance memory lockedOld = lockedBalances[_addr][_lockId];
        LibLockTOS.LockedBalance memory lockedNew = LibLockTOS.LockedBalance({
             amount: lockedOld.amount,
@@ -238,7 +272,8 @@ contract LockTOS is ILockTOS {
             end: lockedOld.end
         });
 
-        lockedNew.amount += _value;
+        // Make new lock
+        lockedNew.amount = lockedNew.amount.add(_value);
         if (_unlockTime > 0) {
             lockedNew.end = _unlockTime;
         }
@@ -246,25 +281,28 @@ contract LockTOS is ILockTOS {
             lockedNew.start = block.timestamp;
         }
 
+        // Checkpoint
         _checkpoint(lockedNew, lockedOld);
 
-        // Transfer tos
-        IERC20(tos).transferFrom(msg.sender, address(this), _value);
+        // Save new lock
         lockedBalances[_addr][_lockId] = lockedNew;
         allLocks[_lockId] = lockedNew;
 
         // Save user point
-        int256 userSlope = int256(lockedNew.amount * MULTIPLIER / MAXTIME);
-        int256 userBias = userSlope * int256(lockedNew.end - block.timestamp);
+        int256 userSlope = lockedNew.amount.mul(MULTIPLIER).div(MAXTIME).toInt256();
+        int256 userBias = userSlope * (lockedNew.end.toInt256() - block.timestamp.toInt256());
         LibLockTOS.Point memory userPoint = LibLockTOS.Point({
             timestamp: block.timestamp,
             slope: userSlope * (block.timestamp <= phase3StartTime ? 2 : 1), // Boost slope if staked before phase3
             bias: userBias
         });
         lockPointHistory[_lockId].push(userPoint);
+
+        // Transfer TOS
+        IERC20(tos).transferFrom(msg.sender, address(this), _value);
     }
 
-    /// @dev Apply changes
+    /// @dev Checkpoint
     function _checkpoint(
         LibLockTOS.LockedBalance memory lockedNew,
         LibLockTOS.LockedBalance memory lockedOld
@@ -276,13 +314,13 @@ contract LockTOS is ILockTOS {
         LibLockTOS.SlopeChange memory changeOld = LibLockTOS.SlopeChange({slope: 0, bias: 0, changeTime: 0});
 
         if (lockedNew.end > timestamp && lockedNew.amount > 0) {
-            changeNew.slope = int256(lockedNew.amount * MULTIPLIER / MAXTIME);
-            changeNew.bias = changeNew.slope * int256(lockedNew.end - timestamp);
+            changeNew.slope = int256(lockedNew.amount.mul(MULTIPLIER).div(MAXTIME));
+            changeNew.bias = changeNew.slope * (lockedNew.end.toInt256() - timestamp.toInt256());
             changeNew.changeTime = lockedNew.end;
         }
         if (lockedOld.end > timestamp && lockedOld.amount > 0) {
-            changeOld.slope = int256(lockedOld.amount * MULTIPLIER / MAXTIME);
-            changeOld.bias = changeOld.slope * int256(lockedOld.end - timestamp);
+            changeOld.slope = int256(lockedOld.amount.mul(MULTIPLIER).div(MAXTIME));
+            changeOld.bias = changeOld.slope * (lockedOld.end.toInt256() - timestamp.toInt256());
             changeOld.changeTime = lockedOld.end;
         }
 
@@ -310,10 +348,9 @@ contract LockTOS is ILockTOS {
         uint256 pointTimestampIterator = (lastWeek.timestamp / ONE_WEEK) * ONE_WEEK;
         while (pointTimestampIterator != timestamp) {
             pointTimestampIterator = Math.min(pointTimestampIterator + ONE_WEEK, timestamp);
-
             int256 deltaSlope = slopeChanges[pointTimestampIterator];
             uint256 deltaTime = pointTimestampIterator - lastWeek.timestamp;
-            lastWeek.bias -= lastWeek.slope * int256(deltaTime);
+            lastWeek.bias -= lastWeek.slope * deltaTime.toInt256();
             lastWeek.slope += deltaSlope;
             lastWeek.bias = lastWeek.bias > 0 ? lastWeek.bias : 0;
             lastWeek.slope = lastWeek.slope > 0 ? lastWeek.slope : 0;

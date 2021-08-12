@@ -3,12 +3,18 @@ pragma solidity >=0.7.6;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/math/Math.sol";
+import "@openzeppelin/contracts/math/SafeMath.sol";
+import "@openzeppelin/contracts/utils/SafeCast.sol";
 
 import "../interfaces/ILockTOSDividend.sol";
 import "../interfaces/ILockTOS.sol";
 import "../libraries/LibLockTOSDividend.sol";
 
+
 contract LockTOSDividend is ILockTOSDividend {
+    using SafeMath for uint256;
+    using SafeCast for uint256;
+
     uint256 public constant ONE_WEEK = 1 weeks;
 
     address public lockTOS;
@@ -51,14 +57,14 @@ contract LockTOSDividend is ILockTOSDividend {
             "Locked Token exists for that epoch"
         );
 
-        uint256 newEpoch = _weeklyEpoch + 1;
-        uint256 newTimestamp = timestamp + ONE_WEEK;
+        uint256 newEpoch = _weeklyEpoch.add(1);
+        uint256 newTimestamp = timestamp.add(ONE_WEEK);
         while (newTimestamp <= block.timestamp) {
             if (ILockTOS(lockTOS).totalSupplyAt(newTimestamp) > 0) {
                 break;
             }
-            newTimestamp += ONE_WEEK;
-            newEpoch += 1;
+            newTimestamp = newTimestamp.add(ONE_WEEK);
+            newEpoch = newEpoch.add(1);
         }
         require(newTimestamp <= block.timestamp, "Cannot find epoch to redistribute");
         
@@ -152,8 +158,6 @@ contract LockTOSDividend is ILockTOSDividend {
             IERC20(_token).transfer(msg.sender, amountToClaim);   
         }
     }
-
-
 
     /// @dev Record claim
     function _recordClaim(
