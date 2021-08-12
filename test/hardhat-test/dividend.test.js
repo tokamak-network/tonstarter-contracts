@@ -45,7 +45,7 @@ describe("LockTOSDividend", function () {
     phase3StartTime = 0; // (await time.latest()) + time.duration.weeks(10);
     lockTOS = await (
       await ethers.getContractFactory("LockTOS")
-    ).deploy(tos.address, phase3StartTime);
+    ).deploy(admin.address, tos.address, phase3StartTime);
     await lockTOS.deployed();
 
     dividend = await (

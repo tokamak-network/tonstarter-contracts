@@ -46,7 +46,7 @@ describe("LockTOS", function () {
     phase3StartTime = (await time.latest()) + time.duration.weeks(10);
     lockTOS = await (
       await ethers.getContractFactory("LockTOS")
-    ).deploy(tos.address, phase3StartTime);
+    ).deploy(admin.address, tos.address, phase3StartTime);
     await lockTOS.deployed();
   });
 
@@ -159,38 +159,38 @@ describe("LockTOS", function () {
   it("should check history changes", async function () {
     const changes = [];
     startTime = parseInt(await time.latest());
+    const ONE_WEEK = parseInt(time.duration.weeks(1));
 
     for (let it = 0; it < 10; ++it) {
       for (const info of userLockInfo) {
         const { lockId, updates } = info;
         for (const { amount, unlockWeeks } of updates) {
           const lock = await lockTOS.lockedBalances(user.address, lockId);
-          lock.end = parseInt(lock.end.toString());
+          const lockStart = parseInt(lock.start);
+          const lockEnd = parseInt(lock.end);
+          const threeYears = parseInt(time.duration.weeks(155));
+
           if (amount) {
-            if (parseInt(await time.latest()) < parseInt(lock.end)) {
+            if (parseInt(await time.latest()) < lockEnd) {
               await tos.connect(user).approve(lockTOS.address, amount);
               await lockTOS.connect(user).increaseAmount(lockId, amount);
             }
           }
           if (unlockWeeks) {
-            if (parseInt(await time.latest()) < parseInt(lock.end)) {
-              const newTime =
-                parseInt(lock.end) + unlockWeeks * 7 * 24 * 60 * 60;
-              if (
-                newTime - parseInt(lock.start) <
-                parseInt(time.duration.weeks(155))
-              ) {
+            const newTime = Math.floor((lockEnd + unlockWeeks * 7 * 24 * 60 * 60) / ONE_WEEK) * ONE_WEEK;
+            if (parseInt(await time.latest()) < lockEnd && lockEnd < newTime) {
+              if (newTime - lockStart < threeYears) {
                 await lockTOS
                   .connect(user)
                   .increaseUnlockTime(lockId, unlockWeeks);
               }
             }
           }
-          await time.increase(time.duration.weeks(1));
 
+          await time.increase(time.duration.weeks(1));
           changes.push({
             lockId,
-            capturedBalance: (await lockTOS.balanceOfLock(lockId)).toString(),
+            capturedBalance: parseInt(await lockTOS.balanceOfLock(lockId)),
             captureTimestamp: parseInt(await time.latest()),
           });
         }
@@ -199,9 +199,9 @@ describe("LockTOS", function () {
 
     for (const change of changes) {
       const { lockId, captureTimestamp, capturedBalance } = change;
-      const lockBalance = (
+      const lockBalance = parseInt(
         await lockTOS.balanceOfLockAt(lockId, captureTimestamp)
-      ).toString();
+      );
       expect(lockBalance).to.be.equal(capturedBalance);
     }
   });
