@@ -617,12 +617,16 @@ class ICO20Contracts {
     await this.stakeVaultFactory.grantRole(ADMIN_ROLE, this.stake1proxy.address );
 
     // attach stake2logic
-    let _func1 = web3.eth.abi.encodeFunctionSignature("balanceOf(address,address)") ;
-    let _func2 = web3.eth.abi.encodeFunctionSignature("balanceOfTOS(address)") ;
-    let _func3 = web3.eth.abi.encodeFunctionSignature("createVault2(uint256,uint256,address,address,address,address,string)") ;
-    let _func4 = web3.eth.abi.encodeFunctionSignature("setVaultLogicByPhase(uint256,address)") ;
+    let _func1 = Web3EthAbi.encodeFunctionSignature("createVault2(uint256,uint256,uint256,bytes32,uint256,address[4],string)") ;
+    let _func2 = Web3EthAbi.encodeFunctionSignature("setVaultLogicByPhase(uint256,address)") ;
+    let _func3 = Web3EthAbi.encodeFunctionSignature("setPool(address,address[4])") ;
+    let _func4 = Web3EthAbi.encodeFunctionSignature("setMiningIntervalSeconds(address,uint256)") ;
+    let _func5 = Web3EthAbi.encodeFunctionSignature("resetCoinageTime(address)") ;
+    let _func6 = Web3EthAbi.encodeFunctionSignature("setStartTimeOfVault2(address,uint256)") ;
+    let _func7 = Web3EthAbi.encodeFunctionSignature("setEndTimeOfVault2(address,uint256)") ;
+
     await this.stake1proxy.setImplementation(this.stake2logic.address, 1, true, { from: owner });
-    await this.stake1proxy.setSelectorImplementations([_func1, _func2, _func3, _func4], this.stake2logic.address, { from: owner });
+    await this.stake1proxy.setSelectorImplementations([_func1, _func2, _func3, _func4, _func5, _func6, _func7], this.stake2logic.address, { from: owner });
 
     await this.stakeEntry2.setVaultLogicByPhase( toBN("2"), this.stake2vaultlogic.address, { from: owner });
 

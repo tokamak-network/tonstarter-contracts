@@ -46,7 +46,7 @@ contract Stake1Logic is StakeProxyStorage, AccessibleCommon, IStake1Logic {
     /// @dev event on setting stake registry
     /// @param stakeRegistry the stakeRegistry address
     event SetStakeRegistry(address stakeRegistry);
-*/
+    */
 
     constructor() {}
 
