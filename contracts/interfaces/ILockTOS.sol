@@ -13,7 +13,7 @@ interface ILockTOS {
     function locksOf(address _addr) external view returns (uint256[] memory);
     
     /// @dev Returns all locks of `_addr`
-    function locksInfo(uint256 _lockId) external view returns (uint256, uint256, uint256);
+    function locksInfo(uint256 _lockId) external view returns (uint256, uint256, uint256, int256);
 
     /// @dev Returns all history of `_addr`
     function pointHistoryOf(uint256 _lockId) external view returns (LibLockTOS.Point[] memory);

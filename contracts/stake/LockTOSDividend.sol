@@ -198,7 +198,7 @@ contract LockTOSDividend is ILockTOSDividend {
         uint256 _startEpoch,
         uint256 _endEpoch
     ) internal view returns (uint256) {
-        (uint256 start, uint256 end, ) = ILockTOS(lockTOS).locksInfo(_lockId);
+        (uint256 start, uint256 end, , ) = ILockTOS(lockTOS).locksInfo(_lockId);
         uint256 epochIterator = Math.max(_startEpoch, getWeeklyEpoch(start));
         uint256 epochLimit = Math.min(_endEpoch, getWeeklyEpoch(end));
         uint256 accumulated = 0;

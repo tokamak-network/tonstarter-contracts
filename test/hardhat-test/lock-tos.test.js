@@ -43,7 +43,8 @@ describe("LockTOS", function () {
   });
 
   it("Deploy LockTOS", async function () {
-    phase3StartTime = (await time.latest()) + time.duration.weeks(10);
+    phase3StartTime =
+      parseInt(await time.latest()) + parseInt(time.duration.weeks(10));
     lockTOS = await (
       await ethers.getContractFactory("LockTOS")
     ).deploy(admin.address, tos.address, phase3StartTime);
@@ -164,16 +165,23 @@ describe("LockTOS", function () {
     for (let it = 0; it < 10; ++it) {
       for (const info of userLockInfo) {
         const { lockId, updates } = info;
+
         for (const { amount, unlockWeeks } of updates) {
           const lock = await lockTOS.lockedBalances(user.address, lockId);
+          expect(lock.boostValue).to.be.equal(2); // Boost Value should stay the same
+
           const lockStart = parseInt(lock.start);
           const lockEnd = parseInt(lock.end);
           const threeYears = parseInt(time.duration.weeks(155));
 
           if (amount) {
             if (parseInt(await time.latest()) < lockEnd) {
-              await tos.connect(user).approve(lockTOS.address, amount);
-              await lockTOS.connect(user).increaseAmount(lockId, amount);
+              await (
+                await tos.connect(user).approve(lockTOS.address, amount)
+              ).wait();
+              await (
+                await lockTOS.connect(user).increaseAmount(lockId, amount)
+              ).wait();
             }
           }
           if (unlockWeeks) {
@@ -183,9 +191,11 @@ describe("LockTOS", function () {
               ) * ONE_WEEK;
             if (parseInt(await time.latest()) < lockEnd && lockEnd < newTime) {
               if (newTime - lockStart < threeYears) {
-                await lockTOS
-                  .connect(user)
-                  .increaseUnlockTime(lockId, unlockWeeks);
+                await (
+                  await lockTOS
+                    .connect(user)
+                    .increaseUnlockTime(lockId, unlockWeeks)
+                ).wait();
               }
             }
           }
@@ -207,6 +217,39 @@ describe("LockTOS", function () {
       );
       expect(lockBalance).to.be.equal(capturedBalance);
     }
+  });
+
+  it("should check if boost value is 1", async function () {
+    if (parseInt(await time.latest()) < phase3StartTime) {
+      await time.increaseTo(phase3StartTime);
+    }
+    const lockId = await createLockWithPermit({
+      tos,
+      lockTOS,
+      user,
+      amount: 1000000,
+      unlockWeeks: 1,
+    });
+    const lock = await lockTOS.lockedBalances(user.address, lockId);
+    expect(lock.boostValue).to.be.equal(1);
+
+    const balance = parseInt(await lockTOS.balanceOfLockAt(lockId, lock.start));
+    const estimate = parseInt(
+      await calculateBalanceOfLock({
+        user,
+        lockId,
+        lockTOS,
+        timestamp: lock.start,
+      })
+    );
+    expect(balance).to.equal(estimate);
+
+    const MAXTIME = 94608000;
+    const MULTIPLIER = Math.pow(10, 18);
+    const slope = Math.floor((parseInt(lock.amount) * MULTIPLIER) / MAXTIME);
+    const deltaTime = parseInt(lock.end) - parseInt(lock.start);
+    const bias = Math.floor((slope * deltaTime) / MULTIPLIER); // no boost value
+    expect(balance).to.be.equal(bias);
   });
 
   it("should check total supply now", async function () {
@@ -236,6 +279,11 @@ describe("LockTOS", function () {
       expect((await tos.balanceOf(user.address)) - initialBalance).to.be.equal(
         accTos
       );
+      const newLock = await lockTOS.lockedBalances(user.address, lockId);
+      expect(newLock.start).to.be.equal(0);
+      expect(newLock.end).to.be.equal(0);
+      expect(newLock.amount).to.be.equal(0);
+      expect(newLock.boostValue).to.be.equal(0);
     }
   });
 });

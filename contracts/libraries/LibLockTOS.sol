@@ -13,6 +13,7 @@ library LibLockTOS {
         uint256 start;
         uint256 end;
         uint256 amount;
+        int256 boostValue;
     }
 
     struct SlopeChange {

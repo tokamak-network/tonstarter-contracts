@@ -10,7 +10,7 @@ task("rinkeby-deploy-lock-tos", "Deploy TOS").setAction(async () => {
 
   const lockTOS = await (await ethers.getContractFactory("LockTOS"))
     .connect(deployer)
-    .deploy(tokenAddress, phase3StartTime);
+    .deploy(deployer.address, tokenAddress, phase3StartTime);
   await lockTOS.deployed();
   console.log("LockTOS: ", lockTOS.address);
   await run("verify", {
