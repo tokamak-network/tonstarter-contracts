@@ -12,9 +12,13 @@
 
 - [`setStakeAddress(address _stakeAddress)`](#Stake2Vault-setStakeAddress-address-)
 
-- [`setRewardPerBlock(uint256 _rewardPerBlock)`](#Stake2Vault-setRewardPerBlock-uint256-)
+- [`setMiningAmountPerSecond(uint256 _miningPerSecond)`](#Stake2Vault-setMiningAmountPerSecond-uint256-)
+
+- [`setMiningStartTime(uint256 _miningStartTime)`](#Stake2Vault-setMiningStartTime-uint256-)
 
 - [`withdraw(address to, uint256 _amount)`](#Stake2Vault-withdraw-address-uint256-)
+
+- [`claimMining(address to, uint256 minableAmount, uint256 miningAmount, uint256 nonMiningAmount)`](#Stake2Vault-claimMining-address-uint256-uint256-uint256-)
 
 - [`claim(address _to, uint256 _amount)`](#Stake2Vault-claim-address-uint256-)
 
@@ -24,7 +28,9 @@
 
 # Events:
 
-- [`ClaimedReward(address from, address to, uint256 amount)`](#Stake2Vault-ClaimedReward-address-address-uint256-)
+- [`ClaimedMining(address to, uint256 minableAmount, uint256 miningAmount, uint256 nonMiningAmount)`](#Stake2Vault-ClaimedMining-address-uint256-uint256-uint256-)
+
+- [`Claimed(address from, address to, uint256 amount)`](#Stake2Vault-Claimed-address-address-uint256-)
 
 ###### Stake2Vault-constructor--
 
@@ -78,15 +84,25 @@ set stake address
 
 - `_stakeAddress`:  stake address
 
-###### Stake2Vault-setRewardPerBlock-uint256-
+###### Stake2Vault-setMiningAmountPerSecond-uint256-
 
-## Function `setRewardPerBlock(uint256 _rewardPerBlock)`
+## Function `setMiningAmountPerSecond(uint256 _miningPerSecond)`
 
-set reward per block
+set mining amount per second
 
 ### Parameters:
 
-- `_rewardPerBlock`:  allocated reward amount
+- `_miningPerSecond`:  a mining amount per second
+
+###### Stake2Vault-setMiningStartTime-uint256-
+
+## Function `setMiningStartTime(uint256 _miningStartTime)`
+
+set mining start time
+
+### Parameters:
+
+- `_miningStartTime`:  mining start time
 
 ###### Stake2Vault-withdraw-address-uint256-
 
@@ -100,23 +116,27 @@ If the vault has more money than the reward to give, the owner can withdraw the 
 
 - `_amount`: the amount of withdrawal
 
+###### Stake2Vault-claimMining-address-uint256-uint256-uint256-
+
+## Function `claimMining(address to, uint256 minableAmount, uint256 miningAmount, uint256 nonMiningAmount)`
+
+ a according to request from(staking contract)  the amount of mining is paid to to.
+
+### Parameters:
+
+- `to`: the address that will receive the reward
+
+- `minableAmount`: minable amount
+
+- `miningAmount`: amount mined
+
+- `nonMiningAmount`: Amount not mined
+
 ###### Stake2Vault-claim-address-uint256-
 
 ## Function `claim(address _to, uint256 _amount)`
 
-claim function.
-
-sender is a staking contract.
-
-A function that pays the amount(_amount) to _to by the staking contract.
-
-A function that _to claim the amount(_amount) from the staking contract and gets the tos in the vault.
-
-### Parameters:
-
-- `_to`: a user that received reward
-
-- `_amount`: the receiving amount
+No description
 
 ###### Stake2Vault-balanceTOSAvailableAmount--
 
@@ -142,20 +162,28 @@ Give the infomation of this vault
 
 - return3 stakeType
 
-- return4 rewardPerBlock
+- return4 miningPerSecond
 
 - return5 name
 
-###### Stake2Vault-ClaimedReward-address-address-uint256-
+###### Stake2Vault-ClaimedMining-address-uint256-uint256-uint256-
 
-## Event `ClaimedReward(address from, address to, uint256 amount)`
+## Event `ClaimedMining(address to, uint256 minableAmount, uint256 miningAmount, uint256 nonMiningAmount)`
 
-event of according to request from(staking contract)  the amount of compensation is paid to to.
+event of according to request from(staking contract)  the amount of mining is paid to to.
 
 ### Parameters:
 
-- `from`: the stakeContract address that call claim
-
 - `to`: the address that will receive the reward
 
-- `amount`: the amount of reward
+- `minableAmount`: minable amount
+
+- `miningAmount`: amount mined
+
+- `nonMiningAmount`: Amount not mined
+
+###### Stake2Vault-Claimed-address-address-uint256-
+
+## Event `Claimed(address from, address to, uint256 amount)`
+
+No description

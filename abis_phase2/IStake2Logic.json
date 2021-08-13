@@ -1,0 +1,2430 @@
+{
+  "contractName": "IStake2Logic",
+  "abi": [
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "vault",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "stakeContract",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "phase",
+          "type": "uint256"
+        }
+      ],
+      "name": "CreatedStakeContract2",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "vault",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "paytoken",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "cap",
+          "type": "uint256"
+        }
+      ],
+      "name": "CreatedVault2",
+      "type": "event"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_phase",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address",
+          "name": "_logic",
+          "type": "address"
+        }
+      ],
+      "name": "setVaultLogicByPhase",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_cap",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_rewardPerBlock",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_phase",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "_vaultName",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_stakeType",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address[4]",
+          "name": "_uniswapInfo",
+          "type": "address[4]"
+        },
+        {
+          "internalType": "string",
+          "name": "_name",
+          "type": "string"
+        }
+      ],
+      "name": "createVault2",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "target",
+          "type": "address"
+        },
+        {
+          "internalType": "address[4]",
+          "name": "uniswapInfo",
+          "type": "address[4]"
+        }
+      ],
+      "name": "setPool",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "target",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "miningIntervalSeconds",
+          "type": "uint256"
+        }
+      ],
+      "name": "setMiningIntervalSeconds",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "target",
+          "type": "address"
+        }
+      ],
+      "name": "resetCoinageTime",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "vault",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "startTime",
+          "type": "uint256"
+        }
+      ],
+      "name": "setStartTimeOfVault2",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "vault",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "endTime",
+          "type": "uint256"
+        }
+      ],
+      "name": "setEndTimeOfVault2",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "metadata": "{\"compiler\":{\"version\":\"0.7.6+commit.7338295f\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"vault\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"stakeContract\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"phase\",\"type\":\"uint256\"}],\"name\":\"CreatedStakeContract2\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"vault\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"paytoken\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"cap\",\"type\":\"uint256\"}],\"name\":\"CreatedVault2\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_cap\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_rewardPerBlock\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_phase\",\"type\":\"uint256\"},{\"internalType\":\"bytes32\",\"name\":\"_vaultName\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"_stakeType\",\"type\":\"uint256\"},{\"internalType\":\"address[4]\",\"name\":\"_uniswapInfo\",\"type\":\"address[4]\"},{\"internalType\":\"string\",\"name\":\"_name\",\"type\":\"string\"}],\"name\":\"createVault2\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"target\",\"type\":\"address\"}],\"name\":\"resetCoinageTime\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"vault\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"endTime\",\"type\":\"uint256\"}],\"name\":\"setEndTimeOfVault2\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"target\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"miningIntervalSeconds\",\"type\":\"uint256\"}],\"name\":\"setMiningIntervalSeconds\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"target\",\"type\":\"address\"},{\"internalType\":\"address[4]\",\"name\":\"uniswapInfo\",\"type\":\"address[4]\"}],\"name\":\"setPool\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"vault\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"startTime\",\"type\":\"uint256\"}],\"name\":\"setStartTimeOfVault2\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_phase\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"_logic\",\"type\":\"address\"}],\"name\":\"setVaultLogicByPhase\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"events\":{\"CreatedStakeContract2(address,address,uint256)\":{\"details\":\"event on create stake contract in vault\",\"params\":{\"phase\":\"the phase of TOS platform\",\"stakeContract\":\"the stake contract address created\",\"vault\":\"the vault address\"}},\"CreatedVault2(address,address,uint256)\":{\"details\":\"event on create vault\",\"params\":{\"cap\":\"allocated reward amount\",\"paytoken\":\"the token used for staking by user\",\"vault\":\"the vault address created\"}}},\"kind\":\"dev\",\"methods\":{\"createVault2(uint256,uint256,uint256,bytes32,uint256,address[4],string)\":{\"details\":\"create vault2\",\"params\":{\"_cap\":\"allocated reward amount\",\"_name\":\"name\",\"_phase\":\"phase of TOS platform\",\"_rewardPerBlock\":\"the reward per block\",\"_stakeType\":\"it's 2, StakeUniswapV3 staking type\",\"_uniswapInfo\":\"npm, pool, token0, token1\",\"_vaultName\":\"vault's name's hash\"}},\"resetCoinageTime(address)\":{\"details\":\"reset coinage's last mining time variable for tes\",\"params\":{\"target\":\"target address\"}},\"setEndTimeOfVault2(address,uint256)\":{\"details\":\"set mining end time\",\"params\":{\"endTime\":\"mining end time\",\"vault\":\"a vault address\"}},\"setMiningIntervalSeconds(address,uint256)\":{\"details\":\"Mining interval setting (seconds)\",\"params\":{\"miningIntervalSeconds\":\"the mining interval (sec)\",\"target\":\"target address\"}},\"setPool(address,address[4])\":{\"details\":\"set pool information\",\"params\":{\"target\":\"target address\",\"uniswapInfo\":\"[NonfungiblePositionManager,UniswapV3Factory,token0,token1]\"}},\"setStartTimeOfVault2(address,uint256)\":{\"details\":\"set the start time of vault2\",\"params\":{\"startTime\":\"mining start time\",\"vault\":\"a vault address\"}},\"setVaultLogicByPhase(uint256,address)\":{\"details\":\"Set stakeVaultLogic address by _phase\",\"params\":{\"_logic\":\"the vault logic address\",\"_phase\":\"the stake type\"}}},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"/Users/zena/ico2.0/ico20-contracts/contracts/interfaces/IStake2Logic.sol\":\"IStake2Logic\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":100},\"remappings\":[]},\"sources\":{\"/Users/zena/ico2.0/ico20-contracts/contracts/interfaces/IStake2Logic.sol\":{\"keccak256\":\"0x5a686722f58b9b30882d31d04899de3fc53ebb21a76c9f54702928e2da9da6c2\",\"license\":\"Unlicense\",\"urls\":[\"bzz-raw://e2c2f63312f307c1ae103deb7bdecd95052f4c40268342644ad83221f80f1ef6\",\"dweb:/ipfs/QmRXgx9pMwucCNkVgFF9zoRUXkYwZRTRr28u3AnsvSuB8H\"]}},\"version\":1}",
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "immutableReferences": {},
+  "generatedSources": [],
+  "deployedGeneratedSources": [],
+  "sourceMap": "",
+  "deployedSourceMap": "",
+  "source": "//SPDX-License-Identifier: Unlicense\npragma solidity ^0.7.6;\n\ninterface IStake2Logic {\n    /// @dev event on create vault\n    /// @param vault the vault address created\n    /// @param paytoken the token used for staking by user\n    /// @param cap  allocated reward amount\n    event CreatedVault2(address indexed vault, address paytoken, uint256 cap);\n\n    /// @dev event on create stake contract in vault\n    /// @param vault the vault address\n    /// @param stakeContract the stake contract address created\n    /// @param phase the phase of TOS platform\n    event CreatedStakeContract2(\n        address indexed vault,\n        address indexed stakeContract,\n        uint256 phase\n    );\n\n    /// @dev Set stakeVaultLogic address by _phase\n    /// @param _phase the stake type\n    /// @param _logic the vault logic address\n    function setVaultLogicByPhase(uint256 _phase, address _logic) external;\n\n    /// @dev create vault2\n    /// @param _cap  allocated reward amount\n    /// @param _rewardPerBlock  the reward per block\n    /// @param _phase  phase of TOS platform\n    /// @param _vaultName  vault's name's hash\n    /// @param _stakeType   it's 2, StakeUniswapV3 staking type\n    /// @param _uniswapInfo  npm, pool, token0, token1\n    /// @param _name   name\n    function createVault2(\n        uint256 _cap,\n        uint256 _rewardPerBlock,\n        uint256 _phase,\n        bytes32 _vaultName,\n        uint256 _stakeType,\n        address[4] memory _uniswapInfo,\n        string memory _name\n    ) external;\n\n    /// @dev set pool information\n    /// @param target  target address\n    /// @param uniswapInfo [NonfungiblePositionManager,UniswapV3Factory,token0,token1]\n    function setPool(address target, address[4] memory uniswapInfo) external;\n\n    /// @dev Mining interval setting (seconds)\n    /// @param target  target address\n    /// @param miningIntervalSeconds the mining interval (sec)\n    function setMiningIntervalSeconds(\n        address target,\n        uint256 miningIntervalSeconds\n    ) external;\n\n    /// @dev reset coinage's last mining time variable for tes\n    /// @param target  target address\n    function resetCoinageTime(address target) external;\n\n    /// @dev set the start time of vault2\n    /// @param vault  a vault address\n    /// @param startTime  mining start time\n    function setStartTimeOfVault2(address vault, uint256 startTime) external;\n\n    /// @dev set mining end time\n    /// @param vault  a vault address\n    /// @param endTime  mining end time\n    function setEndTimeOfVault2(address vault, uint256 endTime) external;\n}\n",
+  "sourcePath": "/Users/zena/ico2.0/ico20-contracts/contracts/interfaces/IStake2Logic.sol",
+  "ast": {
+    "absolutePath": "/Users/zena/ico2.0/ico20-contracts/contracts/interfaces/IStake2Logic.sol",
+    "exportedSymbols": {
+      "IStake2Logic": [
+        3642
+      ]
+    },
+    "id": 3643,
+    "license": "Unlicense",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 3555,
+        "literals": [
+          "solidity",
+          "^",
+          "0.7",
+          ".6"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "37:23:25"
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "fullyImplemented": false,
+        "id": 3642,
+        "linearizedBaseContracts": [
+          3642
+        ],
+        "name": "IStake2Logic",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "anonymous": false,
+            "documentation": {
+              "id": 3556,
+              "nodeType": "StructuredDocumentation",
+              "src": "91:180:25",
+              "text": "@dev event on create vault\n @param vault the vault address created\n @param paytoken the token used for staking by user\n @param cap  allocated reward amount"
+            },
+            "id": 3564,
+            "name": "CreatedVault2",
+            "nodeType": "EventDefinition",
+            "parameters": {
+              "id": 3563,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3558,
+                  "indexed": true,
+                  "mutability": "mutable",
+                  "name": "vault",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3564,
+                  "src": "296:21:25",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 3557,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "296:7:25",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 3560,
+                  "indexed": false,
+                  "mutability": "mutable",
+                  "name": "paytoken",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3564,
+                  "src": "319:16:25",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 3559,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "319:7:25",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 3562,
+                  "indexed": false,
+                  "mutability": "mutable",
+                  "name": "cap",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3564,
+                  "src": "337:11:25",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 3561,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "337:7:25",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "295:54:25"
+            },
+            "src": "276:74:25"
+          },
+          {
+            "anonymous": false,
+            "documentation": {
+              "id": 3565,
+              "nodeType": "StructuredDocumentation",
+              "src": "356:198:25",
+              "text": "@dev event on create stake contract in vault\n @param vault the vault address\n @param stakeContract the stake contract address created\n @param phase the phase of TOS platform"
+            },
+            "id": 3573,
+            "name": "CreatedStakeContract2",
+            "nodeType": "EventDefinition",
+            "parameters": {
+              "id": 3572,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3567,
+                  "indexed": true,
+                  "mutability": "mutable",
+                  "name": "vault",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3573,
+                  "src": "596:21:25",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 3566,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "596:7:25",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 3569,
+                  "indexed": true,
+                  "mutability": "mutable",
+                  "name": "stakeContract",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3573,
+                  "src": "627:29:25",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 3568,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "627:7:25",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 3571,
+                  "indexed": false,
+                  "mutability": "mutable",
+                  "name": "phase",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3573,
+                  "src": "666:13:25",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 3570,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "666:7:25",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "586:99:25"
+            },
+            "src": "559:127:25"
+          },
+          {
+            "documentation": {
+              "id": 3574,
+              "nodeType": "StructuredDocumentation",
+              "src": "692:129:25",
+              "text": "@dev Set stakeVaultLogic address by _phase\n @param _phase the stake type\n @param _logic the vault logic address"
+            },
+            "functionSelector": "e2823698",
+            "id": 3581,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "setVaultLogicByPhase",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 3579,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3576,
+                  "mutability": "mutable",
+                  "name": "_phase",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3581,
+                  "src": "856:14:25",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 3575,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "856:7:25",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 3578,
+                  "mutability": "mutable",
+                  "name": "_logic",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3581,
+                  "src": "872:14:25",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 3577,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "872:7:25",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "855:32:25"
+            },
+            "returnParameters": {
+              "id": 3580,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "896:0:25"
+            },
+            "scope": 3642,
+            "src": "826:71:25",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 3582,
+              "nodeType": "StructuredDocumentation",
+              "src": "903:359:25",
+              "text": "@dev create vault2\n @param _cap  allocated reward amount\n @param _rewardPerBlock  the reward per block\n @param _phase  phase of TOS platform\n @param _vaultName  vault's name's hash\n @param _stakeType   it's 2, StakeUniswapV3 staking type\n @param _uniswapInfo  npm, pool, token0, token1\n @param _name   name"
+            },
+            "functionSelector": "be4377e3",
+            "id": 3601,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "createVault2",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 3599,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3584,
+                  "mutability": "mutable",
+                  "name": "_cap",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3601,
+                  "src": "1298:12:25",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 3583,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1298:7:25",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 3586,
+                  "mutability": "mutable",
+                  "name": "_rewardPerBlock",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3601,
+                  "src": "1320:23:25",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 3585,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1320:7:25",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 3588,
+                  "mutability": "mutable",
+                  "name": "_phase",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3601,
+                  "src": "1353:14:25",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 3587,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1353:7:25",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 3590,
+                  "mutability": "mutable",
+                  "name": "_vaultName",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3601,
+                  "src": "1377:18:25",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 3589,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1377:7:25",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 3592,
+                  "mutability": "mutable",
+                  "name": "_stakeType",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3601,
+                  "src": "1405:18:25",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 3591,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1405:7:25",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 3596,
+                  "mutability": "mutable",
+                  "name": "_uniswapInfo",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3601,
+                  "src": "1433:30:25",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_array$_t_address_$4_memory_ptr",
+                    "typeString": "address[4]"
+                  },
+                  "typeName": {
+                    "baseType": {
+                      "id": 3593,
+                      "name": "address",
+                      "nodeType": "ElementaryTypeName",
+                      "src": "1433:7:25",
+                      "stateMutability": "nonpayable",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_address",
+                        "typeString": "address"
+                      }
+                    },
+                    "id": 3595,
+                    "length": {
+                      "hexValue": "34",
+                      "id": 3594,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": true,
+                      "kind": "number",
+                      "lValueRequested": false,
+                      "nodeType": "Literal",
+                      "src": "1441:1:25",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_rational_4_by_1",
+                        "typeString": "int_const 4"
+                      },
+                      "value": "4"
+                    },
+                    "nodeType": "ArrayTypeName",
+                    "src": "1433:10:25",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_array$_t_address_$4_storage_ptr",
+                      "typeString": "address[4]"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 3598,
+                  "mutability": "mutable",
+                  "name": "_name",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3601,
+                  "src": "1473:19:25",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_memory_ptr",
+                    "typeString": "string"
+                  },
+                  "typeName": {
+                    "id": 3597,
+                    "name": "string",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1473:6:25",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage_ptr",
+                      "typeString": "string"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1288:210:25"
+            },
+            "returnParameters": {
+              "id": 3600,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1507:0:25"
+            },
+            "scope": 3642,
+            "src": "1267:241:25",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 3602,
+              "nodeType": "StructuredDocumentation",
+              "src": "1514:154:25",
+              "text": "@dev set pool information\n @param target  target address\n @param uniswapInfo [NonfungiblePositionManager,UniswapV3Factory,token0,token1]"
+            },
+            "functionSelector": "96ec066a",
+            "id": 3611,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "setPool",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 3609,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3604,
+                  "mutability": "mutable",
+                  "name": "target",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3611,
+                  "src": "1690:14:25",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 3603,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1690:7:25",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 3608,
+                  "mutability": "mutable",
+                  "name": "uniswapInfo",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3611,
+                  "src": "1706:29:25",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_array$_t_address_$4_memory_ptr",
+                    "typeString": "address[4]"
+                  },
+                  "typeName": {
+                    "baseType": {
+                      "id": 3605,
+                      "name": "address",
+                      "nodeType": "ElementaryTypeName",
+                      "src": "1706:7:25",
+                      "stateMutability": "nonpayable",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_address",
+                        "typeString": "address"
+                      }
+                    },
+                    "id": 3607,
+                    "length": {
+                      "hexValue": "34",
+                      "id": 3606,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": true,
+                      "kind": "number",
+                      "lValueRequested": false,
+                      "nodeType": "Literal",
+                      "src": "1714:1:25",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_rational_4_by_1",
+                        "typeString": "int_const 4"
+                      },
+                      "value": "4"
+                    },
+                    "nodeType": "ArrayTypeName",
+                    "src": "1706:10:25",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_array$_t_address_$4_storage_ptr",
+                      "typeString": "address[4]"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1689:47:25"
+            },
+            "returnParameters": {
+              "id": 3610,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1745:0:25"
+            },
+            "scope": 3642,
+            "src": "1673:73:25",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 3612,
+              "nodeType": "StructuredDocumentation",
+              "src": "1752:143:25",
+              "text": "@dev Mining interval setting (seconds)\n @param target  target address\n @param miningIntervalSeconds the mining interval (sec)"
+            },
+            "functionSelector": "a574d1b7",
+            "id": 3619,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "setMiningIntervalSeconds",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 3617,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3614,
+                  "mutability": "mutable",
+                  "name": "target",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3619,
+                  "src": "1943:14:25",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 3613,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1943:7:25",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 3616,
+                  "mutability": "mutable",
+                  "name": "miningIntervalSeconds",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3619,
+                  "src": "1967:29:25",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 3615,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1967:7:25",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1933:69:25"
+            },
+            "returnParameters": {
+              "id": 3618,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "2011:0:25"
+            },
+            "scope": 3642,
+            "src": "1900:112:25",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 3620,
+              "nodeType": "StructuredDocumentation",
+              "src": "2018:96:25",
+              "text": "@dev reset coinage's last mining time variable for tes\n @param target  target address"
+            },
+            "functionSelector": "bcb92308",
+            "id": 3625,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "resetCoinageTime",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 3623,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3622,
+                  "mutability": "mutable",
+                  "name": "target",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3625,
+                  "src": "2145:14:25",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 3621,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2145:7:25",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2144:16:25"
+            },
+            "returnParameters": {
+              "id": 3624,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "2169:0:25"
+            },
+            "scope": 3642,
+            "src": "2119:51:25",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 3626,
+              "nodeType": "StructuredDocumentation",
+              "src": "2176:119:25",
+              "text": "@dev set the start time of vault2\n @param vault  a vault address\n @param startTime  mining start time"
+            },
+            "functionSelector": "4acb0e8d",
+            "id": 3633,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "setStartTimeOfVault2",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 3631,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3628,
+                  "mutability": "mutable",
+                  "name": "vault",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3633,
+                  "src": "2330:13:25",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 3627,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2330:7:25",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 3630,
+                  "mutability": "mutable",
+                  "name": "startTime",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3633,
+                  "src": "2345:17:25",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 3629,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2345:7:25",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2329:34:25"
+            },
+            "returnParameters": {
+              "id": 3632,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "2372:0:25"
+            },
+            "scope": 3642,
+            "src": "2300:73:25",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 3634,
+              "nodeType": "StructuredDocumentation",
+              "src": "2379:106:25",
+              "text": "@dev set mining end time\n @param vault  a vault address\n @param endTime  mining end time"
+            },
+            "functionSelector": "29199599",
+            "id": 3641,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "setEndTimeOfVault2",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 3639,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3636,
+                  "mutability": "mutable",
+                  "name": "vault",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3641,
+                  "src": "2518:13:25",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 3635,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2518:7:25",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 3638,
+                  "mutability": "mutable",
+                  "name": "endTime",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3641,
+                  "src": "2533:15:25",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 3637,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2533:7:25",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2517:32:25"
+            },
+            "returnParameters": {
+              "id": 3640,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "2558:0:25"
+            },
+            "scope": 3642,
+            "src": "2490:69:25",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 3643,
+        "src": "62:2499:25"
+      }
+    ],
+    "src": "37:2525:25"
+  },
+  "legacyAST": {
+    "attributes": {
+      "absolutePath": "/Users/zena/ico2.0/ico20-contracts/contracts/interfaces/IStake2Logic.sol",
+      "exportedSymbols": {
+        "IStake2Logic": [
+          3642
+        ]
+      },
+      "license": "Unlicense"
+    },
+    "children": [
+      {
+        "attributes": {
+          "literals": [
+            "solidity",
+            "^",
+            "0.7",
+            ".6"
+          ]
+        },
+        "id": 3555,
+        "name": "PragmaDirective",
+        "src": "37:23:25"
+      },
+      {
+        "attributes": {
+          "abstract": false,
+          "baseContracts": [
+            null
+          ],
+          "contractDependencies": [
+            null
+          ],
+          "contractKind": "interface",
+          "fullyImplemented": false,
+          "linearizedBaseContracts": [
+            3642
+          ],
+          "name": "IStake2Logic",
+          "scope": 3643
+        },
+        "children": [
+          {
+            "attributes": {
+              "anonymous": false,
+              "name": "CreatedVault2"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "text": "@dev event on create vault\n @param vault the vault address created\n @param paytoken the token used for staking by user\n @param cap  allocated reward amount"
+                },
+                "id": 3556,
+                "name": "StructuredDocumentation",
+                "src": "91:180:25"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "indexed": true,
+                      "mutability": "mutable",
+                      "name": "vault",
+                      "scope": 3564,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "address",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "address",
+                          "stateMutability": "nonpayable",
+                          "type": "address"
+                        },
+                        "id": 3557,
+                        "name": "ElementaryTypeName",
+                        "src": "296:7:25"
+                      }
+                    ],
+                    "id": 3558,
+                    "name": "VariableDeclaration",
+                    "src": "296:21:25"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "indexed": false,
+                      "mutability": "mutable",
+                      "name": "paytoken",
+                      "scope": 3564,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "address",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "address",
+                          "stateMutability": "nonpayable",
+                          "type": "address"
+                        },
+                        "id": 3559,
+                        "name": "ElementaryTypeName",
+                        "src": "319:7:25"
+                      }
+                    ],
+                    "id": 3560,
+                    "name": "VariableDeclaration",
+                    "src": "319:16:25"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "indexed": false,
+                      "mutability": "mutable",
+                      "name": "cap",
+                      "scope": 3564,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "uint256",
+                          "type": "uint256"
+                        },
+                        "id": 3561,
+                        "name": "ElementaryTypeName",
+                        "src": "337:7:25"
+                      }
+                    ],
+                    "id": 3562,
+                    "name": "VariableDeclaration",
+                    "src": "337:11:25"
+                  }
+                ],
+                "id": 3563,
+                "name": "ParameterList",
+                "src": "295:54:25"
+              }
+            ],
+            "id": 3564,
+            "name": "EventDefinition",
+            "src": "276:74:25"
+          },
+          {
+            "attributes": {
+              "anonymous": false,
+              "name": "CreatedStakeContract2"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "text": "@dev event on create stake contract in vault\n @param vault the vault address\n @param stakeContract the stake contract address created\n @param phase the phase of TOS platform"
+                },
+                "id": 3565,
+                "name": "StructuredDocumentation",
+                "src": "356:198:25"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "indexed": true,
+                      "mutability": "mutable",
+                      "name": "vault",
+                      "scope": 3573,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "address",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "address",
+                          "stateMutability": "nonpayable",
+                          "type": "address"
+                        },
+                        "id": 3566,
+                        "name": "ElementaryTypeName",
+                        "src": "596:7:25"
+                      }
+                    ],
+                    "id": 3567,
+                    "name": "VariableDeclaration",
+                    "src": "596:21:25"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "indexed": true,
+                      "mutability": "mutable",
+                      "name": "stakeContract",
+                      "scope": 3573,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "address",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "address",
+                          "stateMutability": "nonpayable",
+                          "type": "address"
+                        },
+                        "id": 3568,
+                        "name": "ElementaryTypeName",
+                        "src": "627:7:25"
+                      }
+                    ],
+                    "id": 3569,
+                    "name": "VariableDeclaration",
+                    "src": "627:29:25"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "indexed": false,
+                      "mutability": "mutable",
+                      "name": "phase",
+                      "scope": 3573,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "uint256",
+                          "type": "uint256"
+                        },
+                        "id": 3570,
+                        "name": "ElementaryTypeName",
+                        "src": "666:7:25"
+                      }
+                    ],
+                    "id": 3571,
+                    "name": "VariableDeclaration",
+                    "src": "666:13:25"
+                  }
+                ],
+                "id": 3572,
+                "name": "ParameterList",
+                "src": "586:99:25"
+              }
+            ],
+            "id": 3573,
+            "name": "EventDefinition",
+            "src": "559:127:25"
+          },
+          {
+            "attributes": {
+              "functionSelector": "e2823698",
+              "implemented": false,
+              "isConstructor": false,
+              "kind": "function",
+              "modifiers": [
+                null
+              ],
+              "name": "setVaultLogicByPhase",
+              "scope": 3642,
+              "stateMutability": "nonpayable",
+              "virtual": false,
+              "visibility": "external"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "text": "@dev Set stakeVaultLogic address by _phase\n @param _phase the stake type\n @param _logic the vault logic address"
+                },
+                "id": 3574,
+                "name": "StructuredDocumentation",
+                "src": "692:129:25"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "_phase",
+                      "scope": 3581,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "uint256",
+                          "type": "uint256"
+                        },
+                        "id": 3575,
+                        "name": "ElementaryTypeName",
+                        "src": "856:7:25"
+                      }
+                    ],
+                    "id": 3576,
+                    "name": "VariableDeclaration",
+                    "src": "856:14:25"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "_logic",
+                      "scope": 3581,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "address",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "address",
+                          "stateMutability": "nonpayable",
+                          "type": "address"
+                        },
+                        "id": 3577,
+                        "name": "ElementaryTypeName",
+                        "src": "872:7:25"
+                      }
+                    ],
+                    "id": 3578,
+                    "name": "VariableDeclaration",
+                    "src": "872:14:25"
+                  }
+                ],
+                "id": 3579,
+                "name": "ParameterList",
+                "src": "855:32:25"
+              },
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 3580,
+                "name": "ParameterList",
+                "src": "896:0:25"
+              }
+            ],
+            "id": 3581,
+            "name": "FunctionDefinition",
+            "src": "826:71:25"
+          },
+          {
+            "attributes": {
+              "functionSelector": "be4377e3",
+              "implemented": false,
+              "isConstructor": false,
+              "kind": "function",
+              "modifiers": [
+                null
+              ],
+              "name": "createVault2",
+              "scope": 3642,
+              "stateMutability": "nonpayable",
+              "virtual": false,
+              "visibility": "external"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "text": "@dev create vault2\n @param _cap  allocated reward amount\n @param _rewardPerBlock  the reward per block\n @param _phase  phase of TOS platform\n @param _vaultName  vault's name's hash\n @param _stakeType   it's 2, StakeUniswapV3 staking type\n @param _uniswapInfo  npm, pool, token0, token1\n @param _name   name"
+                },
+                "id": 3582,
+                "name": "StructuredDocumentation",
+                "src": "903:359:25"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "_cap",
+                      "scope": 3601,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "uint256",
+                          "type": "uint256"
+                        },
+                        "id": 3583,
+                        "name": "ElementaryTypeName",
+                        "src": "1298:7:25"
+                      }
+                    ],
+                    "id": 3584,
+                    "name": "VariableDeclaration",
+                    "src": "1298:12:25"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "_rewardPerBlock",
+                      "scope": 3601,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "uint256",
+                          "type": "uint256"
+                        },
+                        "id": 3585,
+                        "name": "ElementaryTypeName",
+                        "src": "1320:7:25"
+                      }
+                    ],
+                    "id": 3586,
+                    "name": "VariableDeclaration",
+                    "src": "1320:23:25"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "_phase",
+                      "scope": 3601,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "uint256",
+                          "type": "uint256"
+                        },
+                        "id": 3587,
+                        "name": "ElementaryTypeName",
+                        "src": "1353:7:25"
+                      }
+                    ],
+                    "id": 3588,
+                    "name": "VariableDeclaration",
+                    "src": "1353:14:25"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "_vaultName",
+                      "scope": 3601,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "bytes32",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "bytes32",
+                          "type": "bytes32"
+                        },
+                        "id": 3589,
+                        "name": "ElementaryTypeName",
+                        "src": "1377:7:25"
+                      }
+                    ],
+                    "id": 3590,
+                    "name": "VariableDeclaration",
+                    "src": "1377:18:25"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "_stakeType",
+                      "scope": 3601,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "uint256",
+                          "type": "uint256"
+                        },
+                        "id": 3591,
+                        "name": "ElementaryTypeName",
+                        "src": "1405:7:25"
+                      }
+                    ],
+                    "id": 3592,
+                    "name": "VariableDeclaration",
+                    "src": "1405:18:25"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "_uniswapInfo",
+                      "scope": 3601,
+                      "stateVariable": false,
+                      "storageLocation": "memory",
+                      "type": "address[4]",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "type": "address[4]"
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "name": "address",
+                              "stateMutability": "nonpayable",
+                              "type": "address"
+                            },
+                            "id": 3593,
+                            "name": "ElementaryTypeName",
+                            "src": "1433:7:25"
+                          },
+                          {
+                            "attributes": {
+                              "hexvalue": "34",
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": true,
+                              "lValueRequested": false,
+                              "token": "number",
+                              "type": "int_const 4",
+                              "value": "4"
+                            },
+                            "id": 3594,
+                            "name": "Literal",
+                            "src": "1441:1:25"
+                          }
+                        ],
+                        "id": 3595,
+                        "name": "ArrayTypeName",
+                        "src": "1433:10:25"
+                      }
+                    ],
+                    "id": 3596,
+                    "name": "VariableDeclaration",
+                    "src": "1433:30:25"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "_name",
+                      "scope": 3601,
+                      "stateVariable": false,
+                      "storageLocation": "memory",
+                      "type": "string",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "string",
+                          "type": "string"
+                        },
+                        "id": 3597,
+                        "name": "ElementaryTypeName",
+                        "src": "1473:6:25"
+                      }
+                    ],
+                    "id": 3598,
+                    "name": "VariableDeclaration",
+                    "src": "1473:19:25"
+                  }
+                ],
+                "id": 3599,
+                "name": "ParameterList",
+                "src": "1288:210:25"
+              },
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 3600,
+                "name": "ParameterList",
+                "src": "1507:0:25"
+              }
+            ],
+            "id": 3601,
+            "name": "FunctionDefinition",
+            "src": "1267:241:25"
+          },
+          {
+            "attributes": {
+              "functionSelector": "96ec066a",
+              "implemented": false,
+              "isConstructor": false,
+              "kind": "function",
+              "modifiers": [
+                null
+              ],
+              "name": "setPool",
+              "scope": 3642,
+              "stateMutability": "nonpayable",
+              "virtual": false,
+              "visibility": "external"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "text": "@dev set pool information\n @param target  target address\n @param uniswapInfo [NonfungiblePositionManager,UniswapV3Factory,token0,token1]"
+                },
+                "id": 3602,
+                "name": "StructuredDocumentation",
+                "src": "1514:154:25"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "target",
+                      "scope": 3611,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "address",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "address",
+                          "stateMutability": "nonpayable",
+                          "type": "address"
+                        },
+                        "id": 3603,
+                        "name": "ElementaryTypeName",
+                        "src": "1690:7:25"
+                      }
+                    ],
+                    "id": 3604,
+                    "name": "VariableDeclaration",
+                    "src": "1690:14:25"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "uniswapInfo",
+                      "scope": 3611,
+                      "stateVariable": false,
+                      "storageLocation": "memory",
+                      "type": "address[4]",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "type": "address[4]"
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "name": "address",
+                              "stateMutability": "nonpayable",
+                              "type": "address"
+                            },
+                            "id": 3605,
+                            "name": "ElementaryTypeName",
+                            "src": "1706:7:25"
+                          },
+                          {
+                            "attributes": {
+                              "hexvalue": "34",
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": true,
+                              "lValueRequested": false,
+                              "token": "number",
+                              "type": "int_const 4",
+                              "value": "4"
+                            },
+                            "id": 3606,
+                            "name": "Literal",
+                            "src": "1714:1:25"
+                          }
+                        ],
+                        "id": 3607,
+                        "name": "ArrayTypeName",
+                        "src": "1706:10:25"
+                      }
+                    ],
+                    "id": 3608,
+                    "name": "VariableDeclaration",
+                    "src": "1706:29:25"
+                  }
+                ],
+                "id": 3609,
+                "name": "ParameterList",
+                "src": "1689:47:25"
+              },
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 3610,
+                "name": "ParameterList",
+                "src": "1745:0:25"
+              }
+            ],
+            "id": 3611,
+            "name": "FunctionDefinition",
+            "src": "1673:73:25"
+          },
+          {
+            "attributes": {
+              "functionSelector": "a574d1b7",
+              "implemented": false,
+              "isConstructor": false,
+              "kind": "function",
+              "modifiers": [
+                null
+              ],
+              "name": "setMiningIntervalSeconds",
+              "scope": 3642,
+              "stateMutability": "nonpayable",
+              "virtual": false,
+              "visibility": "external"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "text": "@dev Mining interval setting (seconds)\n @param target  target address\n @param miningIntervalSeconds the mining interval (sec)"
+                },
+                "id": 3612,
+                "name": "StructuredDocumentation",
+                "src": "1752:143:25"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "target",
+                      "scope": 3619,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "address",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "address",
+                          "stateMutability": "nonpayable",
+                          "type": "address"
+                        },
+                        "id": 3613,
+                        "name": "ElementaryTypeName",
+                        "src": "1943:7:25"
+                      }
+                    ],
+                    "id": 3614,
+                    "name": "VariableDeclaration",
+                    "src": "1943:14:25"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "miningIntervalSeconds",
+                      "scope": 3619,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "uint256",
+                          "type": "uint256"
+                        },
+                        "id": 3615,
+                        "name": "ElementaryTypeName",
+                        "src": "1967:7:25"
+                      }
+                    ],
+                    "id": 3616,
+                    "name": "VariableDeclaration",
+                    "src": "1967:29:25"
+                  }
+                ],
+                "id": 3617,
+                "name": "ParameterList",
+                "src": "1933:69:25"
+              },
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 3618,
+                "name": "ParameterList",
+                "src": "2011:0:25"
+              }
+            ],
+            "id": 3619,
+            "name": "FunctionDefinition",
+            "src": "1900:112:25"
+          },
+          {
+            "attributes": {
+              "functionSelector": "bcb92308",
+              "implemented": false,
+              "isConstructor": false,
+              "kind": "function",
+              "modifiers": [
+                null
+              ],
+              "name": "resetCoinageTime",
+              "scope": 3642,
+              "stateMutability": "nonpayable",
+              "virtual": false,
+              "visibility": "external"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "text": "@dev reset coinage's last mining time variable for tes\n @param target  target address"
+                },
+                "id": 3620,
+                "name": "StructuredDocumentation",
+                "src": "2018:96:25"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "target",
+                      "scope": 3625,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "address",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "address",
+                          "stateMutability": "nonpayable",
+                          "type": "address"
+                        },
+                        "id": 3621,
+                        "name": "ElementaryTypeName",
+                        "src": "2145:7:25"
+                      }
+                    ],
+                    "id": 3622,
+                    "name": "VariableDeclaration",
+                    "src": "2145:14:25"
+                  }
+                ],
+                "id": 3623,
+                "name": "ParameterList",
+                "src": "2144:16:25"
+              },
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 3624,
+                "name": "ParameterList",
+                "src": "2169:0:25"
+              }
+            ],
+            "id": 3625,
+            "name": "FunctionDefinition",
+            "src": "2119:51:25"
+          },
+          {
+            "attributes": {
+              "functionSelector": "4acb0e8d",
+              "implemented": false,
+              "isConstructor": false,
+              "kind": "function",
+              "modifiers": [
+                null
+              ],
+              "name": "setStartTimeOfVault2",
+              "scope": 3642,
+              "stateMutability": "nonpayable",
+              "virtual": false,
+              "visibility": "external"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "text": "@dev set the start time of vault2\n @param vault  a vault address\n @param startTime  mining start time"
+                },
+                "id": 3626,
+                "name": "StructuredDocumentation",
+                "src": "2176:119:25"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "vault",
+                      "scope": 3633,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "address",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "address",
+                          "stateMutability": "nonpayable",
+                          "type": "address"
+                        },
+                        "id": 3627,
+                        "name": "ElementaryTypeName",
+                        "src": "2330:7:25"
+                      }
+                    ],
+                    "id": 3628,
+                    "name": "VariableDeclaration",
+                    "src": "2330:13:25"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "startTime",
+                      "scope": 3633,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "uint256",
+                          "type": "uint256"
+                        },
+                        "id": 3629,
+                        "name": "ElementaryTypeName",
+                        "src": "2345:7:25"
+                      }
+                    ],
+                    "id": 3630,
+                    "name": "VariableDeclaration",
+                    "src": "2345:17:25"
+                  }
+                ],
+                "id": 3631,
+                "name": "ParameterList",
+                "src": "2329:34:25"
+              },
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 3632,
+                "name": "ParameterList",
+                "src": "2372:0:25"
+              }
+            ],
+            "id": 3633,
+            "name": "FunctionDefinition",
+            "src": "2300:73:25"
+          },
+          {
+            "attributes": {
+              "functionSelector": "29199599",
+              "implemented": false,
+              "isConstructor": false,
+              "kind": "function",
+              "modifiers": [
+                null
+              ],
+              "name": "setEndTimeOfVault2",
+              "scope": 3642,
+              "stateMutability": "nonpayable",
+              "virtual": false,
+              "visibility": "external"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "text": "@dev set mining end time\n @param vault  a vault address\n @param endTime  mining end time"
+                },
+                "id": 3634,
+                "name": "StructuredDocumentation",
+                "src": "2379:106:25"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "vault",
+                      "scope": 3641,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "address",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "address",
+                          "stateMutability": "nonpayable",
+                          "type": "address"
+                        },
+                        "id": 3635,
+                        "name": "ElementaryTypeName",
+                        "src": "2518:7:25"
+                      }
+                    ],
+                    "id": 3636,
+                    "name": "VariableDeclaration",
+                    "src": "2518:13:25"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "endTime",
+                      "scope": 3641,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "uint256",
+                          "type": "uint256"
+                        },
+                        "id": 3637,
+                        "name": "ElementaryTypeName",
+                        "src": "2533:7:25"
+                      }
+                    ],
+                    "id": 3638,
+                    "name": "VariableDeclaration",
+                    "src": "2533:15:25"
+                  }
+                ],
+                "id": 3639,
+                "name": "ParameterList",
+                "src": "2517:32:25"
+              },
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 3640,
+                "name": "ParameterList",
+                "src": "2558:0:25"
+              }
+            ],
+            "id": 3641,
+            "name": "FunctionDefinition",
+            "src": "2490:69:25"
+          }
+        ],
+        "id": 3642,
+        "name": "ContractDefinition",
+        "src": "62:2499:25"
+      }
+    ],
+    "id": 3643,
+    "name": "SourceUnit",
+    "src": "37:2525:25"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.7.6+commit.7338295f.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "3.3.4",
+  "updatedAt": "2021-08-03T05:41:04.933Z",
+  "devdoc": {
+    "events": {
+      "CreatedStakeContract2(address,address,uint256)": {
+        "details": "event on create stake contract in vault",
+        "params": {
+          "phase": "the phase of TOS platform",
+          "stakeContract": "the stake contract address created",
+          "vault": "the vault address"
+        }
+      },
+      "CreatedVault2(address,address,uint256)": {
+        "details": "event on create vault",
+        "params": {
+          "cap": "allocated reward amount",
+          "paytoken": "the token used for staking by user",
+          "vault": "the vault address created"
+        }
+      }
+    },
+    "kind": "dev",
+    "methods": {
+      "createVault2(uint256,uint256,uint256,bytes32,uint256,address[4],string)": {
+        "details": "create vault2",
+        "params": {
+          "_cap": "allocated reward amount",
+          "_name": "name",
+          "_phase": "phase of TOS platform",
+          "_rewardPerBlock": "the reward per block",
+          "_stakeType": "it's 2, StakeUniswapV3 staking type",
+          "_uniswapInfo": "npm, pool, token0, token1",
+          "_vaultName": "vault's name's hash"
+        }
+      },
+      "resetCoinageTime(address)": {
+        "details": "reset coinage's last mining time variable for tes",
+        "params": {
+          "target": "target address"
+        }
+      },
+      "setEndTimeOfVault2(address,uint256)": {
+        "details": "set mining end time",
+        "params": {
+          "endTime": "mining end time",
+          "vault": "a vault address"
+        }
+      },
+      "setMiningIntervalSeconds(address,uint256)": {
+        "details": "Mining interval setting (seconds)",
+        "params": {
+          "miningIntervalSeconds": "the mining interval (sec)",
+          "target": "target address"
+        }
+      },
+      "setPool(address,address[4])": {
+        "details": "set pool information",
+        "params": {
+          "target": "target address",
+          "uniswapInfo": "[NonfungiblePositionManager,UniswapV3Factory,token0,token1]"
+        }
+      },
+      "setStartTimeOfVault2(address,uint256)": {
+        "details": "set the start time of vault2",
+        "params": {
+          "startTime": "mining start time",
+          "vault": "a vault address"
+        }
+      },
+      "setVaultLogicByPhase(uint256,address)": {
+        "details": "Set stakeVaultLogic address by _phase",
+        "params": {
+          "_logic": "the vault logic address",
+          "_phase": "the stake type"
+        }
+      }
+    },
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {},
+    "version": 1
+  }
+}

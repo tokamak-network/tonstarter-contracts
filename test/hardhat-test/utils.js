@@ -30,6 +30,8 @@ async function getAddresses() {
   return addresses;
 }
 
+
+
 async function setupContracts(account) {
   const _TON = createCurrency("TON");
   const _WTON = createCurrency("WTON");
@@ -60,7 +62,6 @@ async function setupContracts(account) {
   const version = "1";
 
   const addresses = await getAddresses();
-  console.log("addresses ", addresses);
 
   const [
     candidate1,
@@ -79,18 +80,11 @@ async function setupContracts(account) {
   const operators = [operator1, operator2];
 
   const deployer = await findSigner(account);
-  console.log("deployer ", deployer.address);
 
   const tos = await (await ethers.getContractFactory("TOS"))
     .connect(deployer)
     .deploy(name, symbol, version);
   await tos.deployed();
-  console.log("tos ", tos.address);
-
-  // const stos = await (await ethers.getContractFactory("STOS"))
-  //   .connect(deployer)
-  //   .deploy();
-  // await stos.deployed();
 
   const stakeRegistry = await (await ethers.getContractFactory("StakeRegistry"))
     .connect(deployer)
@@ -162,12 +156,10 @@ async function setupContracts(account) {
 
   const stake1Proxy = await (await ethers.getContractFactory("Stake1Proxy"))
     .connect(deployer)
-    .deploy(
-      stake1Logic.address
-    );
+    .deploy(stake1Logic.address);
   await stake1Proxy.deployed();
 
-  //await stake1Proxy.connect(deployer).upgradeTo(stake1Logic.address);
+  // await stake1Proxy.connect(deployer).upgradeTo(stake1Logic.address);
 
   const stakeEntry = await (
     await ethers.getContractFactory("Stake1Logic")
@@ -182,7 +174,7 @@ async function setupContracts(account) {
     .connect(deployer)
     .deploy(ton.address);
   await wton.deployed();
-  console.log("hello0");
+
   const layer2Registry = await (
     await ethers.getContractFactory("Layer2Registry")
   )
@@ -204,16 +196,12 @@ async function setupContracts(account) {
     .connect(deployer)
     .deploy();
   await coinageFactory.deployed();
-  console.log("hello0.5");
-
 
   const currentTime = await time.latest();
-  console.log(currentTime.toString());
   const daoVault = await (await ethers.getContractFactory("DAOVault"))
     .connect(deployer)
     .deploy(wton.address, currentTime.toString());
   await daoVault.deployed();
-  console.log("hello0.7");
 
   const seigManager = await (await ethers.getContractFactory("SeigManager"))
     .connect(deployer)
@@ -226,7 +214,6 @@ async function setupContracts(account) {
       coinageFactory.address
     );
   await seigManager.deployed();
-  console.log("hello1");
 
   const powerTON = await (await ethers.getContractFactory("PowerTON"))
     .connect(deployer)
@@ -239,7 +226,6 @@ async function setupContracts(account) {
   await seigManager.connect(deployer).setDao(daoVault.address);
   await wton.connect(deployer).addMinter(seigManager.address);
   await ton.connect(deployer).addMinter(wton.address);
-  console.log("hello2");
 
   await Promise.all(
     [depositManager, wton].map((contract) =>
@@ -272,7 +258,6 @@ async function setupContracts(account) {
         .transfer(account, TON_INITIAL_HOLDERS.toFixed(TON_UNIT))
     )
   );
-  console.log("hello3");
 
   await Promise.all(
     users.map((account) =>
@@ -299,18 +284,14 @@ async function setupContracts(account) {
     .setMinimumAmount(
       TON_MINIMUM_STAKE_AMOUNT.times(WTON_TON_RATIO).toFixed(WTON_UNIT)
     );
-  console.log("hello4");
 
-
-  const swapProxy = await (
-    await ethers.getContractFactory("SwapProxy")
-  )
+  const swapProxy = await (await ethers.getContractFactory("SwapProxy"))
     .connect(deployer)
     .deploy();
 
   return {
+    ton,
     tos,
-    //stos,
     stakeRegistry,
     stakeSimple,
     stakeSimpleFactory,
@@ -362,4 +343,11 @@ async function setupContracts(account) {
   };
 }
 
-module.exports = { setupContracts, getAddresses, findSigner };
+const mineBlocks = async (untilBlock) => {
+  const blockNumber = await ethers.provider.getBlockNumber();
+  for (let i = blockNumber; i < untilBlock; ++i) {
+    await ethers.provider.send("evm_mine");
+  }
+};
+
+module.exports = { setupContracts, getAddresses, findSigner, mineBlocks };
