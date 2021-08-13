@@ -50,7 +50,7 @@ contract LockTOS is ILockTOS, AccessibleCommon {
         phase3StartTime = _phase3StartTime;
     }
 
-    /// @dev Check if a functions is used or not
+    /// @dev Check if a function is used or not
     modifier ifFree {
         require(free == 1, "LockId is already in use");
         free = 0;
