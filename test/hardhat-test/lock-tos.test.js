@@ -177,7 +177,10 @@ describe("LockTOS", function () {
             }
           }
           if (unlockWeeks) {
-            const newTime = Math.floor((lockEnd + unlockWeeks * 7 * 24 * 60 * 60) / ONE_WEEK) * ONE_WEEK;
+            const newTime =
+              Math.floor(
+                (lockEnd + unlockWeeks * 7 * 24 * 60 * 60) / ONE_WEEK
+              ) * ONE_WEEK;
             if (parseInt(await time.latest()) < lockEnd && lockEnd < newTime) {
               if (newTime - lockStart < threeYears) {
                 await lockTOS

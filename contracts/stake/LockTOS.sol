@@ -7,6 +7,7 @@ import "@openzeppelin/contracts/math/Math.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/utils/SafeCast.sol";
+import "@openzeppelin/contracts/math/SignedSafeMath.sol";
 
 import "../interfaces/ILockTOS.sol";
 import "../interfaces/ITOS.sol";
@@ -17,6 +18,7 @@ import "../common/AccessibleCommon.sol";
 contract LockTOS is ILockTOS, AccessibleCommon {
     using SafeMath for uint256;
     using SafeCast for uint256;
+    using SignedSafeMath for int256;
 
     uint256 public constant ONE_WEEK = 1 weeks;
     uint256 public constant MAXTIME = 3 * (365 days); // 3 years
@@ -164,7 +166,7 @@ contract LockTOS is ILockTOS, AccessibleCommon {
         }
 
         LibLockTOS.Point memory point = pointHistory[pointHistory.length - 1];
-        int256 currentBias = point.slope * (block.timestamp.toInt256() - point.timestamp.toInt256());
+        int256 currentBias = point.slope.mul(block.timestamp.sub(point.timestamp).toInt256());
         return uint256(point.bias > currentBias ? point.bias - currentBias : 0).div(MULTIPLIER);
     }
 
@@ -179,7 +181,7 @@ contract LockTOS is ILockTOS, AccessibleCommon {
         if (!success) {
             return 0;
         }
-        int256 currentBias = point.slope * (_timestamp.toInt256() - point.timestamp.toInt256());
+        int256 currentBias = point.slope.mul(_timestamp.sub(point.timestamp).toInt256());
         return uint256(point.bias > currentBias ? point.bias - currentBias : 0).div(MULTIPLIER);
     }
 
@@ -191,7 +193,7 @@ contract LockTOS is ILockTOS, AccessibleCommon {
         }
 
         LibLockTOS.Point memory point = lockPointHistory[_lockId][len - 1];
-        int256 currentBias = point.slope * (block.timestamp.toInt256() - point.timestamp.toInt256());
+        int256 currentBias = point.slope.mul(block.timestamp.sub(point.timestamp).toInt256());
         return uint256(point.bias > currentBias ? point.bias - currentBias : 0).div(MULTIPLIER);
     }
 
@@ -200,7 +202,7 @@ contract LockTOS is ILockTOS, AccessibleCommon {
         uint256[] memory locks = userLocks[_addr];
         if (locks.length == 0) return 0;
         for (uint256 i = 0; i < locks.length; ++i) {
-            balance += balanceOfLockAt(locks[i], _timestamp);
+            balance = balance.add(balanceOfLockAt(locks[i], _timestamp));
         }
     }
 
@@ -209,7 +211,7 @@ contract LockTOS is ILockTOS, AccessibleCommon {
         uint256[] memory locks = userLocks[_addr];
         if (locks.length == 0) return 0;
         for (uint256 i = 0; i < locks.length; ++i) {
-            balance += balanceOfLock(locks[i]);
+            balance = balance.add(balanceOfLock(locks[i]));
         }
     }
 
@@ -232,6 +234,7 @@ contract LockTOS is ILockTOS, AccessibleCommon {
         return userLocks[_addr];
     }
 
+    /// @inheritdoc ILockTOS
     function pointHistoryOf(uint256 _lockId) override public view returns (LibLockTOS.Point[] memory) {
         return lockPointHistory[_lockId];
     }
@@ -290,10 +293,10 @@ contract LockTOS is ILockTOS, AccessibleCommon {
 
         // Save user point
         int256 userSlope = lockedNew.amount.mul(MULTIPLIER).div(MAXTIME).toInt256();
-        int256 userBias = userSlope * (lockedNew.end.toInt256() - block.timestamp.toInt256());
+        int256 userBias = userSlope.mul(lockedNew.end.sub(block.timestamp).toInt256());
         LibLockTOS.Point memory userPoint = LibLockTOS.Point({
             timestamp: block.timestamp,
-            slope: userSlope * (block.timestamp <= phase3StartTime ? 2 : 1), // Boost slope if staked before phase3
+            slope: userSlope.mul(block.timestamp <= phase3StartTime ? 2 : 1), // Boost slope if staked before phase3
             bias: userBias
         });
         lockPointHistory[_lockId].push(userPoint);
@@ -315,19 +318,19 @@ contract LockTOS is ILockTOS, AccessibleCommon {
 
         if (lockedNew.end > timestamp && lockedNew.amount > 0) {
             changeNew.slope = int256(lockedNew.amount.mul(MULTIPLIER).div(MAXTIME));
-            changeNew.bias = changeNew.slope * (lockedNew.end.toInt256() - timestamp.toInt256());
+            changeNew.bias = changeNew.slope.mul(lockedNew.end.sub(timestamp).toInt256());
             changeNew.changeTime = lockedNew.end;
         }
         if (lockedOld.end > timestamp && lockedOld.amount > 0) {
             changeOld.slope = int256(lockedOld.amount.mul(MULTIPLIER).div(MAXTIME));
-            changeOld.bias = changeOld.slope * (lockedOld.end.toInt256() - timestamp.toInt256());
+            changeOld.bias = changeOld.slope.mul(lockedOld.end.sub(timestamp).toInt256());
             changeOld.changeTime = lockedOld.end;
         }
 
         // Record history gaps
         LibLockTOS.Point memory currentWeekPoint = _recordHistoryPoints();
-        currentWeekPoint.bias += (changeNew.bias - changeOld.bias);
-        currentWeekPoint.slope += (changeNew.slope - changeOld.slope);
+        currentWeekPoint.bias = currentWeekPoint.bias.add(changeNew.bias.sub(changeOld.bias));
+        currentWeekPoint.slope = currentWeekPoint.slope.add(changeNew.slope.sub(changeOld.slope));
         currentWeekPoint.bias = currentWeekPoint.bias > 0 ? currentWeekPoint.bias : 0;
         currentWeekPoint.slope = currentWeekPoint.slope > 0 ? currentWeekPoint.slope : 0;
         pointHistory[pointHistory.length - 1] = currentWeekPoint;
@@ -345,13 +348,13 @@ contract LockTOS is ILockTOS, AccessibleCommon {
             lastWeek = LibLockTOS.Point({bias: 0, slope: 0, timestamp: timestamp});
         }
 
-        uint256 pointTimestampIterator = (lastWeek.timestamp / ONE_WEEK) * ONE_WEEK;
+        uint256 pointTimestampIterator = lastWeek.timestamp.div(ONE_WEEK).mul(ONE_WEEK);
         while (pointTimestampIterator != timestamp) {
-            pointTimestampIterator = Math.min(pointTimestampIterator + ONE_WEEK, timestamp);
+            pointTimestampIterator = Math.min(pointTimestampIterator.add(ONE_WEEK), timestamp);
             int256 deltaSlope = slopeChanges[pointTimestampIterator];
-            uint256 deltaTime = pointTimestampIterator - lastWeek.timestamp;
-            lastWeek.bias -= lastWeek.slope * deltaTime.toInt256();
-            lastWeek.slope += deltaSlope;
+            int256 deltaTime = pointTimestampIterator.sub(lastWeek.timestamp).toInt256();
+            lastWeek.bias = lastWeek.bias.sub(lastWeek.slope.mul(deltaTime));
+            lastWeek.slope = lastWeek.slope.add(deltaSlope);
             lastWeek.bias = lastWeek.bias > 0 ? lastWeek.bias : 0;
             lastWeek.slope = lastWeek.slope > 0 ? lastWeek.slope : 0;
             lastWeek.timestamp = pointTimestampIterator;
@@ -368,14 +371,14 @@ contract LockTOS is ILockTOS, AccessibleCommon {
         int256 deltaSlopeNew = slopeChanges[changeNew.changeTime];
         int256 deltaSlopeOld = slopeChanges[changeOld.changeTime];
         if (changeOld.changeTime > block.timestamp) {
-            deltaSlopeOld += changeOld.slope;
+            deltaSlopeOld = deltaSlopeOld.add(changeOld.slope);
             if (changeOld.changeTime == changeNew.changeTime) {
-                deltaSlopeOld -= changeNew.slope;
+                deltaSlopeOld = deltaSlopeOld.sub(changeNew.slope);
             }
             slopeChanges[changeOld.changeTime] = deltaSlopeOld;
         }
         if (changeNew.changeTime > block.timestamp && changeNew.changeTime > changeOld.changeTime) {
-            deltaSlopeNew -= changeNew.slope;
+            deltaSlopeNew = deltaSlopeNew.sub(changeNew.slope);
             slopeChanges[changeNew.changeTime] = deltaSlopeNew;
         }
     }
