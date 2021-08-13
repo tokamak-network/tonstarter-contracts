@@ -40,6 +40,9 @@
 
 * "StakeUniswapV3Proxy": "0xC1349A9a33A0682804c390a3968e26E5a2366153"
 
+## Deployed StakeTONUpgrade
+
+* "StakeTONUpgrade": "0x52b49091d274f093dc813A4b76aB7a6E8f4f8e00"
 
 ### USING TOKAMAK CONTRACTS
 
