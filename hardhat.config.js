@@ -33,8 +33,11 @@ task("accounts", "Prints the list of accounts", async () => {
 });
 
 module.exports = {
-  defaultNetwork: "rinkeby",
+  defaultNetwork: "hardhat",
   networks: {
+    hardhat: {
+      chainId: 31337,
+    },
     zenalocal: {
       url: "http://localhost:8546",
       gas: 9500000,
@@ -61,7 +64,7 @@ module.exports = {
     },
     mainnet: {
       url: `https://mainnet.infura.io/v3/${process.env.InfuraKey}`,
-      accounts: [`${TONSTARTER_DEPLOYER_PK}`],
+      accounts: [`${ACCOUNT0_PK}`],
       gasMultiplier: 1.25,
       gasPrice: 40000000000,
     },
