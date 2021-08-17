@@ -195,6 +195,8 @@ contract StakeTONUpgrade2 is TokamakStakeUpgrade, IStakeTON {
         uint256 rewardClaim = 0;
 
         LibTokenStake1.StakedAmount storage staked = userStaked[msg.sender];
+        require(staked.amount > 0 && staked.claimedBlock < endBlock, "StakeTON: claimed");
+        require(block.number.sub(staked.claimedBlock) > 6, "StakeTON: wait");
 
         rewardClaim = canRewardAmount(msg.sender, block.number);
 
