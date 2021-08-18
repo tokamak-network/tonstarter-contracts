@@ -1363,7 +1363,7 @@ describe(" StakeUniswapV3 ", function () {
 
       // Phase2 StakeUniswapV3Upgrade
       await stakeregister.connect(owner).addDefiInfo(
-          "StakeUniswapV3Upgrade1",
+          "StakeUniswapV3Upgrade",
           cons.stakeUniswapV3Upgrade1.address,
           zeroAddress,
           zeroAddress,
@@ -2167,13 +2167,13 @@ describe(" StakeUniswapV3 ", function () {
 
       await TestStakeUniswapV3Upgrade1
         .connect(tester.account)
-        .StakeUniswapV3Upgrade1(1, "safeApprove(bytes)",
+        .StakeUniswapV3UpgradeInterface(1, "safeApprove(bytes)",
         ethers.utils.defaultAbiCoder.encode(['address', 'uint256'], [wton.address, total_wton])
         );
 
       await TestStakeUniswapV3Upgrade1
         .connect(tester.account)
-        .StakeUniswapV3Upgrade1(1,
+        .StakeUniswapV3UpgradeInterface(1,
           "safeApprove(bytes)",
           ethers.utils.defaultAbiCoder.encode(['address', 'uint256'], [tos.address, total_tos])
         );
@@ -2282,7 +2282,7 @@ describe(" StakeUniswapV3 ", function () {
 
       const tx = await TestStakeUniswapV3Upgrade1
         .connect(tester.account)
-        .StakeUniswapV3Upgrade1(
+        .StakeUniswapV3UpgradeInterface(
           1,
           "increaseLiquidity(bytes)",
           ethers.utils.defaultAbiCoder.encode(['uint256', 'uint256','uint256','uint256','uint256','uint256'],
@@ -2337,7 +2337,7 @@ describe(" StakeUniswapV3 ", function () {
 
       const tx = await TestStakeUniswapV3Upgrade1
         .connect(tester.account)
-        .StakeUniswapV3Upgrade1(
+        .StakeUniswapV3UpgradeInterface(
           1,
           "increaseLiquidity(bytes)",
           ethers.utils.defaultAbiCoder.encode(['uint256', 'uint256','uint256','uint256','uint256','uint256'],
@@ -2398,7 +2398,7 @@ describe(" StakeUniswapV3 ", function () {
 
       const tx = await TestStakeUniswapV3Upgrade1
         .connect(tester.account)
-        .StakeUniswapV3Upgrade1(
+        .StakeUniswapV3UpgradeInterface(
           1,
           "collect(bytes)",
           ethers.utils.defaultAbiCoder.encode(['uint256', 'uint128','uint128'],
@@ -2464,7 +2464,7 @@ describe(" StakeUniswapV3 ", function () {
 
       const tx = await TestStakeUniswapV3Upgrade1
       .connect(tester.account)
-      .StakeUniswapV3Upgrade1(
+      .StakeUniswapV3UpgradeInterface(
         1,
         "collect(bytes)",
         ethers.utils.defaultAbiCoder.encode(['uint256', 'uint128','uint128'],

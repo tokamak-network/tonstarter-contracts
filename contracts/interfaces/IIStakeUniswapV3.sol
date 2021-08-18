@@ -89,6 +89,7 @@ interface IIStakeUniswapV3 {
             uint256 totalClaimedAmount,
             uint256 totalUnableClaimAmount
         );
+
     /*
     /// @dev Give the infomation of this stakeContracts
     /// @return return1  [token, vault, stakeRegistry, coinage]

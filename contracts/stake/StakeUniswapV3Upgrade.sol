@@ -144,6 +144,7 @@ contract StakeUniswapV3Upgrade is
         uint256 tokenId,
         uint256 amount
     );
+
     /// @dev constructor of StakeCoinage
     constructor() {
         _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
@@ -341,7 +342,7 @@ contract StakeUniswapV3Upgrade is
                                 .mul(secondsInsideDiff256)
                                 .div(secondsAbsolute256);
                             nonMiningAmount = minableAmount.sub(miningAmount);
-                        } else if(secondsInsideDiff256 > 0){
+                        } else if (secondsInsideDiff256 > 0) {
                             miningAmount = minableAmount;
                         } else {
                             nonMiningAmount = minableAmount;
@@ -439,6 +440,7 @@ contract StakeUniswapV3Upgrade is
             ,
             ,
             ,
+
         ) = nonfungiblePositionManager.positions(_tokenId);
 
         require(
@@ -449,7 +451,6 @@ contract StakeUniswapV3Upgrade is
 
         require(liquidity > 0, "StakeUniswapV3: zero liquidity");
 
-
         if (poolAddress == address(0)) {
             poolAddress = PoolAddress.computeAddress(
                 uniswapV3FactoryAddress,
@@ -459,8 +460,10 @@ contract StakeUniswapV3Upgrade is
 
         require(poolAddress != address(0), "StakeUniswapV3: zero poolAddress");
 
-
-        require(checkCurrentPosition(tickLower, tickUpper), "StakeUniswapV3: locked or out of range");
+        require(
+            checkCurrentPosition(tickLower, tickUpper),
+            "StakeUniswapV3: locked or out of range"
+        );
 
         (, , uint32 secondsInside) =
             IUniswapV3Pool(poolAddress).snapshotCumulativesInside(
@@ -882,7 +885,11 @@ contract StakeUniswapV3Upgrade is
                 );
                 minableAmount = minableAmountRay.div(10**9);
             }
-            if (minableAmount > 0 && secondsAbsolute > 0 && secondsInsideDiff256 > 0 ) {
+            if (
+                minableAmount > 0 &&
+                secondsAbsolute > 0 &&
+                secondsInsideDiff256 > 0
+            ) {
                 if (
                     secondsInsideDiff256 < secondsAbsolute &&
                     secondsInsideDiff256 > 0
@@ -894,7 +901,7 @@ contract StakeUniswapV3Upgrade is
                 } else {
                     miningAmount = minableAmount;
                 }
-            } else if(secondsInsideDiff256 == 0){
+            } else if (secondsInsideDiff256 == 0) {
                 nonMiningAmount = minableAmount;
             }
         }
@@ -919,9 +926,14 @@ contract StakeUniswapV3Upgrade is
         return v;
     }
 
-    function checkCurrentPosition(int24 tickLower, int24 tickUpper) internal view returns (bool){
-        (,int24 tick,,,,,bool unlocked) = IUniswapV3Pool(poolAddress).slot0();
-        if(unlocked && tickLower < tick && tick < tickUpper) return true;
+    function checkCurrentPosition(int24 tickLower, int24 tickUpper)
+        internal
+        view
+        returns (bool)
+    {
+        (, int24 tick, , , , , bool unlocked) =
+            IUniswapV3Pool(poolAddress).slot0();
+        if (unlocked && tickLower < tick && tick < tickUpper) return true;
         else return false;
     }
 
@@ -931,29 +943,53 @@ contract StakeUniswapV3Upgrade is
     {
         require(
             saleStartTime < block.timestamp,
-            "StakeUniswapV3Upgrade1: before start"
+            "StakeUniswapV3Upgrade: before start"
         );
 
         require(
             block.timestamp < IIStake2Vault(vault).miningEndTime(),
-            "StakeUniswapV3Upgrade1: end mining"
+            "StakeUniswapV3Upgrade: end mining"
         );
         require(
             params.recipient == msg.sender,
-            "StakeUniswapV3Upgrade1: recipient is not sender"
+            "StakeUniswapV3Upgrade: recipient is not sender"
         );
 
-        require(poolToken0 != address(0) && poolToken1 != address(0), 'StakeUniswapV3Upgrade1: zeroAddress token');
-        require(checkCurrentPosition(params.tickLower, params.tickUpper), 'StakeUniswapV3Upgrade1: out of range');
+        require(
+            poolToken0 != address(0) && poolToken1 != address(0),
+            "StakeUniswapV3Upgrade: zeroAddress token"
+        );
+        require(
+            checkCurrentPosition(params.tickLower, params.tickUpper),
+            "StakeUniswapV3Upgrade: out of range"
+        );
 
-        TransferHelper.safeTransferFrom(poolToken0, msg.sender, address(this), params.amount0Desired);
-        TransferHelper.safeTransferFrom(poolToken1, msg.sender, address(this), params.amount1Desired);
+        TransferHelper.safeTransferFrom(
+            poolToken0,
+            msg.sender,
+            address(this),
+            params.amount0Desired
+        );
+        TransferHelper.safeTransferFrom(
+            poolToken1,
+            msg.sender,
+            address(this),
+            params.amount1Desired
+        );
 
-        (uint256 tokenId, uint128 liquidity, , ) = nonfungiblePositionManager.mint(params);
-        require(tokenId > 0 && liquidity > 0, "StakeUniswapV3Upgrade1: zero tokenId or liquidity");
+        (uint256 tokenId, uint128 liquidity, , ) =
+            nonfungiblePositionManager.mint(params);
+        require(
+            tokenId > 0 && liquidity > 0,
+            "StakeUniswapV3Upgrade: zero tokenId or liquidity"
+        );
 
-        LibUniswapV3Stake.StakeLiquidity storage _depositTokens = depositTokens[tokenId];
-        require(_depositTokens.owner == address(0), "StakeUniswapV3Upgrade1: already staked");
+        LibUniswapV3Stake.StakeLiquidity storage _depositTokens =
+            depositTokens[tokenId];
+        require(
+            _depositTokens.owner == address(0),
+            "StakeUniswapV3Upgrade: already staked"
+        );
         _depositTokens.owner = msg.sender;
 
         (, , uint32 secondsInside) =
@@ -979,7 +1015,7 @@ contract StakeUniswapV3Upgrade is
         LibUniswapV3Stake.StakedTotalTokenAmount storage _userTotalStaked =
             userTotalStaked[msg.sender];
 
-        if (!_userTotalStaked.staked){
+        if (!_userTotalStaked.staked) {
             totalStakers = totalStakers.add(1);
             _userTotalStaked.staked = true;
         }
@@ -1006,49 +1042,68 @@ contract StakeUniswapV3Upgrade is
     }
 
     function claim(uint256 tokenId) external override {
-         StakeUniswapV3Upgrade1(uint32(1), "claim(bytes)", abi.encode(tokenId));
+        StakeUniswapV3UpgradeInterface(
+            uint32(1),
+            "claim(bytes)",
+            abi.encode(tokenId)
+        );
     }
 
     function withdraw(uint256 tokenId) external override {
-        StakeUniswapV3Upgrade1(uint32(1), "withdraw(bytes)", abi.encode(tokenId));
+        StakeUniswapV3UpgradeInterface(
+            uint32(1),
+            "withdraw(bytes)",
+            abi.encode(tokenId)
+        );
     }
 
-    function claimAndCollect(uint256 tokenId, uint128 amount0Max, uint128 amount1Max)
-        external
-    {
-        StakeUniswapV3Upgrade1(uint32(1),"claimAndCollect(bytes)", abi.encode(tokenId, amount0Max, amount1Max));
+    function claimAndCollect(
+        uint256 tokenId,
+        uint128 amount0Max,
+        uint128 amount1Max
+    ) external {
+        StakeUniswapV3UpgradeInterface(
+            uint32(1),
+            "claimAndCollect(bytes)",
+            abi.encode(tokenId, amount0Max, amount1Max)
+        );
     }
 
-    function StakeUniswapV3Upgrade1(uint32 version, string memory _sig, bytes memory _data) public {
-        ( , address _impl1, address _impl2, address _impl3, ,address _impl4
-        ) = IStakeRegistry2(stakeRegistry).defiInfo(keccak256(abi.encodePacked("StakeUniswapV3Upgrade1")));
+    function StakeUniswapV3UpgradeInterface(
+        uint32 version,
+        string memory _sig,
+        bytes memory _data
+    ) public {
+        (, address _impl1, address _impl2, address _impl3, , address _impl4) =
+            IStakeRegistry2(stakeRegistry).defiInfo(
+                keccak256(abi.encodePacked("StakeUniswapV3Upgrade"))
+            );
         address _impl = _impl1;
-        if(version == uint32(2)) _impl = _impl2;
-        else if(version == uint32(3)) _impl = _impl3;
-        else if(version == uint32(4)) _impl = _impl4;
-        require(
-            _impl != address(0),
-            "StakeUniswapV3Upgrade1: impl is zero"
-        );
-        (bool success, bytes memory rdata) = _impl.delegatecall(
-            abi.encodeWithSignature(_sig, _data)
-        );
+        if (version == uint32(2)) _impl = _impl2;
+        else if (version == uint32(3)) _impl = _impl3;
+        else if (version == uint32(4)) _impl = _impl4;
+        require(_impl != address(0), "StakeUniswapV3Upgrade: impl is zero");
+        (bool success, bytes memory rdata) =
+            _impl.delegatecall(abi.encodeWithSignature(_sig, _data));
         bool ret = abi.decode(rdata, (bool));
-        require(success, "StakeUniswapV3Upgrade1: fail");
-        require(ret, "StakeUniswapV3Upgrade1: return false");
+        require(success, "StakeUniswapV3Upgrade: fail");
+        require(ret, "StakeUniswapV3Upgrade: return false");
     }
 
     function getInterfaceAddress(uint32 version)
-        external view returns(address)
+        external
+        view
+        returns (address)
     {
-        ( , address _impl1, address _impl2, address _impl3, ,address _impl4
-        ) = IStakeRegistry2(stakeRegistry).defiInfo(keccak256(abi.encodePacked("StakeUniswapV3Upgrade1")));
+        (, address _impl1, address _impl2, address _impl3, , address _impl4) =
+            IStakeRegistry2(stakeRegistry).defiInfo(
+                keccak256(abi.encodePacked("StakeUniswapV3Upgrade"))
+            );
         address _impl = _impl1;
-        if(version == uint32(2)) _impl = _impl2;
-        else if(version == uint32(3)) _impl = _impl3;
-        else if(version == uint32(4)) _impl = _impl4;
+        if (version == uint32(2)) _impl = _impl2;
+        else if (version == uint32(3)) _impl = _impl3;
+        else if (version == uint32(4)) _impl = _impl4;
 
         return _impl;
     }
-
 }
