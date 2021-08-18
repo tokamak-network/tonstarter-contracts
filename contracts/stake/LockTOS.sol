@@ -17,7 +17,7 @@ import "./LockTOSStorage.sol";
 import "hardhat/console.sol";
 
 
-contract LockTOS is AccessibleCommon, LockTOSStorage, ILockTOS {
+contract LockTOS is LockTOSStorage, AccessibleCommon, ILockTOS {
     using SafeMath for uint256;
     using SafeCast for uint256;
     using SignedSafeMath for int256;
@@ -37,12 +37,12 @@ contract LockTOS is AccessibleCommon, LockTOSStorage, ILockTOS {
     }
 
     /// @inheritdoc ILockTOS
-    function setPhase3StartTime(uint256 _phase3StartTime)  override external onlyOwner {
+    function setPhase3StartTime(uint256 _phase3StartTime) external override onlyOwner {
         phase3StartTime = _phase3StartTime;
     }
 
     /// @inheritdoc ILockTOS
-    function increaseAmount(uint256 _lockId, uint256 _value) override external {
+    function increaseAmount(uint256 _lockId, uint256 _value) external override {
         depositFor(msg.sender, _lockId, _value);
     }
 
@@ -55,7 +55,6 @@ contract LockTOS is AccessibleCommon, LockTOSStorage, ILockTOS {
         bytes32 _r,
         bytes32 _s
     ) external override returns (uint256 lockId) {
-        console.log("createLockWithPermit TOS: %s", tos);
         ITOS(tos).permit(
             msg.sender,
             address(this),
@@ -93,6 +92,11 @@ contract LockTOS is AccessibleCommon, LockTOSStorage, ILockTOS {
     }
 
     /// @inheritdoc ILockTOS
+    function globalCheckpoint() external override {
+        _recordHistoryPoints();
+    }
+
+    /// @inheritdoc ILockTOS
     function withdraw(uint256 _lockId) public override ifFree {
         LibLockTOS.LockedBalance memory lockedOld = lockedBalances[msg.sender][_lockId];
         require(lockedOld.start > 0, "Lock does not exist");
@@ -116,16 +120,11 @@ contract LockTOS is AccessibleCommon, LockTOSStorage, ILockTOS {
     }
 
     /// @inheritdoc ILockTOS
-    function globalCheckpoint() external override {
-        _recordHistoryPoints();
-    }
-
-    /// @inheritdoc ILockTOS
     function createLock(uint256 _value, uint256 _unlockWeeks) public override  returns (uint256 lockId) {
         require(_value > 0, "Value locked should be non-zero");
-        require (_unlockWeeks > 0, "Unlock period less than a week");
+        require(_unlockWeeks > 0, "Unlock period less than a week");
 
-        lockId = lockIdCounter ++;
+        lockId = lockIdCounter++;
         uint256 unlockTime = block.timestamp.add(_unlockWeeks.mul(ONE_WEEK));
         unlockTime = unlockTime.div(ONE_WEEK).mul(ONE_WEEK);
         require(unlockTime - block.timestamp < MAXTIME, "Max unlock time is 3 years");

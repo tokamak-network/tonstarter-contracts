@@ -98,7 +98,6 @@ contract LockTOSProxy is LockTOSStorage, ProxyBase, AccessibleCommon, ILockTOSPr
 
     function initialize(address _tos, uint256 _phase3StartTime) external override onlyOwner {
         tos = _tos;
-        console.log("Initialize: %s", tos);
         phase3StartTime = _phase3StartTime;
     }
 }
