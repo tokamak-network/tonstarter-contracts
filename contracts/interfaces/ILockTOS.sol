@@ -52,6 +52,15 @@ interface ILockTOS {
         bytes32 _s
     ) external returns (uint256 lockId);
 
+    /// @dev Edit lock (only for test)
+    function editLock(
+        uint256 _lockId,
+        uint256 _start,
+        uint256 _end,
+        uint256 _value,
+        int256 _boostValue
+    ) external;
+
     /// @dev Create lock
     function createLock(uint256 _value, uint256 _unlockTime) external returns (uint256 lockId);
 

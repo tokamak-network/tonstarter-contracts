@@ -96,6 +96,40 @@ contract LockTOS is LockTOSStorage, AccessibleCommon, ILockTOS {
     }
 
     /// @inheritdoc ILockTOS
+    function editLock(
+        uint256 _lockId,
+        uint256 _start,
+        uint256 _end,
+        uint256 _value,
+        int256 _boostValue
+    ) external override {
+       LibLockTOS.LockedBalance memory lockedOld = lockedBalances[msg.sender][_lockId];
+       LibLockTOS.LockedBalance memory lockedNew = LibLockTOS.LockedBalance({
+            amount: _value,
+            start: _start,
+            end: _end,
+            boostValue: _boostValue
+        });
+
+        // Checkpoint
+        _checkpoint(lockedNew, lockedOld);
+
+        // Save new lock
+        lockedBalances[msg.sender][_lockId] = lockedNew;
+        allLocks[_lockId] = lockedNew;
+
+        // Save user point
+        int256 userSlope = lockedNew.amount.mul(MULTIPLIER).div(MAXTIME).toInt256();
+        int256 userBias = userSlope.mul(lockedNew.end.sub(block.timestamp).toInt256());
+        LibLockTOS.Point memory userPoint = LibLockTOS.Point({
+            timestamp: block.timestamp,
+            slope: userSlope.mul(lockedNew.boostValue), // Boost slope if staked before phase3
+            bias: userBias
+        });
+        lockPointHistory[_lockId].push(userPoint);
+    }
+
+    /// @inheritdoc ILockTOS
     function withdraw(uint256 _lockId) public override ifFree {
         LibLockTOS.LockedBalance memory lockedOld = lockedBalances[msg.sender][_lockId];
         require(lockedOld.start > 0, "Lock does not exist");
@@ -317,12 +351,12 @@ contract LockTOS is LockTOSStorage, AccessibleCommon, ILockTOS {
 
         // Initialize slope changes
         if (lockedNew.end > timestamp && lockedNew.amount > 0) {
-            changeNew.slope = int256(lockedNew.amount.mul(MULTIPLIER).div(MAXTIME));
+            changeNew.slope = lockedNew.amount.mul(MULTIPLIER).div(MAXTIME).toInt256();
             changeNew.bias = changeNew.slope.mul(lockedNew.end.sub(timestamp).toInt256());
             changeNew.changeTime = lockedNew.end;
         }
         if (lockedOld.end > timestamp && lockedOld.amount > 0) {
-            changeOld.slope = int256(lockedOld.amount.mul(MULTIPLIER).div(MAXTIME));
+            changeOld.slope = lockedOld.amount.mul(MULTIPLIER).div(MAXTIME).toInt256();
             changeOld.bias = changeOld.slope.mul(lockedOld.end.sub(timestamp).toInt256());
             changeOld.changeTime = lockedOld.end;
         }
