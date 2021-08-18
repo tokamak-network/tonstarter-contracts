@@ -13,42 +13,20 @@ import "../interfaces/ILockTOS.sol";
 import "../interfaces/ITOS.sol";
 import "../libraries/LibLockTOS.sol";
 import "../common/AccessibleCommon.sol";
+import "./LockTOSStorage.sol";
+import "hardhat/console.sol";
 
 
-contract LockTOS is ILockTOS, AccessibleCommon {
+contract LockTOS is AccessibleCommon, LockTOSStorage, ILockTOS {
     using SafeMath for uint256;
     using SafeCast for uint256;
     using SignedSafeMath for int256;
 
-    uint256 public constant ONE_WEEK = 1 weeks;
-    uint256 public constant MAXTIME = 3 * (365 days); // 3 years
-    uint256 public constant MULTIPLIER = 1e18;
-
-    LibLockTOS.Point[] private pointHistory;
-    mapping (uint256 => LibLockTOS.Point[]) public lockPointHistory;
-    mapping (address => mapping(uint256 =>LibLockTOS.LockedBalance)) public lockedBalances;
-
-    mapping (uint256 => LibLockTOS.LockedBalance) public allLocks;
-    mapping (address => uint256[]) public userLocks;
-    mapping (uint256 => int256) public slopeChanges;
-    mapping (uint256 => bool) public inUse;
-
-    address public tos;
-    uint256 public lockIdCounter = 1;
-    uint256 public phase3StartTime;
-    uint256 internal free = 1;
-
-    event CreateLock(uint256 lockId, uint256 value, uint256 unlockTime);
-    event IncreaseAmount(uint256 lockId, uint256 value);
-    event IncreaseUnlockTime(uint256 lockId, uint256 unlockTime);
-    event DepositFor(uint256 lockId, uint256 value);
-
-    constructor(address _admin, address _tos, uint256 _phase3StartTime) {
-        _setupRole(ADMIN_ROLE, _admin);
-
-        tos = _tos;
-        phase3StartTime = _phase3StartTime;
-    }
+    event LockCreated(address account, uint256 lockId, uint256 value, uint256 unlockTime);
+    event LockAmountIncreased(address account, uint256 lockId, uint256 value);
+    event LockUnlockTimeIncreased(address account, uint256 lockId, uint256 unlockTime);
+    event LockDeposited(address account, uint256 lockId, uint256 value);
+    event LockWithdrawn(address account, uint256 lockId, uint256 value);
 
     /// @dev Check if a function is used or not
     modifier ifFree {
@@ -76,7 +54,8 @@ contract LockTOS is ILockTOS, AccessibleCommon {
         uint8 _v,
         bytes32 _r,
         bytes32 _s
-    ) override external returns (uint256 lockId) {
+    ) external override returns (uint256 lockId) {
+        console.log("createLockWithPermit TOS: %s", tos);
         ITOS(tos).permit(
             msg.sender,
             address(this),
@@ -90,7 +69,59 @@ contract LockTOS is ILockTOS, AccessibleCommon {
     }
 
     /// @inheritdoc ILockTOS
-    function createLock(uint256 _value, uint256 _unlockWeeks) override public returns (uint256 lockId) {
+    function increaseUnlockTime(uint256 _lockId, uint256 _unlockWeeks) external override {
+        require(_unlockWeeks > 0, "Unlock period less than a week");
+
+        LibLockTOS.LockedBalance memory lock = lockedBalances[msg.sender][_lockId];
+        uint256 unlockTime = lock.end.add(_unlockWeeks.mul(ONE_WEEK));
+        unlockTime = unlockTime.div(ONE_WEEK).mul(ONE_WEEK);
+        require(unlockTime - lock.start < MAXTIME, "Max unlock time is 3 years");
+        require(lock.end > block.timestamp, "Lock time already finished");
+        require(lock.end < unlockTime, "New lock time must be greater");
+        require(lock.amount > 0, "No existing locked TOS");
+        _deposit(msg.sender, _lockId, 0, unlockTime);
+
+        emit LockUnlockTimeIncreased(msg.sender, _lockId, unlockTime);
+    }
+
+    /// @inheritdoc ILockTOS
+    function withdrawAll() external override {
+        uint256[] memory locks = userLocks[msg.sender];
+        for (uint256 i = 0; i < locks.length; ++i) {
+            withdraw(locks[i]);
+        }
+    }
+
+    /// @inheritdoc ILockTOS
+    function withdraw(uint256 _lockId) public override ifFree {
+        LibLockTOS.LockedBalance memory lockedOld = lockedBalances[msg.sender][_lockId];
+        require(lockedOld.start > 0, "Lock does not exist");
+        require(lockedOld.end < block.timestamp, "Lock time not finished");
+        require(lockedOld.amount > 0, "Already withdrawn");
+
+        LibLockTOS.LockedBalance memory lockedNew = LibLockTOS.LockedBalance({
+            amount: 0,
+            start: 0,
+            end: 0,
+            boostValue: 0
+        });
+
+        // Checkpoint
+        _checkpoint(lockedNew, lockedOld);
+
+        // Transfer TOS back        
+        lockedBalances[msg.sender][_lockId] = lockedNew;   
+        IERC20(tos).transfer(msg.sender, lockedOld.amount);
+        emit LockWithdrawn(msg.sender, _lockId, lockedOld.amount);
+    }
+
+    /// @inheritdoc ILockTOS
+    function globalCheckpoint() external override {
+        _recordHistoryPoints();
+    }
+
+    /// @inheritdoc ILockTOS
+    function createLock(uint256 _value, uint256 _unlockWeeks) public override  returns (uint256 lockId) {
         require(_value > 0, "Value locked should be non-zero");
         require (_unlockWeeks > 0, "Unlock period less than a week");
 
@@ -101,64 +132,21 @@ contract LockTOS is ILockTOS, AccessibleCommon {
         _deposit(msg.sender, lockId, _value, unlockTime);
         userLocks[msg.sender].push(lockId);
 
-        emit CreateLock(lockId, _value, unlockTime);
+        emit LockCreated(msg.sender, lockId, _value, unlockTime);
     }
 
     /// @inheritdoc ILockTOS
-    function increaseUnlockTime(uint256 _lockId, uint256 _unlockWeeks) override external {
-        require (_unlockWeeks > 0, "Unlock period less than a week");
-
-        LibLockTOS.LockedBalance memory lock = lockedBalances[msg.sender][_lockId];
-        uint256 unlockTime = lock.end.add(_unlockWeeks.mul(ONE_WEEK));
-        unlockTime = unlockTime.div(ONE_WEEK).mul(ONE_WEEK);
-        require(unlockTime - lock.start < MAXTIME, "Max unlock time is 3 years");
-        require (lock.end > block.timestamp, "Lock time already finished");
-        require (lock.end < unlockTime, "New lock time must be greater");
-        require(lock.amount > 0, "No existing locked TOS");
-        _deposit(msg.sender, _lockId, 0, unlockTime);
-
-        emit IncreaseUnlockTime(_lockId, unlockTime);
-    }
-
-    /// @inheritdoc ILockTOS
-    function withdraw(uint256 _lockId) override external ifFree {
-        LibLockTOS.LockedBalance memory lockedOld = lockedBalances[msg.sender][_lockId];
-        LibLockTOS.LockedBalance memory lockedNew = LibLockTOS.LockedBalance({
-            amount: 0,
-            start: 0,
-            end: 0,
-            boostValue: 0
-        });
-        require(lockedOld.start > 0, "Lock does not exist");
-        require(lockedOld.end < block.timestamp, "Lock time not finished");
-        require(lockedOld.amount > 0, "Already withdrawn");
-
-        // Checkpoint
-        _checkpoint(lockedNew, lockedOld);
-
-        // Transfer TOS back        
-        lockedBalances[msg.sender][_lockId] = lockedNew;   
-        IERC20(tos).transfer(msg.sender, lockedOld.amount);
-    }
-
-    /// @inheritdoc ILockTOS
-    function globalCheckpoint() override external {
-        _recordHistoryPoints();
-    }
-
-    /// @inheritdoc ILockTOS
-    function depositFor(address _addr, uint256 _lockId, uint256 _value) override public {
+    function depositFor(address _addr, uint256 _lockId, uint256 _value) public override{
         require(_value > 0, "Value locked should be non-zero");
         LibLockTOS.LockedBalance memory locked = lockedBalances[_addr][_lockId];
         require(locked.start > 0, "Lock does not exist");
         require(locked.end > block.timestamp, "Lock time is finished");
         _deposit(_addr, _lockId, _value, 0);
-
-        emit DepositFor(_lockId, _value);
+        emit LockDeposited(msg.sender, _lockId, _value);
     }
 
     /// @inheritdoc ILockTOS
-    function totalSupplyAt(uint256 _timestamp) override public view returns (uint256) {
+    function totalSupplyAt(uint256 _timestamp) public view override returns (uint256) {
         (bool success, LibLockTOS.Point memory point) = _findClosestPoint(pointHistory, _timestamp);
         if (!success) {
             return 0;

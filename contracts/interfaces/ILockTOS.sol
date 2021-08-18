@@ -58,6 +58,9 @@ interface ILockTOS {
     /// @dev Increase 
     function increaseUnlockTime(uint256 _lockId, uint256 unlockTime) external;
 
+    /// @dev Withdraw all TOS
+    function withdrawAll() external;
+
     /// @dev Withdraw TOS
     function withdraw(uint256 _lockId) external;
 

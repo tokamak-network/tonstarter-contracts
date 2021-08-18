@@ -78,6 +78,7 @@ const createLockWithPermit = async ({
     }
   );
   const signature = ethers.utils.splitSignature(rawSignature);
+  console.log("good so far");
   await (
     await lockTOS
       .connect(user)
@@ -90,6 +91,7 @@ const createLockWithPermit = async ({
         signature.s
       )
   ).wait();
+  console.log("not good");
 
   const userLocks = await lockTOS.connect(user).locksOf(user.address);
   if (userLocks.length === 0) {

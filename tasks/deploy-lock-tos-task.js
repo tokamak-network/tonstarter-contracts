@@ -15,6 +15,6 @@ task("rinkeby-deploy-lock-tos", "Deploy TOS").setAction(async () => {
   console.log("LockTOS: ", lockTOS.address);
   await run("verify", {
     address: lockTOS.address,
-    constructorArgsParams: [tokenAddress, phase3StartTime]
+    constructorArgsParams: [deployer.address, tokenAddress, phase3StartTime]
   });
 });

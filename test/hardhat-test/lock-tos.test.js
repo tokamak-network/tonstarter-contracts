@@ -45,10 +45,27 @@ describe("LockTOS", function () {
   it("Deploy LockTOS", async function () {
     phase3StartTime =
       parseInt(await time.latest()) + parseInt(time.duration.weeks(10));
-    lockTOS = await (
+    const lockTOSImpl = await (
       await ethers.getContractFactory("LockTOS")
-    ).deploy(admin.address, tos.address, phase3StartTime);
-    await lockTOS.deployed();
+    ).deploy();
+    await lockTOSImpl.deployed();
+
+    const lockTOSProxy = await (
+      await ethers.getContractFactory("LockTOSProxy")
+    ).deploy(lockTOSImpl.address);
+    await lockTOSProxy.deployed();
+
+    console.log(tos.address);
+    console.log(await lockTOSProxy.tos());
+    await (await lockTOSProxy.initialize(tos.address, phase3StartTime)).wait();
+    console.log(await lockTOSProxy.tos());
+
+    const lockTOSArtifact = await hre.artifacts.readArtifact("LockTOS");
+    lockTOS = new ethers.Contract(
+      lockTOSProxy.address,
+      lockTOSArtifact.abi,
+      ethers.provider
+    );
   });
 
   it("mint TOS to users", async function () {
