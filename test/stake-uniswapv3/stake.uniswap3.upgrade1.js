@@ -1359,7 +1359,7 @@ describe(" StakeUniswapV3 ", function () {
 
       await stakeEntry.connect(owner).upgradeStakeTo(stakeContractAddress, cons.stakeUniswapV3Upgrade.address);
 
-      console.log("cons.stakeUniswapV3Upgrade1.address:",cons.stakeUniswapV3Upgrade1.address);
+      // console.log("cons.stakeUniswapV3Upgrade1.address:",cons.stakeUniswapV3Upgrade1.address);
 
       // Phase2 StakeUniswapV3Upgrade
       await stakeregister.connect(owner).addDefiInfo(
@@ -1974,7 +1974,7 @@ describe(" StakeUniswapV3 ", function () {
       tester2.miningTimeLast = coinageLastMintBlockTimetampAfter;
     });
   });
-  describe("# 13.  evm_increaseTime :   ", () => {
+  describe("# 13. evm_increaseTime :   ", () => {
 
     it("1. snapshot : tester1  ", async () => {
       let interval = 50;
@@ -1982,14 +1982,14 @@ describe(" StakeUniswapV3 ", function () {
       let currentTime = new Date().getTime();
       currentTime = Math.floor(currentTime/1000);
 
-      ethers.provider.send("evm_increaseTime", [interval])   // add 26 seconds
+      ethers.provider.send("evm_increaseTime", [interval])
       ethers.provider.send("evm_mine")      // mine the next block
 
     });
   });
 
 
-  describe("# 9. Swap : change the current tick to outside range", () => {
+  describe("# 14. Swap : change the current tick to outside range", () => {
     it("1. check current tick ", async () => {
       this.timeout(1000000);
       const tester = tester1;
@@ -2084,7 +2084,7 @@ describe(" StakeUniswapV3 ", function () {
     });
   });
 
-  describe("# 13. increaseLiquidity :   ", () => {
+  describe("# 15. increaseLiquidity :   ", () => {
 
     it("1. snapshot : tester1  ", async () => {
       const tester = tester1;
@@ -2167,13 +2167,13 @@ describe(" StakeUniswapV3 ", function () {
 
       await TestStakeUniswapV3Upgrade1
         .connect(tester.account)
-        .StakeUniswapV3Upgrade1("safeApprove(bytes)",
+        .StakeUniswapV3Upgrade1(1, "safeApprove(bytes)",
         ethers.utils.defaultAbiCoder.encode(['address', 'uint256'], [wton.address, total_wton])
         );
 
       await TestStakeUniswapV3Upgrade1
         .connect(tester.account)
-        .StakeUniswapV3Upgrade1(
+        .StakeUniswapV3Upgrade1(1,
           "safeApprove(bytes)",
           ethers.utils.defaultAbiCoder.encode(['address', 'uint256'], [tos.address, total_tos])
         );
@@ -2283,6 +2283,7 @@ describe(" StakeUniswapV3 ", function () {
       const tx = await TestStakeUniswapV3Upgrade1
         .connect(tester.account)
         .StakeUniswapV3Upgrade1(
+          1,
           "increaseLiquidity(bytes)",
           ethers.utils.defaultAbiCoder.encode(['uint256', 'uint256','uint256','uint256','uint256','uint256'],
           [tester.tokens[0], tester.amount0Desired, tester.amount1Desired, 0,0,100000000000000])
@@ -2337,6 +2338,7 @@ describe(" StakeUniswapV3 ", function () {
       const tx = await TestStakeUniswapV3Upgrade1
         .connect(tester.account)
         .StakeUniswapV3Upgrade1(
+          1,
           "increaseLiquidity(bytes)",
           ethers.utils.defaultAbiCoder.encode(['uint256', 'uint256','uint256','uint256','uint256','uint256'],
           [tester.tokens[0], tester.amount0Desired, tester.amount1Desired, 0,0,100000000000000])
@@ -2378,7 +2380,7 @@ describe(" StakeUniswapV3 ", function () {
   });
 
 
-  describe("# 13-1. StakeUniswapV3Upgrade1 : collect ", () => {
+  describe("# 16. StakeUniswapV3Upgrade1 : collect ", () => {
 
     it("1. collect : tester1 ", async () => {
       const tester = tester1;
@@ -2397,6 +2399,7 @@ describe(" StakeUniswapV3 ", function () {
       const tx = await TestStakeUniswapV3Upgrade1
         .connect(tester.account)
         .StakeUniswapV3Upgrade1(
+          1,
           "collect(bytes)",
           ethers.utils.defaultAbiCoder.encode(['uint256', 'uint128','uint128'],
           [tester.tokens[0], positions.tokensOwed0, positions.tokensOwed1])
@@ -2462,6 +2465,7 @@ describe(" StakeUniswapV3 ", function () {
       const tx = await TestStakeUniswapV3Upgrade1
       .connect(tester.account)
       .StakeUniswapV3Upgrade1(
+        1,
         "collect(bytes)",
         ethers.utils.defaultAbiCoder.encode(['uint256', 'uint128','uint128'],
         [tester.tokens[0], positions.tokensOwed0, positions.tokensOwed1])
@@ -2505,7 +2509,7 @@ describe(" StakeUniswapV3 ", function () {
   });
 
 
-  describe("# 14. StakeUniswapV3 Of TONStarter : withdraw ", () => {
+  describe("# 17. StakeUniswapV3 Of TONStarter : withdraw ", () => {
     it("1. check current tick ", async () => {
       this.timeout(1000000);
       const tester = tester1;
@@ -3008,7 +3012,7 @@ describe(" StakeUniswapV3 ", function () {
 
   });
 
-  describe("# 15. nftPositionManager : collect ", () => {
+  describe("# 18. nftPositionManager : collect ", () => {
       /*
     it("1. collect : tester1 ", async () => {
       const tester = tester1;
