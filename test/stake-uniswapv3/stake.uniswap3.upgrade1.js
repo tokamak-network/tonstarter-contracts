@@ -82,6 +82,7 @@ let stakeContractAddress = null;
 let deployer;
 let tokenId_First, tokenId_second;
 let TestStakeUniswapV3, TestStake2Vault;
+let TestStakeUniswapV3Proxy, TestStakeUniswapV3Upgrade1;
 let secondsPerMining;
 let alignPair = 1;
 
@@ -96,6 +97,14 @@ const tester1 = {
   wtonbalanceBefore: 0,
   tosbalanceBefore: 0,
   miningTimeLast: 0,
+  snapshot: {
+    depositTokens : null,
+    positions: null,
+    stakedCoinageTokens : null,
+    userTotalStaked : null,
+    increasedLiquidity: null,
+    collect: null
+    }
 };
 const tester2 = {
   account: null,
@@ -108,7 +117,44 @@ const tester2 = {
   wtonbalanceBefore: 0,
   tosbalanceBefore: 0,
   miningTimeLast: 0,
+  snapshot: {
+    depositTokens : null,
+    positions: null,
+    stakedCoinageTokens : null,
+    userTotalStaked : null,
+    increasedLiquidity: null,
+    collect: null
+    }
 };
+
+ let topic0Collected = ethers.utils.id("Collected(address,uint256,uint256,uint256)");
+  let abiCollected = [
+    {
+      "indexed": true,
+      "internalType": "address",
+      "name": "sender",
+      "type": "address"
+    },
+    {
+      "indexed": true,
+      "internalType": "uint256",
+      "name": "tokenId",
+      "type": "uint256"
+    },
+    {
+      "indexed": false,
+      "internalType": "uint256",
+      "name": "amount0",
+      "type": "uint256"
+    },
+    {
+      "indexed": false,
+      "internalType": "uint256",
+      "name": "amount1",
+      "type": "uint256"
+    }
+  ];
+
 
 function getAlignedPair(_token0, _token1) {
   let token0 = _token0;
@@ -138,8 +184,9 @@ describe(" StakeUniswapV3 ", function () {
     stakeUniswapV3,
     stake2Logic,
     stake2Vault,
-    stakeVaultFactory;
-  let Stake2Logic, StakeUniswapV3, StakeUniswapV3Factory, Stake2Vault;
+    stakeVaultFactory,
+    stakeUniswapV3Upgrade1;
+  let Stake2Logic, StakeUniswapV3, StakeUniswapV3Factory, Stake2Vault, StakeUniswapV3Upgrade1;
 
   const stakeType = "2"; // stake type for uniswapV3 stake
 
@@ -435,19 +482,17 @@ describe(" StakeUniswapV3 ", function () {
       // await timeout(10);
     });
 
-    it("3. approve token : tester1 ", async () => {
+    it("3. approve wton, tos : tester1 ", async () => {
       this.timeout(1000000);
       const tester = tester1;
+      //await approve(tester, wton, tester.account, deployedUniswapV3.nftPositionManager.address, tester.amount0Desired);
+
       tester.wtonbalanceBefore = await wton.balanceOf(tester.account.address);
       tester.tosbalanceBefore = await tos.balanceOf(tester.account.address);
 
-      // console.log('wtonbalanceBefore:',tester.wtonbalanceBefore.toString());
-      // console.log('tosbalanceBefore:',tester.tosbalanceBefore.toString());
-
       expect(tester.wtonbalanceBefore).to.be.above(tester.amount0Desired);
       expect(tester.tosbalanceBefore).to.be.above(tester.amount1Desired);
-      // console.log('call approve wton & tos');
-      // await timeout(5);
+
 
       await wton
         .connect(tester.account)
@@ -461,9 +506,7 @@ describe(" StakeUniswapV3 ", function () {
           deployedUniswapV3.nftPositionManager.address,
           tester.tosbalanceBefore
         );
-      // console.log('approve wton & tos');
 
-      // await timeout(5);
       expect(
         await wton.allowance(
           tester.account.address,
@@ -476,9 +519,7 @@ describe(" StakeUniswapV3 ", function () {
           deployedUniswapV3.nftPositionManager.address
         )
       ).to.be.equal(tester.tosbalanceBefore);
-      // console.log('check approve & allowance of wton , tos');
 
-      // await timeout(5);
     });
 
     it("4. mint : tester1 ", async () => {
@@ -540,7 +581,7 @@ describe(" StakeUniswapV3 ", function () {
       expect(tester.tokens.length).to.be.equal(1);
     });
 
-    it("5. approve  : tester2 ", async () => {
+    it("5. approve  wton , tos : tester2 ", async () => {
       this.timeout(1000000);
       const tester = tester2;
       tester.wtonbalanceBefore = await wton.balanceOf(tester.account.address);
@@ -663,7 +704,7 @@ describe(" StakeUniswapV3 ", function () {
 
     });
 
-    it("2. approve  : tester1 ", async () => {
+    it("2. approve wton : tester1 ", async () => {
       this.timeout(1000000);
       const tester = tester1;
       tester.wtonbalanceBefore = await wton.balanceOf(tester.account.address);
@@ -838,7 +879,7 @@ describe(" StakeUniswapV3 ", function () {
       */
     });
 
-    it("2. approve  : tester1 ", async () => {
+    it("2. approve tos : tester1 ", async () => {
       this.timeout(1000000);
       const tester = tester1;
       tester.tosbalanceBefore = await tos.balanceOf(tester.account.address);
@@ -942,12 +983,16 @@ describe(" StakeUniswapV3 ", function () {
       ).to.be.revertedWith("ERC721: transfer caller is not owner nor approved");
     });
 
-    it("6. stake : after approve tester1's token ", async () => {
+    it("6. stake : after setApprovalForAll tester1's token ", async () => {
       this.timeout(1000000);
       const tester = tester1;
+      // await deployedUniswapV3.nftPositionManager
+      //   .connect(tester.account)
+      //   .approve(stakeContractAddress, tester.tokens[0]);
+
       await deployedUniswapV3.nftPositionManager
         .connect(tester.account)
-        .approve(stakeContractAddress, tester.tokens[0]);
+        .setApprovalForAll(stakeContractAddress, true);
 
       TestStakeUniswapV3 = await ico20Contracts.getContract(
         "StakeUniswapV3",
@@ -997,12 +1042,12 @@ describe(" StakeUniswapV3 ", function () {
       tester2.miningTimeLast = coinageLastMintBlockTimetampAfter;
     });
 
-    it("7. stake : after approve tester2's token ", async () => {
+    it("7. stake : after setApprovalForAll tester2's token ", async () => {
       this.timeout(1000000);
       const tester = tester2;
       await deployedUniswapV3.nftPositionManager
         .connect(tester.account)
-        .approve(stakeContractAddress, tester.tokens[0]);
+        .setApprovalForAll(stakeContractAddress, true);
 
       TestStakeUniswapV3 = await ico20Contracts.getContract(
         "StakeUniswapV3",
@@ -1052,42 +1097,7 @@ describe(" StakeUniswapV3 ", function () {
       tester2.miningTimeLast = coinageLastMintBlockTimetampAfter;
     });
 
-    it("8. miningCoinage :  ", async () => {
-      this.timeout(1000000);
-      const coinageLastMintBlockTimetampBefore =
-        await TestStakeUniswapV3.coinageLastMintBlockTimetamp();
-      const canBalanceBefore = await TestStakeUniswapV3.balanceOfCoinage(
-        tester1.tokens[0]
-      );
-
-      await TestStakeUniswapV3.connect(tester1.account).miningCoinage();
-
-      const canBalanceAfter = await TestStakeUniswapV3.balanceOfCoinage(
-        tester1.tokens[0]
-      );
-      const coinageLastMintBlockTimetampAfter =
-        await TestStakeUniswapV3.coinageLastMintBlockTimetamp();
-      expect(canBalanceAfter).to.be.above(
-        canBalanceBefore
-      );
-      expect(coinageLastMintBlockTimetampBefore).to.be.lt(
-        coinageLastMintBlockTimetampAfter
-      );
-
-      tester1.miningTimeLast = coinageLastMintBlockTimetampAfter;
-      tester2.miningTimeLast = coinageLastMintBlockTimetampAfter;
-
-      const diffTimeMining = coinageLastMintBlockTimetampAfter.sub(
-        coinageLastMintBlockTimetampBefore
-      );
-      remainMiningTotal = remainMiningTotal.add(
-        diffTimeMining.mul(utils.parseUnits(PHASE2_MINING_PERSECOND, 0))
-      );
-      // console.log('diffTimeMining 1 : ',diffTimeMining.toString());
-      // console.log('miningAmount 1 : ', remainMiningTotal.toString());
-    });
-
-    it("9. claim : tester1 ", async () => {
+    it("8. claim : tester1 ", async () => {
       this.timeout(1000000);
       const tester = tester1;
       const vaultBalanceTOS = await tos.balanceOf(vaultAddress);
@@ -1222,7 +1232,7 @@ describe(" StakeUniswapV3 ", function () {
 
     });
 
-    it("10. claim : tester2 ", async () => {
+    it("9. claim : tester2 ", async () => {
       this.timeout(1000000);
       const tester = tester2;
       const vaultBalanceTOS = await tos.balanceOf(vaultAddress);
@@ -1342,6 +1352,41 @@ describe(" StakeUniswapV3 ", function () {
       tester2.miningTimeLast = coinageLastMintBlockTimetampAfter;
     });
   });
+
+  describe("# 8-1. Upgrade : stakeUniswapV3Upgrade1 ", () => {
+    it("1. change logic to stakeUniswapV3Upgrade1 ", async () => {
+      const cons = await ico20Contracts.getICOContracts();
+
+      await stakeEntry.connect(owner).upgradeStakeTo(stakeContractAddress, cons.stakeUniswapV3Upgrade.address);
+
+      console.log("cons.stakeUniswapV3Upgrade1.address:",cons.stakeUniswapV3Upgrade1.address);
+
+      // Phase2 StakeUniswapV3Upgrade
+      await stakeregister.connect(owner).addDefiInfo(
+          "StakeUniswapV3Upgrade1",
+          cons.stakeUniswapV3Upgrade1.address,
+          zeroAddress,
+          zeroAddress,
+          0,
+          zeroAddress
+        );
+
+      //let defiInfo = await stakeregister.defiInfo(keccak256("StakeUniswapV3Upgrade1"));
+      //console.log("defiInfo:",defiInfo);
+
+    });
+
+    it("2. check stakeUniswapV3Upgrade1 ", async () => {
+      const cons = await ico20Contracts.getICOContracts();
+      TestStakeUniswapV3Upgrade1 = await ico20Contracts.getContract(
+        "StakeUniswapV3Upgrade",
+        stakeContractAddress,
+        owner.address
+      );
+    });
+
+  });
+
 
   describe("# 9. Swap : change the current tick to outside range", () => {
     it("1. check current tick ", async () => {
@@ -1444,42 +1489,8 @@ describe(" StakeUniswapV3 ", function () {
   });
 
   describe("# 10. StakeUniswapV3 Of TONStarter : case in partial liquidity ", () => {
-    it("1. miningCoinage :  ", async () => {
-      this.timeout(1000000);
-      await timeout(15);
 
-      const coinageLastMintBlockTimetampBefore =
-        await TestStakeUniswapV3.coinageLastMintBlockTimetamp();
-      const canBalanceBefore = await TestStakeUniswapV3.balanceOfCoinage(
-        tester1.tokens[0]
-      );
-
-      await TestStakeUniswapV3.connect(tester1.account).miningCoinage();
-
-      const canBalanceAfter = await TestStakeUniswapV3.balanceOfCoinage(
-        tester1.tokens[0]
-      );
-      const coinageLastMintBlockTimetampAfter =
-        await TestStakeUniswapV3.coinageLastMintBlockTimetamp();
-      expect(canBalanceAfter).to.be.above(
-        canBalanceBefore
-      );
-      expect(coinageLastMintBlockTimetampBefore).to.be.lt(
-        coinageLastMintBlockTimetampAfter
-      );
-
-      tester1.miningTimeLast = coinageLastMintBlockTimetampAfter;
-      tester2.miningTimeLast = coinageLastMintBlockTimetampAfter;
-
-      const diffTimeMining = coinageLastMintBlockTimetampAfter.sub(
-        coinageLastMintBlockTimetampBefore
-      );
-      remainMiningTotal = remainMiningTotal.add(
-        diffTimeMining.mul(utils.parseUnits(PHASE2_MINING_PERSECOND, 0))
-      );
-    });
-
-    it("2. claim : case in partial liquidity", async () => {
+    it("1. claim : case in partial liquidity", async () => {
       this.timeout(1000000);
 
       const tester = tester1;
@@ -1489,7 +1500,7 @@ describe(" StakeUniswapV3 ", function () {
       let nonminingAmount = ethers.BigNumber.from("0");
 
       const tosBalanceBefore = await tos.balanceOf(tester.account.address);
-      const miningInfosBefore = await TestStakeUniswapV3.getMiningTokenId(
+      const miningInfosBefore = await TestStakeUniswapV3Upgrade1.getMiningTokenId(
         tester.tokens[0]
       );
       // console.log('tosBalanceBefore: ',tosBalanceBefore.toString());
@@ -1519,11 +1530,11 @@ describe(" StakeUniswapV3 ", function () {
         ethers.BigNumber.from("0")
       );
 
-      const coinageTokenBefore = await TestStakeUniswapV3.stakedCoinageTokens(
+      const coinageTokenBefore = await TestStakeUniswapV3Upgrade1.stakedCoinageTokens(
         tester.tokens[0]
       );
 
-      const tx = await TestStakeUniswapV3.connect(tester.account).claim(
+      const tx = await TestStakeUniswapV3Upgrade1.connect(tester.account).claim(
         tester.tokens[0]
       );
       const receipt = await tx.wait();
@@ -1545,7 +1556,7 @@ describe(" StakeUniswapV3 ", function () {
 
       const tosBalanceAfter = await tos.balanceOf(tester.account.address);
 
-      const miningInfosAfter = await TestStakeUniswapV3.getMiningTokenId(
+      const miningInfosAfter = await TestStakeUniswapV3Upgrade1.getMiningTokenId(
         tester.tokens[0]
       );
       expect(miningInfosAfter.miningAmount).to.be.equal(
@@ -1558,13 +1569,13 @@ describe(" StakeUniswapV3 ", function () {
         ethers.BigNumber.from("0")
       );
 
-      const depositToken = await TestStakeUniswapV3.depositTokens(
+      const depositToken = await TestStakeUniswapV3Upgrade1.depositTokens(
         tester.tokens[0]
       );
-      const coinageToken = await TestStakeUniswapV3.stakedCoinageTokens(
+      const coinageToken = await TestStakeUniswapV3Upgrade1.stakedCoinageTokens(
         tester.tokens[0]
       );
-      const userTotalStaked = await TestStakeUniswapV3.userTotalStaked(
+      const userTotalStaked = await TestStakeUniswapV3Upgrade1.userTotalStaked(
         tester.account.address
       );
 
@@ -1608,7 +1619,7 @@ describe(" StakeUniswapV3 ", function () {
       );
 
       const coinageLastMintBlockTimetampAfter =
-        await TestStakeUniswapV3.coinageLastMintBlockTimetamp();
+        await TestStakeUniswapV3Upgrade1.coinageLastMintBlockTimetamp();
       tester1.miningTimeLast = coinageLastMintBlockTimetampAfter;
       tester2.miningTimeLast = coinageLastMintBlockTimetampAfter;
     });
@@ -1633,7 +1644,7 @@ describe(" StakeUniswapV3 ", function () {
       else expect(slot0.tick).to.be.above(tester.positions[0].tickLower);
     });
 
-    it("2. approve  : tester1 ", async () => {
+    it("2. approve  wton : tester1 ", async () => {
       this.timeout(1000000);
       const tester = tester1;
       tester.wtonbalanceBefore = await wton.balanceOf(tester.account.address);
@@ -1718,25 +1729,26 @@ describe(" StakeUniswapV3 ", function () {
       expect(slot0.tick).to.be.below(tester.positions[0].tickUpper);
     });
 
+
     it("2. miningCoinage :  ", async () => {
       this.timeout(1000000);
       await timeout(10);
       const coinageLastMintBlockTimetampBefore =
-        await TestStakeUniswapV3.coinageLastMintBlockTimetamp();
-      const canBalanceBefore = await TestStakeUniswapV3.balanceOfCoinage(
+        await TestStakeUniswapV3Upgrade1.coinageLastMintBlockTimetamp();
+      const canBalanceBefore = await TestStakeUniswapV3Upgrade1.balanceOfCoinage(
         tester1.tokens[0]
       );
       expect(coinageLastMintBlockTimetampBefore).to.be.equal(
         tester1.miningTimeLast
       );
 
-      await TestStakeUniswapV3.connect(tester1.account).miningCoinage();
+      await TestStakeUniswapV3Upgrade1.connect(tester1.account).miningCoinage();
 
-      const canBalanceAfter = await TestStakeUniswapV3.balanceOfCoinage(
+      const canBalanceAfter = await TestStakeUniswapV3Upgrade1.balanceOfCoinage(
         tester1.tokens[0]
       );
       const coinageLastMintBlockTimetampAfter =
-        await TestStakeUniswapV3.coinageLastMintBlockTimetamp();
+        await TestStakeUniswapV3Upgrade1.coinageLastMintBlockTimetamp();
       expect(canBalanceAfter).to.be.above(
         canBalanceBefore
       );
@@ -1757,12 +1769,13 @@ describe(" StakeUniswapV3 ", function () {
 
     });
 
+
     it("3. check expected mining amount :  ", async () => {
       this.timeout(1000000);
       await timeout(10);
       const coinageLastMintBlockTimetampBefore =
-        await TestStakeUniswapV3.coinageLastMintBlockTimetamp();
-      const canBalanceBefore = await TestStakeUniswapV3.balanceOfCoinage(
+        await TestStakeUniswapV3Upgrade1.coinageLastMintBlockTimetamp();
+      const canBalanceBefore = await TestStakeUniswapV3Upgrade1.balanceOfCoinage(
         tester1.tokens[0]
       );
       expect(coinageLastMintBlockTimetampBefore).to.be.equal(
@@ -1785,7 +1798,7 @@ describe(" StakeUniswapV3 ", function () {
       ethers.provider.send("evm_increaseTime", [interval])   // add 26 seconds
       ethers.provider.send("evm_mine")      // mine the next block
 
-      let currentliquidityTokenId = await TestStakeUniswapV3.connect(tester1.account).currentliquidityTokenId(
+      let currentliquidityTokenId = await TestStakeUniswapV3Upgrade1.connect(tester1.account).currentliquidityTokenId(
         tester1.tokens[0],
         coinageLastMintBlockTimetampBefore.add(ethers.BigNumber.from(interval))
       );
@@ -1795,7 +1808,7 @@ describe(" StakeUniswapV3 ", function () {
       // console.log('currentliquidityTokenId.liquidity', currentliquidityTokenId.liquidity.toString());
       // console.log('currentliquidityTokenId.expectTime', currentliquidityTokenId.expectTime.toString());
 
-      let currentCoinageBalanceTokenId = await TestStakeUniswapV3.connect(tester1.account).currentCoinageBalanceTokenId(
+      let currentCoinageBalanceTokenId = await TestStakeUniswapV3Upgrade1.connect(tester1.account).currentCoinageBalanceTokenId(
         tester1.tokens[0],
         coinageLastMintBlockTimetampBefore.add(ethers.BigNumber.from(interval))
       );
@@ -1806,7 +1819,7 @@ describe(" StakeUniswapV3 ", function () {
       // console.log('currentCoinageBalanceTokenId.expectTime', currentCoinageBalanceTokenId.expectTime.toString());
       // console.log('currentCoinageBalanceTokenId.addIntervalTime', currentCoinageBalanceTokenId.addIntervalTime.toString());
 
-      let expectedInfo = await TestStakeUniswapV3.connect(tester1.account).expectedPlusClaimableAmount(
+      let expectedInfo = await TestStakeUniswapV3Upgrade1.connect(tester1.account).expectedPlusClaimableAmount(
         tester1.tokens[0],
         coinageLastMintBlockTimetampBefore.add(ethers.BigNumber.from(interval))
       );
@@ -1841,7 +1854,7 @@ describe(" StakeUniswapV3 ", function () {
       const tester = tester1;
 
       const tosBalanceBefore = await tos.balanceOf(tester.account.address);
-      const miningInfosBefore = await TestStakeUniswapV3.getMiningTokenId(
+      const miningInfosBefore = await TestStakeUniswapV3Upgrade1.getMiningTokenId(
         tester.tokens[0]
       );
 
@@ -1866,11 +1879,11 @@ describe(" StakeUniswapV3 ", function () {
       expect(miningInfosBefore.minableAmount).to.be.above(
         ethers.BigNumber.from("0")
       );
-      const coinageTokenBefore = await TestStakeUniswapV3.stakedCoinageTokens(
+      const coinageTokenBefore = await TestStakeUniswapV3Upgrade1.stakedCoinageTokens(
         tester.tokens[0]
       );
 
-      let depositToken = await TestStakeUniswapV3.depositTokens(
+      let depositToken = await TestStakeUniswapV3Upgrade1.depositTokens(
         tester.tokens[0]
       );
 
@@ -1884,7 +1897,7 @@ describe(" StakeUniswapV3 ", function () {
         ethers.BigNumber.from("0")
       );
 
-      const tx = await TestStakeUniswapV3.connect(tester.account).claim(
+      const tx = await TestStakeUniswapV3Upgrade1.connect(tester.account).claim(
         tester.tokens[0]
       );
       const receipt = await tx.wait();
@@ -1903,7 +1916,7 @@ describe(" StakeUniswapV3 ", function () {
       }
       const minableAmount = miningAmount.add(nonminingAmount);
       const tosBalanceAfter = await tos.balanceOf(tester.account.address);
-      const miningInfosAfter = await TestStakeUniswapV3.getMiningTokenId(
+      const miningInfosAfter = await TestStakeUniswapV3Upgrade1.getMiningTokenId(
         tester.tokens[0]
       );
 
@@ -1919,11 +1932,11 @@ describe(" StakeUniswapV3 ", function () {
 
       expect(tosBalanceBefore.add(miningAmount)).to.be.equal(tosBalanceAfter);
 
-      depositToken = await TestStakeUniswapV3.depositTokens(tester.tokens[0]);
-      const coinageToken = await TestStakeUniswapV3.stakedCoinageTokens(
+      depositToken = await TestStakeUniswapV3Upgrade1.depositTokens(tester.tokens[0]);
+      const coinageToken = await TestStakeUniswapV3Upgrade1.stakedCoinageTokens(
         tester.tokens[0]
       );
-      const userTotalStaked = await TestStakeUniswapV3.userTotalStaked(
+      const userTotalStaked = await TestStakeUniswapV3Upgrade1.userTotalStaked(
         tester.account.address
       );
 
@@ -1956,13 +1969,543 @@ describe(" StakeUniswapV3 ", function () {
       );
 
       const coinageLastMintBlockTimetampAfter =
-        await TestStakeUniswapV3.coinageLastMintBlockTimetamp();
+        await TestStakeUniswapV3Upgrade1.coinageLastMintBlockTimetamp();
       tester1.miningTimeLast = coinageLastMintBlockTimetampAfter;
       tester2.miningTimeLast = coinageLastMintBlockTimetampAfter;
     });
   });
+  describe("# 13.  evm_increaseTime :   ", () => {
 
-  describe("# 13. StakeUniswapV3 Of TONStarter : withdraw ", () => {
+    it("1. snapshot : tester1  ", async () => {
+      let interval = 50;
+
+      let currentTime = new Date().getTime();
+      currentTime = Math.floor(currentTime/1000);
+
+      ethers.provider.send("evm_increaseTime", [interval])   // add 26 seconds
+      ethers.provider.send("evm_mine")      // mine the next block
+
+    });
+  });
+
+
+  describe("# 9. Swap : change the current tick to outside range", () => {
+    it("1. check current tick ", async () => {
+      this.timeout(1000000);
+      const tester = tester1;
+
+      // pool_wton_tos_address
+      const pool = new ethers.Contract(
+        pool_wton_tos_address,
+        IUniswapV3PoolABI.abi,
+        tester.account
+      );
+      const slot0 = await pool.slot0();
+
+      expect(tester.positions.length).to.be.above(0);
+
+      expect(slot0.tick).to.be.above(tester.positions[0].tickLower);
+      expect(slot0.tick).to.be.below(tester.positions[0].tickUpper);
+
+      expect(tester2.positions.length).to.be.above(0);
+      expect(slot0.tick).to.be.above(tester2.positions[0].tickLower);
+      expect(slot0.tick).to.be.below(tester2.positions[0].tickUpper);
+    });
+
+    it("2. approve  : tester1 ", async () => {
+      this.timeout(1000000);
+      const tester = tester1;
+      tester.wtonbalanceBefore = await wton.balanceOf(tester.account.address);
+      await wton
+        .connect(tester.account)
+        .approve(
+          deployedUniswapV3.swapRouter.address,
+          tester.wtonbalanceBefore
+        );
+
+      expect(
+        await wton.allowance(
+          tester.account.address,
+          deployedUniswapV3.swapRouter.address
+        )
+      ).to.be.equal(tester.wtonbalanceBefore);
+    });
+    it("3. swap ", async () => {
+      this.timeout(1000000);
+      const tester = tester1;
+
+      swapAmountWTON = ethers.utils.parseUnits("50", 18);
+      swapAmountTOS = ethers.utils.parseUnits("900", 18);
+
+      tester.wtonbalanceBefore = await wton.balanceOf(tester.account.address);
+      tester.tosbalanceBefore = await tos.balanceOf(tester.account.address);
+
+      // expect(tester.wtonbalanceBefore).to.be.above(tester.amount0Desired);
+      // expect(tester.tosbalanceBefore).to.be.above(tester.amount1Desired);
+
+      const params = {
+        tokenIn: wton.address,
+        tokenOut: tos.address,
+        fee: FeeAmount.MEDIUM,
+        recipient: tester1.account.address,
+        deadline: 100000000000000,
+        amountIn: swapAmountWTON,
+        amountOutMinimum: ethers.BigNumber.from("0"),
+        sqrtPriceLimitX96: ethers.BigNumber.from("0"),
+      };
+
+      const tx = await deployedUniswapV3.swapRouter
+        .connect(tester.account)
+        .exactInputSingle(params);
+      tx.wait();
+
+      const wtonBalance = await wton.balanceOf(tester.account.address);
+      const tosBalance = await tos.balanceOf(tester.account.address);
+    });
+
+    it("4. out of current tick ", async () => {
+      this.timeout(1000000);
+      const tester = tester1;
+
+      // pool_wton_tos_address
+      const pool = new ethers.Contract(
+        pool_wton_tos_address,
+        IUniswapV3PoolABI.abi,
+        tester.account
+      );
+      const slot0 = await pool.slot0();
+
+
+      // console.log('slot0.tick',slot0.tick.toString());
+      // console.log('tester.positions[0].tickLower',tester.positions[0].tickLower);
+      // console.log('tester.positions[0].tickUpper',tester.positions[0].tickUpper);
+      expect(tester.positions.length).to.be.above(0);
+      expect(slot0.tick).to.be.below(tester.positions[0].tickUpper);
+    });
+  });
+
+  describe("# 13. increaseLiquidity :   ", () => {
+
+    it("1. snapshot : tester1  ", async () => {
+      const tester = tester1;
+      let depositTokens = await TestStakeUniswapV3Upgrade1.depositTokens(
+          tester.tokens[0]
+        );
+      // console.log('depositTokens.liquidity', depositTokens.liquidity.toString());
+      // console.log('depositTokens.tickLower', depositTokens.tickLower);
+      // console.log('depositTokens.tickUpper', depositTokens.tickUpper);
+      let positions = await deployedUniswapV3.nftPositionManager.positions(tester.tokens[0]);
+
+      // console.log('positions.liquidity', positions.liquidity.toString());
+      // console.log('positions.tickLower', positions.tickLower);
+      // console.log('positions.tickUpper', positions.tickUpper);
+      // console.log('positions.operator', positions.operator);
+      // console.log('positions.tokensOwed0', positions.tokensOwed0.toString());
+      // console.log('positions.tokensOwed1', positions.tokensOwed1.toString());
+
+      let stakedCoinageTokens = await TestStakeUniswapV3Upgrade1.stakedCoinageTokens(
+          tester.tokens[0]
+        );
+      let userTotalStaked = await TestStakeUniswapV3Upgrade1.userTotalStaked(
+          tester.account.address
+        );
+
+      tester.snapshot.depositTokens = depositTokens;
+      tester.snapshot.positions = positions;
+      tester.snapshot.stakedCoinageTokens = stakedCoinageTokens;
+      tester.snapshot.userTotalStaked = userTotalStaked;
+
+    });
+
+    it("2. snapshot : tester2  ", async () => {
+
+      const tester = tester2;
+      let depositTokens = await TestStakeUniswapV3Upgrade1.depositTokens(
+          tester.tokens[0]
+        );
+      // console.log('depositTokens.liquidity', depositTokens.liquidity.toString());
+      // console.log('depositTokens.tickLower', depositTokens.tickLower);
+      // console.log('depositTokens.tickUpper', depositTokens.tickUpper);
+      let positions = await deployedUniswapV3.nftPositionManager.positions(tester.tokens[0]);
+
+      // console.log('positions.liquidity', positions.liquidity.toString());
+      // console.log('positions.tickLower', positions.tickLower);
+      // console.log('positions.tickUpper', positions.tickUpper);
+      // console.log('positions.operator', positions.operator);
+      // console.log('positions.tokensOwed0', positions.tokensOwed0.toString());
+      // console.log('positions.tokensOwed1', positions.tokensOwed1.toString());
+
+      let stakedCoinageTokens = await TestStakeUniswapV3Upgrade1.stakedCoinageTokens(
+          tester.tokens[0]
+        );
+      let userTotalStaked = await TestStakeUniswapV3Upgrade1.userTotalStaked(
+          tester.account.address
+        );
+
+      tester.snapshot.depositTokens = depositTokens;
+      tester.snapshot.positions = positions;
+      tester.snapshot.stakedCoinageTokens = stakedCoinageTokens;
+      tester.snapshot.userTotalStaked = userTotalStaked;
+
+    });
+    it("3. approve  wton , tos : TestStakeUniswapV3Upgrade1 ", async () => {
+      this.timeout(1000000);
+      const tester = tester1;
+      let registry =  await TestStakeUniswapV3Upgrade1.stakeRegistry();
+      //console.log('registry',registry);
+
+      let total_wton = await wton.totalSupply();
+      let total_tos= await tos.totalSupply();
+      let parms1 = {
+        token: wton.address,
+        total: total_wton
+      }
+      let parms2 = {
+        token: tos.address,
+        total: total_tos
+      }
+
+      await TestStakeUniswapV3Upgrade1
+        .connect(tester.account)
+        .StakeUniswapV3Upgrade1("safeApprove(bytes)",
+        ethers.utils.defaultAbiCoder.encode(['address', 'uint256'], [wton.address, total_wton])
+        );
+
+      await TestStakeUniswapV3Upgrade1
+        .connect(tester.account)
+        .StakeUniswapV3Upgrade1(
+          "safeApprove(bytes)",
+          ethers.utils.defaultAbiCoder.encode(['address', 'uint256'], [tos.address, total_tos])
+        );
+
+      expect(
+        await wton.allowance(
+          TestStakeUniswapV3Upgrade1.address,
+          deployedUniswapV3.nftPositionManager.address)
+      ).to.be.equal(total_wton);
+
+      expect(
+        await tos.allowance(
+          TestStakeUniswapV3Upgrade1.address,
+          deployedUniswapV3.nftPositionManager.address
+        )
+      ).to.be.equal(total_tos);
+    });
+
+    it("4. approve  wton , tos : tester1 ", async () => {
+      this.timeout(1000000);
+      const tester = tester1;
+
+      let total_wton = await wton.totalSupply();
+      let total_tos= await tos.totalSupply();
+
+      await wton
+        .connect(tester.account)
+        .approve(
+          TestStakeUniswapV3Upgrade1.address,
+          total_wton
+        );
+
+      await tos
+        .connect(tester.account)
+        .approve(
+          TestStakeUniswapV3Upgrade1.address,
+          total_tos
+        );
+
+      expect(
+        await wton.allowance(
+          tester.account.address,
+          TestStakeUniswapV3Upgrade1.address)
+      ).to.be.equal(total_wton);
+
+      expect(
+        await tos.allowance(
+          tester.account.address,
+          TestStakeUniswapV3Upgrade1.address
+        )
+      ).to.be.equal(total_tos);
+    });
+
+    it("5. approve  wton , tos : tester2 ", async () => {
+      this.timeout(1000000);
+      const tester = tester2;
+
+      let total_wton = await wton.totalSupply();
+      let total_tos= await tos.totalSupply();
+
+      await wton
+        .connect(tester.account)
+        .approve(
+          TestStakeUniswapV3Upgrade1.address,
+          total_wton
+        );
+
+      await tos
+        .connect(tester.account)
+        .approve(
+          TestStakeUniswapV3Upgrade1.address,
+          total_tos
+        );
+
+      expect(
+        await wton.allowance(
+          tester.account.address,
+          TestStakeUniswapV3Upgrade1.address)
+      ).to.be.equal(total_wton);
+
+      expect(
+        await tos.allowance(
+          tester.account.address,
+          TestStakeUniswapV3Upgrade1.address
+        )
+      ).to.be.equal(total_tos);
+
+    });
+
+    it("6. increaseLiquidity : tester1 ", async () => {
+      const tester = tester1;
+
+      tester.wtonbalanceBefore = await wton.balanceOf(tester.account.address);
+      tester.tosbalanceBefore = await tos.balanceOf(tester.account.address);
+      expect(tester.wtonbalanceBefore).to.be.above(tester.amount0Desired);
+      expect(tester.tosbalanceBefore).to.be.above(tester.amount1Desired);
+
+      let params = {
+        tokenId: tester.tokens[0],
+        amount0Desired: tester.amount0Desired,
+        amount1Desired: tester.amount1Desired,
+        amount0Min: 0,
+        amount1Min: 0,
+        deadline: 100000000000000
+      }
+
+      const tx = await TestStakeUniswapV3Upgrade1
+        .connect(tester.account)
+        .StakeUniswapV3Upgrade1(
+          "increaseLiquidity(bytes)",
+          ethers.utils.defaultAbiCoder.encode(['uint256', 'uint256','uint256','uint256','uint256','uint256'],
+          [tester.tokens[0], tester.amount0Desired, tester.amount1Desired, 0,0,100000000000000])
+        );
+      const receipt = await tx.wait();
+
+      for (let i = 0; i < receipt.events.length; i++) {
+        // console.log('receipt.events[i].event',i, receipt.events[i].event);
+        if (
+          receipt.events[i].event == "IncreasedLiquidity" &&
+          receipt.events[i].args != null
+        ) {
+          // const sender = receipt.events[i].args.sender;
+          // const tokenId = receipt.events[i].args.tokenId;
+          // const liquidity = receipt.events[i].args.liquidity;
+          // const amount0 = receipt.events[i].args.amount0;
+          // const amount1 = receipt.events[i].args.amount1;
+          tester.increasedLiquidity = receipt.events[i].args;
+        }
+      }
+
+      let balance_contract = await wton.balanceOf(tester.account.address);
+
+      const wtonBalanceAfter = await wton.balanceOf(tester.account.address);
+      const tosBalanceAfter = await tos.balanceOf(tester.account.address);
+
+      expect(wtonBalanceAfter).to.be.equal(
+        tester.wtonbalanceBefore.sub(tester.amount0Desired)
+      );
+      expect(tosBalanceAfter).to.be.equal(
+        tester.tosbalanceBefore.sub(tester.amount1Desired)
+      );
+
+    });
+    it("7. increaseLiquidity : tester2 ", async () => {
+      const tester = tester2;
+
+      tester.wtonbalanceBefore = await wton.balanceOf(tester.account.address);
+      tester.tosbalanceBefore = await tos.balanceOf(tester.account.address);
+      expect(tester.wtonbalanceBefore).to.be.above(tester.amount0Desired);
+      expect(tester.tosbalanceBefore).to.be.above(tester.amount1Desired);
+
+      let params = {
+        tokenId: tester.tokens[0],
+        amount0Desired: tester.amount0Desired,
+        amount1Desired: tester.amount1Desired,
+        amount0Min: 0,
+        amount1Min: 0,
+        deadline: 100000000000000
+      }
+
+      const tx = await TestStakeUniswapV3Upgrade1
+        .connect(tester.account)
+        .StakeUniswapV3Upgrade1(
+          "increaseLiquidity(bytes)",
+          ethers.utils.defaultAbiCoder.encode(['uint256', 'uint256','uint256','uint256','uint256','uint256'],
+          [tester.tokens[0], tester.amount0Desired, tester.amount1Desired, 0,0,100000000000000])
+        );
+
+      const receipt = await tx.wait();
+
+      for (let i = 0; i < receipt.events.length; i++) {
+        // console.log('receipt.events[i].event',i, receipt.events[i].event);
+        if (
+          receipt.events[i].event == "IncreasedLiquidity" &&
+          receipt.events[i].args != null
+        ) {
+          // const sender = receipt.events[i].args.sender;
+          // const tokenId = receipt.events[i].args.tokenId;
+          // const liquidity = receipt.events[i].args.liquidity;
+          // const amount0 = receipt.events[i].args.amount0;
+          // const amount1 = receipt.events[i].args.amount1;
+          tester.increasedLiquidity = receipt.events[i].args;
+        }
+      }
+
+      let balance_contract = await wton.balanceOf(tester.account.address);
+
+      const wtonBalanceAfter = await wton.balanceOf(tester.account.address);
+      const tosBalanceAfter = await tos.balanceOf(tester.account.address);
+
+      expect(wtonBalanceAfter).to.be.equal(
+        tester.wtonbalanceBefore.sub(tester.amount0Desired)
+      );
+      expect(tosBalanceAfter).to.be.equal(
+        tester.tosbalanceBefore.sub(tester.amount1Desired)
+      );
+
+      let positions = await deployedUniswapV3.nftPositionManager.positions(tester.tokens[0]);
+      expect(positions.tokensOwed0).to.be.above(tester.snapshot.positions.tokensOwed0);
+      expect(positions.tokensOwed1).to.be.above(tester.snapshot.positions.tokensOwed1);
+    });
+  });
+
+
+  describe("# 13-1. StakeUniswapV3Upgrade1 : collect ", () => {
+
+    it("1. collect : tester1 ", async () => {
+      const tester = tester1;
+
+      tester.wtonbalanceBefore = await wton.balanceOf(tester.account.address);
+      tester.tosbalanceBefore = await tos.balanceOf(tester.account.address);
+
+      let positions = await deployedUniswapV3.nftPositionManager.positions(tester.tokens[0]);
+      let params = {
+        tokenId: tester.tokens[0],
+        recipient: tester.account.address,
+        amount0Max: positions.tokensOwed0,
+        amount1Max: positions.tokensOwed1
+      }
+
+      const tx = await TestStakeUniswapV3Upgrade1
+        .connect(tester.account)
+        .StakeUniswapV3Upgrade1(
+          "collect(bytes)",
+          ethers.utils.defaultAbiCoder.encode(['uint256', 'uint128','uint128'],
+          [tester.tokens[0], positions.tokensOwed0, positions.tokensOwed1])
+        );
+
+      const receipt = await tx.wait();
+
+      for (let i = 0; i < receipt.events.length; i++) {
+
+        if (
+          receipt.events[i].topics.length > 0 &&
+          receipt.events[i].topics[0] == topic0Collected
+        ) {
+
+           const eventObj = web3.eth.abi.decodeLog(
+            abiCollected,
+            receipt.events[i].data,
+            receipt.events[i].topics.slice(1)
+          );
+          tester.snapshot.collect = eventObj;
+          //console.log('tester.snapshot.collect',tester.snapshot.collect);
+
+        }
+      }
+      expect(tester.snapshot.collect.amount0).to.be.above(ethers.BigNumber.from('0'));
+
+      let wtonBalanceAfter = await wton.balanceOf(tester.account.address);
+      let tosBalanceAfter = await tos.balanceOf(tester.account.address);
+
+      let tokenToggle = false;
+      if(positions.token0 == tos.address) tokenToggle=true;
+
+      if(!tokenToggle){
+          expect(wtonBalanceAfter).to.be.equal(tester.wtonbalanceBefore.add( ethers.BigNumber.from(tester.snapshot.collect.amount0) ));
+          expect(tosBalanceAfter).to.be.equal(tester.tosbalanceBefore.add(ethers.BigNumber.from(tester.snapshot.collect.amount1)));
+      }else{
+          expect(tosBalanceAfter).to.be.equal(tester.tosbalanceBefore.add(ethers.BigNumber.from(tester.snapshot.collect.amount0)));
+          expect(wtonBalanceAfter).to.be.equal(tester.wtonbalanceBefore.add(ethers.BigNumber.from(tester.snapshot.collect.amount1)));
+      }
+
+    });
+
+    it("2. decreaseLiquidity : tester1 ", async () => {
+
+    });
+
+    /*
+    it("2. collect : tester2 ", async () => {
+
+      const tester = tester2;
+
+      tester.wtonbalanceBefore = await wton.balanceOf(tester.account.address);
+      tester.tosbalanceBefore = await tos.balanceOf(tester.account.address);
+
+      let positions = await deployedUniswapV3.nftPositionManager.positions(tester.tokens[0]);
+      let params = {
+        tokenId: tester.tokens[0],
+        recipient: tester.account.address,
+        amount0Max: positions.tokensOwed0,
+        amount1Max: positions.tokensOwed1
+      }
+
+      const tx = await TestStakeUniswapV3Upgrade1
+      .connect(tester.account)
+      .StakeUniswapV3Upgrade1(
+        "collect(bytes)",
+        ethers.utils.defaultAbiCoder.encode(['uint256', 'uint128','uint128'],
+        [tester.tokens[0], positions.tokensOwed0, positions.tokensOwed1])
+      );
+
+      const receipt = await tx.wait();
+      for (let i = 0; i < receipt.events.length; i++) {
+
+        if (
+          receipt.events[i].topics.length > 0 &&
+          receipt.events[i].topics[0] == topic0Collected
+        ) {
+
+           const eventObj = web3.eth.abi.decodeLog(
+            abiCollected,
+            receipt.events[i].data,
+            receipt.events[i].topics.slice(1)
+          );
+          tester.snapshot.collect = eventObj;
+          //console.log('tester.snapshot.collect',tester.snapshot.collect);
+
+        }
+      }
+
+      let wtonBalanceAfter = await wton.balanceOf(tester.account.address);
+      let tosBalanceAfter = await tos.balanceOf(tester.account.address);
+
+      let tokenToggle = false;
+      if(positions.token0 == tos.address) tokenToggle=true;
+
+      if(!tokenToggle){
+          expect(wtonBalanceAfter).to.be.equal(tester.wtonbalanceBefore.add( ethers.BigNumber.from(tester.snapshot.collect.amount0) ));
+          expect(tosBalanceAfter).to.be.equal(tester.tosbalanceBefore.add(ethers.BigNumber.from(tester.snapshot.collect.amount1)));
+      }else{
+          expect(tosBalanceAfter).to.be.equal(tester.tosbalanceBefore.add(ethers.BigNumber.from(tester.snapshot.collect.amount0)));
+          expect(wtonBalanceAfter).to.be.equal(tester.wtonbalanceBefore.add(ethers.BigNumber.from(tester.snapshot.collect.amount1)));
+      }
+    });
+
+    */
+  });
+
+
+  describe("# 14. StakeUniswapV3 Of TONStarter : withdraw ", () => {
     it("1. check current tick ", async () => {
       this.timeout(1000000);
       const tester = tester1;
@@ -1980,45 +2523,7 @@ describe(" StakeUniswapV3 ", function () {
       expect(slot0.tick).to.be.below(tester.positions[0].tickUpper);
     });
 
-    it("2. miningCoinage :  ", async () => {
-      this.timeout(1000000);
-      await timeout(10);
-      const coinageLastMintBlockTimetampBefore =
-        await TestStakeUniswapV3.coinageLastMintBlockTimetamp();
-      const canBalanceBefore = await TestStakeUniswapV3.balanceOfCoinage(
-        tester1.tokens[0]
-      );
-      expect(coinageLastMintBlockTimetampBefore).to.be.equal(
-        tester1.miningTimeLast
-      );
-
-      await TestStakeUniswapV3.connect(tester1.account).miningCoinage();
-
-      const canBalanceAfter = await TestStakeUniswapV3.balanceOfCoinage(
-        tester1.tokens[0]
-      );
-      const coinageLastMintBlockTimetampAfter =
-        await TestStakeUniswapV3.coinageLastMintBlockTimetamp();
-      expect(canBalanceAfter).to.be.above(
-        canBalanceBefore
-      );
-      expect(coinageLastMintBlockTimetampBefore).to.be.lt(
-        coinageLastMintBlockTimetampAfter
-      );
-
-      tester1.miningTimeLast = coinageLastMintBlockTimetampAfter;
-      tester2.miningTimeLast = coinageLastMintBlockTimetampAfter;
-
-      const diffTimeMining = coinageLastMintBlockTimetampAfter.sub(
-        coinageLastMintBlockTimetampBefore
-      );
-
-      remainMiningTotal = remainMiningTotal.add(
-        diffTimeMining.mul(utils.parseUnits(PHASE2_MINING_PERSECOND, 0))
-      );
-    });
-
-    it("3. pass miningEndTime :  ", async () => {
+    it("2. pass miningEndTime :  ", async () => {
 
       const miningEndTime = await TestStake2Vault.miningEndTime();
       ethers.provider.send("evm_increaseTime", [miningEndTime.toNumber()])   // add 60 seconds
@@ -2026,41 +2531,14 @@ describe(" StakeUniswapV3 ", function () {
 
     });
 
-    it("4. stake : Fail ", async () => {
+    it("3. stake : Fail ", async () => {
       this.timeout(1000000);
       await expect(
-        TestStakeUniswapV3.connect(tester1.account).stake(tester1.tokens[0])
+        TestStakeUniswapV3Upgrade1.connect(tester1.account).stake(tester1.tokens[0])
       ).to.be.revertedWith("StakeUniswapV3: end mining");
     });
 
-    it("5. miningCoinage :  ", async () => {
-      this.timeout(1000000);
-      await timeout(10);
-      const coinageLastMintBlockTimetampBefore =
-        await TestStakeUniswapV3.coinageLastMintBlockTimetamp();
-      const canBalanceBefore = await TestStakeUniswapV3.balanceOfCoinage(
-        tester1.tokens[0]
-      );
-      expect(coinageLastMintBlockTimetampBefore).to.be.equal(
-        tester1.miningTimeLast
-      );
-
-      await TestStakeUniswapV3.connect(tester1.account).miningCoinage();
-
-      const canBalanceAfter = await TestStakeUniswapV3.balanceOfCoinage(
-        tester1.tokens[0]
-      );
-      const coinageLastMintBlockTimetampAfter =
-        await TestStakeUniswapV3.coinageLastMintBlockTimetamp();
-      expect(canBalanceAfter).to.be.equal(
-        canBalanceBefore
-      );
-      expect(coinageLastMintBlockTimetampBefore).to.be.equal(
-        coinageLastMintBlockTimetampAfter
-      );
-    });
-
-    it("6. withdraw : tester1 ", async () => {
+    it("4. withdraw : tester1 ", async () => {
       this.timeout(1000000);
       await timeout(10);
       const tester = tester1;
@@ -2072,21 +2550,21 @@ describe(" StakeUniswapV3 ", function () {
       const tosBalanceBefore = await tos.balanceOf(tester.account.address);
 
       const totalStakedAmountBefore =
-        await TestStakeUniswapV3.totalStakedAmount();
-      const totalTokensBefore = await TestStakeUniswapV3.totalTokens();
+        await TestStakeUniswapV3Upgrade1.totalStakedAmount();
+      const totalTokensBefore = await TestStakeUniswapV3Upgrade1.totalTokens();
       const miningAmountTotalBefore =
-        await TestStakeUniswapV3.miningAmountTotal();
+        await TestStakeUniswapV3Upgrade1.miningAmountTotal();
       const nonMiningAmountTotalBefore =
-        await TestStakeUniswapV3.nonMiningAmountTotal();
+        await TestStakeUniswapV3Upgrade1.nonMiningAmountTotal();
 
-      const coinageTokenBefore = await TestStakeUniswapV3.stakedCoinageTokens(
+      const coinageTokenBefore = await TestStakeUniswapV3Upgrade1.stakedCoinageTokens(
         tester.tokens[0]
       );
-      const depositTokenBefore = await TestStakeUniswapV3.depositTokens(
+      const depositTokenBefore = await TestStakeUniswapV3Upgrade1.depositTokens(
         tester.tokens[0]
       );
 
-      const tx = await TestStakeUniswapV3.connect(tester.account).withdraw(
+      const tx = await TestStakeUniswapV3Upgrade1.connect(tester.account).withdraw(
         tester.tokens[0]
       );
       const receipt = await tx.wait();
@@ -2114,13 +2592,13 @@ describe(" StakeUniswapV3 ", function () {
       const tosBalanceAfter = await tos.balanceOf(tester.account.address);
       const totalSupplyTOSAfter = await tos.totalSupply();
 
-      const depositToken = await TestStakeUniswapV3.depositTokens(
+      const depositToken = await TestStakeUniswapV3Upgrade1.depositTokens(
         tester.tokens[0]
       );
-      const coinageToken = await TestStakeUniswapV3.stakedCoinageTokens(
+      const coinageToken = await TestStakeUniswapV3Upgrade1.stakedCoinageTokens(
         tester.tokens[0]
       );
-      const userTotalStaked = await TestStakeUniswapV3.userTotalStaked(
+      const userTotalStaked = await TestStakeUniswapV3Upgrade1.userTotalStaked(
         tester.account.address
       );
 
@@ -2168,7 +2646,7 @@ describe(" StakeUniswapV3 ", function () {
         ethers.BigNumber.from("0")
       );
 
-      const miningInfosAfter = await TestStakeUniswapV3.getMiningTokenId(
+      const miningInfosAfter = await TestStakeUniswapV3Upgrade1.getMiningTokenId(
         tester.tokens[0]
       );
 
@@ -2189,12 +2667,12 @@ describe(" StakeUniswapV3 ", function () {
       );
 
       const totalStakedAmountAfter =
-        await TestStakeUniswapV3.totalStakedAmount();
-      const totalTokensAfter = await TestStakeUniswapV3.totalTokens();
+        await TestStakeUniswapV3Upgrade1.totalStakedAmount();
+      const totalTokensAfter = await TestStakeUniswapV3Upgrade1.totalTokens();
       const miningAmountTotalAfter =
-        await TestStakeUniswapV3.miningAmountTotal();
+        await TestStakeUniswapV3Upgrade1.miningAmountTotal();
       const nonMiningAmountTotalAfter =
-        await TestStakeUniswapV3.nonMiningAmountTotal();
+        await TestStakeUniswapV3Upgrade1.nonMiningAmountTotal();
 
       expect(totalStakedAmountAfter).to.be.equal(
         totalStakedAmountBefore.sub(depositTokenBefore.liquidity)
@@ -2210,12 +2688,12 @@ describe(" StakeUniswapV3 ", function () {
       );
 
       const coinageLastMintBlockTimetampAfter =
-        await TestStakeUniswapV3.coinageLastMintBlockTimetamp();
+        await TestStakeUniswapV3Upgrade1.coinageLastMintBlockTimetamp();
       tester1.miningTimeLast = coinageLastMintBlockTimetampAfter;
       tester2.miningTimeLast = coinageLastMintBlockTimetampAfter;
     });
 
-    it("7. claim: tester2 ", async () => {
+    it("5. claim: tester2 ", async () => {
       this.timeout(1000000);
 
       const vaultBalanceTOS = await tos.balanceOf(vaultAddress);
@@ -2226,7 +2704,7 @@ describe(" StakeUniswapV3 ", function () {
       const tester = tester2;
 
       const tosBalanceBefore = await tos.balanceOf(tester.account.address);
-      const miningInfosBefore = await TestStakeUniswapV3.getMiningTokenId(
+      const miningInfosBefore = await TestStakeUniswapV3Upgrade1.getMiningTokenId(
         tester.tokens[0]
       );
 
@@ -2251,11 +2729,11 @@ describe(" StakeUniswapV3 ", function () {
       expect(miningInfosBefore.minableAmount).to.be.above(
         ethers.BigNumber.from("0")
       );
-      const coinageTokenBefore = await TestStakeUniswapV3.stakedCoinageTokens(
+      const coinageTokenBefore = await TestStakeUniswapV3Upgrade1.stakedCoinageTokens(
         tester.tokens[0]
       );
 
-      let depositToken = await TestStakeUniswapV3.depositTokens(
+      let depositToken = await TestStakeUniswapV3Upgrade1.depositTokens(
         tester.tokens[0]
       );
 
@@ -2269,7 +2747,7 @@ describe(" StakeUniswapV3 ", function () {
         ethers.BigNumber.from("0")
       );
 
-      const tx = await TestStakeUniswapV3.connect(tester.account).claim(
+      const tx = await TestStakeUniswapV3Upgrade1.connect(tester.account).claim(
         tester.tokens[0]
       );
       const receipt = await tx.wait();
@@ -2288,7 +2766,7 @@ describe(" StakeUniswapV3 ", function () {
       }
       const minableAmount = miningAmount.add(nonminingAmount);
       const tosBalanceAfter = await tos.balanceOf(tester.account.address);
-      const miningInfosAfter = await TestStakeUniswapV3.getMiningTokenId(
+      const miningInfosAfter = await TestStakeUniswapV3Upgrade1.getMiningTokenId(
         tester.tokens[0]
       );
 
@@ -2304,11 +2782,11 @@ describe(" StakeUniswapV3 ", function () {
 
       expect(tosBalanceBefore.add(miningAmount)).to.be.equal(tosBalanceAfter);
 
-      depositToken = await TestStakeUniswapV3.depositTokens(tester.tokens[0]);
-      const coinageToken = await TestStakeUniswapV3.stakedCoinageTokens(
+      depositToken = await TestStakeUniswapV3Upgrade1.depositTokens(tester.tokens[0]);
+      const coinageToken = await TestStakeUniswapV3Upgrade1.stakedCoinageTokens(
         tester.tokens[0]
       );
-      const userTotalStaked = await TestStakeUniswapV3.userTotalStaked(
+      const userTotalStaked = await TestStakeUniswapV3Upgrade1.userTotalStaked(
         tester.account.address
       );
 
@@ -2341,12 +2819,12 @@ describe(" StakeUniswapV3 ", function () {
       );
 
       const coinageLastMintBlockTimetampAfter =
-        await TestStakeUniswapV3.coinageLastMintBlockTimetamp();
+        await TestStakeUniswapV3Upgrade1.coinageLastMintBlockTimetamp();
       tester1.miningTimeLast = coinageLastMintBlockTimetampAfter;
       tester2.miningTimeLast = coinageLastMintBlockTimetampAfter;
     });
 
-    it("8. withdraw : tester2 ", async () => {
+    it("6. withdraw : tester2 ", async () => {
       this.timeout(1000000);
       await timeout(10);
       const tester = tester2;
@@ -2358,21 +2836,21 @@ describe(" StakeUniswapV3 ", function () {
       const tosBalanceBefore = await tos.balanceOf(tester.account.address);
 
       const totalStakedAmountBefore =
-        await TestStakeUniswapV3.totalStakedAmount();
-      const totalTokensBefore = await TestStakeUniswapV3.totalTokens();
+        await TestStakeUniswapV3Upgrade1.totalStakedAmount();
+      const totalTokensBefore = await TestStakeUniswapV3Upgrade1.totalTokens();
       const miningAmountTotalBefore =
-        await TestStakeUniswapV3.miningAmountTotal();
+        await TestStakeUniswapV3Upgrade1.miningAmountTotal();
       const nonMiningAmountTotalBefore =
-        await TestStakeUniswapV3.nonMiningAmountTotal();
+        await TestStakeUniswapV3Upgrade1.nonMiningAmountTotal();
 
-      const coinageTokenBefore = await TestStakeUniswapV3.stakedCoinageTokens(
+      const coinageTokenBefore = await TestStakeUniswapV3Upgrade1.stakedCoinageTokens(
         tester.tokens[0]
       );
-      const depositTokenBefore = await TestStakeUniswapV3.depositTokens(
+      const depositTokenBefore = await TestStakeUniswapV3Upgrade1.depositTokens(
         tester.tokens[0]
       );
 
-      const tx = await TestStakeUniswapV3.connect(tester.account).withdraw(
+      const tx = await TestStakeUniswapV3Upgrade1.connect(tester.account).withdraw(
         tester.tokens[0]
       );
       const receipt = await tx.wait();
@@ -2400,13 +2878,13 @@ describe(" StakeUniswapV3 ", function () {
       const tosBalanceAfter = await tos.balanceOf(tester.account.address);
       const totalSupplyTOSAfter = await tos.totalSupply();
 
-      const depositToken = await TestStakeUniswapV3.depositTokens(
+      const depositToken = await TestStakeUniswapV3Upgrade1.depositTokens(
         tester.tokens[0]
       );
-      const coinageToken = await TestStakeUniswapV3.stakedCoinageTokens(
+      const coinageToken = await TestStakeUniswapV3Upgrade1.stakedCoinageTokens(
         tester.tokens[0]
       );
-      const userTotalStaked = await TestStakeUniswapV3.userTotalStaked(
+      const userTotalStaked = await TestStakeUniswapV3Upgrade1.userTotalStaked(
         tester.account.address
       );
 
@@ -2454,7 +2932,7 @@ describe(" StakeUniswapV3 ", function () {
         ethers.BigNumber.from("0")
       );
 
-      const miningInfosAfter = await TestStakeUniswapV3.getMiningTokenId(
+      const miningInfosAfter = await TestStakeUniswapV3Upgrade1.getMiningTokenId(
         tester.tokens[0]
       );
 
@@ -2475,12 +2953,12 @@ describe(" StakeUniswapV3 ", function () {
       );
 
       const totalStakedAmountAfter =
-        await TestStakeUniswapV3.totalStakedAmount();
-      const totalTokensAfter = await TestStakeUniswapV3.totalTokens();
+        await TestStakeUniswapV3Upgrade1.totalStakedAmount();
+      const totalTokensAfter = await TestStakeUniswapV3Upgrade1.totalTokens();
       const miningAmountTotalAfter =
-        await TestStakeUniswapV3.miningAmountTotal();
+        await TestStakeUniswapV3Upgrade1.miningAmountTotal();
       const nonMiningAmountTotalAfter =
-        await TestStakeUniswapV3.nonMiningAmountTotal();
+        await TestStakeUniswapV3Upgrade1.nonMiningAmountTotal();
 
       expect(totalStakedAmountAfter).to.be.equal(
         totalStakedAmountBefore.sub(depositTokenBefore.liquidity)
@@ -2496,20 +2974,20 @@ describe(" StakeUniswapV3 ", function () {
       );
 
       const coinageLastMintBlockTimetampAfter =
-        await TestStakeUniswapV3.coinageLastMintBlockTimetamp();
+        await TestStakeUniswapV3Upgrade1.coinageLastMintBlockTimetamp();
       tester1.miningTimeLast = coinageLastMintBlockTimetampAfter;
       tester2.miningTimeLast = coinageLastMintBlockTimetampAfter;
     });
 
-    it("9. check :  storage ", async () => {
-      const totalStakedAmount = await TestStakeUniswapV3.totalStakedAmount();
-      const totalTokens = await TestStakeUniswapV3.totalTokens();
+    it("7. check :  storage ", async () => {
+      const totalStakedAmount = await TestStakeUniswapV3Upgrade1.totalStakedAmount();
+      const totalTokens = await TestStakeUniswapV3Upgrade1.totalTokens();
 
-      const totalSupplyCoinage = await TestStakeUniswapV3.totalSupplyCoinage();
-      const balanceOfCoinageTester1 = await TestStakeUniswapV3.balanceOfCoinage(
+      const totalSupplyCoinage = await TestStakeUniswapV3Upgrade1.totalSupplyCoinage();
+      const balanceOfCoinageTester1 = await TestStakeUniswapV3Upgrade1.balanceOfCoinage(
         tester1.tokens[0]
       );
-      const balanceOfCoinageTester2 = await TestStakeUniswapV3.balanceOfCoinage(
+      const balanceOfCoinageTester2 = await TestStakeUniswapV3Upgrade1.balanceOfCoinage(
         tester2.tokens[0]
       );
 
@@ -2527,5 +3005,100 @@ describe(" StakeUniswapV3 ", function () {
         balanceOfCoinageTester2.div(ethers.BigNumber.from(10 ** 9)).toNumber()
       ).to.be.equal(0);
     });
+
   });
+
+  describe("# 15. nftPositionManager : collect ", () => {
+      /*
+    it("1. collect : tester1 ", async () => {
+      const tester = tester1;
+
+      tester.wtonbalanceBefore = await wton.balanceOf(tester.account.address);
+      tester.tosbalanceBefore = await tos.balanceOf(tester.account.address);
+
+      let positions = await deployedUniswapV3.nftPositionManager.positions(tester.tokens[0]);
+      let params = {
+        tokenId: tester.tokens[0],
+        recipient: tester.account.address,
+        amount0Max: positions.tokensOwed0,
+        amount1Max: positions.tokensOwed1
+      }
+
+      let tx = await deployedUniswapV3.nftPositionManager.connect(tester.account).collect(params);
+
+      const receipt = await tx.wait();
+      for (let i = 0; i < receipt.events.length; i++) {
+        if (
+          receipt.events[i].event == "Collect" &&
+          receipt.events[i].args != null
+        ) {
+          tester.snapshot.collect = receipt.events[i].args;
+        }
+      }
+
+      expect(tester.snapshot.collect.amount0).to.bo.above(ether.BigNumber.from('0'));
+
+      let wtonBalanceAfter = await wton.balanceOf(tester.account.address);
+      let tosBalanceAfter = await tos.balanceOf(tester.account.address);
+
+      let tokenToggle = false;
+      if(positions.token0 == tos.address) tokenToggle=true;
+
+      if(!tokenToggle){
+          expect(wtonBalanceAfter).to.be.equal(tester.wtonbalanceBefore.add(tester.snapshot.collect.amount0));
+          expect(tosBalanceAfter).to.be.equal(tester.tosbalanceBefore.add(tester.snapshot.collect.amount1));
+      }else{
+          expect(tosBalanceAfter).to.be.equal(tester.tosbalanceBefore.add(tester.snapshot.collect.amount0));
+          expect(wtonBalanceAfter).to.be.equal(tester.wtonbalanceBefore.add(tester.snapshot.collect.amount1));
+      }
+    });
+      */
+    it("2. collect : tester2 ", async () => {
+
+      const tester = tester2;
+
+      tester.wtonbalanceBefore = await wton.balanceOf(tester.account.address);
+      tester.tosbalanceBefore = await tos.balanceOf(tester.account.address);
+
+      let positions = await deployedUniswapV3.nftPositionManager.positions(tester.tokens[0]);
+      let params = {
+        tokenId: tester.tokens[0],
+        recipient: tester.account.address,
+        amount0Max: positions.tokensOwed0,
+        amount1Max: positions.tokensOwed1
+      }
+
+      let tx = await deployedUniswapV3.nftPositionManager.connect(tester.account).collect(params);
+
+      const receipt = await tx.wait();
+
+      for (let i = 0; i < receipt.events.length; i++) {
+        if (
+          receipt.events[i].event == "Collect" &&
+          receipt.events[i].args != null
+        ) {
+          tester.snapshot.collect = receipt.events[i].args;
+        }
+      }
+
+      expect(tester.snapshot.collect.amount0).to.be.above(ethers.BigNumber.from('0'));
+
+      let wtonBalanceAfter = await wton.balanceOf(tester.account.address);
+      let tosBalanceAfter = await tos.balanceOf(tester.account.address);
+
+      let tokenToggle = false;
+      if(positions.token0 == tos.address) tokenToggle=true;
+
+      if(!tokenToggle){
+          expect(wtonBalanceAfter).to.be.equal(tester.wtonbalanceBefore.add(tester.snapshot.collect.amount0));
+          expect(tosBalanceAfter).to.be.equal(tester.tosbalanceBefore.add(tester.snapshot.collect.amount1));
+      }else{
+          expect(tosBalanceAfter).to.be.equal(tester.tosbalanceBefore.add(tester.snapshot.collect.amount0));
+          expect(wtonBalanceAfter).to.be.equal(tester.wtonbalanceBefore.add(tester.snapshot.collect.amount1));
+      }
+    });
+
+
+  });
+
 });
