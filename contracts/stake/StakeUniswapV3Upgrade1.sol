@@ -17,6 +17,10 @@ import "../stake/StakeUniswapV3Storage.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "../libraries/SafeMath32.sol";
 
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+
+//import "hardhat/console.sol";
+
 /// @title StakeUniswapV3
 /// @notice Uniswap V3 Contract for staking LP and mining TOS
 contract StakeUniswapV3Upgrade1 is
@@ -78,16 +82,16 @@ contract StakeUniswapV3Upgrade1 is
     );
 
     event WithdrawalToken(
-        address indexed to,
-        uint256 tokenId,
+        address indexed sender,
+        uint256 indexed tokenId,
         uint256 miningAmount,
         uint256 nonMiningAmount
     );
 
     event Claimed(
-        address indexed to,
+        address indexed sender,
+        uint256 indexed tokenId,
         address poolAddress,
-        uint256 tokenId,
         uint256 miningAmount,
         uint256 nonMiningAmount
     );
@@ -111,20 +115,29 @@ contract StakeUniswapV3Upgrade1 is
     function miningCoinage() public lock {
         if (saleStartTime == 0 || saleStartTime > block.timestamp) return;
         if (stakeStartTime == 0 || stakeStartTime > block.timestamp) return;
+
+        uint256 _miningEndTime = IIStake2Vault(vault).miningEndTime();
+
+        uint256 curBlocktimestamp = block.timestamp;
+        if (curBlocktimestamp > _miningEndTime)
+            curBlocktimestamp = _miningEndTime;
+
         if (
             IIStake2Vault(vault).miningStartTime() > block.timestamp ||
-            IIStake2Vault(vault).miningEndTime() < block.timestamp
+            (coinageLastMintBlockTimetamp > 0 &&
+                IIStake2Vault(vault).miningEndTime() <=
+                coinageLastMintBlockTimetamp)
         ) return;
 
         if (coinageLastMintBlockTimetamp == 0)
             coinageLastMintBlockTimetamp = stakeStartTime;
 
         if (
-            block.timestamp >
+            curBlocktimestamp >
             (coinageLastMintBlockTimetamp.add(miningIntervalSeconds))
         ) {
             uint256 miningInterval =
-                block.timestamp.sub(coinageLastMintBlockTimetamp);
+                curBlocktimestamp.sub(coinageLastMintBlockTimetamp);
             uint256 miningAmount =
                 miningInterval.mul(IIStake2Vault(vault).miningPerSecond());
             uint256 prevTotalSupply =
@@ -141,7 +154,7 @@ contract StakeUniswapV3Upgrade1 is
                             IAutoRefactorCoinageWithTokenId(coinage).factor()
                         )
                     );
-                coinageLastMintBlockTimetamp = block.timestamp;
+                coinageLastMintBlockTimetamp = curBlocktimestamp;
 
                 emit MinedCoinage(
                     block.timestamp,
@@ -506,15 +519,17 @@ contract StakeUniswapV3Upgrade1 is
             delete userTotalStaked[msg.sender];
         }
 
-        if (minableAmount > 0)
+        if (minableAmount > 0) {
             require(
                 IIStake2Vault(vault).claimMining(
                     msg.sender,
                     minableAmount,
                     miningAmount,
                     nonMiningAmount
-                )
+                ),
+                "fail claimMining"
             );
+        }
 
         nonfungiblePositionManager.safeTransferFrom(
             address(this),
@@ -583,6 +598,11 @@ contract StakeUniswapV3Upgrade1 is
             balanceOfTokenIdRay = IAutoRefactorCoinageWithTokenId(coinage)
                 .balanceOf(tokenId);
 
+            uint256 curBlockTimestamp = block.timestamp;
+            uint256 _miningEndTime = IIStake2Vault(vault).miningEndTime();
+            if (curBlockTimestamp > _miningEndTime)
+                curBlockTimestamp = _miningEndTime;
+
             if (_depositTokens.liquidity > 0 && balanceOfTokenIdRay > 0) {
                 if (balanceOfTokenIdRay > liquidity.mul(10**9)) {
                     minableAmountRay = balanceOfTokenIdRay.sub(
@@ -599,11 +619,11 @@ contract StakeUniswapV3Upgrade1 is
                     secondsInside256 = uint256(secondsInside);
 
                     if (_depositTokens.claimedTime > 0)
-                        secondsAbsolute = uint32(block.timestamp).sub(
+                        secondsAbsolute = uint32(curBlockTimestamp).sub(
                             _depositTokens.claimedTime
                         );
                     else
-                        secondsAbsolute = uint32(block.timestamp).sub(
+                        secondsAbsolute = uint32(curBlockTimestamp).sub(
                             _depositTokens.startTime
                         );
                     secondsAbsolute256 = uint256(secondsAbsolute);
@@ -725,8 +745,8 @@ contract StakeUniswapV3Upgrade1 is
 
         emit Claimed(
             msg.sender,
-            poolAddress,
             tokenId,
+            poolAddress,
             miningAmount,
             nonMiningAmount
         );
@@ -734,17 +754,13 @@ contract StakeUniswapV3Upgrade1 is
     }
 
     function claimAndCollect(bytes calldata params) external returns (bool) {
-        (uint256 tokenId, uint128 amount0Max, uint128 amount1Max) =
-            abi.decode(params, (uint256, uint128, uint128));
+        (uint256 tokenId, , ) = abi.decode(params, (uint256, uint128, uint128));
 
         require(
             claim(abi.encode(tokenId)),
             "StakeUniswapV3Upgrade1: fail claim"
         );
-        require(
-            collect(abi.encode(amount0Max, amount1Max)),
-            "StakeUniswapV3Upgrade1: fail collect"
-        );
+        require(collect(params), "StakeUniswapV3Upgrade1: fail collect");
         return true;
     }
 }

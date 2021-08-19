@@ -41,35 +41,6 @@ contract StakeUniswapV3Upgrade is
     using SafeMath for uint256;
     using SafeMath32 for uint32;
 
-    struct PositionInfo {
-        // the amount of liquidity owned by this position
-        uint128 liquidity;
-        // fee growth per unit of liquidity as of the last update to liquidity or fees owed
-        uint256 feeGrowthInside0LastX128;
-        uint256 feeGrowthInside1LastX128;
-        // the fees owed to the position owner in token0/token1
-        uint128 tokensOwed0;
-        uint128 tokensOwed1;
-    }
-
-    struct Slot0 {
-        // the current price
-        uint160 sqrtPriceX96;
-        // the current tick
-        int24 tick;
-        // the most-recently updated index of the observations array
-        uint16 observationIndex;
-        // the current maximum number of observations that are being stored
-        uint16 observationCardinality;
-        // the next maximum number of observations to store, triggered in observations.write
-        uint16 observationCardinalityNext;
-        // the current protocol fee as a percentage of the swap fee taken on withdrawal
-        // represented as an integer denominator (1/x)%
-        uint8 feeProtocol;
-        // whether the pool is locked
-        bool unlocked;
-    }
-
     /// @dev event on staking
     /// @param to the sender
     /// @param poolAddress the pool address of uniswapV3
@@ -83,27 +54,27 @@ contract StakeUniswapV3Upgrade is
     );
 
     /// @dev event on claim
-    /// @param to the sender
-    /// @param poolAddress the pool address of uniswapV3
+    /// @param sender the sender
     /// @param tokenId the uniswapV3 Lp token
+    /// @param poolAddress the pool address of uniswapV3
     /// @param miningAmount the amount of mining
     /// @param nonMiningAmount the amount of non-mining
     event Claimed(
-        address indexed to,
+        address indexed sender,
+        uint256 indexed tokenId,
         address poolAddress,
-        uint256 tokenId,
         uint256 miningAmount,
         uint256 nonMiningAmount
     );
 
     /// @dev event on withdrawal
-    /// @param to the sender
+    /// @param sender the sender
     /// @param tokenId the uniswapV3 Lp token
     /// @param miningAmount the amount of mining
     /// @param nonMiningAmount the amount of non-mining
     event WithdrawalToken(
-        address indexed to,
-        uint256 tokenId,
+        address indexed sender,
+        uint256 indexed tokenId,
         uint256 miningAmount,
         uint256 nonMiningAmount
     );
@@ -143,6 +114,29 @@ contract StakeUniswapV3Upgrade is
         address indexed poolAddress,
         uint256 tokenId,
         uint256 amount
+    );
+
+    event IncreasedLiquidity(
+        address indexed sender,
+        uint256 indexed tokenId,
+        uint128 liquidity,
+        uint256 amount0,
+        uint256 amount1
+    );
+
+    event Collected(
+        address indexed sender,
+        uint256 indexed tokenId,
+        uint256 amount0,
+        uint256 amount1
+    );
+
+    event DecreasedLiquidity(
+        address indexed sender,
+        uint256 indexed tokenId,
+        uint128 liquidity,
+        uint256 amount0,
+        uint256 amount1
     );
 
     /// @dev constructor of StakeCoinage
@@ -223,20 +217,29 @@ contract StakeUniswapV3Upgrade is
     function miningCoinage() public lock {
         if (saleStartTime == 0 || saleStartTime > block.timestamp) return;
         if (stakeStartTime == 0 || stakeStartTime > block.timestamp) return;
+
+        uint256 _miningEndTime = IIStake2Vault(vault).miningEndTime();
+
+        uint256 curBlocktimestamp = block.timestamp;
+        if (curBlocktimestamp > _miningEndTime)
+            curBlocktimestamp = _miningEndTime;
+
         if (
             IIStake2Vault(vault).miningStartTime() > block.timestamp ||
-            IIStake2Vault(vault).miningEndTime() < block.timestamp
+            (coinageLastMintBlockTimetamp > 0 &&
+                IIStake2Vault(vault).miningEndTime() <=
+                coinageLastMintBlockTimetamp)
         ) return;
 
         if (coinageLastMintBlockTimetamp == 0)
             coinageLastMintBlockTimetamp = stakeStartTime;
 
         if (
-            block.timestamp >
+            curBlocktimestamp >
             (coinageLastMintBlockTimetamp.add(miningIntervalSeconds))
         ) {
             uint256 miningInterval =
-                block.timestamp.sub(coinageLastMintBlockTimetamp);
+                curBlocktimestamp.sub(coinageLastMintBlockTimetamp);
             uint256 miningAmount =
                 miningInterval.mul(IIStake2Vault(vault).miningPerSecond());
             uint256 prevTotalSupply =
@@ -253,7 +256,7 @@ contract StakeUniswapV3Upgrade is
                             IAutoRefactorCoinageWithTokenId(coinage).factor()
                         )
                     );
-                coinageLastMintBlockTimetamp = block.timestamp;
+                coinageLastMintBlockTimetamp = curBlocktimestamp;
 
                 emit MinedCoinage(
                     block.timestamp,
@@ -298,14 +301,20 @@ contract StakeUniswapV3Upgrade is
             balanceOfTokenIdRay = IAutoRefactorCoinageWithTokenId(coinage)
                 .balanceOf(tokenId);
 
+            uint256 curBlockTimestamp = block.timestamp;
+            //uint256 _miningEndTime = IIStake2Vault(vault).miningEndTime();
+            if (curBlockTimestamp > IIStake2Vault(vault).miningEndTime())
+                curBlockTimestamp = IIStake2Vault(vault).miningEndTime();
+
             if (_depositTokens.liquidity > 0 && balanceOfTokenIdRay > 0) {
+                uint256 _minableAmount = 0;
                 if (balanceOfTokenIdRay > liquidity.mul(10**9)) {
                     minableAmountRay = balanceOfTokenIdRay.sub(
                         liquidity.mul(10**9)
                     );
-                    minableAmount = minableAmountRay.div(10**9);
+                    _minableAmount = minableAmountRay.div(10**9);
                 }
-                if (minableAmount > 0) {
+                if (_minableAmount > 0) {
                     (, , secondsInside) = IUniswapV3Pool(poolAddress)
                         .snapshotCumulativesInside(
                         _depositTokens.tickLower,
@@ -314,11 +323,11 @@ contract StakeUniswapV3Upgrade is
                     secondsInside256 = uint256(secondsInside);
 
                     if (_depositTokens.claimedTime > 0)
-                        secondsAbsolute = uint32(block.timestamp).sub(
+                        secondsAbsolute = uint32(curBlockTimestamp).sub(
                             _depositTokens.claimedTime
                         );
                     else
-                        secondsAbsolute = uint32(block.timestamp).sub(
+                        secondsAbsolute = uint32(curBlockTimestamp).sub(
                             _depositTokens.startTime
                         );
                     secondsAbsolute256 = uint256(secondsAbsolute);
@@ -334,19 +343,19 @@ contract StakeUniswapV3Upgrade is
                             );
                         }
 
+                        minableAmount = _minableAmount;
                         if (
                             secondsInsideDiff256 < secondsAbsolute256 &&
                             secondsInsideDiff256 > 0
                         ) {
-                            miningAmount = minableAmount
+                            miningAmount = _minableAmount
                                 .mul(secondsInsideDiff256)
                                 .div(secondsAbsolute256);
-                            nonMiningAmount = minableAmount.sub(miningAmount);
                         } else if (secondsInsideDiff256 > 0) {
-                            miningAmount = minableAmount;
-                        } else {
-                            nonMiningAmount = minableAmount;
+                            miningAmount = _minableAmount;
                         }
+
+                        nonMiningAmount = minableAmount.sub(miningAmount);
                     }
                 }
             }

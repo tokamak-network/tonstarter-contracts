@@ -81,7 +81,8 @@ let StakeTONFactory, StakeDefiFactory,
   StakeSimpleFactory, StakeTONProxyFactory ,
   StakeUniswapV3, StakeCoinageFactory, StakeUniswapV3Factory,
   Stake2Logic, Stake2VaultLogic ,
-  StakeTONLogic, StakeSimple , StakeUniswapV3Upgrade, StakeUniswapV3Upgrade1;
+  StakeTONLogic, StakeSimple , StakeUniswapV3Upgrade, StakeUniswapV3Upgrade1,
+  Stake2VaultUpgrade;
 
 // plasma-evm-contracts
 let TON, WTON,
@@ -110,9 +111,9 @@ const PHASE1_ETH_Staking = "175000000." + "0".repeat(18);
 const PHASE1_TOSETHLP_Staking = "150000000." + "0".repeat(18);
 const PHASE1_DEV_Mining = "150000000." + "0".repeat(18);
 //const PHASE2_ETHTOS_Staking = "8000000." + "0".repeat(18);
-const PHASE2_ETHTOS_Staking = "8000000";
 
-const PHASE2_REWARD_PERBLOCK = "1.5" + "0".repeat(17);
+
+const PHASE2_ETHTOS_Staking = "8000000";
 const PHASE2_MINING_PERSECOND= "84559445290038900" ;
 
 const HASH_PHASE2_ETHTOS_Staking = keccak256("PHASE2_ETHTOS_STAKING");
@@ -120,30 +121,6 @@ const HASH_PHASE1_TON_Staking = keccak256("PHASE1_TON_STAKING");
 const HASH_PHASE1_ETH_Staking = keccak256("PHASE1_ETH_STAKING");
 const HASH_PHASE1_TOSETHLP_Staking = keccak256("PHASE1_TOSETHLP_Staking");
 const HASH_PHASE1_DEV_Mining = keccak256("PHASE1_DEV_Mining");
-
-
-// const deployTON = async () => {
-//   const contract = await (
-//     await ethers.getContractFactory(
-//       TON.abi,
-//       TON.bytecode
-//     )
-//   ).deploy();
-//   const deployed = await contract.deployed();
-//   return deployed;
-// };
-
-// const deployWTON = async () => {
-//   const contract = await (
-//     await ethers.getContractFactory(
-//       WTON.abi,
-//       WTON.bytecode
-//     )
-//   ).deploy();
-//   const deployed = await contract.deployed();
-//   return deployed;
-// };
-
 
 class ICO20Contracts {
   constructor() {
@@ -200,6 +177,7 @@ class ICO20Contracts {
     this.stake2Vault = null;
     this.stakeUniswapV3Upgrade = null;
     this.stakeUniswapV3Upgrade1 = null;
+    this.stake2VaultUpgrade = null;
 
     this.AbiObject = {
       TON: null,
@@ -386,6 +364,9 @@ class ICO20Contracts {
     StakeUniswapV3Upgrade1 = await ethers.getContractFactory("StakeUniswapV3Upgrade1");
     this.stakeUniswapV3Upgrade1 = await StakeUniswapV3Upgrade1.connect(owner).deploy();
 
+    Stake2VaultUpgrade = await ethers.getContractFactory("Stake2VaultUpgrade");
+    this.stake2VaultUpgrade = await Stake2VaultUpgrade.connect(owner).deploy();
+
     const returnData = {
       tos: this.tos,
       stos: this.stos,
@@ -412,7 +393,8 @@ class ICO20Contracts {
       stakeEntry2 : this.stakeEntry2,
       stakeVaultFactory: this.stakeVaultFactory,
       stakeUniswapV3Upgrade: this.stakeUniswapV3Upgrade,
-      stakeUniswapV3Upgrade1: this.stakeUniswapV3Upgrade1
+      stakeUniswapV3Upgrade1: this.stakeUniswapV3Upgrade1,
+      stake2VaultUpgrade: this.stake2VaultUpgrade
     };
     // console.log(' initializeICO20Contracts  :',returnData );
 
@@ -623,7 +605,8 @@ class ICO20Contracts {
       stakeSimpleFactory: this.stakeSimpleFactory,
       stakeVaultFactory : this.stakeVaultFactory,
       stakeUniswapV3Upgrade: this.stakeUniswapV3Upgrade,
-      stakeUniswapV3Upgrade1: this.stakeUniswapV3Upgrade1
+      stakeUniswapV3Upgrade1: this.stakeUniswapV3Upgrade1,
+      stake2VaultUpgrade: this.stake2VaultUpgrade
     };
   };
 
