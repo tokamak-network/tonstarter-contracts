@@ -13,23 +13,23 @@ import "hardhat/console.sol";
 /// @title The proxy of TOS Plaform
 /// @notice Admin can createVault, createStakeContract.
 /// User can excute the tokamak staking function of each contract through this logic.
-contract LockTOSProxy is LockTOSStorage, ProxyBase, AccessibleCommon, ILockTOSProxy {
+contract LockTOSProxy is LockTOSStorage, AccessibleCommon, ProxyBase, ILockTOSProxy {
     event Upgraded(address indexed implementation);
 
     /// @dev constructor of StakeVaultProxy
-    /// @param impl the logic address of StakeVaultProxy
-    constructor(address impl) {
+    /// @param _impl the logic address of StakeVaultProxy
+    constructor(address _impl, address _admin) {
         assert(
             IMPLEMENTATION_SLOT ==
                 bytes32(uint256(keccak256("eip1967.proxy.implementation")) - 1)
         );
 
-        require(impl != address(0), "LockTOSProxy: logic is zero");
+        require(_impl != address(0), "LockTOSProxy: logic is zero");
 
-        _setImplementation(impl);
+        _setImplementation(_impl);
 
         _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
-        _setupRole(ADMIN_ROLE, msg.sender);
+        _setupRole(ADMIN_ROLE, _admin);
         _setupRole(ADMIN_ROLE, address(this));
     }
 
@@ -96,6 +96,7 @@ contract LockTOSProxy is LockTOSStorage, ProxyBase, AccessibleCommon, ILockTOSPr
         }
     }
 
+    /// @dev Initialize
     function initialize(address _tos, uint256 _phase3StartTime) external override onlyOwner {
         tos = _tos;
         phase3StartTime = _phase3StartTime;

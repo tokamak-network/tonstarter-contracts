@@ -55,10 +55,7 @@ describe("LockTOS", function () {
     ).deploy(lockTOSImpl.address);
     await lockTOSProxy.deployed();
 
-    console.log(tos.address);
-    console.log(await lockTOSProxy.tos());
     await (await lockTOSProxy.initialize(tos.address, phase3StartTime)).wait();
-    console.log(await lockTOSProxy.tos());
 
     const lockTOSArtifact = await hre.artifacts.readArtifact("LockTOS");
     lockTOS = new ethers.Contract(
