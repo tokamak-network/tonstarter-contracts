@@ -71,9 +71,9 @@ contract LockTOS is LockTOSStorage, AccessibleCommon, ILockTOS {
         require(_unlockWeeks > 0, "Unlock period less than a week");
 
         LibLockTOS.LockedBalance memory lock = lockedBalances[msg.sender][_lockId];
-        uint256 unlockTime = lock.end.add(_unlockWeeks.mul(ONE_WEEK));
-        unlockTime = unlockTime.div(ONE_WEEK).mul(ONE_WEEK);
-        require(unlockTime - lock.start < MAXTIME, "Max unlock time is 3 years");
+        uint256 unlockTime = lock.end.add(_unlockWeeks.mul(epochUnit));
+        unlockTime = unlockTime.div(epochUnit).mul(epochUnit);
+        require(unlockTime - lock.start < maxTime, "Max unlock time is 3 years");
         require(lock.end > block.timestamp, "Lock time already finished");
         require(lock.end < unlockTime, "New lock time must be greater");
         require(lock.amount > 0, "No existing locked TOS");
@@ -83,11 +83,23 @@ contract LockTOS is LockTOSStorage, AccessibleCommon, ILockTOS {
     }
 
     /// @inheritdoc ILockTOS
-    function withdrawAll() external override {
-        uint256[] memory locks = userLocks[msg.sender];
-        for (uint256 i = 0; i < locks.length; ++i) {
-            withdraw(locks[i]);
+    function withdrawAll() external override ifFree {
+        uint256[] storage locks = userLocks[msg.sender];
+
+        if (locks.length == 0) {
+            return;
         }
+
+        for (uint256 i = locks.length - 1; i >= 0; i--) {
+            LibLockTOS.LockedBalance memory lock = allLocks[locks[i]];
+            if (lock.amount > 0 && lock.start > 0 && lock.end < block.timestamp) {
+                _withdraw(locks[i]);
+                locks[i] = locks[locks.length - 1];
+                delete locks[locks.length - 1];
+            }
+
+            if (i == 0) break; // i is unsigned
+        } 
     }
 
     /// @inheritdoc ILockTOS
@@ -96,41 +108,18 @@ contract LockTOS is LockTOSStorage, AccessibleCommon, ILockTOS {
     }
 
     /// @inheritdoc ILockTOS
-    function editLock(
-        uint256 _lockId,
-        uint256 _start,
-        uint256 _end,
-        uint256 _value,
-        int256 _boostValue
-    ) external override {
-       LibLockTOS.LockedBalance memory lockedOld = lockedBalances[msg.sender][_lockId];
-       LibLockTOS.LockedBalance memory lockedNew = LibLockTOS.LockedBalance({
-            amount: _value,
-            start: _start,
-            end: _end,
-            boostValue: _boostValue
-        });
-
-        // Checkpoint
-        _checkpoint(lockedNew, lockedOld);
-
-        // Save new lock
-        lockedBalances[msg.sender][_lockId] = lockedNew;
-        allLocks[_lockId] = lockedNew;
-
-        // Save user point
-        int256 userSlope = lockedNew.amount.mul(MULTIPLIER).div(MAXTIME).toInt256();
-        int256 userBias = userSlope.mul(lockedNew.end.sub(block.timestamp).toInt256());
-        LibLockTOS.Point memory userPoint = LibLockTOS.Point({
-            timestamp: block.timestamp,
-            slope: userSlope.mul(lockedNew.boostValue), // Boost slope if staked before phase3
-            bias: userBias
-        });
-        lockPointHistory[_lockId].push(userPoint);
+    function withdraw(uint256 _lockId) public override ifFree {
+        _withdraw(_lockId);
+        uint256[] storage locks = userLocks[msg.sender];
+        for (uint256 i = 0; i < locks.length; ++i) {
+            if (locks[i] == _lockId) {
+                locks[i] = locks[locks.length - 1];
+                delete locks[locks.length - 1];
+            }
+        }
     }
 
-    /// @inheritdoc ILockTOS
-    function withdraw(uint256 _lockId) public override ifFree {
+    function _withdraw(uint256 _lockId) internal {
         LibLockTOS.LockedBalance memory lockedOld = lockedBalances[msg.sender][_lockId];
         require(lockedOld.start > 0, "Lock does not exist");
         require(lockedOld.end < block.timestamp, "Lock time not finished");
@@ -147,7 +136,9 @@ contract LockTOS is LockTOSStorage, AccessibleCommon, ILockTOS {
         _checkpoint(lockedNew, lockedOld);
 
         // Transfer TOS back        
-        lockedBalances[msg.sender][_lockId] = lockedNew;   
+        lockedBalances[msg.sender][_lockId] = lockedNew;
+        allLocks[_lockId] = lockedNew;
+
         IERC20(tos).transfer(msg.sender, lockedOld.amount);
         emit LockWithdrawn(msg.sender, _lockId, lockedOld.amount);
     }
@@ -158,9 +149,9 @@ contract LockTOS is LockTOSStorage, AccessibleCommon, ILockTOS {
         require(_unlockWeeks > 0, "Unlock period less than a week");
 
         lockId = lockIdCounter++;
-        uint256 unlockTime = block.timestamp.add(_unlockWeeks.mul(ONE_WEEK));
-        unlockTime = unlockTime.div(ONE_WEEK).mul(ONE_WEEK);
-        require(unlockTime - block.timestamp < MAXTIME, "Max unlock time is 3 years");
+        uint256 unlockTime = block.timestamp.add(_unlockWeeks.mul(epochUnit));
+        unlockTime = unlockTime.div(epochUnit).mul(epochUnit);
+        require(unlockTime - block.timestamp < maxTime, "Max unlock time is 3 years");
         _deposit(msg.sender, lockId, _value, unlockTime);
         userLocks[msg.sender].push(lockId);
 
@@ -325,7 +316,7 @@ contract LockTOS is LockTOSStorage, AccessibleCommon, ILockTOS {
         allLocks[_lockId] = lockedNew;
 
         // Save user point
-        int256 userSlope = lockedNew.amount.mul(MULTIPLIER).div(MAXTIME).toInt256();
+        int256 userSlope = lockedNew.amount.mul(MULTIPLIER).div(maxTime).toInt256();
         int256 userBias = userSlope.mul(lockedNew.end.sub(block.timestamp).toInt256());
         LibLockTOS.Point memory userPoint = LibLockTOS.Point({
             timestamp: block.timestamp,
@@ -351,12 +342,12 @@ contract LockTOS is LockTOSStorage, AccessibleCommon, ILockTOS {
 
         // Initialize slope changes
         if (lockedNew.end > timestamp && lockedNew.amount > 0) {
-            changeNew.slope = lockedNew.amount.mul(MULTIPLIER).div(MAXTIME).toInt256();
+            changeNew.slope = lockedNew.amount.mul(MULTIPLIER).div(maxTime).toInt256();
             changeNew.bias = changeNew.slope.mul(lockedNew.end.sub(timestamp).toInt256());
             changeNew.changeTime = lockedNew.end;
         }
         if (lockedOld.end > timestamp && lockedOld.amount > 0) {
-            changeOld.slope = lockedOld.amount.mul(MULTIPLIER).div(MAXTIME).toInt256();
+            changeOld.slope = lockedOld.amount.mul(MULTIPLIER).div(maxTime).toInt256();
             changeOld.bias = changeOld.slope.mul(lockedOld.end.sub(timestamp).toInt256());
             changeOld.changeTime = lockedOld.end;
         }
@@ -383,9 +374,9 @@ contract LockTOS is LockTOSStorage, AccessibleCommon, ILockTOS {
         }
 
         // Iterate through all past unrecoreded weeks and record
-        uint256 pointTimestampIterator = lastWeek.timestamp.div(ONE_WEEK).mul(ONE_WEEK);
+        uint256 pointTimestampIterator = lastWeek.timestamp.div(epochUnit).mul(epochUnit);
         while (pointTimestampIterator != timestamp) {
-            pointTimestampIterator = Math.min(pointTimestampIterator.add(ONE_WEEK), timestamp);
+            pointTimestampIterator = Math.min(pointTimestampIterator.add(epochUnit), timestamp);
             int256 deltaSlope = slopeChanges[pointTimestampIterator];
             int256 deltaTime = pointTimestampIterator.sub(lastWeek.timestamp).toInt256();
             lastWeek.bias = lastWeek.bias.sub(lastWeek.slope.mul(deltaTime));

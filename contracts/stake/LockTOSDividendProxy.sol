@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.7.6;
 
-import "../interfaces/ILockTOSProxy.sol";
+import "../interfaces/ILockTOSDividendProxy.sol";
 import {Address} from "@openzeppelin/contracts/utils/Address.sol";
 
 import "../common/AccessibleCommon.sol";
@@ -9,11 +9,12 @@ import "./LockTOSStorage.sol";
 import "./ProxyBase.sol";
 
 import "hardhat/console.sol";
+import "./LockTOSDividendStorage.sol";
 
 /// @title The proxy of TOS Plaform
 /// @notice Admin can createVault, createStakeContract.
 /// User can excute the tokamak staking function of each contract through this logic.
-contract LockTOSProxy is LockTOSStorage, AccessibleCommon, ProxyBase, ILockTOSProxy {
+contract LockTOSDividendProxy is LockTOSDividendStorage, AccessibleCommon, ProxyBase, ILockTOSDividendProxy {
     event Upgraded(address indexed implementation);
 
     /// @dev constructor of StakeVaultProxy
@@ -96,11 +97,7 @@ contract LockTOSProxy is LockTOSStorage, AccessibleCommon, ProxyBase, ILockTOSPr
     }
 
     /// @dev Initialize
-    function initialize(address _tos, uint256 _epochUnit, uint256 _maxTime, uint256 _phase3StartTime) external override onlyOwner {
-        require(tos == address(0), "Already initialized");
-        tos = _tos;
-        epochUnit = _epochUnit;
-        maxTime = _maxTime;
-        phase3StartTime = _phase3StartTime;
+    function initialize(address _lockTOS) external override onlyOwner {
+        lockTOS = _lockTOS;
     }
 }

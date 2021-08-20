@@ -10,21 +10,16 @@ import "../interfaces/ILockTOSDividend.sol";
 import "../interfaces/ILockTOS.sol";
 import "../libraries/LibLockTOSDividend.sol";
 
+import "../common/AccessibleCommon.sol";
+import "./LockTOSDividendStorage.sol";
 
-contract LockTOSDividend is ILockTOSDividend {
-    using SafeMath for uint256;
-    using SafeCast for uint256;
-
-    uint256 public constant ONE_WEEK = 1 weeks;
-
-    address public lockTOS;
-    uint256 public genesis;
-    mapping (address => LibLockTOSDividend.Distribution) public distributions;
-    uint256 internal free = 1;
-    
+contract LockTOSDividend is LockTOSDividendStorage, AccessibleCommon, ILockTOSDividend {
     event Claim(address token, uint256 amount, uint256 timestamp);
     event Distribute(address token, uint256 amount);
     event Redistribute(address token, uint256 oldEpoch, uint256 newEpoch);
+
+    using SafeMath for uint256;
+    using SafeCast for uint256;
 
     constructor(address _lockTOS) {
         lockTOS = _lockTOS;

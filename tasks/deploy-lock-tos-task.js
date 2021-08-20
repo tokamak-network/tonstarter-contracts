@@ -13,22 +13,31 @@ task("rinkeby-deploy-lock-tos", "Deploy TOS").setAction(async () => {
   console.log({ phase3StartTime });
   const deployer = await findAccount(account);
 
-  // const lockTOS = await (await ethers.getContractFactory("LockTOS"))
-  //   .connect(deployer)
-  //   .deploy();
-  // await lockTOS.deployed();
-  // console.log("LockTOS: ", lockTOS.address);
-  const lockTOSAddress = "0x792259078517fa61a182be0f7036d604043752ff"; // lockTOS.address;
+  const lockTOS = await (await ethers.getContractFactory("LockTOS"))
+    .connect(deployer)
+    .deploy();
+  await lockTOS.deployed();
+  console.log("LockTOS: ", lockTOS.address);
+  const lockTOSAddress = lockTOS.address;
+
+  const lockTOSProxy = await (await ethers.getContractFactory("LockTOSProxy"))
+    .connect(deployer)
+    .deploy(lockTOS.address, deployer.address);
+  await lockTOSProxy.deployed();
+  console.log("LockTOSProxy: ", lockTOSProxy.address);
+  const lockTOSProxyAddress = lockTOSProxy.address;
+
+  // await (
+  //   await lockTOSProxy.initialize(
+  //     tosAddress,
+  //     time.duration.weeks(1),
+  //     time.duration.weeks(156),
+  //     phase3StartTime
+  //   )
+  // ).wait();
 
   const adminAddress = "0x8c595DA827F4182bC0E3917BccA8e654DF8223E1";
-  // const lockTOSProxy = await (await ethers.getContractFactory("LockTOSProxy"))
-  //   .connect(deployer)
-  //   .deploy(lockTOS.address, adminAddress);
-  // await lockTOSProxy.deployed();
-  // console.log("LockTOSProxy: ", lockTOSProxy.address);
-  const lockTOSProxyAddress = "0x75bc9e5082c5485c414b09374cd4f0be472bedb2"; // lockTOSProxy.address;
-
-  // await (await lockTOSProxy.initialize(tosAddress, phase3StartTime)).wait();
+  await (await lockTOSProxy.addAdmin(adminAddress)).wait();
 
   await run("verify", {
     address: lockTOSAddress,
@@ -37,7 +46,7 @@ task("rinkeby-deploy-lock-tos", "Deploy TOS").setAction(async () => {
 
   await run("verify", {
     address: lockTOSProxyAddress,
-    constructorArgsParams: [lockTOSAddress, adminAddress],
+    constructorArgsParams: [lockTOSAddress, deployer.address],
   });
 });
 

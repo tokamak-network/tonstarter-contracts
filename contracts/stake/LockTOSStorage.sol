@@ -12,8 +12,9 @@ contract LockTOSStorage {
     address public stakeRegistry;
     bool public migratedL2;
 
-    uint256 public constant ONE_WEEK = 1 weeks;
-    uint256 public constant MAXTIME = 3 * (365 days); // 3 years
+    uint256 public epochUnit;
+    uint256 public maxTime;    
+
     uint256 public constant MULTIPLIER = 1e18;
 
     address public tos;

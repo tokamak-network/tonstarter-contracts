@@ -55,7 +55,14 @@ describe("LockTOS", function () {
     ).deploy(lockTOSImpl.address);
     await lockTOSProxy.deployed();
 
-    await (await lockTOSProxy.initialize(tos.address, phase3StartTime)).wait();
+    await (
+      await lockTOSProxy.initialize(
+        tos.address,
+        time.duration.weeks(1),
+        time.duration.weeks(156),
+        phase3StartTime
+      )
+    ).wait();
 
     const lockTOSArtifact = await hre.artifacts.readArtifact("LockTOS");
     lockTOS = new ethers.Contract(
@@ -283,6 +290,9 @@ describe("LockTOS", function () {
     const initialBalance = parseInt(await tos.balanceOf(user.address));
     for (const info of userLockInfo) {
       const { lockId } = info;
+      if (lockId === 1) { // it will be withdrawn
+        continue;
+      }
       const lock = await lockTOS.lockedBalances(user.address, lockId);
       if (parseInt(lock.end) > parseInt(await time.latest())) {
         await time.increaseTo(parseInt(lock.end));
@@ -299,5 +309,9 @@ describe("LockTOS", function () {
       expect(newLock.amount).to.be.equal(0);
       expect(newLock.boostValue).to.be.equal(0);
     }
+  });
+
+  it("should withdraw all leftover locks", async function () {
+    await (await lockTOS.connect(user).withdrawAll()).wait();
   });
 });
