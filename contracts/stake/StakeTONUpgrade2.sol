@@ -10,16 +10,17 @@ import {IWTON} from "../interfaces/IWTON.sol";
 import "../libraries/LibTokenStake1.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
 
-import "../connection/TokamakStakeUpgrade.sol";
-import {
-    ERC165Checker
-} from "@openzeppelin/contracts/introspection/ERC165Checker.sol";
-import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
+import "../connection/TokamakStakeUpgrade2.sol";
+
+// import {
+//     ERC165Checker
+// } from "@openzeppelin/contracts/introspection/ERC165Checker.sol";
+// import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 
 /// @title Stake Contract
 /// @notice It can be staked in Tokamak. Can be swapped using Uniswap.
 /// Stake contracts can interact with the vault to claim tos tokens
-contract StakeTONUpgrade2 is TokamakStakeUpgrade, IStakeTON {
+contract StakeTONUpgrade2 is TokamakStakeUpgrade2, IStakeTON {
     using SafeMath for uint256;
 
     /// @dev event on staking
@@ -56,7 +57,7 @@ contract StakeTONUpgrade2 is TokamakStakeUpgrade, IStakeTON {
             address depositManager,
             address seigManager,
 
-        ) = ITokamakRegistry1(stakeRegistry).getTokamak();
+        ) = ITokamakRegistry2(stakeRegistry).getTokamak();
         require(
             ton != address(0) &&
                 wton != address(0) &&
@@ -71,7 +72,7 @@ contract StakeTONUpgrade2 is TokamakStakeUpgrade, IStakeTON {
                     address(this)
                 ) ==
                     0 &&
-                    IIDepositManager(depositManager).pendingUnstaked(
+                    IIIDepositManager(depositManager).pendingUnstaked(
                         tokamakLayer2,
                         address(this)
                     ) ==
@@ -195,7 +196,10 @@ contract StakeTONUpgrade2 is TokamakStakeUpgrade, IStakeTON {
         uint256 rewardClaim = 0;
 
         LibTokenStake1.StakedAmount storage staked = userStaked[msg.sender];
-        require(staked.amount > 0 && staked.claimedBlock < endBlock, "StakeTON: claimed");
+        require(
+            staked.amount > 0 && staked.claimedBlock < endBlock,
+            "StakeTON: claimed"
+        );
         require(block.number.sub(staked.claimedBlock) > 6, "StakeTON: wait");
 
         rewardClaim = canRewardAmount(msg.sender, block.number);
