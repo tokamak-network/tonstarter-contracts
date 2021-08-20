@@ -200,7 +200,6 @@ contract StakeTONUpgrade2 is TokamakStakeUpgrade2, IStakeTON {
             staked.amount > 0 && staked.claimedBlock < endBlock,
             "StakeTON: claimed"
         );
-        require(block.number.sub(staked.claimedBlock) > 6, "StakeTON: wait");
 
         rewardClaim = canRewardAmount(msg.sender, block.number);
 
