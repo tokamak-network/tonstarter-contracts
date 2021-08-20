@@ -8,7 +8,6 @@ import "../common/AccessibleCommon.sol";
 import "./LockTOSStorage.sol";
 import "./ProxyBase.sol";
 
-import "hardhat/console.sol";
 
 /// @title The proxy of TOS Plaform
 /// @notice Admin can createVault, createStakeContract.

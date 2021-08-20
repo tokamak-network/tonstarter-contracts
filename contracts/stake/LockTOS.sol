@@ -15,6 +15,7 @@ import "../libraries/LibLockTOS.sol";
 import "../common/AccessibleCommon.sol";
 import "./LockTOSStorage.sol";
 
+import "hardhat/console.sol";
 
 contract LockTOS is LockTOSStorage, AccessibleCommon, ILockTOS {
     using SafeMath for uint256;

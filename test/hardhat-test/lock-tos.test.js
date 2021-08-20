@@ -52,14 +52,14 @@ describe("LockTOS", function () {
 
     const lockTOSProxy = await (
       await ethers.getContractFactory("LockTOSProxy")
-    ).deploy(lockTOSImpl.address);
+    ).deploy(lockTOSImpl.address, admin.address);
     await lockTOSProxy.deployed();
 
     await (
       await lockTOSProxy.initialize(
         tos.address,
-        time.duration.weeks(1),
-        time.duration.weeks(156),
+        parseInt(time.duration.weeks(1)),
+        parseInt(time.duration.weeks(156)),
         phase3StartTime
       )
     ).wait();
@@ -265,7 +265,7 @@ describe("LockTOS", function () {
     );
     expect(balance).to.equal(estimate);
 
-    const MAXTIME = 94608000;
+    const MAXTIME = 94348800;
     const MULTIPLIER = Math.pow(10, 18);
     const slope = Math.floor((parseInt(lock.amount) * MULTIPLIER) / MAXTIME);
     const deltaTime = parseInt(lock.end) - parseInt(lock.start);
@@ -290,9 +290,7 @@ describe("LockTOS", function () {
     const initialBalance = parseInt(await tos.balanceOf(user.address));
     for (const info of userLockInfo) {
       const { lockId } = info;
-      if (lockId === 1) { // it will be withdrawn
-        continue;
-      }
+
       const lock = await lockTOS.lockedBalances(user.address, lockId);
       if (parseInt(lock.end) > parseInt(await time.latest())) {
         await time.increaseTo(parseInt(lock.end));
