@@ -29,7 +29,7 @@ contract LockTOSProxy is LockTOSStorage, AccessibleCommon, ProxyBase, ILockTOSPr
 
         _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
         _setupRole(ADMIN_ROLE, _admin);
-        _setupRole(ADMIN_ROLE, address(this));
+        //_setupRole(ADMIN_ROLE, address(this));
     }
 
     /// @notice Set pause state
