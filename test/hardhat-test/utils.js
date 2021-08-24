@@ -1,5 +1,8 @@
 /* eslint-disable no-undef */
 const { createCurrency, createCurrencyRatio } = require("@makerdao/currency");
+const { ethers } = require("hardhat");
+const utils = ethers.utils;
+
 const {
   BN,
   constants,
