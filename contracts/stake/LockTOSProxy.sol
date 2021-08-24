@@ -8,11 +8,15 @@ import "../common/AccessibleCommon.sol";
 import "./LockTOSStorage.sol";
 import "./ProxyBase.sol";
 
-
 /// @title The proxy of TOS Plaform
 /// @notice Admin can createVault, createStakeContract.
 /// User can excute the tokamak staking function of each contract through this logic.
-contract LockTOSProxy is LockTOSStorage, AccessibleCommon, ProxyBase, ILockTOSProxy {
+contract LockTOSProxy is
+    LockTOSStorage,
+    AccessibleCommon,
+    ProxyBase,
+    ILockTOSProxy
+{
     event Upgraded(address indexed implementation);
 
     /// @dev constructor of StakeVaultProxy
@@ -95,7 +99,12 @@ contract LockTOSProxy is LockTOSStorage, AccessibleCommon, ProxyBase, ILockTOSPr
     }
 
     /// @dev Initialize
-    function initialize(address _tos, uint256 _epochUnit, uint256 _maxTime, uint256 _phase3StartTime) external override onlyOwner {
+    function initialize(
+        address _tos,
+        uint256 _epochUnit,
+        uint256 _maxTime,
+        uint256 _phase3StartTime
+    ) external override onlyOwner {
         require(tos == address(0), "Already initialized");
         tos = _tos;
         epochUnit = _epochUnit;

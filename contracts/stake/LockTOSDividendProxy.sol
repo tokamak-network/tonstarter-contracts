@@ -14,7 +14,12 @@ import "./LockTOSDividendStorage.sol";
 /// @title The proxy of TOS Plaform
 /// @notice Admin can createVault, createStakeContract.
 /// User can excute the tokamak staking function of each contract through this logic.
-contract LockTOSDividendProxy is LockTOSDividendStorage, AccessibleCommon, ProxyBase, ILockTOSDividendProxy {
+contract LockTOSDividendProxy is
+    LockTOSDividendStorage,
+    AccessibleCommon,
+    ProxyBase,
+    ILockTOSDividendProxy
+{
     event Upgraded(address indexed implementation);
 
     /// @dev constructor of StakeVaultProxy

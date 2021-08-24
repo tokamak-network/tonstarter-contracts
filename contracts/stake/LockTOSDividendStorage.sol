@@ -3,7 +3,6 @@ pragma solidity ^0.7.6;
 
 import "../libraries/LibLockTOSDividend.sol";
 
-
 contract LockTOSDividendStorage {
     /// @dev flag for pause proxy
     bool public pauseProxy;
@@ -16,6 +15,6 @@ contract LockTOSDividendStorage {
 
     address public lockTOS;
     uint256 public genesis;
-    mapping (address => LibLockTOSDividend.Distribution) public distributions;
+    mapping(address => LibLockTOSDividend.Distribution) public distributions;
     uint256 internal free = 1;
 }
