@@ -91,6 +91,7 @@ contract LockTOS is LockTOSStorage, AccessibleCommon, ILockTOS {
         override
     {
         require(_unlockWeeks > 0, "Unlock period less than a week");
+        cumulativeEpochUnit = cumulativeEpochUnit.add(_unlockWeeks);
 
         LibLockTOS.LockedBalance memory lock =
             lockedBalances[msg.sender][_lockId];
@@ -192,6 +193,8 @@ contract LockTOS is LockTOSStorage, AccessibleCommon, ILockTOS {
         require(_unlockWeeks > 0, "Unlock period less than a week");
 
         lockId = lockIdCounter++;
+        cumulativeEpochUnit = cumulativeEpochUnit.add(_unlockWeeks);
+        cumulativeTOSAmount = cumulativeTOSAmount.add(_value);
         uint256 unlockTime = block.timestamp.add(_unlockWeeks.mul(epochUnit));
         unlockTime = unlockTime.div(epochUnit).mul(epochUnit);
         require(
@@ -214,6 +217,8 @@ contract LockTOS is LockTOSStorage, AccessibleCommon, ILockTOS {
         LibLockTOS.LockedBalance memory locked = lockedBalances[_addr][_lockId];
         require(locked.start > 0, "Lock does not exist");
         require(locked.end > block.timestamp, "Lock time is finished");
+
+        cumulativeTOSAmount = cumulativeTOSAmount.add(_value);
         _deposit(_addr, _lockId, _value, 0);
         emit LockDeposited(msg.sender, _lockId, _value);
     }
@@ -465,7 +470,7 @@ contract LockTOS is LockTOSStorage, AccessibleCommon, ILockTOS {
         lockPointHistory[_lockId].push(userPoint);
 
         // Transfer TOS
-        IERC20(tos).transferFrom(msg.sender, address(this), _value);
+        require(IERC20(tos).transferFrom(msg.sender, address(this), _value), "LockTOS: fail transferFrom");
     }
 
     /// @dev Checkpoint

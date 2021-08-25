@@ -19,6 +19,9 @@ contract LockTOSStorage {
     address public tos;
     uint256 public lockIdCounter = 1;
     uint256 public phase3StartTime;
+    uint256 public cumulativeEpochUnit = 0;
+    uint256 public cumulativeTOSAmount = 0;
+
     uint256 internal free = 1;
 
     LibLockTOS.Point[] public pointHistory;
