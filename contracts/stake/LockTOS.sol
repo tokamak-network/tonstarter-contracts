@@ -192,7 +192,6 @@ contract LockTOS is LockTOSStorage, AccessibleCommon, ILockTOS {
         require(_value > 0, "Value locked should be non-zero");
         require(_unlockWeeks > 0, "Unlock period less than a week");
 
-        lockId = lockIdCounter++;
         cumulativeEpochUnit = cumulativeEpochUnit.add(_unlockWeeks);
         cumulativeTOSAmount = cumulativeTOSAmount.add(_value);
         uint256 unlockTime = block.timestamp.add(_unlockWeeks.mul(epochUnit));
@@ -201,6 +200,10 @@ contract LockTOS is LockTOSStorage, AccessibleCommon, ILockTOS {
             unlockTime - block.timestamp <= maxTime,
             "Max unlock time is 3 years"
         );
+
+        lockIdCounter = lockIdCounter.add(1);
+        lockId = lockIdCounter;
+
         _deposit(msg.sender, lockId, _value, unlockTime);
         userLocks[msg.sender].push(lockId);
 
@@ -470,7 +473,10 @@ contract LockTOS is LockTOSStorage, AccessibleCommon, ILockTOS {
         lockPointHistory[_lockId].push(userPoint);
 
         // Transfer TOS
-        require(IERC20(tos).transferFrom(msg.sender, address(this), _value), "LockTOS: fail transferFrom");
+        require(
+            IERC20(tos).transferFrom(msg.sender, address(this), _value),
+            "LockTOS: fail transferFrom"
+        );
     }
 
     /// @dev Checkpoint
