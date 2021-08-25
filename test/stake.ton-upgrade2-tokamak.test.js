@@ -584,7 +584,7 @@ describe("TokamakStaker ", function () {
 
           expect(totalStakedAmount[i].toString()).to.be.equal(amount.toString());
 
-          expect(await contract.version()).to.be.equal("upgrade.v2.202108");
+          expect(await contract.version()).to.be.equal("phase1.upgrade.v2");
         }
       }
     });

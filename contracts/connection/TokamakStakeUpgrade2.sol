@@ -297,7 +297,7 @@ contract TokamakStakeUpgrade2 is
     }
 
     function version() external pure returns (string memory) {
-        return "upgrade.v2.202108";
+        return "phase1.upgrade.v2";
     }
 
     /// @dev  request unstaking the amount excluding principal   in layer2 in tokamak
