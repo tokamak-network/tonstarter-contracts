@@ -25,6 +25,7 @@ const {
 const name = "TONStarter";
 const symbol = "TOS";
 const version = "1.0";
+let testerAddress = "";
 
 describe("LockTOS", function () {
   let admin, user;
@@ -39,6 +40,7 @@ describe("LockTOS", function () {
     const addresses = await getAddresses();
     admin = await findSigner(addresses[0]);
     user = await findSigner(addresses[1]);
+    testerAddress = addresses[1];
   });
 
   // it("Initialize contracts", async function () {
@@ -172,19 +174,21 @@ describe("LockTOS", function () {
         lockTOS
       });
 
-    console.log('lockId',lockId.toString(), lastestTime.toString());
+    // console.log('lockId',lockId.toString(), lastestTime.toString());
 
     const balanceOfLock = await lockTOS.balanceOfLock(lockId);
     console.log('balanceOfLock',balanceOfLock.toString());
 
     const locksInfo = await lockTOS.locksInfo(lockId);
-    console.log('locksInfo start',locksInfo.start.toString());
-    console.log('locksInfo end',locksInfo.end.toString());
-    console.log('locksInfo amount',locksInfo.amount.toString());
-    console.log('locksInfoboostValue',locksInfo.boostValue.toString());
+    // console.log('locksInfo start',locksInfo.start.toString());
+    // console.log('locksInfo end',locksInfo.end.toString());
+    // console.log('locksInfo amount',locksInfo.amount.toString());
+    // console.log('locksInfoboostValue',locksInfo.boostValue.toString());
 
     const balance = await lockTOS.balanceOfLockAt(lockId, locksInfo.start);
-    console.log('balanceOfLockAt',balance.toString());
+    // console.log('balanceOfLockAt',balance.toString());
+
+
     /*
     const balanceOfLockTest = await lockTOS.balanceOfLockTest(lockId);
     console.log('balanceOfLockTest _balance',balanceOfLockTest._balance.toString() );
@@ -194,8 +198,11 @@ describe("LockTOS", function () {
     console.log('balanceOfLockTest _bias',balanceOfLockTest._bias.toString() );
     console.log('balanceOfLockTest _timestamp',balanceOfLockTest._timestamp.toString() );
     */
+    //console.log('testerAddress',testerAddress);
+    let alivelocks = await lockTOS.alivelocksOf(testerAddress);
+    //console.log('alivelocks',alivelocks);
+    expect(alivelocks.length).to.equal(5);
   });
-
 
   it("should check balances of user at now", async function () {
     //let lastestTime =parseInt(await time.latest());
@@ -228,6 +235,7 @@ describe("LockTOS", function () {
       expect(balance).to.equal(estimate);
     }
   });
+
 
   it("should check of balances at the start", async function () {
     for (const info of userLockInfo) {
@@ -412,5 +420,11 @@ describe("LockTOS", function () {
 
   it("should withdraw all leftover locks", async function () {
     await (await lockTOS.connect(user).withdrawAll()).wait();
+  });
+
+  it("alivelocksOf", async function () {
+    let alivelocks = await lockTOS.alivelocksOf(testerAddress);
+    //console.log('alivelocks',alivelocks);
+    expect(alivelocks.length).to.equal(1);
   });
 });

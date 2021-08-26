@@ -127,8 +127,7 @@ contract LockTOS is LockTOSStorage, AccessibleCommon, ILockTOS {
                 lock.end < block.timestamp
             ) {
                 _withdraw(locks[i]);
-                locks[i] = locks[locks.length - 1];
-                delete locks[locks.length - 1];
+                //locks[i] = locks[locks.length - 1];
             }
 
             if (i == 0) break; // i is unsigned
@@ -144,13 +143,12 @@ contract LockTOS is LockTOSStorage, AccessibleCommon, ILockTOS {
     function withdraw(uint256 _lockId) public override ifFree {
         require(_lockId > 0, "_lockId is zero");
         _withdraw(_lockId);
-        uint256[] storage locks = userLocks[msg.sender];
-        for (uint256 i = 0; i < locks.length; i++) {
-            if (locks[i] == _lockId) {
-                locks[i] = locks[locks.length - 1];
-                delete locks[locks.length - 1];
-            }
-        }
+        // uint256[] storage locks = userLocks[msg.sender];
+        // for (uint256 i = 0; i < locks.length; i++) {
+        //     if (locks[i] == _lockId) {
+        //         locks[i] = locks[locks.length - 1];
+        //     }
+        // }
     }
 
     function _withdraw(uint256 _lockId) internal {
@@ -387,6 +385,43 @@ contract LockTOS is LockTOSStorage, AccessibleCommon, ILockTOS {
         return userLocks[_addr];
     }
 
+    function alivelocksOf(address _addr)
+        public
+        view
+        returns (
+            LibLockTOS.LockedBalanceInfo[] memory
+        )
+    {
+        uint256 len = userLocks[_addr].length;
+
+        uint256 _size = 0;
+        for(uint i =0; i < len; i++){
+            uint256 _id = userLocks[_addr][i];
+            LibLockTOS.LockedBalance memory _lock = lockedBalances[_addr][_id];
+            if(_lock.end > block.timestamp && _id > 0 ) {
+                _size++;
+            }
+        }
+
+        LibLockTOS.LockedBalanceInfo[] memory datas = new LibLockTOS.LockedBalanceInfo[](_size);
+        _size = 0;
+        for(uint i =0; i < len; i++){
+            uint256 _id = userLocks[_addr][i];
+            LibLockTOS.LockedBalance memory _lock = lockedBalances[_addr][_id];
+
+            if(_lock.end > block.timestamp && _id > 0 ) {
+                uint256 _balance = balanceOfLock(userLocks[_addr][i]);
+                datas[_size++] = LibLockTOS.LockedBalanceInfo(
+                    _id, _lock.start, _lock.end,  _lock.amount, _lock.boostValue, _balance
+                );
+
+
+            }
+        }
+        return datas;
+    }
+
+
     /// @inheritdoc ILockTOS
     function pointHistoryOf(uint256 _lockId)
         public
@@ -494,24 +529,27 @@ contract LockTOS is LockTOSStorage, AccessibleCommon, ILockTOS {
         if (lockedNew.end > timestamp && lockedNew.amount > 0) {
             changeNew.slope = lockedNew
                 .amount
+                .mul(uint256(lockedNew.boostValue))
                 .mul(MULTIPLIER)
                 .div(maxTime)
                 .toInt256();
-            changeNew.bias = changeNew.slope.mul(
-                lockedNew.end.sub(timestamp).toInt256()
+            changeNew.bias = changeNew.slope
+                .mul(lockedNew.end.sub(timestamp).toInt256()
             );
             changeNew.changeTime = lockedNew.end;
+
         }
         if (lockedOld.end > timestamp && lockedOld.amount > 0) {
             changeOld.slope = lockedOld
                 .amount
+                .mul(uint256(lockedOld.boostValue))
                 .mul(MULTIPLIER)
                 .div(maxTime)
                 .toInt256();
-            changeOld.bias = changeOld.slope.mul(
-                lockedOld.end.sub(timestamp).toInt256()
-            );
+            changeOld.bias = changeOld.slope
+                .mul(lockedOld.end.sub(timestamp).toInt256());
             changeOld.changeTime = lockedOld.end;
+
         }
 
         // Record history gaps
@@ -533,6 +571,7 @@ contract LockTOS is LockTOSStorage, AccessibleCommon, ILockTOS {
         // Update slope changes
         _updateSlopeChanges(changeNew, changeOld);
     }
+
 
     /// @dev Fill the gaps
     function _recordHistoryPoints()
@@ -596,5 +635,9 @@ contract LockTOS is LockTOSStorage, AccessibleCommon, ILockTOS {
 
     function getCurrentTime() external view returns (uint256) {
         return block.timestamp;
+    }
+
+    function currentStakedTotalTOS() external view returns (uint256) {
+        return IERC20(tos).balanceOf(address(this));
     }
 }

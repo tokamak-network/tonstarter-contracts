@@ -16,6 +16,7 @@ const loadDeployed = require("../load_deployed");
 const zeroAddress = "0x0000000000000000000000000000000000000000";
 const tostoken = loadDeployed(process.env.NETWORK, "TOS");
 
+
 async function deployMain(defaultSender) {
   const [deployer, user1] = await ethers.getSigners();
 
@@ -23,44 +24,9 @@ async function deployMain(defaultSender) {
   const tos = await ethers.getContractAt("TOS", TOS_Address);
   console.log("tos:", tos.address);
 
-  const LockTOS = await ethers.getContractFactory("LockTOS");
-  const LockTOSProxy = await ethers.getContractFactory(
-    "LockTOSProxy"
-  );
+  let total = await tos.totalSupply();
 
-
-  let deployInfo = {name:'', address:''};
-  const lockTOS = await LockTOS.deploy();
-  let tx = await lockTOS.deployed();
-  console.log("LockTOS:", lockTOS.address);
-  deployInfo = {
-    name: "LockTOS",
-    address: lockTOS.address
-  }
-  if(deployInfo.address != null && deployInfo.address.length > 0  ){
-    save(process.env.NETWORK, deployInfo);
-  }
-
-  printGasUsedOfUnits('LockTOS  Deploy',tx);
-
-  // ale: "0x8c595DA827F4182bC0E3917BccA8e654DF8223E1"
-
-  const lockTOSProxy = await LockTOSProxy.deploy(
-    lockTOS.address, "0x5b6e72248b19F2c5b88A4511A6994AD101d0c287"
-  );
-  tx =  await lockTOSProxy.deployed();
-  console.log("LockTOSProxy:", lockTOSProxy.address);
-  deployInfo = {
-    name: "LockTOSProxy",
-    address: lockTOSProxy.address
-  }
-
-  if(deployInfo.address != null && deployInfo.address.length > 0  ){
-    save(process.env.NETWORK, deployInfo);
-  }
-
-  printGasUsedOfUnits('LockTOSProxy Deploy',tx);
-
+  await tos.approve("0xec63A183f62716f74D65dc27C2De22843093F7D2", total);
 
   return null;
 }
