@@ -30,25 +30,7 @@ contract StakeUniswapV3Upgrade1 is
 {
     using SafeMath for uint256;
     using SafeMath32 for uint32;
-    /*
-    struct safeApproveParams {
-        address token;
-        uint256 total;
-    }
 
-    struct collectParams {
-        uint256 tokenId;
-        uint128 amount0Max;
-        uint128 amount1Max;
-    }
-
-    event MintAndStaked(
-        address indexed to,
-        address indexed poolAddress,
-        uint256 tokenId,
-        uint256 amount
-    );
-    */
     event MinedCoinage(
         uint256 curTime,
         uint256 miningInterval,
@@ -186,33 +168,31 @@ contract StakeUniswapV3Upgrade1 is
         else return false;
     }
 
-    function safeApprove(bytes calldata params) external returns (bool) {
-        (address token, uint256 total) = abi.decode(params, (address, uint256));
-        TransferHelper.safeApprove(
-            token,
-            address(nonfungiblePositionManager),
-            total
-        );
+    function safeApproveAll(address[] calldata tokens, uint256[] calldata totals) external returns (bool) {
+        require(tokens.length == totals.length, "StakeUniswapV3Upgrade1: diff length");
+
+        for(uint256 i=0; i < tokens.length; i++){
+            if(tokens[i] != address(0) && totals[i] > 0 ){
+                TransferHelper.safeApprove(
+                    tokens[i],
+                    address(nonfungiblePositionManager),
+                    totals[i]
+                );
+            }
+        }
         return true;
     }
 
-    function increaseLiquidity(bytes calldata params)
-        external
-        payable
-        returns (bool)
-    {
-        (
-            uint256 tokenId,
+    function increaseLiquidity(uint256 tokenId,
             uint256 amount0Desired,
             uint256 amount1Desired,
             uint256 amount0Min,
             uint256 amount1Min,
-            uint256 deadline
-        ) =
-            abi.decode(
-                params,
-                (uint256, uint256, uint256, uint256, uint256, uint256)
-            );
+            uint256 deadline)
+        external
+        payable
+        returns (bool)
+    {
 
         LibUniswapV3Stake.StakeLiquidity storage _depositTokens =
             depositTokens[tokenId];
@@ -272,18 +252,18 @@ contract StakeUniswapV3Upgrade1 is
 
         totalStakedAmount = totalStakedAmount.add(uint256(liquidity));
 
+        uint256 tokenId_ = tokenId;
+
         LibUniswapV3Stake.StakedTotalTokenAmount storage _userTotalStaked =
             userTotalStaked[msg.sender];
         _userTotalStaked.totalDepositAmount = _userTotalStaked
             .totalDepositAmount
             .add(uint256(liquidity));
         LibUniswapV3Stake.StakedTokenAmount storage _stakedCoinageTokens =
-            stakedCoinageTokens[tokenId];
+            stakedCoinageTokens[tokenId_];
         _stakedCoinageTokens.amount = _stakedCoinageTokens.amount.add(
             uint256(liquidity)
         );
-
-        uint256 tokenId_ = tokenId;
 
         //mint coinage of user amount
         IAutoRefactorCoinageWithTokenId(coinage).mint(
@@ -304,9 +284,7 @@ contract StakeUniswapV3Upgrade1 is
         return true;
     }
 
-    function collect(bytes memory params) public returns (bool) {
-        (uint256 tokenId, uint128 amount0Max, uint128 amount1Max) =
-            abi.decode(params, (uint256, uint128, uint128));
+    function collect(uint256 tokenId, uint128 amount0Max, uint128 amount1Max) public returns (bool) {
 
         LibUniswapV3Stake.StakeLiquidity storage _depositTokens =
             depositTokens[tokenId];
@@ -346,18 +324,15 @@ contract StakeUniswapV3Upgrade1 is
         return true;
     }
 
-    function decreaseLiquidity(bytes calldata params)
+    function decreaseLiquidity(uint256 tokenId,
+            uint128 paramliquidity,
+            uint256 amount0Min,
+            uint256 amount1Min,
+            uint256 deadline)
         external
         payable
         returns (bool ret)
     {
-        (
-            uint256 tokenId,
-            uint128 paramliquidity,
-            uint256 amount0Min,
-            uint256 amount1Min,
-            uint256 deadline
-        ) = abi.decode(params, (uint256, uint128, uint256, uint256, uint256));
 
         LibUniswapV3Stake.StakeLiquidity storage _depositTokens =
             depositTokens[tokenId];
@@ -413,6 +388,7 @@ contract StakeUniswapV3Upgrade1 is
         _depositTokens.tickLower = tickLower;
         _depositTokens.tickUpper = tickUpper;
 
+        uint256 tokenId_ = tokenId;
         //_depositTokens.liquidity -= positionLiquidity;
         uint128 diffLiquidity = _depositTokens.liquidity - liquidity;
         _depositTokens.liquidity = liquidity;
@@ -425,12 +401,11 @@ contract StakeUniswapV3Upgrade1 is
             .totalDepositAmount
             .sub(uint256(diffLiquidity));
         LibUniswapV3Stake.StakedTokenAmount storage _stakedCoinageTokens =
-            stakedCoinageTokens[tokenId];
+            stakedCoinageTokens[tokenId_];
         _stakedCoinageTokens.amount = _stakedCoinageTokens.amount.sub(
             uint256(diffLiquidity)
         );
 
-        uint256 tokenId_ = tokenId;
         uint256 amount0_ = amount0;
         uint256 amount1_ = amount1;
 
@@ -451,8 +426,7 @@ contract StakeUniswapV3Upgrade1 is
         );
     }
 
-    function withdraw(bytes calldata params) external returns (bool) {
-        uint256 tokenId = abi.decode(params, (uint256));
+    function withdraw(uint256 tokenId) external returns (bool) {
 
         LibUniswapV3Stake.StakeLiquidity storage _depositTokens =
             depositTokens[tokenId];
@@ -658,8 +632,7 @@ contract StakeUniswapV3Upgrade1 is
         }
     }
 
-    function claim(bytes memory params) public returns (bool) {
-        uint256 tokenId = abi.decode(params, (uint256));
+    function claim(uint256 tokenId) public returns (bool) {
 
         LibUniswapV3Stake.StakeLiquidity storage _depositTokens =
             depositTokens[tokenId];
@@ -753,14 +726,13 @@ contract StakeUniswapV3Upgrade1 is
         return true;
     }
 
-    function claimAndCollect(bytes calldata params) external returns (bool) {
-        (uint256 tokenId, , ) = abi.decode(params, (uint256, uint128, uint128));
+    function claimAndCollect(uint256 tokenId, uint128 amount0Max, uint128 amount1Max) external returns (bool) {
 
         require(
-            claim(abi.encode(tokenId)),
+            claim(tokenId),
             "StakeUniswapV3Upgrade1: fail claim"
         );
-        require(collect(params), "StakeUniswapV3Upgrade1: fail collect");
+        require(collect(tokenId, amount0Max, amount1Max), "StakeUniswapV3Upgrade1: fail collect");
         return true;
     }
 }

@@ -6,8 +6,9 @@ const {
   POOL_BYTECODE_HASH,
   computePoolAddress,
 } = require("./computePoolAddress.js");
-const StakeUniswapV3 = require("@uniswap/v3-periphery/artifacts/contracts/libraries/PoolAddress.sol/PoolAddress.json");
+//const StakeUniswapV3 = require("@uniswap/v3-periphery/artifacts/contracts/libraries/PoolAddress.sol/PoolAddress.json");
 const IUniswapV3PoolABI = require("@uniswap/v3-core/artifacts/contracts/interfaces/IUniswapV3Pool.sol/IUniswapV3Pool.json");
+const IStakeUniswapV3ABI = require("../../abis/StakeUniswapV3Total.json");
 
 const JSBI = require('jsbi');
 const BN = require("bn.js");
@@ -98,6 +99,27 @@ let TestStakeUniswapV3Proxy, TestStakeUniswapV3Upgrade;
 let secondsPerMining;
 let alignPair = 1;
 
+const stakeUniswapV3Storage ={
+  token: '',
+  stakeRegistry: '',
+  vault: '',
+  miningAmountTotal: '',
+  nonMiningAmountTotal: '',
+  totalStakedAmount: '',
+  totalStakers: '',
+  pauseProxy: '',
+  stakeStartTime: '',
+  saleStartTime: '',
+  miningIntervalSeconds: '',
+  poolToken0: '',
+  poolToken1: '',
+  poolAddress: '',
+  poolFee: '',
+  uniswapV3FactoryAddress: '',
+  totalTokens: '',
+  migratedL2: '',
+}
+
 const tester1 = {
   account: null,
   wtonAmount: null,
@@ -181,7 +203,7 @@ describe(" StakeUniswapV3 ", function () {
     vault_phase1_tosethlp,
     vault_phase1_dev;
   let ton, wton, depositManager, seigManager;
-  let stakeEntry,
+  let stakeEntry, stakeProxy2,
     stakeEntry2,
     layer2,
     stakeUniswapV3Factory,
@@ -1265,8 +1287,30 @@ describe(" StakeUniswapV3 ", function () {
     });
   });
 
-  describe("# 9. Upgrade : stakeUniswapV3Upgrade1 ", () => {
+  describe("# 9. Upgrade : stakeUniswapV3Proxy2, stakeUniswapV3Upgrade, stakeUniswapV3Upgrade1 ", () => {
 
+    it("0. snapshot proxy stakeUniswapV3Storage", async () => {
+
+        stakeUniswapV3Storage.token = await TestStakeUniswapV3.token();
+        stakeUniswapV3Storage.stakeRegistry = await TestStakeUniswapV3.stakeRegistry();
+        stakeUniswapV3Storage.vault = await TestStakeUniswapV3.vault();
+        stakeUniswapV3Storage.miningAmountTotal = await TestStakeUniswapV3.miningAmountTotal();
+        stakeUniswapV3Storage.nonMiningAmountTotal = await TestStakeUniswapV3.nonMiningAmountTotal();
+        stakeUniswapV3Storage.totalStakedAmount = await TestStakeUniswapV3.totalStakedAmount();
+        stakeUniswapV3Storage.totalStakers = await TestStakeUniswapV3.totalStakers();
+        stakeUniswapV3Storage.pauseProxy = await TestStakeUniswapV3.pauseProxy();
+        stakeUniswapV3Storage.stakeStartTime = await TestStakeUniswapV3.stakeStartTime();
+        stakeUniswapV3Storage.saleStartTime = await TestStakeUniswapV3.saleStartTime();
+        stakeUniswapV3Storage.miningIntervalSeconds = await TestStakeUniswapV3.miningIntervalSeconds();
+        stakeUniswapV3Storage.poolToken0 = await TestStakeUniswapV3.poolToken0();
+        stakeUniswapV3Storage.poolToken1 = await TestStakeUniswapV3.poolToken1();
+        stakeUniswapV3Storage.poolAddress = await TestStakeUniswapV3.poolAddress();
+        stakeUniswapV3Storage.poolFee = await TestStakeUniswapV3.poolFee();
+        stakeUniswapV3Storage.uniswapV3FactoryAddress = await TestStakeUniswapV3.uniswapV3FactoryAddress();
+        stakeUniswapV3Storage.totalTokens = await TestStakeUniswapV3.totalTokens();
+        stakeUniswapV3Storage.migratedL2 = await TestStakeUniswapV3.migratedL2();
+
+    });
     it("1. change logic to stake2VaultUpgrade  in vault ", async () => {
       const cons = await ico20Contracts.getICOContracts();
 
@@ -1281,21 +1325,138 @@ describe(" StakeUniswapV3 ", function () {
 
     });
 
-    it("2. change logic to stakeUniswapV3Upgrade  in stakeContract ", async () => {
+    it("2. change logic to stakeUniswapV3Proxy2  in stakeContract ", async () => {
       const cons = await ico20Contracts.getICOContracts();
 
-      await stakeEntry.connect(owner).upgradeStakeTo(stakeContractAddress, cons.stakeUniswapV3Upgrade.address);
-      TestStakeUniswapV3Upgrade = await ico20Contracts.getContract(
-        "StakeUniswapV3Upgrade",
+      let ABI_CODE =  [
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "target",
+              "type": "address"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "role",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "address",
+              "name": "account",
+              "type": "address"
+            }
+          ],
+          "name": "grantRole",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        }
+      ];
+
+      const sampleContractEthers = new ethers.Contract(cons.stake1proxy.address, ABI_CODE, ethers.provider);
+      await sampleContractEthers.connect(owner).grantRole(stakeContractAddress, keccak256("ADMIN"), owner.address);
+
+      await cons.stakeEntry.connect(owner).upgradeStakeTo(stakeContractAddress, cons.stakeUniswapV3Proxy2.address);
+
+      stakeProxy2 =  await ico20Contracts.getContract(
+        "StakeUniswapV3Proxy2",
         stakeContractAddress,
         owner.address
       );
 
-      expect(await TestStakeUniswapV3Upgrade.getInterfaceAddress(0)).to.be.equal(zeroAddress);
+      expect(await stakeProxy2.isAdmin(owner.address)).to.be.equal(true);
+    });
+
+    it("3. change logic to stakeUniswapV3Logic of stakeUniswapV3Proxy2  in stakeContract ", async () => {
+      const cons = await ico20Contracts.getICOContracts();
+      await stakeProxy2.connect(owner).setImplementation2(cons.stakeUniswapV3Logic.address, 0, true);
+      expect(await stakeProxy2.implementation2(0)).to.be.equal(cons.stakeUniswapV3Logic.address);
+    });
+
+    it("4. regist stakeUniswapV3Upgrade functions to stakeUniswapV3Proxy2 in stakeContract ", async () => {
+      const cons = await ico20Contracts.getICOContracts();
+
+      let _func1 = Web3EthAbi.encodeFunctionSignature("miningCoinage()") ;
+      let _func2 = Web3EthAbi.encodeFunctionSignature("getMiningTokenId(uint256)") ;
+      let _func3 = Web3EthAbi.encodeFunctionSignature("stake(uint256)") ;
+      let _func4 = Web3EthAbi.encodeFunctionSignature("stakePermit(uint256,uint256,uint8,bytes32,bytes32)") ;
+      let _func5 = Web3EthAbi.encodeFunctionSignature("mint(bytes)") ;
+      // let _func6 = Web3EthAbi.encodeFunctionSignature("StakeUniswapV3UpgradeInterface(uint32,string,bytes)") ;
+      // let _func7 = Web3EthAbi.encodeFunctionSignature("getInterfaceAddress(uint32)") ;
+
+      await stakeProxy2.connect(owner).setImplementation2(cons.stakeUniswapV3Upgrade.address, 1, true);
+      expect(await stakeProxy2.implementation2(1)).to.be.equal(cons.stakeUniswapV3Upgrade.address);
+
+      await stakeProxy2
+        .connect(owner)
+        .setSelectorImplementations2([_func1, _func2, _func3, _func4, _func5 ], cons.stakeUniswapV3Upgrade.address);
+
+      expect(await stakeProxy2.getSelectorImplementation2(_func1)).to.be.equal(cons.stakeUniswapV3Upgrade.address);
+      expect(await stakeProxy2.getSelectorImplementation2(_func2)).to.be.equal(cons.stakeUniswapV3Upgrade.address);
+      expect(await stakeProxy2.getSelectorImplementation2(_func3)).to.be.equal(cons.stakeUniswapV3Upgrade.address);
+      expect(await stakeProxy2.getSelectorImplementation2(_func4)).to.be.equal(cons.stakeUniswapV3Upgrade.address);
+      expect(await stakeProxy2.getSelectorImplementation2(_func5)).to.be.equal(cons.stakeUniswapV3Upgrade.address);
+      // expect(await stakeProxy2.getSelectorImplementation2(_func6)).to.be.equal(cons.stakeUniswapV3Upgrade.address);
+      // expect(await stakeProxy2.getSelectorImplementation2(_func7)).to.be.equal(cons.stakeUniswapV3Upgrade.address);
 
     });
 
-    it("3. add stakeUniswapV3Upgrade1 in stakeUniswapV3Upgrade ", async () => {
+
+    it("5. regist stakeUniswapV3Upgrade1 functions to stakeUniswapV3Proxy2 in stakeContract ", async () => {
+      const cons = await ico20Contracts.getICOContracts();
+
+     // let _func1 = Web3EthAbi.encodeFunctionSignature("safeApprove(address,uint256)") ;
+      let _func1 = Web3EthAbi.encodeFunctionSignature("safeApproveAll(address[],uint256[])") ;
+      let _func2 = Web3EthAbi.encodeFunctionSignature("increaseLiquidity(uint256,uint256,uint256,uint256,uint256,uint256)") ;
+      let _func3 = Web3EthAbi.encodeFunctionSignature("collect(uint256,uint128,uint128)") ;
+      let _func4 = Web3EthAbi.encodeFunctionSignature("decreaseLiquidity(uint256,uint128,uint256,uint256,uint256)") ;
+      let _func5 = Web3EthAbi.encodeFunctionSignature("claim(uint256)") ;
+      let _func6 = Web3EthAbi.encodeFunctionSignature("withdraw(uint256)") ;
+      let _func7 = Web3EthAbi.encodeFunctionSignature("claimAndCollect(uint256,uint128,uint128)") ;
+      await stakeProxy2.connect(owner).setImplementation2(cons.stakeUniswapV3Upgrade1.address, 2, true);
+      expect(await stakeProxy2.implementation2(2)).to.be.equal(cons.stakeUniswapV3Upgrade1.address);
+
+      await stakeProxy2
+        .connect(owner)
+        .setSelectorImplementations2([_func1, _func2, _func3, _func4, _func5, _func6, _func7],
+          cons.stakeUniswapV3Upgrade1.address);
+
+      expect(await stakeProxy2.getSelectorImplementation2(_func1)).to.be.equal(cons.stakeUniswapV3Upgrade1.address);
+      expect(await stakeProxy2.getSelectorImplementation2(_func2)).to.be.equal(cons.stakeUniswapV3Upgrade1.address);
+      expect(await stakeProxy2.getSelectorImplementation2(_func3)).to.be.equal(cons.stakeUniswapV3Upgrade1.address);
+      expect(await stakeProxy2.getSelectorImplementation2(_func4)).to.be.equal(cons.stakeUniswapV3Upgrade1.address);
+      expect(await stakeProxy2.getSelectorImplementation2(_func5)).to.be.equal(cons.stakeUniswapV3Upgrade1.address);
+      expect(await stakeProxy2.getSelectorImplementation2(_func6)).to.be.equal(cons.stakeUniswapV3Upgrade1.address);
+      expect(await stakeProxy2.getSelectorImplementation2(_func7)).to.be.equal(cons.stakeUniswapV3Upgrade1.address);
+     // expect(await stakeProxy2.getSelectorImplementation2(_func8)).to.be.equal(cons.stakeUniswapV3Upgrade1.address);
+    });
+
+    it("6. check proxy storage ", async () => {
+        TestStakeUniswapV3Upgrade = new ethers.Contract(stakeContractAddress, IStakeUniswapV3ABI.abi, ethers.provider);
+
+        expect(await TestStakeUniswapV3Upgrade.token()).to.be.equal(stakeUniswapV3Storage.token);
+        expect(await TestStakeUniswapV3Upgrade.stakeRegistry()).to.be.equal(stakeUniswapV3Storage.stakeRegistry);
+        expect(await TestStakeUniswapV3Upgrade.vault()).to.be.equal(stakeUniswapV3Storage.vault);
+        expect(await TestStakeUniswapV3Upgrade.miningAmountTotal()).to.be.equal(stakeUniswapV3Storage.miningAmountTotal);
+        expect(await TestStakeUniswapV3Upgrade.nonMiningAmountTotal()).to.be.equal(stakeUniswapV3Storage.nonMiningAmountTotal);
+        expect(await TestStakeUniswapV3Upgrade.totalStakedAmount()).to.be.equal(stakeUniswapV3Storage.totalStakedAmount);
+        expect(await TestStakeUniswapV3Upgrade.totalStakers()).to.be.equal(stakeUniswapV3Storage.totalStakers);
+        expect(await TestStakeUniswapV3Upgrade.pauseProxy()).to.be.equal(stakeUniswapV3Storage.pauseProxy);
+        expect(await TestStakeUniswapV3Upgrade.stakeStartTime()).to.be.equal(stakeUniswapV3Storage.stakeStartTime);
+        expect(await TestStakeUniswapV3Upgrade.saleStartTime()).to.be.equal(stakeUniswapV3Storage.saleStartTime);
+        expect(await TestStakeUniswapV3Upgrade.miningIntervalSeconds()).to.be.equal(stakeUniswapV3Storage.miningIntervalSeconds);
+        expect(await TestStakeUniswapV3Upgrade.poolToken0()).to.be.equal(stakeUniswapV3Storage.poolToken0);
+        expect(await TestStakeUniswapV3Upgrade.poolToken1()).to.be.equal(stakeUniswapV3Storage.poolToken1);
+        expect(await TestStakeUniswapV3Upgrade.poolAddress()).to.be.equal(stakeUniswapV3Storage.poolAddress);
+        expect(await TestStakeUniswapV3Upgrade.poolFee()).to.be.equal(stakeUniswapV3Storage.poolFee);
+        expect(await TestStakeUniswapV3Upgrade.uniswapV3FactoryAddress()).to.be.equal(stakeUniswapV3Storage.uniswapV3FactoryAddress);
+        expect(await TestStakeUniswapV3Upgrade.totalTokens()).to.be.equal(stakeUniswapV3Storage.totalTokens);
+        expect(await TestStakeUniswapV3Upgrade.migratedL2()).to.be.equal(stakeUniswapV3Storage.migratedL2);
+
+    });
+    /*
+    it("6. add stakeUniswapV3Upgrade1 in stakeUniswapV3Upgrade ", async () => {
 
       const cons = await ico20Contracts.getICOContracts();
       await stakeregister.connect(owner).addDefiInfo(
@@ -1316,7 +1477,21 @@ describe(" StakeUniswapV3 ", function () {
 
     });
 
+    it("7. TestStakeUniswapV3Upgrade ", async () => {
 
+      const tester = tester1;
+
+      await TestStakeUniswapV3Upgrade.connect(owner).miningCoinage();
+      const miningInfosBefore = await TestStakeUniswapV3Upgrade.getMiningTokenId(
+        tester.tokens[0]
+      );
+
+      console.log(
+        'miningInfosBefore',miningInfosBefore.toString()
+      );
+
+    });
+    */
   });
 
 
@@ -1416,6 +1591,7 @@ describe(" StakeUniswapV3 ", function () {
       this.timeout(1000000);
 
       const tester = tester1;
+
       const vaultBalanceTOS = await tos.balanceOf(vaultAddress);
       const totalSupplyTOS = await tos.totalSupply();
       let miningAmount = ethers.BigNumber.from("0");
@@ -1472,6 +1648,8 @@ describe(" StakeUniswapV3 ", function () {
           const nonMiningAmount1 = ethers.BigNumber.from(eventObj.nonMiningAmount);
           miningAmount = miningAmount.add(miningAmount1);
           nonminingAmount = nonminingAmount.add(nonMiningAmount1);
+          // console.log('calim miningAmount',miningAmount);
+          // console.log('calim nonminingAmount',nonminingAmount);
 
         }
       }
@@ -1482,6 +1660,8 @@ describe(" StakeUniswapV3 ", function () {
       const miningInfosAfter = await TestStakeUniswapV3Upgrade.getMiningTokenId(
         tester.tokens[0]
       );
+
+
       expect(miningInfosAfter.miningAmount).to.be.equal(
         ethers.BigNumber.from("0")
       );
@@ -1514,6 +1694,14 @@ describe(" StakeUniswapV3 ", function () {
       ).sub(
         ethers.BigNumber.from(depositToken.secondsInsideInitial.toString())
       );
+
+      // console.log('PHASE2_MINING_PERSECOND',PHASE2_MINING_PERSECOND) ;
+      // console.log('secondDiff',secondDiff) ;
+      // console.log('depositToken.claimedTime',depositToken.claimedTime) ;
+      // console.log('coinageToken.claimedTime',coinageToken.claimedTime) ;
+      // console.log('userTotalStaked.totalMiningAmount',coinageToken.claimedTime) ;
+      // console.log('userTotalStaked.totalNonMiningAmount',coinageToken.totalNonMiningAmount) ;
+
 
       const miningAmountForSecondDiff =
         secondDiff.toNumber() * PHASE2_MINING_PERSECOND;
@@ -2043,16 +2231,7 @@ describe(" StakeUniswapV3 ", function () {
 
       await TestStakeUniswapV3Upgrade
         .connect(tester.account)
-        .StakeUniswapV3UpgradeInterface(1, "safeApprove(bytes)",
-        ethers.utils.defaultAbiCoder.encode(['address', 'uint256'], [wton.address, total_wton])
-        );
-
-      await TestStakeUniswapV3Upgrade
-        .connect(tester.account)
-        .StakeUniswapV3UpgradeInterface(1,
-          "safeApprove(bytes)",
-          ethers.utils.defaultAbiCoder.encode(['address', 'uint256'], [tos.address, total_tos])
-        );
+        .safeApproveAll([wton.address, tos.address], [total_wton, total_tos]);
 
       expect(
         await wton.allowance(
@@ -2109,12 +2288,8 @@ describe(" StakeUniswapV3 ", function () {
 
       const tx = await TestStakeUniswapV3Upgrade
         .connect(tester.account)
-        .StakeUniswapV3UpgradeInterface(
-          1,
-          "increaseLiquidity(bytes)",
-          ethers.utils.defaultAbiCoder.encode(['uint256', 'uint256','uint256','uint256','uint256','uint256'],
-          [tester.tokens[0], tester.amount0Desired, tester.amount1Desired, 0,0,100000000000000])
-        );
+        .increaseLiquidity(tester.tokens[0], tester.amount0Desired, tester.amount1Desired, 0,0,100000000000000);
+
       const receipt = await tx.wait();
 
       for (let i = 0; i < receipt.events.length; i++) {
@@ -2170,12 +2345,7 @@ describe(" StakeUniswapV3 ", function () {
 
       const tx = await TestStakeUniswapV3Upgrade
         .connect(tester.account)
-        .StakeUniswapV3UpgradeInterface(
-          1,
-          "increaseLiquidity(bytes)",
-          ethers.utils.defaultAbiCoder.encode(['uint256', 'uint256','uint256','uint256','uint256','uint256'],
-          [tester.tokens[0], tester.amount0Desired, tester.amount1Desired, 0,0,100000000000000])
-        );
+        .increaseLiquidity(tester.tokens[0], tester.amount0Desired, tester.amount1Desired, 0,0,100000000000000);
 
       const receipt = await tx.wait();
 
@@ -2276,12 +2446,8 @@ describe(" StakeUniswapV3 ", function () {
 
       const tx = await TestStakeUniswapV3Upgrade
         .connect(tester.account)
-        .StakeUniswapV3UpgradeInterface(
-          1,
-          "decreaseLiquidity(bytes)",
-          ethers.utils.defaultAbiCoder.encode(['uint256', 'uint128','uint256','uint256','uint256' ],
-          [tester.tokens[0], paramliquidity.toString(), 0, 0, 100000000000000])
-        );
+        .decreaseLiquidity(tester.tokens[0], paramliquidity.toString(), 0, 0, 100000000000000);
+
       const receipt = await tx.wait();
 
       for (let i = 0; i < receipt.events.length; i++) {
@@ -2334,12 +2500,8 @@ describe(" StakeUniswapV3 ", function () {
 
       const tx = await TestStakeUniswapV3Upgrade
         .connect(tester.account)
-        .StakeUniswapV3UpgradeInterface(
-          1,
-          "decreaseLiquidity(bytes)",
-          ethers.utils.defaultAbiCoder.encode(['uint256', 'uint128','uint256','uint256','uint256' ],
-          [tester.tokens[0], paramliquidity.toString(), 0, 0, 100000000000000])
-        );
+        .decreaseLiquidity(tester.tokens[0], paramliquidity.toString(), 0, 0, 100000000000000);
+
       const receipt = await tx.wait();
 
       for (let i = 0; i < receipt.events.length; i++) {
@@ -2397,12 +2559,8 @@ describe(" StakeUniswapV3 ", function () {
 
       const tx = await TestStakeUniswapV3Upgrade
         .connect(tester.account)
-        .StakeUniswapV3UpgradeInterface(
-          1,
-          "collect(bytes)",
-          ethers.utils.defaultAbiCoder.encode(['uint256', 'uint128','uint128'],
-          [tester.tokens[0], params.amount0Max.toString(), params.amount1Max.toString()])
-        );
+        .collect(tester.tokens[0], params.amount0Max.toString(), params.amount1Max.toString());
+
 
       const receipt = await tx.wait();
 
@@ -2708,7 +2866,7 @@ describe(" StakeUniswapV3 ", function () {
       this.timeout(1000000);
       await expect(
         TestStakeUniswapV3Upgrade.connect(tester1.account).stake(tester1.tokens[0])
-      ).to.be.revertedWith("StakeUniswapV3: end mining");
+      ).to.be.revertedWith("StakeUniswapV3Upgrade: end mining");
     });
 
     it("4. withdraw : tester1 ", async () => {
@@ -3046,13 +3204,17 @@ describe(" StakeUniswapV3 ", function () {
 
       for (let i = 0; i < receipt.events.length; i++) {
         if (
-          receipt.events[i].event == "WithdrawalToken" &&
-          receipt.events[i].args != null
+          receipt.events[i].topics.length > 0 &&
+          receipt.events[i].topics[0] == topic0WithdrawalToken
         ) {
-          const miningAmount1 = receipt.events[i].args.miningAmount;
-          const nonMiningAmount1 = receipt.events[i].args.nonMiningAmount;
-          miningAmount = miningAmount.add(miningAmount1);
-          nonminingAmount = nonminingAmount.add(nonMiningAmount1);
+            const eventObj = web3.eth.abi.decodeLog(
+            abiWithdrawalToken,
+            receipt.events[i].data,
+            receipt.events[i].topics.slice(1)
+          );
+
+          miningAmount = miningAmount.add(ethers.BigNumber.from(eventObj.miningAmount));
+          nonminingAmount = nonminingAmount.add(ethers.BigNumber.from(eventObj.nonMiningAmount));
         }
       }
 

@@ -82,7 +82,7 @@ let StakeTONFactory, StakeDefiFactory,
   StakeUniswapV3, StakeCoinageFactory, StakeUniswapV3Factory,
   Stake2Logic, Stake2VaultLogic ,
   StakeTONLogic, StakeSimple , StakeUniswapV3Upgrade, StakeUniswapV3Upgrade1,
-  Stake2VaultUpgrade;
+  Stake2VaultUpgrade, StakeUniswapV3Proxy2;
 
 // plasma-evm-contracts
 let TON, WTON,
@@ -178,6 +178,7 @@ class ICO20Contracts {
     this.stakeUniswapV3Upgrade = null;
     this.stakeUniswapV3Upgrade1 = null;
     this.stake2VaultUpgrade = null;
+    this.stakeUniswapV3Proxy2 = null;
 
     this.AbiObject = {
       TON: null,
@@ -358,6 +359,10 @@ class ICO20Contracts {
     //   this.stake1proxy.address
     // );
 
+    StakeUniswapV3Proxy2 = await ethers.getContractFactory("StakeUniswapV3Proxy2");
+    this.stakeUniswapV3Proxy2 = await StakeUniswapV3Proxy2.connect(owner).deploy();
+
+
     StakeUniswapV3Upgrade = await ethers.getContractFactory("StakeUniswapV3Upgrade");
     this.stakeUniswapV3Upgrade = await StakeUniswapV3Upgrade.connect(owner).deploy();
 
@@ -394,7 +399,8 @@ class ICO20Contracts {
       stakeVaultFactory: this.stakeVaultFactory,
       stakeUniswapV3Upgrade: this.stakeUniswapV3Upgrade,
       stakeUniswapV3Upgrade1: this.stakeUniswapV3Upgrade1,
-      stake2VaultUpgrade: this.stake2VaultUpgrade
+      stake2VaultUpgrade: this.stake2VaultUpgrade,
+      stakeUniswapV3Proxy2 : this.stakeUniswapV3Proxy2
     };
     // console.log(' initializeICO20Contracts  :',returnData );
 
@@ -606,7 +612,8 @@ class ICO20Contracts {
       stakeVaultFactory : this.stakeVaultFactory,
       stakeUniswapV3Upgrade: this.stakeUniswapV3Upgrade,
       stakeUniswapV3Upgrade1: this.stakeUniswapV3Upgrade1,
-      stake2VaultUpgrade: this.stake2VaultUpgrade
+      stake2VaultUpgrade: this.stake2VaultUpgrade,
+      stakeUniswapV3Proxy2 : this.stakeUniswapV3Proxy2
     };
   };
 
