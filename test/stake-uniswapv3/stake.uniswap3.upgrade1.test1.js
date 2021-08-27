@@ -1381,9 +1381,7 @@ describe(" StakeUniswapV3 ", function () {
       let _func2 = Web3EthAbi.encodeFunctionSignature("getMiningTokenId(uint256)") ;
       let _func3 = Web3EthAbi.encodeFunctionSignature("stake(uint256)") ;
       let _func4 = Web3EthAbi.encodeFunctionSignature("stakePermit(uint256,uint256,uint8,bytes32,bytes32)") ;
-      let _func5 = Web3EthAbi.encodeFunctionSignature("mint(bytes)") ;
-      // let _func6 = Web3EthAbi.encodeFunctionSignature("StakeUniswapV3UpgradeInterface(uint32,string,bytes)") ;
-      // let _func7 = Web3EthAbi.encodeFunctionSignature("getInterfaceAddress(uint32)") ;
+      let _func5 = Web3EthAbi.encodeFunctionSignature("mint(int24,int24,uint256,uint256,uint256,uint256,uint256)") ;
 
       await stakeProxy2.connect(owner).setImplementation2(cons.stakeUniswapV3Upgrade.address, 1, true);
       expect(await stakeProxy2.implementation2(1)).to.be.equal(cons.stakeUniswapV3Upgrade.address);
@@ -1397,8 +1395,6 @@ describe(" StakeUniswapV3 ", function () {
       expect(await stakeProxy2.getSelectorImplementation2(_func3)).to.be.equal(cons.stakeUniswapV3Upgrade.address);
       expect(await stakeProxy2.getSelectorImplementation2(_func4)).to.be.equal(cons.stakeUniswapV3Upgrade.address);
       expect(await stakeProxy2.getSelectorImplementation2(_func5)).to.be.equal(cons.stakeUniswapV3Upgrade.address);
-      // expect(await stakeProxy2.getSelectorImplementation2(_func6)).to.be.equal(cons.stakeUniswapV3Upgrade.address);
-      // expect(await stakeProxy2.getSelectorImplementation2(_func7)).to.be.equal(cons.stakeUniswapV3Upgrade.address);
 
     });
 
@@ -1406,7 +1402,6 @@ describe(" StakeUniswapV3 ", function () {
     it("5. regist stakeUniswapV3Upgrade1 functions to stakeUniswapV3Proxy2 in stakeContract ", async () => {
       const cons = await ico20Contracts.getICOContracts();
 
-     // let _func1 = Web3EthAbi.encodeFunctionSignature("safeApprove(address,uint256)") ;
       let _func1 = Web3EthAbi.encodeFunctionSignature("safeApproveAll(address[],uint256[])") ;
       let _func2 = Web3EthAbi.encodeFunctionSignature("increaseLiquidity(uint256,uint256,uint256,uint256,uint256,uint256)") ;
       let _func3 = Web3EthAbi.encodeFunctionSignature("collect(uint256,uint128,uint128)") ;
@@ -1429,7 +1424,7 @@ describe(" StakeUniswapV3 ", function () {
       expect(await stakeProxy2.getSelectorImplementation2(_func5)).to.be.equal(cons.stakeUniswapV3Upgrade1.address);
       expect(await stakeProxy2.getSelectorImplementation2(_func6)).to.be.equal(cons.stakeUniswapV3Upgrade1.address);
       expect(await stakeProxy2.getSelectorImplementation2(_func7)).to.be.equal(cons.stakeUniswapV3Upgrade1.address);
-     // expect(await stakeProxy2.getSelectorImplementation2(_func8)).to.be.equal(cons.stakeUniswapV3Upgrade1.address);
+
     });
 
     it("6. check proxy storage ", async () => {

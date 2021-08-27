@@ -302,9 +302,15 @@ contract StakeUniswapV3Upgrade1 is
         );
         (, , , , , , , , , , uint128 tokensOwed0, uint128 tokensOwed1) =
             nonfungiblePositionManager.positions(tokenId);
+
         require(
             amount0Max <= tokensOwed0 && amount1Max <= tokensOwed1,
             "StakeUniswapV3Upgrade1: tokensOwed is insufficient"
+        );
+
+        require(
+            amount0Max > 0 || amount1Max > 0,
+            "StakeUniswapV3Upgrade1: zero amount"
         );
 
         _depositTokens.claimLock = true;

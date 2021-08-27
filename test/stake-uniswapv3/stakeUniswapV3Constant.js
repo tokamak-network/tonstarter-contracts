@@ -4,7 +4,7 @@ let topic0IncreasedLiquidity = ethers.utils.id("IncreasedLiquidity(address,uint2
 let topic0DecreasedLiquidity = ethers.utils.id("DecreasedLiquidity(address,uint256,uint128,uint256,uint256)");
 let topic0WithdrawalToken = ethers.utils.id("WithdrawalToken(address,uint256,uint256,uint256)");
 let topic0Claimed = ethers.utils.id("Claimed(address,uint256,address,uint256,uint256)");
-let topic0MintAndStaked = ethers.utils.id("MintAndStaked(address,address,uint256,uint256)");
+let topic0MintAndStaked = ethers.utils.id("MintAndStaked(address,address,uint256,uint256,uint256,uint256)");
 
 let abiCollected = [
     {
@@ -163,66 +163,40 @@ let abiClaimed = [
 
 let abiMintAndStaked = [
         {
-          "components": [
-            {
-              "internalType": "address",
-              "name": "token0",
-              "type": "address"
-            },
-            {
-              "internalType": "address",
-              "name": "token1",
-              "type": "address"
-            },
-            {
-              "internalType": "uint24",
-              "name": "fee",
-              "type": "uint24"
-            },
-            {
-              "internalType": "int24",
-              "name": "tickLower",
-              "type": "int24"
-            },
-            {
-              "internalType": "int24",
-              "name": "tickUpper",
-              "type": "int24"
-            },
-            {
-              "internalType": "uint256",
-              "name": "amount0Desired",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "amount1Desired",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "amount0Min",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "amount1Min",
-              "type": "uint256"
-            },
-            {
-              "internalType": "address",
-              "name": "recipient",
-              "type": "address"
-            },
-            {
-              "internalType": "uint256",
-              "name": "deadline",
-              "type": "uint256"
-            }
-          ],
-          "internalType": "struct INonfungiblePositionManager.MintParams",
-          "name": "params",
-          "type": "tuple"
+          "indexed": true,
+          "internalType": "address",
+          "name": "to",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "poolAddress",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "tokenId",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "liquidity",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "amount0",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "amount1",
+          "type": "uint256"
         }
       ];
 

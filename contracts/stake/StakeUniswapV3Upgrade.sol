@@ -28,19 +28,6 @@ contract StakeUniswapV3Upgrade is
     using SafeMath for uint256;
     using SafeMath32 for uint32;
 
-    struct MintParams {
-        address token0;
-        address token1;
-        uint24 fee;
-        int24 tickLower;
-        int24 tickUpper;
-        uint256 amount0Desired;
-        uint256 amount1Desired;
-        uint256 amount0Min;
-        uint256 amount1Min;
-        address recipient;
-        uint256 deadline;
-    }
     /// @dev event on staking
     /// @param to the sender
     /// @param poolAddress the pool address of uniswapV3
@@ -73,7 +60,9 @@ contract StakeUniswapV3Upgrade is
         address indexed to,
         address indexed poolAddress,
         uint256 tokenId,
-        uint256 amount
+        uint256 liquidity,
+        uint256 amount0,
+        uint256 amount1
     );
 
     /// @dev constructor of StakeCoinage
@@ -474,10 +463,10 @@ contract StakeUniswapV3Upgrade is
         else return false;
     }
 
-    function mint(INonfungiblePositionManager.MintParams calldata params)
-    //function mint(MintParams calldata params)
+    function mint(int24 tickLower, int24 tickUpper,
+        uint256 amount0Desired, uint256 amount1Desired, uint256 amount0Min, uint256 amount1Min,
+        uint256 deadline)
         external
-        lock
     {
         require(
             saleStartTime < block.timestamp,
@@ -488,35 +477,71 @@ contract StakeUniswapV3Upgrade is
             block.timestamp < IIStake2Vault(vault).miningEndTime(),
             "StakeUniswapV3Upgrade: end mining"
         );
-        require(
-            params.recipient == msg.sender,
-            "StakeUniswapV3Upgrade: recipient is not sender"
-        );
 
         require(
             poolToken0 != address(0) && poolToken1 != address(0),
             "StakeUniswapV3Upgrade: zeroAddress token"
         );
         require(
-            checkCurrentPosition(params.tickLower, params.tickUpper),
+            checkCurrentPosition(tickLower, tickUpper),
             "StakeUniswapV3Upgrade: out of range"
         );
 
-        TransferHelper.safeTransferFrom(
-            poolToken0,
-            msg.sender,
-            address(this),
-            params.amount0Desired
-        );
-        TransferHelper.safeTransferFrom(
-            poolToken1,
-            msg.sender,
-            address(this),
-            params.amount1Desired
+        require(
+            amount0Desired > 0 ||  amount1Desired > 0,
+            "StakeUniswapV3Upgrade: liquidity zero"
         );
 
-        (uint256 tokenId, uint128 liquidity, , ) =
-            nonfungiblePositionManager.mint(params);
+        if(amount0Desired > 0 ){
+             TransferHelper.safeTransferFrom(
+                poolToken0,
+                msg.sender,
+                address(this),
+                amount0Desired
+            );
+        }
+        if(amount1Desired > 0 ){
+            TransferHelper.safeTransferFrom(
+                poolToken1,
+                msg.sender,
+                address(this),
+                amount1Desired
+            );
+        }
+
+        (uint256 tokenId, uint128 liquidity, uint256 amount0, uint256 amount1) =
+            nonfungiblePositionManager.mint(
+                INonfungiblePositionManager.MintParams({
+                    token0: poolToken0,
+                    token1: poolToken1,
+                    fee: uint24(poolFee),
+                    tickLower: tickLower,
+                    tickUpper: tickUpper,
+                    amount0Desired: amount0Desired,
+                    amount1Desired: amount1Desired,
+                    amount0Min: amount0Min,
+                    amount1Min: amount1Min,
+                    recipient: address(this),
+                    deadline: deadline
+                })
+            );
+
+        require(nonfungiblePositionManager.ownerOf(tokenId) == address(this), "StakeUniswapV3Upgrade: owner wrong");
+
+        if(amount0 < amount0Desired) {
+            TransferHelper.safeTransfer(
+                poolToken0,
+                msg.sender,
+                amount0Desired.sub(amount0)
+            );
+        }
+        if(amount1 < amount1Desired) {
+            TransferHelper.safeTransfer(
+                poolToken1,
+                msg.sender,
+                amount1Desired.sub(amount1)
+            );
+        }
 
         require(
             tokenId > 0 && liquidity > 0,
@@ -533,14 +558,14 @@ contract StakeUniswapV3Upgrade is
 
         (, , uint32 secondsInside) =
             IUniswapV3Pool(poolAddress).snapshotCumulativesInside(
-                params.tickLower,
-                params.tickUpper
+                tickLower,
+                tickUpper
             );
 
         _depositTokens.idIndex = userStakedTokenIds[msg.sender].length;
         _depositTokens.liquidity = liquidity;
-        _depositTokens.tickLower = params.tickLower;
-        _depositTokens.tickUpper = params.tickUpper;
+        _depositTokens.tickLower = tickLower;
+        _depositTokens.tickUpper = tickUpper;
         _depositTokens.startTime = uint32(block.timestamp);
         _depositTokens.claimedTime = 0;
         _depositTokens.secondsInsideInitial = secondsInside;
@@ -577,7 +602,7 @@ contract StakeUniswapV3Upgrade is
 
         miningCoinage();
 
-        emit MintAndStaked(msg.sender, poolAddress, tokenId, liquidity);
+        emit MintAndStaked(msg.sender, poolAddress, tokenId, liquidity, amount0, amount1);
     }
 
 }
