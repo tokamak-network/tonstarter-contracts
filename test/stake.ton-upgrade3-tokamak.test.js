@@ -2,10 +2,13 @@
 // const { ethers, upgrades } = require("hardhat")
 
 const { time, expectEvent } = require("@openzeppelin/test-helpers");
-const { ethers } = require("ethers");
+//const { ethers } = require("ethers");
+const { ethers } = require("hardhat");
+
 const BigNumber = ethers.BigNumber; // https://docs.ethers.io/v5/api/utils/bignumber/
 const utils = ethers.utils;
 
+const Web3EthAbi = require("web3-eth-abi");
 const {
   defaultSender,
   accounts,
@@ -29,6 +32,10 @@ const [
 const candidates = [candidate1, candidate2, candidate3];
 const users = [user1, user2, user3, user4, user5];
 const operators = [operator1, operator2];
+const {
+  topic0TonWithdrawal,
+  abiTonWithdrawal
+  } = require("./stakeTONUpgrade3Constant");
 
 // const { expectEvent } = require('openzeppelin-test-helpers');
 
@@ -113,6 +120,37 @@ let tokamakStakedInfo = {
 
 let stakeContractTokamak = [];
 let unstakingBlock ;
+let stakeTONStoragelist = [];
+let stakeTONStorage = {
+  token:'',
+  stakeRegistry:'',
+  paytoken:'',
+  vault:'',
+  saleStartBlock:'',
+  startBlock:'',
+  endBlock:'',
+  rewardClaimedTotal:'',
+  totalStakedAmount:'',
+  totalStakers:'',
+  pauseProxy:'',
+  defiAddr:'',
+  migratedL2:'',
+  ton:'',
+  wton:'',
+  seigManager:'',
+  depositManager:'',
+  swapProxy:'',
+  tokamakLayer2:'',
+  toTokamak:'',
+  fromTokamak:'',
+  toUniswapWTON:'',
+  swappedAmountTOS:'',
+  finalBalanceTON:'',
+  finalBalanceWTON:'',
+  defiStatus:'',
+  requestNum:'',
+  withdrawFlag:''
+}
 //
 describe("TokamakStaker ", function () {
   let weth, tos, stakeregister, stakefactory, stake1proxy, stake1logic;
@@ -544,8 +582,30 @@ describe("TokamakStaker ", function () {
         await expect(toBN(totalStakedAmount).toString())
             .to.be.bignumber.lt(toBN(pendingOf).add(toBN(stakeOf)).div(toBN(10**9)).toString());
 
-        // await expect(toBN(stakeOf).toString()).to.be.bignumber.equal(remainAmount.toString());
+        await expect(toBN(pendingOf)).to.be.bignumber.above(toBN('0'));
+        /*
+        let startIndex = await depositManager.withdrawalRequestIndex(
+                layer2.address,
+                stakeAddresses[i]
+            );
 
+        let numPendingRequests = await depositManager.numPendingRequests(
+                layer2.address,
+                stakeAddresses[i]
+            );
+
+        console.log('startIndex',i, startIndex.toString());
+        console.log('numPendingRequests',i, numPendingRequests.toString());
+        // await expect(toBN(stakeOf).toString()).to.be.bignumber.equal(remainAmount.toString());
+        for (let k = parseInt(startIndex); k < (parseInt(numPendingRequests)+parseInt(startIndex)); k++) {
+            let withdrawalRequest = await depositManager.withdrawalRequest(
+                layer2.address,
+                stakeAddresses[i],
+                k
+            );
+            console.log('withdrawalRequest',i, k,withdrawalRequest.processed , withdrawalRequest.withdrawableBlockNumber.toString() , withdrawalRequest.amount.toString() );
+        }
+        */
       }
     });
 
@@ -589,35 +649,45 @@ describe("TokamakStaker ", function () {
           expect(totalStakedAmount[i].toString()).to.be.equal(amount.toString());
 
           expect(await contract.version()).to.be.equal("phase1.upgrade.v2");
+
+          let stakeTONStorageNew = JSON.parse(JSON.stringify(stakeTONStorage));
+
+          stakeTONStorageNew.token = await contract.token();
+          stakeTONStorageNew.stakeRegistry = await contract.stakeRegistry();
+          stakeTONStorageNew.paytoken = await contract.paytoken();
+          stakeTONStorageNew.vault = await contract.vault();
+          stakeTONStorageNew.saleStartBlock = await contract.saleStartBlock();
+          stakeTONStorageNew.startBlock = await contract.startBlock();
+          stakeTONStorageNew.endBlock = await contract.endBlock();
+          stakeTONStorageNew.rewardClaimedTotal = await contract.rewardClaimedTotal();
+          stakeTONStorageNew.totalStakedAmount = await contract.totalStakedAmount();
+          stakeTONStorageNew.totalStakers = await contract.totalStakers();
+          stakeTONStorageNew.pauseProxy = await contract.pauseProxy();
+          stakeTONStorageNew.defiAddr = await contract.defiAddr();
+          stakeTONStorageNew.migratedL2 = await contract.migratedL2();
+          stakeTONStorageNew.ton = await contract.ton();
+          stakeTONStorageNew.wton = await contract.wton();
+          stakeTONStorageNew.seigManager = await contract.seigManager();
+          stakeTONStorageNew.depositManager = await contract.depositManager();
+          stakeTONStorageNew.swapProxy = await contract.swapProxy();
+          stakeTONStorageNew.tokamakLayer2 = await contract.tokamakLayer2();
+          stakeTONStorageNew.toTokamak = await contract.toTokamak();
+          stakeTONStorageNew.fromTokamak = await contract.fromTokamak();
+          stakeTONStorageNew.toUniswapWTON = await contract.toUniswapWTON();
+          stakeTONStorageNew.swappedAmountTOS = await contract.swappedAmountTOS();
+          stakeTONStorageNew.finalBalanceTON = await contract.finalBalanceTON();
+          stakeTONStorageNew.finalBalanceWTON = await contract.finalBalanceWTON();
+          stakeTONStorageNew.defiStatus = await contract.defiStatus();
+          stakeTONStorageNew.requestNum = await contract.requestNum();
+          stakeTONStorageNew.withdrawFlag = await contract.withdrawFlag();
+          stakeTONStoragelist.push(stakeTONStorageNew);
         }
       }
     });
   });
 
-  describe('# 5. StakeTONUpgrade3 in StakeTONUpgrade', async function () {
+  describe('# 5. StakeTONUpgrade3, StakeProxy2 in StakeTONUpgrade', async function () {
 
-    it("0. snapshot proxy StakeTON", async () => {
-        /*
-        stakeUniswapV3Storage.token = await TestStakeUniswapV3.token();
-        stakeUniswapV3Storage.stakeRegistry = await TestStakeUniswapV3.stakeRegistry();
-        stakeUniswapV3Storage.vault = await TestStakeUniswapV3.vault();
-        stakeUniswapV3Storage.miningAmountTotal = await TestStakeUniswapV3.miningAmountTotal();
-        stakeUniswapV3Storage.nonMiningAmountTotal = await TestStakeUniswapV3.nonMiningAmountTotal();
-        stakeUniswapV3Storage.totalStakedAmount = await TestStakeUniswapV3.totalStakedAmount();
-        stakeUniswapV3Storage.totalStakers = await TestStakeUniswapV3.totalStakers();
-        stakeUniswapV3Storage.pauseProxy = await TestStakeUniswapV3.pauseProxy();
-        stakeUniswapV3Storage.stakeStartTime = await TestStakeUniswapV3.stakeStartTime();
-        stakeUniswapV3Storage.saleStartTime = await TestStakeUniswapV3.saleStartTime();
-        stakeUniswapV3Storage.miningIntervalSeconds = await TestStakeUniswapV3.miningIntervalSeconds();
-        stakeUniswapV3Storage.poolToken0 = await TestStakeUniswapV3.poolToken0();
-        stakeUniswapV3Storage.poolToken1 = await TestStakeUniswapV3.poolToken1();
-        stakeUniswapV3Storage.poolAddress = await TestStakeUniswapV3.poolAddress();
-        stakeUniswapV3Storage.poolFee = await TestStakeUniswapV3.poolFee();
-        stakeUniswapV3Storage.uniswapV3FactoryAddress = await TestStakeUniswapV3.uniswapV3FactoryAddress();
-        stakeUniswapV3Storage.totalTokens = await TestStakeUniswapV3.totalTokens();
-        stakeUniswapV3Storage.migratedL2 = await TestStakeUniswapV3.migratedL2();
-        */
-    });
     it("1. StakeTONUpgrade3 Deploy", async function () {
       stakeTONUpgrade3 = await StakeTONUpgrade3.new({ from: defaultSender });
       expect(stakeTONUpgrade3.address).to.not.eq(zeroAddress);
@@ -628,15 +698,78 @@ describe("TokamakStaker ", function () {
       expect(stakeTONProxy2.address).to.not.eq(zeroAddress);
     });
 
+    it("3. add burn percantage of swapped tos in phase1 to registry ", async function () {
+        this.timeout(1000000);
+        const cons = await ico20Contracts.getICOContracts();
+        stakeregister = cons.stakeregister;
+
+        await stakeregister.addDefiInfo(
+          "PHASE1.SWAPTOS.BURNPERCENT",
+          stakeTONUpgrade3.address,
+          zeroAddress,
+          zeroAddress,
+          0,
+          zeroAddress
+          ,{ from: defaultSender }
+        );
+    });
+
+    it("4. add tos burner autority to StakeTON Contracts  ", async function () {
+        this.timeout(1000000);
+        const cons = await ico20Contracts.getICOContracts();
+
+        for (let i = 0; i < stakeAddresses.length; i++) {
+          if (stakeAddresses[i] != null) {
+            await tos.addBurner(stakeAddresses[i], { from: defaultSender });
+          }
+        }
+    });
+
     it("3. StakeTONProxy upgradeStakeTo StakeTONProxy2", async function () {
       this.timeout(1000000);
 
+      let ABI_CODE =  [
+          {
+            "inputs": [],
+            "stateMutability": "nonpayable",
+            "type": "constructor"
+          },
+          {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "target",
+              "type": "address"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "role",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "address",
+              "name": "account",
+              "type": "address"
+            }
+          ],
+          "name": "grantRole",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        }
+      ];
+      const cons = await ico20Contracts.getICOContracts();
+      const proxyContract = new web3.eth.Contract(ABI_CODE, cons.stake1proxy.address );
+
       for (let i = 0; i < stakeAddresses.length; i++) {
         if (stakeAddresses[i] != null) {
-          await stakeEntry.grantRole(stakeAddresses[i], keccak256("ADMIN"), defaultSender, { from: defaultSender });
+
+          await proxyContract.methods.grantRole(stakeAddresses[i], keccak256("ADMIN"), defaultSender).send({ from: defaultSender });
+
           await stakeEntry.upgradeStakeTo(stakeAddresses[i], stakeTONProxy2.address, { from: defaultSender });
 
-          let contract =  new web3.eth.Contract(StakeTONTotalAbi, stakeAddresses[i]);
+          let contract = await StakeTONProxy2.at(stakeAddresses[i], { from: defaultSender });
+
           expect(await contract.isAdmin(defaultSender)).to.be.equal(true);
 
           await contract.setImplementation2(stakeTONUpgrade2.address, 0, true, { from: defaultSender });
@@ -644,28 +777,72 @@ describe("TokamakStaker ", function () {
 
           let amount = await contract.totalStakedAmount();
           expect(totalStakedAmount[i].toString()).to.be.equal(amount.toString());
-          //expect(await contract.version()).to.be.equal("phase1.upgrade.v3");
 
+          let stakeTONStorageSnapshot = stakeTONStoragelist[i];
+          expect(await contract.token()).to.be.equal(stakeTONStorageSnapshot.token);
+          expect(await contract.stakeRegistry()).to.be.equal(stakeTONStorageSnapshot.stakeRegistry);
+          expect(await contract.paytoken()).to.be.equal(stakeTONStorageSnapshot.paytoken);
+          expect(await contract.vault()).to.be.equal(stakeTONStorageSnapshot.vault);
+          expect(await contract.saleStartBlock()).to.be.bignumber.equal(stakeTONStorageSnapshot.saleStartBlock);
+          expect(await contract.startBlock()).to.be.bignumber.equal(stakeTONStorageSnapshot.startBlock);
+          expect(await contract.endBlock()).to.be.bignumber.equal(stakeTONStorageSnapshot.endBlock);
+          expect(await contract.rewardClaimedTotal()).to.be.bignumber.equal(stakeTONStorageSnapshot.rewardClaimedTotal);
+          expect(await contract.totalStakedAmount()).to.be.bignumber.equal(stakeTONStorageSnapshot.totalStakedAmount);
+          expect(await contract.totalStakers()).to.be.bignumber.equal(stakeTONStorageSnapshot.totalStakers);
+          expect(await contract.pauseProxy()).to.be.equal(stakeTONStorageSnapshot.pauseProxy);
+          expect(await contract.defiAddr()).to.be.equal(stakeTONStorageSnapshot.defiAddr);
+          expect(await contract.migratedL2()).to.be.equal(stakeTONStorageSnapshot.migratedL2);
+          expect(await contract.ton()).to.be.equal(stakeTONStorageSnapshot.ton);
+          expect(await contract.wton()).to.be.equal(stakeTONStorageSnapshot.wton);
+          expect(await contract.seigManager()).to.be.equal(stakeTONStorageSnapshot.seigManager);
+          expect(await contract.depositManager()).to.be.equal(stakeTONStorageSnapshot.depositManager);
+          expect(await contract.swapProxy()).to.be.equal(stakeTONStorageSnapshot.swapProxy);
+          expect(await contract.tokamakLayer2()).to.be.equal(stakeTONStorageSnapshot.tokamakLayer2);
+          expect(await contract.toTokamak()).to.be.bignumber.equal(stakeTONStorageSnapshot.toTokamak);
+          expect(await contract.fromTokamak()).to.be.bignumber.equal(stakeTONStorageSnapshot.fromTokamak);
+          expect(await contract.toUniswapWTON()).to.be.bignumber.equal(stakeTONStorageSnapshot.toUniswapWTON);
+          expect(await contract.swappedAmountTOS()).to.be.bignumber.equal(stakeTONStorageSnapshot.swappedAmountTOS);
+          expect(await contract.finalBalanceTON()).to.be.bignumber.equal(stakeTONStorageSnapshot.finalBalanceTON);
+          expect(await contract.finalBalanceWTON()).to.be.bignumber.equal(stakeTONStorageSnapshot.finalBalanceWTON);
+          expect((await contract.defiStatus()).toString()).to.be.equal(stakeTONStorageSnapshot.defiStatus.toString());
+          expect(await contract.requestNum()).to.be.bignumber.equal(stakeTONStorageSnapshot.requestNum);
+          expect(await contract.withdrawFlag()).to.be.equal(stakeTONStorageSnapshot.withdrawFlag);
         }
       }
     });
+
+    it("4. change withdraw function logic to StakeTONUpgrade3", async function () {
+      this.timeout(1000000);
+      const cons = await ico20Contracts.getICOContracts();
+
+      let _func1 = Web3EthAbi.encodeFunctionSignature("withdraw()") ;
+      for (let i = 0; i < stakeAddresses.length; i++) {
+        if (stakeAddresses[i] != null) {
+          let contract = await StakeTONProxy2.at(stakeAddresses[i], { from: defaultSender });
+          await contract.setImplementation2(stakeTONUpgrade3.address, 1, true, { from: defaultSender });
+          expect(await contract.implementation2(1)).to.be.equal(stakeTONUpgrade3.address);
+          await contract.setSelectorImplementations2([_func1], stakeTONUpgrade3.address, { from: defaultSender });
+          expect(await contract.getSelectorImplementation2(_func1)).to.be.equal(stakeTONUpgrade3.address);
+        }
+      }
+    });
+
   });
 
-  describe('# 5. tokamakProcessUnStaking ', async function () {
+  describe('# 6. tokamakProcessUnStaking ', async function () {
 
     it("1. tokamakProcessUnStaking : Only those past the delayed block can be processed  ", async function () {
       this.timeout(1000000);
       const delayBlocks = await depositManager.globalWithdrawalDelay();
 
       let curLatestBlock = await time.latestBlock();
-
-      //await time.advanceBlockTo(parseInt(unstakingBlock) + parseInt(delayBlocks) );
+      //console.log('curLatestBlock',parseInt(curLatestBlock));
+      await time.advanceBlockTo(parseInt(curLatestBlock) + parseInt(delayBlocks) );
 
 
       for (let i = 0; i < stakeAddresses.length; i++) {
 
         stakeContractTokamak[i].tonBalance = await ton.balanceOf(stakeAddresses[i]);
-
         /*
         let startIndex = await depositManager.withdrawalRequestIndex(
                 layer2.address,
@@ -676,13 +853,21 @@ describe("TokamakStaker ", function () {
                 layer2.address,
                 stakeAddresses[i]
             );
-        console.log('numPendingRequests',numPendingRequests.toString());
+
+        console.log('startIndex',i, startIndex.toString());
+        console.log('numPendingRequests',i, numPendingRequests.toString());
+        // await expect(toBN(stakeOf).toString()).to.be.bignumber.equal(remainAmount.toString());
+        for (let k = parseInt(startIndex); k < (parseInt(numPendingRequests)+parseInt(startIndex)); k++) {
+            let withdrawalRequest = await depositManager.withdrawalRequest(
+                layer2.address,
+                stakeAddresses[i],
+                k
+            );
+            console.log('withdrawalRequest',i, k,withdrawalRequest.processed , withdrawalRequest.withdrawableBlockNumber.toString() , withdrawalRequest.amount.toString() );
+        }
         */
         let contract = await StakeTONUpgrade2.at(stakeAddresses[i]);
         let canTokamakProcessUnStakingCount = await contract.canTokamakProcessUnStakingCount(layer2.address);
-        // console.log('canTokamakProcessUnStakingCount.count',canTokamakProcessUnStakingCount.count.toString());
-        // console.log('canTokamakProcessUnStakingCount.amount',canTokamakProcessUnStakingCount.amount.toString());
-
         stakeContractTokamak[i].tonBalance = toBN(stakeContractTokamak[i].tonBalance).add(toBN(canTokamakProcessUnStakingCount.amount).div(toBN(10**9)));
 
         await stakeEntry.tokamakProcessUnStaking(
@@ -716,49 +901,38 @@ describe("TokamakStaker ", function () {
 
     });
 
-    it("3. tokamakProcessUnStaking ", async function () {
+    it("3. tokamakProcessUnStaking fail when there is nothing that can be withdrawn", async function () {
       this.timeout(1000000);
       const delayBlocks = await depositManager.globalWithdrawalDelay();
       let latest = await time.latestBlock();
       await time.advanceBlockTo(parseInt(latest) + parseInt(delayBlocks)+1);
 
       latest = await time.latestBlock();
-      //console.log('curBlock:', latest.toString());
 
 
       for (let i = 0; i < stakeAddresses.length; i++) {
 
-        stakeContractTokamak[i].tonBalance = await ton.balanceOf(stakeAddresses[i]);
-        stakeContractTokamak[i].pendingOf = await depositManager.pendingUnstaked(
-          layer2.address,
-          stakeAddresses[i]
-        );
+        let contract = await StakeTONUpgrade2.at(stakeAddresses[i]);
+        let canTokamakProcessUnStakingCount = await contract.canTokamakProcessUnStakingCount(layer2.address);
 
-        stakeContractTokamak[i].tonBalance = toBN(stakeContractTokamak[i].tonBalance).add(toBN(stakeContractTokamak[i].pendingOf).div(toBN(10**9)));
+        expect(canTokamakProcessUnStakingCount.count).to.be.bignumber.equal(toBN('0'));
+        expect(canTokamakProcessUnStakingCount.amount).to.be.bignumber.equal(toBN('0'));
 
-        await stakeEntry.tokamakProcessUnStaking(
-          stakeAddresses[i],
-          layer2.address,
-          { from: defaultSender }
-        );
-
-        let currentTONAmount = await ton.balanceOf(stakeAddresses[i]);
-
-        await expect(stakeContractTokamak[i].tonBalance.toString())
-            .to.be.bignumber.equal(toBN(currentTONAmount).toString());
-
-        expect(await depositManager.pendingUnstaked(
-          layer2.address,
-          stakeAddresses[i])).to.be.bignumber.equal(toBN('0'));
+        await expect(
+           stakeEntry.tokamakProcessUnStaking(
+            stakeAddresses[i],
+            layer2.address,
+            { from: defaultSender }
+          )
+         ).to.be.revertedWith("TokamakStaker: no able request.");
 
       }
     });
 
-
   });
 
 
-  describe('# 6. Function Test2 For Claim after passed blocks ', async function () {
+  describe('# 7. Function Test2 For Claim after passed blocks ', async function () {
 
     it("1. claim", async function () {
       this.timeout(1000000);
@@ -778,7 +952,7 @@ describe("TokamakStaker ", function () {
         if (stakeAddresses.length > 0) {
           for (let j = 0; j < stakeAddresses.length; j++) {
             if (logFlag) console.log(`\n ----  StakeContract:`, j);
-            let stakeContract = await StakeTON.at(stakeAddresses[j]);
+            let stakeContract = await StakeTONUpgrade2.at(stakeAddresses[j]);
             const prevRewardClaimedTotal = await stakeContract.rewardClaimedTotal();
             let sum = toBN(prevRewardClaimedTotal.toString());
 
@@ -849,20 +1023,20 @@ describe("TokamakStaker ", function () {
 
   });
 
-  describe('# 7. withdraw : tester1', async function () {
+  describe('# 8. withdraw : tester1', async function () {
     it("1. withdraw fail when hasn't be passed end block ", async function () {
       // let latest = await time.latestBlock();
       // console.log('latestBlock', latest.toString()) ;
       this.timeout(1000000);
       if (stakeAddresses.length > 0) {
           for (let j = 0; j < stakeAddresses.length; j++) {
-            let stakeContract = await StakeTON.at(stakeAddresses[j]);
+            let stakeContract = await StakeTONUpgrade2.at(stakeAddresses[j]);
             // const endBlock = await stakeContract.endBlock();
             // console.log('endBlock', j, endBlock.toString()) ;
 
             await expect(
               stakeContract.withdraw({ from: user1 })
-            ).to.be.revertedWith("StakeTON: not end.");
+            ).to.be.revertedWith("StakeTONUpgrade3: not end");
 
           }
       }
@@ -875,7 +1049,7 @@ describe("TokamakStaker ", function () {
       this.timeout(1000000);
       if (stakeAddresses.length > 0) {
           for (let j = 0; j < stakeAddresses.length; j++) {
-            let stakeContract = await StakeTON.at(stakeAddresses[j]);
+            let stakeContract = await StakeTONUpgrade2.at(stakeAddresses[j]);
             const endBlock = await stakeContract.endBlock();
             // console.log('endBlock', j, endBlock.toString()) ;
 
@@ -886,7 +1060,7 @@ describe("TokamakStaker ", function () {
 
             await expect(
               stakeContract.withdraw({ from: user1 })
-            ).to.be.revertedWith("StakeTON: remain amount in tokamak");
+            ).to.be.revertedWith("StakeTONUpgrade3: remain amount in tokamak");
           }
       }
 
@@ -948,6 +1122,35 @@ describe("TokamakStaker ", function () {
 
       for (let i = 0; i < stakeAddresses.length; i++) {
 
+        /*
+        let startIndex = await depositManager.withdrawalRequestIndex(
+                layer2.address,
+                stakeAddresses[i]
+            );
+
+        let numPendingRequests = await depositManager.numPendingRequests(
+                layer2.address,
+                stakeAddresses[i]
+            );
+
+        console.log('startIndex',i, startIndex.toString());
+        console.log('numPendingRequests',i, numPendingRequests.toString());
+        // await expect(toBN(stakeOf).toString()).to.be.bignumber.equal(remainAmount.toString());
+        for (let k = parseInt(startIndex); k < (parseInt(numPendingRequests)+parseInt(startIndex)); k++) {
+            let withdrawalRequest = await depositManager.withdrawalRequest(
+                layer2.address,
+                stakeAddresses[i],
+                k
+            );
+            console.log('withdrawalRequest',i, k,withdrawalRequest.processed , withdrawalRequest.withdrawableBlockNumber.toString() , withdrawalRequest.amount.toString() );
+        }
+
+        let contract = await StakeTONUpgrade2.at(stakeAddresses[i]);
+        let canTokamakProcessUnStakingCount = await contract.canTokamakProcessUnStakingCount(layer2.address);
+        console.log('canTokamakProcessUnStakingCount.count',canTokamakProcessUnStakingCount.count.toString());
+        console.log('canTokamakProcessUnStakingCount.amount',canTokamakProcessUnStakingCount.amount.toString());
+        */
+        //_____
         stakeContractTokamak[i].tonBalance = await ton.balanceOf(stakeAddresses[i]);
         stakeContractTokamak[i].pendingOf = await depositManager.pendingUnstaked(
           layer2.address,
@@ -978,7 +1181,7 @@ describe("TokamakStaker ", function () {
       }
     });
 
-    it("5. withdraw  ", async function () {
+    it("5. withdraw : swapped tos burn 0% ", async function () {
       // let latest = await time.latestBlock();
       // console.log('latestBlock', latest.toString()) ;
       this.timeout(1000000);
@@ -1018,8 +1221,8 @@ describe("TokamakStaker ", function () {
         wtonBalance : 0
       }
       if (stakeAddresses.length > 0) {
-          for (let j = 0; j < stakeAddresses.length; j++) {
-            let stakeContract = await StakeTON.at(stakeAddresses[j]);
+          for (let j = 0; j < 1; j++) {
+            let stakeContract = await StakeTONUpgrade2.at(stakeAddresses[j]);
 
             // for test
             await tos.mint(stakeAddresses[j], toBN('100000000000000000000'), { from: defaultSender });
@@ -1053,8 +1256,8 @@ describe("TokamakStaker ", function () {
             let finalBalanceTON2 = await stakeContract.finalBalanceTON();
             let finalBalanceWTON2 = await stakeContract.finalBalanceWTON();
 
-            // expect(totalStakers1).to.be.bignumber.equal(toBN('1'));
-            // expect(totalStakers2).to.be.bignumber.equal(toBN('0'));
+            expect(totalStakers1).to.be.bignumber.equal(toBN('1'));
+            expect(totalStakers2).to.be.bignumber.equal(toBN('0'));
 
             expect(withdrawFlag1).to.be.equal(true);
             expect(withdrawFlag2).to.be.equal(true);
@@ -1131,7 +1334,280 @@ describe("TokamakStaker ", function () {
     });
 
 
-    it("4. claim", async function () {
+    it("6. change burn percantage of swapped tos in phase1 to registry ", async function () {
+        this.timeout(1000000);
+        const cons = await ico20Contracts.getICOContracts();
+        stakeregister = cons.stakeregister;
+
+        await stakeregister.addDefiInfo(
+          "PHASE1.SWAPTOS.BURNPERCENT",
+          stakeTONUpgrade3.address,
+          zeroAddress,
+          zeroAddress,
+          90,
+          zeroAddress
+          ,{ from: defaultSender }
+        );
+    });
+
+    it("7. withdraw : swapped tos burn 90% ", async function () {
+      // let latest = await time.latestBlock();
+      // console.log('latestBlock', latest.toString()) ;
+      this.timeout(1000000);
+      let contractPrev = {
+        tosBalance : 0,
+        tonBalance : 0,
+        wtonBalance : 0
+      }
+      let user1InfoPrev = {
+        tosBalance : 0,
+        tonBalance : 0,
+        wtonBalance : 0,
+        userStaked: null
+      }
+      let user2InfoPrev = {
+        tosBalance : 0,
+        tonBalance : 0,
+        wtonBalance : 0,
+        userStaked: null
+      }
+
+      let user1InfoAfter = {
+        tosBalance : 0,
+        tonBalance : 0,
+        wtonBalance : 0,
+        userStaked: null
+      }
+      let user2InfoAfter = {
+        tosBalance : 0,
+        tonBalance : 0,
+        wtonBalance : 0,
+        userStaked: null
+      }
+      let contractAfter = {
+        tosBalance : 0,
+        tonBalance : 0,
+        wtonBalance : 0
+      }
+      if (stakeAddresses.length > 0) {
+          for (let j = 1; j < 2; j++) {
+            let stakeContract = await StakeTONUpgrade2.at(stakeAddresses[j]);
+
+            // for test
+            await tos.mint(stakeAddresses[j], toBN('100000000000000000000'), { from: defaultSender });
+
+            contractPrev.tonBalance = await ton.balanceOf(stakeAddresses[j]);
+            contractPrev.wtonBalance = await wton.balanceOf(stakeAddresses[j]);
+            contractPrev.tosBalance = await tos.balanceOf(stakeAddresses[j]);
+
+            user1InfoPrev.tonBalance = await ton.balanceOf(user1);
+            user1InfoPrev.wtonBalance = await wton.balanceOf(user1);
+            user1InfoPrev.tosBalance = await tos.balanceOf(user1);
+            user1InfoPrev.userStaked = await stakeContract.getUserStaked(user1);
+
+            user2InfoPrev.tonBalance = await ton.balanceOf(user2);
+            user2InfoPrev.wtonBalance = await wton.balanceOf(user2);
+            user2InfoPrev.tosBalance = await tos.balanceOf(user2);
+            user2InfoPrev.userStaked = await stakeContract.getUserStaked(user2);
+
+            let totalStakedAmount = await stakeContract.totalStakedAmount();
+            let tx1 = await stakeContract.withdraw({ from: user1 });
+            // console.log('tx1',tx1);
+            // console.log('tx1.receipt.rawLogs',tx1.receipt.rawLogs);
+            // console.log('topic0TonWithdrawal',topic0TonWithdrawal);
+
+            let withdrawInfo1 ={
+              tonAmount: '',
+              wtonAmount: '',
+              tosAmount: '',
+              tosBurnAmount: ''
+            }
+            for (let k = 0; k < tx1.receipt.rawLogs.length; k++) {
+
+              if (
+                tx1.receipt.rawLogs[k].topics.length > 0 &&
+                tx1.receipt.rawLogs[k].topics[0] == topic0TonWithdrawal
+              ) {
+                 const eventObj = web3.eth.abi.decodeLog(
+                  abiTonWithdrawal,
+                  tx1.receipt.rawLogs[k].data,
+                  tx1.receipt.rawLogs[k].topics.slice(1)
+                );
+
+                 withdrawInfo1.tonAmount = toBN(eventObj.tonAmount.toString());
+                 withdrawInfo1.wtonAmount = toBN(eventObj.wtonAmount.toString());
+                 withdrawInfo1.tosAmount = toBN(eventObj.tosAmount.toString());
+                 withdrawInfo1.tosBurnAmount = toBN(eventObj.tosBurnAmount.toString());
+              }
+            }
+
+            let totalStakers1 = await stakeContract.totalStakers();
+            let withdrawFlag1 = await stakeContract.withdrawFlag();
+            let swappedAmountTOS1 = await stakeContract.swappedAmountTOS();
+            let finalBalanceTON1 = await stakeContract.finalBalanceTON();
+            let finalBalanceWTON1 = await stakeContract.finalBalanceWTON();
+
+            let withdrawInfo2 ={
+              tonAmount: '',
+              wtonAmount: '',
+              tosAmount: '',
+              tosBurnAmount: ''
+            }
+            let tx2 = await stakeContract.withdraw({ from: user2 });
+
+            for (let k = 0; k < tx2.receipt.rawLogs.length; k++) {
+              if (
+                  tx2.receipt.rawLogs[k].topics.length > 0 &&
+                  tx2.receipt.rawLogs[k].topics[0] == topic0TonWithdrawal
+                ) {
+                  const eventObj = web3.eth.abi.decodeLog(
+                    abiTonWithdrawal,
+                    tx2.receipt.rawLogs[k].data,
+                    tx2.receipt.rawLogs[k].topics.slice(1)
+                  );
+
+                  withdrawInfo2.tonAmount = toBN(eventObj.tonAmount.toString());
+                  withdrawInfo2.wtonAmount = toBN(eventObj.wtonAmount.toString());
+                  withdrawInfo2.tosAmount = toBN(eventObj.tosAmount.toString());
+                  withdrawInfo2.tosBurnAmount = toBN(eventObj.tosBurnAmount.toString());
+                }
+            }
+
+            let totalStakers2 = await stakeContract.totalStakers();
+            let withdrawFlag2 = await stakeContract.withdrawFlag();
+            let swappedAmountTOS2 = await stakeContract.swappedAmountTOS();
+            let finalBalanceTON2 = await stakeContract.finalBalanceTON();
+            let finalBalanceWTON2 = await stakeContract.finalBalanceWTON();
+
+            expect(totalStakers1).to.be.bignumber.equal(toBN('1'));
+            expect(totalStakers2).to.be.bignumber.equal(toBN('0'));
+
+            expect(withdrawFlag1).to.be.equal(true);
+            expect(withdrawFlag2).to.be.equal(true);
+            expect(swappedAmountTOS1).to.be.bignumber.equal(swappedAmountTOS2);
+            expect(finalBalanceTON1).to.be.bignumber.equal(finalBalanceTON2);
+            expect(finalBalanceWTON1).to.be.bignumber.equal(finalBalanceWTON2);
+            expect(swappedAmountTOS1).to.be.bignumber.above(toBN('0'));
+            expect(finalBalanceTON1).to.be.bignumber.above(toBN('0'));
+
+            contractAfter.tonBalance = await ton.balanceOf(stakeAddresses[j]);
+            contractAfter.wtonBalance = await wton.balanceOf(stakeAddresses[j]);
+            contractAfter.tosBalance = await tos.balanceOf(stakeAddresses[j]);
+
+            user1InfoAfter.tonBalance = await ton.balanceOf(user1);
+            user1InfoAfter.wtonBalance = await wton.balanceOf(user1);
+            user1InfoAfter.tosBalance = await tos.balanceOf(user1);
+            user1InfoAfter.userStaked = await stakeContract.getUserStaked(user1);
+
+            user2InfoAfter.tonBalance = await ton.balanceOf(user2);
+            user2InfoAfter.wtonBalance = await wton.balanceOf(user2);
+            user2InfoAfter.tosBalance = await tos.balanceOf(user2);
+            user2InfoAfter.userStaked = await stakeContract.getUserStaked(user2);
+            /*
+            console.log('totalStakedAmount:', totalStakedAmount.toString());
+            console.log('user1InfoPrev.userStaked.amount:', user1InfoPrev.userStaked.amount.toString());
+            console.log('user2InfoPrev.userStaked.amount:', user2InfoPrev.userStaked.amount.toString());
+
+            console.log('user1InfoAfter.userStaked.released:', user1InfoAfter.userStaked.released);
+            console.log('user1InfoAfter.userStaked.amount:', user1InfoAfter.userStaked.amount.toString());
+            console.log('user1InfoAfter.userStaked.releasedAmount:', user1InfoAfter.userStaked.releasedAmount.toString());
+            console.log('user1InfoAfter.userStaked.releasedTOSAmount:', user1InfoAfter.userStaked.releasedTOSAmount.toString());
+
+            console.log('user2InfoAfter.userStaked.released:', user2InfoAfter.userStaked.released);
+            console.log('user2InfoAfter.userStaked.amount:', user2InfoAfter.userStaked.amount.toString());
+            console.log('user2InfoAfter.userStaked.releasedAmount:', user2InfoAfter.userStaked.releasedAmount.toString());
+            console.log('user2InfoAfter.userStaked.releasedTOSAmount:', user2InfoAfter.userStaked.releasedTOSAmount.toString());
+            */
+            expect(user1InfoAfter.tonBalance).to.be.bignumber.equal(
+              user1InfoPrev.tonBalance.add(
+                finalBalanceTON1.mul(user1InfoPrev.userStaked.amount).div(totalStakedAmount)
+              )
+            );
+
+            expect(user2InfoAfter.tonBalance).to.be.bignumber.equal(
+              user2InfoPrev.tonBalance.add(
+                finalBalanceTON1.mul(user2InfoPrev.userStaked.amount).div(totalStakedAmount)
+              )
+            );
+
+            expect(user1InfoAfter.wtonBalance).to.be.bignumber.equal(
+              user1InfoPrev.wtonBalance.add(
+                finalBalanceWTON1.mul(user1InfoPrev.userStaked.amount).div(totalStakedAmount)
+              )
+            );
+
+            expect(user2InfoAfter.wtonBalance).to.be.bignumber.equal(
+              user2InfoPrev.wtonBalance.add(
+                finalBalanceWTON1.mul(user2InfoPrev.userStaked.amount).div(totalStakedAmount)
+              )
+            );
+
+            let diffAmountUser1 = user1InfoAfter.tonBalance.sub(user1InfoPrev.tonBalance);
+            let diffAmountUser2 = user2InfoAfter.tonBalance.sub(user2InfoPrev.tonBalance);
+            expect(finalBalanceTON1).to.be.bignumber.gte(diffAmountUser1.add(diffAmountUser2));
+
+            diffAmountUser1 = user1InfoAfter.wtonBalance.sub(user1InfoPrev.wtonBalance);
+            diffAmountUser2 = user2InfoAfter.wtonBalance.sub(user2InfoPrev.wtonBalance);
+            expect(finalBalanceWTON1).to.be.bignumber.gte(diffAmountUser1.add(diffAmountUser2));
+
+            //
+            const cons = await ico20Contracts.getICOContracts();
+            let burnpercentage = await cons.stakeregister.defiInfo(keccak256("PHASE1.SWAPTOS.BURNPERCENT"));
+            //console.log("burnpercentage.fee" , burnpercentage.fee) ;
+
+            let releasedTOSAmount1 = user1InfoAfter.userStaked.releasedTOSAmount ;
+            let releasedTOSAmount2 = user2InfoAfter.userStaked.releasedTOSAmount ;
+
+            expect(user1InfoAfter.tosBalance).to.be.bignumber.equal(
+              user1InfoPrev.tosBalance.add(releasedTOSAmount1)
+            );
+            expect(user2InfoAfter.tosBalance).to.be.bignumber.equal(
+              user2InfoPrev.tosBalance.add(releasedTOSAmount2)
+            );
+
+            expect(withdrawInfo1.tosAmount).to.be.bignumber.equal(releasedTOSAmount1);
+            expect(withdrawInfo2.tosAmount).to.be.bignumber.equal(releasedTOSAmount2);
+
+            expect(withdrawInfo1.tosAmount.add(withdrawInfo1.tosBurnAmount)).to.be.bignumber.equal(
+              swappedAmountTOS1.mul(user1InfoPrev.userStaked.amount).div(totalStakedAmount)
+            );
+
+            expect(withdrawInfo2.tosAmount.add(withdrawInfo2.tosBurnAmount)).to.be.bignumber.equal(
+              swappedAmountTOS1.mul(user2InfoPrev.userStaked.amount).div(totalStakedAmount)
+            );
+
+            // console.log("releasedTOSAmount1" , releasedTOSAmount1.toString()) ;
+            // console.log("swappedAmountTOS1" , swappedAmountTOS1.toString()) ;
+            // console.log("user1InfoPrev.userStaked.amount" , user1InfoPrev.userStaked.amount.toString()) ;
+            // console.log("totalStakedAmount" , totalStakedAmount.toString()) ;
+            // console.log("burnpercentage.fee" , burnpercentage.fee.toString()) ;
+            // console.log("totalStakedAmount" , totalStakedAmount.toString()) ;
+
+            expect(releasedTOSAmount1).to.be.bignumber.equal(
+                swappedAmountTOS1.mul(user1InfoPrev.userStaked.amount).div(totalStakedAmount)
+                .sub(
+                  swappedAmountTOS1.mul(user1InfoPrev.userStaked.amount).div(totalStakedAmount)
+                  .mul(burnpercentage.fee).div(toBN('100'))
+                )
+            );
+
+            expect(releasedTOSAmount2).to.be.bignumber.equal(
+                swappedAmountTOS1.mul(user2InfoPrev.userStaked.amount).div(totalStakedAmount)
+                .sub(
+                  swappedAmountTOS1.mul(user2InfoPrev.userStaked.amount).div(totalStakedAmount)
+                  .mul(burnpercentage.fee).div(toBN('100'))
+                )
+            );
+
+            diffAmountUser1 = user1InfoAfter.tosBalance.sub(user1InfoPrev.tosBalance);
+            diffAmountUser2 = user2InfoAfter.tosBalance.sub(user2InfoPrev.tosBalance);
+            expect(swappedAmountTOS1).to.be.bignumber.gte(diffAmountUser1.add(diffAmountUser2));
+
+          }
+      }
+    });
+
+    it("6. claim", async function () {
       this.timeout(1000000);
       let passBlocks = 10;
       let latest = await time.latestBlock();
@@ -1149,7 +1625,7 @@ describe("TokamakStaker ", function () {
         if (stakeAddresses.length > 0) {
           for (let j = 0; j < stakeAddresses.length; j++) {
             if (logFlag) console.log(`\n ----  StakeContract:`, j);
-            let stakeContract = await StakeTON.at(stakeAddresses[j]);
+            let stakeContract = await StakeTONUpgrade2.at(stakeAddresses[j]);
             const prevRewardClaimedTotal = await stakeContract.rewardClaimedTotal();
             let sum = toBN(prevRewardClaimedTotal.toString());
 
@@ -1219,8 +1695,8 @@ describe("TokamakStaker ", function () {
             // console.log('stakeInfos.startBlock',stakeInfos.startBlock.toString());
             // console.log('stakeInfos.endBlock',stakeInfos.endBlock.toString());
             // console.log('stakeInfos.balance',stakeInfos.balance.toString());
-            console.log('stakeInfos.totalRewardAmount',stakeInfos.totalRewardAmount.toString());
-            console.log('stakeInfos.claimRewardAmount',stakeInfos.claimRewardAmount.toString());
+            // console.log('stakeInfos.totalRewardAmount',stakeInfos.totalRewardAmount.toString());
+            // console.log('stakeInfos.claimRewardAmount',stakeInfos.claimRewardAmount.toString());
 
             expect(stakeInfos.totalRewardAmount).to.be.bignumber.gte(stakeInfos.claimRewardAmount);
           }
