@@ -1024,7 +1024,79 @@ describe("TokamakStaker ", function () {
 
   });
 
-  describe('# 8. withdraw : tester1', async function () {
+  describe('# 8. multi control that withdrawAll and swap ', async function () {
+
+    it("1. StakeTONControl deploy ", async function () {
+      stakeTONControl = await StakeTONControl.new({ from: defaultSender });
+      expect(stakeTONControl.address).to.not.eq(zeroAddress);
+    });
+
+    it("2. setInfo of StakeTONControl ", async function () {
+      await stakeTONControl.setInfo(
+        ton.address, wton.address, tos.address,
+        depositManager.address , seigManager.address, layer2.address,
+        stakeAddresses.length  , {from: defaultSender }
+      );
+      expect(await stakeTONControl.ton()).to.be.equal(ton.address);
+      expect(await stakeTONControl.wton()).to.be.equal(wton.address);
+      expect(await stakeTONControl.tos()).to.be.equal(tos.address);
+      expect(await stakeTONControl.depositManager()).to.be.equal(depositManager.address);
+      expect(await stakeTONControl.seigManager()).to.be.equal(seigManager.address);
+      expect(await stakeTONControl.layer2()).to.be.equal(layer2.address);
+      expect(await stakeTONControl.countStakeTons()).to.be.bignumber.equal(toBN(stakeAddresses.length));
+    });
+
+    it("3. pass some blocks ", async function () {
+
+    });
+
+    it("6. updateReward in Tokamak ", async function () {
+      this.timeout(1000000);
+      let currentBlockTime = parseInt(unstakingBlock)+500;
+      await time.advanceBlockTo(currentBlockTime);
+      await ico20Contracts.updateRewardTokamak(layer2, operator1);
+
+      for (let i = 0; i < stakeAddresses.length; i++) {
+        let stakeOf = await seigManager.stakeOf(
+            layer2.address,
+            stakeAddresses[i]
+          );
+
+
+        await expect(toBN(stakeOf).toString())
+            .to.be.bignumber.above(
+              toBN(stakeContractTokamak[i].stakeOf.toString()));
+      }
+
+      unstakingBlock = currentBlockTime;
+    });
+
+    it("4. updateReward in Tokamak ", async function () {
+
+    });
+
+    it("5. tokamakRequestUnStaking ", async function () {
+
+    });
+
+    it("6. withdrawLayer2AndSwapTOS ", async function () {
+
+    });
+
+    it("7. withdrawLayer2All ", async function () {
+
+    });
+
+    it("8. pass some blocks ", async function () {
+
+    });
+
+    it("9. withdrawLayer2AllAndSwapAll ", async function () {
+
+    });
+  });
+
+  describe('# 9. withdraw : tester1', async function () {
     it("1. withdraw fail when hasn't be passed end block ", async function () {
       // let latest = await time.latestBlock();
       // console.log('latestBlock', latest.toString()) ;
