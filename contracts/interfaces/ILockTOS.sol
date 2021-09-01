@@ -5,9 +5,6 @@ pragma abicoder v2;
 import "../libraries/LibLockTOS.sol";
 
 interface ILockTOS {
-    /// @dev Set phase3 start time
-    function setPhase3StartTime(uint256 _phase3StartTime) external;
-
     /// @dev Returns all locks of `_addr`
     function locksOf(address _addr) external view returns (uint256[] memory);
 
@@ -18,8 +15,7 @@ interface ILockTOS {
         returns (
             uint256,
             uint256,
-            uint256,
-            int256
+            uint256
         );
 
     /// @dev Returns all history of `_addr`

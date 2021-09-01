@@ -18,7 +18,6 @@ interface ILockTOSProxy {
     function initialize(
         address _tos,
         uint256 _epochUnit,
-        uint256 _maxTime,
-        uint256 _phase3StartTime
+        uint256 _maxTime
     ) external;
 }

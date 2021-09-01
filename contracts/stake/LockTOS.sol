@@ -46,15 +46,6 @@ contract LockTOS is LockTOSStorage, AccessibleCommon, ILockTOS {
     }
 
     /// @inheritdoc ILockTOS
-    function setPhase3StartTime(uint256 _phase3StartTime)
-        external
-        override
-        onlyOwner
-    {
-        phase3StartTime = _phase3StartTime;
-    }
-
-    /// @inheritdoc ILockTOS
     function setMaxTime(uint256 _maxTime) external override onlyOwner {
         maxTime = _maxTime;
     }
@@ -162,8 +153,7 @@ contract LockTOS is LockTOSStorage, AccessibleCommon, ILockTOS {
             LibLockTOS.LockedBalance({
                 amount: 0,
                 start: 0,
-                end: 0,
-                boostValue: 0
+                end: 0
             });
 
         // Checkpoint
@@ -363,15 +353,13 @@ contract LockTOS is LockTOSStorage, AccessibleCommon, ILockTOS {
         returns (
             uint256 start,
             uint256 end,
-            uint256 amount,
-            int256 boostValue
+            uint256 amount
         )
     {
         return (
             allLocks[_lockId].start,
             allLocks[_lockId].end,
-            allLocks[_lockId].amount,
-            allLocks[_lockId].boostValue
+            allLocks[_lockId].amount
         );
     }
 
@@ -405,14 +393,14 @@ contract LockTOS is LockTOSStorage, AccessibleCommon, ILockTOS {
 
         LibLockTOS.LockedBalanceInfo[] memory datas = new LibLockTOS.LockedBalanceInfo[](_size);
         _size = 0;
-        for(uint i =0; i < len; i++){
+        for(uint i =0; i < len; i++) {
             uint256 _id = userLocks[_addr][i];
             LibLockTOS.LockedBalance memory _lock = lockedBalances[_addr][_id];
 
             if(_lock.end > block.timestamp && _id > 0 ) {
                 uint256 _balance = balanceOfLock(userLocks[_addr][i]);
                 datas[_size++] = LibLockTOS.LockedBalanceInfo(
-                    _id, _lock.start, _lock.end,  _lock.amount, _lock.boostValue, _balance
+                    _id, _lock.start, _lock.end,  _lock.amount, _balance
                 );
 
 
@@ -420,7 +408,6 @@ contract LockTOS is LockTOSStorage, AccessibleCommon, ILockTOS {
         }
         return datas;
     }
-
 
     /// @inheritdoc ILockTOS
     function pointHistoryOf(uint256 _lockId)
@@ -465,14 +452,16 @@ contract LockTOS is LockTOSStorage, AccessibleCommon, ILockTOS {
         uint256 _value,
         uint256 _unlockTime
     ) internal ifFree {
+        require(_unlockTime == _unlockTime / epochUnit * epochUnit, "epoch unit");
+        require(_unlockTime == _unlockTime.div(epochUnit).mul(epochUnit), "epoch unit 2");
+
         LibLockTOS.LockedBalance memory lockedOld =
             lockedBalances[_addr][_lockId];
         LibLockTOS.LockedBalance memory lockedNew =
             LibLockTOS.LockedBalance({
                 amount: lockedOld.amount,
                 start: lockedOld.start,
-                end: lockedOld.end,
-                boostValue: lockedOld.boostValue
+                end: lockedOld.end
             });
 
         // Make new lock
@@ -482,9 +471,6 @@ contract LockTOS is LockTOSStorage, AccessibleCommon, ILockTOS {
         }
         if (lockedNew.start == 0) {
             lockedNew.start = block.timestamp;
-        }
-        if (lockedNew.boostValue == 0) {
-            lockedNew.boostValue = block.timestamp <= phase3StartTime ? 2 : 1;
         }
 
         // Checkpoint
@@ -502,10 +488,13 @@ contract LockTOS is LockTOSStorage, AccessibleCommon, ILockTOS {
         LibLockTOS.Point memory userPoint =
             LibLockTOS.Point({
                 timestamp: block.timestamp,
-                slope: userSlope.mul(lockedNew.boostValue), // Boost slope if staked before phase3
-                bias: userBias.mul(lockedNew.boostValue)
+                slope: userSlope,
+                bias: userBias
             });
         lockPointHistory[_lockId].push(userPoint);
+
+        console.log("UserSlope: %s, UserBias: %s", uint256(userSlope), uint256(userBias));
+        console.log("TimeStamp: %s", block.timestamp);
 
         // Transfer TOS
         require(
@@ -529,27 +518,22 @@ contract LockTOS is LockTOSStorage, AccessibleCommon, ILockTOS {
         if (lockedNew.end > timestamp && lockedNew.amount > 0) {
             changeNew.slope = lockedNew
                 .amount
-                .mul(uint256(lockedNew.boostValue))
                 .mul(MULTIPLIER)
                 .div(maxTime)
                 .toInt256();
             changeNew.bias = changeNew.slope
-                .mul(lockedNew.end.sub(timestamp).toInt256()
-            );
+                .mul(lockedNew.end.sub(timestamp).toInt256());
             changeNew.changeTime = lockedNew.end;
-
         }
         if (lockedOld.end > timestamp && lockedOld.amount > 0) {
             changeOld.slope = lockedOld
                 .amount
-                .mul(uint256(lockedOld.boostValue))
                 .mul(MULTIPLIER)
                 .div(maxTime)
                 .toInt256();
             changeOld.bias = changeOld.slope
                 .mul(lockedOld.end.sub(timestamp).toInt256());
             changeOld.changeTime = lockedOld.end;
-
         }
 
         // Record history gaps
@@ -572,6 +556,9 @@ contract LockTOS is LockTOSStorage, AccessibleCommon, ILockTOS {
         _updateSlopeChanges(changeNew, changeOld);
     }
 
+    function slopeChangesRet(uint256 time) public view returns (int256) {
+        return slopeChanges[time.div(epochUnit).mul(epochUnit)];
+    }
 
     /// @dev Fill the gaps
     function _recordHistoryPoints()
@@ -599,12 +586,14 @@ contract LockTOS is LockTOSStorage, AccessibleCommon, ILockTOS {
             );
             int256 deltaSlope = slopeChanges[pointTimestampIterator];
             int256 deltaTime =
-                pointTimestampIterator.sub(lastWeek.timestamp).toInt256();
+                Math.min(pointTimestampIterator.sub(lastWeek.timestamp), epochUnit).toInt256();
             lastWeek.bias = lastWeek.bias.sub(lastWeek.slope.mul(deltaTime));
             lastWeek.slope = lastWeek.slope.add(deltaSlope);
             lastWeek.bias = lastWeek.bias > 0 ? lastWeek.bias : 0;
             lastWeek.slope = lastWeek.slope > 0 ? lastWeek.slope : 0;
             lastWeek.timestamp = pointTimestampIterator;
+            console.log("Slope: %d", uint256(deltaSlope));
+            console.log("Week: %d, Bias: %d, Slope: %d", pointTimestampIterator, uint256(lastWeek.bias), uint256(lastWeek.slope));
             pointHistory.push(lastWeek);
         }
         return lastWeek;

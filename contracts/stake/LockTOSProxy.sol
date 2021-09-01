@@ -105,13 +105,11 @@ contract LockTOSProxy is
     function initialize(
         address _tos,
         uint256 _epochUnit,
-        uint256 _maxTime,
-        uint256 _phase3StartTime
+        uint256 _maxTime
     ) external override onlyOwner {
         require(tos == address(0), "Already initialized");
         tos = _tos;
         epochUnit = _epochUnit;
         maxTime = _maxTime;
-        phase3StartTime = _phase3StartTime;
     }
 }
