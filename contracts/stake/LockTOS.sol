@@ -556,10 +556,6 @@ contract LockTOS is LockTOSStorage, AccessibleCommon, ILockTOS {
         _updateSlopeChanges(changeNew, changeOld);
     }
 
-    function slopeChangesRet(uint256 time) public view returns (int256) {
-        return slopeChanges[time.div(epochUnit).mul(epochUnit)];
-    }
-
     /// @dev Fill the gaps
     function _recordHistoryPoints()
         internal
@@ -592,8 +588,6 @@ contract LockTOS is LockTOSStorage, AccessibleCommon, ILockTOS {
             lastWeek.bias = lastWeek.bias > 0 ? lastWeek.bias : 0;
             lastWeek.slope = lastWeek.slope > 0 ? lastWeek.slope : 0;
             lastWeek.timestamp = pointTimestampIterator;
-            console.log("Slope: %d", uint256(deltaSlope));
-            console.log("Week: %d, Bias: %d, Slope: %d", pointTimestampIterator, uint256(lastWeek.bias), uint256(lastWeek.slope));
             pointHistory.push(lastWeek);
         }
         return lastWeek;
