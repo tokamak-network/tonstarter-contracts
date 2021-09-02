@@ -65,16 +65,6 @@ describe("LockTOS", function () {
     ).deploy(lockTOSImpl.address, admin.address);
     await lockTOSProxy.deployed();
 
-    /*
-    await (
-      await lockTOSProxy.initialize(
-        tos.address,
-        parseInt(time.duration.weeks(1)),
-        parseInt(time.duration.weeks(156)),
-        phase3StartTime
-      )
-    ).wait();
-    */
     await (
       await lockTOSProxy.initialize(tos.address, epochUnit, maxTime)
     ).wait();
@@ -147,19 +137,6 @@ describe("LockTOS", function () {
         { unlockWeeks: 2 }, // 2 weeks
       ],
     });
-  });
-
-  it("check", async function () {
-    await createLockWithPermit({
-      user,
-      amount: 100000000,
-      unlockWeeks: 156,
-      tos,
-      lockTOS,
-    });
-
-    const alivelocks = await lockTOS.alivelocksOf(testerAddress);
-    expect(alivelocks.length).to.equal(5);
   });
 
   it("should check balances of user at now", async function () {
@@ -349,11 +326,5 @@ describe("LockTOS", function () {
 
   it("should withdraw all leftover locks", async function () {
     await (await lockTOS.connect(user).withdrawAll()).wait();
-  });
-
-  it("alivelocksOf", async function () {
-    const alivelocks = await lockTOS.alivelocksOf(testerAddress);
-    // console.log('alivelocks',alivelocks);
-    expect(alivelocks.length).to.equal(1);
   });
 });
