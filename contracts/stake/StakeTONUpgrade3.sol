@@ -10,9 +10,7 @@ import "@openzeppelin/contracts/math/SafeMath.sol";
 import "../common/AccessibleCommon.sol";
 import "./StakeTONStorage.sol";
 
-
 interface ITokamakRegistry3 {
-
     function defiInfo(bytes32)
         external
         view
@@ -28,8 +26,11 @@ interface ITokamakRegistry3 {
 
 interface ITOS3 {
     function balanceOf(address owner) external view returns (uint256);
+
     function transfer(address to, uint256 value) external returns (bool);
+
     function burn(address from, uint256 amount) external returns (bool);
+
     function isBurner(address account) external view returns (bool);
 }
 
@@ -48,7 +49,13 @@ contract StakeTONUpgrade3 is StakeTONStorage, AccessibleCommon {
     /// @param tonAmount the amount of TON withdrawal
     /// @param tosAmount the amount of TOS withdrawal
     event Withdrawal(address indexed to, uint256 tonAmount, uint256 tosAmount);
-    event TonWithdrawal(address indexed to, uint256 tonAmount, uint256 wtonAmount, uint256 tosAmount, uint256 tosBurnAmount);
+    event TonWithdrawal(
+        address indexed to,
+        uint256 tonAmount,
+        uint256 wtonAmount,
+        uint256 tosAmount,
+        uint256 tosBurnAmount
+    );
 
     /// @dev constructor of StakeTON
     constructor() {}
@@ -60,7 +67,10 @@ contract StakeTONUpgrade3 is StakeTONStorage, AccessibleCommon {
 
     /// @dev withdraw
     function withdraw() external {
-        require(endBlock > 0 && endBlock < block.number, "StakeTONUpgrade3: not end");
+        require(
+            endBlock > 0 && endBlock < block.number,
+            "StakeTONUpgrade3: not end"
+        );
 
         /*
         (
@@ -71,8 +81,10 @@ contract StakeTONUpgrade3 is StakeTONStorage, AccessibleCommon {
 
         ) = ITokamakRegistry2(stakeRegistry).getTokamak();
         */
-        ( ,,,,uint256 _burnPercent,
-        ) = ITokamakRegistry3(stakeRegistry).defiInfo(keccak256("PHASE1.SWAPTOS.BURNPERCENT"));
+        (, , , , uint256 _burnPercent, ) =
+            ITokamakRegistry3(stakeRegistry).defiInfo(
+                keccak256("PHASE1.SWAPTOS.BURNPERCENT")
+            );
 
         require(
             ton != address(0) &&
@@ -131,9 +143,9 @@ contract StakeTONUpgrade3 is StakeTONStorage, AccessibleCommon {
                 wtonAmount = finalBalanceWTON.mul(amount).div(
                     totalStakedAmount
                 );
-            if (swappedAmountTOS > 0){
+            if (swappedAmountTOS > 0) {
                 tosAmount = swappedAmountTOS.mul(amount).div(totalStakedAmount);
-                if(tosAmount > 0 && _burnPercent > 0 && _burnPercent <= 100){
+                if (tosAmount > 0 && _burnPercent > 0 && _burnPercent <= 100) {
                     tosBurnAmount = tosAmount.mul(_burnPercent).div(100);
                     tosAmount = tosAmount.sub(tosBurnAmount);
                 }
@@ -144,17 +156,29 @@ contract StakeTONUpgrade3 is StakeTONStorage, AccessibleCommon {
                 staked.releasedAmount = wtonAmount.div(10**9).add(tonAmount);
             else staked.releasedAmount = tonAmount;
 
-            tonWithdraw(ton, wton, tonAmount, wtonAmount, tosAmount, tosBurnAmount);
-
+            tonWithdraw(
+                ton,
+                wton,
+                tonAmount,
+                wtonAmount,
+                tosAmount,
+                tosBurnAmount
+            );
         } else if (paytoken == address(0)) {
-            require(staked.releasedAmount <= amount, "StakeTONUpgrade3: Amount wrong");
+            require(
+                staked.releasedAmount <= amount,
+                "StakeTONUpgrade3: Amount wrong"
+            );
             staked.releasedAmount = amount;
             address payable self = address(uint160(address(this)));
             require(self.balance >= amount, "StakeTONUpgrade3: insuffient ETH");
             (bool success, ) = msg.sender.call{value: amount}("");
             require(success, "StakeTONUpgrade3: withdraw failed.");
         } else {
-            require(staked.releasedAmount <= amount, "StakeTONUpgrade3: Amount wrong");
+            require(
+                staked.releasedAmount <= amount,
+                "StakeTONUpgrade3: Amount wrong"
+            );
             staked.releasedAmount = amount;
             require(
                 ITOS3(paytoken).transfer(msg.sender, amount),

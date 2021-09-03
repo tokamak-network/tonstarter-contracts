@@ -11,11 +11,7 @@ import {OnApprove} from "../tokens/OnApprove.sol";
 import "./ProxyBase.sol";
 
 /// @title Proxy for Stake contracts in Phase 1
-contract StakeTONProxy2 is
-    StakeTONStorage,
-    AccessibleCommon,
-    ProxyBase
-{
+contract StakeTONProxy2 is StakeTONStorage, AccessibleCommon, ProxyBase {
     mapping(uint256 => address) public proxyImplementation;
     mapping(address => bool) public aliveImplementation;
     mapping(bytes4 => address) public selectorImplementation;
@@ -36,16 +32,12 @@ contract StakeTONProxy2 is
     //     _setupRole(ADMIN_ROLE, msg.sender);
     // }
 
-    constructor() {
-    }
+    constructor() {}
+
     /// @dev view implementation address of the proxy[index]
     /// @param _index index of proxy
     /// @return address of the implementation
-    function implementation2(uint256 _index)
-        external
-        view
-        returns (address)
-    {
+    function implementation2(uint256 _index) external view returns (address) {
         return _implementation2(_index);
     }
 
@@ -158,7 +150,10 @@ contract StakeTONProxy2 is
     /// @dev fallback function , execute on undefined function call
     function _fallback() internal {
         address _impl = getSelectorImplementation2(msg.sig);
-        require(_impl != address(0) && !pauseProxy, "StakeTONProxy2: impl OR proxy is false");
+        require(
+            _impl != address(0) && !pauseProxy,
+            "StakeTONProxy2: impl OR proxy is false"
+        );
 
         assembly {
             // Copy msg.data. We take full control of memory in this inline assembly

@@ -2,7 +2,6 @@
 pragma solidity ^0.7.6;
 
 interface ITokamakStakerUpgrade {
-
     /// @dev the total staked amount
     function totalStakedAmount() external view returns (uint256);
 
@@ -51,17 +50,22 @@ interface ITokamakStakerUpgrade {
     ) external returns (uint256 amountOut);
 
     function canTokamakRequestUnStaking(address _layer2)
-        external view returns (uint256 canUnStakingAmount);
+        external
+        view
+        returns (uint256 canUnStakingAmount);
 
     function canTokamakRequestUnStakingAll(address _layer2)
-        external view returns (bool can);
+        external
+        view
+        returns (bool can);
 
     function canTokamakRequestUnStakingAllBlock(address _layer2)
-        external view returns (uint256 _block);
+        external
+        view
+        returns (uint256 _block);
 
     function canTokamakProcessUnStakingCount(address _layer2)
         external
         view
         returns (uint256 count, uint256 amount);
-
 }
