@@ -9,6 +9,9 @@ interface ILockTOS {
     function locksOf(address _addr) external view returns (uint256[] memory);
 
     /// @dev Returns all locks of `_addr`
+    function activeLocksOf(address _addr) external view returns (uint256[] memory);
+
+    /// @dev Returns all locks of `_addr`
     function locksInfo(uint256 _lockId)
         external
         view

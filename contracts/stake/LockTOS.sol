@@ -15,7 +15,6 @@ import "../libraries/LibLockTOS.sol";
 import "../common/AccessibleCommon.sol";
 import "./LockTOSStorage.sol";
 
-import "hardhat/console.sol";
 
 contract LockTOS is LockTOSStorage, AccessibleCommon, ILockTOS {
     using SafeMath for uint256;
@@ -100,16 +99,15 @@ contract LockTOS is LockTOSStorage, AccessibleCommon, ILockTOS {
         emit LockUnlockTimeIncreased(msg.sender, _lockId, unlockTime);
     }
 
+    /// @inheritdoc ILockTOS
     function withdrawAll() external override ifFree {
         uint256[] storage locks = userLocks[msg.sender];
-
         if (locks.length == 0) {
             return;
         }
 
-        for (uint256 i = locks.length - 1; i >= 0; i--) {
+        for (uint256 i = 0; i < locks.length; i++) {
             LibLockTOS.LockedBalance memory lock = allLocks[locks[i]];
-
             if (
                 locks[i] > 0 &&
                 lock.amount > 0 &&
@@ -118,10 +116,7 @@ contract LockTOS is LockTOSStorage, AccessibleCommon, ILockTOS {
                 lock.end < block.timestamp
             ) {
                 _withdraw(locks[i]);
-                //locks[i] = locks[locks.length - 1];
             }
-
-            if (i == 0) break; // i is unsigned
         }
     }
 
@@ -134,12 +129,6 @@ contract LockTOS is LockTOSStorage, AccessibleCommon, ILockTOS {
     function withdraw(uint256 _lockId) public override ifFree {
         require(_lockId > 0, "_lockId is zero");
         _withdraw(_lockId);
-        // uint256[] storage locks = userLocks[msg.sender];
-        // for (uint256 i = 0; i < locks.length; i++) {
-        //     if (locks[i] == _lockId) {
-        //         locks[i] = locks[locks.length - 1];
-        //     }
-        // }
     }
 
     function _withdraw(uint256 _lockId) internal {
@@ -163,9 +152,6 @@ contract LockTOS is LockTOSStorage, AccessibleCommon, ILockTOS {
         uint256 amount = lockedOld.amount;
         lockedBalances[msg.sender][_lockId] = lockedNew;
         allLocks[_lockId] = lockedNew;
-
-        // delete lockedBalances[msg.sender][_lockId];
-        // delete allLocks[_lockId];
 
         IERC20(tos).transfer(msg.sender, amount);
         emit LockWithdrawn(msg.sender, _lockId, amount);
@@ -221,6 +207,7 @@ contract LockTOS is LockTOSStorage, AccessibleCommon, ILockTOS {
         override
         returns (uint256)
     {
+        require(pointHistory.length > 0, "No history recorded");        
         (bool success, LibLockTOS.Point memory point) =
             _findClosestPoint(pointHistory, _timestamp);
         if (!success) {
@@ -286,37 +273,6 @@ contract LockTOS is LockTOSStorage, AccessibleCommon, ILockTOS {
                 .div(MULTIPLIER);
     }
 
-    function balanceOfLockTest(uint256 _lockId)
-        public
-        view
-        returns (
-            uint256 _balance,
-            uint256 _blocktime,
-            int256 _currentBias,
-            int256 _slope,
-            int256 _bias,
-            uint256 _timestamp
-        )
-    {
-        uint256 len = lockPointHistory[_lockId].length;
-        if (len == 0) {
-            return (0, 0, 0, 0, 0, 0);
-        }
-
-        LibLockTOS.Point memory point = lockPointHistory[_lockId][len - 1];
-        int256 currentBias =
-            point.slope.mul(block.timestamp.sub(point.timestamp).toInt256());
-        _balance = uint256(
-            point.bias > currentBias ? point.bias.sub(currentBias) : 0
-        )
-            .div(MULTIPLIER);
-        _blocktime = block.timestamp;
-        _currentBias = currentBias;
-        _slope = point.slope;
-        _bias = point.bias;
-        _timestamp = point.timestamp;
-    }
-
     /// @inheritdoc ILockTOS
     function balanceOfAt(address _addr, uint256 _timestamp)
         public
@@ -373,17 +329,16 @@ contract LockTOS is LockTOSStorage, AccessibleCommon, ILockTOS {
         return userLocks[_addr];
     }
 
-    function alivelocksOf(address _addr)
+    /// @inheritdoc ILockTOS
+    function activeLocksOf(address _addr)
         public
         view
-        returns (
-            LibLockTOS.LockedBalanceInfo[] memory
-        )
+        override
+        returns (uint256[] memory)
     {
         uint256 len = userLocks[_addr].length;
-
         uint256 _size = 0;
-        for(uint i =0; i < len; i++){
+        for(uint i = 0; i < len; i++){
             uint256 _id = userLocks[_addr][i];
             LibLockTOS.LockedBalance memory _lock = lockedBalances[_addr][_id];
             if(_lock.end > block.timestamp && _id > 0 ) {
@@ -391,22 +346,16 @@ contract LockTOS is LockTOSStorage, AccessibleCommon, ILockTOS {
             }
         }
 
-        LibLockTOS.LockedBalanceInfo[] memory datas = new LibLockTOS.LockedBalanceInfo[](_size);
+        uint256[] memory activeLocks = new uint256[](_size);
         _size = 0;
-        for(uint i =0; i < len; i++) {
+        for(uint i = 0; i < len; i++) {
             uint256 _id = userLocks[_addr][i];
             LibLockTOS.LockedBalance memory _lock = lockedBalances[_addr][_id];
-
             if(_lock.end > block.timestamp && _id > 0 ) {
-                uint256 _balance = balanceOfLock(userLocks[_addr][i]);
-                datas[_size++] = LibLockTOS.LockedBalanceInfo(
-                    _id, _lock.start, _lock.end,  _lock.amount, _balance
-                );
-
-
+                activeLocks[_size++] = _id;
             }
         }
-        return datas;
+        return activeLocks;
     }
 
     /// @inheritdoc ILockTOS
@@ -492,9 +441,6 @@ contract LockTOS is LockTOSStorage, AccessibleCommon, ILockTOS {
                 bias: userBias
             });
         lockPointHistory[_lockId].push(userPoint);
-
-        console.log("UserSlope: %s, UserBias: %s", uint256(userSlope), uint256(userBias));
-        console.log("TimeStamp: %s", block.timestamp);
 
         // Transfer TOS
         require(

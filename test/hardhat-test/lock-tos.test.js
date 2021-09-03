@@ -301,9 +301,7 @@ describe("LockTOS", function () {
 
       const cur = parseInt(await lockTOS.getCurrentTime());
       const end = parseInt(lock.end);
-      // if (parseInt(lock.end) > parseInt(await time.latest())) {
       if (end > cur) {
-        // await time.increaseTo(parseInt(lock.end));
         const diff = end - cur;
         ethers.provider.send("evm_increaseTime", [diff]); // add 60 seconds
         ethers.provider.send("evm_mine"); // mine the next block
