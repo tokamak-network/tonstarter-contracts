@@ -24,6 +24,7 @@ contract LockTOSStorage {
 
     uint256 internal free = 1;
 
+    address[] public uniqueUsers;
     LibLockTOS.Point[] public pointHistory;
     mapping(uint256 => LibLockTOS.Point[]) public lockPointHistory;
     mapping(address => mapping(uint256 => LibLockTOS.LockedBalance))

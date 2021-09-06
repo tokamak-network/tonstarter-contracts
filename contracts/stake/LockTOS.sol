@@ -55,6 +55,33 @@ contract LockTOS is LockTOSStorage, AccessibleCommon, ILockTOS {
     }
 
     /// @inheritdoc ILockTOS
+    function allHolders() external override view returns (address[] memory) {
+        return uniqueUsers;
+    }
+
+    /// @inheritdoc ILockTOS
+    function activeHolders() external override view returns (address[] memory) {
+        bool[] memory activeCheck = new bool[](uniqueUsers.length);
+        uint256 activeSize = 0;        
+        for (uint256 i = 0; i < uniqueUsers.length; ++i) {
+            uint256[] memory activeLocks = activeLocksOf(uniqueUsers[i]);
+            if (activeLocks.length > 0) {
+                activeSize++;
+                activeCheck[i] = true;
+            }
+        }
+
+        address[] memory activeUsers = new address[](activeSize);
+        uint256 j = 0;
+        for (uint256 i = 0; i < uniqueUsers.length; ++i) {
+            if (activeCheck[i]) {
+                activeUsers[j++] = uniqueUsers[i];
+            }
+        }
+        return activeUsers;
+    }
+
+    /// @inheritdoc ILockTOS
     function createLockWithPermit(
         uint256 _value,
         uint256 _unlockWeeks,
@@ -174,6 +201,10 @@ contract LockTOS is LockTOSStorage, AccessibleCommon, ILockTOS {
             unlockTime - block.timestamp <= maxTime,
             "Max unlock time is 3 years"
         );
+
+        if (userLocks[msg.sender].length == 0) { // check if user for the first time
+            uniqueUsers.push(msg.sender);
+        }
 
         lockIdCounter = lockIdCounter.add(1);
         lockId = lockIdCounter;

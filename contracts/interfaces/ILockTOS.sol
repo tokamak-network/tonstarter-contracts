@@ -4,7 +4,14 @@ pragma abicoder v2;
 
 import "../libraries/LibLockTOS.sol";
 
+
 interface ILockTOS {
+    /// @dev Returns addresses of all holders of LockTOS
+    function allHolders() external returns (address[] memory);
+
+    /// @dev Returns addresses of active holders of LockTOS
+    function activeHolders() external returns (address[] memory);
+
     /// @dev Returns all locks of `_addr`
     function locksOf(address _addr) external view returns (uint256[] memory);
 

@@ -126,6 +126,13 @@ describe("LockTOS", function () {
     });
   });
 
+  it("should check lockTOS holders number", async function () {
+    const allHolders = await lockTOS.allHolders();
+    const activeHolders = await lockTOS.activeHolders();
+    expect(allHolders.length).to.be.eq(2);
+    expect(activeHolders.length).to.be.eq(2);
+  });
+
   it("should check total supply now", async function () {
     const now =
       Math.floor(parseInt(await lockTOS.getCurrentTime()) / epochUnit) *
@@ -179,5 +186,14 @@ describe("LockTOS", function () {
     // };
     // const pointHistory = makeInt(await lockTOS.allPointHistory());
     // console.log({ pointHistory });
+  });
+
+  it("should check if active holders became less", async function () {
+    ethers.provider.send("evm_increaseTime", [epochUnit * 156]); // add 60 seconds
+    ethers.provider.send("evm_mine"); // mine the next block
+    const allHolders = await lockTOS.allHolders();
+    const activeHolders = await lockTOS.activeHolders();
+    expect(allHolders.length).to.be.eq(2);
+    expect(activeHolders.length).to.be.eq(0);
   });
 });
