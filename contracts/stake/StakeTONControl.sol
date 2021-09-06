@@ -187,12 +187,7 @@ contract StakeTONControl is AccessibleCommon {
     }
 
     function withdrawLayer2AllAndSwapAll(uint256[] memory amountOuts) external nonZeroAddress(layer2)  {
-        // require(amountOuts.length == countStakeTons, "StakeTONControl: diff length");
-        // (bool can, bool[] memory canProcessUnStaking) = canWithdrawLayer2All();
-        // require(can, "StakeTONControl: no available withdraw from layer2");
-        // for (uint256 i = 1; i <= countStakeTons; i++) {
-        //     if(canProcessUnStaking[i-1]) withdrawLayer2AndSwapTOS(i, amountOuts[i-1]);
-        // }
+
         withdrawLayer2All();
         SwapAll(amountOuts);
     }

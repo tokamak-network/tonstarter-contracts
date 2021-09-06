@@ -11,6 +11,17 @@ import "../common/AccessibleCommon.sol";
 import "./StakeTONStorage.sol";
 
 interface ITokamakRegistry3 {
+    function getTokamak()
+        external
+        view
+        returns (
+            address,
+            address,
+            address,
+            address,
+            address
+        );
+
     function defiInfo(bytes32)
         external
         view
@@ -72,15 +83,13 @@ contract StakeTONUpgrade3 is StakeTONStorage, AccessibleCommon {
             "StakeTONUpgrade3: not end"
         );
 
-        /*
         (
             address ton,
             address wton,
             address depositManager,
             address seigManager,
+        ) = ITokamakRegistry3(stakeRegistry).getTokamak();
 
-        ) = ITokamakRegistry2(stakeRegistry).getTokamak();
-        */
         (, , , , uint256 _burnPercent, ) =
             ITokamakRegistry3(stakeRegistry).defiInfo(
                 keccak256("PHASE1.SWAPTOS.BURNPERCENT")
