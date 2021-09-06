@@ -207,11 +207,15 @@ contract StakeTONControl is AccessibleCommon {
         can = false;
         canProcessUnStaking = new bool[](countStakeTons);
         for (uint256 i = 1; i <= countStakeTons; i++) {
-            (uint256 count, uint256 amount) = ITokamakStakerUpgrade(stakeTons[i]).canTokamakProcessUnStakingCount(layer2);
-            if (count > 0 && amount > 0) {
-                if(!can) can = true;
-                canProcessUnStaking[i-1] = true;
-            } else {
+            if(ITokamakStakerUpgrade(stakeTons[i]).tokamakLayer2() == layer2){
+                (uint256 count, uint256 amount) = ITokamakStakerUpgrade(stakeTons[i]).canTokamakProcessUnStakingCount(layer2);
+                if (count > 0 && amount > 0) {
+                    if(!can) can = true;
+                    canProcessUnStaking[i-1] = true;
+                } else {
+                    canProcessUnStaking[i-1] = false;
+                }
+            }else{
                 canProcessUnStaking[i-1] = false;
             }
         }

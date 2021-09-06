@@ -2,6 +2,10 @@
 pragma solidity ^0.7.6;
 
 interface ITokamakStakerUpgrade {
+
+    /// @dev the total staked amount
+    function tokamakLayer2() external view returns (address);
+
     /// @dev the total staked amount
     function totalStakedAmount() external view returns (uint256);
 
