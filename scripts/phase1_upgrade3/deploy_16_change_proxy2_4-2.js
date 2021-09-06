@@ -43,8 +43,8 @@ async function deployMain(defaultSender) {
   printGasUsedOfUnits('setImplementation2 PHASE1_TON_4_ADDRESS StakeTONUpgrade2',tx1);
 
   let tx2 = await stakeTON.setImplementation2(StakeTONUpgrade3, 1, true);
-  console.log("setImplementation2 PHASE1_TON_4_ADDRESS StakeTONUpgrade3", tx1.hash);
-  printGasUsedOfUnits('setImplementation2 PHASE1_TON_4_ADDRESS StakeTONUpgrade3',tx1);
+  console.log("setImplementation2 PHASE1_TON_4_ADDRESS StakeTONUpgrade3", tx2.hash);
+  printGasUsedOfUnits('setImplementation2 PHASE1_TON_4_ADDRESS StakeTONUpgrade3',tx2);
 
   let _func1 = Web3EthAbi.encodeFunctionSignature("withdraw()") ;
   console.log("_func1 withdraw()", _func1);

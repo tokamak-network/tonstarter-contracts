@@ -33,24 +33,17 @@ async function deployMain(defaultSender) {
   const tos = await ethers.getContractAt("TOS", TOS_Address);
   console.log("tos:", tos.address);
 
-  const stakeTON = await ethers.getContractAt("StakeTONProxy2", process.env.PHASE1_TON_5_ADDRESS);
-
-  let isAdmin = await stakeTON.isAdmin(deployer.address);
-  console.log("isAdmin PHASE1_TON_5_ADDRESS", deployer.address, isAdmin);
-
-  let tx1 = await stakeTON.setImplementation2(StakeTONUpgrade2, 0, true);
-  console.log("setImplementation2 PHASE1_TON_5_ADDRESS StakeTONUpgrade2 ", tx1.hash);
-  printGasUsedOfUnits('setImplementation2 PHASE1_TON_5_ADDRESS StakeTONUpgrade2',tx1);
+  const stakeTON = await ethers.getContractAt("StakeTONProxy2", process.env.PHASE1_TON_2_ADDRESS);
 
   let tx2 = await stakeTON.setImplementation2(StakeTONUpgrade3, 1, true);
-  console.log("setImplementation2 PHASE1_TON_5_ADDRESS StakeTONUpgrade3", tx2.hash);
-  printGasUsedOfUnits('setImplementation2 PHASE1_TON_5_ADDRESS StakeTONUpgrade3',tx2);
+  console.log("setImplementation2 PHASE1_TON_2_ADDRESS StakeTONUpgrade3", tx2.hash);
+  printGasUsedOfUnits('setImplementation2 PHASE1_TON_2_ADDRESS StakeTONUpgrade3',tx2);
 
   let _func1 = Web3EthAbi.encodeFunctionSignature("withdraw()") ;
   console.log("_func1 withdraw()", _func1);
   let tx3 =  await stakeTON.setSelectorImplementations2([_func1], StakeTONUpgrade3 );
-  console.log("setSelectorImplementations2 PHASE1_TON_5_ADDRESS withdraw", tx3.hash);
-  printGasUsedOfUnits('setSelectorImplementations2 PHASE1_TON_5_ADDRESS withdraw',tx3);
+  console.log("setSelectorImplementations2 PHASE1_TON_2_ADDRESS withdraw", tx3.hash);
+  printGasUsedOfUnits('setSelectorImplementations2 PHASE1_TON_2_ADDRESS withdraw',tx3);
 
   return null;
 }
