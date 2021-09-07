@@ -42,7 +42,10 @@ interface ITOS3 {
 
     function burn(address from, uint256 amount) external returns (bool);
 
-    function isBurner(address account) external view returns (bool);
+    //function isBurner(address account) external view returns (bool);
+
+    function hasRole(bytes32 role, address account) external view returns (bool) ;
+
 }
 
 contract StakeTONUpgrade3 is StakeTONStorage, AccessibleCommon {
@@ -173,6 +176,7 @@ contract StakeTONUpgrade3 is StakeTONStorage, AccessibleCommon {
                 tosAmount,
                 tosBurnAmount
             );
+
         } else if (paytoken == address(0)) {
             require(
                 staked.releasedAmount <= amount,
@@ -248,8 +252,12 @@ contract StakeTONUpgrade3 is StakeTONStorage, AccessibleCommon {
             );
         }
         if (tosBurnAmount > 0) {
+            // require(
+            //     ITOS3(token).isBurner(address(this)),
+            //     "StakeTONUpgrade3: not burner"
+            // );
             require(
-                ITOS3(token).isBurner(address(this)),
+                ITOS3(token).hasRole(keccak256("BURNER"), address(this)),
                 "StakeTONUpgrade3: not burner"
             );
             require(
@@ -270,4 +278,6 @@ contract StakeTONUpgrade3 is StakeTONStorage, AccessibleCommon {
     function version() external pure returns (string memory) {
         return "phase1.upgrade.v3";
     }
+
+
 }
