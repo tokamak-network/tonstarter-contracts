@@ -30,23 +30,43 @@ const StakeTONUpgrade3 = loadDeployed(process.env.NETWORK, "StakeTONUpgrade3");
 async function deployMain(defaultSender) {
   const [deployer, user1] = await ethers.getSigners();
   const TOS_Address = tostoken;
+
   const tos = await ethers.getContractAt("TOS", TOS_Address);
   console.log("tos:", tos.address);
+  let tosbalance = await tos.balanceOf(process.env.PHASE1_TON_4_ADDRESS);
+  console.log("tosbalance:", tosbalance.toString());
 
-  const stakeTON = await ethers.getContractAt("StakeTONProxy2", process.env.PHASE1_TON_5_ADDRESS);
 
-  let tx2 = await stakeTON.setImplementation2(StakeTONUpgrade3, 1, true);
-  console.log("setImplementation2 PHASE1_TON_5_ADDRESS StakeTONUpgrade3", tx2.hash);
-  printGasUsedOfUnits('setImplementation2 PHASE1_TON_5_ADDRESS StakeTONUpgrade3',tx2);
 
-  let _func1 = Web3EthAbi.encodeFunctionSignature("withdraw()") ;
-  let _func3 = Web3EthAbi.encodeFunctionSignature("version()") ;
+  const stakeTON2 = await ethers.getContractAt("StakeTONUpgrade2", process.env.PHASE1_TON_4_ADDRESS);
+  let totalStakedAmount = await stakeTON2.totalStakedAmount();
+  console.log("totalStakedAmount", totalStakedAmount.toString());
+  let token1 = await stakeTON2.token();
+  console.log("token", token1);
+  let wton1 = await stakeTON2.wton();
+  console.log("wton", wton1);
+  let ton1 = await stakeTON2.ton();
+  console.log("ton", ton1);
+  let depositManager = await stakeTON2.depositManager();
+  console.log("depositManager", depositManager);
+  let seigManager = await stakeTON2.seigManager();
+  console.log("seigManager", seigManager);
+  let tokamakLayer2 = await stakeTON2.tokamakLayer2();
+  console.log("tokamakLayer2", tokamakLayer2);
 
-  console.log("_func1 withdraw()", _func1);
-  let tx3 =  await stakeTON.setSelectorImplementations2([_func1,_func3], StakeTONUpgrade3 );
-  console.log("setSelectorImplementations2 PHASE1_TON_5_ADDRESS withdraw", tx3.hash);
-  printGasUsedOfUnits('setSelectorImplementations2 PHASE1_TON_5_ADDRESS withdraw',tx3);
+  const stakeTON = await ethers.getContractAt("StakeTONUpgrade3", process.env.PHASE1_TON_4_ADDRESS);
 
+  let version = await stakeTON.connect(user1).version();
+  console.log("version", version);
+
+  // let tx1 = await stakeTON.connect(user1).withdraw();
+  // console.log("withdraw", tx1);
+
+
+  let tx1 = await stakeTON.withdrawData('0x3b9878Ef988B086F13E5788ecaB9A35E74082ED9');
+  console.log("withdrawData", tx1);
+
+  console.log("PHASE1.SWAPTOS.BURNPERCENT: ", keccak256("PHASE1.SWAPTOS.BURNPERCENT"));
   return null;
 }
 

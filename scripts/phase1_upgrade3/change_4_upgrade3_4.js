@@ -33,17 +33,22 @@ async function deployMain(defaultSender) {
   const tos = await ethers.getContractAt("TOS", TOS_Address);
   console.log("tos:", tos.address);
 
+  let _func1 = Web3EthAbi.encodeFunctionSignature("withdraw()") ;
+  let _func2 = Web3EthAbi.encodeFunctionSignature("withdrawData(address)") ;
+  let _func3 = Web3EthAbi.encodeFunctionSignature("version()") ;
+
   const stakeTON = await ethers.getContractAt("StakeTONProxy2", process.env.PHASE1_TON_4_ADDRESS);
 
   let tx2 = await stakeTON.setImplementation2(StakeTONUpgrade3, 1, true);
   console.log("setImplementation2 PHASE1_TON_4_ADDRESS StakeTONUpgrade3", tx2.hash);
   printGasUsedOfUnits('setImplementation2 PHASE1_TON_4_ADDRESS StakeTONUpgrade3',tx2);
 
-  let _func1 = Web3EthAbi.encodeFunctionSignature("withdraw()") ;
+
   console.log("_func1 withdraw()", _func1);
-  let tx3 =  await stakeTON.setSelectorImplementations2([_func1], StakeTONUpgrade3 );
+  let tx3 =  await stakeTON.setSelectorImplementations2([_func1,_func3], StakeTONUpgrade3 );
   console.log("setSelectorImplementations2 PHASE1_TON_4_ADDRESS withdraw", tx3.hash);
   printGasUsedOfUnits('setSelectorImplementations2 PHASE1_TON_4_ADDRESS withdraw',tx3);
+
 
   return null;
 }
