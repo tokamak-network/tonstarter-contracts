@@ -158,18 +158,21 @@ contract LockTOS is LockTOSStorage, AccessibleCommon, ILockTOS {
         _withdraw(_lockId);
     }
 
+    /// @dev Send staked amount back to user
     function _withdraw(uint256 _lockId) internal {
         LibLockTOS.LockedBalance memory lockedOld =
             lockedBalances[msg.sender][_lockId];
+        require(lockedOld.withdrawn == false, "Already withdrawn");
         require(lockedOld.start > 0, "Lock does not exist");
         require(lockedOld.end < block.timestamp, "Lock time not finished");
-        require(lockedOld.amount > 0, "Already withdrawn");
+        require(lockedOld.amount > 0, "No amount to withdraw");
 
         LibLockTOS.LockedBalance memory lockedNew =
             LibLockTOS.LockedBalance({
                 amount: 0,
                 start: 0,
-                end: 0
+                end: 0,
+                withdrawn: true
             });
 
         // Checkpoint
@@ -249,6 +252,32 @@ contract LockTOS is LockTOSStorage, AccessibleCommon, ILockTOS {
         return
             uint256(point.bias > currentBias ? point.bias - currentBias : 0)
                 .div(MULTIPLIER);
+    }
+
+    /// @inheritdoc ILockTOS
+    function totalLockedAmountOf(address _addr) external view override returns (uint256) {
+        uint256 len = userLocks[_addr].length;
+        uint256 stakedAmount = 0;
+        for (uint256 i = 0; i < len; ++i) {
+            uint256 lockId = userLocks[_addr][i];
+            LibLockTOS.LockedBalance memory lock = lockedBalances[_addr][lockId];
+            stakedAmount = stakedAmount.add(lock.amount);
+        }
+        return stakedAmount;
+    }
+
+    /// @inheritdoc ILockTOS
+    function withdrawableAmountOf(address _addr) external view override returns (uint256) {
+        uint256 len = userLocks[_addr].length;
+        uint256 amount = 0;
+        for(uint i = 0; i < len; i++){
+            uint256 lockId = userLocks[_addr][i];
+            LibLockTOS.LockedBalance memory lock = lockedBalances[_addr][lockId];
+            if(lock.end <= block.timestamp && lock.amount > 0 && lock.withdrawn == false) {
+                amount = amount.add(lock.amount);
+            }
+        }
+        return amount;
     }
 
     /// @inheritdoc ILockTOS
@@ -361,6 +390,30 @@ contract LockTOS is LockTOSStorage, AccessibleCommon, ILockTOS {
     }
 
     /// @inheritdoc ILockTOS
+    function withdrawableLocksOf(address _addr)  external view override returns (uint256[] memory) {
+        uint256 len = userLocks[_addr].length;
+        uint256 size = 0;
+        for(uint i = 0; i < len; i++){
+            uint256 lockId = userLocks[_addr][i];
+            LibLockTOS.LockedBalance memory lock = lockedBalances[_addr][lockId];
+            if(lock.end <= block.timestamp && lock.amount > 0 && lock.withdrawn == false) {
+                size++;
+            }
+        }
+
+        uint256[] memory withdrawable = new uint256[](size);
+        size = 0;
+        for(uint i = 0; i < len; i++) {
+            uint256 lockId = userLocks[_addr][i];
+            LibLockTOS.LockedBalance memory lock = lockedBalances[_addr][lockId];
+            if(lock.end <= block.timestamp && lock.amount > 0 && lock.withdrawn == false) {
+                withdrawable[size++] = lockId;
+            }
+        }
+        return withdrawable;
+    }
+
+    /// @inheritdoc ILockTOS
     function activeLocksOf(address _addr)
         public
         view
@@ -370,9 +423,9 @@ contract LockTOS is LockTOSStorage, AccessibleCommon, ILockTOS {
         uint256 len = userLocks[_addr].length;
         uint256 _size = 0;
         for(uint i = 0; i < len; i++){
-            uint256 _id = userLocks[_addr][i];
-            LibLockTOS.LockedBalance memory _lock = lockedBalances[_addr][_id];
-            if(_lock.end > block.timestamp && _id > 0 ) {
+            uint256 lockId = userLocks[_addr][i];
+            LibLockTOS.LockedBalance memory lock = lockedBalances[_addr][lockId];
+            if(lock.end > block.timestamp) {
                 _size++;
             }
         }
@@ -380,10 +433,10 @@ contract LockTOS is LockTOSStorage, AccessibleCommon, ILockTOS {
         uint256[] memory activeLocks = new uint256[](_size);
         _size = 0;
         for(uint i = 0; i < len; i++) {
-            uint256 _id = userLocks[_addr][i];
-            LibLockTOS.LockedBalance memory _lock = lockedBalances[_addr][_id];
-            if(_lock.end > block.timestamp && _id > 0 ) {
-                activeLocks[_size++] = _id;
+            uint256 lockId = userLocks[_addr][i];
+            LibLockTOS.LockedBalance memory lock = lockedBalances[_addr][lockId];
+            if(lock.end > block.timestamp) {
+                activeLocks[_size++] = lockId;
             }
         }
         return activeLocks;
@@ -441,7 +494,8 @@ contract LockTOS is LockTOSStorage, AccessibleCommon, ILockTOS {
             LibLockTOS.LockedBalance({
                 amount: lockedOld.amount,
                 start: lockedOld.start,
-                end: lockedOld.end
+                end: lockedOld.end,
+                withdrawn: false
             });
 
         // Make new lock

@@ -12,6 +12,7 @@ library LibLockTOS {
         uint256 start;
         uint256 end;
         uint256 amount;
+        bool withdrawn;
     }
 
     struct SlopeChange {

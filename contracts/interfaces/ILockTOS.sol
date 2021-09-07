@@ -6,17 +6,27 @@ import "../libraries/LibLockTOS.sol";
 
 
 interface ILockTOS {
+    
     /// @dev Returns addresses of all holders of LockTOS
     function allHolders() external returns (address[] memory);
 
     /// @dev Returns addresses of active holders of LockTOS
     function activeHolders() external returns (address[] memory);
 
+    /// @dev Returns all withdrawable locks
+    function withdrawableLocksOf(address user) external view returns (uint256[] memory);
+
     /// @dev Returns all locks of `_addr`
     function locksOf(address _addr) external view returns (uint256[] memory);
 
     /// @dev Returns all locks of `_addr`
     function activeLocksOf(address _addr) external view returns (uint256[] memory);
+
+    /// @dev Total locked amount of `_addr`
+    function totalLockedAmountOf(address _addr) external view returns (uint256);
+
+    /// @dev Withdrawable amount of `_addr`
+    function withdrawableAmountOf(address _addr) external view returns (uint256);
 
     /// @dev Returns all locks of `_addr`
     function locksInfo(uint256 _lockId)

@@ -4,14 +4,17 @@ const { time } = require("@openzeppelin/test-helpers");
 task("rinkeby-deploy-lock-tos", "Deploy TOS").setAction(async () => {
   const { RINKEBY_DEPLOY_ACCOUNT: account, RINKEBY_TOS_ADDRESS: tosAddress } =
     process.env;
-
-  const lastBlockNum = await ethers.provider.getBlockNumber();
-  const lastBlock = await ethers.provider.getBlock(lastBlockNum);
-  const lastTimestamp = parseInt(lastBlock.timestamp);
-  console.log({ lastTimestamp });
-  const phase3StartTime = lastTimestamp + parseInt(time.duration.weeks(4));
-  console.log({ phase3StartTime });
   const deployer = await findAccount(account);
+
+  // const tos = await (await ethers.getContractFactory("TOS"))
+  //   .connect(deployer)
+  //   .deploy("Ton starter", "TOS", "1");
+  // await tos.deployed();
+  // console.log("TOS: ", tos.address);
+  // const tosAddress = tos.address;
+  // await (
+  //   await tos.connect(deployer).mint(deployer.address, 1000000000000)
+  // ).wait();
 
   const lockTOS = await (await ethers.getContractFactory("LockTOS"))
     .connect(deployer)
@@ -27,14 +30,13 @@ task("rinkeby-deploy-lock-tos", "Deploy TOS").setAction(async () => {
   console.log("LockTOSProxy: ", lockTOSProxy.address);
   const lockTOSProxyAddress = lockTOSProxy.address;
 
-  // await (
-  //   await lockTOSProxy.initialize(
-  //     tosAddress,
-  //     time.duration.weeks(1),
-  //     time.duration.weeks(156),
-  //     phase3StartTime
-  //   )
-  // ).wait();
+  await (
+    await lockTOSProxy.initialize(
+      tosAddress,
+      parseInt(time.duration.minutes(10)),
+      parseInt(time.duration.minutes(156 * 10))
+    )
+  ).wait();
 
   const adminAddress = "0x8c595DA827F4182bC0E3917BccA8e654DF8223E1";
   await (await lockTOSProxy.addAdmin(adminAddress)).wait();
@@ -56,17 +58,15 @@ task("rinkeby-deploy-lock-tos-dividend", "Deploy TOS").setAction(async () => {
     RINKEBY_TOS_ADDRESS: tokenAddress,
     RINKEBY_LOCK_TOS_ADDRESS: lockTOSAddress,
   } = process.env;
-  const phase3StartTime = "0"; // (await time.latest()) + time.duration.weeks(4);
-  console.log({ phase3StartTime });
   const deployer = await findAccount(account);
 
   const lockTOS = await (await ethers.getContractFactory("LockTOSDividend"))
     .connect(deployer)
-    .deploy(deployer.address, tokenAddress, phase3StartTime);
+    .deploy(deployer.address, tokenAddress);
   await lockTOS.deployed();
   console.log("LockTOS: ", lockTOS.address);
   await run("verify", {
     address: lockTOS.address,
-    constructorArgsParams: [deployer.address, tokenAddress, phase3StartTime],
+    constructorArgsParams: [deployer.address, tokenAddress],
   });
 });

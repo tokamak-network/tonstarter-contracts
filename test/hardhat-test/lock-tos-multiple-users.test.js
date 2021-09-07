@@ -54,7 +54,6 @@ describe("LockTOS", function () {
 
   it("Deploy LockTOS", async function () {
     const now = parseInt(Date.now() / 1000);
-    console.log("now", now);
 
     const lockTOSImpl = await (
       await ethers.getContractFactory("LockTOS")
@@ -65,7 +64,6 @@ describe("LockTOS", function () {
       await ethers.getContractFactory("LockTOSProxy")
     ).deploy(lockTOSImpl.address, admin.address);
     await lockTOSProxy.deployed();
-    console.log("here");
     await (
       await lockTOSProxy.initialize(tos.address, epochUnit, maxTime)
     ).wait();
@@ -133,6 +131,19 @@ describe("LockTOS", function () {
     expect(activeHolders.length).to.be.eq(2);
   });
 
+  it("should check withdrawable amount to be equal to total", async function () {
+    const stakedAmount = parseInt(
+      await lockTOS.totalLockedAmountOf(user1.address)
+    );
+    const withdrawableAmount = parseInt(
+      await lockTOS.withdrawableAmountOf(user1.address)
+    );
+    expect(stakedAmount).to.be.greaterThan(withdrawableAmount);
+    const locks = await lockTOS.locksOf(user1.address);
+    const withdrawableLocks = await lockTOS.withdrawableLocksOf(user1.address);
+    expect(locks.length).to.be.greaterThan(withdrawableLocks.length);
+  });
+
   it("should check total supply now", async function () {
     const now =
       Math.floor(parseInt(await lockTOS.getCurrentTime()) / epochUnit) *
@@ -195,5 +206,19 @@ describe("LockTOS", function () {
     const activeHolders = await lockTOS.activeHolders();
     expect(allHolders.length).to.be.eq(2);
     expect(activeHolders.length).to.be.eq(0);
+  });
+
+  it("should check withdrawable amount to be equal to total", async function () {
+    const lockedAmount = parseInt(
+      await lockTOS.totalLockedAmountOf(user1.address)
+    );
+    const withdrawableAmount = parseInt(
+      await lockTOS.withdrawableAmountOf(user1.address)
+    );
+    expect(lockedAmount).to.be.eq(withdrawableAmount);
+
+    const locks = await lockTOS.locksOf(user1.address);
+    const withdrawableLocks = await lockTOS.withdrawableLocksOf(user1.address);
+    expect(locks).to.be.deep.eq(withdrawableLocks);
   });
 });
