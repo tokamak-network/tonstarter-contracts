@@ -23,15 +23,6 @@ contract StakeTONProxy2 is StakeTONStorage, AccessibleCommon, ProxyBase {
         _lock = 0;
     }
 
-    // constructor(address _logic) {
-
-    //     require(_logic != address(0), "StakeTONProxy2: logic is zero");
-
-    //     _setImplementation2(_logic, 0, true);
-    //     _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
-    //     _setupRole(ADMIN_ROLE, msg.sender);
-    // }
-
     constructor() {}
 
     /// @dev view implementation address of the proxy[index]
