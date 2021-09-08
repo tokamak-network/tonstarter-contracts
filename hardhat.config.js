@@ -2,6 +2,7 @@ require("@nomiclabs/hardhat-ethers");
 require("@openzeppelin/hardhat-upgrades");
 require("@nomiclabs/hardhat-etherscan");
 require("@nomiclabs/hardhat-waffle");
+require("@nomiclabs/hardhat-web3");
 //require("hardhat-gas-reporter");
 
 require("dotenv").config();
@@ -13,6 +14,8 @@ require("./tasks/uniswap-v3-increase-liquidity-task");
 require("./tasks/uniswap-v3-mint-position-task");
 require("./tasks/uniswap-v3-swap-task");
 require("./tasks/view-tasks");
+require("./tasks/abi-retriever");
+
 
 const {
   RINKEBY_UNISWAP_V3_ACCOUNT_PK1,
@@ -33,7 +36,7 @@ task("accounts", "Prints the list of accounts", async () => {
 });
 
 module.exports = {
-  defaultNetwork: "rinkeby",
+  defaultNetwork: "localhost",
   networks: {
     zenalocal: {
       url: "http://localhost:8546",
@@ -52,12 +55,12 @@ module.exports = {
       gas: 9500000,
       gasMultiplier: 100,
       blockGasLimit: 124500000,
-      accounts: {
-        mnemonic: process.env.MNEMONIC_HARDHAT,
-        count: 30,
-        initialIndex: 0,
-        accountsBalance: "10000000000000000000000",
-      },
+      // accounts: {
+      //   mnemonic: process.env.MNEMONIC_HARDHAT,
+      //   count: 30,
+      //   initialIndex: 0,
+      //   accountsBalance: "10000000000000000000000",
+      // },
     },
     /* hardhat: {
       accounts: {
@@ -69,10 +72,11 @@ module.exports = {
       chainId: 31337,
     }, */
     rinkeby: {
-      url: "https://rinkeby.infura.io/v3/9cb35f5029cb4604b3b7c1b2e92c6ac9",
+      chainId: 4,
+      url: "https://eth-rinkeby.alchemyapi.io/v2/5gNmfCGyn5VQ1IQ_V-NwBVbXG5jCbhLK",
       accounts: [`${ACCOUNT0_PK}`, `${ACCOUNT1_PK}`, `${ACCOUNT2_PK}`],
-      gasMultiplier: 1.25 //,
-      //gasPrice: 20000000000,
+      gasMultiplier: 1.25,
+      gasPrice: 20000000000,
     },
     mainnet: {
       url: `https://mainnet.infura.io/v3/${process.env.InfuraKey}`,

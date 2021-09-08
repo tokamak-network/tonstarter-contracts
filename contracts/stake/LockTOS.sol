@@ -15,6 +15,7 @@ import "../libraries/LibLockTOS.sol";
 import "../common/AccessibleCommon.sol";
 import "./LockTOSStorage.sol";
 
+
 contract LockTOS is LockTOSStorage, AccessibleCommon, ILockTOS {
     using SafeMath for uint256;
     using SafeCast for uint256;
