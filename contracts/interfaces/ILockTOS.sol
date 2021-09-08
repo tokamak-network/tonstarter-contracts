@@ -25,7 +25,7 @@ interface ILockTOS {
     /// @dev Total locked amount of `_addr`
     function totalLockedAmountOf(address _addr) external view returns (uint256);
 
-    /// @dev Withdrawable amount of `_addr`
+    /// @dev     jhswuqhdiuwjhdoiehdoijijf   bhabcgfzvg tqafstqfzys amount of `_addr`
     function withdrawableAmountOf(address _addr) external view returns (uint256);
 
     /// @dev Returns all locks of `_addr`
@@ -101,6 +101,9 @@ interface ILockTOS {
 
     /// @dev Withdraw TOS
     function withdraw(uint256 _lockId) external;
+    
+    /// @dev needCheckpoint
+    function needCheckpoint() external view returns (bool need);
 
     /// @dev Global checkpoint
     function globalCheckpoint() external;

@@ -150,9 +150,11 @@ describe("LockTOS", function () {
       epochUnit;
     ethers.provider.send("evm_increaseTime", [epochUnit * 20]); // add 60 seconds
     ethers.provider.send("evm_mine"); // mine the next block
-
-    await (await lockTOS.connect(admin).globalCheckpoint()).wait();
-
+    console.log("here", await lockTOS.needCheckpoint());
+    if (await lockTOS.needCheckpoint()) {
+      console.log("need");
+      await (await lockTOS.connect(admin).globalCheckpoint()).wait();
+    }
     const lastTime = now + epochUnit * 15;
     for (let cur = now; cur <= lastTime; cur += epochUnit) {
       const totalSupplyAt = parseInt(await lockTOS.totalSupplyAt(cur));

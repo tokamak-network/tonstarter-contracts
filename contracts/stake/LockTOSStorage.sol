@@ -18,7 +18,6 @@ contract LockTOSStorage {
 
     address public tos;
     uint256 public lockIdCounter;
-    uint256 public phase3StartTime;
     uint256 public cumulativeEpochUnit;
     uint256 public cumulativeTOSAmount;
 

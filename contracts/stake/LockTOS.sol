@@ -15,7 +15,6 @@ import "../libraries/LibLockTOS.sol";
 import "../common/AccessibleCommon.sol";
 import "./LockTOSStorage.sol";
 
-
 contract LockTOS is LockTOSStorage, AccessibleCommon, ILockTOS {
     using SafeMath for uint256;
     using SafeCast for uint256;
@@ -42,6 +41,15 @@ contract LockTOS is LockTOSStorage, AccessibleCommon, ILockTOS {
         free = 0;
         _;
         free = 1;
+    }
+
+    /// @inheritdoc ILockTOS
+    function needCheckpoint() external override view returns (bool need) {
+        uint256 len = pointHistory.length;
+        if (len == 0) {
+            return true;
+        }
+        need = (block.timestamp - pointHistory[len - 1].timestamp) > epochUnit; // if the last record was within a week
     }
 
     /// @inheritdoc ILockTOS
