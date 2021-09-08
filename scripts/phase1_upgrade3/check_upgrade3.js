@@ -27,52 +27,46 @@ const StakeTONUpgrade3 = loadDeployed(process.env.NETWORK, "StakeTONUpgrade3");
 async function deployMain(defaultSender) {
   const [deployer, user1] = await ethers.getSigners();
   const TOS_Address = tostoken;
+
   const tos = await ethers.getContractAt("TOS", TOS_Address);
   console.log("tos:", tos.address);
+  const tosbalance = await tos.balanceOf(process.env.PHASE1_TON_4_ADDRESS);
+  console.log("tosbalance:", tosbalance.toString());
 
-  const stakeTON = await ethers.getContractAt(
-    "StakeTONProxy2",
+  const stakeTON1 = await ethers.getContractAt(
+    "StakeTONUpgrade3",
+    process.env.PHASE1_TON_1_ADDRESS
+  );
+  let version = await stakeTON1.connect(user1).version();
+  console.log("PHASE1_TON_1_ADDRESS version", version);
+
+  const stakeTON2 = await ethers.getContractAt(
+    "StakeTONUpgrade3",
+    process.env.PHASE1_TON_2_ADDRESS
+  );
+  version = await stakeTON2.connect(user1).version();
+  console.log("PHASE1_TON_2_ADDRESS version", version);
+
+  const stakeTON3 = await ethers.getContractAt(
+    "StakeTONUpgrade3",
+    process.env.PHASE1_TON_3_ADDRESS
+  );
+  version = await stakeTON3.connect(user1).version();
+  console.log("PHASE1_TON_3_ADDRESS version", version);
+
+  const stakeTON4 = await ethers.getContractAt(
+    "StakeTONUpgrade3",
     process.env.PHASE1_TON_4_ADDRESS
   );
+  version = await stakeTON4.connect(user1).version();
+  console.log("PHASE1_TON_4_ADDRESS version", version);
 
-  const isAdmin = await stakeTON.isAdmin(deployer.address);
-  console.log("isAdmin PHASE1_TON_4_ADDRESS", deployer.address, isAdmin);
-
-  const tx1 = await stakeTON.setImplementation2(StakeTONUpgrade2, 0, true);
-  console.log(
-    "setImplementation2 PHASE1_TON_4_ADDRESS StakeTONUpgrade2 ",
-    tx1.hash
+  const stakeTON5 = await ethers.getContractAt(
+    "StakeTONUpgrade3",
+    process.env.PHASE1_TON_5_ADDRESS
   );
-  printGasUsedOfUnits(
-    "setImplementation2 PHASE1_TON_4_ADDRESS StakeTONUpgrade2",
-    tx1
-  );
-
-  const tx2 = await stakeTON.setImplementation2(StakeTONUpgrade3, 1, true);
-  console.log(
-    "setImplementation2 PHASE1_TON_4_ADDRESS StakeTONUpgrade3",
-    tx2.hash
-  );
-  printGasUsedOfUnits(
-    "setImplementation2 PHASE1_TON_4_ADDRESS StakeTONUpgrade3",
-    tx2
-  );
-
-  const _func1 = Web3EthAbi.encodeFunctionSignature("withdraw()");
-  const _func3 = Web3EthAbi.encodeFunctionSignature("version()");
-  console.log("_func1 withdraw()", _func1);
-  const tx3 = await stakeTON.setSelectorImplementations2(
-    [_func1, _func3],
-    StakeTONUpgrade3
-  );
-  console.log(
-    "setSelectorImplementations2 PHASE1_TON_4_ADDRESS withdraw",
-    tx3.hash
-  );
-  printGasUsedOfUnits(
-    "setSelectorImplementations2 PHASE1_TON_4_ADDRESS withdraw",
-    tx3
-  );
+  version = await stakeTON5.connect(user1).version();
+  console.log("PHASE1_TON_5_ADDRESS version", version);
 
   return null;
 }

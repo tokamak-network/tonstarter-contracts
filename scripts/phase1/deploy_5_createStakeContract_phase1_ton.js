@@ -3,7 +3,7 @@ const { ethers, upgrades } = require("hardhat");
 const utils = ethers.utils;
 const save = require("../save_deployed_file");
 const loadDeployed = require("../load_deployed");
-//const loadDeployedInput = require("./load_deployed_input");
+// const loadDeployedInput = require("./load_deployed_input");
 const {
   // padLeft,
   // toBN,
@@ -35,7 +35,7 @@ const {
   createStakeContract,
   timeout,
   getPeriodBlockByTimes,
-  getEndTime
+  getEndTime,
 } = require("../../utils/deploy_common.js");
 
 /*
@@ -71,54 +71,53 @@ const periods = [
   }
 ];
 */
-//for mainnet
+// for mainnet
 const periods = [
   {
     name: process.env.PHASE1_TON_1_NAME,
     period: process.env.PHASE1_TON_1_PERIOD,
     startTime: process.env.PHASE1_TON_MINING_STARTTIME,
-    endTime: 0 ,
-    periodBlocks: 0
+    endTime: 0,
+    periodBlocks: 0,
   },
   {
     name: process.env.PHASE1_TON_2_NAME,
     period: process.env.PHASE1_TON_2_PERIOD,
     startTime: process.env.PHASE1_TON_MINING_STARTTIME,
     endTime: 0,
-    periodBlocks: 0
+    periodBlocks: 0,
   },
   {
     name: process.env.PHASE1_TON_3_NAME,
     period: process.env.PHASE1_TON_3_PERIOD,
     startTime: process.env.PHASE1_TON_MINING_STARTTIME,
     endTime: 0,
-    periodBlocks: 0
+    periodBlocks: 0,
   },
   {
     name: process.env.PHASE1_TON_4_NAME,
     period: process.env.PHASE1_TON_4_PERIOD,
     startTime: process.env.PHASE1_TON_MINING_STARTTIME,
     endTime: 0,
-    periodBlocks: 0
+    periodBlocks: 0,
   },
   {
     name: process.env.PHASE1_TON_5_NAME,
     period: process.env.PHASE1_TON_5_PERIOD,
     startTime: process.env.PHASE1_TON_MINING_STARTTIME,
     endTime: 0,
-    periodBlocks: 0
+    periodBlocks: 0,
   },
 ];
 
 async function main() {
-
   const [deployer, user1] = await ethers.getSigners();
   const users = await ethers.getSigners();
   console.log("Deploying contracts with the account:", deployer.address);
   console.log("Account balance:", (await deployer.getBalance()).toString());
 
-  for(let i=0; i< periods.length; i++){
-    let res = getEndTime(periods[i].startTime, periods[i].period);
+  for (let i = 0; i < periods.length; i++) {
+    const res = getEndTime(periods[i].startTime, periods[i].period);
 
     periods[i].endTime = res.stakeEndDate;
     periods[i].periodBlocks = res.periodBlocks;
@@ -131,22 +130,21 @@ async function main() {
   if (
     process.env.PHASE1_TON_VAULT_ADDRESS != null &&
     process.env.PHASE1_TON_VAULT_ADDRESS.length > 0 &&
-    (
-      process.env.PHASE1_TON_STAKE_TYPE == "TON" ||
-      process.env.PHASE1_TON_STAKE_TYPE == "ETH"
-    ) &&
+    (process.env.PHASE1_TON_STAKE_TYPE == "TON" ||
+      process.env.PHASE1_TON_STAKE_TYPE == "ETH") &&
     process.env.PHASE1_TON_VAULT_NAME != null
   ) {
     if (process.env.PHASE1_TON_STAKE_TYPE == "TON") {
       token = ton;
-
     } else if (process.env.PHASE1_TON_STAKE_TYPE == "ETH") {
       token = zeroAddress;
     }
     console.log("PHASE1_TON_STAKE_TYPE", process.env.PHASE1_TON_STAKE_TYPE);
-    console.log("PHASE1_TON_VAULT_ADDRESS", process.env.PHASE1_TON_VAULT_ADDRESS);
+    console.log(
+      "PHASE1_TON_VAULT_ADDRESS",
+      process.env.PHASE1_TON_VAULT_ADDRESS
+    );
     console.log("token", token);
-
 
     for (let i = 0; i < periods.length; i++) {
       await createStakeContract(
@@ -158,7 +156,6 @@ async function main() {
       timeout(10000);
     }
   }
-
 }
 
 main()
