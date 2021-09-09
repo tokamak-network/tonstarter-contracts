@@ -46,6 +46,14 @@
 
 * "StakeTONUpgrade2": "0x07bc0a6036d8448da9cb06da859f35086533188c"
 
+## Deployed StakeTONUpgrade3
+
+* "StakeTONProxy2": "0xa16412acf22b70ddccebcafa75e773bb1879b341"
+
+* "StakeTONUpgrade3": "0xe75d8392c2eed2425afc7fcfba88d340b493ccc2"
+
+* "StakeTONControl": "0xacdded49ac67ba9c87b1bbc5cb248b1bd7dc0f19"
+
 ## Deployed related to pools
 
 * "StakeVaultFactory": "0x87d03e876d0FaDa4A347dae56Eff6F023B08543B"

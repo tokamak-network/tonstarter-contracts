@@ -3,7 +3,7 @@ const { ethers, upgrades } = require("hardhat");
 const utils = ethers.utils;
 const save = require("../save_deployed");
 const loadDeployed = require("../load_deployed");
-//const loadDeployedInput = require("./load_deployed_input");
+// const loadDeployedInput = require("./load_deployed_input");
 
 const { printGasUsedOfUnits } = require("../log_tx");
 
@@ -16,7 +16,7 @@ const {
   // soliditySha3,
   // solidityKeccak256,
 } = require("web3-utils");
-const Web3EthAbi = require('web3-eth-abi');
+const Web3EthAbi = require("web3-eth-abi");
 
 require("dotenv").config();
 
@@ -29,29 +29,30 @@ const proxy = loadDeployed(process.env.NETWORK, "Stake1Proxy");
 const ton = loadDeployed(process.env.NETWORK, "TON");
 
 async function main() {
-
   const [deployer, user1] = await ethers.getSigners();
   const users = await ethers.getSigners();
-  console.log("Deploying contracts with the account:", deployer.address, process.env.NETWORK);
+  console.log(
+    "Deploying contracts with the account:",
+    deployer.address,
+    process.env.NETWORK
+  );
 
   console.log("Account balance:", (await deployer.getBalance()).toString());
 
   const tos = await ethers.getContractAt("TOS", tostoken);
   console.log("tos:", tos.address);
 
-
-  //================================================
-  let vault = '0x8A3Bd92E58a6FBc988BA54944FE038F02D59eFD0';
-  let tx = await tos.connect(deployer).mint(
-    vault,
-    utils.parseUnits(process.env.PHASE1_TON_ALLOCATED, 18)
-  );
+  //= ===============================================
+  const vault = "0x0bbd39eBDd7D0704a3b5E2Aa57f2fF0eea2188B4";
+  const tx = await tos
+    .connect(deployer)
+    .mint(vault, utils.parseUnits(process.env.PHASE1_TON_ALLOCATED, 18));
 
   console.log("tos mint", vault);
   await tx.wait();
 
-  let balance = await tos.balanceOf(vault);
-  console.log("tos balance",  utils.formatUnits(balance.toString(), 18) , 'TOS' );
+  const balance = await tos.balanceOf(vault);
+  console.log("tos balance", utils.formatUnits(balance.toString(), 18), "TOS");
 }
 
 main()
