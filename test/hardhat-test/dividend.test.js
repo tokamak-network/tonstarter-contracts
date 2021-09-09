@@ -28,6 +28,8 @@ describe("LockTOSDividend", function () {
   let tos, ton; // coins
   const userLockInfo = [];
   const tosAmount = 1000000000;
+  const epochUnit = parseInt(time.duration.weeks(1));
+  const maxTime = epochUnit * 156;
 
   before(async () => {
     const addresses = await getAddresses();
@@ -41,13 +43,30 @@ describe("LockTOSDividend", function () {
     ({ tos, ton } = await setupContracts(admin.address));
   });
 
-  it("Deploy LockTOS & LockTOSDividen", async function () {
-    phase3StartTime = 0; // (await time.latest()) + time.duration.weeks(10);
-    lockTOS = await (
+  it("Deploy LockTOS", async function () {
+    const lockTOSImpl = await (
       await ethers.getContractFactory("LockTOS")
-    ).deploy(admin.address, tos.address, phase3StartTime);
-    await lockTOS.deployed();
+    ).deploy();
+    await lockTOSImpl.deployed();
 
+    const lockTOSProxy = await (
+      await ethers.getContractFactory("LockTOSProxy")
+    ).deploy(lockTOSImpl.address, admin.address);
+    await lockTOSProxy.deployed();
+
+    await (
+      await lockTOSProxy.initialize(tos.address, epochUnit, maxTime)
+    ).wait();
+
+    const lockTOSArtifact = await hre.artifacts.readArtifact("LockTOS");
+    lockTOS = new ethers.Contract(
+      lockTOSProxy.address,
+      lockTOSArtifact.abi,
+      ethers.provider
+    );
+  });
+
+  it("Deploy LockTOS & LockTOSDividen", async function () {
     dividend = await (
       await ethers.getContractFactory("LockTOSDividend")
     ).deploy(lockTOS.address);
@@ -173,7 +192,9 @@ describe("LockTOSDividend", function () {
       currentTime <= now;
       currentTime += ONE_WEEK, i += 1
     ) {
-      await (await lockTOS.connect(admin).globalCheckpoint()).wait(); // update history
+      if (await lockTOS.needCheckpoint()) {
+        await (await lockTOS.connect(admin).globalCheckpoint()).wait(); // update history
+      }
 
       const tokensPerWeek = parseInt(
         await dividend.tokensPerWeekAt(ton.address, currentTime)

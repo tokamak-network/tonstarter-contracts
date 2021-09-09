@@ -124,7 +124,7 @@ contract LockTOS is LockTOSStorage, AccessibleCommon, ILockTOS {
         uint256 unlockTime = lock.end.add(_unlockWeeks.mul(epochUnit));
         unlockTime = unlockTime.div(epochUnit).mul(epochUnit);
         require(
-            unlockTime - lock.start < maxTime,
+            unlockTime - block.timestamp < maxTime,
             "Max unlock time is 3 years"
         );
         require(lock.end > block.timestamp, "Lock time already finished");
@@ -256,6 +256,8 @@ contract LockTOS is LockTOSStorage, AccessibleCommon, ILockTOS {
         if (!success) {
             return 0;
         }
+        
+        point = _fillRecordGaps(point, _timestamp);
         int256 currentBias =
             point.slope * (_timestamp.sub(point.timestamp).toInt256());
         return
@@ -631,6 +633,32 @@ contract LockTOS is LockTOSStorage, AccessibleCommon, ILockTOS {
             pointHistory.push(lastWeek);
         }
         return lastWeek;
+    }
+
+    /// @dev 
+    function _fillRecordGaps(LibLockTOS.Point memory week, uint256 timestamp)
+        internal
+        view
+        returns (LibLockTOS.Point memory)
+    {
+        // Iterate through all past unrecoreded weeks
+        uint256 pointTimestampIterator =
+            week.timestamp.div(epochUnit).mul(epochUnit);
+        while (pointTimestampIterator != timestamp) {
+            pointTimestampIterator = Math.min(
+                pointTimestampIterator.add(epochUnit),
+                timestamp
+            );
+            int256 deltaSlope = slopeChanges[pointTimestampIterator];
+            int256 deltaTime =
+                Math.min(pointTimestampIterator.sub(week.timestamp), epochUnit).toInt256();
+            week.bias = week.bias.sub(week.slope.mul(deltaTime));
+            week.slope = week.slope.add(deltaSlope);
+            week.bias = week.bias > 0 ? week.bias : 0;
+            week.slope = week.slope > 0 ? week.slope : 0;
+            week.timestamp = pointTimestampIterator;
+        }
+        return week;
     }
 
     /// @dev Update slope changes
