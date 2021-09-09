@@ -9,7 +9,7 @@ task("write-contracts", "Deploy TOS").setAction(async () => {
   fs.writeFileSync("./abis/LockTOS_BYTECODE.json", lockTOSArtifact.bytecode);
   console.log({ lockTOSArtifact });
 
-  const lockTOSProxyArtifact = await hre.artifacts.readArtifact("LockTOS");
+  const lockTOSProxyArtifact = await hre.artifacts.readArtifact("LockTOSProxy");
   fs.writeFileSync(
     "./abis/LockTOSProxy_ABI.json",
     JSON.stringify(lockTOSProxyArtifact.abi, null, 2)
