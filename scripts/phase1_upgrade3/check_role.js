@@ -32,9 +32,12 @@ async function deployMain(defaultSender) {
 
   console.log("PHASE1.SWAPTOS.BURNPERCENT: ", keccak256("PHASE1.SWAPTOS.BURNPERCENT"));
   console.log("ADMIN: ", keccak256("ADMIN"));
+  console.log("BURNER: ", keccak256("BURNER"));
   let _func1 = Web3EthAbi.encodeFunctionSignature("withdraw()") ;
+  let _func2 = Web3EthAbi.encodeFunctionSignature("withdrawData(address)") ;
   let _func3 = Web3EthAbi.encodeFunctionSignature("version()") ;
   console.log("_func1 withdraw()", _func1);
+  console.log("_func2 withdrawData(address)", _func2);
   console.log("_func3 version()", _func3);
   return null;
 }

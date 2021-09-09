@@ -45,7 +45,7 @@ async function deployMain(defaultSender) {
 
 
   console.log("_func1 withdraw()", _func1);
-  let tx3 =  await stakeTON.setSelectorImplementations2([_func1,_func3], StakeTONUpgrade3 );
+  let tx3 =  await stakeTON.setSelectorImplementations2([_func1,_func2,_func3], StakeTONUpgrade3 );
   console.log("setSelectorImplementations2 PHASE1_TON_4_ADDRESS withdraw", tx3.hash);
   printGasUsedOfUnits('setSelectorImplementations2 PHASE1_TON_4_ADDRESS withdraw',tx3);
 

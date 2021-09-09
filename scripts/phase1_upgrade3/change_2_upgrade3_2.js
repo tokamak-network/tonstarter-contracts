@@ -41,9 +41,9 @@ async function deployMain(defaultSender) {
 
   let _func1 = Web3EthAbi.encodeFunctionSignature("withdraw()") ;
   let _func3 = Web3EthAbi.encodeFunctionSignature("version()") ;
-
+  let _func2 = Web3EthAbi.encodeFunctionSignature("withdrawData(address)") ;
   console.log("_func1 withdraw()", _func1);
-  let tx3 =  await stakeTON.setSelectorImplementations2([_func1,_func3], StakeTONUpgrade3 );
+  let tx3 =  await stakeTON.setSelectorImplementations2([_func1,_func2,_func3], StakeTONUpgrade3 );
   console.log("setSelectorImplementations2 PHASE1_TON_2_ADDRESS withdraw", tx3.hash);
   printGasUsedOfUnits('setSelectorImplementations2 PHASE1_TON_2_ADDRESS withdraw',tx3);
 
