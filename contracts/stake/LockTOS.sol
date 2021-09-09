@@ -298,6 +298,7 @@ contract LockTOS is LockTOSStorage, AccessibleCommon, ILockTOS {
         }
 
         LibLockTOS.Point memory point = pointHistory[pointHistory.length - 1];
+        point = _fillRecordGaps(point, block.timestamp);
         int256 currentBias =
             point.slope.mul(block.timestamp.sub(point.timestamp).toInt256());
         return
