@@ -10,6 +10,7 @@ const {
 } = require("@openzeppelin/test-helpers");
 const { connect } = require("http2");
 const { toBN, toWei, keccak256, fromWei } = require("web3-utils");
+const { ethers } = require("hardhat");
 
 async function findSigner(address) {
   const signers = await ethers.getSigners();

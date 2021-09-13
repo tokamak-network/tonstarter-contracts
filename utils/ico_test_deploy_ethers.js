@@ -23,6 +23,8 @@ const Web3EthAbi = require('web3-eth-abi');
 const chai = require("chai");
 chai.use(require("chai-bn")(BN)).should();
 
+const { ethers } = require("hardhat");
+
 const zeroAddress = "0x0000000000000000000000000000000000000000";
 
 const ADMIN_ROLE = keccak256("ADMIN");

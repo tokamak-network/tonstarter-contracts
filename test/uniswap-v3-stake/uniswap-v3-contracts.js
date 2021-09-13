@@ -14,6 +14,7 @@ const WETH9 = require("./weth/weth.json");
 const bn = require("bignumber.js");
 const linkLibraries = require("./linkLibraries");
 
+const { ethers } = require("hardhat");
 
 async function findSigner(address) {
   const signers = await ethers.getSigners();
