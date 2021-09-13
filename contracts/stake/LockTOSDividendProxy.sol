@@ -1,15 +1,17 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.7.6;
 
-import "../interfaces/ILockTOSDividendProxy.sol";
 import {Address} from "@openzeppelin/contracts/utils/Address.sol";
+import "@openzeppelin/contracts/math/SafeMath.sol";
 
 import "../common/AccessibleCommon.sol";
 import "./LockTOSStorage.sol";
 import "./ProxyBase.sol";
+import "./LockTOSDividendStorage.sol";
+
+import "../interfaces/ILockTOSDividendProxy.sol";
 
 import "hardhat/console.sol";
-import "./LockTOSDividendStorage.sol";
 
 /// @title The proxy of TOS Plaform
 /// @notice Admin can createVault, createStakeContract.
@@ -22,8 +24,11 @@ contract LockTOSDividendProxy is
 {
     event Upgraded(address indexed implementation);
 
+    using SafeMath for uint256;
+
     /// @dev constructor of StakeVaultProxy
     /// @param _impl the logic address of StakeVaultProxy
+    /// @param _admin the admin address of StakeVaultProxy
     constructor(address _impl, address _admin) {
         assert(
             IMPLEMENTATION_SLOT ==
@@ -102,7 +107,9 @@ contract LockTOSDividendProxy is
     }
 
     /// @dev Initialize
-    function initialize(address _lockTOS) external override onlyOwner {
+    function initialize(address _lockTOS, uint256 _epochUnit) external override onlyOwner {
         lockTOS = _lockTOS;
+        epochUnit = _epochUnit;
+        genesis = block.timestamp.div(epochUnit).mul(epochUnit);
     }
 }

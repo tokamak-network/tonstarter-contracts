@@ -29,7 +29,7 @@ describe("LockTOSDividend", function () {
   const userLockInfo = [];
   const tosAmount = 1000000000;
   const epochUnit = parseInt(time.duration.weeks(1));
-  const maxTime = epochUnit * 156;
+  const maxTime = epochUnit * 156; // 3 years
 
   before(async () => {
     const addresses = await getAddresses();
@@ -67,10 +67,26 @@ describe("LockTOSDividend", function () {
   });
 
   it("Deploy LockTOS & LockTOSDividen", async function () {
-    dividend = await (
+    const dividendImpl = await (
       await ethers.getContractFactory("LockTOSDividend")
-    ).deploy(lockTOS.address);
-    await dividend.deployed();
+    ).deploy();
+    await dividendImpl.deployed();
+
+    const dividendProxy = await (
+      await ethers.getContractFactory("LockTOSDividendProxy")
+    ).deploy(dividendImpl.address, admin.address);
+    await dividendProxy.deployed();
+
+    await (await dividendProxy.initialize(lockTOS.address, epochUnit)).wait();
+
+    const dividendArtifact = await hre.artifacts.readArtifact(
+      "LockTOSDividend"
+    );
+    dividend = new ethers.Contract(
+      dividendProxy.address,
+      dividendArtifact.abi,
+      ethers.provider
+    );
   });
 
   it("mint TOS to users", async function () {
@@ -152,7 +168,7 @@ describe("LockTOSDividend", function () {
 
   let initialTime;
   it("LockTOS stake TOS", async function () {
-    initialTime = parseInt(await time.latest());
+    initialTime = parseInt(await lockTOS.getCurrentTime());
     console.log({ initialTime });
 
     const distributions = [
@@ -163,7 +179,11 @@ describe("LockTOSDividend", function () {
     ];
     for (const { amount, account, weekIncrease } of distributions) {
       if (weekIncrease) {
-        await time.increase(time.duration.weeks(weekIncrease));
+        // await time.increase(time.duration.weeks(weekIncrease));
+        await ethers.provider.send("evm_increaseTime", [
+          parseInt(time.duration.weeks(weekIncrease)),
+        ]);
+        await ethers.provider.send("evm_mine"); // mine the next block
       }
       await approveTON(account, amount);
       await distributeTON(account, amount);
@@ -171,7 +191,7 @@ describe("LockTOSDividend", function () {
   });
 
   it("should check tokens per week", async function () {
-    const now = parseInt(await time.latest());
+    const now = parseInt(await lockTOS.getCurrentTime());
     const expected = [
       { tokensPerWeek: 5000000 },
       { tokensPerWeek: 0 },
@@ -214,7 +234,6 @@ describe("LockTOSDividend", function () {
         );
         accum += claimable;
       }
-
       if (expected[i].tokensPerWeek > 0) {
         expect(accum).to.be.closeTo(expected[i].tokensPerWeek, 1000);
       }

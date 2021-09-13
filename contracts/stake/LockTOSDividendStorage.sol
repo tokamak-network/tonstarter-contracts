@@ -11,8 +11,7 @@ contract LockTOSDividendStorage {
     address public stakeRegistry;
     bool public migratedL2;
 
-    uint256 public constant ONE_WEEK = 10 minutes;
-
+    uint256 public epochUnit;
     address public lockTOS;
     uint256 public genesis;
     mapping(address => LibLockTOSDividend.Distribution) public distributions;

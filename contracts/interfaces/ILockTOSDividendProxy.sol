@@ -15,5 +15,5 @@ interface ILockTOSDividendProxy {
     function implementation() external view returns (address);
 
     /// @dev initialize
-    function initialize(address _lockTOS) external;
+    function initialize(address _lockTOS, uint256 _epochUnit) external;
 }

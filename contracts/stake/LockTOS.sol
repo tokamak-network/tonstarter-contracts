@@ -250,7 +250,10 @@ contract LockTOS is LockTOSStorage, AccessibleCommon, ILockTOS {
         override
         returns (uint256)
     {
-        require(pointHistory.length > 0, "No history recorded");        
+        if (pointHistory.length == 0) {
+            return 0;
+        }
+
         (bool success, LibLockTOS.Point memory point) =
             _findClosestPoint(pointHistory, _timestamp);
         if (!success) {
@@ -297,8 +300,11 @@ contract LockTOS is LockTOSStorage, AccessibleCommon, ILockTOS {
             return 0;
         }
 
-        LibLockTOS.Point memory point = pointHistory[pointHistory.length - 1];
-        point = _fillRecordGaps(point, block.timestamp);
+        LibLockTOS.Point memory point = _fillRecordGaps(
+            pointHistory[pointHistory.length - 1],
+            block.timestamp
+        );
+
         int256 currentBias =
             point.slope.mul(block.timestamp.sub(point.timestamp).toInt256());
         return
@@ -472,7 +478,7 @@ contract LockTOS is LockTOSStorage, AccessibleCommon, ILockTOS {
         if (_history.length == 0) {
             return (false, point);
         }
-
+        
         uint256 left = 0;
         uint256 right = _history.length;
         while (left + 1 < right) {
@@ -636,7 +642,7 @@ contract LockTOS is LockTOSStorage, AccessibleCommon, ILockTOS {
         return lastWeek;
     }
 
-    /// @dev 
+    /// @dev Fills the record gaps
     function _fillRecordGaps(LibLockTOS.Point memory week, uint256 timestamp)
         internal
         view
