@@ -145,6 +145,7 @@ contract LockTOS is LockTOSStorage, AccessibleCommon, ILockTOS {
         for (uint256 i = 0; i < locks.length; i++) {
             LibLockTOS.LockedBalance memory lock = allLocks[locks[i]];
             if (
+                lock.withdrawn == false &&
                 locks[i] > 0 &&
                 lock.amount > 0 &&
                 lock.start > 0 &&
@@ -234,9 +235,10 @@ contract LockTOS is LockTOSStorage, AccessibleCommon, ILockTOS {
         uint256 _value
     ) public override {
         require(_value > 0, "Value locked should be non-zero");
-        LibLockTOS.LockedBalance memory locked = lockedBalances[_addr][_lockId];
-        require(locked.start > 0, "Lock does not exist");
-        require(locked.end > block.timestamp, "Lock time is finished");
+        LibLockTOS.LockedBalance memory lock = lockedBalances[_addr][_lockId];
+        require(lock.withdrawn == false, "Lock is withdrawn");
+        require(lock.start > 0, "Lock does not exist");
+        require(lock.end > block.timestamp, "Lock time is finished");
 
         cumulativeTOSAmount = cumulativeTOSAmount.add(_value);
         _deposit(_addr, _lockId, _value, 0);
