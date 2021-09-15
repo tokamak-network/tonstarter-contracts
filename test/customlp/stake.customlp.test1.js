@@ -644,10 +644,10 @@ describe("Stake CustomLP ", function () {
 
             let tester = tester1;
             let tokenId = tester.tokens[0];
-            let canClaim = await customLPRewardProxy1.canClaimableWhenFullLiquidity(tokenId, currentTime);
-            expect(canClaim.canFlag).to.be.eq(false);
+            // let canClaim = await customLPRewardProxy1.canClaimableWhenFullLiquidity(tokenId, currentTime);
+            // expect(canClaim.canFlag).to.be.eq(false);
         });
-
+        /*
         it("5. claim fail if no reward", async function () {
 
             let tester = tester1;
@@ -656,19 +656,19 @@ describe("Stake CustomLP ", function () {
                 customLPRewardProxy1.connect(tester.account).claim(tokenId)
             ).to.be.revertedWith("CustomLPRewardLogic1: no reward");
         });
-
+        */
     });
 
     describe("# 6. DonateReward ", async function () {
         it("1. donate fail if no-approve", async function () {
             let tester = tester1;
             let amount = ethers.BigNumber.from('200000000000000000000');
-            let periodSeconds = 60*60*1; // 1시간
+            let periodSeconds = ethers.BigNumber.from('3600') ; // 1시간
             let _donate = {
                         token: '',
                         amount: amount,
                         periods: periodSeconds,
-                        periodPerSeconds : amount.div(ethers.BigNumber.from(periodSeconds))
+                        rewardPerSeconds : amount.div(periodSeconds)
                     }
             await tos.mint(tester.account.address, amount, {
                 from: defaultSender,
@@ -687,16 +687,18 @@ describe("Stake CustomLP ", function () {
         it("2. donate TOS", async function () {
             let tester = tester1;
             let amount = ethers.BigNumber.from('200000000000000000000');
-            let periodSeconds = 60*60*1; // 1시간
+            let periodSeconds = ethers.BigNumber.from('3600') ; // 1시간
             let _donate = {
+                        index:0,
                         token: '',
                         donator: '',
                         amount: amount,
-                        periods: periodSeconds,
-                        periodPerSeconds : amount.div(ethers.BigNumber.from(periodSeconds)),
+                        periodSeconds: periodSeconds,
+                        rewardPerSeconds : amount.div(periodSeconds),
                         start: 0,
                         end: 0
                     }
+            let rewardCountPre = await customLPRewardProxy1.rewardCount();
 
             await tos.connect(tester.account).approve(customLPRewardProxy.address, amount );
 
@@ -709,16 +711,116 @@ describe("Stake CustomLP ", function () {
                 amount,
                 periodSeconds
             );
-            // console.log('tx',tx);
+
+            const receipt = await tx.wait();
+            //console.log('receipt',receipt) ;
+
+            for (let i = 0; i < receipt.events.length; i++) {
+                if (
+                    receipt.events[i].event == "DonatedReward"  &&
+                    receipt.events[i].args != null
+                ) {
+                    //console.log(receipt.events[i]) ;
+                    expect(receipt.events[i].args.donator).to.be.eq(tester.account.address);
+                    expect(receipt.events[i].args.token).to.be.eq(tos.address);
+                    expect(receipt.events[i].args.amount).to.be.eq(amount);
+                    expect(receipt.events[i].args.periodSeconds).to.be.eq(periodSeconds);
+                    _donate.index = receipt.events[i].args.rewardIndex;
+                }
+            }
+
+            expect(_donate.index).to.be.above(0);
+
             let block = await ethers.provider.getBlock(tx.blockNumber);
             _donate.token = tos.address;
             _donate.donator = tester.account.address;
             _donate.start = block.timestamp;
-            _donate.end = _donate.start + periodSeconds;
+            _donate.end = _donate.start + periodSeconds.toNumber();
             donateInfo.push(_donate);
 
-            //console.log('_donate',_donate);
+            expect(await customLPRewardProxy1.rewardCount()).to.be.eq(rewardCountPre.add(1));
+
+            let rewardToken = await customLPRewardProxy1.rewardTokens(_donate.index);
+            // console.log('rewardToken.allocatedAmount ', rewardToken.allocatedAmount.toString() );
+            // console.log('rewardToken.start ', rewardToken.start.toString() );
+            // console.log('rewardToken.end ', rewardToken.end.toString() );
+            // console.log('rewardToken.rewardPerSecond ', rewardToken.rewardPerSecond.toString() );
+            // console.log('rewardToken.tokenPerShare ', rewardToken.tokenPerShare.toString() );
+            // console.log('rewardToken.lastRewardTime ', rewardToken.lastRewardTime.toString() );
+
+
+            expect(rewardToken.allocatedAmount).to.be.eq(amount);
+            expect(rewardToken.rewardPerSecond).to.be.eq(_donate.rewardPerSeconds);
+            expect(_donate.periodSeconds).to.be.eq((rewardToken.end).sub(rewardToken.start));
+
+            // console.log(_donate.periodSeconds);
+            // console.log(rewardToken.end);
+            // console.log(rewardToken.start);
+
         });
+        it("3. canClaimable ", async function () {
+            ethers.provider.send("evm_increaseTime", [10]);
+            ethers.provider.send("evm_mine");
+            let blockNumber = await ethers.provider.getBlockNumber();
+            let block = await ethers.provider.getBlock(blockNumber);
+            let currentTime = block.timestamp;
+            console.log('currentTime',currentTime );
+
+            let tester = tester1;
+            let tokenId = tester.tokens[0];
+
+            let data = await customLPRewardProxy1.canClaimable(tokenId, currentTime );
+            console.log(data);
+
+            // console.log('canFlag ', data.canFlag);
+            // console.log('claimableList ', data.claimableList);
+            // console.log('tokenList ', data.tokenList);
+            // console.log('tokenIndexList ', data.tokenIndexList);
+
+            let rewardToken = await customLPRewardProxy1.rewardTokens(donateInfo[0].index);
+            //console.log(rewardToken);
+
+            console.log('rewardToken.allocatedAmount ', rewardToken.allocatedAmount.toString() );
+            console.log('rewardToken.start ', rewardToken.start.toString() );
+            console.log('rewardToken.end ', rewardToken.end.toString() );
+            console.log('rewardToken.rewardPerSecond ', rewardToken.rewardPerSecond.toString() );
+            console.log('rewardToken.tokenPerShare ', rewardToken.tokenPerShare.toString() );
+            console.log('rewardToken.tokenPlastRewardTimeerShare ', rewardToken.lastRewardTime.toString() );
+
+        });
+
+        /*
+        it("3. canClaimableWhenFullLiquidity ", async function () {
+            ethers.provider.send("evm_increaseTime", [10]);
+            ethers.provider.send("evm_mine");
+            let blockNumber = await ethers.provider.getBlockNumber();
+            let block = await ethers.provider.getBlock(blockNumber);
+            let currentTime = block.timestamp;
+            console.log('currentTime',currentTime );
+
+            let tester = tester1;
+            let tokenId = tester.tokens[0];
+
+            let data = await customLPRewardProxy1.canClaimableWhenFullLiquidity(tokenId, currentTime );
+            //console.log(data);
+
+            console.log('canFlag ', data.canFlag);
+            console.log('claimableList ', data.claimableList);
+            console.log('tokenList ', data.tokenList);
+            console.log('tokenIndexList ', data.tokenIndexList);
+
+            let rewardToken = await customLPRewardProxy1.rewardTokens(data.tokenIndexList[0]);
+            //console.log(rewardToken);
+
+            console.log('rewardToken.allocatedAmount ', rewardToken.allocatedAmount.toString() );
+            console.log('rewardToken.start ', rewardToken.start.toString() );
+            console.log('rewardToken.end ', rewardToken.end.toString() );
+            console.log('rewardToken.rewardPerSecond ', rewardToken.rewardPerSecond.toString() );
+            console.log('rewardToken.tokenPerShare ', rewardToken.tokenPerShare.toString() );
+            console.log('rewardToken.tokenPlastRewardTimeerShare ', rewardToken.lastRewardTime.toString() );
+
+        });
+        */
     });
 
     describe("# 7. Claim  ", async function () {

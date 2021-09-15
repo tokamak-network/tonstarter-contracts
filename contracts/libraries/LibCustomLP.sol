@@ -2,7 +2,6 @@
 pragma solidity ^0.7.6;
 
 library LibCustomLP {
-
     struct RewardToken {
         bool allocated;
         address token;

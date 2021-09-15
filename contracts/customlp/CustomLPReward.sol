@@ -23,10 +23,7 @@ contract CustomLPReward is CustomLPRewardStorage, AccessibleCommon {
     /// @dev Set implementation contract
     /// @param impl New implementation contract address
     /// @param _index index of proxy
-    function upgradeTo(address impl, uint256 _index)
-        external
-        onlyOwner
-    {
+    function upgradeTo(address impl, uint256 _index) external onlyOwner {
         require(impl != address(0), "CustomLPReward: input is zero");
         require(_implementation(_index) != impl, "CustomLPReward: same impl");
 
@@ -39,11 +36,7 @@ contract CustomLPReward is CustomLPRewardStorage, AccessibleCommon {
     /// @dev view implementation address of the proxy[index]
     /// @param _index index of proxy
     /// @return address of the implementation
-    function implementation(uint256 _index)
-        external
-        view
-        returns (address)
-    {
+    function implementation(uint256 _index) external view returns (address) {
         return _implementation(_index);
     }
 
@@ -156,7 +149,10 @@ contract CustomLPReward is CustomLPRewardStorage, AccessibleCommon {
     /// @dev fallback function , execute on undefined function call
     function _fallback() internal {
         address _impl = getSelectorImplementation(msg.sig);
-        require(_impl != address(0) && !pauseProxy, "CustomLPReward: impl OR proxy is false");
+        require(
+            _impl != address(0) && !pauseProxy,
+            "CustomLPReward: impl OR proxy is false"
+        );
 
         assembly {
             // Copy msg.data. We take full control of memory in this inline assembly

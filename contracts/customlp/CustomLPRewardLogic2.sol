@@ -23,44 +23,48 @@ contract CustomLPRewardLogic2 is CustomLPRewardStorage, AccessibleCommon {
         require(_val > 0, "CustomLPRewardLogic1: zero value");
         _;
     }
-    constructor() {
 
-    }
+    constructor() {}
 
-    function initInfo
-    (
+    function initInfo(
         address _registry,
         address _nonfungiblePositionManager,
         address _uniswapV3Factory,
         address _commonLib,
         uint256 _minimumDonation
     )
-        external onlyOwner
+        external
+        onlyOwner
         nonZeroAddress(_registry)
         nonZeroAddress(_nonfungiblePositionManager)
         nonZeroAddress(_uniswapV3Factory)
         nonZeroAddress(_commonLib)
         nonZero(_minimumDonation)
     {
-        require(uniswapV3Factory == address(0), "CustomLPRewardLogic2: already initialize");
+        require(
+            uniswapV3Factory == address(0),
+            "CustomLPRewardLogic2: already initialize"
+        );
         stakeRegistry = _registry;
-        nonfungiblePositionManager = INonfungiblePositionManager(_nonfungiblePositionManager);
+        nonfungiblePositionManager = INonfungiblePositionManager(
+            _nonfungiblePositionManager
+        );
         uniswapV3Factory = _uniswapV3Factory;
         commonLib = _commonLib;
         minimumDonation = _minimumDonation;
     }
 
-    function setPool
-    (
-        uint256 tokenId
-    )
+    function setPool(uint256 tokenId)
         external
         nonZeroAddress(stakeRegistry)
         nonZeroAddress(address(nonfungiblePositionManager))
         nonZeroAddress(uniswapV3Factory)
         nonZeroAddress(commonLib)
     {
-        require(poolAddress == address(0), "CustomLPRewardLogic2: already setPool");
+        require(
+            poolAddress == address(0),
+            "CustomLPRewardLogic2: already setPool"
+        );
         (, , address token0, address token1, uint24 fee, , , , , , , ) =
             nonfungiblePositionManager.positions(tokenId);
 
@@ -73,23 +77,15 @@ contract CustomLPRewardLogic2 is CustomLPRewardStorage, AccessibleCommon {
         );
     }
 
-    function setCommonLib
-    (
-        address _lib
-    )
-        external
-        nonZeroAddress(_lib)
-    {
+    function setCommonLib(address _lib) external nonZeroAddress(_lib) {
         commonLib = _lib;
     }
 
-    function setMinimumDonation
-    (
-        uint256 amount
-    )
-        external
-    {
-        require(amount > 0 && minimumDonation != amount, "CustomLPRewardLogic1: zero or same");
+    function setMinimumDonation(uint256 amount) external {
+        require(
+            amount > 0 && minimumDonation != amount,
+            "CustomLPRewardLogic1: zero or same"
+        );
         minimumDonation = amount;
     }
 }
