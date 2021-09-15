@@ -10,7 +10,7 @@ import "@openzeppelin/contracts/math/SafeMath.sol";
 import { PublicSaleStorage } from "./PublicSaleStorage.sol";
 
 
-contract OpenSale is PublicSaleStorage, Ownable, ReentrancyGuard {
+contract OpenSale is Ownable, ReentrancyGuard {
     using SafeERC20 for IERC20;
     using SafeMath for uint256;
 
@@ -31,8 +31,6 @@ contract OpenSale is PublicSaleStorage, Ownable, ReentrancyGuard {
     uint256 public totalOpenSaleAmount;         //총 OpenSale 판매 토큰량
     uint256 public totalExpectOpenSaleAmount;   //예정된 판매 토큰량
     uint256 public totalOpenPurchasedAmount;    //총 지불토큰 받은양
-
-    uint256 public rateSaleToken;   //구매시 받을 토큰 계산
 
     address[] public subscriptors;
 

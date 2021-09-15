@@ -11,7 +11,7 @@ import { PublicSaleStorage } from "./PublicSaleStorage.sol";
 
 import { IERC20Snapshot } from "./ERC20/IERC20Snapshot.sol";
 
-contract ExclusiveSale is PublicSaleStorage, Ownable, ReentrancyGuard {
+contract ExclusiveSale is Ownable, ReentrancyGuard {
     using SafeERC20 for IERC20;
     using SafeMath for uint256;
 
@@ -54,7 +54,5 @@ contract ExclusiveSale is PublicSaleStorage, Ownable, ReentrancyGuard {
     function setExEndTime(uint256 _endExclusiveTime) external onlyOwner {
         endExclusiveTime = _endExclusiveTime;
     }
-
-    function setTokenPrice(uint256 _saleTokenPrice, uint256 _)
     
 }
