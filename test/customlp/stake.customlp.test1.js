@@ -164,6 +164,8 @@ const tester2 = {
     }
 };
 
+let donateInfo = [];
+
 function getAlignedPair(_token0, _token1) {
   let token0 = _token0;
   let token1 = _token1;
@@ -215,6 +217,7 @@ describe("Stake CustomLP ", function () {
 
   let CustomLPReward, CustomLPRewardLogic1 , CustomLPRewardLogic2,  CustomCommonLib ;
   let customLPRewardProxy, customLPReward, customLPRewardLogic1, customLPRewardLogic2, customCommonLib ;
+    let customLPRewardProxy1, customLPRewardProxy2 ;
 
 
   const stakeType = "2"; // stake type for uniswapV3 stake
@@ -289,6 +292,7 @@ describe("Stake CustomLP ", function () {
       await ton.mint(defaultSender, ethers.utils.parseUnits("1000", 18), {
         from: defaultSender,
       });
+
       await wton.mint(defaultSender, ethers.utils.parseUnits("1000", 27), {
         from: defaultSender,
       });
@@ -523,131 +527,206 @@ describe("Stake CustomLP ", function () {
 
   });
 
-  describe("# 4. Swap : change the current tick", () => {
-    it("1. check current tick ", async () => {
-      this.timeout(1000000);
-      const tester = tester1;
 
-      // pool_wton_tos_address
-      const pool = new ethers.Contract(
-        pool_wton_tos_address,
-        IUniswapV3PoolABI.abi,
-        tester.account
-      );
-      const slot0 = await pool.slot0();
+    describe("# 5. Create CustomLP ", async function () {
+        it("1. Create CustomLPReward", async function () {
+            this.timeout(1000000);
 
-      expect(tester.positions.length).to.be.above(0);
+            CustomLPReward = await ethers.getContractFactory("CustomLPReward");
+            CustomLPRewardLogic1 = await ethers.getContractFactory("CustomLPRewardLogic1");
+            CustomLPRewardLogic2 = await ethers.getContractFactory("CustomLPRewardLogic2");
+            CustomCommonLib = await ethers.getContractFactory("CustomCommonLib");
 
-      expect(slot0.tick).to.be.above(tester.positions[0].tickLower);
-      expect(slot0.tick).to.be.below(tester.positions[0].tickUpper);
+            customCommonLib = await CustomCommonLib.connect(owner).deploy();
+            customLPRewardLogic1 = await CustomLPRewardLogic1.connect(owner).deploy();
+            customLPRewardLogic2 = await CustomLPRewardLogic2.connect(owner).deploy();
 
-      expect(tester2.positions.length).to.be.above(0);
-      expect(slot0.tick).to.be.above(tester2.positions[0].tickLower);
-      expect(slot0.tick).to.be.below(tester2.positions[0].tickUpper);
+            customLPRewardProxy = await CustomLPReward.connect(owner).deploy();
+
+            await customLPRewardProxy.connect(owner).setAliveImplementation(customLPRewardLogic1.address, true);
+            await customLPRewardProxy.connect(owner).setImplementation(customLPRewardLogic1.address, 0, true);
+
+            expect(await customLPRewardProxy.implementation(0)).to.be.eq(customLPRewardLogic1.address);
+
+            let _func1 = Web3EthAbi.encodeFunctionSignature("initInfo(address,address,address,address,uint256)") ;
+            let _func2 = Web3EthAbi.encodeFunctionSignature("setPool(uint256)") ;
+            let _func3 = Web3EthAbi.encodeFunctionSignature("setCommonLib(address)") ;
+            await customLPRewardProxy.connect(owner).setAliveImplementation(customLPRewardLogic2.address, true);
+            await customLPRewardProxy.connect(owner).setImplementation(customLPRewardLogic2.address, 1, true);
+            await customLPRewardProxy.connect(owner).setSelectorImplementations([_func1,_func2,_func3], customLPRewardLogic2.address);
+
+            expect(await customLPRewardProxy.implementation(1)).to.be.eq(customLPRewardLogic2.address);
+            expect(await customLPRewardProxy.getSelectorImplementation(_func1)).to.be.eq(customLPRewardLogic2.address);
+            expect(await customLPRewardProxy.getSelectorImplementation(_func2)).to.be.eq(customLPRewardLogic2.address);
+            expect(await customLPRewardProxy.getSelectorImplementation(_func3)).to.be.eq(customLPRewardLogic2.address);
+        });
+
+        it("2. initInfo fail if non-admin", async function () {
+
+            customLPRewardProxy2 = await ethers.getContractAt("CustomLPRewardLogic2", customLPRewardProxy.address);
+
+            await expect(
+                customLPRewardProxy2.connect(tester1.account).initInfo(
+                    stakeregister.address,
+                    deployedUniswapV3.nftPositionManager.address,
+                    deployedUniswapV3.coreFactory.address,
+                    customCommonLib.address,
+                    ethers.BigNumber.from('100000000000000000000'))
+            ).to.be.revertedWith("Accessible: Caller is not an admin");
+        });
+
+        it("3. initInfo  ", async function () {
+
+            customLPRewardProxy2 = await ethers.getContractAt("CustomLPRewardLogic2", customLPRewardProxy.address);
+
+            await customLPRewardProxy2.connect(owner).initInfo(
+                    stakeregister.address,
+                    deployedUniswapV3.nftPositionManager.address,
+                    deployedUniswapV3.coreFactory.address,
+                    customCommonLib.address,
+                    ethers.BigNumber.from('100000000000000000000')
+                    );
+
+            expect(await customLPRewardProxy2.stakeRegistry()).to.be.eq(stakeregister.address);
+            expect(await customLPRewardProxy2.nonfungiblePositionManager()).to.be.eq(deployedUniswapV3.nftPositionManager.address);
+            expect(await customLPRewardProxy2.uniswapV3Factory()).to.be.eq(deployedUniswapV3.coreFactory.address);
+            expect(await customLPRewardProxy2.commonLib()).to.be.eq(customCommonLib.address);
+        });
+
+        it("4. setPool", async function () {
+
+            await customLPRewardProxy2.connect(owner).setPool(
+                    tester1.tokens[0]);
+
+            const [token0, token1] = getAlignedPair(wton.address, tos.address);
+
+            expect(await customLPRewardProxy2.poolToken0()).to.be.eq(token0);
+            expect(await customLPRewardProxy2.poolToken1()).to.be.eq(token1);
+            //expect(await customLPRewardProxy2.poolFee()).to.be.eq( );
+            expect(await customLPRewardProxy2.poolAddress()).to.be.eq(pool_wton_tos_address);
+        });
+    });
+
+    describe("# 6. Staking if no-reward ", async function () {
+
+        it("1. staking fail if didn't approve LP ", async function () {
+            let tester = tester1;
+
+            customLPRewardProxy1 = await ethers.getContractAt("CustomLPRewardLogic1", customLPRewardProxy.address);
+
+            await expect(
+                customLPRewardProxy1.connect(tester.account).stake(tester.tokens[0])
+            ).to.be.revertedWith("ERC721: transfer caller is not owner nor approved");
+
+        });
+
+        it("2. setApprovalForAll ", async function () {
+            let tester = tester1;
+            await deployedUniswapV3.nftPositionManager.connect(tester.account).setApprovalForAll(customLPRewardProxy.address, true);
+        });
+
+        it("3. staking ", async function () {
+            let tester = tester1;
+            let tokenId = tester.tokens[0];
+            await customLPRewardProxy1.connect(tester.account).stake(tokenId);
+            let depositToken = await customLPRewardProxy1.depositTokens(tokenId);
+
+            expect(depositToken.owner).to.be.eq(tester.account.address);
+            expect(depositToken.liquidity).to.be.above(0);
+        });
+
+        it("4. canClaimableWhenFullLiquidity is false if no-reward ", async function () {
+            ethers.provider.send("evm_increaseTime", [10]);
+            ethers.provider.send("evm_mine");
+            let blockNumber = await ethers.provider.getBlockNumber();
+            let block = await ethers.provider.getBlock(blockNumber);
+            let currentTime = block.timestamp;
+
+            let tester = tester1;
+            let tokenId = tester.tokens[0];
+            let canClaim = await customLPRewardProxy1.canClaimableWhenFullLiquidity(tokenId, currentTime);
+            expect(canClaim.canFlag).to.be.eq(false);
+        });
+
+        it("5. claim fail if no reward", async function () {
+
+            let tester = tester1;
+            let tokenId = tester.tokens[0];
+            await expect(
+                customLPRewardProxy1.connect(tester.account).claim(tokenId)
+            ).to.be.revertedWith("CustomLPRewardLogic1: no reward");
+        });
 
     });
 
-    it("2. approve wton : tester1 ", async () => {
-      this.timeout(1000000);
-      const tester = tester1;
-      tester.wtonbalanceBefore = await wton.balanceOf(tester.account.address);
-      await approve(wton, tester.account, deployedUniswapV3.swapRouter.address, tester.wtonbalanceBefore);
+    describe("# 6. DonateReward ", async function () {
+        it("1. donate fail if no-approve", async function () {
+            let tester = tester1;
+            let amount = ethers.BigNumber.from('200000000000000000000');
+            let periodSeconds = 60*60*1; // 1시간
+            let _donate = {
+                        token: '',
+                        amount: amount,
+                        periods: periodSeconds,
+                        periodPerSeconds : amount.div(ethers.BigNumber.from(periodSeconds))
+                    }
+            await tos.mint(tester.account.address, amount, {
+                from: defaultSender,
+            });
+            expect(await tos.balanceOf(tester.account.address)).to.be.above(amount);
 
-    });
-    it("3. swap ", async () => {
-      this.timeout(1000000);
-      const tester = tester1;
+            await expect(
+                customLPRewardProxy1.connect(tester.account).donateReward(
+                    tos.address,
+                    amount,
+                    periodSeconds
+                )
+            ).to.be.revertedWith("ERC20: transfer amount exceeds allowance");
+        });
 
-      swapAmountWTON = ethers.utils.parseUnits("900", 18);
-      swapAmountTOS = ethers.utils.parseUnits("900", 18);
+        it("2. donate TOS", async function () {
+            let tester = tester1;
+            let amount = ethers.BigNumber.from('200000000000000000000');
+            let periodSeconds = 60*60*1; // 1시간
+            let _donate = {
+                        token: '',
+                        donator: '',
+                        amount: amount,
+                        periods: periodSeconds,
+                        periodPerSeconds : amount.div(ethers.BigNumber.from(periodSeconds)),
+                        start: 0,
+                        end: 0
+                    }
 
-      tester.wtonbalanceBefore = await wton.balanceOf(tester.account.address);
-      tester.tosbalanceBefore = await tos.balanceOf(tester.account.address);
+            await tos.connect(tester.account).approve(customLPRewardProxy.address, amount );
 
-      expect(tester.wtonbalanceBefore).to.be.above(tester.amount0Desired);
-      expect(tester.tosbalanceBefore).to.be.above(tester.amount1Desired);
+            expect(
+                await tos.allowance(tester.account.address, customLPRewardProxy.address)
+            ).to.be.gte(amount);
 
-      const params = {
-        tokenIn: wton.address,
-        tokenOut: tos.address,
-        fee: FeeAmount.MEDIUM,
-        recipient: tester1.account.address,
-        deadline: 100000000000000,
-        amountIn: swapAmountWTON,
-        amountOutMinimum: ethers.BigNumber.from("0"),
-        sqrtPriceLimitX96: ethers.BigNumber.from("0"),
-      };
+            let tx = await customLPRewardProxy1.connect(tester.account).donateReward(
+                tos.address,
+                amount,
+                periodSeconds
+            );
+            // console.log('tx',tx);
+            let block = await ethers.provider.getBlock(tx.blockNumber);
+            _donate.token = tos.address;
+            _donate.donator = tester.account.address;
+            _donate.start = block.timestamp;
+            _donate.end = _donate.start + periodSeconds;
+            donateInfo.push(_donate);
 
-      const tx = await deployedUniswapV3.swapRouter
-        .connect(tester.account)
-        .exactInputSingle(params);
-      tx.wait();
-
-      const wtonBalance = await wton.balanceOf(tester.account.address);
-      const tosBalance = await tos.balanceOf(tester.account.address);
-
-      expect(wtonBalance).to.be.below(tester.wtonbalanceBefore);
-      expect(tosBalance).to.be.above(tester.tosbalanceBefore);
-
-      tester.wtonbalanceBefore = wtonBalance;
-      tester.tosbalanceBefore = tosBalance;
-    });
-
-    it("4. out of current tick ", async () => {
-      this.timeout(1000000);
-      const tester = tester1;
-
-      // pool_wton_tos_address
-      const pool = new ethers.Contract(
-        pool_wton_tos_address,
-        IUniswapV3PoolABI.abi,
-        tester.account
-      );
-      const slot0 = await pool.slot0();
-
-      expect(tester.positions.length).to.be.above(0);
-      if (alignPair)
-        expect(slot0.tick).to.be.below(tester.positions[0].tickLower);
-      else expect(slot0.tick).to.be.above(tester.positions[0].tickLower);
-    });
-  });
-
-  describe("# 5. CustomLP ", async function () {
-    it("1. Create CustomLP ", async function () {
-        this.timeout(1000000);
-
-        CustomLPReward = await ethers.getContractFactory("CustomLPReward");
-        CustomLPRewardLogic1 = await ethers.getContractFactory("CustomLPRewardLogic1");
-        CustomLPRewardLogic2 = await ethers.getContractFactory("CustomLPRewardLogic2");
-        CustomCommonLib = await ethers.getContractFactory("CustomCommonLib");
-
-        customCommonLib = await CustomCommonLib.connect(owner).deploy();
-        customLPRewardLogic1 = await CustomLPRewardLogic1.connect(owner).deploy();
-        customLPRewardLogic2 = await CustomLPRewardLogic2.connect(owner).deploy();
-
-        customLPRewardProxy = await CustomLPReward.connect(owner).deploy();
-
-        await customLPRewardProxy.connect(owner).setAliveImplementation(customLPRewardLogic1.address, true);
-        await customLPRewardProxy.connect(owner).setImplementation(customLPRewardLogic1.address, 0, true);
-
-        expect(await customLPRewardProxy.implementation(0)).to.be.eq(customLPRewardLogic1.address);
-
-        let _func1 = Web3EthAbi.encodeFunctionSignature("initInfo(address,address,address,address)") ;
-        let _func2 = Web3EthAbi.encodeFunctionSignature("setPool(uint256)") ;
-        let _func3 = Web3EthAbi.encodeFunctionSignature("setCommonLib(address)") ;
-        await customLPRewardProxy.connect(owner).setAliveImplementation(customLPRewardLogic2.address, true);
-        await customLPRewardProxy.connect(owner).setImplementation(customLPRewardLogic2.address, 1, true);
-        await customLPRewardProxy.connect(owner).setSelectorImplementations([_func1,_func2,_func3], customLPRewardLogic2.address);
-
-        expect(await customLPRewardProxy.implementation(1)).to.be.eq(customLPRewardLogic2.address);
-        expect(await customLPRewardProxy.getSelectorImplementation(_func1)).to.be.eq(customLPRewardLogic2.address);
-        expect(await customLPRewardProxy.getSelectorImplementation(_func2)).to.be.eq(customLPRewardLogic2.address);
-        expect(await customLPRewardProxy.getSelectorImplementation(_func3)).to.be.eq(customLPRewardLogic2.address);
+            //console.log('_donate',_donate);
+        });
     });
 
-    // it("1. set init ", async function () {
-    // });
+    describe("# 7. Claim  ", async function () {
 
-  });
+    });
+
+    describe("# 6. Withdraw ", async function () {
+
+    });
 
 });

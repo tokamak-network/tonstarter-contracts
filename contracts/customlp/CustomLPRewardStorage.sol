@@ -19,7 +19,9 @@ contract CustomLPRewardStorage {
     uint256 public totalStakedAmount;
     uint256 public totalTokens;
 
-    uint256[] public rewardIndexs;
+    uint256 public rewardCount;
+    uint256 public minimumDonation;
+    //uint256 public maxRewardCount;
     mapping(uint256 => LibCustomLP.RewardToken) public rewardTokens;
     mapping(address => uint256[]) public userStakedTokenIds;
 

@@ -24,8 +24,16 @@ contract CustomLPRewardLogic1 is CustomLPRewardStorage, AccessibleCommon {
         require(_val > 0, "CustomLPRewardLogic1: zero value");
         _;
     }
-    constructor() {
 
+    modifier noReentrancy() {
+        require(_lock == 0, "CustomLPRewardLogic1: noReentrancy");
+        _lock = 1;
+        _;
+        _lock = 0;
+    }
+
+    constructor() {
+        rewardCount = 0;
     }
 
     function poolCheck(address token0, address token1) public view {
@@ -37,22 +45,22 @@ contract CustomLPRewardLogic1 is CustomLPRewardStorage, AccessibleCommon {
     }
 
     function canClaimableWhenFullLiquidity(uint256 tokenId, uint256 _timestamp)
-        public view returns (bool, uint256[] memory, address[] memory, address[] memory, uint256[] memory)
+        public view returns (bool canFlag, uint256[] memory claimableList, address[] memory tokenList, address[] memory donatorList, uint256[] memory tokenIndexList)
     {
-        if(rewardIndexs.length > 0){
+        if(rewardCount > 0){
             bool can = false;
-            uint256[] memory canClaimed = new uint256[](rewardIndexs.length);
-            address[] memory tokens = new address[](rewardIndexs.length);
-            address[] memory donators = new address[](rewardIndexs.length);
-            uint256[] memory tokenIndex = new uint256[](rewardIndexs.length);
+            uint256[] memory canClaimed = new uint256[](rewardCount);
+            address[] memory tokens = new address[](rewardCount);
+            address[] memory donators = new address[](rewardCount);
+            uint256[] memory tokenIndex = new uint256[](rewardCount);
 
-            for(uint256 i=0; i < rewardIndexs.length; i++){
-                LibCustomLP.ClaimInfoLP storage _claimsByTokenIds = claimsByTokenIds[tokenId][rewardIndexs[i]];
-                tokenIndex[i] = rewardIndexs[i];
+            for(uint256 i=1; i <= rewardCount; i++){
+                LibCustomLP.ClaimInfoLP storage _claimsByTokenIds = claimsByTokenIds[tokenId][i];
+                tokenIndex[i-1] = i;
 
                 if(_claimsByTokenIds.lastClaimedTime >= _timestamp ) canClaimed[i] = 0;
                 else {
-                    LibCustomLP.RewardToken storage _rewardToken = rewardTokens[rewardIndexs[i]];
+                    LibCustomLP.RewardToken storage _rewardToken = rewardTokens[i];
                     if(_timestamp <= _rewardToken.lastRewardTime && _timestamp >= _rewardToken.start ) {
                         uint256 reward = _claimsByTokenIds.amount;
                         reward = reward.mul(_rewardToken.tokenPerShare).div(10000);
@@ -222,7 +230,7 @@ contract CustomLPRewardLogic1 is CustomLPRewardStorage, AccessibleCommon {
 
     function claim(uint256 tokenId) public returns (bool) {
         require(
-            rewardIndexs.length > 0,
+            rewardCount > 0,
             "CustomLPRewardLogic1: no reward"
         );
 
@@ -236,7 +244,7 @@ contract CustomLPRewardLogic1 is CustomLPRewardStorage, AccessibleCommon {
 
         (bool can, uint256[] memory rewards, address[] memory tokens, address[] memory donators, uint256[] memory tokenIndex)
             = canClaimableWhenFullLiquidity(tokenId, block.timestamp);
-        require(can, "CustomLPRewardLogic1: can");
+        require(can, "CustomLPRewardLogic1: no claimable amount");
         require(rewards.length == tokens.length, "CustomLPRewardLogic1: diff rewards,tokens length");
         require(rewards.length == donators.length, "CustomLPRewardLogic1: diff rewards,donators length");
         require(rewards.length == tokenIndex.length, "CustomLPRewardLogic1: diff rewards,tokenIndex length");
@@ -260,9 +268,7 @@ contract CustomLPRewardLogic1 is CustomLPRewardStorage, AccessibleCommon {
 
         // give rewards
         for(uint256 i = 0; i< rewards.length ; i++){
-            //LibCustomLP.RewardToken storage _rewardToken = rewardTokens[rewardIndexs[i]];
-            // _rewardToken.token
-            // _rewardToken.donator
+
             if(rewards[i] > 0 && tokens[i] != address(0) ){
 
                 LibCustomLP.ClaimInfoLP storage _lp = claimsByTokenIds[tokenId][tokenIndex[i]];
@@ -292,14 +298,14 @@ contract CustomLPRewardLogic1 is CustomLPRewardStorage, AccessibleCommon {
 
     function updateReward() public {
         require(
-            rewardIndexs.length > 0,
+            rewardCount > 0,
             "CustomLPRewardLogic1: no reward"
         );
         if (totalStakedAmount == 0) {
             return;
         }
-        for(uint256 i=0; i < rewardIndexs.length; i++){
-            LibCustomLP.RewardToken storage _rewardToken = rewardTokens[rewardIndexs[i]];
+        for(uint256 i=1; i <= rewardCount; i++){
+            LibCustomLP.RewardToken storage _rewardToken = rewardTokens[i];
             uint256 curTime = block.timestamp;
             if(curTime <= _rewardToken.start ) curTime = 0;
             if(curTime > _rewardToken.end ) curTime = _rewardToken.end;
@@ -309,6 +315,43 @@ contract CustomLPRewardLogic1 is CustomLPRewardStorage, AccessibleCommon {
                 _rewardToken.lastRewardTime = curTime;
             }
         }
+    }
+
+    function donateReward(
+        address token,
+        uint256 amount,
+        uint256 periodSeconds
+    )
+        external
+        nonZeroAddress(token)
+        // nonZeroAddress(stakeRegistry)
+        // nonZeroAddress(address(nonfungiblePositionManager))
+        // nonZeroAddress(uniswapV3Factory)
+        // nonZeroAddress(poolAddress)
+        // nonZeroAddress(poolToken0)
+        // nonZeroAddress(poolToken1)
+        // nonZeroAddress(commonLib)
+        nonZero(amount)
+        nonZero(periodSeconds)
+        noReentrancy
+    {
+        require(amount >= minimumDonation, "CustomLPRewardLogic1: less than minimum donation");
+        require(token != address(0) && amount <= IERC20(token).balanceOf(msg.sender), "CustomLPRewardLogic1: donate insufficeient");
+        rewardCount = rewardCount.add(1);
+        LibCustomLP.RewardToken storage _reward = rewardTokens[rewardCount];
+        require(!_reward.allocated, "CustomLPRewardLogic1: alreay allocated");
+
+        _reward.allocated = true;
+        _reward.token = token;
+        _reward.donator = msg.sender;
+        _reward.allocatedAmount = amount;
+        _reward.start = block.timestamp;
+        _reward.end = block.timestamp.add(periodSeconds);
+        _reward.rewardPerSecond = 0;
+        _reward.tokenPerShare = 0;
+        _reward.lastRewardTime = block.timestamp;
+
+        IERC20(token).safeTransferFrom(msg.sender, address(this), amount);
     }
 
 }

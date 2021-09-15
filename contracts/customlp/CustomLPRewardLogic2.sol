@@ -32,19 +32,22 @@ contract CustomLPRewardLogic2 is CustomLPRewardStorage, AccessibleCommon {
         address _registry,
         address _nonfungiblePositionManager,
         address _uniswapV3Factory,
-        address _commonLib
+        address _commonLib,
+        uint256 _minimumDonation
     )
         external onlyOwner
         nonZeroAddress(_registry)
         nonZeroAddress(_nonfungiblePositionManager)
         nonZeroAddress(_uniswapV3Factory)
         nonZeroAddress(_commonLib)
+        nonZero(_minimumDonation)
     {
         require(uniswapV3Factory == address(0), "CustomLPRewardLogic2: already initialize");
         stakeRegistry = _registry;
         nonfungiblePositionManager = INonfungiblePositionManager(_nonfungiblePositionManager);
         uniswapV3Factory = _uniswapV3Factory;
         commonLib = _commonLib;
+        minimumDonation = _minimumDonation;
     }
 
     function setPool
@@ -78,5 +81,15 @@ contract CustomLPRewardLogic2 is CustomLPRewardStorage, AccessibleCommon {
         nonZeroAddress(_lib)
     {
         commonLib = _lib;
+    }
+
+    function setMinimumDonation
+    (
+        uint256 amount
+    )
+        external
+    {
+        require(amount > 0 && minimumDonation != amount, "CustomLPRewardLogic1: zero or same");
+        minimumDonation = amount;
     }
 }
