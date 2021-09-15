@@ -505,9 +505,6 @@ contract LockTOS is LockTOSStorage, AccessibleCommon, ILockTOS {
         uint256 _value,
         uint256 _unlockTime
     ) internal ifFree {
-        require(_unlockTime == _unlockTime / epochUnit * epochUnit, "epoch unit");
-        require(_unlockTime == _unlockTime.div(epochUnit).mul(epochUnit), "epoch unit 2");
-
         LibLockTOS.LockedBalance memory lockedOld =
             lockedBalances[_addr][_lockId];
         LibLockTOS.LockedBalance memory lockedNew =

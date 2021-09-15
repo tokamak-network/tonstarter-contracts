@@ -33,7 +33,6 @@ contract LockTOSProxy is
 
         _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
         _setupRole(ADMIN_ROLE, _admin);
-        //_setupRole(ADMIN_ROLE, address(this));
         lockIdCounter = 0;
         cumulativeEpochUnit = 0;
         cumulativeTOSAmount = 0;
