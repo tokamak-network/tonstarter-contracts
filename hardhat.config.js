@@ -33,19 +33,9 @@ task("accounts", "Prints the list of accounts", async () => {
 });
 
 module.exports = {
-  defaultNetwork: "rinkeby",
+  defaultNetwork: "hardhat",
   networks: {
-    zenalocal: {
-      url: "http://localhost:8546",
-      gas: 9500000,
-      gasMultiplier: 100,
-      blockGasLimit: 1524500000,
-      accounts: {
-        mnemonic: process.env.MNEMONIC_HARDHAT,
-        count: 30,
-        initialIndex: 0,
-        accountsBalance: "1000000000000000000000",
-      },
+    hardhat:{
       chainId: 1337,
     },
     localhost: {
@@ -53,18 +43,18 @@ module.exports = {
       gasMultiplier: 100,
       blockGasLimit: 524500000,
     },
-    rinkeby: {
-      url: "https://rinkeby.infura.io/v3/9cb35f5029cb4604b3b7c1b2e92c6ac9",
-      accounts: [`${ACCOUNT0_PK}`, `${ACCOUNT1_PK}`, `${ACCOUNT2_PK}`],
-      gasMultiplier: 1.25 //,
-      //gasPrice: 20000000000,
-    },
-    mainnet: {
-      url: `https://mainnet.infura.io/v3/${process.env.InfuraKey}`,
-      accounts: [`${TONSTARTER_DEPLOYER_PK}`],
-      gasMultiplier: 1.25,
-      gasPrice: 40000000000,
-    },
+    // rinkeby: {
+    //   url: "https://rinkeby.infura.io/v3/9cb35f5029cb4604b3b7c1b2e92c6ac9",
+    //   accounts: [`${ACCOUNT0_PK}`, `${ACCOUNT1_PK}`, `${ACCOUNT2_PK}`],
+    //   gasMultiplier: 1.25 //,
+    //   //gasPrice: 20000000000,
+    // },
+    // mainnet: {
+    //   url: `https://mainnet.infura.io/v3/${process.env.InfuraKey}`,
+    //   accounts: [`${TONSTARTER_DEPLOYER_PK}`],
+    //   gasMultiplier: 1.25,
+    //   gasPrice: 40000000000,
+    // },
   },
   etherscan: {
     apiKey: `${process.env.APIKey}`,
