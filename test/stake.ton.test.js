@@ -35,14 +35,14 @@ const { getSignature, signatureValidTime, timeout } = require("./common");
 const {
   ICO20Contracts,
   initialTotal,
-  Pharse1_TON_Staking,
-  Pharse1_ETH_Staking,
-  Pharse1_TOSETHLP_Staking,
-  Pharse1_DEV_Mining,
-  HASH_Pharse1_TON_Staking,
-  HASH_Pharse1_ETH_Staking,
-  HASH_Pharse1_TOSETHLP_Staking,
-  HASH_Pharse1_DEV_Mining
+  PHASE1_TON_Staking,
+  PHASE1_ETH_Staking,
+  PHASE1_TOSETHLP_Staking,
+  PHASE1_DEV_Mining,
+  HASH_PHASE1_TON_Staking,
+  HASH_PHASE1_ETH_Staking,
+  HASH_PHASE1_TOSETHLP_Staking,
+  HASH_PHASE1_DEV_Mining
   } = require("../utils/ico_test_deploy.js");
 
 let ico20Contracts;
@@ -157,16 +157,16 @@ let stakeContractTokamak = [];
         console.log(`\n\nCurrent block: ${current} `);
         console.log(" saleStartBlock ", saleStartBlock);
         console.log(" stakeStartBlock ", stakeStartBlock);
-        console.log(" Pharse1_TON_Staking ", Pharse1_TON_Staking);
+        console.log(" PHASE1_TON_Staking ", PHASE1_TON_Staking);
       }
 
       const tx = await stakeEntry.createVault(
         ton.address,
-        utils.parseUnits(Pharse1_TON_Staking, 18),
+        utils.parseUnits(PHASE1_TON_Staking, 18),
         toBN(saleStartBlock),
         toBN(stakeStartBlock),
         toBN("1"),
-        HASH_Pharse1_TON_Staking,
+        HASH_PHASE1_TON_Staking,
         toBN("0"),
         zeroAddress,
         { from: defaultSender }
@@ -178,7 +178,7 @@ let stakeContractTokamak = [];
       });
       await tos.mint(
         vault_phase1_ton.address,
-        utils.parseUnits(Pharse1_TON_Staking, 18),
+        utils.parseUnits(PHASE1_TON_Staking, 18),
         { from: defaultSender }
       );
     });

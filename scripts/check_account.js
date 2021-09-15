@@ -15,6 +15,7 @@ const loadDeployed = require("./load_deployed");
 
 const zeroAddress = "0x0000000000000000000000000000000000000000";
 const tostoken = loadDeployed(process.env.NETWORK, "TOS");
+const proxy = loadDeployed(process.env.NETWORK, "Stake1Proxy");
 
 async function deployMain(defaultSender) {
   const [deployer, user1] = await ethers.getSigners();

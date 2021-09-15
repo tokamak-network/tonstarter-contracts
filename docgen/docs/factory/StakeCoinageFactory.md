@@ -1,9 +1,9 @@
 # Functions:
 
-- [`deploy()`](#StakeCoinageFactory-deploy--)
+- [`deploy(address owner)`](#StakeCoinageFactory-deploy-address-)
 
-###### StakeCoinageFactory-deploy--
+###### StakeCoinageFactory-deploy-address-
 
-## Function `deploy()`
+## Function `deploy(address owner)`
 
 No description

@@ -4,6 +4,14 @@
 
 - [`createVault2(uint256 _cap, uint256 _rewardPerBlock, uint256 _phase, bytes32 _vaultName, uint256 _stakeType, address[4] _uniswapInfo, string _name)`](#IStake2Logic-createVault2-uint256-uint256-uint256-bytes32-uint256-address-4--string-)
 
+- [`setPool(address target, address[4] uniswapInfo)`](#IStake2Logic-setPool-address-address-4--)
+
+- [`setMiningIntervalSeconds(address target, uint256 miningIntervalSeconds)`](#IStake2Logic-setMiningIntervalSeconds-address-uint256-)
+
+- [`resetCoinageTime(address target)`](#IStake2Logic-resetCoinageTime-address-)
+
+- [`setStartTimeOfVault2(address vault, uint256 startTime)`](#IStake2Logic-setStartTimeOfVault2-address-uint256-)
+
 # Events:
 
 - [`CreatedVault2(address vault, address paytoken, uint256 cap)`](#IStake2Logic-CreatedVault2-address-address-uint256-)
@@ -43,6 +51,34 @@ create vault2
 - `_uniswapInfo`:  npm, pool, token0, token1
 
 - `_name`:   name
+
+###### IStake2Logic-setPool-address-address-4--
+
+## Function `setPool(address target, address[4] uniswapInfo)`
+
+set pool information
+
+### Parameters:
+
+- `uniswapInfo`: [NonfungiblePositionManager,UniswapV3Factory,token0,token1]
+
+###### IStake2Logic-setMiningIntervalSeconds-address-uint256-
+
+## Function `setMiningIntervalSeconds(address target, uint256 miningIntervalSeconds)`
+
+No description
+
+###### IStake2Logic-resetCoinageTime-address-
+
+## Function `resetCoinageTime(address target)`
+
+No description
+
+###### IStake2Logic-setStartTimeOfVault2-address-uint256-
+
+## Function `setStartTimeOfVault2(address vault, uint256 startTime)`
+
+No description
 
 ###### IStake2Logic-CreatedVault2-address-address-uint256-
 

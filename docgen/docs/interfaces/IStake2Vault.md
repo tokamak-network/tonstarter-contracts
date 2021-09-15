@@ -8,11 +8,15 @@
 
 - [`setStakeAddress(address _stakeAddress)`](#IStake2Vault-setStakeAddress-address-)
 
-- [`setRewardPerBlock(uint256 _rewardPerBlock)`](#IStake2Vault-setRewardPerBlock-uint256-)
+- [`setMiningStartTime(uint256 _miningStartTime)`](#IStake2Vault-setMiningStartTime-uint256-)
+
+- [`setMiningAmountPerSecond(uint256 _miningPerSecond)`](#IStake2Vault-setMiningAmountPerSecond-uint256-)
 
 - [`withdraw(address to, uint256 _amount)`](#IStake2Vault-withdraw-address-uint256-)
 
 - [`claim(address _to, uint256 _amount)`](#IStake2Vault-claim-address-uint256-)
+
+- [`claimMining(address to, uint256 minableAmount, uint256 miningAmount, uint256 nonMiningAmount)`](#IStake2Vault-claimMining-address-uint256-uint256-uint256-)
 
 - [`infos()`](#IStake2Vault-infos--)
 
@@ -58,15 +62,25 @@ set stake address
 
 - `_stakeAddress`:  stake address
 
-###### IStake2Vault-setRewardPerBlock-uint256-
+###### IStake2Vault-setMiningStartTime-uint256-
 
-## Function `setRewardPerBlock(uint256 _rewardPerBlock)`
+## Function `setMiningStartTime(uint256 _miningStartTime)`
 
-set reward per block
+set mining start time
 
 ### Parameters:
 
-- `_rewardPerBlock`:  allocated reward amount
+- `_miningStartTime`:  mining start time
+
+###### IStake2Vault-setMiningAmountPerSecond-uint256-
+
+## Function `setMiningAmountPerSecond(uint256 _miningPerSecond)`
+
+set mining amount per second
+
+### Parameters:
+
+- `_miningPerSecond`:  a mining amount per second
 
 ###### IStake2Vault-withdraw-address-uint256-
 
@@ -97,6 +111,22 @@ A function that _to claim the amount(_amount) from the staking contract and gets
 - `_to`: a user that received reward
 
 - `_amount`: the receiving amount
+
+###### IStake2Vault-claimMining-address-uint256-uint256-uint256-
+
+## Function `claimMining(address to, uint256 minableAmount, uint256 miningAmount, uint256 nonMiningAmount)`
+
+ a according to request from(staking contract)  the amount of mining is paid to to.
+
+### Parameters:
+
+- `to`: the address that will receive the reward
+
+- `minableAmount`: minable amount
+
+- `miningAmount`: amount mined
+
+- `nonMiningAmount`: Amount not mined
 
 ###### IStake2Vault-infos--
 

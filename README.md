@@ -22,6 +22,45 @@
 
 * "Stake1Proxy": "0x8e539e29D80fd4cB3167409A82787f3B80bf9113"
 
+## Deployed related to pools
+
+* "StakeVaultFactory": "0x87d03e876d0FaDa4A347dae56Eff6F023B08543B"
+
+* "Stake2Vault": "0x6359722370754B2ca15DDa3a2f6fe000AE2e4327"
+
+* "StakeUniswapV3": "0xA4cc74701AaB6A3280C768dC669881a8a5fA1C77"
+
+* "StakeCoinageFactory": "0x27EEbEd0a0F17Bea0fdd1957ef9aAf1F770a6866"
+
+* "StakeUniswapV3Factory": "0x0cfaE39054263B9269B89568B802a69c99e67Bb7"
+
+* "Stake2Logic": "0x62c957BE256cD01695ddfE97d306A737aE179272"
+
+* "Stake2VaultProxy": "0xB9C3531f1230De8E775F386f3B57d6dCB3F0202a"
+
+* "StakeUniswapV3Proxy": "0xC1349A9a33A0682804c390a3968e26E5a2366153"
+
+## Deployed StakeTONUpgrade
+
+* "StakeTONUpgrade": "0x52b49091d274f093dc813A4b76aB7a6E8f4f8e00"
+
+* "StakeTONUpgrade2": "0x07bc0a6036d8448da9cb06da859f35086533188c"
+
+## Deployed StakeTONUpgrade3
+
+* "StakeTONProxy2": "0xa16412acf22b70ddccebcafa75e773bb1879b341"
+
+* "StakeTONUpgrade3": "0xe75d8392c2eed2425afc7fcfba88d340b493ccc2"
+
+* "StakeTONControl": "0xacdded49ac67ba9c87b1bbc5cb248b1bd7dc0f19"
+
+
+## Deployed related to DAO
+
+* "LockTOS": "0x47f9FEbB2456d71Aab621F683AD680D71aF1306d"
+
+* "LockTOSProxy": "0x69b4A202Fa4039B42ab23ADB725aA7b1e9EEBD79"
+
 
 ### USING TOKAMAK CONTRACTS
 
@@ -54,6 +93,11 @@
 `npm run test:upgrade`
 
 `npm run test:factory`
+
+`npm run test:uniswapv3-simple`
+
+`npm run test:uniswapv3-liquidity`
+
 
 ### Deploy to Ethereum
 

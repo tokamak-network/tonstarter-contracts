@@ -11,7 +11,7 @@ const { toBN, toWei, keccak256, fromWei } = require("web3-utils");
 const { getAddresses, findSigner, setupContracts } = require("./utils");
 const { ethers } = require("hardhat");
 
-const Pharse1_ETH_Staking = "175000000." + "0".repeat(18);
+const PHASE1_ETH_Staking = "175000000." + "0".repeat(18);
 const zeroAddress = "0x0000000000000000000000000000000000000000";
 
 // const Stake1Vault = contract.fromArtifact("Stake1Vault");
@@ -63,15 +63,15 @@ describe("Stake", function () {
     const current = await time.latestBlock();
     saleStartBlock = parseInt(current + 4);
     stakeStartBlock = saleStartBlock + 20;
-    const HASH_Pharse1_ETH_Staking = keccak256("PHASE1_ETH_STAKING");
+    const HASH_PHASE1_ETH_Staking = keccak256("PHASE1_ETH_STAKING");
 
     const tx = await stakeEntry.connect(sender).createVault(
       zeroAddress, // ethers
-      ethers.utils.parseUnits(Pharse1_ETH_Staking, 18),
+      ethers.utils.parseUnits(PHASE1_ETH_Staking, 18),
       saleStartBlock,
       stakeStartBlock,
       "1",
-      HASH_Pharse1_ETH_Staking,
+      HASH_PHASE1_ETH_Staking,
       "1",
       zeroAddress
     );
@@ -86,7 +86,7 @@ describe("Stake", function () {
     ).attach(stakeVaultAddress);
     await setup.tos
       .connect(sender)
-      .mint(Vault.address, ethers.utils.parseUnits(Pharse1_ETH_Staking, 18));
+      .mint(Vault.address, ethers.utils.parseUnits(PHASE1_ETH_Staking, 18));
   });
 
   it("should create stake contracts", async function () {

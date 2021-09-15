@@ -21,9 +21,17 @@ interface IStake2Vault {
     /// @param _stakeAddress  stake address
     function setStakeAddress(address _stakeAddress) external;
 
-    /// @dev set reward per block
-    /// @param _rewardPerBlock  allocated reward amount
-    function setRewardPerBlock(uint256 _rewardPerBlock) external;
+    /// @dev set mining start time
+    /// @param _miningStartTime  mining start time
+    function setMiningStartTime(uint256 _miningStartTime) external;
+
+    /// @dev set mining end time
+    /// @param _miningEndTime  mining end time
+    function setMiningEndTime(uint256 _miningEndTime) external;
+
+    /// @dev set mining amount per second
+    /// @param _miningPerSecond  a mining amount per second
+    function setMiningAmountPerSecond(uint256 _miningPerSecond) external;
 
     /// @dev If the vault has more money than the reward to give, the owner can withdraw the remaining amount.
     /// @param to to address
@@ -38,6 +46,18 @@ interface IStake2Vault {
     /// @param _amount the receiving amount
     /// @return true
     function claim(address _to, uint256 _amount) external returns (bool);
+
+    /// @dev  a according to request from(staking contract)  the amount of mining is paid to to.
+    /// @param to the address that will receive the reward
+    /// @param minableAmount minable amount
+    /// @param miningAmount amount mined
+    /// @param nonMiningAmount Amount not mined
+    function claimMining(
+        address to,
+        uint256 minableAmount,
+        uint256 miningAmount,
+        uint256 nonMiningAmount
+    ) external returns (bool);
 
     /// @dev Give the infomation of this vault
     /// @return return1 [tos, stakeAddress]
@@ -59,4 +79,8 @@ interface IStake2Vault {
     /// @dev Returns Give the TOS balance stored in the vault
     /// @return the balance of TOS in this vault.
     function balanceTOSAvailableAmount() external view returns (uint256);
+
+    /// @dev Give all stakeContracts's addresses in this vault
+    /// @return all stakeContracts's addresses
+    function stakeAddressesAll() external view returns (address[] memory);
 }

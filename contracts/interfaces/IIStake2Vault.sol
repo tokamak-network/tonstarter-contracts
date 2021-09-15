@@ -5,14 +5,24 @@ pragma solidity ^0.7.6;
 //import "../libraries/LibTokenStake1.sol";
 
 interface IIStake2Vault {
-    /// @dev claim function.
-    /// @dev sender is a staking contract.
-    /// @dev A function that pays the amount(_amount) to _to by the staking contract.
-    /// @dev A function that _to claim the amount(_amount) from the staking contract and gets the TOS in the vault.
-    /// @param _to a user that received reward
-    /// @param _amount the receiving amount
-    /// @return true
-    function claim(address _to, uint256 _amount) external returns (bool);
+    /// @dev  of according to request from(staking contract)  the amount of mining is paid to to.
+    /// @param to the address that will receive the reward
+    /// @param minableAmount minable amount
+    /// @param miningAmount amount mined
+    /// @param nonMiningAmount Amount not mined
+    function claimMining(
+        address to,
+        uint256 minableAmount,
+        uint256 miningAmount,
+        uint256 nonMiningAmount
+    ) external returns (bool);
 
-    function rewardPerBlock() external returns (uint256);
+    /// @dev mining per second
+    function miningPerSecond() external view returns (uint256);
+
+    /// @dev mining start time
+    function miningStartTime() external view returns (uint256);
+
+    /// @dev mining end time
+    function miningEndTime() external view returns (uint256);
 }

@@ -16,7 +16,7 @@ const {
 } = require("../hardhat-test/utils");
 const { network } = require("hardhat");
 
-const Pharse1_ETH_Staking = "175000000." + "0".repeat(18);
+const PHASE1_ETH_Staking = "175000000." + "0".repeat(18);
 const zeroAddress = "0x0000000000000000000000000000000000000000";
 const {
   deployedUniswapV3Contracts,
@@ -140,14 +140,14 @@ describe("Stake 2", function () {
     saleStartBlock = parseInt(current + 1);
     stakeStartBlock = saleStartBlock + 6;
     console.log({ current, saleStartBlock, stakeStartBlock });
-    const HASH_Pharse1_ETH_Staking = keccak256("PHASE1_ETH_STAKING");
+    const HASH_PHASE1_ETH_Staking = keccak256("PHASE1_ETH_STAKING");
     const tx = await stakeEntry.connect(sender).createVault(
       setup.ton.address, // ton
-      ethers.utils.parseUnits(Pharse1_ETH_Staking, 18),
+      ethers.utils.parseUnits(PHASE1_ETH_Staking, 18),
       saleStartBlock,
       stakeStartBlock,
       "1",
-      HASH_Pharse1_ETH_Staking,
+      HASH_PHASE1_ETH_Staking,
       stakeType,
       zeroAddress
     );
@@ -163,7 +163,7 @@ describe("Stake 2", function () {
     ).attach(stakeVaultAddress);
     await setup.tos
       .connect(sender)
-      .mint(Vault.address, ethers.utils.parseUnits(Pharse1_ETH_Staking, 18));
+      .mint(Vault.address, ethers.utils.parseUnits(PHASE1_ETH_Staking, 18));
   });
 
   it("should create stake contracts", async function () {

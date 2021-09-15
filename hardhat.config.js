@@ -42,7 +42,7 @@ module.exports = {
       url: "http://localhost:8546",
       gas: 9500000,
       gasMultiplier: 100,
-      blockGasLimit: 124500000,
+      blockGasLimit: 1524500000,
       accounts: {
         mnemonic: process.env.MNEMONIC_HARDHAT,
         count: 30,
@@ -54,23 +54,8 @@ module.exports = {
     localhost: {
       gas: 9500000,
       gasMultiplier: 100,
-      blockGasLimit: 124500000,
-      // accounts: {
-      //   mnemonic: process.env.MNEMONIC_HARDHAT,
-      //   count: 30,
-      //   initialIndex: 0,
-      //   accountsBalance: "10000000000000000000000",
-      // },
+      blockGasLimit: 524500000,
     },
-    /* hardhat: {
-      accounts: {
-        mnemonic: process.env.MNEMONIC_HARDHAT,
-        count: 30,
-        initialIndex: 0,
-        accountsBalance: "10000000000000000000000",
-      },
-      chainId: 31337,
-    }, */
     rinkeby: {
       chainId: 4,
       url: "https://eth-rinkeby.alchemyapi.io/v2/5gNmfCGyn5VQ1IQ_V-NwBVbXG5jCbhLK",

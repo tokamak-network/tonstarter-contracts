@@ -33,6 +33,8 @@ async function getAddresses() {
   return addresses;
 }
 
+
+
 async function setupContracts(account) {
   const _TON = createCurrency("TON");
   const _WTON = createCurrency("WTON");

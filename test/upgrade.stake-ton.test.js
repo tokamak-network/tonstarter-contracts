@@ -35,14 +35,14 @@ const { getSignature, signatureValidTime, timeout } = require("./common");
 const {
   ICO20Contracts,
   initialTotal,
-  Pharse1_TON_Staking,
-  Pharse1_ETH_Staking,
-  Pharse1_TOSETHLP_Staking,
-  Pharse1_DEV_Mining,
-  HASH_Pharse1_TON_Staking,
-  HASH_Pharse1_ETH_Staking,
-  HASH_Pharse1_TOSETHLP_Staking,
-  HASH_Pharse1_DEV_Mining
+  PHASE1_TON_Staking,
+  PHASE1_ETH_Staking,
+  PHASE1_TOSETHLP_Staking,
+  PHASE1_DEV_Mining,
+  HASH_PHASE1_TON_Staking,
+  HASH_PHASE1_ETH_Staking,
+  HASH_PHASE1_TOSETHLP_Staking,
+  HASH_PHASE1_DEV_Mining
   } = require("../utils/ico_test_deploy.js");
 
 let ico20Contracts;
@@ -51,7 +51,7 @@ let ICOContractsDeployed;
 // ------------------------
 const Stake1Vault = contract.fromArtifact("Stake1Vault");
 const StakeTON = contract.fromArtifact("StakeTON");
-const StakeTON_NEW = contract.fromArtifact("StakeTON_NEW");
+const StakeTONUpgrade = contract.fromArtifact("StakeTONUpgrade");
 const StakeTONProxy = contract.fromArtifact("StakeTONProxy");
 const IERC20 = contract.fromArtifact("IERC20");
 // ----------------------
@@ -163,16 +163,16 @@ describe("StakeTON: Upgrade", function () {
         console.log(`\n\nCurrent block: ${current} `);
         console.log(" saleStartBlock ", saleStartBlock);
         console.log(" stakeStartBlock ", stakeStartBlock);
-        console.log(" Pharse1_TON_Staking ", Pharse1_TON_Staking);
+        console.log(" PHASE1_TON_Staking ", PHASE1_TON_Staking);
       }
 
       const tx = await stakeEntry.createVault(
         ton.address,
-        utils.parseUnits(Pharse1_TON_Staking, 18),
+        utils.parseUnits(PHASE1_TON_Staking, 18),
         toBN(saleStartBlock),
         toBN(stakeStartBlock),
         toBN("1"),
-        HASH_Pharse1_TON_Staking,
+        HASH_PHASE1_TON_Staking,
         toBN("0"),
         zeroAddress,
         { from: defaultSender }
@@ -184,7 +184,7 @@ describe("StakeTON: Upgrade", function () {
       });
       await tos.mint(
         vault_phase1_ton.address,
-        utils.parseUnits(Pharse1_TON_Staking, 18),
+        utils.parseUnits(PHASE1_TON_Staking, 18),
         { from: defaultSender }
       );
     });
@@ -212,14 +212,14 @@ describe("StakeTON: Upgrade", function () {
     });
   });
 
-  describe('# 3. Upgrade StakeTON to StakeTON_NEW on particular stakeContract', async function () {
-    it("1. Create StakeTON_NEW", async function () {
+  describe('# 3. Upgrade StakeTON to StakeTONUpgrade on particular stakeContract', async function () {
+    it("1. Create StakeTONUpgrade", async function () {
         this.timeout(1000000);
-        stakeTonNew = await StakeTON_NEW.new({ from: defaultSender });
+        stakeTonNew = await StakeTONUpgrade.new({ from: defaultSender });
 
     });
 
-    it("2. Upgrade StakeTON to StakeTON_NEW of particular StakeContract", async function () {
+    it("2. Upgrade StakeTON to StakeTONUpgrade of particular StakeContract", async function () {
         this.timeout(1000000);
         let i=0;
         await stakeEntry.upgradeStakeTo(stakeAddresses[i], stakeTonNew.address, { from: defaultSender });
@@ -229,12 +229,10 @@ describe("StakeTON: Upgrade", function () {
         let imp = await stakeTonProxy.implementation();
         expect(imp).to.be.equal(stakeTonNew.address);
 
-        let stakeContract0 = await StakeTON_NEW.at(stakeAddresses[i]);
+        let stakeContract0 = await StakeTONUpgrade.at(stakeAddresses[i]);
         let version = await stakeContract0.version();
-        let vaultAddress = await stakeContract0.getVaultAddress();
 
-        expect(version).to.be.equal("new.1.0");
-        expect(vaultAddress).to.be.equal(vault_phase1_ton.address);
+        expect(version).to.be.equal("upgrade.20210803");
 
     });
 
@@ -246,12 +244,9 @@ describe("StakeTON: Upgrade", function () {
         let imp = await stakeTonProxy.implementation();
         expect(imp).to.be.equal(stakeTONLogic.address);
 
-        let stakeContract1 = await StakeTON_NEW.at(stakeAddresses[i]);
+        let stakeContract1 = await StakeTONUpgrade.at(stakeAddresses[i]);
         await expect(
           stakeContract1.version()
-        ).to.be.reverted;
-        await expect(
-          stakeContract1.getVaultAddress()
         ).to.be.reverted;
 
     });
