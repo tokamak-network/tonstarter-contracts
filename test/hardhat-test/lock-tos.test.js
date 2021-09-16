@@ -22,32 +22,58 @@ const {
   createLockWithPermit,
 } = require("./helpers/lock-tos-helper");
 
+const name = "TONStarter";
+const symbol = "TOS";
+const version = "1.0";
+let testerAddress = "";
+
 describe("LockTOS", function () {
   let admin, user;
   let tos;
   let lockTOS;
-  let phase3StartTime;
   const userLockInfo = [];
   const tosAmount = 1000000000;
+  const epochUnit = parseInt(time.duration.minutes(1));
+  const maxTime = epochUnit * 156;
 
   // Helper functions
   before(async () => {
     const addresses = await getAddresses();
     admin = await findSigner(addresses[0]);
     user = await findSigner(addresses[1]);
+    testerAddress = addresses[1];
   });
 
-  it("Initialize contracts", async function () {
+  it("Initialize TOS", async function () {
     this.timeout(1000000);
-    ({ tos } = await setupContracts(admin.address));
+    const TOS = await ethers.getContractFactory("TOS");
+    tos = await TOS.deploy(name, symbol, version);
+    await tos.deployed();
   });
 
   it("Deploy LockTOS", async function () {
-    phase3StartTime = (await time.latest()) + time.duration.weeks(10);
-    lockTOS = await (
+    const now = parseInt(Date.now() / 1000);
+    console.log("now", now);
+
+    const lockTOSImpl = await (
       await ethers.getContractFactory("LockTOS")
-    ).deploy(admin.address, tos.address, phase3StartTime);
-    await lockTOS.deployed();
+    ).deploy();
+    await lockTOSImpl.deployed();
+
+    const lockTOSProxy = await (
+      await ethers.getContractFactory("LockTOSProxy")
+    ).deploy(lockTOSImpl.address, admin.address);
+    await lockTOSProxy.deployed();
+
+    await (
+      await lockTOSProxy.initialize(tos.address, epochUnit, maxTime)
+    ).wait();
+    const lockTOSArtifact = await hre.artifacts.readArtifact("LockTOS");
+    lockTOS = new ethers.Contract(
+      lockTOSProxy.address,
+      lockTOSArtifact.abi,
+      ethers.provider
+    );
   });
 
   it("mint TOS to users", async function () {
@@ -72,7 +98,7 @@ describe("LockTOS", function () {
         tos,
         lockTOS,
         user,
-        amount: 300000000,
+        amount: 200000000,
         unlockWeeks: 20,
       }),
       updates: [
@@ -114,18 +140,22 @@ describe("LockTOS", function () {
   });
 
   it("should check balances of user at now", async function () {
+    const lastestTime = await lockTOS.getCurrentTime();
+
     const totalBalance = parseInt(await lockTOS.balanceOf(user.address));
     const estimatedTotalBalance = parseInt(
       await calculateBalanceOfUser({
         user,
+        timestamp: lastestTime,
         lockTOS,
-        timestamp: parseInt(await time.latest()),
       })
     );
+
     expect(totalBalance).to.equal(estimatedTotalBalance);
 
     for (const info of userLockInfo) {
-      const currentTime = parseInt(await time.latest());
+      const currentTime = await lockTOS.getCurrentTime();
+
       const { lockId } = info;
       const balance = parseInt(await lockTOS.balanceOfLock(lockId));
       const estimate = await calculateBalanceOfLock({
@@ -158,40 +188,53 @@ describe("LockTOS", function () {
   let startTime;
   it("should check history changes", async function () {
     const changes = [];
-    startTime = parseInt(await time.latest());
-    const ONE_WEEK = parseInt(time.duration.weeks(1));
+    // startTime = parseInt(await time.latest());
+    startTime = await lockTOS.getCurrentTime();
 
     for (let it = 0; it < 10; ++it) {
       for (const info of userLockInfo) {
         const { lockId, updates } = info;
+
         for (const { amount, unlockWeeks } of updates) {
           const lock = await lockTOS.lockedBalances(user.address, lockId);
+
           const lockStart = parseInt(lock.start);
           const lockEnd = parseInt(lock.end);
-          const threeYears = parseInt(time.duration.weeks(155));
+          const threeYears = epochUnit * 155;
 
           if (amount) {
-            if (parseInt(await time.latest()) < lockEnd) {
-              await tos.connect(user).approve(lockTOS.address, amount);
-              await lockTOS.connect(user).increaseAmount(lockId, amount);
+            if (parseInt(await lockTOS.getCurrentTime()) < lockEnd) {
+              await (
+                await tos.connect(user).approve(lockTOS.address, amount)
+              ).wait();
+              await (
+                await lockTOS.connect(user).increaseAmount(lockId, amount)
+              ).wait();
             }
           }
           if (unlockWeeks) {
-            const newTime = Math.floor((lockEnd + unlockWeeks * 7 * 24 * 60 * 60) / ONE_WEEK) * ONE_WEEK;
-            if (parseInt(await time.latest()) < lockEnd && lockEnd < newTime) {
+            const newTime =
+              Math.floor((lockEnd + unlockWeeks * epochUnit) / epochUnit) *
+              epochUnit;
+            if (
+              parseInt(await lockTOS.getCurrentTime()) < lockEnd &&
+              lockEnd < newTime
+            ) {
               if (newTime - lockStart < threeYears) {
-                await lockTOS
-                  .connect(user)
-                  .increaseUnlockTime(lockId, unlockWeeks);
+                await (
+                  await lockTOS
+                    .connect(user)
+                    .increaseUnlockTime(lockId, unlockWeeks)
+                ).wait();
               }
             }
           }
 
-          await time.increase(time.duration.weeks(1));
+          await time.increase(epochUnit);
           changes.push({
             lockId,
             capturedBalance: parseInt(await lockTOS.balanceOfLock(lockId)),
-            captureTimestamp: parseInt(await time.latest()),
+            captureTimestamp: parseInt(await lockTOS.getCurrentTime()),
           });
         }
       }
@@ -206,12 +249,42 @@ describe("LockTOS", function () {
     }
   });
 
+  it("should check if boost value is 1", async function () {
+    const lockId = await createLockWithPermit({
+      tos,
+      lockTOS,
+      user,
+      amount: 1000000,
+      unlockWeeks: 1,
+    });
+    const lock = await lockTOS.lockedBalances(user.address, lockId);
+
+    const balance = parseInt(await lockTOS.balanceOfLockAt(lockId, lock.start));
+    const estimate = parseInt(
+      await calculateBalanceOfLock({
+        user,
+        lockId,
+        lockTOS,
+        timestamp: lock.start,
+      })
+    );
+    expect(balance).to.equal(estimate);
+
+    const MAXTIME = epochUnit * 156;
+    const MULTIPLIER = Math.pow(10, 18);
+    const slope = Math.floor((parseInt(lock.amount) * MULTIPLIER) / MAXTIME);
+    const deltaTime = parseInt(lock.end) - parseInt(lock.start);
+    const bias = Math.floor((slope * deltaTime) / MULTIPLIER);
+    expect(balance).to.be.equal(bias);
+  });
+
   it("should check total supply now", async function () {
-    const now = parseInt(await time.latest());
+    const now = parseInt(await lockTOS.getCurrentTime());
     for (
       let cur = startTime;
       cur <= now;
-      cur += parseInt(time.duration.weeks(1))
+      // cur += parseInt(time.duration.weeks(1))
+      cur += epochUnit
     ) {
       const totalSupplyAt = parseInt(await lockTOS.totalSupplyAt(cur));
       expect(totalSupplyAt).to.greaterThan(0);
@@ -223,16 +296,33 @@ describe("LockTOS", function () {
     const initialBalance = parseInt(await tos.balanceOf(user.address));
     for (const info of userLockInfo) {
       const { lockId } = info;
+
       const lock = await lockTOS.lockedBalances(user.address, lockId);
-      if (parseInt(lock.end) > parseInt(await time.latest())) {
-        await time.increaseTo(parseInt(lock.end));
+
+      const cur = parseInt(await lockTOS.getCurrentTime());
+      const end = parseInt(lock.end);
+      if (end > cur) {
+        const diff = end - cur;
+        ethers.provider.send("evm_increaseTime", [diff]); // add 60 seconds
+        ethers.provider.send("evm_mine"); // mine the next block
       }
 
       accTos += parseInt(lock.amount);
+
       await (await lockTOS.connect(user).withdraw(lockId)).wait();
+
       expect((await tos.balanceOf(user.address)) - initialBalance).to.be.equal(
         accTos
       );
+      const newLock = await lockTOS.lockedBalances(user.address, lockId);
+
+      expect(newLock.start).to.be.equal(0);
+      expect(newLock.end).to.be.equal(0);
+      expect(newLock.amount).to.be.equal(0);
     }
+  });
+
+  it("should withdraw all leftover locks", async function () {
+    await (await lockTOS.connect(user).withdrawAll()).wait();
   });
 });

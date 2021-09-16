@@ -10,47 +10,66 @@ import "../interfaces/ILockTOSDividend.sol";
 import "../interfaces/ILockTOS.sol";
 import "../libraries/LibLockTOSDividend.sol";
 
+import "../common/AccessibleCommon.sol";
+import "./LockTOSDividendStorage.sol";
 
-contract LockTOSDividend is ILockTOSDividend {
+
+contract LockTOSDividend is
+    LockTOSDividendStorage,
+    AccessibleCommon,
+    ILockTOSDividend
+{
+    event Claim(address token, uint256 amount, uint256 timestamp);
+    event Distribute(address token, uint256 amount);
+    event Redistribute(address token, uint256 oldEpoch, uint256 newEpoch);
+
     using SafeMath for uint256;
     using SafeCast for uint256;
 
-    uint256 public constant ONE_WEEK = 1 weeks;
-
-    address public lockTOS;
-    uint256 public genesis;
-    mapping (address => LibLockTOSDividend.Distribution) public distributions;
-
-    constructor(address _lockTOS) {
-        lockTOS = _lockTOS;
-        genesis = (block.timestamp / ONE_WEEK) * ONE_WEEK;
+    /// @dev Check if a function is used or not
+    modifier ifFree {
+        require(free == 1, "LockId is already in use");
+        free = 0;
+        _;
+        free = 1;
     }
 
     /// @inheritdoc ILockTOSDividend
-    function claim(address _token) override external {
+    function claim(address _token) external override {
         _claimUpTo(_token, block.timestamp);
     }
 
     /// @inheritdoc ILockTOSDividend
-    function claimUpTo(address _token, uint256 _timestamp) override external {
+    function claimUpTo(address _token, uint256 _timestamp) external override {
         _claimUpTo(_token, _timestamp);
     }
 
     /// @inheritdoc ILockTOSDividend
-    function distribute(address _token, uint256 _amount) override external {
-        IERC20(_token).transferFrom(msg.sender, address(this), _amount);
+    function distribute(address _token, uint256 _amount)
+        external
+        override
+        ifFree
+    {
         LibLockTOSDividend.Distribution storage distr = distributions[_token];
 
-        distr.totalDistribution += _amount;
+        distr.totalDistribution = distr.totalDistribution.add(_amount);
 
         uint256 weeklyEpoch = getCurrentWeeklyEpoch();
-        distr.tokensPerWeek[weeklyEpoch] += _amount;
+        distr.tokensPerWeek[weeklyEpoch] = distr.tokensPerWeek[weeklyEpoch].add(
+            _amount
+        );
+
+        IERC20(_token).transferFrom(msg.sender, address(this), _amount);
+        emit Distribute(_token, _amount);
     }
 
     /// @inheritdoc ILockTOSDividend
-    function redistribute(address _token, uint256 _weeklyEpoch) override external {
+    function redistribute(address _token, uint256 _weeklyEpoch)
+        external
+        override
+    {
         require(_weeklyEpoch < getCurrentWeeklyEpoch());
-        uint256 timestamp = (genesis + _weeklyEpoch * ONE_WEEK) + ONE_WEEK;
+        uint256 timestamp = (genesis + _weeklyEpoch * epochUnit) + epochUnit;
 
         require(
             ILockTOS(lockTOS).totalSupplyAt(timestamp) == 0,
@@ -58,19 +77,26 @@ contract LockTOSDividend is ILockTOSDividend {
         );
 
         uint256 newEpoch = _weeklyEpoch.add(1);
-        uint256 newTimestamp = timestamp.add(ONE_WEEK);
+        uint256 newTimestamp = timestamp.add(epochUnit);
         while (newTimestamp <= block.timestamp) {
             if (ILockTOS(lockTOS).totalSupplyAt(newTimestamp) > 0) {
                 break;
             }
-            newTimestamp = newTimestamp.add(ONE_WEEK);
+            newTimestamp = newTimestamp.add(epochUnit);
             newEpoch = newEpoch.add(1);
         }
-        require(newTimestamp <= block.timestamp, "Cannot find epoch to redistribute");
-        
+        require(
+            newTimestamp <= block.timestamp,
+            "Cannot find epoch to redistribute"
+        );
+
         LibLockTOSDividend.Distribution storage distr = distributions[_token];
-        distr.tokensPerWeek[newEpoch] += distr.tokensPerWeek[_weeklyEpoch];
+        distr.tokensPerWeek[newEpoch] = distr.tokensPerWeek[newEpoch].add(
+            distr.tokensPerWeek[_weeklyEpoch]
+        );
         distr.tokensPerWeek[_weeklyEpoch] = 0;
+
+        emit Redistribute(_token, _weeklyEpoch, newEpoch);
     }
 
     /// @inheritdoc ILockTOSDividend
@@ -80,14 +106,14 @@ contract LockTOSDividend is ILockTOSDividend {
         override
         returns (uint256)
     {
-        return (_timestamp - genesis) / ONE_WEEK;
+        return (_timestamp.sub(genesis)).div(epochUnit);
     }
 
     /// @inheritdoc ILockTOSDividend
     function tokensPerWeekAt(address _token, uint256 _timestamp)
-        override
         external
         view
+        override
         returns (uint256)
     {
         uint256 weeklyEpoch = getWeeklyEpoch(_timestamp);
@@ -96,26 +122,21 @@ contract LockTOSDividend is ILockTOSDividend {
 
     /// @inheritdoc ILockTOSDividend
     function claimStartWeeklyEpoch(address _token, uint256 _lockId)
-        override
         external
         view
+        override
         returns (uint256)
     {
         return distributions[_token].claimStartWeeklyEpoch[_lockId];
     }
 
     /// @inheritdoc ILockTOSDividend
-    function getCurrentWeeklyEpoch()
-        public
-        view
-        override
-        returns (uint256)
-    {
+    function getCurrentWeeklyEpoch() public view override returns (uint256) {
         return getWeeklyEpoch(block.timestamp);
     }
 
     /// @inheritdoc ILockTOSDividend
-    function claimable(address _token) override public view returns (uint256) {
+    function claimable(address _token) public view override returns (uint256) {
         return claimableForPeriod(_token, 0, block.timestamp);
     }
 
@@ -124,30 +145,30 @@ contract LockTOSDividend is ILockTOSDividend {
         address _token,
         uint256 _timeStart,
         uint256 _timeEnd
-    )
-        override
-        public
-        view
-        returns (uint256)
-    {
+    ) public view override returns (uint256) {
         uint256 epochStart = getWeeklyEpoch(_timeStart);
         uint256 epochEnd = getWeeklyEpoch(_timeEnd);
         if (epochEnd == 0) {
-            return 0;            
+            return 0;
         }
-
+        
         uint256[] memory userLocks = ILockTOS(lockTOS).locksOf(msg.sender);
         uint256 amountToClaim = 0;
         LibLockTOSDividend.Distribution storage distr = distributions[_token];
         for (uint256 i = 0; i < userLocks.length; ++i) {
             uint256 lockId = userLocks[i];
-            amountToClaim += _canClaim(distr, lockId, epochStart, epochEnd);
+            amountToClaim += _calculateClaim(
+                distr,
+                lockId,
+                epochStart,
+                epochEnd
+            );
         }
         return amountToClaim;
-    } 
+    }
 
     /// @dev Claim rewards
-    function _claimUpTo(address _token, uint256 _timestamp) internal {
+    function _claimUpTo(address _token, uint256 _timestamp) internal ifFree {
         uint256 weeklyEpoch = getWeeklyEpoch(_timestamp);
         uint256[] memory userLocks = ILockTOS(lockTOS).locksOf(msg.sender);
         uint256 amountToClaim = 0;
@@ -155,8 +176,9 @@ contract LockTOSDividend is ILockTOSDividend {
             amountToClaim += _recordClaim(_token, userLocks[i], weeklyEpoch);
         }
         if (amountToClaim > 0) {
-            IERC20(_token).transfer(msg.sender, amountToClaim);   
+            IERC20(_token).transfer(msg.sender, amountToClaim);
         }
+        emit Claim(_token, amountToClaim, _timestamp);
     }
 
     /// @dev Record claim
@@ -166,35 +188,56 @@ contract LockTOSDividend is ILockTOSDividend {
         uint256 _weeklyEpoch
     ) internal returns (uint256 amountToClaim) {
         LibLockTOSDividend.Distribution storage distr = distributions[_token];
-        amountToClaim = _canClaim(distr, _lockId, distr.claimStartWeeklyEpoch[_lockId], _weeklyEpoch);
+        amountToClaim = _calculateClaim(
+            distr,
+            _lockId,
+            distr.claimStartWeeklyEpoch[_lockId],
+            _weeklyEpoch
+        );
 
-        distr.claimStartWeeklyEpoch[_lockId] = _weeklyEpoch + 1;
-        distr.totalDistribution -= amountToClaim;
+        distr.claimStartWeeklyEpoch[_lockId] = _weeklyEpoch.add(1);
+        distr.totalDistribution = distr.totalDistribution.sub(amountToClaim);
         return amountToClaim;
     }
 
     /// @dev Amount claimable
-    function _canClaim(
+    function _calculateClaim(
         LibLockTOSDividend.Distribution storage _distr,
         uint256 _lockId,
         uint256 _startEpoch,
         uint256 _endEpoch
     ) internal view returns (uint256) {
-        (uint256 start, uint256 end, uint256 amount) = ILockTOS(lockTOS).locksInfo(_lockId);
+        (uint256 start, uint256 end,) = ILockTOS(lockTOS).locksInfo(_lockId);
 
         uint256 epochIterator = Math.max(_startEpoch, getWeeklyEpoch(start));
         uint256 epochLimit = Math.min(_endEpoch, getWeeklyEpoch(end));
-
         uint256 accumulated = 0;
         while (epochIterator <= epochLimit) {
-            uint256 timestamp = (genesis + epochIterator * ONE_WEEK) + ONE_WEEK;
-            uint256 balance = ILockTOS(lockTOS).balanceOfLockAt(_lockId, timestamp);
-            uint256 supply = ILockTOS(lockTOS).totalSupplyAt(timestamp);
-            if (balance > 0 && supply > 0) {
-                accumulated += _distr.tokensPerWeek[epochIterator] * balance / supply;
-            }
-            epochIterator += 1;
+            accumulated = accumulated.add(
+                _calculateClaimPerEpoch(
+                    _lockId,
+                    epochIterator,
+                    _distr.tokensPerWeek[epochIterator]
+                )
+            );
+            epochIterator = epochIterator.add(1);
         }
         return accumulated;
+    }
+
+    /// @dev Calculates claim portion
+    function _calculateClaimPerEpoch(
+        uint256 _lockId,
+        uint256 _weeklyEpoch,
+        uint256 _tokensPerWeek
+    ) internal view returns (uint256) {
+        uint256 timestamp =
+            genesis.add(_weeklyEpoch.mul(epochUnit)).add(epochUnit);
+        uint256 balance = ILockTOS(lockTOS).balanceOfLockAt(_lockId, timestamp);
+        uint256 supply = ILockTOS(lockTOS).totalSupplyAt(timestamp);
+        if (balance == 0 || supply == 0) {
+            return 0;
+        }
+        return _tokensPerWeek.mul(balance).div(supply);
     }
 }
