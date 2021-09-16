@@ -29,7 +29,7 @@ contract CustomLPRewardStorage {
     mapping(uint256 => LibCustomLP.StakeLiquidity) public depositTokens;
     mapping(uint256 => mapping(uint256 => LibCustomLP.ClaimInfoLP))
         public claimsByTokenIds;
-    uint256 divFlag = 1000000000;
+    uint256 divFlag = 10000000000;
     uint256 internal _lock;
     bool public pauseProxy;
     bool public migratedL2;

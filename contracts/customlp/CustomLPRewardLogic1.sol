@@ -42,6 +42,14 @@ contract CustomLPRewardLogic1 is CustomLPRewardStorage, AccessibleCommon {
         uint256 periodSeconds
     );
 
+    event Claimed(
+        address indexed from,
+        uint256 tokenId,
+        address token,
+        uint256 rewards,
+        uint256 claimedReward
+    );
+
     constructor() {
         rewardCount = 0;
     }
@@ -144,23 +152,27 @@ contract CustomLPRewardLogic1 is CustomLPRewardStorage, AccessibleCommon {
         view
         returns (
             bool canFlag,
-            uint256[] memory claimableList
+            uint256[] memory claimableList,
+            uint256[] memory tokenIndexList
         )
     {
         if (rewardCount > 0) {
             bool can = false;
 
             uint256[] memory canClaimed = new uint256[](rewardCount);
+            uint256[] memory tokenIndex = new uint256[](rewardCount);
+
             uint256 tokenId = _tokenId;
             uint256 _timestamp = timestamp_;
             for (uint256 i = 1; i <= rewardCount; i++) {
                 LibCustomLP.ClaimInfoLP storage _claimsByTokenIds =
                     claimsByTokenIds[tokenId][i];
+                tokenIndex[i - 1] = i;
 
                 if (_claimsByTokenIds.lastClaimedTime >= _timestamp){
-                    canClaimed[i] = 0;
+                    canClaimed[i-1] = 0;
 
-                    console.log("  _claimsByTokenIds.lastClaimedTime %s, >= _timestamp %s ", _claimsByTokenIds.lastClaimedTime, _timestamp);
+                    //console.log("  _claimsByTokenIds.lastClaimedTime %s, >= _timestamp %s ", _claimsByTokenIds.lastClaimedTime, _timestamp);
                 } else {
                     LibCustomLP.RewardToken storage _rewardToken =
                         rewardTokens[i];
@@ -168,49 +180,61 @@ contract CustomLPRewardLogic1 is CustomLPRewardStorage, AccessibleCommon {
 
                     if (
                         _timestamp <= _rewardToken.lastRewardTime &&
-                        _timestamp >= _rewardToken.start
+                        _timestamp > _rewardToken.start &&
+                        _rewardToken.lastRewardTime < _rewardToken.end
                     ) {
-                        uint256 reward = _claimsByTokenIds.amount;
-                        reward = reward.mul(_rewardToken.tokenPerShare).div(
+                        uint256 debt = 0;
+                        uint256 reward = 0;
+
+                        // console.log("_rewardToken.tokenPerShare %s", _rewardToken.tokenPerShare);
+                        // console.log("_depositToken.liquidity %s", _depositToken.liquidity);
+                        reward = uint256(_depositToken.liquidity).mul(_rewardToken.tokenPerShare).div(
                             divFlag
                         );
-                        if (reward <= _claimsByTokenIds.debt) canClaimed[i] = 0;
+                        // console.log("_claimsByTokenIds.debt %s", _claimsByTokenIds.debt);
+
+                        if (reward == 0 ||  reward <= _claimsByTokenIds.debt ) canClaimed[i-1] = 0;
                         else {
                             reward = reward.sub(_claimsByTokenIds.debt);
                             canClaimed[i - 1] = reward;
 
                             if (!can && reward > 0) can = true;
                         }
+                        // console.log("reward %s, canClaimed[i - 1] ", reward, canClaimed[i - 1]);
+
                     } else {
                         uint256 end = Math.min(_timestamp, _rewardToken.end);
 
                         uint256 intervals = end.sub(_rewardToken.lastRewardTime);
-                        console.log(" _rewardToken.lastRewardTime %s ,intervals to %s", _rewardToken.lastRewardTime, intervals);
-                        console.log(" _rewardToken.rewardPerSecond %s ",_rewardToken.rewardPerSecond);
+                        // console.log(" _rewardToken.lastRewardTime %s ,intervals to %s", _rewardToken.lastRewardTime, intervals);
+                        // console.log(" _rewardToken.rewardPerSecond %s ",_rewardToken.rewardPerSecond);
 
-                        uint256 reward1 = intervals.mul( _rewardToken.rewardPerSecond );
-                        console.log(" end %s ,reward1 to %s", end, reward1);
+                        uint256 reward1 = intervals.mul(_rewardToken.rewardPerSecond);
+                        // console.log(" end %s ,reward1 to %s", end, reward1);
+
                         uint256 addShare = reward1.mul(divFlag).div(totalStakedAmount);
-                        console.log(" addShare %s ,totalStakedAmount to %s", addShare, totalStakedAmount);
-                        uint256 tokenShare =
-                            _rewardToken.tokenPerShare.add(addShare);
+                        //console.log(" addShare %s ,totalStakedAmount to %s", addShare, totalStakedAmount);
+                        uint256 tokenShare = _rewardToken.tokenPerShare.add(addShare);
 
                         uint256 reward = uint256(_depositToken.liquidity).mul(tokenShare)
                                 .div(divFlag)
                                 .sub(_claimsByTokenIds.debt);
 
-                        console.log("liquidity %s,  tokenShare %s ,reward to %s",_depositToken.liquidity, tokenShare, reward);
+
+                        // console.log("liquidity %s,  tokenShare %s ,reward to %s",_depositToken.liquidity, tokenShare, reward);
+                        // console.log("_claimsByTokenIds.debt %s, liquidity %s ",_claimsByTokenIds.debt, uint256(_depositToken.liquidity));
+
                         canClaimed[i - 1] = reward;
 
                         if (!can && reward > 0) can = true;
                     }
                 }
             }
-            return (can, canClaimed );
+            return (can, canClaimed, tokenIndex );
         } else {
             uint256[] memory data = new uint256[](1);
             // address[] memory addr = new address[](1);
-            return (false, data );
+            return (false, data , data);
         }
     }
 
@@ -341,6 +365,16 @@ contract CustomLPRewardLogic1 is CustomLPRewardStorage, AccessibleCommon {
         _depositTokens.secondsInsideInitial = secondsInside;
         _depositTokens.secondsInsideLast = 0;
 
+        // save debt
+        for (uint256 i = 1; i <= rewardCount; i++) {
+            LibCustomLP.RewardToken storage _rewardToken = rewardTokens[i];
+            if (_rewardToken.token != address(0) &&  _rewardToken.lastRewardTime < _rewardToken.end) {
+                LibCustomLP.ClaimInfoLP storage _lp = claimsByTokenIds[tokenId_][i];
+                _lp.debt = (uint256(liquidity)).mul(_rewardToken.tokenPerShare).div(divFlag);
+            }
+        }
+        //---
+
         nonfungiblePositionManager.transferFrom(
             msg.sender,
             address(this),
@@ -349,12 +383,12 @@ contract CustomLPRewardLogic1 is CustomLPRewardStorage, AccessibleCommon {
 
         userStakedTokenIds[msg.sender].push(tokenId_);
 
-        totalStakedAmount = totalStakedAmount.add(liquidity);
+        totalStakedAmount = totalStakedAmount.add(uint256(liquidity));
         totalTokens = totalTokens.add(1);
 
         // emit Staked(msg.sender, poolAddress, tokenId_, liquidity);
     }
-    /*
+
     function claim(uint256 tokenId) public returns (bool) {
         require(rewardCount > 0, "CustomLPRewardLogic1: no reward");
 
@@ -370,24 +404,23 @@ contract CustomLPRewardLogic1 is CustomLPRewardStorage, AccessibleCommon {
         (
             bool can,
             uint256[] memory rewards,
-            address[] memory tokens,
-            address[] memory donators,
             uint256[] memory tokenIndex
-        ) = canClaimableWhenFullLiquidity(tokenId, block.timestamp);
+        ) = canClaimable(tokenId, block.timestamp);
 
         require(can, "CustomLPRewardLogic1: no claimable amount");
-        require(
-            rewards.length == tokens.length,
-            "CustomLPRewardLogic1: diff rewards,tokens length"
-        );
-        require(
-            rewards.length == donators.length,
-            "CustomLPRewardLogic1: diff rewards,donators length"
-        );
+        // require(
+        //     rewards.length == tokens.length,
+        //     "CustomLPRewardLogic1: diff rewards,tokens length"
+        // );
+        // require(
+        //     rewards.length == donators.length,
+        //     "CustomLPRewardLogic1: diff rewards,donators length"
+        // );
         require(
             rewards.length == tokenIndex.length,
             "CustomLPRewardLogic1: diff rewards,tokenIndex length"
         );
+        console.log('rewards',rewards[0]);
 
         uint256 secondsAbsolute = 0;
         uint256 secondsInsideDiff256 = 0;
@@ -413,40 +446,43 @@ contract CustomLPRewardLogic1 is CustomLPRewardStorage, AccessibleCommon {
 
         // give rewards
         for (uint256 i = 0; i < rewards.length; i++) {
-            if (rewards[i] > 0 && tokens[i] != address(0)) {
+            LibCustomLP.RewardToken storage _rewardToken = rewardTokens[tokenIndex[i]];
+            if (rewards[i] > 0 && _rewardToken.token != address(0)) {
                 LibCustomLP.ClaimInfoLP storage _lp =
                     claimsByTokenIds[tokenId][tokenIndex[i]];
 
-                uint256 calimRewardAmount = 0;
+                uint256 claimRewardAmount = 0;
                 if (secondsAbsolute > secondsInsideDiff256) {
-                    calimRewardAmount = rewards[i]
+                    claimRewardAmount = rewards[i]
                         .mul(secondsInsideDiff256)
                         .div(secondsAbsolute);
                 } else {
-                    calimRewardAmount = rewards[i];
+                    claimRewardAmount = rewards[i];
                 }
 
-                _lp.claimedAmount = _lp.claimedAmount.add(calimRewardAmount);
+                _lp.claimedAmount = _lp.claimedAmount.add(claimRewardAmount);
                 _lp.lastClaimedTime = block.timestamp;
                 _lp.debt = _lp.debt.add(rewards[i]);
 
                 require(
-                    IERC20(tokens[i]).balanceOf(address(this)) >= rewards[i],
+                    IERC20(_rewardToken.token).balanceOf(address(this)) >= rewards[i],
                     "CustomLPRewardLogic1: insufficeient"
                 );
-                IERC20(tokens[i]).safeTransfer(msg.sender, calimRewardAmount);
-                if (rewards[i] > calimRewardAmount) {
-                    IERC20(tokens[i]).safeTransfer(
-                        donators[i],
-                        rewards[i].sub(calimRewardAmount)
+                IERC20(_rewardToken.token).safeTransfer(msg.sender, claimRewardAmount);
+                if (rewards[i] > claimRewardAmount) {
+                    IERC20(_rewardToken.token).safeTransfer(
+                        _rewardToken.donator,
+                        rewards[i].sub(claimRewardAmount)
                     );
                 }
+                emit Claimed(msg.sender, tokenId, _rewardToken.token, rewards[i], claimRewardAmount);
             }
         }
+        //---
         _depositTokens.lock = false;
         return true;
     }
-    */
+
     function updateReward() public {
         require(rewardCount > 0, "CustomLPRewardLogic1: no reward");
         if (totalStakedAmount == 0) {
@@ -463,9 +499,10 @@ contract CustomLPRewardLogic1 is CustomLPRewardStorage, AccessibleCommon {
                         _rewardToken.rewardPerSecond
                     );
                 _rewardToken.tokenPerShare = _rewardToken.tokenPerShare.add(
-                    reward.mul(10000).div(totalStakedAmount)
+                    reward.mul(divFlag).div(totalStakedAmount)
                 );
                 _rewardToken.lastRewardTime = curTime;
+                console.log('updateReward _rewardToken.tokenPerShare %s _rewardToken.lastRewardTime %s', _rewardToken.tokenPerShare, _rewardToken.lastRewardTime);
             }
         }
     }

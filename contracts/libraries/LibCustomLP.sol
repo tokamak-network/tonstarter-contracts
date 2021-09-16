@@ -15,8 +15,8 @@ library LibCustomLP {
     }
 
     struct ClaimInfoLP {
-        bool staked;
-        uint256 amount;
+        //bool staked;
+        //uint256 amount;
         uint256 debt;
         uint256 claimedAmount;
         uint256 lastClaimedTime;
