@@ -12,6 +12,4 @@ contract PublicSaleStorage is Ownable {
     IERC20 public getToken;
 
     uint256 public rateSaleToken;   //구매시 받을 토큰 계산
-
-    function setTokenPrice(uint256 _saleTokenPrice, uint256 _payTokenPrice) external 
 }

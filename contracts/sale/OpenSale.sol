@@ -34,6 +34,11 @@ contract OpenSale is Ownable, ReentrancyGuard {
 
     address[] public subscriptors;
 
+    IERC20 public saleToken;
+    IERC20 public getToken;
+
+    uint256 public rateSaleToken;   //구매시 받을 토큰 계산
+    
     mapping (address => UserInfoOpen) public usersOpen;
 
 

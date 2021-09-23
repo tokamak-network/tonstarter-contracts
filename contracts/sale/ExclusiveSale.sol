@@ -35,6 +35,11 @@ contract ExclusiveSale is Ownable, ReentrancyGuard {
     uint256 public totalExpectSaleAmount = 0;   //예정된 판매토큰 양 (exclusive)
     uint256 public totalExPurchasedAmount = 0;  //총 지불토큰 받은 양 (exclusive)
 
+    IERC20 public saleToken;
+    IERC20 public getToken;
+
+    uint256 public rateSaleToken;   //구매시 받을 토큰 계산
+
     mapping (address => UserInfoEx) public usersEx;
 
     constructor(address _saleTokenAddress, address _getTokenAddress, address _getTokenOwner) {
