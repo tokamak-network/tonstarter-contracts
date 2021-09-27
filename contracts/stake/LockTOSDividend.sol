@@ -214,7 +214,7 @@ contract LockTOSDividend is
         uint256 accumulated = 0;
         while (epochIterator <= epochLimit) {
             accumulated = accumulated.add(
-                _calculateClaimPerEpoch(
+                _calculateClaimPerEpoch( 
                     _lockId,
                     epochIterator,
                     _distr.tokensPerWeek[epochIterator]
