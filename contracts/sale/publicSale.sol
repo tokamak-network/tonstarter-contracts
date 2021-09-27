@@ -167,11 +167,11 @@ contract PublicSale is Ownable, ReentrancyGuard{
         UserInfoEx memory userEx = usersEx[_address];
         uint tier = calculTier(_address);
         if(userEx.join == true){
-            uint256 salePossible = totalExpectSaleAmount.div(tiersAccount[tier]).mul(tiersPercents[tier]).div(10000);
+            uint256 salePossible = totalExpectSaleAmount.mul(tiersPercents[tier]).div(tiersAccount[tier]).div(10000);
             return salePossible;
         } else {
             uint256 tierAccount = tiersAccount[tier] +1;
-            uint256 salePossible = totalExpectSaleAmount.div(tierAccount).mul(tiersPercents[tier]).div(10000);
+            uint256 salePossible = totalExpectSaleAmount.mul(tiersPercents[tier]).div(tierAccount).div(10000);
             return salePossible;
         }
     }
@@ -183,12 +183,12 @@ contract PublicSale is Ownable, ReentrancyGuard{
     function calculOpenSaleAmount(address _account, uint256 _amount) public view returns(uint256) {
         UserInfoOpen memory userOpen = usersOpen[_account];
         uint256 depositAmount = userOpen.depositAmount.add(_amount);
-        uint256 openSalePossible = totalExpectOpenSaleAmount.mul(depositAmount).div(totalDepositAmount);
+        uint256 openSalePossible = totalExpectOpenSaleAmount.mul(depositAmount).div(totalDepositAmount.add(_amount));
         return openSalePossible;
     }
 
     function addWhiteList() external nonReentrant {
-        require(block.timestamp <= startExclusiveTime, "end the whitelist time");
+        require(block.timestamp < startExclusiveTime, "end the whitelist time");
         uint tier = calculTier(msg.sender);
         require(tier <= 4, "need to more sTOS balance");
         tiersAccount[tier] = tiersAccount[tier] + 1;
@@ -204,11 +204,15 @@ contract PublicSale is Ownable, ReentrancyGuard{
     //_amount는 payTokenAmount
     //payToken은 getTokenOwner에게 가고 추후 saleToken을 살 수 있도록 기록한다.
     function exclusiveSale(uint256 _amount) external nonReentrant {
+        require(block.timestamp >= startExclusiveTime, "need to exclusiveStartTime");
+        require(block.timestamp < endExclusiveTime, "need to exclusiveEndtime");
         UserInfoEx storage userEx = usersEx[msg.sender];
         require(userEx.join == true, "need to attend the whitelist");
         uint256 tokenSaleAmount = calculSaleToken(_amount);
         uint256 salePossible = calculTierAmount(msg.sender);
+
         require(salePossible >= tokenSaleAmount, "just buy whitelist amount");
+        require(salePossible >= userEx.saleAmount.add(tokenSaleAmount), "just buy whitelisted amount");
         getToken.safeTransferFrom(msg.sender, address(this), _amount);
         getToken.safeTransfer(getTokenOwner, _amount);
 

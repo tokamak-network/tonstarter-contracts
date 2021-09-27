@@ -35,9 +35,6 @@ task("accounts", "Prints the list of accounts", async () => {
 module.exports = {
   defaultNetwork: "hardhat",
   networks: {
-    hardhat:{
-      chainId: 1337,
-    },
     localhost: {
       gas: 9500000,
       gasMultiplier: 100,
@@ -57,7 +54,7 @@ module.exports = {
     // },
   },
   etherscan: {
-    apiKey: `${process.env.APIKey}`,
+    apiKey: `${process.env.ETHERSCAN_API_KEY}`,
   },
   solidity: {
     version: "0.7.6",
