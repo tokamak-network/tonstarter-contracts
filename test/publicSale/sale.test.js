@@ -65,7 +65,7 @@ describe("Sale", () => {
         erc20snapToken = await ethers.getContractFactory("ERC20SnapshotMock");
         tosToken = await erc20snapToken.connect(tosTokenOwner).deploy("testsTOS", "sTOS");
 
-        deploySale = await ethers.getContractFactory("publicSale");
+        deploySale = await ethers.getContractFactory("PublicSale");
         saleContract = await deploySale.connect(saleOwner).deploy(
             saleToken.address, 
             getToken.address, 
