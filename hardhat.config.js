@@ -16,6 +16,7 @@ require("./tasks/uniswap-v3-swap-task");
 require("./tasks/view-tasks");
 require("./tasks/abi-retriever");
 
+require("./tasks-rewardprogram/info");
 
 const {
   RINKEBY_UNISWAP_V3_ACCOUNT_PK1,
@@ -36,25 +37,10 @@ task("accounts", "Prints the list of accounts", async () => {
 });
 
 module.exports = {
-  defaultNetwork: "localhost",
+  defaultNetwork: "hardhat",
   networks: {
-    zenalocal: {
-      url: "http://localhost:8546",
-      gas: 9500000,
-      gasMultiplier: 100,
-      blockGasLimit: 1524500000,
-      accounts: {
-        mnemonic: process.env.MNEMONIC_HARDHAT,
-        count: 30,
-        initialIndex: 0,
-        accountsBalance: "1000000000000000000000",
-      },
+    hardhat: {
       chainId: 1337,
-    },
-    localhost: {
-      gas: 9500000,
-      gasMultiplier: 100,
-      blockGasLimit: 524500000,
     },
     rinkeby: {
       chainId: 4,
@@ -65,7 +51,7 @@ module.exports = {
     },
     mainnet: {
       url: `https://mainnet.infura.io/v3/${process.env.InfuraKey}`,
-      accounts: [`${TONSTARTER_DEPLOYER_PK}`],
+      accounts: [`${ACCOUNT0_PK}`],
       gasMultiplier: 1.25,
       gasPrice: 40000000000,
     },
