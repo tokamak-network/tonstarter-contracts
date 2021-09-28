@@ -56,12 +56,16 @@ describe("Sale", () => {
     let totalSaleAmount = 1000000;
 
     let blocktime;
+    let whitelistStartTime;
+    let whitelistEndTime;
     let exclusiveStartTime;
     let exclusiveEndTime;
     let depositStartTime;
     let depositEndTime;
     let openSaleStartTime;
     let openSaleEndTime;
+    let claimStartTime;
+    let claimEndTime;
 
     before(async () => {
         const addresses = await getAddresses();
@@ -240,26 +244,43 @@ describe("Sale", () => {
 
             it('setting the ExclusiveTime caller not owner', async () => {
                 blocktime = Number(await time.latest())
-                // console.log(blocktime)
-                exclusiveStartTime = blocktime + 86400;
+                whitelistStartTime = blocktime + 86400;
+                whitelistEndTime = whitelistStartTime + (86400*7);
+                exclusiveStartTime = whitelistEndTime + 1;
                 exclusiveEndTime = exclusiveStartTime + (86400*7);
 
-                let tx = saleContract.connect(account1).setExclusiveTime(exclusiveStartTime, exclusiveEndTime)
+                let tx = saleContract.connect(account1).setExclusiveTime(
+                    whitelistStartTime, 
+                    whitelistEndTime, 
+                    exclusiveStartTime, 
+                    exclusiveEndTime
+                )
                 await expect(tx).to.be.revertedWith("Ownable: caller is not the owner")
             })
 
             it('setting the ExclusiveTime caller owner', async () => {
                 blocktime = Number(await time.latest())
                 // console.log(blocktime)
-                exclusiveStartTime = blocktime + 86400;
+                whitelistStartTime = blocktime + 86400;
+                whitelistEndTime = whitelistStartTime + (86400*7);
+                exclusiveStartTime = whitelistEndTime + 1;
                 exclusiveEndTime = exclusiveStartTime + (86400*7);
 
-                await saleContract.connect(saleOwner).setExclusiveTime(exclusiveStartTime, exclusiveEndTime)
+                await saleContract.connect(saleOwner).setExclusiveTime(
+                    whitelistStartTime, 
+                    whitelistEndTime, 
+                    exclusiveStartTime, 
+                    exclusiveEndTime
+                )
 
                 let tx = Number(await saleContract.startExclusiveTime())
                 expect(tx).to.be.equal(exclusiveStartTime)
                 let tx2 = Number(await saleContract.endExclusiveTime())
                 expect(tx2).to.be.equal(exclusiveEndTime)
+                let tx3 = Number(await saleContract.startAddWhiteTime())
+                expect(tx3).to.be.equal(whitelistStartTime)
+                let tx4 = Number(await saleContract.endAddWhiteTime())
+                expect(tx4).to.be.equal(whitelistEndTime)
             })
         })
         describe("exclusiveSale Sale", () => {
@@ -273,6 +294,12 @@ describe("Sale", () => {
                 let tx4 = Number(await saleContract.calculTierAmount(account4.address))
                 expect(tx4).to.be.equal(600000)
             })
+
+            it("duration the time", async () => {
+                await ethers.provider.send('evm_setNextBlockTimestamp', [whitelistStartTime]);
+                await ethers.provider.send('evm_mine');
+            })
+
             it("addwhiteList", async () => {
                 let tx = Number(await saleContract.connect(account1).tiersAccount(1))
                 expect(tx).to.be.equal(0)
@@ -341,7 +368,7 @@ describe("Sale", () => {
 
             it("addwhitelist after exclusiveTime", async () => {
                 let tx3 = saleContract.connect(account1).addWhiteList()
-                await expect(tx3).to.be.revertedWith("end the whitelist time")
+                await expect(tx3).to.be.revertedWith("end the whitelistTime")
             })
 
             it("exclusiveSale after exclusive startTime", async () => {
@@ -406,7 +433,54 @@ describe("Sale", () => {
         })
 
         describe("openSale Sale", () => {
+            it("deposit before depositTime", async () => {
+                let tx = saleContract.connect(account1).deposit(100)
+                await expect(tx).to.be.revertedWith("don't start depositTime")
+            })
+
+            it("duration the time", async () => {
+                await ethers.provider.send('evm_setNextBlockTimestamp', [depositStartTime]);
+                await ethers.provider.send('evm_mine');
+            })
+
+            it("deposit after depositTime", async () => {
+                await getToken.connect(account1).approve(saleContract.address, 100)
+                await getToken.connect(account2).approve(saleContract.address, 100)
+                await getToken.connect(account3).approve(saleContract.address, 100)
+                await getToken.connect(account4).approve(saleContract.address, 100)
+
+                await saleContract.connect(account1).deposit(100)
+                await saleContract.connect(account2).deposit(100)
+                await saleContract.connect(account3).deposit(100)
+                await saleContract.connect(account4).deposit(100)
+
+                let tx = await saleContract.usersOpen(account1.address)
+                expect(Number(tx.depositAmount)).to.be.equal(100)
+                let tx2 = await saleContract.usersOpen(account2.address)
+                expect(Number(tx2.depositAmount)).to.be.equal(100)
+                let tx3 = await saleContract.usersOpen(account3.address)
+                expect(Number(tx3.depositAmount)).to.be.equal(100)
+                let tx4 = await saleContract.usersOpen(account4.address)
+                expect(Number(tx4.depositAmount)).to.be.equal(100)
+            })
+
+            it("duration the time", async () => {
+                await ethers.provider.send('evm_setNextBlockTimestamp', [openSaleStartTime]);
+                await ethers.provider.send('evm_mine');
+            })
+
+            it("deposit after depositEndTime", async () => {
+                await getToken.connect(account1).approve(saleContract.address, 100)
+
+                let tx = saleContract.connect(account1).deposit(100)
+                await expect(tx).to.be.revertedWith("end the depositTime")
+            })
+
 
         })
+    })
+
+    describe("claim test", () => {
+
     })
 })
