@@ -16,7 +16,7 @@ require("./tasks/uniswap-v3-swap-task");
 require("./tasks/view-tasks");
 require("./tasks/abi-retriever");
 
-require("./tasks-rewardprogram/info");
+require("./tasks-rewardprogram/testcase");
 
 const {
   RINKEBY_UNISWAP_V3_ACCOUNT_PK1,
