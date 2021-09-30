@@ -43,6 +43,7 @@ describe("Sale", () => {
     let account2;
     let account3;
     let account4;
+    let account5;
     // let account3 = accounts[6];   
     // let account4 = accounts[7];
     let balance1, balance2, balance3;
@@ -65,7 +66,10 @@ describe("Sale", () => {
     let openSaleStartTime;
     let openSaleEndTime;
     let claimStartTime;
-    let claimEndTime;
+
+    let claimInterval = 86400;
+    let claimPeriod = 6;
+    let claimTestTime;
 
     before(async () => {
         const addresses = await getAddresses();
@@ -77,6 +81,7 @@ describe("Sale", () => {
         account2 = await findSigner(addresses[5]);
         account3 = await findSigner(addresses[6]);
         account4 = await findSigner(addresses[7]);
+        account5 = await findSigner(addresses[8]);
         
         erc20token = await ethers.getContractFactory("ERC20Mock");
         saleToken = await erc20token.connect(saleTokenOwner).deploy("testDOC", "DOC");
@@ -89,12 +94,12 @@ describe("Sale", () => {
         saleContract = await deploySale.connect(saleOwner).deploy(
             saleToken.address, 
             getToken.address, 
-            getTokenOwner.address, 
+            account5.address, 
             tosToken.address
         )
         // console.log(saleContract)
         
-        await saleToken.connect(saleTokenOwner).transfer(saleContract.address, basicAmount)
+        await saleToken.connect(saleTokenOwner).transfer(saleContract.address, (basicAmount*2))
         // await getToken.connect(getTokenOwner).transfer(saleContract.address, basicAmount)
         // await tosToken.connect(tosTokenOwner).transfer(saleContract.address, basicAmount)
 
@@ -147,7 +152,7 @@ describe("Sale", () => {
             it("check the balance (contract have the saleToken) ", async () => {
                 balance1 = Number(await saleToken.balanceOf(saleContract.address))
     
-                expect(balance1).to.be.equal(basicAmount)
+                expect(balance1).to.be.equal((basicAmount*2))
             })
 
             it('setting the price caller not owner', async () => {
@@ -211,7 +216,7 @@ describe("Sale", () => {
                 await saleContract.connect(saleOwner).setSaleAmount(basicAmount, totalSaleAmount)
                 let tx = Number(await saleContract.connect(saleOwner).totalExpectSaleAmount())
                 expect(tx).to.be.equal(basicAmount)
-                let tx2 = Number(await saleContract.connect(saleOwner).totalOpenSaleAmount())
+                let tx2 = Number(await saleContract.connect(saleOwner).totalExpectOpenSaleAmount())
                 expect(tx2).to.be.equal(totalSaleAmount)
             })
 
@@ -281,6 +286,23 @@ describe("Sale", () => {
                 expect(tx3).to.be.equal(whitelistStartTime)
                 let tx4 = Number(await saleContract.endAddWhiteTime())
                 expect(tx4).to.be.equal(whitelistEndTime)
+            })
+
+            it('setting the setClaim', async () => {
+                claimStartTime = exclusiveEndTime + (86400 * 20);
+
+                await saleContract.connect(saleOwner).setClaim(
+                    claimStartTime,
+                    claimInterval,
+                    claimPeriod
+                )
+
+                let tx = Number(await saleContract.startClaimTime())
+                expect(tx).to.be.equal(claimStartTime)
+                let tx2 = Number(await saleContract.claimInterval())
+                expect(tx2).to.be.equal(claimInterval)
+                let tx3 = Number(await saleContract.claimPeriod())
+                expect(tx3).to.be.equal(claimPeriod)
             })
         })
         describe("exclusiveSale Sale", () => {
@@ -366,7 +388,7 @@ describe("Sale", () => {
                 await time.increaseTo(exclusiveStartTime+86400);
             })
 
-            it("addwhitelist after exclusiveTime", async () => {
+            it("addwhitelist after whitelistTIme", async () => {
                 let tx3 = saleContract.connect(account1).addWhiteList()
                 await expect(tx3).to.be.revertedWith("end the whitelistTime")
             })
@@ -396,6 +418,9 @@ describe("Sale", () => {
                 expect(tx5).to.be.equal(1000)
                 let tx6 = Number(await saleContract.totalExSaleAmount())
                 expect(tx6).to.be.equal(1000000)
+                let tx7 = Number(await getToken.balanceOf(account5.address))
+                expect(tx7).to.be.equal(1000)
+
             })
         })
     })
@@ -471,16 +496,266 @@ describe("Sale", () => {
 
             it("deposit after depositEndTime", async () => {
                 await getToken.connect(account1).approve(saleContract.address, 100)
-
                 let tx = saleContract.connect(account1).deposit(100)
                 await expect(tx).to.be.revertedWith("end the depositTime")
             })
+            
+            it("depositors", async () => {
+                let tx = await saleContract.depositors(0)
+                expect(account1.address).to.be.equal(tx)
+            })
 
+            it("openSale function", async () => {
+                let tx = await saleContract.usersClaim(account1.address)
+                expect(Number(tx.totalClaimReward)).to.be.equal(60000)
+                let tx2 = await saleContract.usersClaim(account2.address)
+                expect(Number(tx2.totalClaimReward)).to.be.equal(120000)
+                let tx3 = await saleContract.usersClaim(account3.address)
+                expect(Number(tx3.totalClaimReward)).to.be.equal(220000)
+                let tx4 = await saleContract.usersClaim(account4.address)
+                expect(Number(tx4.totalClaimReward)).to.be.equal(600000)
+                let totaldeposit = await saleContract.totalDepositAmount()
+                expect(Number(totaldeposit)).to.be.equal(400)
+
+                let beforeTON = Number(await getToken.balanceOf(account5.address))
+                expect(beforeTON).to.be.equal(1000)
+
+                await saleContract.connect(account1).openSale()
+                await saleContract.connect(account2).openSale()
+                await saleContract.connect(account3).openSale()
+                await saleContract.connect(account4).openSale()
+
+                let afterTON = Number(await getToken.balanceOf(account5.address))
+                expect(afterTON).to.be.equal(1400)
+
+                let tx5 = await saleContract.usersClaim(account1.address)
+                expect(Number(tx5.totalClaimReward)).to.be.equal(160000)
+                let tx6 = await saleContract.usersClaim(account2.address)
+                expect(Number(tx6.totalClaimReward)).to.be.equal(220000)
+                let tx7 = await saleContract.usersClaim(account3.address)
+                expect(Number(tx7.totalClaimReward)).to.be.equal(320000)
+                let tx8 = await saleContract.usersClaim(account4.address)
+                expect(Number(tx8.totalClaimReward)).to.be.equal(700000)
+
+                let tx9 = await saleContract.usersOpen(account1.address)
+                expect(Number(tx9.saleAmount)).to.be.equal(100000)
+                let tx10 = await saleContract.usersEx(account1.address)
+                expect(Number(tx10.saleAmount)).to.be.equal(60000)
+            })
 
         })
     })
 
     describe("claim test", () => {
+        it('claim before claimTime', async () => {
+            let tx = saleContract.connect(account1).claim()
+            await expect(tx).to.be.revertedWith("don't start claimTime")
+        })
+        it("duration the time to period = 1", async () => {
+            await ethers.provider.send('evm_setNextBlockTimestamp', [claimStartTime]);
+            await ethers.provider.send('evm_mine');
+        })
+        it("claim period = 1, claim call the account1", async () => {
+            let expectClaim = Number(await saleContract.calculCalimAmount(account1.address))
+            let tx = await saleContract.usersClaim(account1.address)
+            expect(Number(tx.claimAmount)).to.be.equal(0)
+            await saleContract.connect(account1).claim()
+            let tx2 = await saleContract.usersClaim(account1.address)
+            // console.log("period1 :", Number(tx2.claimAmount))
+            expect(Number(tx2.claimAmount)).to.be.equal(expectClaim)
+            let tx3 = await saleToken.balanceOf(account1.address)
+            expect(Number(tx3)).to.be.equal(expectClaim)
+        })
 
+        it("duration the time to period = 2", async () => {
+            let period2 = claimStartTime + 86400
+            await ethers.provider.send('evm_setNextBlockTimestamp', [period2]);
+            await ethers.provider.send('evm_mine');
+        })
+
+        it("claim period = 2, claim call the account1, account2", async () => {
+            let expectClaim = Number(await saleContract.calculCalimAmount(account1.address))
+            let expectClaim2 = Number(await saleContract.calculCalimAmount(account2.address))
+
+            let claimAmount1 = await saleContract.usersClaim(account1.address)
+            expect(Number(claimAmount1.claimAmount)).to.be.equal(26666)
+
+            let claimAmount2 = await saleContract.usersClaim(account2.address)
+            expect(Number(claimAmount2.claimAmount)).to.be.equal(0)
+
+            await saleContract.connect(account1).claim()
+            await saleContract.connect(account2).claim()
+            
+            let tx3 = await saleContract.usersClaim(account1.address)
+            // console.log("period2 :", Number(tx3.claimAmount))
+            expect(Number(tx3.claimAmount)).to.be.equal((Number(claimAmount1.claimAmount)+expectClaim))
+            let tx4 = await saleToken.balanceOf(account1.address)
+            expect(Number(tx4)).to.be.equal((Number(claimAmount1.claimAmount)+expectClaim))
+
+            let tx5 = await saleContract.usersClaim(account2.address)
+            expect(Number(tx5.claimAmount)).to.be.equal(expectClaim2)
+            let tx6 = await saleToken.balanceOf(account2.address)
+            expect(Number(tx6)).to.be.equal(expectClaim2)
+
+            //account1 = 26666 + 26666
+            //account2 = 73332
+        })
+
+        it("duration the time to period = 3", async () => {
+            let period3 = claimStartTime + (86400*2)
+            await ethers.provider.send('evm_setNextBlockTimestamp', [period3]);
+            await ethers.provider.send('evm_mine');
+        })
+
+        it("claim period = 3, claim call the account1, account3", async () => {
+            let expectClaim = Number(await saleContract.calculCalimAmount(account1.address))
+            let expectClaim2 = Number(await saleContract.calculCalimAmount(account3.address))
+
+            let claimAmount1 = await saleContract.usersClaim(account1.address)
+            expect(Number(claimAmount1.claimAmount)).to.be.equal(53332)
+
+            let claimAmount2 = await saleContract.usersClaim(account3.address)
+            expect(Number(claimAmount2.claimAmount)).to.be.equal(0)
+
+            await saleContract.connect(account1).claim()
+            await saleContract.connect(account3).claim()
+
+            let tx3 = await saleContract.usersClaim(account1.address)
+            // console.log("period3 :", Number(tx3.claimAmount))
+            expect(Number(tx3.claimAmount)).to.be.equal((Number(claimAmount1.claimAmount)+expectClaim))
+            let tx4 = await saleToken.balanceOf(account1.address)
+            expect(Number(tx4)).to.be.equal((Number(claimAmount1.claimAmount)+expectClaim))
+
+            let tx5 = await saleContract.usersClaim(account3.address)
+            expect(Number(tx5.claimAmount)).to.be.equal(expectClaim2)
+            let tx6 = await saleToken.balanceOf(account3.address)
+            expect(Number(tx6)).to.be.equal(expectClaim2)
+
+            //account1 = 26666 + 26666 + 26666
+            //account2 = 73332
+            //account3 = 159999
+        })
+
+        it("duration the time to period = 4", async () => {
+            let period4 = claimStartTime + (86400*3)
+            await ethers.provider.send('evm_setNextBlockTimestamp', [period4]);
+            await ethers.provider.send('evm_mine');
+        })
+
+        it("claim period = 4, claim call the account1, account4", async () => {
+            let expectClaim = Number(await saleContract.calculCalimAmount(account1.address))
+            let expectClaim2 = Number(await saleContract.calculCalimAmount(account4.address))
+
+            let claimAmount1 = await saleContract.usersClaim(account1.address)
+            expect(Number(claimAmount1.claimAmount)).to.be.equal(79998)
+
+            let claimAmount2 = await saleContract.usersClaim(account4.address)
+            expect(Number(claimAmount2.claimAmount)).to.be.equal(0)
+
+            await saleContract.connect(account1).claim()
+            await saleContract.connect(account4).claim()
+
+            let tx3 = await saleContract.usersClaim(account1.address)
+            // console.log("period4 :", Number(tx3.claimAmount))
+            expect(Number(tx3.claimAmount)).to.be.equal((Number(claimAmount1.claimAmount)+expectClaim))
+            let tx4 = await saleToken.balanceOf(account1.address)
+            expect(Number(tx4)).to.be.equal((Number(claimAmount1.claimAmount)+expectClaim))
+
+            let tx5 = await saleContract.usersClaim(account4.address)
+            expect(Number(tx5.claimAmount)).to.be.equal(expectClaim2)
+            let tx6 = await saleToken.balanceOf(account4.address)
+            expect(Number(tx6)).to.be.equal(expectClaim2)
+
+            //account1 = 26666 + 26666 + 26666 + 26666
+            //account2 = 73332
+            //account3 = 159999
+            //account4 = 466664
+        })
+
+        it("duration the time to period = 6", async () => {
+            let period6 = claimStartTime + (86400*5)
+            await ethers.provider.send('evm_setNextBlockTimestamp', [period6]);
+            await ethers.provider.send('evm_mine');
+        })
+
+        it("claim period = 6, claim call the account1, account2", async () => {
+            let expectClaim = Number(await saleContract.calculCalimAmount(account1.address))
+            let expectClaim2 = Number(await saleContract.calculCalimAmount(account2.address))
+
+            let claimAmount1 = await saleContract.usersClaim(account1.address)
+            expect(Number(claimAmount1.claimAmount)).to.be.equal(106664)
+            let claimRemainAmount1 = Number(claimAmount1.totalClaimReward) - Number(claimAmount1.claimAmount)
+            expect(claimRemainAmount1).to.be.equal(expectClaim)
+
+            let claimAmount2 = await saleContract.usersClaim(account2.address)
+            expect(Number(claimAmount2.claimAmount)).to.be.equal(73332)
+            let claimRemainAmount2 = Number(claimAmount2.totalClaimReward) - Number(claimAmount2.claimAmount)
+            expect(claimRemainAmount2).to.be.equal(expectClaim2)
+
+            await saleContract.connect(account1).claim()
+            await saleContract.connect(account2).claim()
+
+            let tx3 = await saleContract.usersClaim(account1.address)
+            // console.log("period4 :", Number(tx3.claimAmount))
+            expect(Number(tx3.claimAmount)).to.be.equal(Number(claimAmount1.totalClaimReward))
+            let tx4 = await saleToken.balanceOf(account1.address)
+            expect(Number(tx4)).to.be.equal(Number(claimAmount1.totalClaimReward))
+
+            let tx5 = await saleContract.usersClaim(account2.address)
+            expect(Number(tx5.claimAmount)).to.be.equal(Number(tx5.totalClaimReward))
+            let tx6 = await saleToken.balanceOf(account2.address)
+            expect(Number(tx6)).to.be.equal(Number(tx5.totalClaimReward))
+
+            //account1 = 160,000
+            //account2 = 220,000 
+            //account3 = 159999
+            //account4 = 466664
+        })
+
+        it("duration the time to period end", async () => {
+            let periodEnd = claimStartTime + (86400*7)
+            await ethers.provider.send('evm_setNextBlockTimestamp', [periodEnd]);
+            await ethers.provider.send('evm_mine');
+        })
+
+        it("claim period end, claim call the account1, account3, account4", async () => {
+            let expectClaim = Number(await saleContract.calculCalimAmount(account1.address))
+            expect(expectClaim).to.be.equal(0)
+            let expectClaim2 = Number(await saleContract.calculCalimAmount(account3.address))
+            let expectClaim3 = Number(await saleContract.calculCalimAmount(account4.address))
+
+            let claimAmount1 = await saleContract.usersClaim(account3.address)
+            expect(Number(claimAmount1.claimAmount)).to.be.equal(159999)
+            let claimRemainAmount1 = Number(claimAmount1.totalClaimReward) - Number(claimAmount1.claimAmount)
+            expect(claimRemainAmount1).to.be.equal(expectClaim2)
+
+            let claimAmount2 = await saleContract.usersClaim(account4.address)
+            expect(Number(claimAmount2.claimAmount)).to.be.equal(466664)
+            let claimRemainAmount2 = Number(claimAmount2.totalClaimReward) - Number(claimAmount2.claimAmount)
+            expect(claimRemainAmount2).to.be.equal(expectClaim3)
+
+            // let revert = saleContract.connect(account1).claim()
+            // await expect(revert).to.be.revertedWith("user is already getAllreward")
+
+            await saleContract.connect(account3).claim()
+            await saleContract.connect(account4).claim()
+
+
+            let tx3 = await saleContract.usersClaim(account3.address)
+            // console.log("period4 :", Number(tx3.claimAmount))
+            expect(Number(tx3.claimAmount)).to.be.equal(Number(claimAmount1.totalClaimReward))
+            let tx4 = await saleToken.balanceOf(account3.address)
+            expect(Number(tx4)).to.be.equal(Number(claimAmount1.totalClaimReward))
+
+            let tx5 = await saleContract.usersClaim(account4.address)
+            expect(Number(tx5.claimAmount)).to.be.equal(Number(tx5.totalClaimReward))
+            let tx6 = await saleToken.balanceOf(account4.address)
+            expect(Number(tx6)).to.be.equal(Number(tx5.totalClaimReward))
+
+            //account1 = 160,000
+            //account2 = 220,000 
+            //account3 = 320,000
+            //account4 = 700,000
+        })
     })
 })

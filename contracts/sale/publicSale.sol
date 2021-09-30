@@ -47,7 +47,6 @@ contract PublicSale is Ownable, ReentrancyGuard{
     uint256 public endOpenSaleTime = 0;         //openSale 끝 시간
 
     uint256 public startClaimTime = 0;
-    uint256 public endClaimTime = 0;
 
     uint256 public totalWhitelists = 0;         //총 화이트리스트 수 (exclusive)
     uint256 public totalExSaleAmount = 0;       //총 exclu 실제 판매토큰 양 (exclusive)
@@ -119,20 +118,18 @@ contract PublicSale is Ownable, ReentrancyGuard{
 
     function setClaim(
         uint256 _startClaimTime,
-        uint256 _endClaimTime,
         uint256 _claimInterval,
         uint256 _claimPeriod
     ) external onlyOwner {
         startClaimTime = _startClaimTime;
-        endClaimTime = _endClaimTime;
         claimInterval = _claimInterval;
         claimPeriod = _claimPeriod;
     }
     
     //세일에서 얼만큼 팔지 결정
-    function setSaleAmount(uint256 _totalExpectSaleAmount, uint256 _totalOpenSaleAmount) external onlyOwner {
+    function setSaleAmount(uint256 _totalExpectSaleAmount, uint256 _totalExpectOpenSaleAmount) external onlyOwner {
         totalExpectSaleAmount = _totalExpectSaleAmount;
-        totalOpenSaleAmount = _totalOpenSaleAmount;
+        totalExpectOpenSaleAmount = _totalExpectOpenSaleAmount;
     }
 
     //티어제도에서 티어조건 설정 (sTOS 개수) 
@@ -196,7 +193,7 @@ contract PublicSale is Ownable, ReentrancyGuard{
     //내가 참여하게 되면 얼만큼 살 수 있는지 리턴, 참여했다면 현재 얼만큼 살 수 있는지 리턴 (exclusive)
     //식 : 전체 판매 token양 * 티어의 배당 % / 티어참여인 수 -> 전체 100개 티어 60%, 티어참여인 수 = 3 -> 60개를 3명이서 나누어서 사니까 개인당 20개
     function calculTierAmount(address _address) public view returns(uint256) {
-        UserInfoEx memory userEx = usersEx[_address];
+        UserInfoEx storage userEx = usersEx[_address];
         uint tier = calculTier(_address);
         if(userEx.join == true){
             uint256 salePossible = totalExpectSaleAmount.mul(tiersPercents[tier]).div(tiersAccount[tier]).div(10000);
@@ -213,7 +210,7 @@ contract PublicSale is Ownable, ReentrancyGuard{
     //_amount에 값을 넣으면 _amount만큼 더 넣었을 때 얼만큼 더 구매가능해지는 지 확인합니다.
     //식 : openSale에 판매할 토큰양 * (내가 deposit한 양/전체 deposit한 양) = 내가 구매할 수 있는 토큰 양
     function calculOpenSaleAmount(address _account, uint256 _amount) public view returns(uint256) {
-        UserInfoOpen memory userOpen = usersOpen[_account];
+        UserInfoOpen storage userOpen = usersOpen[_account];
         uint256 depositAmount = userOpen.depositAmount.add(_amount);
         uint256 openSalePossible = totalExpectOpenSaleAmount.mul(depositAmount).div(totalDepositAmount.add(_amount));
         return openSalePossible;
@@ -222,6 +219,7 @@ contract PublicSale is Ownable, ReentrancyGuard{
     function calculCalimAmount(
         address _account
     ) public view returns(uint256) {
+        require(block.timestamp >= startClaimTime, "don't start claimTime");
         UserClaim storage userClaim = usersClaim[_account];
         uint difftime = block.timestamp - startClaimTime;
 
@@ -278,7 +276,7 @@ contract PublicSale is Ownable, ReentrancyGuard{
 
         userClaim.totalClaimReward = userClaim.totalClaimReward + tokenSaleAmount;
         uint256 periodReward = userClaim.totalClaimReward.div(claimPeriod);
-        userClaim.periodReward = userClaim.periodReward + periodReward;
+        userClaim.periodReward = periodReward;
 
         totalExPurchasedAmount = totalExPurchasedAmount + _amount;
         totalExSaleAmount = totalExSaleAmount + tokenSaleAmount;
@@ -295,6 +293,7 @@ contract PublicSale is Ownable, ReentrancyGuard{
         userOpen.join = true;
         userOpen.depositAmount = userOpen.depositAmount.add(_amount);
         totalDepositAmount = totalDepositAmount.add(_amount);
+        depositors.push(msg.sender);
     }
 
     
@@ -315,19 +314,21 @@ contract PublicSale is Ownable, ReentrancyGuard{
             getToken.safeTransfer(getTokenOwner, realPayAmount);
             userOpen.payAmount = userOpen.payAmount + realPayAmount;
             userOpen.saleAmount = userOpen.saleAmount + openSalePossible;
+            totalOpenSaleAmount = totalOpenSaleAmount + openSalePossible;
 
             userClaim.totalClaimReward = userClaim.totalClaimReward + openSalePossible;
             uint256 periodReward = userClaim.totalClaimReward.div(claimPeriod);
-            userClaim.periodReward = userClaim.periodReward + periodReward; 
+            userClaim.periodReward = periodReward; 
         } else {
             getToken.safeTransfer(getTokenOwner, userOpen.depositAmount);
             userOpen.payAmount = userOpen.payAmount + userOpen.depositAmount;
             uint256 realSaleAmount = calculSaleToken(userOpen.depositAmount);
             userOpen.saleAmount = userOpen.saleAmount + realSaleAmount; 
+            totalOpenSaleAmount = totalOpenSaleAmount + realSaleAmount;
 
-            userClaim.totalClaimReward = userClaim.totalClaimReward + openSalePossible;
+            userClaim.totalClaimReward = userClaim.totalClaimReward + realSaleAmount;
             uint256 periodReward = userClaim.totalClaimReward.div(claimPeriod);
-            userClaim.periodReward = userClaim.periodReward + periodReward; 
+            userClaim.periodReward = periodReward; 
         }   
     }
 
