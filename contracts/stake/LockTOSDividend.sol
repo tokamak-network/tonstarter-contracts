@@ -19,9 +19,9 @@ contract LockTOSDividend is
     AccessibleCommon,
     ILockTOSDividend
 {
-    event Claim(address token, uint256 amount, uint256 timestamp);
-    event Distribute(address token, uint256 amount);
-    event Redistribute(address token, uint256 oldEpoch, uint256 newEpoch);
+    event Claim(address indexed token, uint256 amount, uint256 timestamp);
+    event Distribute(address indexed token, uint256 amount);
+    event Redistribute(address indexed token, uint256 oldEpoch, uint256 newEpoch);
 
     using SafeMath for uint256;
     using SafeCast for uint256;
@@ -161,7 +161,7 @@ contract LockTOSDividend is
             amountToClaim += _calculateClaim(
                 distr,
                 lockId,
-                epochStart,
+                distr.claimStartWeeklyEpoch[_lockId],
                 epochEnd
             );
         }
