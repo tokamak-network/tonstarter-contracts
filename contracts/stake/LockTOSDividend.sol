@@ -136,12 +136,13 @@ contract LockTOSDividend is
     }
 
     /// @inheritdoc ILockTOSDividend
-    function claimable(address _token) public view override returns (uint256) {
-        return claimableForPeriod(_token, 0, block.timestamp);
+    function claimable(address _account, address _token) public view override returns (uint256) {
+        return claimableForPeriod(_account, _token, genesis, block.timestamp);
     }
 
     /// @inheritdoc ILockTOSDividend
     function claimableForPeriod(
+        address _account,
         address _token,
         uint256 _timeStart,
         uint256 _timeEnd
@@ -152,7 +153,7 @@ contract LockTOSDividend is
             return 0;
         }
         
-        uint256[] memory userLocks = ILockTOS(lockTOS).locksOf(msg.sender);
+        uint256[] memory userLocks = ILockTOS(lockTOS).locksOf(_account);
         uint256 amountToClaim = 0;
         LibLockTOSDividend.Distribution storage distr = distributions[_token];
         for (uint256 i = 0; i < userLocks.length; ++i) {

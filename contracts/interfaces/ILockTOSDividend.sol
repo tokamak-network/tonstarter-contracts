@@ -34,8 +34,8 @@ interface ILockTOSDividend {
         returns (uint256);
 
     /// @dev Returns claimable amount
-    function claimable(address _token) external view returns (uint256);
+    function claimable(address _account, address _token) external view returns (uint256);
     
     /// @dev Returns claimable amount from `_timeStart` to `_timeEnd`
-    function claimableForPeriod(address _token, uint256 _timeStart, uint256 _timeEnd) external view returns (uint256);
+    function claimableForPeriod(address _account, address _token, uint256 _timeStart, uint256 _timeEnd) external view returns (uint256);
 }

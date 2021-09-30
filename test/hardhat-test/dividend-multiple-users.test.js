@@ -314,6 +314,7 @@ describe("LockTOS", function () {
           await dividend
             .connect(account)
             .claimableForPeriod(
+              account.address,
               ton.address,
               currentTime,
               currentTime + epochUnit
@@ -326,6 +327,20 @@ describe("LockTOS", function () {
         expect(accum).to.be.closeTo(expected[i].tokensPerWeek, 1000);
       }
     }
+
+    let accum = 0;
+    for (const { account } of accounts) {
+      const claimable = parseInt(
+        await dividend
+          .connect(account)
+          .claimable(
+            account.address,
+            ton.address
+          )
+      );
+      accum += claimable;
+    }
+    console.log({ accum });
   });
 
   it("should claim", async function () {
