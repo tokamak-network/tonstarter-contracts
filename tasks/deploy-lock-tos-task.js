@@ -111,6 +111,14 @@ task("rinkeby-deploy-dividend-implementation", "Deploy TOS").setAction(async () 
     .connect(deployer)
     .deploy();
   await dividendPool.deployed(); 
+  console.log("Dividend Pool: ", dividendPool.address);
+  const dividendPoolAddress = dividendPool.address;
+  await run("verify", {
+    address: dividendPoolAddress,
+    constructorArgsParams: [],
+  });
+
+
 });
 
 task("rinkeby-deploy-dividend-pool", "Deploy TOS").setAction(async () => {

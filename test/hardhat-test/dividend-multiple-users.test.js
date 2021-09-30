@@ -339,8 +339,8 @@ describe("LockTOS", function () {
           )
       );
       accum += claimable;
-    }
-    console.log({ accum });
+    }    
+    expect(accum).to.be.closeTo(25000000, 1000);
   });
 
   it("should claim", async function () {
