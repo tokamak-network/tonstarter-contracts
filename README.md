@@ -54,6 +54,14 @@
 
 * "StakeTONControl": "0xacdded49ac67ba9c87b1bbc5cb248b1bd7dc0f19"
 
+
+## Deployed related to DAO
+
+* "LockTOS": "0x47f9FEbB2456d71Aab621F683AD680D71aF1306d"
+
+* "LockTOSProxy": "0x69b4A202Fa4039B42ab23ADB725aA7b1e9EEBD79"
+
+
 ### USING TOKAMAK CONTRACTS
 
 * "TON": "0x2be5e8c109e2197D077D13A82dAead6a9b3433C5"

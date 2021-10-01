@@ -28,6 +28,8 @@ describe("LockTOSDividend", function () {
   let tos, ton; // coins
   const userLockInfo = [];
   const tosAmount = 1000000000;
+  const epochUnit = parseInt(time.duration.weeks(1));
+  const maxTime = epochUnit * 156; // 3 years
 
   before(async () => {
     const addresses = await getAddresses();
@@ -41,17 +43,50 @@ describe("LockTOSDividend", function () {
     ({ tos, ton } = await setupContracts(admin.address));
   });
 
-  it("Deploy LockTOS & LockTOSDividen", async function () {
-    phase3StartTime = 0; // (await time.latest()) + time.duration.weeks(10);
-    lockTOS = await (
+  it("Deploy LockTOS", async function () {
+    const lockTOSImpl = await (
       await ethers.getContractFactory("LockTOS")
-    ).deploy(admin.address, tos.address, phase3StartTime);
-    await lockTOS.deployed();
+    ).deploy();
+    await lockTOSImpl.deployed();
 
-    dividend = await (
+    const lockTOSProxy = await (
+      await ethers.getContractFactory("LockTOSProxy")
+    ).deploy(lockTOSImpl.address, admin.address);
+    await lockTOSProxy.deployed();
+
+    await (
+      await lockTOSProxy.initialize(tos.address, epochUnit, maxTime)
+    ).wait();
+
+    const lockTOSArtifact = await hre.artifacts.readArtifact("LockTOS");
+    lockTOS = new ethers.Contract(
+      lockTOSProxy.address,
+      lockTOSArtifact.abi,
+      ethers.provider
+    );
+  });
+
+  it("Deploy LockTOS & LockTOSDividen", async function () {
+    const dividendImpl = await (
       await ethers.getContractFactory("LockTOSDividend")
-    ).deploy(lockTOS.address);
-    await dividend.deployed();
+    ).deploy();
+    await dividendImpl.deployed();
+
+    const dividendProxy = await (
+      await ethers.getContractFactory("LockTOSDividendProxy")
+    ).deploy(dividendImpl.address, admin.address);
+    await dividendProxy.deployed();
+
+    await (await dividendProxy.initialize(lockTOS.address, epochUnit)).wait();
+
+    const dividendArtifact = await hre.artifacts.readArtifact(
+      "LockTOSDividend"
+    );
+    dividend = new ethers.Contract(
+      dividendProxy.address,
+      dividendArtifact.abi,
+      ethers.provider
+    );
   });
 
   it("mint TOS to users", async function () {
@@ -133,7 +168,7 @@ describe("LockTOSDividend", function () {
 
   let initialTime;
   it("LockTOS stake TOS", async function () {
-    initialTime = parseInt(await time.latest());
+    initialTime = parseInt(await lockTOS.getCurrentTime());
     console.log({ initialTime });
 
     const distributions = [
@@ -144,7 +179,11 @@ describe("LockTOSDividend", function () {
     ];
     for (const { amount, account, weekIncrease } of distributions) {
       if (weekIncrease) {
-        await time.increase(time.duration.weeks(weekIncrease));
+        // await time.increase(time.duration.weeks(weekIncrease));
+        await ethers.provider.send("evm_increaseTime", [
+          parseInt(time.duration.weeks(weekIncrease)),
+        ]);
+        await ethers.provider.send("evm_mine"); // mine the next block
       }
       await approveTON(account, amount);
       await distributeTON(account, amount);
@@ -152,7 +191,7 @@ describe("LockTOSDividend", function () {
   });
 
   it("should check tokens per week", async function () {
-    const now = parseInt(await time.latest());
+    const now = parseInt(await lockTOS.getCurrentTime());
     const expected = [
       { tokensPerWeek: 5000000 },
       { tokensPerWeek: 0 },
@@ -173,7 +212,9 @@ describe("LockTOSDividend", function () {
       currentTime <= now;
       currentTime += ONE_WEEK, i += 1
     ) {
-      await (await lockTOS.connect(admin).globalCheckpoint()).wait(); // update history
+      if (await lockTOS.needCheckpoint()) {
+        await (await lockTOS.connect(admin).globalCheckpoint()).wait(); // update history
+      }
 
       const tokensPerWeek = parseInt(
         await dividend.tokensPerWeekAt(ton.address, currentTime)
@@ -193,7 +234,6 @@ describe("LockTOSDividend", function () {
         );
         accum += claimable;
       }
-
       if (expected[i].tokensPerWeek > 0) {
         expect(accum).to.be.closeTo(expected[i].tokensPerWeek, 1000);
       }

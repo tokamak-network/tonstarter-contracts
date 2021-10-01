@@ -1,5 +1,8 @@
 /* eslint-disable no-undef */
 const { createCurrency, createCurrencyRatio } = require("@makerdao/currency");
+const { ethers } = require("hardhat");
+const utils = ethers.utils;
+
 const {
   BN,
   constants,
@@ -57,9 +60,9 @@ async function setupContracts(account) {
 
   const TON_MINIMUM_STAKE_AMOUNT = _TON("1000");
 
-  const name = "TOS";
-  const symbol = "TOS";
-  const version = "1";
+const name = "TONStarter";
+const symbol = "TOS";
+const version = "1.0";
 
   const addresses = await getAddresses();
 

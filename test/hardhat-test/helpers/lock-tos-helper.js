@@ -1,6 +1,10 @@
 const { time } = require("@openzeppelin/test-helpers");
 const MAXTIME = 94608000;
 
+const name = "TONStarter";
+const symbol = "TOS";
+const version = "1.0";
+
 const findClosestPoint = (history, timestamp) => {
   if (history.length === 0) {
     return null;
@@ -17,9 +21,12 @@ const findClosestPoint = (history, timestamp) => {
 
 const calculateBalanceOfLock = async ({ lockId, timestamp, lockTOS }) => {
   const userHistory = await lockTOS.pointHistoryOf(lockId);
+
   const foundPoint = await findClosestPoint(userHistory, timestamp);
+
   if (foundPoint == null) return 0;
   const currentBias = foundPoint.slope * (timestamp - foundPoint.timestamp);
+
   const MULTIPLIER = Math.pow(10, 18);
   return Math.floor(
     (foundPoint.bias > currentBias ? foundPoint.bias - currentBias : 0) /
@@ -29,9 +36,13 @@ const calculateBalanceOfLock = async ({ lockId, timestamp, lockTOS }) => {
 
 const calculateBalanceOfUser = async ({ user, timestamp, lockTOS }) => {
   const locks = await lockTOS.locksOf(user.address);
+
   let accBalance = 0;
   for (const lockId of locks) {
-    accBalance += await calculateBalanceOfLock({ lockTOS, lockId, timestamp });
+    let val = await calculateBalanceOfLock({  lockId, timestamp , lockTOS });
+
+    accBalance += val;
+    //accBalance += await calculateBalanceOfLock({ lockTOS, lockId, timestamp });
   }
   return accBalance;
 };
@@ -52,12 +63,12 @@ const createLockWithPermit = async ({
   lockTOS,
 }) => {
   const nonce = parseInt(await tos.nonces(user.address));
-  const deadline = parseInt(await time.latest()) + 20;
+  const deadline = parseInt(await time.latest()) + 1000;
   const rawSignature = await user._signTypedData(
     {
       chainId: parseInt(await network.provider.send("eth_chainId")),
-      name: "TOS",
-      version: "1",
+      name: name,
+      version: version,
       verifyingContract: tos.address,
     },
     {

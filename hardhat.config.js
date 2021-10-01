@@ -7,7 +7,19 @@ require("@nomiclabs/hardhat-web3");
 
 require("dotenv").config();
 
-const { ACCOUNT0_PK, ACCOUNT1_PK, ACCOUNT2_PK, TONSTARTER_DEPLOYER_PK } = process.env;
+require("./tasks/deploy-lock-tos-task");
+require("./tasks/uniswap-v3-approve-erc20-task");
+require("./tasks/uniswap-v3-create-pool-task");
+require("./tasks/uniswap-v3-increase-liquidity-task");
+require("./tasks/uniswap-v3-mint-position-task");
+require("./tasks/uniswap-v3-swap-task");
+require("./tasks/view-tasks");
+require("./tasks/abi-retriever");
+
+require("./tasks-rewardprogram/testcase");
+
+
+const { ACCOUNT0_PK, ACCOUNT1_PK, ACCOUNT2_PK } = process.env;
 
 task("accounts", "Prints the list of accounts", async () => {
   const accounts = await ethers.getSigners();
