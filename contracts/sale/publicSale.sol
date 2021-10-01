@@ -7,7 +7,7 @@ import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 import { SafeERC20 } from "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import { ReentrancyGuard } from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
-import "./ERC20/IERC20Snapshot.sol";
+import "../interfaces/ILockTOS.sol";
 
 contract PublicSale is Ownable, ReentrancyGuard{
     using SafeERC20 for IERC20;
@@ -67,7 +67,7 @@ contract PublicSale is Ownable, ReentrancyGuard{
 
     IERC20 public saleToken;
     IERC20 public getToken;
-    IERC20Snapshot public sTOS;
+    ILockTOS public sTOS;
 
     address[] public depositors;
 
@@ -83,7 +83,7 @@ contract PublicSale is Ownable, ReentrancyGuard{
         saleToken = IERC20(_saleTokenAddress);
         getToken = IERC20(_getTokenAddress);
         getTokenOwner = _getTokenOwner;
-        sTOS = IERC20Snapshot(_sTOS);
+        sTOS = ILockTOS(_sTOS);
     }
 
     function setSnapshot(uint256 _snapshot) external onlyOwner {

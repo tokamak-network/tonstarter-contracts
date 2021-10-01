@@ -7,19 +7,19 @@ require("@nomiclabs/hardhat-web3");
 
 require("dotenv").config();
 
-require("./tasks/deploy-lock-tos-task");
-require("./tasks/uniswap-v3-approve-erc20-task");
-require("./tasks/uniswap-v3-create-pool-task");
-require("./tasks/uniswap-v3-increase-liquidity-task");
-require("./tasks/uniswap-v3-mint-position-task");
-require("./tasks/uniswap-v3-swap-task");
-require("./tasks/view-tasks");
-require("./tasks/abi-retriever");
+// require("./tasks/deploy-lock-tos-task");
+// require("./tasks/uniswap-v3-approve-erc20-task");
+// require("./tasks/uniswap-v3-create-pool-task");
+// require("./tasks/uniswap-v3-increase-liquidity-task");
+// require("./tasks/uniswap-v3-mint-position-task");
+// require("./tasks/uniswap-v3-swap-task");
+// require("./tasks/view-tasks");
+// require("./tasks/abi-retriever");
 
-require("./tasks-rewardprogram/testcase");
+// require("./tasks-rewardprogram/testcase");
 
 
-const { ACCOUNT0_PK, ACCOUNT1_PK, ACCOUNT2_PK } = process.env;
+// const { ACCOUNT0_PK, ACCOUNT1_PK, ACCOUNT2_PK } = process.env;
 
 task("accounts", "Prints the list of accounts", async () => {
   const accounts = await ethers.getSigners();
@@ -38,22 +38,22 @@ module.exports = {
     hardhat: {
       chainId: 1337,
     },
-    rinkeby: {
-      chainId: 4,
-      url: `https://rinkeby.infura.io/v3/${process.env.InfuraKey}`,
-      accounts: [`${ACCOUNT0_PK}`, `${ACCOUNT1_PK}`, `${ACCOUNT2_PK}`],
-      gasMultiplier: 1.25,
-      gasPrice: 20000000000,
-    },
-    mainnet: {
-      url: `https://mainnet.infura.io/v3/${process.env.InfuraKey}`,
-      accounts: [`${ACCOUNT0_PK}`],
-      gasMultiplier: 1.25,
-      gasPrice: 40000000000,
-    },
+    // rinkeby: {
+    //   chainId: 4,
+    //   url: `https://rinkeby.infura.io/v3/${process.env.InfuraKey}`,
+    //   accounts: [`${ACCOUNT0_PK}`, `${ACCOUNT1_PK}`, `${ACCOUNT2_PK}`],
+    //   gasMultiplier: 1.25,
+    //   gasPrice: 20000000000,
+    // },
+    // mainnet: {
+    //   url: `https://mainnet.infura.io/v3/${process.env.InfuraKey}`,
+    //   accounts: [`${ACCOUNT0_PK}`],
+    //   gasMultiplier: 1.25,
+    //   gasPrice: 40000000000,
+    // },
   },
   etherscan: {
-    apiKey: `${process.env.APIKey}`,
+    // apiKey: `${process.env.APIKey}`,
   },
   solidity: {
     version: "0.7.6",
