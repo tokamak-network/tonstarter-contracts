@@ -1,5 +1,8 @@
 const { time } = require("@openzeppelin/test-helpers");
 const MAXTIME = 94608000;
+const name = "TONStarter";
+const symbol = "TOS";
+const version = "1.0";
 
 const findClosestPoint = (history, timestamp) => {
   if (history.length === 0) {
@@ -52,12 +55,18 @@ const createLockWithPermit = async ({
   lockTOS,
 }) => {
   const nonce = parseInt(await tos.nonces(user.address));
-  const deadline = parseInt(await time.latest()) + 20;
+
+  const block = await ethers.provider.getBlock('latest')
+  if (!block) {
+      throw new Error('null block returned from provider')
+  }
+  let deadline = block.timestamp + 1000000;
+
   const rawSignature = await user._signTypedData(
     {
       chainId: parseInt(await network.provider.send("eth_chainId")),
-      name: "TOS",
-      version: "1",
+      name: name,
+      version: version,
       verifyingContract: tos.address,
     },
     {

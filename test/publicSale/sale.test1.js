@@ -18,6 +18,8 @@ const {
   } = require("./helpers/lock-tos-helper");
 
 
+const LockTOS_ABI = require("../..//artifacts/contracts/stake/LockTOS.sol/LockTOS.json");
+
 const zeroAddress = "0x0000000000000000000000000000000000000000";
 
 
@@ -71,12 +73,29 @@ describe("Sale", () => {
     let claimPeriod = 6;
     let claimTestTime;
 
-    let tos, lockTOS, lockTOSImpl, lockTOSProxy, deployer ;
+    let tos, ton, lockTOS, lockTOSImpl, lockTOSProxy ;
     let epochUnit, maxTime;
     const name = "TONStarter";
     const symbol = "TOS";
     const version = "1.0";
+    const tosAmount = ethers.BigNumber.from('100000000000000000000');
+    let deployer, user1, user2;
+    let userLockInfo = [];
 
+    let tester1 = {
+        account: null,
+        lockTOSIds: [],
+        balanceOf: 0,
+        snapshot: 0,
+        balanceOfAt: 0
+    }
+    let tester2 = {
+        account: null,
+        lockTOSIds: [],
+        balanceOf: 0,
+        snapshot: 0,
+        balanceOfAt: 0
+    }
     before(async () => {
         const addresses = await getAddresses();
 
@@ -84,8 +103,16 @@ describe("Sale", () => {
         getTokenOwner = await findSigner(addresses[1]);
         tosTokenOwner = await findSigner(addresses[2]);
         saleOwner = await findSigner(addresses[3]);
+        account1 = await findSigner(addresses[4]);
+        account2 = await findSigner(addresses[5]);
+        account3 = await findSigner(addresses[6]);
+        account4 = await findSigner(addresses[7]);
+        account5 = await findSigner(addresses[8]);
+
 
         deployer = saleTokenOwner;
+        tester1.account = getTokenOwner;
+        tester2.account = tosTokenOwner;
 
         /*
         erc20token = await ethers.getContractFactory("ERC20Mock");
@@ -117,19 +144,20 @@ describe("Sale", () => {
 
     });
 
-    describe("Initialize", () => {
+    describe("Initialize TON, TOS, LockTOS", () => {
+        it("Initialize TON, TOS ", async function () {
+            this.timeout(1000000);
+            let dummy;
+            ({ dummy, ton } = await setupContracts(deployer.address));
+        });
         it("Initialize TOS", async function () {
             const TOS = await ethers.getContractFactory("TOS");
             tos = await TOS.deploy(name, symbol, version);
             await tos.deployed();
         });
         it("Deploy LockTOS", async function () {
-            const now = parseInt(Date.now() / 1000);
-            console.log("now", now);
 
-            const LockTOS = await ethers.getContractFactory("LockTOS");
-
-            lockTOSImpl = await LockTOS.deploy();
+            lockTOSImpl = await (await ethers.getContractFactory("LockTOS")).deploy();
             await lockTOSImpl.deployed();
 
             lockTOSProxy = await (
@@ -137,14 +165,95 @@ describe("Sale", () => {
             ).deploy(lockTOSImpl.address, deployer.address);
             await lockTOSProxy.deployed();
 
-            /*
             await (
                 await lockTOSProxy.initialize(tos.address, epochUnit, maxTime)
             ).wait();
-            const lockTOSArtifact = await hre.artifacts.readArtifact("LockTOS");
 
-            lockTOS = new ethers.Contract( lockTOSProxy.address, lockTOSArtifact.abi, ethers.provider );
-            */
+            lockTOS = new ethers.Contract( lockTOSProxy.address, LockTOS_ABI.abi, ethers.provider );
+        });
+
+        it("mint TOS to users", async function () {
+            await (await tos.connect(deployer).mint(tester1.account.address, tosAmount)).wait();
+            expect(await tos.balanceOf(tester1.account.address)).to.be.equal(tosAmount);
+
+            await (await tos.connect(deployer).mint(tester2.account.address, tosAmount)).wait();
+            expect(await tos.balanceOf(tester2.account.address)).to.be.equal(tosAmount);
+        });
+
+
+        it("should create locks for user", async function () {
+
+            expect(await lockTOS.balanceOf(tester1.account.address)).to.be.equal(0);
+            expect(await lockTOS.balanceOf(tester2.account.address)).to.be.equal(0);
+
+            let id = await createLockWithPermit({
+                    user: tester1.account,
+                    amount: ethers.BigNumber.from('1000000000000000000'),
+                    unlockWeeks: 1,
+                    tos,
+                    lockTOS,
+                });
+            expect(id).to.be.equal(1);
+            tester1.lockTOSIds.push(id);
+
+            id = await createLockWithPermit({
+                    user: tester2.account,
+                    amount: ethers.BigNumber.from('1000000000000000000'),
+                    unlockWeeks: 2,
+                    tos,
+                    lockTOS,
+                });
+            tester2.lockTOSIds.push(id);
+            expect(id).to.be.equal(2);
+
+            ethers.provider.send("evm_increaseTime", [10])   // add 26 seconds
+            ethers.provider.send("evm_mine")      // mine the next block
+
+            const block = await ethers.provider.getBlock('latest')
+            if (!block) {
+                throw new Error('null block returned from provider')
+            }
+            let snapshot = block.timestamp;
+
+            tester1.balanceOfAt = await lockTOS.balanceOfAt(tester1.account.address, snapshot);
+            expect(tester1.balanceOfAt).to.be.above(0);
+
+            tester2.balanceOfAt = await lockTOS.balanceOfAt(tester2.account.address, snapshot);
+            expect(tester2.balanceOfAt).to.be.above(0);
+
+            expect(await lockTOS.totalSupplyAt(snapshot)).to.be.equal(
+                tester1.balanceOfAt.add(tester2.balanceOfAt)
+            );
+
+        });
+
+    });
+
+    describe("Initialize PublicSale", () => {
+        it("Initialize Funcding Token", async function () {
+            getToken = ton;
+        });
+
+        it("Initialize Sale Token", async function () {
+            erc20token = await ethers.getContractFactory("ERC20Mock");
+            saleToken = await erc20token.connect(saleTokenOwner).deploy("testDOC", "DOC");
+        });
+
+        it("Initialize PublicSale", async function () {
+            deploySale = await ethers.getContractFactory("PublicSale");
+            saleContract = await deploySale.connect(saleOwner).deploy(
+                saleToken.address,
+                getToken.address,
+                account5.address,
+                tos.address
+            );
+
+            await saleToken.connect(saleTokenOwner).transfer(saleContract.address, (basicAmount*2))
+            await getToken.connect(getTokenOwner).transfer(account1.address, basicAmount)
+            await getToken.connect(getTokenOwner).transfer(account2.address, basicAmount)
+            await getToken.connect(getTokenOwner).transfer(account3.address, basicAmount)
+            await getToken.connect(getTokenOwner).transfer(account4.address, basicAmount)
+
         });
     });
 
