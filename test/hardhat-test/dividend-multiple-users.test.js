@@ -355,6 +355,16 @@ describe("LockTOS", function () {
       const tonBalance = parseInt(await ton.balanceOf(account.address));
       totalTonBalance += tonBalance;
     }
+
+    for (const { account } of accounts) {
+      const amount = parseInt(
+        await dividend
+          .connect(account)
+          .claimable(account.address, ton.address)
+      );
+      console.log({ amount });
+      expect(amount).to.be.equal(0);
+    }
     expect(totalTonBalance).to.be.closeTo(25000000, 1000);
   });
 });

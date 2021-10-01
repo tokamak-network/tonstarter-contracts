@@ -161,7 +161,7 @@ contract LockTOSDividend is
             amountToClaim += _calculateClaim(
                 distr,
                 lockId,
-                distr.claimStartWeeklyEpoch[_lockId],
+                Math.max(epochStart, distr.claimStartWeeklyEpoch[lockId]),
                 epochEnd
             );
         }
