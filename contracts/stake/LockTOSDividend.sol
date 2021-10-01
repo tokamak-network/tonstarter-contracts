@@ -41,6 +41,7 @@ contract LockTOSDividend is
 
     /// @inheritdoc ILockTOSDividend
     function claimUpTo(address _token, uint256 _timestamp) external override {
+        require(claimableForPeriod(msg.sender, _token, genesis, _timestamp) > 0, "Claimable amount is zero");
         _claimUpTo(_token, _timestamp);
     }
 
@@ -176,9 +177,8 @@ contract LockTOSDividend is
         for (uint256 i = 0; i < userLocks.length; ++i) {
             amountToClaim += _recordClaim(_token, userLocks[i], weeklyEpoch);
         }
-        if (amountToClaim > 0) {
-            IERC20(_token).transfer(msg.sender, amountToClaim);
-        }
+        require(amountToClaim > 0, "Amount to be claimed is zero");
+        IERC20(_token).transfer(msg.sender, amountToClaim);
         emit Claim(_token, amountToClaim, _timestamp);
     }
 
