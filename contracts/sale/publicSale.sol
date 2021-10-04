@@ -8,83 +8,12 @@ import { SafeERC20 } from "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import { ReentrancyGuard } from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "../interfaces/ILockTOS.sol";
+import "../common/AccessibleCommon.sol";
+import "./PublicSaleStorage.sol";
 
-contract PublicSale is Ownable, ReentrancyGuard{
+contract PublicSale is PublicSaleStorage, AccessibleCommon, ReentrancyGuard{
     using SafeERC20 for IERC20;
     using SafeMath for uint256;
-
-    struct UserInfoEx {
-        bool join;
-        uint tier;
-        uint256 payAmount;
-        uint256 saleAmount;
-    }
-
-    struct UserInfoOpen {
-        bool join;
-        uint256 depositAmount;
-        uint256 payAmount;
-        uint256 saleAmount;
-    }
-
-    struct UserClaim {
-        uint256 totalClaimReward;
-        uint256 periodReward;
-        uint256 claimAmount;
-    }
-
-    address public getTokenOwner;
-    uint256 public snapshot;
-
-    uint256 public startAddWhiteTime = 0;
-    uint256 public endAddWhiteTime = 0;
-    uint256 public startExclusiveTime = 0;
-    uint256 public endExclusiveTime = 0;
-
-    uint256 public startDepositTime = 0;        //청약 시작시간
-    uint256 public endDepositTime = 0;          //청약 끝시간
-    uint256 public startOpenSaleTime = 0;       //openSale 시작시간
-    uint256 public endOpenSaleTime = 0;         //openSale 끝 시간
-
-    uint256 public startClaimTime = 0;
-
-    uint256 public totalWhitelists = 0;         //총 화이트리스트 수 (exclusive)
-    uint256 public totalExSaleAmount = 0;       //총 exclu 실제 판매토큰 양 (exclusive)
-    uint256 public totalExPurchasedAmount = 0;  //총 지불토큰 받은 양 (exclusive)
-
-    uint256 public totalDepositAmount;          //총 청약 한 양 (openSale)
-    uint256 public totalOpenSaleAmount;         //총 OpenSale 실제판매 토큰량 (openSale)
-    uint256 public totalOpenPurchasedAmount;    //총 지불토큰 받은양 (openSale)
-
-    uint256 public totalExpectSaleAmount;       //예정된 판매토큰 양 (exclusive)
-    uint256 public totalExpectOpenSaleAmount;   //예정된 판매 토큰량 (opensale)
-
-    uint256 public saleTokenPrice;  //판매하는 토큰(DOC)
-    uint256 public payTokenPrice;   //받는 토큰(TON)
-
-    uint256 public claimInterval; //클레임 간격 (epochtime)
-    uint256 public claimPeriod;   //클레임 횟수
-
-    IERC20 public saleToken;
-    IERC20 public getToken;
-    ILockTOS public sTOS;
-
-    address[] public depositors;
-
-    mapping (address => UserInfoEx) public usersEx;
-    mapping (address => UserInfoOpen) public usersOpen;
-    mapping (address => UserClaim) public usersClaim;
-    mapping (uint => uint256) public tiers;         //티어별 가격 설정
-    mapping (uint => uint256) public tiersAccount;  //티어별 참여자 숫자 기록
-    mapping (uint => uint256) public tiersPercents;  //티어별 퍼센트 기록
-
-
-    constructor(address _saleTokenAddress, address _getTokenAddress, address _getTokenOwner,address _sTOS) {
-        saleToken = IERC20(_saleTokenAddress);
-        getToken = IERC20(_getTokenAddress);
-        getTokenOwner = _getTokenOwner;
-        sTOS = ILockTOS(_sTOS);
-    }
 
     function setSnapshot(uint256 _snapshot) external onlyOwner {
         snapshot = _snapshot;
