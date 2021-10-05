@@ -25,7 +25,7 @@ contract PublicSaleProxy is
                 bytes32(uint256(keccak256("eip1967.proxy.implementation")) - 1)
         );
 
-        require(_impl != address(0), "LockTOSProxy: logic is zero");
+        require(_impl != address(0), "PublicSaleProxy: logic is zero");
 
         _setImplementation(_impl);
 
@@ -42,8 +42,8 @@ contract PublicSaleProxy is
     /// @notice Set implementation contract
     /// @param impl New implementation contract address
     function upgradeTo(address impl) external override onlyOwner {
-        require(impl != address(0), "LockTOSProxy: input is zero");
-        require(_implementation() != impl, "LockTOSProxy: same");
+        require(impl != address(0), "PublicSaleProxy: input is zero");
+        require(_implementation() != impl, "PublicSaleProxy: same");
         _setImplementation(impl);
         emit Upgraded(impl);
     }
@@ -68,7 +68,7 @@ contract PublicSaleProxy is
         address _impl = _implementation();
         require(
             _impl != address(0) && !pauseProxy,
-            "LockTOSProxy: impl OR proxy is false"
+            "PublicSaleProxy: impl OR proxy is false"
         );
 
         assembly {
@@ -102,6 +102,7 @@ contract PublicSaleProxy is
         address _getTokenOwner,
         address _sTOS
     ) external override onlyOwner {
+        require(snapshot == 0, "possible to setting the snapshot before");
         saleToken = IERC20(_saleTokenAddress);
         getToken = IERC20(_getTokenAddress);
         getTokenOwner = _getTokenOwner;

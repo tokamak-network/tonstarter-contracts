@@ -11,7 +11,7 @@ import "../interfaces/ILockTOS.sol";
 import "../common/AccessibleCommon.sol";
 import "./PublicSaleStorage.sol";
 
-contract PublicSale is PublicSaleStorage, AccessibleCommon, ReentrancyGuard{
+contract PublicSale is PublicSaleStorage, AccessibleCommon, ReentrancyGuard {
     using SafeERC20 for IERC20;
     using SafeMath for uint256;
 

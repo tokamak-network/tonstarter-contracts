@@ -38,6 +38,11 @@ module.exports = {
     hardhat: {
       chainId: 1337,
     },
+    rinkeby: {
+      url: `https://rinkeby.infura.io/v3/${process.env.INFURA_API_KEY}`,
+      accounts: [ `${process.env.RINKEBY_PRIVATE_KEY}` ],
+      gasPrice: 20000000000
+    },
     // rinkeby: {
     //   chainId: 4,
     //   url: `https://rinkeby.infura.io/v3/${process.env.InfuraKey}`,
@@ -53,7 +58,7 @@ module.exports = {
     // },
   },
   etherscan: {
-    // apiKey: `${process.env.APIKey}`,
+    apiKey: process.env.ETHERSCAN_API_KEY
   },
   solidity: {
     version: "0.7.6",

@@ -29,7 +29,7 @@ contract PublicSaleStorage  {
         uint256 claimAmount;
     }
 
-    uint256 public snapshot;
+    uint256 public snapshot = 0;
 
     uint256 public startAddWhiteTime = 0;
     uint256 public endAddWhiteTime = 0;
