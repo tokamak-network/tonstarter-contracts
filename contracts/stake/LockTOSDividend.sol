@@ -70,7 +70,7 @@ contract LockTOSDividend is
         override
     {
         require(_weeklyEpoch < getCurrentWeeklyEpoch());
-        uint256 timestamp = (genesis + _weeklyEpoch * epochUnit) + epochUnit;
+        uint256 timestamp = genesis.add(_weeklyEpoch * epochUnit).add(epochUnit);
 
         require(
             ILockTOS(lockTOS).totalSupplyAt(timestamp) == 0,
