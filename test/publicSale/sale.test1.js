@@ -329,7 +329,6 @@ describe("Sale", () => {
     });
 
     describe("setting", () => {
-
         describe("exclusiveSale setting", () => {
             it("check the balance (contract have the saleToken) ", async () => {
                 balance1 = Number(await saleToken.balanceOf(saleContract.address))

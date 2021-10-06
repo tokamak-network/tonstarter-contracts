@@ -18,9 +18,9 @@ const {
   } = require("./helpers/lock-tos-helper");
 
 const LockTOS_ABI = require("../..//artifacts/contracts/stake/LockTOS.sol/LockTOS.json");
+const PublicSale_ABI = require('../../artifacts/contracts/sale/publicSale.sol/PublicSale.json');
 
 const zeroAddress = "0x0000000000000000000000000000000000000000";
-
 
 describe("Sale", () => {
     //mockERC20으로 doc, ton, tos까지 배포해야함
@@ -299,54 +299,33 @@ describe("Sale", () => {
         });
 
         it("Initialize PublicSale", async function () {
-            deploySale = await ethers.getContractFactory("publicSale");
-            saleContract = await deploySale.connect(saleOwner).deploy(
+            let PublicSale = await ethers.getContractFactory("PublicSale");
+            let deploySaleImpl = await PublicSale.connect(saleOwner).deploy();
+
+            let PublicSaleProxy = await ethers.getContractFactory("PublicSaleProxy");
+            let PublicSaleContract = await PublicSaleProxy.connect(saleOwner).deploy(
+                deploySaleImpl.address,
+                saleOwner.address
+            );
+
+            await PublicSaleContract.connect(saleOwner).initialize(
                 saleToken.address,
                 getToken.address,
                 account5.address,
                 lockTOS.address
             );
 
+            saleContract = new ethers.Contract( PublicSaleContract.address, PublicSale_ABI.abi, ethers.provider );
+
             await saleToken.connect(saleTokenOwner).transfer(saleContract.address, (basicAmount*2))
             await getToken.connect(getTokenOwner).transfer(account1.address, basicAmount)
             await getToken.connect(getTokenOwner).transfer(account2.address, basicAmount)
             await getToken.connect(getTokenOwner).transfer(account3.address, basicAmount)
             await getToken.connect(getTokenOwner).transfer(account4.address, basicAmount)
-
         });
     });
 
-    describe("exclusiveSale", () => {
-        // describe("snapshot test", () => {
-        //     it("check snapshot", async () => {
-        //         let tx = await tosToken.connect(tosTokenOwner).snapshot()
-    
-        //         await expect(tx).to.emit(tosToken, 'Snapshot').withArgs(
-        //             1
-        //         )
-    
-        //         balance1 = Number(await tosToken.balanceOf(account1.address))
-        //         expect(balance1).to.be.equal(0)
-    
-        //         await tosToken.connect(tosTokenOwner).transfer(account1.address, 100)
-    
-        //         balance1 = Number(await tosToken.balanceOf(account1.address))
-        //         expect(balance1).to.be.equal(100)
-    
-        //         let tx2 = await tosToken.connect(tosTokenOwner).snapshot()
-    
-        //         await expect(tx2).to.emit(tosToken, 'Snapshot').withArgs(
-        //             2
-        //         )
-        //     })
-    
-        //     it('snapshot balanceOf test', async () => {
-        //         let tx = Number(await tosToken.connect(tosTokenOwner).balanceOfAt(account1.address, 1))
-        //         expect(tx).to.be.equal(0)
-        //         let tx2 = Number(await tosToken.connect(tosTokenOwner).balanceOfAt(account1.address, 2))
-        //         expect(tx2).to.be.equal(100)
-        //     });
-        // })
+    describe("setting", () => {
         describe("exclusiveSale setting", () => {
             it("check the balance (contract have the saleToken) ", async () => {
                 balance1 = Number(await saleToken.balanceOf(saleContract.address))
@@ -356,7 +335,7 @@ describe("Sale", () => {
 
             it('setting the price caller not owner', async () => {
                 let tx = saleContract.connect(account1).setTokenPrice(saleTokenPrice, payTokenPrice)
-                await expect(tx).to.be.revertedWith("Ownable: caller is not the owner")
+                await expect(tx).to.be.revertedWith("Accessible: Caller is not an admin")
             })
 
             it('setting the price caller owner', async () => {
@@ -369,7 +348,7 @@ describe("Sale", () => {
     
             it('tier setting caller not owner', async () => {
                 let tx = saleContract.connect(account1).setTier(100, 200, 1000, 4000)
-                await expect(tx).to.be.revertedWith("Ownable: caller is not the owner")
+                await expect(tx).to.be.revertedWith("Accessible: Caller is not an admin")
             })
     
             it('tier setting caller owner', async () => {
@@ -391,7 +370,7 @@ describe("Sale", () => {
     
             it('setting tierPercents caller not owner', async () => {
                 let tx = saleContract.connect(account1).setTierPercents(600, 1200, 2200, 6000)
-                await expect(tx).to.be.revertedWith("Ownable: caller is not the owner")
+                await expect(tx).to.be.revertedWith("Accessible: Caller is not an admin")
             })
 
             it('setting tierPercents caller owner', async () => {
@@ -408,7 +387,7 @@ describe("Sale", () => {
 
             it('setting the setSaleAmount caller not owner', async () => {
                 let tx = saleContract.connect(account1).setSaleAmount(basicAmount, totalSaleAmount)
-                await expect(tx).to.be.revertedWith("Ownable: caller is not the owner")
+                await expect(tx).to.be.revertedWith("Accessible: Caller is not an admin")
             })
 
             it('setting the setSaleAmount caller owner', async () => {
@@ -419,36 +398,9 @@ describe("Sale", () => {
                 expect(tx2).to.be.equal(totalSaleAmount)
             })
 
-            // it('setting the snapshot caller not owner', async () => {
-            //     let tx = saleContract.connect(account1).setSnapshot(2)
-            //     await expect(tx).to.be.revertedWith("Ownable: caller is not the owner")
-            // })
-
-            // it('setting the snapshot caller owner', async () => {
-            //     let settingSnapNumber = 3
-            //     let snapShot = await tosToken.connect(tosTokenOwner).snapshot()
-
-            //     await expect(snapShot).to.emit(tosToken, 'Snapshot').withArgs(
-            //         settingSnapNumber
-            //     )
-
-            //     await saleContract.connect(saleOwner).setSnapshot(settingSnapNumber)
-            //     let snap = Number(await saleContract.connect(saleOwner).snapshot())
-            //     expect(snap).to.be.equal(3)
-
-            //     let tx = Number(await tosToken.connect(tosTokenOwner).balanceOfAt(account1.address, settingSnapNumber))
-            //     expect(tx).to.be.equal(100)
-            //     let tx2 = Number(await tosToken.connect(tosTokenOwner).balanceOfAt(account2.address, settingSnapNumber))
-            //     expect(tx2).to.be.equal(200)
-            //     let tx3 = Number(await tosToken.connect(tosTokenOwner).balanceOfAt(account3.address, settingSnapNumber))
-            //     expect(tx3).to.be.equal(1000)
-            //     let tx4 = Number(await tosToken.connect(tosTokenOwner).balanceOfAt(account4.address, settingSnapNumber))
-            //     expect(tx4).to.be.equal(4000) 
-            // })
-
             it('setting the snapshot caller not owner', async () => {
                 let tx = saleContract.connect(account1).setSnapshot(setSnapshot)
-                await expect(tx).to.be.revertedWith("Ownable: caller is not the owner")
+                await expect(tx).to.be.revertedWith("Accessible: Caller is not an admin")
             })
 
             it('setting the snapshot caller owner', async () => {
@@ -479,7 +431,7 @@ describe("Sale", () => {
                     exclusiveStartTime, 
                     exclusiveEndTime
                 )
-                await expect(tx).to.be.revertedWith("Ownable: caller is not the owner")
+                await expect(tx).to.be.revertedWith("Accessible: Caller is not an admin")
             })
 
             it('setting the ExclusiveTime caller owner', async () => {
@@ -524,6 +476,39 @@ describe("Sale", () => {
                 expect(tx3).to.be.equal(claimPeriod)
             })
         })
+
+        describe("openSale setting", () => {
+            it("setting the openSaletime not owner", async () => {
+                blocktime = Number(await time.latest())
+                depositStartTime = exclusiveEndTime ;
+                depositEndTime = depositStartTime + (86400*7);
+                openSaleStartTime = depositEndTime + 1;
+                openSaleEndTime = openSaleStartTime + (86400*7);
+
+                let tx = saleContract.connect(account1).setOpenTime(depositStartTime, depositEndTime, openSaleStartTime, openSaleEndTime)
+                await expect(tx).to.be.revertedWith("Accessible: Caller is not an admin")
+            })
+
+            it("setting the openSaletime owner", async () => {
+                depositStartTime = exclusiveEndTime ;
+                depositEndTime = depositStartTime + (86400*7);  //일주일동안 deposit
+                openSaleStartTime = depositEndTime + 1;
+                openSaleEndTime = openSaleStartTime + (86400*7); //일주일동안 sale
+
+                await saleContract.connect(saleOwner).setOpenTime(depositStartTime, depositEndTime, openSaleStartTime, openSaleEndTime)
+                let tx = await saleContract.startDepositTime()
+                expect(tx).to.be.equal(depositStartTime)
+                let tx2 = await saleContract.endDepositTime()
+                expect(tx2).to.be.equal(depositEndTime)
+                let tx3 = await saleContract.startOpenSaleTime()
+                expect(tx3).to.be.equal(openSaleStartTime)
+                let tx4 = await saleContract.endOpenSaleTime()
+                expect(tx4).to.be.equal(openSaleEndTime)
+            })
+        })
+    })
+    
+    describe("Sale", () => {
         describe("exclusiveSale Sale", () => {
             it("calculTierAmount test before addwhiteList", async () => {
                  let tx = Number(await saleContract.calculTierAmount(account1.address))
@@ -567,7 +552,7 @@ describe("Sale", () => {
                 expect(tx8).to.be.equal(1)
 
                 let tx9 = saleContract.connect(tester4.account).addWhiteList()
-                await expect(tx9).to.be.revertedWith("already you attend whitelist")
+                await expect(tx9).to.be.revertedWith("PublicSale: already attended")
             })
 
             it("how many input amount", async () => {
@@ -595,7 +580,7 @@ describe("Sale", () => {
             it("exclusiveSale before exclusive startTime", async () => {
                 await getToken.connect(account1).approve(saleContract.address, 60)
                 let tx = saleContract.connect(account1).exclusiveSale(60)
-                await expect(tx).to.be.revertedWith("need to exclusiveStartTime")
+                await expect(tx).to.be.revertedWith("PublicSale: exclusiveStartTime has not passed")
             })
 
             it("duration the time", async () => {
@@ -609,7 +594,7 @@ describe("Sale", () => {
 
             it("addwhitelist after whitelistTIme", async () => {
                 let tx3 = saleContract.connect(account1).addWhiteList()
-                await expect(tx3).to.be.revertedWith("end the whitelistTime")
+                await expect(tx3).to.be.revertedWith("PublicSale: end the whitelistTime")
             })
 
             it("exclusiveSale after exclusive startTime", async () => {
@@ -639,47 +624,18 @@ describe("Sale", () => {
                 expect(tx6).to.be.equal(1000000)
                 let tx7 = Number(await getToken.balanceOf(account5.address))
                 expect(tx7).to.be.equal(1000)
-
             })
-        })
-    })
-    
-    describe("openSale", () => {
-        describe("openSale setting", () => {
-            it("setting the openSaletime not owner", async () => {
-                blocktime = Number(await time.latest())
-                depositStartTime = blocktime + 86400;
-                depositEndTime = exclusiveStartTime + (86400*7); 
-                openSaleStartTime = depositEndTime + 1;
-                openSaleEndTime = openSaleStartTime + (86400*7);
-
-                let tx = saleContract.connect(account1).setOpenTime(depositStartTime, depositEndTime, openSaleStartTime, openSaleEndTime)
-                await expect(tx).to.be.revertedWith("Ownable: caller is not the owner")
-            })
-
-            it("setting the openSaletime owner", async () => {
-                blocktime = Number(await time.latest())
-                depositStartTime = blocktime + 86400;
-                depositEndTime = exclusiveStartTime + (86400*7);  //일주일동안 deposit
-                openSaleStartTime = depositEndTime + 1;
-                openSaleEndTime = openSaleStartTime + (86400*7); //일주일동안 sale
-
-                await saleContract.connect(saleOwner).setOpenTime(depositStartTime, depositEndTime, openSaleStartTime, openSaleEndTime)
-                let tx = await saleContract.startDepositTime()
-                expect(tx).to.be.equal(depositStartTime)
-                let tx2 = await saleContract.endDepositTime()
-                expect(tx2).to.be.equal(depositEndTime)
-                let tx3 = await saleContract.startOpenSaleTime()
-                expect(tx3).to.be.equal(openSaleStartTime)
-                let tx4 = await saleContract.endOpenSaleTime()
-                expect(tx4).to.be.equal(openSaleEndTime)
+            
+            it("endExclusiveSale before exclusiveEndTime", async () => {
+                let tx = saleContract.connect(account1).endExclusiveSale()
+                await expect(tx).to.be.revertedWith("PublicSale: didn't end exclusiveSale")
             })
         })
 
         describe("openSale Sale", () => {
             it("deposit before depositTime", async () => {
                 let tx = saleContract.connect(account1).deposit(100)
-                await expect(tx).to.be.revertedWith("don't start depositTime")
+                await expect(tx).to.be.revertedWith("PublicSale: don't start depositTime")
             })
 
             it("duration the time", async () => {
@@ -716,7 +672,7 @@ describe("Sale", () => {
             it("deposit after depositEndTime", async () => {
                 await getToken.connect(account1).approve(saleContract.address, 100)
                 let tx = saleContract.connect(account1).deposit(100)
-                await expect(tx).to.be.revertedWith("end the depositTime")
+                await expect(tx).to.be.revertedWith("PublicSale: end the depositTime")
             })
             
             it("depositors", async () => {
@@ -768,7 +724,7 @@ describe("Sale", () => {
     describe("claim test", () => {
         it('claim before claimTime', async () => {
             let tx = saleContract.connect(account1).claim()
-            await expect(tx).to.be.revertedWith("don't start claimTime")
+            await expect(tx).to.be.revertedWith("PublicSale: don't start claimTime")
         })
         it("duration the time to period = 1", async () => {
             await ethers.provider.send('evm_setNextBlockTimestamp', [claimStartTime]);
