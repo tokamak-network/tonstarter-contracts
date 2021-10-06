@@ -62,59 +62,18 @@ contract PublicSale is PublicSaleStorage, AccessibleCommon, ReentrancyGuard, IPu
         snapshot = _snapshot;
     }
 
-    function setAllTime(
-        uint256 _startAddWhiteTime,
-        uint256 _endAddWhiteTime,
-        uint256 _startExclusiveTime,
-        uint256 _endExclusiveTime,
-        uint256 _startDepositTime,
-        uint256 _endDepositTime,
-        uint256 _startOpenSaleTime,
-        uint256 _endOpenSaleTime,
-        uint256 _startClaimTime,
-        uint256 _claimInterval,
-        uint256 _claimPeriod
-    ) external override onlyOwner 
-        nonZero(_startAddWhiteTime)
-        nonZero(_endAddWhiteTime)
-        nonZero(_startExclusiveTime)
-        nonZero(_endExclusiveTime)
-        nonZero(_startDepositTime)
-        nonZero(_endDepositTime)
-        nonZero(_startOpenSaleTime)
-        nonZero(_endOpenSaleTime)
-        nonZero(_startClaimTime)
-        nonZero(_claimInterval)
-        nonZero(_claimPeriod)
-    {
-        startAddWhiteTime = _startAddWhiteTime;
-        endAddWhiteTime = _endAddWhiteTime;
-        startExclusiveTime = _startExclusiveTime;
-        endExclusiveTime = _endExclusiveTime;
-        startDepositTime = _startDepositTime;
-        endDepositTime = _endDepositTime;
-        startOpenSaleTime = _startOpenSaleTime;
-        endOpenSaleTime = _endOpenSaleTime;
-        startClaimTime = _startClaimTime;
-        claimInterval = _claimInterval;
-        claimPeriod = _claimPeriod;
-    }
-
     /// @inheritdoc IPublicSale
     function setExclusiveTime(
         uint256 _startAddWhiteTime,
         uint256 _endAddWhiteTime,
         uint256 _startExclusiveTime,
         uint256 _endExclusiveTime
-    ) external override onlyOwner
+    ) external override onlyOwner 
         nonZero(_startAddWhiteTime)
         nonZero(_endAddWhiteTime)
         nonZero(_startExclusiveTime)
         nonZero(_endExclusiveTime)
         beforeStartAddWhiteTime
-        lessThan(_startAddWhiteTime, _endAddWhiteTime)
-        lessThan(_startAddWhiteTime, _startExclusiveTime)
-        lessThan(_startExclusiveTime, _endExclusiveTime)
     {
         startAddWhiteTime = _startAddWhiteTime;
         endAddWhiteTime = _endAddWhiteTime;
@@ -128,15 +87,12 @@ contract PublicSale is PublicSaleStorage, AccessibleCommon, ReentrancyGuard, IPu
         uint256 _endDepositTime,
         uint256 _startOpenSaleTime,
         uint256 _endOpenSaleTime
-    ) external override onlyOwner
+    ) external override onlyOwner 
         nonZero(_startDepositTime)
         nonZero(_endDepositTime)
         nonZero(_startOpenSaleTime)
         nonZero(_endOpenSaleTime)
         beforeStartAddWhiteTime
-        lessThan(_startDepositTime, _endDepositTime)
-        lessThan(_startDepositTime, _startOpenSaleTime)
-        lessThan(_startOpenSaleTime, _endOpenSaleTime)
     {
         startDepositTime = _startDepositTime;
         endDepositTime = _endDepositTime;
@@ -149,15 +105,19 @@ contract PublicSale is PublicSaleStorage, AccessibleCommon, ReentrancyGuard, IPu
         uint256 _startClaimTime,
         uint256 _claimInterval,
         uint256 _claimPeriod
-    ) external override onlyOwner
+    ) external override onlyOwner 
         nonZero(_startClaimTime)
         nonZero(_claimInterval)
         nonZero(_claimPeriod)
-        beforeEndAddWhiteTime
+        beforeStartAddWhiteTime
     {
         startClaimTime = _startClaimTime;
         claimInterval = _claimInterval;
         claimPeriod = _claimPeriod;
+    }
+
+    function reset() external onlyOwner{
+        startAddWhiteTime = 0;
     }
 
     /// @inheritdoc IPublicSale
@@ -328,13 +288,13 @@ contract PublicSale is PublicSaleStorage, AccessibleCommon, ReentrancyGuard, IPu
         require(block.timestamp < endAddWhiteTime, "PublicSale: end the whitelistTime");
         uint tier = calculTier(msg.sender);
         require(tier >= 1, "PublicSale: need to more sTOS");
-        tiersAccount[tier] = tiersAccount[tier] + 1;
         UserInfoEx storage userEx = usersEx[msg.sender];
         require(userEx.join != true, "PublicSale: already attended");
-
+    
         userEx.join = true;
         userEx.tier = tier;
-        totalWhitelists = totalWhitelists + 1;
+        totalWhitelists = totalWhitelists.add(1);
+        tiersAccount[tier] = tiersAccount[tier].add(1);
 
         emit AddedWhiteList(msg.sender, tier);
     }
@@ -350,7 +310,6 @@ contract PublicSale is PublicSaleStorage, AccessibleCommon, ReentrancyGuard, IPu
         require(userEx.join == true, "PublicSale: Whitelist not registered");
         uint256 tokenSaleAmount = calculSaleToken(_amount);
         uint256 salePossible = calculTierAmount(msg.sender);
-
         require(salePossible >= tokenSaleAmount, "PublicSale: just buy whitelist amount");
         require(salePossible >= userEx.saleAmount.add(tokenSaleAmount), "PublicSale: just buy whitelisted amount");
 
@@ -365,6 +324,9 @@ contract PublicSale is PublicSaleStorage, AccessibleCommon, ReentrancyGuard, IPu
 
         totalExPurchasedAmount = totalExPurchasedAmount.add(_amount);
         totalExSaleAmount = totalExSaleAmount.add(tokenSaleAmount);
+
+        uint tier = calculTier(msg.sender);
+        tiersExAccount[tier] = tiersExAccount[tier].add(1);
 
         getToken.safeTransferFrom(msg.sender, address(this), _amount);
         getToken.safeTransfer(getTokenOwner, _amount);
