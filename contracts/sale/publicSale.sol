@@ -33,6 +33,13 @@ contract PublicSale is PublicSaleStorage, AccessibleCommon, ReentrancyGuard, IPu
         _;
     }
 
+    modifier beforeEndAddWhiteTime() {
+        require(
+            endAddWhiteTime == 0 ||
+            (endAddWhiteTime > 0 && block.timestamp < endAddWhiteTime), "PublicSale: not beforeEndAddWhiteTime");
+        _;
+    }
+
     function setSnapshot(uint256 _snapshot) external override onlyOwner nonZero(_snapshot) {
         snapshot = _snapshot;
     }
@@ -83,6 +90,7 @@ contract PublicSale is PublicSaleStorage, AccessibleCommon, ReentrancyGuard, IPu
         nonZero(_startClaimTime)
         nonZero(_claimInterval)
         nonZero(_claimPeriod)
+        beforeEndAddWhiteTime
     {
         startClaimTime = _startClaimTime;
         claimInterval = _claimInterval;
