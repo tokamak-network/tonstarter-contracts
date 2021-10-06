@@ -328,37 +328,8 @@ describe("Sale", () => {
         });
     });
 
-    describe("exclusiveSale", () => {
-        // describe("snapshot test", () => {
-        //     it("check snapshot", async () => {
-        //         let tx = await tosToken.connect(tosTokenOwner).snapshot()
+    describe("setting", () => {
 
-        //         await expect(tx).to.emit(tosToken, 'Snapshot').withArgs(
-        //             1
-        //         )
-
-        //         balance1 = Number(await tosToken.balanceOf(account1.address))
-        //         expect(balance1).to.be.equal(0)
-
-        //         await tosToken.connect(tosTokenOwner).transfer(account1.address, 100)
-
-        //         balance1 = Number(await tosToken.balanceOf(account1.address))
-        //         expect(balance1).to.be.equal(100)
-
-        //         let tx2 = await tosToken.connect(tosTokenOwner).snapshot()
-
-        //         await expect(tx2).to.emit(tosToken, 'Snapshot').withArgs(
-        //             2
-        //         )
-        //     })
-
-        //     it('snapshot balanceOf test', async () => {
-        //         let tx = Number(await tosToken.connect(tosTokenOwner).balanceOfAt(account1.address, 1))
-        //         expect(tx).to.be.equal(0)
-        //         let tx2 = Number(await tosToken.connect(tosTokenOwner).balanceOfAt(account1.address, 2))
-        //         expect(tx2).to.be.equal(100)
-        //     });
-        // })
         describe("exclusiveSale setting", () => {
             it("check the balance (contract have the saleToken) ", async () => {
                 balance1 = Number(await saleToken.balanceOf(saleContract.address))
@@ -431,33 +402,6 @@ describe("Sale", () => {
                 expect(tx2).to.be.equal(totalSaleAmount)
             })
 
-            // it('setting the snapshot caller not owner', async () => {
-            //     let tx = saleContract.connect(account1).setSnapshot(2)
-            //     await expect(tx).to.be.revertedWith("Ownable: caller is not the owner")
-            // })
-
-            // it('setting the snapshot caller owner', async () => {
-            //     let settingSnapNumber = 3
-            //     let snapShot = await tosToken.connect(tosTokenOwner).snapshot()
-
-            //     await expect(snapShot).to.emit(tosToken, 'Snapshot').withArgs(
-            //         settingSnapNumber
-            //     )
-
-            //     await saleContract.connect(saleOwner).setSnapshot(settingSnapNumber)
-            //     let snap = Number(await saleContract.connect(saleOwner).snapshot())
-            //     expect(snap).to.be.equal(3)
-
-            //     let tx = Number(await tosToken.connect(tosTokenOwner).balanceOfAt(account1.address, settingSnapNumber))
-            //     expect(tx).to.be.equal(100)
-            //     let tx2 = Number(await tosToken.connect(tosTokenOwner).balanceOfAt(account2.address, settingSnapNumber))
-            //     expect(tx2).to.be.equal(200)
-            //     let tx3 = Number(await tosToken.connect(tosTokenOwner).balanceOfAt(account3.address, settingSnapNumber))
-            //     expect(tx3).to.be.equal(1000)
-            //     let tx4 = Number(await tosToken.connect(tosTokenOwner).balanceOfAt(account4.address, settingSnapNumber))
-            //     expect(tx4).to.be.equal(4000)
-            // })
-
             it('setting the snapshot caller not owner', async () => {
                 let tx = saleContract.connect(account1).setSnapshot(setSnapshot)
                 await expect(tx).to.be.revertedWith("Accessible: Caller is not an admin")
@@ -495,9 +439,8 @@ describe("Sale", () => {
             })
 
             it('setting the ExclusiveTime caller owner', async () => {
-                blocktime = Number(await time.latest())
-                // console.log(blocktime)
-                whitelistStartTime = blocktime + 86400;
+                let block = await ethers.provider.getBlock();
+                whitelistStartTime = block.timestamp + 86400;
                 whitelistEndTime = whitelistStartTime + (86400*7);
                 exclusiveStartTime = whitelistEndTime + 1;
                 exclusiveEndTime = exclusiveStartTime + (86400*7);
@@ -536,6 +479,39 @@ describe("Sale", () => {
                 expect(tx3).to.be.equal(claimPeriod)
             })
         })
+
+        describe("openSale setting", () => {
+            it("setting the openSaletime not owner", async () => {
+                blocktime = Number(await time.latest())
+                depositStartTime = exclusiveEndTime ;
+                depositEndTime = depositStartTime + (86400*7);
+                openSaleStartTime = depositEndTime + 1;
+                openSaleEndTime = openSaleStartTime + (86400*7);
+
+                let tx = saleContract.connect(account1).setOpenTime(depositStartTime, depositEndTime, openSaleStartTime, openSaleEndTime)
+                await expect(tx).to.be.revertedWith("Accessible: Caller is not an admin")
+            })
+
+            it("setting the openSaletime owner", async () => {
+                depositStartTime = exclusiveEndTime ;
+                depositEndTime = depositStartTime + (86400*7);  //일주일동안 deposit
+                openSaleStartTime = depositEndTime + 1;
+                openSaleEndTime = openSaleStartTime + (86400*7); //일주일동안 sale
+
+                await saleContract.connect(saleOwner).setOpenTime(depositStartTime, depositEndTime, openSaleStartTime, openSaleEndTime)
+                let tx = await saleContract.startDepositTime()
+                expect(tx).to.be.equal(depositStartTime)
+                let tx2 = await saleContract.endDepositTime()
+                expect(tx2).to.be.equal(depositEndTime)
+                let tx3 = await saleContract.startOpenSaleTime()
+                expect(tx3).to.be.equal(openSaleStartTime)
+                let tx4 = await saleContract.endOpenSaleTime()
+                expect(tx4).to.be.equal(openSaleEndTime)
+            })
+        })
+    })
+
+    describe("Sale", () => {
         describe("exclusiveSale Sale", () => {
             it("calculTierAmount test before addwhiteList", async () => {
                  let tx = Number(await saleContract.calculTierAmount(account1.address))
@@ -652,42 +628,6 @@ describe("Sale", () => {
                 let tx7 = Number(await getToken.balanceOf(account5.address))
                 expect(tx7).to.be.equal(1000)
 
-            })
-        })
-    })
-
-    describe("openSale", () => {
-        describe("openSale setting", () => {
-            it("setting the openSaletime not owner", async () => {
-                blocktime = Number(await time.latest())
-                //depositStartTime = blocktime + 86400;
-                //depositStartTime = exclusiveEndTime + (60*60*1); // exclusive 끝나고 한시간뒤 또는 바로 즉시.
-                depositStartTime = exclusiveEndTime ;
-                depositEndTime = depositStartTime + (86400*7);
-                openSaleStartTime = depositEndTime + 1;
-                openSaleEndTime = openSaleStartTime + (86400*7);
-
-                let tx = saleContract.connect(account1).setOpenTime(depositStartTime, depositEndTime, openSaleStartTime, openSaleEndTime)
-                await expect(tx).to.be.revertedWith("Accessible: Caller is not an admin")
-            })
-
-            it("setting the openSaletime owner", async () => {
-                blocktime = Number(await time.latest())
-                //depositStartTime = blocktime + 86400;
-                depositStartTime = exclusiveEndTime ;
-                depositEndTime = depositStartTime + (86400*7);  //일주일동안 deposit
-                openSaleStartTime = depositEndTime + 1;
-                openSaleEndTime = openSaleStartTime + (86400*7); //일주일동안 sale
-
-                await saleContract.connect(saleOwner).setOpenTime(depositStartTime, depositEndTime, openSaleStartTime, openSaleEndTime)
-                let tx = await saleContract.startDepositTime()
-                expect(tx).to.be.equal(depositStartTime)
-                let tx2 = await saleContract.endDepositTime()
-                expect(tx2).to.be.equal(depositEndTime)
-                let tx3 = await saleContract.startOpenSaleTime()
-                expect(tx3).to.be.equal(openSaleStartTime)
-                let tx4 = await saleContract.endOpenSaleTime()
-                expect(tx4).to.be.equal(openSaleEndTime)
             })
         })
 

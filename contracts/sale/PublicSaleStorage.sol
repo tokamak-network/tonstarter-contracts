@@ -68,7 +68,7 @@ contract PublicSaleStorage  {
 
     address[] public depositors;
 
-    bool public endExclusiveSaleExec;
+    bool public endExclusiveSaleExec; //endExclusiveSale 실행여부
 
     mapping (address => UserInfoEx) public usersEx;
     mapping (address => UserInfoOpen) public usersOpen;

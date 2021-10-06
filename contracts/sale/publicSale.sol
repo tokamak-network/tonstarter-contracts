@@ -26,6 +26,13 @@ contract PublicSale is PublicSaleStorage, AccessibleCommon, ReentrancyGuard, IPu
         _;
     }
 
+    modifier beforeStartAddWhiteTime() {
+        require(
+            startAddWhiteTime == 0 ||
+            (startAddWhiteTime > 0 && block.timestamp < startAddWhiteTime), "PublicSale: not beforeStartAddWhiteTime");
+        _;
+    }
+
     function setSnapshot(uint256 _snapshot) external override onlyOwner nonZero(_snapshot) {
         snapshot = _snapshot;
     }
@@ -41,6 +48,7 @@ contract PublicSale is PublicSaleStorage, AccessibleCommon, ReentrancyGuard, IPu
         nonZero(_endAddWhiteTime)
         nonZero(_startExclusiveTime)
         nonZero(_endExclusiveTime)
+        beforeStartAddWhiteTime
     {
         startAddWhiteTime = _startAddWhiteTime;
         endAddWhiteTime = _endAddWhiteTime;
@@ -59,6 +67,7 @@ contract PublicSale is PublicSaleStorage, AccessibleCommon, ReentrancyGuard, IPu
         nonZero(_endDepositTime)
         nonZero(_startOpenSaleTime)
         nonZero(_endOpenSaleTime)
+        beforeStartAddWhiteTime
     {
         startDepositTime = _startDepositTime;
         endDepositTime = _endDepositTime;
@@ -84,6 +93,7 @@ contract PublicSale is PublicSaleStorage, AccessibleCommon, ReentrancyGuard, IPu
     function setSaleAmount(uint256 _totalExpectSaleAmount, uint256 _totalExpectOpenSaleAmount)
         external override onlyOwner
         nonZero(_totalExpectSaleAmount.add(_totalExpectOpenSaleAmount))
+        beforeStartAddWhiteTime
     {
         totalExpectSaleAmount = _totalExpectSaleAmount;
         totalExpectOpenSaleAmount = _totalExpectOpenSaleAmount;
@@ -96,6 +106,7 @@ contract PublicSale is PublicSaleStorage, AccessibleCommon, ReentrancyGuard, IPu
         nonZero(_tier2)
         nonZero(_tier3)
         nonZero(_tier4)
+        beforeStartAddWhiteTime
     {
         tiers[1] = _tier1;
         tiers[2] = _tier2;
@@ -110,6 +121,7 @@ contract PublicSale is PublicSaleStorage, AccessibleCommon, ReentrancyGuard, IPu
         nonZero(_tier2)
         nonZero(_tier3)
         nonZero(_tier4)
+        beforeStartAddWhiteTime
     {
         require(_tier1.add(_tier2).add(_tier3).add(_tier4) == 10000, "PublicSale: Sum should be 10000");
         tiersPercents[1] = _tier1;
@@ -132,6 +144,7 @@ contract PublicSale is PublicSaleStorage, AccessibleCommon, ReentrancyGuard, IPu
         external override onlyOwner
         nonZero(_saleTokenPrice)
         nonZero(_payTokenPrice)
+        beforeStartAddWhiteTime
     {
         saleTokenPrice = _saleTokenPrice;
         payTokenPrice = _payTokenPrice;
