@@ -61,12 +61,14 @@ contract PublicSaleStorage  {
     uint256 public claimPeriod;   //클레임 횟수
 
     address public getTokenOwner;
-    
+
     IERC20 public saleToken;
     IERC20 public getToken;
     ILockTOS public sTOS;
 
     address[] public depositors;
+
+    bool public endExclusiveSaleExec;
 
     mapping (address => UserInfoEx) public usersEx;
     mapping (address => UserInfoOpen) public usersOpen;

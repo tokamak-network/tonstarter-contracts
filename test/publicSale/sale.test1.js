@@ -579,7 +579,7 @@ describe("Sale", () => {
                 expect(tx8).to.be.equal(1)
 
                 let tx9 = saleContract.connect(tester4.account).addWhiteList()
-                await expect(tx9).to.be.revertedWith("already you attend whitelist")
+                await expect(tx9).to.be.revertedWith("PublicSale: already attended")
             })
 
             it("how many input amount", async () => {
@@ -607,7 +607,7 @@ describe("Sale", () => {
             it("exclusiveSale before exclusive startTime", async () => {
                 await getToken.connect(account1).approve(saleContract.address, 60)
                 let tx = saleContract.connect(account1).exclusiveSale(60)
-                await expect(tx).to.be.revertedWith("need to exclusiveStartTime")
+                await expect(tx).to.be.revertedWith("PublicSale: exclusiveStartTime has not passed")
             })
 
             it("duration the time", async () => {
@@ -621,7 +621,7 @@ describe("Sale", () => {
 
             it("addwhitelist after whitelistTIme", async () => {
                 let tx3 = saleContract.connect(account1).addWhiteList()
-                await expect(tx3).to.be.revertedWith("end the whitelistTime")
+                await expect(tx3).to.be.revertedWith("PublicSale: end the whitelistTime")
             })
 
             it("exclusiveSale after exclusive startTime", async () => {
@@ -660,8 +660,10 @@ describe("Sale", () => {
         describe("openSale setting", () => {
             it("setting the openSaletime not owner", async () => {
                 blocktime = Number(await time.latest())
-                depositStartTime = blocktime + 86400;
-                depositEndTime = exclusiveStartTime + (86400*7);
+                //depositStartTime = blocktime + 86400;
+                //depositStartTime = exclusiveEndTime + (60*60*1); // exclusive 끝나고 한시간뒤 또는 바로 즉시.
+                depositStartTime = exclusiveEndTime ;
+                depositEndTime = depositStartTime + (86400*7);
                 openSaleStartTime = depositEndTime + 1;
                 openSaleEndTime = openSaleStartTime + (86400*7);
 
@@ -671,8 +673,9 @@ describe("Sale", () => {
 
             it("setting the openSaletime owner", async () => {
                 blocktime = Number(await time.latest())
-                depositStartTime = blocktime + 86400;
-                depositEndTime = exclusiveStartTime + (86400*7);  //일주일동안 deposit
+                //depositStartTime = blocktime + 86400;
+                depositStartTime = exclusiveEndTime ;
+                depositEndTime = depositStartTime + (86400*7);  //일주일동안 deposit
                 openSaleStartTime = depositEndTime + 1;
                 openSaleEndTime = openSaleStartTime + (86400*7); //일주일동안 sale
 
@@ -691,7 +694,7 @@ describe("Sale", () => {
         describe("openSale Sale", () => {
             it("deposit before depositTime", async () => {
                 let tx = saleContract.connect(account1).deposit(100)
-                await expect(tx).to.be.revertedWith("don't start depositTime")
+                await expect(tx).to.be.revertedWith("PublicSale: don't start depositTime")
             })
 
             it("duration the time", async () => {
@@ -728,7 +731,7 @@ describe("Sale", () => {
             it("deposit after depositEndTime", async () => {
                 await getToken.connect(account1).approve(saleContract.address, 100)
                 let tx = saleContract.connect(account1).deposit(100)
-                await expect(tx).to.be.revertedWith("end the depositTime")
+                await expect(tx).to.be.revertedWith("PublicSale: end the depositTime")
             })
 
             it("depositors", async () => {
@@ -780,7 +783,7 @@ describe("Sale", () => {
     describe("claim test", () => {
         it('claim before claimTime', async () => {
             let tx = saleContract.connect(account1).claim()
-            await expect(tx).to.be.revertedWith("don't start claimTime")
+            await expect(tx).to.be.revertedWith("PublicSale: don't start claimTime")
         })
         it("duration the time to period = 1", async () => {
             await ethers.provider.send('evm_setNextBlockTimestamp', [claimStartTime]);
