@@ -7,6 +7,21 @@ interface IPublicSale {
     /// @param _snapshot _snapshot timestamp
     function setSnapshot(uint256 _snapshot) external;
 
+    /// @dev set information related to saleTime
+    function setAllTime(
+        uint256 _startAddWhiteTime,
+        uint256 _endAddWhiteTime,
+        uint256 _startExclusiveTime,
+        uint256 _endExclusiveTime,
+        uint256 _startDepositTime,
+        uint256 _endDepositTime,
+        uint256 _startOpenSaleTime,
+        uint256 _endOpenSaleTime,
+        uint256 _startClaimTime,
+        uint256 _claimInterval,
+        uint256 _claimPeriod
+    ) external;
+
     /// @dev set information related to exclusive sale
     /// @param _startAddWhiteTime start time of addwhitelist
     /// @param _endAddWhiteTime end time of addwhitelist
@@ -119,4 +134,7 @@ interface IPublicSale {
 
     /// @dev execute the claim
     function claim() external;
+
+    /// @dev execute the withdraw
+    function withdraw() external;
 }

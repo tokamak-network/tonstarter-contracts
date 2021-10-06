@@ -62,6 +62,44 @@ contract PublicSale is PublicSaleStorage, AccessibleCommon, ReentrancyGuard, IPu
         snapshot = _snapshot;
     }
 
+    function setAllTime(
+        uint256 _startAddWhiteTime,
+        uint256 _endAddWhiteTime,
+        uint256 _startExclusiveTime,
+        uint256 _endExclusiveTime,
+        uint256 _startDepositTime,
+        uint256 _endDepositTime,
+        uint256 _startOpenSaleTime,
+        uint256 _endOpenSaleTime,
+        uint256 _startClaimTime,
+        uint256 _claimInterval,
+        uint256 _claimPeriod
+    ) external override onlyOwner 
+        nonZero(_startAddWhiteTime)
+        nonZero(_endAddWhiteTime)
+        nonZero(_startExclusiveTime)
+        nonZero(_endExclusiveTime)
+        nonZero(_startDepositTime)
+        nonZero(_endDepositTime)
+        nonZero(_startOpenSaleTime)
+        nonZero(_endOpenSaleTime)
+        nonZero(_startClaimTime)
+        nonZero(_claimInterval)
+        nonZero(_claimPeriod)
+    {
+        startAddWhiteTime = _startAddWhiteTime;
+        endAddWhiteTime = _endAddWhiteTime;
+        startExclusiveTime = _startExclusiveTime;
+        endExclusiveTime = _endExclusiveTime;
+        startDepositTime = _startDepositTime;
+        endDepositTime = _endDepositTime;
+        startOpenSaleTime = _startOpenSaleTime;
+        endOpenSaleTime = _endOpenSaleTime;
+        startClaimTime = _startClaimTime;
+        claimInterval = _claimInterval;
+        claimPeriod = _claimPeriod;
+    }
+
     /// @inheritdoc IPublicSale
     function setExclusiveTime(
         uint256 _startAddWhiteTime,
@@ -172,6 +210,7 @@ contract PublicSale is PublicSaleStorage, AccessibleCommon, ReentrancyGuard, IPu
         require(block.timestamp >= endExclusiveTime, "PublicSale: didn't end exclusiveSale");
         endExclusiveSaleExec = true;
         totalExpectOpenSaleAmount = totalExpectOpenSaleAmount.add(totalExpectSaleAmount).sub(totalExSaleAmount);
+        totalExpectSaleAmount = totalExSaleAmount;
         emit EndedExclusiveSale();
     }
 
@@ -413,6 +452,12 @@ contract PublicSale is PublicSaleStorage, AccessibleCommon, ReentrancyGuard, IPu
 
         saleToken.safeTransfer(msg.sender, reward);
         emit Claimed(msg.sender, reward);
+    }
+
+    function withdraw() external override onlyOwner{
+        require(block.timestamp > endOpenSaleTime, "PublicSale: end the openSaleTime");
+        uint256 withdrawAmount = totalExpectSaleAmount.add(totalExpectOpenSaleAmount).sub(totalExSaleAmount).sub(totalOpenSaleAmount);
+        saleToken.safeTransfer(msg.sender, withdrawAmount);
     }
 
 }
