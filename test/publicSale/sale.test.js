@@ -458,23 +458,6 @@ describe("Sale", () => {
                 let tx4 = Number(await saleContract.endAddWhiteTime())
                 expect(tx4).to.be.equal(whitelistEndTime)
             })
-
-            it('setting the setClaim', async () => {
-                claimStartTime = exclusiveEndTime + (86400 * 20);
-
-                await saleContract.connect(saleOwner).setClaim(
-                    claimStartTime,
-                    claimInterval,
-                    claimPeriod
-                )
-
-                let tx = Number(await saleContract.startClaimTime())
-                expect(tx).to.be.equal(claimStartTime)
-                let tx2 = Number(await saleContract.claimInterval())
-                expect(tx2).to.be.equal(claimInterval)
-                let tx3 = Number(await saleContract.claimPeriod())
-                expect(tx3).to.be.equal(claimPeriod)
-            })
         })
 
         describe("openSale setting", () => {
@@ -504,6 +487,49 @@ describe("Sale", () => {
                 expect(tx3).to.be.equal(openSaleStartTime)
                 let tx4 = await saleContract.endOpenSaleTime()
                 expect(tx4).to.be.equal(openSaleEndTime)
+            })
+
+            // it('setting the setClaim', async () => {
+            //     claimStartTime = openSaleEndTime + (86400 * 20);
+
+            //     await saleContract.connect(saleOwner).setClaim(
+            //         claimStartTime,
+            //         claimInterval,
+            //         claimPeriod
+            //     )
+
+            //     let tx = Number(await saleContract.startClaimTime())
+            //     expect(tx).to.be.equal(claimStartTime)
+            //     let tx2 = Number(await saleContract.claimInterval())
+            //     expect(tx2).to.be.equal(claimInterval)
+            //     let tx3 = Number(await saleContract.claimPeriod())
+            //     expect(tx3).to.be.equal(claimPeriod)
+            // })
+
+            it('setting the setValue caller not owner', async () => {
+                claimStartTime = openSaleEndTime + (86400 * 20);
+
+                let tx = saleContract.connect(account1).setAllValue(
+                    [whitelistStartTime, whitelistEndTime, exclusiveStartTime, exclusiveEndTime],
+                    [depositStartTime, depositEndTime, openSaleStartTime, openSaleEndTime],
+                    [claimStartTime, claimInterval, claimPeriod]
+                )
+                await expect(tx).to.be.revertedWith("Accessible: Caller is not an admin")
+            })
+
+            it('setting the setValue caller owner', async () => {
+                await saleContract.connect(saleOwner).setAllValue(
+                    [whitelistStartTime, whitelistEndTime, exclusiveStartTime, exclusiveEndTime],
+                    [depositStartTime, depositEndTime, openSaleStartTime, openSaleEndTime],
+                    [claimStartTime, claimInterval, claimPeriod]
+                )
+
+                let tx = Number(await saleContract.startClaimTime())
+                expect(tx).to.be.equal(claimStartTime)
+                let tx2 = Number(await saleContract.claimInterval())
+                expect(tx2).to.be.equal(claimInterval)
+                let tx3 = Number(await saleContract.claimPeriod())
+                expect(tx3).to.be.equal(claimPeriod)
             })
         })
     })
@@ -627,7 +653,7 @@ describe("Sale", () => {
             })
             
             it("endExclusiveSale before exclusiveEndTime", async () => {
-                let tx = saleContract.connect(account1).endExclusiveSale()
+                let tx = saleContract.connect(account1). endExclusiveSale()
                 await expect(tx).to.be.revertedWith("PublicSale: didn't end exclusiveSale")
             })
         })

@@ -62,6 +62,30 @@ contract PublicSale is PublicSaleStorage, AccessibleCommon, ReentrancyGuard, IPu
         snapshot = _snapshot;
     }
 
+    function setAllValue(
+        uint256[4] calldata _exclusiveTime,
+        uint256[4] calldata _openSaleTime,
+        uint256[3] calldata _claimTime
+    ) external onlyOwner {
+        require((_exclusiveTime[0] < _exclusiveTime[1]) && (_exclusiveTime[2] < _exclusiveTime[3]));
+        require((_openSaleTime[0] < _openSaleTime[1]) && (_openSaleTime[2] < _openSaleTime[3]));
+        startAddWhiteTime = _exclusiveTime[0];
+        endAddWhiteTime = _exclusiveTime[1];
+        startExclusiveTime = _exclusiveTime[2];
+        endExclusiveTime = _exclusiveTime[3];
+        startDepositTime = _openSaleTime[0];
+        endDepositTime = _openSaleTime[1];
+        startOpenSaleTime = _openSaleTime[2];
+        endOpenSaleTime = _openSaleTime[3];
+        startClaimTime = _claimTime[0];
+        claimInterval = _claimTime[1];
+        claimPeriod = _claimTime[2];
+    }
+
+    function changeTONOwner(address _address) external onlyOwner {
+        getTokenOwner = _address;
+    }
+
     /// @inheritdoc IPublicSale
     function setExclusiveTime(
         uint256 _startAddWhiteTime,
