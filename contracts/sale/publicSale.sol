@@ -66,7 +66,9 @@ contract PublicSale is PublicSaleStorage, AccessibleCommon, ReentrancyGuard, IPu
         uint256[4] calldata _exclusiveTime,
         uint256[4] calldata _openSaleTime,
         uint256[3] calldata _claimTime
-    ) external onlyOwner {
+    ) external onlyOwner 
+        beforeStartAddWhiteTime
+    {
         require((_exclusiveTime[0] < _exclusiveTime[1]) && (_exclusiveTime[2] < _exclusiveTime[3]));
         require((_openSaleTime[0] < _openSaleTime[1]) && (_openSaleTime[2] < _openSaleTime[3]));
         startAddWhiteTime = _exclusiveTime[0];
@@ -140,8 +142,40 @@ contract PublicSale is PublicSaleStorage, AccessibleCommon, ReentrancyGuard, IPu
         claimPeriod = _claimPeriod;
     }
 
-    function reset() external onlyOwner{
+    function resetAllData() external onlyOwner{
         startAddWhiteTime = 0;
+        totalWhitelists = 0;
+        totalExSaleAmount = 0;
+        totalExPurchasedAmount = 0;
+        totalDepositAmount = 0;
+        totalOpenSaleAmount = 0;
+        totalOpenPurchasedAmount = 0;
+
+        for(uint i = 0; i < whitelists.length; i++) {
+            UserInfoEx storage userEx = usersEx[whitelists[i]];
+            userEx.join = false;
+            userEx.payAmount = 0;
+            userEx.saleAmount = 0;
+            UserClaim storage userClaim = usersClaim[whitelists[i]];
+            userClaim.claimAmount = 0;
+            userClaim.periodReward = 0;
+            userClaim.totalClaimReward = 0;
+        }
+        for(uint j = 0; j < depositors.length; j++) {
+            UserInfoOpen storage userOpen = usersOpen[depositors[j]];
+            userOpen.depositAmount = 0;
+            userOpen.join = false;
+            userOpen.payAmount = 0;
+            userOpen.saleAmount = 0;
+            UserClaim storage userClaim = usersClaim[depositors[j]];
+            userClaim.claimAmount = 0;
+            userClaim.periodReward = 0;
+            userClaim.totalClaimReward = 0;
+        }
+        for (uint k = 1; k < 5; k++) {
+            tiersAccount[k] = 0;
+            tiersExAccount[k] = 0;
+        }
     }
 
     /// @inheritdoc IPublicSale
@@ -280,7 +314,7 @@ contract PublicSale is PublicSaleStorage, AccessibleCommon, ReentrancyGuard, IPu
     }
 
     /// @inheritdoc IPublicSale
-    function calculCalimAmount(
+    function calculClaimAmount(
         address _account
     ) public view override returns(uint256) {
         require(block.timestamp >= startClaimTime, "PublicSale: don't start claimTime");
@@ -314,7 +348,8 @@ contract PublicSale is PublicSaleStorage, AccessibleCommon, ReentrancyGuard, IPu
         require(tier >= 1, "PublicSale: need to more sTOS");
         UserInfoEx storage userEx = usersEx[msg.sender];
         require(userEx.join != true, "PublicSale: already attended");
-    
+
+        if(!userEx.join) whitelists.push(msg.sender);
         userEx.join = true;
         userEx.tier = tier;
         totalWhitelists = totalWhitelists.add(1);
@@ -429,7 +464,7 @@ contract PublicSale is PublicSaleStorage, AccessibleCommon, ReentrancyGuard, IPu
         UserClaim storage userClaim = usersClaim[msg.sender];
         require(userClaim.totalClaimReward > 0, "PublicSale: need the participation");
 
-        uint256 reward = calculCalimAmount(msg.sender);
+        uint256 reward = calculClaimAmount(msg.sender);
         require(reward > 0, "PublicSale: no reward");
         require(userClaim.totalClaimReward.sub(userClaim.claimAmount) >= reward, "PublicSale: user is already getAllreward");
         require(saleToken.balanceOf(address(this)) >= reward, "PublicSale: dont have saleToken in pool");

@@ -98,7 +98,7 @@ interface IPublicSale {
 
     /// @dev calculate the open sale amount
     /// @param _account user address
-    function calculCalimAmount(
+    function calculClaimAmount(
         address _account
     ) external view returns(uint256);
 

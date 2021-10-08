@@ -67,6 +67,7 @@ contract PublicSaleStorage  {
     ILockTOS public sTOS;
 
     address[] public depositors;
+    address[] public whitelists;
 
     bool public endExclusiveSaleExec; //endExclusiveSale 실행여부
 
