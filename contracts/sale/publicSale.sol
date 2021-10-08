@@ -57,12 +57,12 @@ contract PublicSale is PublicSaleStorage, AccessibleCommon, ReentrancyGuard, IPu
         _;
     }
 
-    /// @inheritdoc IPublicSale
-    function setSnapshot(uint256 _snapshot) external override onlyOwner nonZero(_snapshot) {
-        snapshot = _snapshot;
+    function changeTONOwner(address _address) external onlyOwner {
+        getTokenOwner = _address;
     }
 
     function setAllValue(
+        uint256 _snapshot,
         uint256[4] calldata _exclusiveTime,
         uint256[4] calldata _openSaleTime,
         uint256[3] calldata _claimTime
@@ -71,6 +71,7 @@ contract PublicSale is PublicSaleStorage, AccessibleCommon, ReentrancyGuard, IPu
     {
         require((_exclusiveTime[0] < _exclusiveTime[1]) && (_exclusiveTime[2] < _exclusiveTime[3]));
         require((_openSaleTime[0] < _openSaleTime[1]) && (_openSaleTime[2] < _openSaleTime[3]));
+        snapshot = _snapshot;
         startAddWhiteTime = _exclusiveTime[0];
         endAddWhiteTime = _exclusiveTime[1];
         startExclusiveTime = _exclusiveTime[2];
@@ -84,8 +85,9 @@ contract PublicSale is PublicSaleStorage, AccessibleCommon, ReentrancyGuard, IPu
         claimPeriod = _claimTime[2];
     }
 
-    function changeTONOwner(address _address) external onlyOwner {
-        getTokenOwner = _address;
+    /// @inheritdoc IPublicSale
+    function setSnapshot(uint256 _snapshot) external override onlyOwner nonZero(_snapshot) {
+        snapshot = _snapshot;
     }
 
     /// @inheritdoc IPublicSale
@@ -178,14 +180,18 @@ contract PublicSale is PublicSaleStorage, AccessibleCommon, ReentrancyGuard, IPu
         }
     }
 
-    /// @inheritdoc IPublicSale
-    function setSaleAmount(uint256 _totalExpectSaleAmount, uint256 _totalExpectOpenSaleAmount)
-        external override onlyOwner
-        nonZero(_totalExpectSaleAmount.add(_totalExpectOpenSaleAmount))
-        beforeStartAddWhiteTime
-    {
-        totalExpectSaleAmount = _totalExpectSaleAmount;
-        totalExpectOpenSaleAmount = _totalExpectOpenSaleAmount;
+    function setAllTier(
+        uint256[4] calldata _tier,
+        uint256[4] calldata _tierPercent
+    ) external onlyOwner {
+        tiers[1] = _tier[0];
+        tiers[2] = _tier[1];
+        tiers[3] = _tier[2];
+        tiers[4] = _tier[3];
+        tiersPercents[1] = _tierPercent[0];
+        tiersPercents[2] = _tierPercent[1];
+        tiersPercents[3] = _tierPercent[2];
+        tiersPercents[4] = _tierPercent[3];
     }
 
     /// @inheritdoc IPublicSale
@@ -220,16 +226,24 @@ contract PublicSale is PublicSaleStorage, AccessibleCommon, ReentrancyGuard, IPu
         tiersPercents[4] = _tier4;
     }
 
+    function setAllAmount(
+        uint256[2] calldata _expectAmount,
+        uint256[2] calldata _priceAmount
+    ) external onlyOwner {
+        totalExpectSaleAmount = _expectAmount[0];
+        totalExpectOpenSaleAmount = _expectAmount[1];
+        saleTokenPrice = _priceAmount[0];
+        payTokenPrice = _priceAmount[1];
+    }
+
     /// @inheritdoc IPublicSale
-    //exclusiveSale이 끝나고 saleToken양을 openSale의 판매량 증가
-    //식 : openSale토큰 판매 예정량 = openSale 판매 예정량 + (exclu 판매 예정량 - exclu 실제 판매량)
-    function endExclusiveSale() public override {
-        require(!endExclusiveSaleExec, "PublicSale: allready endExclusiveSaleExec");
-        require(block.timestamp >= endExclusiveTime, "PublicSale: didn't end exclusiveSale");
-        endExclusiveSaleExec = true;
-        totalExpectOpenSaleAmount = totalExpectOpenSaleAmount.add(totalExpectSaleAmount).sub(totalExSaleAmount);
-        totalExpectSaleAmount = totalExSaleAmount;
-        emit EndedExclusiveSale();
+    function setSaleAmount(uint256 _totalExpectSaleAmount, uint256 _totalExpectOpenSaleAmount)
+        external override onlyOwner
+        nonZero(_totalExpectSaleAmount.add(_totalExpectOpenSaleAmount))
+        beforeStartAddWhiteTime
+    {
+        totalExpectSaleAmount = _totalExpectSaleAmount;
+        totalExpectOpenSaleAmount = _totalExpectOpenSaleAmount;
     }
 
     /// @inheritdoc IPublicSale
@@ -242,6 +256,18 @@ contract PublicSale is PublicSaleStorage, AccessibleCommon, ReentrancyGuard, IPu
     {
         saleTokenPrice = _saleTokenPrice;
         payTokenPrice = _payTokenPrice;
+    }
+
+    /// @inheritdoc IPublicSale
+    //exclusiveSale이 끝나고 saleToken양을 openSale의 판매량 증가
+    //식 : openSale토큰 판매 예정량 = openSale 판매 예정량 + (exclu 판매 예정량 - exclu 실제 판매량)
+    function endExclusiveSale() public override {
+        require(!endExclusiveSaleExec, "PublicSale: allready endExclusiveSaleExec");
+        require(block.timestamp >= endExclusiveTime, "PublicSale: didn't end exclusiveSale");
+        endExclusiveSaleExec = true;
+        totalExpectOpenSaleAmount = totalExpectOpenSaleAmount.add(totalExpectSaleAmount).sub(totalExSaleAmount);
+        totalExpectSaleAmount = totalExSaleAmount;
+        emit EndedExclusiveSale();
     }
 
     /// @inheritdoc IPublicSale
@@ -295,7 +321,7 @@ contract PublicSale is PublicSaleStorage, AccessibleCommon, ReentrancyGuard, IPu
             uint256 salePossible = totalExpectSaleAmount.mul(tiersPercents[tier]).div(tiersAccount[tier]).div(10000);
             return salePossible;
         } else {
-            uint256 tierAccount = tiersAccount[tier] +1;
+            uint256 tierAccount = tiersAccount[tier].add(1);
             uint256 salePossible = totalExpectSaleAmount.mul(tiersPercents[tier]).div(tierAccount).div(10000);
             return salePossible;
         }
@@ -329,7 +355,7 @@ contract PublicSale is PublicSaleStorage, AccessibleCommon, ReentrancyGuard, IPu
             uint256 reward = (userClaim.periodReward.mul(period)).sub(userClaim.claimAmount);
             return reward;
         } else {
-            uint period = (difftime/claimInterval)+1;
+            uint period = (difftime/claimInterval).add(1);
             if (period >= claimPeriod) {
                 uint256 reward = userClaim.totalClaimReward.sub(userClaim.claimAmount);
                 return reward;
@@ -430,6 +456,7 @@ contract PublicSale is PublicSaleStorage, AccessibleCommon, ReentrancyGuard, IPu
             uint256 returnAmount = userOpen.depositAmount.sub(realPayAmount);
 
             userOpen.payAmount = userOpen.payAmount.add(realPayAmount);
+            totalOpenPurchasedAmount = totalOpenPurchasedAmount.add(realPayAmount);
             userOpen.saleAmount = userOpen.saleAmount.add(openSalePossible);
             totalOpenSaleAmount = totalOpenSaleAmount.add(openSalePossible);
 
@@ -444,6 +471,7 @@ contract PublicSale is PublicSaleStorage, AccessibleCommon, ReentrancyGuard, IPu
 
         } else {
             userOpen.payAmount = userOpen.payAmount.add(userOpen.depositAmount);
+            totalOpenPurchasedAmount = totalOpenPurchasedAmount.add(userOpen.depositAmount);
             uint256 realSaleAmount = calculSaleToken(userOpen.depositAmount);
             userOpen.saleAmount = userOpen.saleAmount.add(realSaleAmount);
             totalOpenSaleAmount = totalOpenSaleAmount.add(realSaleAmount);
