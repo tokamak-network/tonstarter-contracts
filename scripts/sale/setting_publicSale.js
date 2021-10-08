@@ -28,7 +28,7 @@ let claimStartTime, claimInterval, claimPeriod
 async function setValue() {
     const [deployer] = await ethers.getSigners()
     // const publicSale = await ethers.Contract("PublicSale", proxy, adminAddress);
-    const publicSale = await ethers.Contract(proxyAddress, abiPublic, provider);
+    const publicSale = new ethers.Contract(proxyAddress, abiPublic, provider);
 
     let epochTime = 1633668934
     let epochTimePeriod = 1800      //30분
@@ -61,7 +61,7 @@ async function setValue() {
 
 async function setSaleAmount() {
     const [deployer] = await ethers.getSigners()
-    const publicSale = await ethers.Contract(proxyAddress, abiPublic, provider);
+    const publicSale = new ethers.Contract(proxyAddress, abiPublic, provider);
 
     // 1000000000000000000 wei = 1 ether
     // 1000000000000000000000000 wei = 1000000 ether
@@ -85,7 +85,7 @@ async function setSaleAmount() {
 
 async function setTier() {
     const [deployer] = await ethers.getSigners()
-    const publicSale = await ethers.Contract(proxyAddress, abiPublic, provider);
+    const publicSale = new ethers.Contract(proxyAddress, abiPublic, provider);
 
     let tier1 = 100
     let tier2 = 200
@@ -102,7 +102,7 @@ async function setTier() {
 
 async function setTierPercents() {
     const [deployer] = await ethers.getSigners()
-    const publicSale = await ethers.Contract(proxyAddress, abiPublic, provider);
+    const publicSale = new ethers.Contract(proxyAddress, abiPublic, provider);
 
     let tierPercents1 = 600
     let tierPercents2 = 1200
@@ -119,7 +119,7 @@ async function setTierPercents() {
 
 async function setTokenPrice() {
     const [deployer] = await ethers.getSigners()
-    const publicSale = await ethers.Contract(proxyAddress, abiPublic, provider);
+    const publicSale = new ethers.Contract(proxyAddress, abiPublic, provider);
 
     let saleTokenPrice = 12     //DOC토큰 가격
     let payTokenPrice = 10800   //TON토큰 가격

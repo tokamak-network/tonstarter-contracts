@@ -433,6 +433,7 @@ contract PublicSale is PublicSaleStorage, AccessibleCommon, ReentrancyGuard, IPu
         if(!userOpen.join) depositors.push(msg.sender);
         userOpen.join = true;
         userOpen.depositAmount = userOpen.depositAmount.add(_amount);
+        userOpen.saleAmount = 0;
         totalDepositAmount = totalDepositAmount.add(_amount);
 
         getToken.safeTransferFrom(msg.sender, address(this), _amount);
@@ -503,10 +504,20 @@ contract PublicSale is PublicSaleStorage, AccessibleCommon, ReentrancyGuard, IPu
         emit Claimed(msg.sender, reward);
     }
 
+    function depositWithdraw() external {
+        require(block.timestamp > endOpenSaleTime, "PublicSale: don't end saleTime");
+        UserInfoOpen storage userOpen = usersOpen[msg.sender];
+        require(userOpen.join == true && userOpen.saleAmount == 0, "PublicSale: need to deposit and don't attend the openSale");
+        uint256 withdrawAmount = userOpen.depositAmount;
+        userOpen.depositAmount = 0;
+        getToken.safeTransfer(msg.sender, withdrawAmount);
+    }
+
     function withdraw() external override onlyOwner{
         require(block.timestamp > endOpenSaleTime, "PublicSale: end the openSaleTime");
         uint256 withdrawAmount = totalExpectSaleAmount.add(totalExpectOpenSaleAmount).sub(totalExSaleAmount).sub(totalOpenSaleAmount);
+        require(withdrawAmount != 0, "PublicSale: don't exist withdrawAmount");
+        totalExpectOpenSaleAmount = totalExpectOpenSaleAmount.sub(withdrawAmount);
         saleToken.safeTransfer(msg.sender, withdrawAmount);
     }
-
 }
