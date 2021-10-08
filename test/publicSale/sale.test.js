@@ -18,9 +18,9 @@ const {
   } = require("./helpers/lock-tos-helper");
 
 const LockTOS_ABI = require("../..//artifacts/contracts/stake/LockTOS.sol/LockTOS.json");
+const PublicSale_ABI = require('../../artifacts/contracts/sale/publicSale.sol/PublicSale.json');
 
 const zeroAddress = "0x0000000000000000000000000000000000000000";
-
 
 describe("Sale", () => {
     //mockERC20으로 doc, ton, tos까지 배포해야함
@@ -299,54 +299,33 @@ describe("Sale", () => {
         });
 
         it("Initialize PublicSale", async function () {
-            deploySale = await ethers.getContractFactory("publicSale");
-            saleContract = await deploySale.connect(saleOwner).deploy(
+            let PublicSale = await ethers.getContractFactory("PublicSale");
+            let deploySaleImpl = await PublicSale.connect(saleOwner).deploy();
+
+            let PublicSaleProxy = await ethers.getContractFactory("PublicSaleProxy");
+            let PublicSaleContract = await PublicSaleProxy.connect(saleOwner).deploy(
+                deploySaleImpl.address,
+                saleOwner.address
+            );
+
+            await PublicSaleContract.connect(saleOwner).initialize(
                 saleToken.address,
                 getToken.address,
                 account5.address,
                 lockTOS.address
             );
 
+            saleContract = new ethers.Contract( PublicSaleContract.address, PublicSale_ABI.abi, ethers.provider );
+
             await saleToken.connect(saleTokenOwner).transfer(saleContract.address, (basicAmount*2))
             await getToken.connect(getTokenOwner).transfer(account1.address, basicAmount)
             await getToken.connect(getTokenOwner).transfer(account2.address, basicAmount)
             await getToken.connect(getTokenOwner).transfer(account3.address, basicAmount)
             await getToken.connect(getTokenOwner).transfer(account4.address, basicAmount)
-
         });
     });
 
-    describe("exclusiveSale", () => {
-        // describe("snapshot test", () => {
-        //     it("check snapshot", async () => {
-        //         let tx = await tosToken.connect(tosTokenOwner).snapshot()
-    
-        //         await expect(tx).to.emit(tosToken, 'Snapshot').withArgs(
-        //             1
-        //         )
-    
-        //         balance1 = Number(await tosToken.balanceOf(account1.address))
-        //         expect(balance1).to.be.equal(0)
-    
-        //         await tosToken.connect(tosTokenOwner).transfer(account1.address, 100)
-    
-        //         balance1 = Number(await tosToken.balanceOf(account1.address))
-        //         expect(balance1).to.be.equal(100)
-    
-        //         let tx2 = await tosToken.connect(tosTokenOwner).snapshot()
-    
-        //         await expect(tx2).to.emit(tosToken, 'Snapshot').withArgs(
-        //             2
-        //         )
-        //     })
-    
-        //     it('snapshot balanceOf test', async () => {
-        //         let tx = Number(await tosToken.connect(tosTokenOwner).balanceOfAt(account1.address, 1))
-        //         expect(tx).to.be.equal(0)
-        //         let tx2 = Number(await tosToken.connect(tosTokenOwner).balanceOfAt(account1.address, 2))
-        //         expect(tx2).to.be.equal(100)
-        //     });
-        // })
+    describe("setting", () => {
         describe("exclusiveSale setting", () => {
             it("check the balance (contract have the saleToken) ", async () => {
                 balance1 = Number(await saleToken.balanceOf(saleContract.address))
@@ -356,7 +335,7 @@ describe("Sale", () => {
 
             it('setting the price caller not owner', async () => {
                 let tx = saleContract.connect(account1).setTokenPrice(saleTokenPrice, payTokenPrice)
-                await expect(tx).to.be.revertedWith("Ownable: caller is not the owner")
+                await expect(tx).to.be.revertedWith("Accessible: Caller is not an admin")
             })
 
             it('setting the price caller owner', async () => {
@@ -369,7 +348,7 @@ describe("Sale", () => {
     
             it('tier setting caller not owner', async () => {
                 let tx = saleContract.connect(account1).setTier(100, 200, 1000, 4000)
-                await expect(tx).to.be.revertedWith("Ownable: caller is not the owner")
+                await expect(tx).to.be.revertedWith("Accessible: Caller is not an admin")
             })
     
             it('tier setting caller owner', async () => {
@@ -391,7 +370,7 @@ describe("Sale", () => {
     
             it('setting tierPercents caller not owner', async () => {
                 let tx = saleContract.connect(account1).setTierPercents(600, 1200, 2200, 6000)
-                await expect(tx).to.be.revertedWith("Ownable: caller is not the owner")
+                await expect(tx).to.be.revertedWith("Accessible: Caller is not an admin")
             })
 
             it('setting tierPercents caller owner', async () => {
@@ -408,7 +387,7 @@ describe("Sale", () => {
 
             it('setting the setSaleAmount caller not owner', async () => {
                 let tx = saleContract.connect(account1).setSaleAmount(basicAmount, totalSaleAmount)
-                await expect(tx).to.be.revertedWith("Ownable: caller is not the owner")
+                await expect(tx).to.be.revertedWith("Accessible: Caller is not an admin")
             })
 
             it('setting the setSaleAmount caller owner', async () => {
@@ -419,36 +398,9 @@ describe("Sale", () => {
                 expect(tx2).to.be.equal(totalSaleAmount)
             })
 
-            // it('setting the snapshot caller not owner', async () => {
-            //     let tx = saleContract.connect(account1).setSnapshot(2)
-            //     await expect(tx).to.be.revertedWith("Ownable: caller is not the owner")
-            // })
-
-            // it('setting the snapshot caller owner', async () => {
-            //     let settingSnapNumber = 3
-            //     let snapShot = await tosToken.connect(tosTokenOwner).snapshot()
-
-            //     await expect(snapShot).to.emit(tosToken, 'Snapshot').withArgs(
-            //         settingSnapNumber
-            //     )
-
-            //     await saleContract.connect(saleOwner).setSnapshot(settingSnapNumber)
-            //     let snap = Number(await saleContract.connect(saleOwner).snapshot())
-            //     expect(snap).to.be.equal(3)
-
-            //     let tx = Number(await tosToken.connect(tosTokenOwner).balanceOfAt(account1.address, settingSnapNumber))
-            //     expect(tx).to.be.equal(100)
-            //     let tx2 = Number(await tosToken.connect(tosTokenOwner).balanceOfAt(account2.address, settingSnapNumber))
-            //     expect(tx2).to.be.equal(200)
-            //     let tx3 = Number(await tosToken.connect(tosTokenOwner).balanceOfAt(account3.address, settingSnapNumber))
-            //     expect(tx3).to.be.equal(1000)
-            //     let tx4 = Number(await tosToken.connect(tosTokenOwner).balanceOfAt(account4.address, settingSnapNumber))
-            //     expect(tx4).to.be.equal(4000) 
-            // })
-
             it('setting the snapshot caller not owner', async () => {
                 let tx = saleContract.connect(account1).setSnapshot(setSnapshot)
-                await expect(tx).to.be.revertedWith("Ownable: caller is not the owner")
+                await expect(tx).to.be.revertedWith("Accessible: Caller is not an admin")
             })
 
             it('setting the snapshot caller owner', async () => {
@@ -479,7 +431,7 @@ describe("Sale", () => {
                     exclusiveStartTime, 
                     exclusiveEndTime
                 )
-                await expect(tx).to.be.revertedWith("Ownable: caller is not the owner")
+                await expect(tx).to.be.revertedWith("Accessible: Caller is not an admin")
             })
 
             it('setting the ExclusiveTime caller owner', async () => {
@@ -506,14 +458,72 @@ describe("Sale", () => {
                 let tx4 = Number(await saleContract.endAddWhiteTime())
                 expect(tx4).to.be.equal(whitelistEndTime)
             })
+        })
 
-            it('setting the setClaim', async () => {
-                claimStartTime = exclusiveEndTime + (86400 * 20);
+        describe("openSale setting", () => {
+            it("setting the openSaletime not owner", async () => {
+                blocktime = Number(await time.latest())
+                depositStartTime = exclusiveEndTime ;
+                depositEndTime = depositStartTime + (86400*7);
+                openSaleStartTime = depositEndTime + 1;
+                openSaleEndTime = openSaleStartTime + (86400*7);
 
-                await saleContract.connect(saleOwner).setClaim(
-                    claimStartTime,
-                    claimInterval,
-                    claimPeriod
+                let tx = saleContract.connect(account1).setOpenTime(depositStartTime, depositEndTime, openSaleStartTime, openSaleEndTime)
+                await expect(tx).to.be.revertedWith("Accessible: Caller is not an admin")
+            })
+
+            it("setting the openSaletime owner", async () => {
+                depositStartTime = exclusiveEndTime ;
+                depositEndTime = depositStartTime + (86400*7);  //일주일동안 deposit
+                openSaleStartTime = depositEndTime + 1;
+                openSaleEndTime = openSaleStartTime + (86400*7); //일주일동안 sale
+
+                await saleContract.connect(saleOwner).setOpenTime(depositStartTime, depositEndTime, openSaleStartTime, openSaleEndTime)
+                let tx = await saleContract.startDepositTime()
+                expect(tx).to.be.equal(depositStartTime)
+                let tx2 = await saleContract.endDepositTime()
+                expect(tx2).to.be.equal(depositEndTime)
+                let tx3 = await saleContract.startOpenSaleTime()
+                expect(tx3).to.be.equal(openSaleStartTime)
+                let tx4 = await saleContract.endOpenSaleTime()
+                expect(tx4).to.be.equal(openSaleEndTime)
+            })
+
+            // it('setting the setClaim', async () => {
+            //     claimStartTime = openSaleEndTime + (86400 * 20);
+
+            //     await saleContract.connect(saleOwner).setClaim(
+            //         claimStartTime,
+            //         claimInterval,
+            //         claimPeriod
+            //     )
+
+            //     let tx = Number(await saleContract.startClaimTime())
+            //     expect(tx).to.be.equal(claimStartTime)
+            //     let tx2 = Number(await saleContract.claimInterval())
+            //     expect(tx2).to.be.equal(claimInterval)
+            //     let tx3 = Number(await saleContract.claimPeriod())
+            //     expect(tx3).to.be.equal(claimPeriod)
+            // })
+
+            it('setting the setValue caller not owner', async () => {
+                claimStartTime = openSaleEndTime + (86400 * 20);
+
+                let tx = saleContract.connect(account1).setAllValue(
+                    setSnapshot,
+                    [whitelistStartTime, whitelistEndTime, exclusiveStartTime, exclusiveEndTime],
+                    [depositStartTime, depositEndTime, openSaleStartTime, openSaleEndTime],
+                    [claimStartTime, claimInterval, claimPeriod]
+                )
+                await expect(tx).to.be.revertedWith("Accessible: Caller is not an admin")
+            })
+
+            it('setting the setValue caller owner', async () => {
+                await saleContract.connect(saleOwner).setAllValue(
+                    setSnapshot,
+                    [whitelistStartTime, whitelistEndTime, exclusiveStartTime, exclusiveEndTime],
+                    [depositStartTime, depositEndTime, openSaleStartTime, openSaleEndTime],
+                    [claimStartTime, claimInterval, claimPeriod]
                 )
 
                 let tx = Number(await saleContract.startClaimTime())
@@ -524,6 +534,9 @@ describe("Sale", () => {
                 expect(tx3).to.be.equal(claimPeriod)
             })
         })
+    })
+    
+    describe("Sale", () => {
         describe("exclusiveSale Sale", () => {
             it("calculTierAmount test before addwhiteList", async () => {
                  let tx = Number(await saleContract.calculTierAmount(account1.address))
@@ -567,7 +580,7 @@ describe("Sale", () => {
                 expect(tx8).to.be.equal(1)
 
                 let tx9 = saleContract.connect(tester4.account).addWhiteList()
-                await expect(tx9).to.be.revertedWith("already you attend whitelist")
+                await expect(tx9).to.be.revertedWith("PublicSale: already attended")
             })
 
             it("how many input amount", async () => {
@@ -595,7 +608,7 @@ describe("Sale", () => {
             it("exclusiveSale before exclusive startTime", async () => {
                 await getToken.connect(account1).approve(saleContract.address, 60)
                 let tx = saleContract.connect(account1).exclusiveSale(60)
-                await expect(tx).to.be.revertedWith("need to exclusiveStartTime")
+                await expect(tx).to.be.revertedWith("PublicSale: exclusiveStartTime has not passed")
             })
 
             it("duration the time", async () => {
@@ -609,7 +622,7 @@ describe("Sale", () => {
 
             it("addwhitelist after whitelistTIme", async () => {
                 let tx3 = saleContract.connect(account1).addWhiteList()
-                await expect(tx3).to.be.revertedWith("end the whitelistTime")
+                await expect(tx3).to.be.revertedWith("PublicSale: end the whitelistTime")
             })
 
             it("exclusiveSale after exclusive startTime", async () => {
@@ -639,47 +652,18 @@ describe("Sale", () => {
                 expect(tx6).to.be.equal(1000000)
                 let tx7 = Number(await getToken.balanceOf(account5.address))
                 expect(tx7).to.be.equal(1000)
-
             })
-        })
-    })
-    
-    describe("openSale", () => {
-        describe("openSale setting", () => {
-            it("setting the openSaletime not owner", async () => {
-                blocktime = Number(await time.latest())
-                depositStartTime = blocktime + 86400;
-                depositEndTime = exclusiveStartTime + (86400*7); 
-                openSaleStartTime = depositEndTime + 1;
-                openSaleEndTime = openSaleStartTime + (86400*7);
-
-                let tx = saleContract.connect(account1).setOpenTime(depositStartTime, depositEndTime, openSaleStartTime, openSaleEndTime)
-                await expect(tx).to.be.revertedWith("Ownable: caller is not the owner")
-            })
-
-            it("setting the openSaletime owner", async () => {
-                blocktime = Number(await time.latest())
-                depositStartTime = blocktime + 86400;
-                depositEndTime = exclusiveStartTime + (86400*7);  //일주일동안 deposit
-                openSaleStartTime = depositEndTime + 1;
-                openSaleEndTime = openSaleStartTime + (86400*7); //일주일동안 sale
-
-                await saleContract.connect(saleOwner).setOpenTime(depositStartTime, depositEndTime, openSaleStartTime, openSaleEndTime)
-                let tx = await saleContract.startDepositTime()
-                expect(tx).to.be.equal(depositStartTime)
-                let tx2 = await saleContract.endDepositTime()
-                expect(tx2).to.be.equal(depositEndTime)
-                let tx3 = await saleContract.startOpenSaleTime()
-                expect(tx3).to.be.equal(openSaleStartTime)
-                let tx4 = await saleContract.endOpenSaleTime()
-                expect(tx4).to.be.equal(openSaleEndTime)
+            
+            it("endExclusiveSale before exclusiveEndTime", async () => {
+                let tx = saleContract.connect(account1). endExclusiveSale()
+                await expect(tx).to.be.revertedWith("PublicSale: didn't end exclusiveSale")
             })
         })
 
         describe("openSale Sale", () => {
             it("deposit before depositTime", async () => {
                 let tx = saleContract.connect(account1).deposit(100)
-                await expect(tx).to.be.revertedWith("don't start depositTime")
+                await expect(tx).to.be.revertedWith("PublicSale: don't start depositTime")
             })
 
             it("duration the time", async () => {
@@ -716,7 +700,7 @@ describe("Sale", () => {
             it("deposit after depositEndTime", async () => {
                 await getToken.connect(account1).approve(saleContract.address, 100)
                 let tx = saleContract.connect(account1).deposit(100)
-                await expect(tx).to.be.revertedWith("end the depositTime")
+                await expect(tx).to.be.revertedWith("PublicSale: end the depositTime")
             })
             
             it("depositors", async () => {
@@ -768,14 +752,14 @@ describe("Sale", () => {
     describe("claim test", () => {
         it('claim before claimTime', async () => {
             let tx = saleContract.connect(account1).claim()
-            await expect(tx).to.be.revertedWith("don't start claimTime")
+            await expect(tx).to.be.revertedWith("PublicSale: don't start claimTime")
         })
         it("duration the time to period = 1", async () => {
             await ethers.provider.send('evm_setNextBlockTimestamp', [claimStartTime]);
             await ethers.provider.send('evm_mine');
         })
         it("claim period = 1, claim call the account1", async () => {
-            let expectClaim = Number(await saleContract.calculCalimAmount(account1.address))
+            let expectClaim = Number(await saleContract.calculClaimAmount(account1.address))
             let tx = await saleContract.usersClaim(account1.address)
             expect(Number(tx.claimAmount)).to.be.equal(0)
             await saleContract.connect(account1).claim()
@@ -793,8 +777,8 @@ describe("Sale", () => {
         })
 
         it("claim period = 2, claim call the account1, account2", async () => {
-            let expectClaim = Number(await saleContract.calculCalimAmount(account1.address))
-            let expectClaim2 = Number(await saleContract.calculCalimAmount(account2.address))
+            let expectClaim = Number(await saleContract.calculClaimAmount(account1.address))
+            let expectClaim2 = Number(await saleContract.calculClaimAmount(account2.address))
 
             let claimAmount1 = await saleContract.usersClaim(account1.address)
             expect(Number(claimAmount1.claimAmount)).to.be.equal(26666)
@@ -827,8 +811,8 @@ describe("Sale", () => {
         })
 
         it("claim period = 3, claim call the account1, account3", async () => {
-            let expectClaim = Number(await saleContract.calculCalimAmount(account1.address))
-            let expectClaim2 = Number(await saleContract.calculCalimAmount(account3.address))
+            let expectClaim = Number(await saleContract.calculClaimAmount(account1.address))
+            let expectClaim2 = Number(await saleContract.calculClaimAmount(account3.address))
 
             let claimAmount1 = await saleContract.usersClaim(account1.address)
             expect(Number(claimAmount1.claimAmount)).to.be.equal(53332)
@@ -862,8 +846,8 @@ describe("Sale", () => {
         })
 
         it("claim period = 4, claim call the account1, account4", async () => {
-            let expectClaim = Number(await saleContract.calculCalimAmount(account1.address))
-            let expectClaim2 = Number(await saleContract.calculCalimAmount(account4.address))
+            let expectClaim = Number(await saleContract.calculClaimAmount(account1.address))
+            let expectClaim2 = Number(await saleContract.calculClaimAmount(account4.address))
 
             let claimAmount1 = await saleContract.usersClaim(account1.address)
             expect(Number(claimAmount1.claimAmount)).to.be.equal(79998)
@@ -898,8 +882,8 @@ describe("Sale", () => {
         })
 
         it("claim period = 6, claim call the account1, account2", async () => {
-            let expectClaim = Number(await saleContract.calculCalimAmount(account1.address))
-            let expectClaim2 = Number(await saleContract.calculCalimAmount(account2.address))
+            let expectClaim = Number(await saleContract.calculClaimAmount(account1.address))
+            let expectClaim2 = Number(await saleContract.calculClaimAmount(account2.address))
 
             let claimAmount1 = await saleContract.usersClaim(account1.address)
             expect(Number(claimAmount1.claimAmount)).to.be.equal(106664)
@@ -938,10 +922,10 @@ describe("Sale", () => {
         })
 
         it("claim period end, claim call the account1, account3, account4", async () => {
-            let expectClaim = Number(await saleContract.calculCalimAmount(account1.address))
+            let expectClaim = Number(await saleContract.calculClaimAmount(account1.address))
             expect(expectClaim).to.be.equal(0)
-            let expectClaim2 = Number(await saleContract.calculCalimAmount(account3.address))
-            let expectClaim3 = Number(await saleContract.calculCalimAmount(account4.address))
+            let expectClaim2 = Number(await saleContract.calculClaimAmount(account3.address))
+            let expectClaim3 = Number(await saleContract.calculClaimAmount(account4.address))
 
             let claimAmount1 = await saleContract.usersClaim(account3.address)
             expect(Number(claimAmount1.claimAmount)).to.be.equal(159999)
@@ -975,6 +959,75 @@ describe("Sale", () => {
             //account2 = 220,000 
             //account3 = 320,000
             //account4 = 700,000
+        })
+
+        it("data check", async () => {
+            let tx = Number(await saleContract.totalWhitelists())
+            // console.log(tx)
+            expect(tx).to.be.equal(4)
+            let tx2 = Number(await saleContract.totalExSaleAmount())
+            // console.log(tx2)
+            expect(tx2).to.be.equal(1000000)
+            let tx3 = Number(await saleContract.totalExPurchasedAmount())
+            // console.log(tx3)
+            expect(tx3).to.be.equal(1000)
+            let tx4 = Number(await saleContract.totalDepositAmount())
+            // console.log(tx4)
+            expect(tx4).to.be.equal(400)
+            let tx5 = Number(await saleContract.totalOpenSaleAmount())
+            // console.log(tx5)
+            expect(tx5).to.be.equal(400000)
+            let tx6 = Number(await saleContract.totalOpenPurchasedAmount())
+            // console.log(tx6)
+            expect(tx6).to.be.equal(400)
+            let tx7 = Number(await saleContract.tiersAccount(1))
+            // console.log(tx7)
+            expect(tx7).to.be.equal(1)
+            let tx8 = Number(await saleContract.tiersAccount(4))
+            // console.log(tx8)
+            expect(tx8).to.be.equal(1)
+            let tx9 = Number(await saleContract.tiersExAccount(1))
+            // console.log(tx9)
+            expect(tx9).to.be.equal(1)
+            let tx10 = Number(await saleContract.tiersExAccount(4))
+            // console.log(tx10)
+            expect(tx10).to.be.equal(1)
+            let tx11 = await saleContract.usersEx(account4.address)
+            expect(Number(tx11.saleAmount)).to.be.equal(600000)
+            let tx12 = await saleContract.usersOpen(account4.address)
+            expect(Number(tx12.saleAmount)).to.be.equal(100000)
+            let tx13 = await saleContract.usersClaim(account4.address)
+            expect(Number(tx13.totalClaimReward)).to.be.equal(700000)
+        })
+
+        it("resetData", async () => {
+            await saleContract.connect(saleOwner).resetAllData()
+            let tx = Number(await saleContract.totalWhitelists())
+            expect(tx).to.be.equal(0)
+            let tx2 = Number(await saleContract.totalExSaleAmount())
+            expect(tx2).to.be.equal(0)
+            let tx3 = Number(await saleContract.totalExPurchasedAmount())
+            expect(tx3).to.be.equal(0)
+            let tx4 = Number(await saleContract.totalDepositAmount())
+            expect(tx4).to.be.equal(0)
+            let tx5 = Number(await saleContract.totalOpenSaleAmount())
+            expect(tx5).to.be.equal(0)
+            let tx6 = Number(await saleContract.totalOpenPurchasedAmount())
+            expect(tx6).to.be.equal(0)
+            let tx7 = Number(await saleContract.tiersAccount(1))
+            expect(tx7).to.be.equal(0)
+            let tx8 = Number(await saleContract.tiersAccount(4))
+            expect(tx8).to.be.equal(0)
+            let tx9 = Number(await saleContract.tiersExAccount(1))
+            expect(tx9).to.be.equal(0)
+            let tx10 = Number(await saleContract.tiersExAccount(4))
+            expect(tx10).to.be.equal(0)
+            let tx11 = await saleContract.usersEx(account4.address)
+            expect(Number(tx11.saleAmount)).to.be.equal(0)
+            let tx12 = await saleContract.usersOpen(account4.address)
+            expect(Number(tx12.saleAmount)).to.be.equal(0)
+            let tx13 = await saleContract.usersClaim(account4.address)
+            expect(Number(tx13.totalClaimReward)).to.be.equal(0)
         })
     })
 })

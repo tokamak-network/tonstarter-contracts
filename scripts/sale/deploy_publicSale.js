@@ -21,7 +21,8 @@ async function main() {
     // let docAddress = "0x0e498afce58dE8651B983F136256fA3b8d9703bc" //mainnet (saleToken)
     let tonAddress = "0x44d4F5d89E9296337b8c48a332B3b2fb2C190CD0" //rinkeby (getToken)
     // let tonAddress = "0x2be5e8c109e2197D077D13A82dAead6a9b3433C5" //mainnet (getToken)
-    let sTOSAddress = "0xc1545632e67cefF8ECaB83072118271577e66aDc" //rinkeby (sTosToken)(sTOS의 proxy)
+    // let sTOSAddress = "0xc1545632e67cefF8ECaB83072118271577e66aDc" //rinkeby (sTosToken)(sTOS의 proxy)
+    let sTOSAddress = "0x8487632Aa57d663A84E836c212977a022346c50D" //rinkeby (sTOSToken2)
     // let sTOSAddress = "" //mainnet (sTOS)
     
     //세일로 받은 TON을 관리할 주소

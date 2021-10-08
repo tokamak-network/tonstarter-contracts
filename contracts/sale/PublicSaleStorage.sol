@@ -67,13 +67,16 @@ contract PublicSaleStorage  {
     ILockTOS public sTOS;
 
     address[] public depositors;
+    address[] public whitelists;
 
     bool public endExclusiveSaleExec; //endExclusiveSale 실행여부
 
     mapping (address => UserInfoEx) public usersEx;
     mapping (address => UserInfoOpen) public usersOpen;
     mapping (address => UserClaim) public usersClaim;
+
     mapping (uint => uint256) public tiers;         //티어별 가격 설정
-    mapping (uint => uint256) public tiersAccount;  //티어별 참여자 숫자 기록
+    mapping (uint => uint256) public tiersAccount;  //티어별 화이트리스트 참여자 숫자 기록
+    mapping (uint => uint256) public tiersExAccount;  //티어별 exclusiveSale 참여자 숫자 기록
     mapping (uint => uint256) public tiersPercents;  //티어별 퍼센트 기록
 }

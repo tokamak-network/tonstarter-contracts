@@ -57,6 +57,34 @@ contract PublicSale is PublicSaleStorage, AccessibleCommon, ReentrancyGuard, IPu
         _;
     }
 
+    function changeTONOwner(address _address) external onlyOwner {
+        getTokenOwner = _address;
+    }
+
+    function setAllValue(
+        uint256 _snapshot,
+        uint256[4] calldata _exclusiveTime,
+        uint256[4] calldata _openSaleTime,
+        uint256[3] calldata _claimTime
+    ) external onlyOwner 
+        beforeStartAddWhiteTime
+    {
+        require((_exclusiveTime[0] < _exclusiveTime[1]) && (_exclusiveTime[2] < _exclusiveTime[3]));
+        require((_openSaleTime[0] < _openSaleTime[1]) && (_openSaleTime[2] < _openSaleTime[3]));
+        snapshot = _snapshot;
+        startAddWhiteTime = _exclusiveTime[0];
+        endAddWhiteTime = _exclusiveTime[1];
+        startExclusiveTime = _exclusiveTime[2];
+        endExclusiveTime = _exclusiveTime[3];
+        startDepositTime = _openSaleTime[0];
+        endDepositTime = _openSaleTime[1];
+        startOpenSaleTime = _openSaleTime[2];
+        endOpenSaleTime = _openSaleTime[3];
+        startClaimTime = _claimTime[0];
+        claimInterval = _claimTime[1];
+        claimPeriod = _claimTime[2];
+    }
+
     /// @inheritdoc IPublicSale
     function setSnapshot(uint256 _snapshot) external override onlyOwner nonZero(_snapshot) {
         snapshot = _snapshot;
@@ -68,15 +96,12 @@ contract PublicSale is PublicSaleStorage, AccessibleCommon, ReentrancyGuard, IPu
         uint256 _endAddWhiteTime,
         uint256 _startExclusiveTime,
         uint256 _endExclusiveTime
-    ) external override onlyOwner
+    ) external override onlyOwner 
         nonZero(_startAddWhiteTime)
         nonZero(_endAddWhiteTime)
         nonZero(_startExclusiveTime)
         nonZero(_endExclusiveTime)
         beforeStartAddWhiteTime
-        lessThan(_startAddWhiteTime, _endAddWhiteTime)
-        lessThan(_startAddWhiteTime, _startExclusiveTime)
-        lessThan(_startExclusiveTime, _endExclusiveTime)
     {
         startAddWhiteTime = _startAddWhiteTime;
         endAddWhiteTime = _endAddWhiteTime;
@@ -90,15 +115,12 @@ contract PublicSale is PublicSaleStorage, AccessibleCommon, ReentrancyGuard, IPu
         uint256 _endDepositTime,
         uint256 _startOpenSaleTime,
         uint256 _endOpenSaleTime
-    ) external override onlyOwner
+    ) external override onlyOwner 
         nonZero(_startDepositTime)
         nonZero(_endDepositTime)
         nonZero(_startOpenSaleTime)
         nonZero(_endOpenSaleTime)
         beforeStartAddWhiteTime
-        lessThan(_startDepositTime, _endDepositTime)
-        lessThan(_startDepositTime, _startOpenSaleTime)
-        lessThan(_startOpenSaleTime, _endOpenSaleTime)
     {
         startDepositTime = _startDepositTime;
         endDepositTime = _endDepositTime;
@@ -111,25 +133,65 @@ contract PublicSale is PublicSaleStorage, AccessibleCommon, ReentrancyGuard, IPu
         uint256 _startClaimTime,
         uint256 _claimInterval,
         uint256 _claimPeriod
-    ) external override onlyOwner
+    ) external override onlyOwner 
         nonZero(_startClaimTime)
         nonZero(_claimInterval)
         nonZero(_claimPeriod)
-        beforeEndAddWhiteTime
+        beforeStartAddWhiteTime
     {
         startClaimTime = _startClaimTime;
         claimInterval = _claimInterval;
         claimPeriod = _claimPeriod;
     }
 
-    /// @inheritdoc IPublicSale
-    function setSaleAmount(uint256 _totalExpectSaleAmount, uint256 _totalExpectOpenSaleAmount)
-        external override onlyOwner
-        nonZero(_totalExpectSaleAmount.add(_totalExpectOpenSaleAmount))
-        beforeStartAddWhiteTime
-    {
-        totalExpectSaleAmount = _totalExpectSaleAmount;
-        totalExpectOpenSaleAmount = _totalExpectOpenSaleAmount;
+    function resetAllData() external onlyOwner{
+        startAddWhiteTime = 0;
+        totalWhitelists = 0;
+        totalExSaleAmount = 0;
+        totalExPurchasedAmount = 0;
+        totalDepositAmount = 0;
+        totalOpenSaleAmount = 0;
+        totalOpenPurchasedAmount = 0;
+
+        for(uint i = 0; i < whitelists.length; i++) {
+            UserInfoEx storage userEx = usersEx[whitelists[i]];
+            userEx.join = false;
+            userEx.payAmount = 0;
+            userEx.saleAmount = 0;
+            UserClaim storage userClaim = usersClaim[whitelists[i]];
+            userClaim.claimAmount = 0;
+            userClaim.periodReward = 0;
+            userClaim.totalClaimReward = 0;
+        }
+        for(uint j = 0; j < depositors.length; j++) {
+            UserInfoOpen storage userOpen = usersOpen[depositors[j]];
+            userOpen.depositAmount = 0;
+            userOpen.join = false;
+            userOpen.payAmount = 0;
+            userOpen.saleAmount = 0;
+            UserClaim storage userClaim = usersClaim[depositors[j]];
+            userClaim.claimAmount = 0;
+            userClaim.periodReward = 0;
+            userClaim.totalClaimReward = 0;
+        }
+        for (uint k = 1; k < 5; k++) {
+            tiersAccount[k] = 0;
+            tiersExAccount[k] = 0;
+        }
+    }
+
+    function setAllTier(
+        uint256[4] calldata _tier,
+        uint256[4] calldata _tierPercent
+    ) external onlyOwner {
+        tiers[1] = _tier[0];
+        tiers[2] = _tier[1];
+        tiers[3] = _tier[2];
+        tiers[4] = _tier[3];
+        tiersPercents[1] = _tierPercent[0];
+        tiersPercents[2] = _tierPercent[1];
+        tiersPercents[3] = _tierPercent[2];
+        tiersPercents[4] = _tierPercent[3];
     }
 
     /// @inheritdoc IPublicSale
@@ -164,15 +226,24 @@ contract PublicSale is PublicSaleStorage, AccessibleCommon, ReentrancyGuard, IPu
         tiersPercents[4] = _tier4;
     }
 
+    function setAllAmount(
+        uint256[2] calldata _expectAmount,
+        uint256[2] calldata _priceAmount
+    ) external onlyOwner {
+        totalExpectSaleAmount = _expectAmount[0];
+        totalExpectOpenSaleAmount = _expectAmount[1];
+        saleTokenPrice = _priceAmount[0];
+        payTokenPrice = _priceAmount[1];
+    }
+
     /// @inheritdoc IPublicSale
-    //exclusiveSale이 끝나고 saleToken양을 openSale의 판매량 증가
-    //식 : openSale토큰 판매 예정량 = openSale 판매 예정량 + (exclu 판매 예정량 - exclu 실제 판매량)
-    function endExclusiveSale() public override {
-        require(!endExclusiveSaleExec, "PublicSale: allready endExclusiveSaleExec");
-        require(block.timestamp >= endExclusiveTime, "PublicSale: didn't end exclusiveSale");
-        endExclusiveSaleExec = true;
-        totalExpectOpenSaleAmount = totalExpectOpenSaleAmount.add(totalExpectSaleAmount).sub(totalExSaleAmount);
-        emit EndedExclusiveSale();
+    function setSaleAmount(uint256 _totalExpectSaleAmount, uint256 _totalExpectOpenSaleAmount)
+        external override onlyOwner
+        nonZero(_totalExpectSaleAmount.add(_totalExpectOpenSaleAmount))
+        beforeStartAddWhiteTime
+    {
+        totalExpectSaleAmount = _totalExpectSaleAmount;
+        totalExpectOpenSaleAmount = _totalExpectOpenSaleAmount;
     }
 
     /// @inheritdoc IPublicSale
@@ -185,6 +256,18 @@ contract PublicSale is PublicSaleStorage, AccessibleCommon, ReentrancyGuard, IPu
     {
         saleTokenPrice = _saleTokenPrice;
         payTokenPrice = _payTokenPrice;
+    }
+
+    /// @inheritdoc IPublicSale
+    //exclusiveSale이 끝나고 saleToken양을 openSale의 판매량 증가
+    //식 : openSale토큰 판매 예정량 = openSale 판매 예정량 + (exclu 판매 예정량 - exclu 실제 판매량)
+    function endExclusiveSale() public override {
+        require(!endExclusiveSaleExec, "PublicSale: allready endExclusiveSaleExec");
+        require(block.timestamp >= endExclusiveTime, "PublicSale: didn't end exclusiveSale");
+        endExclusiveSaleExec = true;
+        totalExpectOpenSaleAmount = totalExpectOpenSaleAmount.add(totalExpectSaleAmount).sub(totalExSaleAmount);
+        totalExpectSaleAmount = totalExSaleAmount;
+        emit EndedExclusiveSale();
     }
 
     /// @inheritdoc IPublicSale
@@ -238,7 +321,7 @@ contract PublicSale is PublicSaleStorage, AccessibleCommon, ReentrancyGuard, IPu
             uint256 salePossible = totalExpectSaleAmount.mul(tiersPercents[tier]).div(tiersAccount[tier]).div(10000);
             return salePossible;
         } else {
-            uint256 tierAccount = tiersAccount[tier] +1;
+            uint256 tierAccount = tiersAccount[tier].add(1);
             uint256 salePossible = totalExpectSaleAmount.mul(tiersPercents[tier]).div(tierAccount).div(10000);
             return salePossible;
         }
@@ -257,7 +340,7 @@ contract PublicSale is PublicSaleStorage, AccessibleCommon, ReentrancyGuard, IPu
     }
 
     /// @inheritdoc IPublicSale
-    function calculCalimAmount(
+    function calculClaimAmount(
         address _account
     ) public view override returns(uint256) {
         require(block.timestamp >= startClaimTime, "PublicSale: don't start claimTime");
@@ -272,7 +355,7 @@ contract PublicSale is PublicSaleStorage, AccessibleCommon, ReentrancyGuard, IPu
             uint256 reward = (userClaim.periodReward.mul(period)).sub(userClaim.claimAmount);
             return reward;
         } else {
-            uint period = (difftime/claimInterval)+1;
+            uint period = (difftime/claimInterval).add(1);
             if (period >= claimPeriod) {
                 uint256 reward = userClaim.totalClaimReward.sub(userClaim.claimAmount);
                 return reward;
@@ -289,13 +372,14 @@ contract PublicSale is PublicSaleStorage, AccessibleCommon, ReentrancyGuard, IPu
         require(block.timestamp < endAddWhiteTime, "PublicSale: end the whitelistTime");
         uint tier = calculTier(msg.sender);
         require(tier >= 1, "PublicSale: need to more sTOS");
-        tiersAccount[tier] = tiersAccount[tier] + 1;
         UserInfoEx storage userEx = usersEx[msg.sender];
         require(userEx.join != true, "PublicSale: already attended");
 
+        if(!userEx.join) whitelists.push(msg.sender);
         userEx.join = true;
         userEx.tier = tier;
-        totalWhitelists = totalWhitelists + 1;
+        totalWhitelists = totalWhitelists.add(1);
+        tiersAccount[tier] = tiersAccount[tier].add(1);
 
         emit AddedWhiteList(msg.sender, tier);
     }
@@ -311,7 +395,6 @@ contract PublicSale is PublicSaleStorage, AccessibleCommon, ReentrancyGuard, IPu
         require(userEx.join == true, "PublicSale: Whitelist not registered");
         uint256 tokenSaleAmount = calculSaleToken(_amount);
         uint256 salePossible = calculTierAmount(msg.sender);
-
         require(salePossible >= tokenSaleAmount, "PublicSale: just buy whitelist amount");
         require(salePossible >= userEx.saleAmount.add(tokenSaleAmount), "PublicSale: just buy whitelisted amount");
 
@@ -326,6 +409,9 @@ contract PublicSale is PublicSaleStorage, AccessibleCommon, ReentrancyGuard, IPu
 
         totalExPurchasedAmount = totalExPurchasedAmount.add(_amount);
         totalExSaleAmount = totalExSaleAmount.add(tokenSaleAmount);
+
+        uint tier = calculTier(msg.sender);
+        tiersExAccount[tier] = tiersExAccount[tier].add(1);
 
         getToken.safeTransferFrom(msg.sender, address(this), _amount);
         getToken.safeTransfer(getTokenOwner, _amount);
@@ -370,6 +456,7 @@ contract PublicSale is PublicSaleStorage, AccessibleCommon, ReentrancyGuard, IPu
             uint256 returnAmount = userOpen.depositAmount.sub(realPayAmount);
 
             userOpen.payAmount = userOpen.payAmount.add(realPayAmount);
+            totalOpenPurchasedAmount = totalOpenPurchasedAmount.add(realPayAmount);
             userOpen.saleAmount = userOpen.saleAmount.add(openSalePossible);
             totalOpenSaleAmount = totalOpenSaleAmount.add(openSalePossible);
 
@@ -384,6 +471,7 @@ contract PublicSale is PublicSaleStorage, AccessibleCommon, ReentrancyGuard, IPu
 
         } else {
             userOpen.payAmount = userOpen.payAmount.add(userOpen.depositAmount);
+            totalOpenPurchasedAmount = totalOpenPurchasedAmount.add(userOpen.depositAmount);
             uint256 realSaleAmount = calculSaleToken(userOpen.depositAmount);
             userOpen.saleAmount = userOpen.saleAmount.add(realSaleAmount);
             totalOpenSaleAmount = totalOpenSaleAmount.add(realSaleAmount);
@@ -404,7 +492,7 @@ contract PublicSale is PublicSaleStorage, AccessibleCommon, ReentrancyGuard, IPu
         UserClaim storage userClaim = usersClaim[msg.sender];
         require(userClaim.totalClaimReward > 0, "PublicSale: need the participation");
 
-        uint256 reward = calculCalimAmount(msg.sender);
+        uint256 reward = calculClaimAmount(msg.sender);
         require(reward > 0, "PublicSale: no reward");
         require(userClaim.totalClaimReward.sub(userClaim.claimAmount) >= reward, "PublicSale: user is already getAllreward");
         require(saleToken.balanceOf(address(this)) >= reward, "PublicSale: dont have saleToken in pool");
@@ -413,6 +501,12 @@ contract PublicSale is PublicSaleStorage, AccessibleCommon, ReentrancyGuard, IPu
 
         saleToken.safeTransfer(msg.sender, reward);
         emit Claimed(msg.sender, reward);
+    }
+
+    function withdraw() external override onlyOwner{
+        require(block.timestamp > endOpenSaleTime, "PublicSale: end the openSaleTime");
+        uint256 withdrawAmount = totalExpectSaleAmount.add(totalExpectOpenSaleAmount).sub(totalExSaleAmount).sub(totalOpenSaleAmount);
+        saleToken.safeTransfer(msg.sender, withdrawAmount);
     }
 
 }
