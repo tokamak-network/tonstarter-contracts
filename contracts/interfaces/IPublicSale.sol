@@ -2,7 +2,6 @@
 pragma solidity ^0.7.6;
 
 interface IPublicSale {
-
     /// @dev set snapshot
     /// @param _snapshot _snapshot timestamp
     function setSnapshot(uint256 _snapshot) external;
@@ -44,28 +43,37 @@ interface IPublicSale {
     /// @dev set information related to sale amount
     /// @param _totalExpectSaleAmount expected amount of exclusive sale
     /// @param _totalExpectOpenSaleAmount expected amount of open sale
-    function setSaleAmount(uint256 _totalExpectSaleAmount, uint256 _totalExpectOpenSaleAmount)
-        external;
-
+    function setSaleAmount(
+        uint256 _totalExpectSaleAmount,
+        uint256 _totalExpectOpenSaleAmount
+    ) external;
 
     /// @dev set information related to tier
     /// @param _tier1 tier1 condition of STOS hodings
     /// @param _tier2 tier2 condition of STOS hodings
     /// @param _tier3 tier3 condition of STOS hodings
     /// @param _tier4 tier4 condition of STOS hodings
-    function setTier(uint256 _tier1, uint256 _tier2, uint256 _tier3, uint256 _tier4)
-        external;
+    function setTier(
+        uint256 _tier1,
+        uint256 _tier2,
+        uint256 _tier3,
+        uint256 _tier4
+    ) external;
 
     /// @dev set information related to tier proportion for exclusive sale
     /// @param _tier1 tier1 proportion (If it is 6%, enter as 600 -> To record up to the 2nd decimal point)
     /// @param _tier2 tier2 proportion
     /// @param _tier3 tier3 proportion
     /// @param _tier4 tier4 proportion
-    function setTierPercents(uint256 _tier1, uint256 _tier2, uint256 _tier3, uint256 _tier4)
-        external;
+    function setTierPercents(
+        uint256 _tier1,
+        uint256 _tier2,
+        uint256 _tier3,
+        uint256 _tier4
+    ) external;
 
     /// @dev set to endExclusiveSale (After the exclusive sale, the remaining allocation amount is sent to the open sale)
-    function endExclusiveSale() external ;
+    function endExclusiveSale() external;
 
     /// @dev set information related to token price
     /// @param _saleTokenPrice the sale token price
@@ -75,32 +83,41 @@ interface IPublicSale {
 
     /// @dev calculate the sale Token amount
     /// @param _amount th amount
-    function calculSaleToken(uint256 _amount) external view returns(uint256);
+    function calculSaleToken(uint256 _amount) external view returns (uint256);
 
     /// @dev calculate the pay Token amount
     /// @param _amount th amount
-    function calculPayToken(uint256 _amount) external view returns(uint256);
+    function calculPayToken(uint256 _amount) external view returns (uint256);
 
     /// @dev calculate the tier
     /// @param _address user address
-    function calculTier(address _address)
-        external view
-        returns(uint);
+    function calculTier(address _address) external view returns (uint256);
 
     /// @dev calculate the tier's amount
     /// @param _address user address
-    function calculTierAmount(address _address) external view returns(uint256);
+    function calculTierAmount(address _address) external view returns (uint256);
 
     /// @dev calculate the open sale amount
     /// @param _account user address
     /// @param _amount  amount
-    function calculOpenSaleAmount(address _account, uint256 _amount) external view returns(uint256);
+    function calculOpenSaleAmount(address _account, uint256 _amount)
+        external
+        view
+        returns (uint256);
 
     /// @dev calculate the open sale amount
     /// @param _account user address
-    function calculClaimAmount(
-        address _account
-    ) external view returns(uint256);
+    function calculClaimAmount(address _account)
+        external
+        view
+        returns (uint256);
+
+    /// @dev view totalExpectOpenSaleAmount
+    function totalExpectOpenSaleAmountView()
+        external
+        view
+        returns(uint256);
+
 
     /// @dev execute add whitelist
     function addWhiteList() external;
@@ -116,10 +133,16 @@ interface IPublicSale {
     /// @dev execute open sale
     function openSale() external;
 
-
     /// @dev execute the claim
     function claim() external;
 
+    /// @dev Called when depositing and not participating in the sale, and need to recover the deposit.
+    function depositWithdraw() external;
+
     /// @dev execute the withdraw
     function withdraw() external;
+
+
+
+
 }

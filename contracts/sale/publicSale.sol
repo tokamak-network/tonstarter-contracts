@@ -34,6 +34,7 @@ contract PublicSale is
     );
     event Claimed(address indexed from, uint256 amount);
     event Withdrawal(address indexed from, uint256 amount);
+    event DepositWithdrawal(address indexed from, uint256 amount);
 
     modifier nonZero(uint256 _value) {
         require(_value > 0, "PublicSale: zero");
@@ -503,6 +504,7 @@ contract PublicSale is
         if (!userEx.join) whitelists.push(msg.sender);
         userEx.join = true;
         userEx.tier = tier;
+        userEx.saleAmount = 0;
         totalWhitelists = totalWhitelists.add(1);
         tiersAccount[tier] = tiersAccount[tier].add(1);
 
@@ -516,6 +518,7 @@ contract PublicSale is
     function exclusiveSale(uint256 _amount)
         external
         override
+        nonZero(_amount)
         nonZero(claimPeriod)
         nonReentrant
     {
@@ -528,16 +531,16 @@ contract PublicSale is
             "PublicSale: end the exclusiveTime"
         );
         UserInfoEx storage userEx = usersEx[msg.sender];
-        require(userEx.join == true, "PublicSale: Whitelist not registered");
+        require(userEx.join == true, "PublicSale: not registered in whitelist");
         uint256 tokenSaleAmount = calculSaleToken(_amount);
         uint256 salePossible = calculTierAmount(msg.sender);
-        require(
-            salePossible >= tokenSaleAmount,
-            "PublicSale: just buy whitelist amount"
-        );
+        // require(
+        //     salePossible >= tokenSaleAmount,
+        //     "PublicSale: just buy whitelist amount"
+        // );
         require(
             salePossible >= userEx.saleAmount.add(tokenSaleAmount),
-            "PublicSale: just buy whitelisted amount"
+            "PublicSale: just buy tier's allocated amount"
         );
 
         UserClaim storage userClaim = usersClaim[msg.sender];
@@ -580,8 +583,10 @@ contract PublicSale is
 
         UserInfoOpen storage userOpen = usersOpen[msg.sender];
 
-        if (!userOpen.join) depositors.push(msg.sender);
-        userOpen.join = true;
+        if (!userOpen.join) {
+            depositors.push(msg.sender);
+            userOpen.join = true;
+        }
         userOpen.depositAmount = userOpen.depositAmount.add(_amount);
         userOpen.saleAmount = 0;
         totalDepositAmount = totalDepositAmount.add(_amount);
@@ -607,7 +612,12 @@ contract PublicSale is
         UserClaim storage userClaim = usersClaim[msg.sender];
         require(
             userOpen.join == true,
-            "PublicSale: need to attend the deposit"
+            "PublicSale: not deposit"
+        );
+
+        require(
+            userOpen.saleAmount == 0,
+            "PublicSale: already execute openSale"
         );
         uint256 openSalePossible = calculOpenSaleAmount(msg.sender, 0);
         uint256 realPayAmount = calculPayToken(openSalePossible);
@@ -682,21 +692,41 @@ contract PublicSale is
         emit Claimed(msg.sender, reward);
     }
 
-    function depositWithdraw() external {
+    /// @inheritdoc IPublicSale
+    function depositWithdraw() external override {
         require(block.timestamp > endOpenSaleTime, "PublicSale: don't end saleTime");
         UserInfoOpen storage userOpen = usersOpen[msg.sender];
         require(userOpen.join == true && userOpen.saleAmount == 0, "PublicSale: need to deposit and don't attend the openSale");
+        require(userOpen.depositAmount > 0, "PublicSale: no deposited amount");
         uint256 withdrawAmount = userOpen.depositAmount;
         userOpen.depositAmount = 0;
+        // @harvey: need to check
+        // userOpen.join = false;
         getToken.safeTransfer(msg.sender, withdrawAmount);
+
+        emit DepositWithdrawal(msg.sender, withdrawAmount);
     }
 
+    /// @inheritdoc IPublicSale
     function withdraw() external override onlyOwner{
-        require(block.timestamp > endOpenSaleTime, "PublicSale: end the openSaleTime");
-        uint256 withdrawAmount = totalExpectSaleAmount.add(totalExpectOpenSaleAmount).sub(totalExSaleAmount).sub(totalOpenSaleAmount);
-        require(withdrawAmount != 0, "PublicSale: don't exist withdrawAmount");
-        totalExpectOpenSaleAmount = totalExpectOpenSaleAmount.sub(withdrawAmount);
-        saleToken.safeTransfer(msg.sender, withdrawAmount);
-        emit Withdrawal(msg.sender, withdrawAmount);
+
+        if(block.timestamp <= endOpenSaleTime){
+            uint256 balance = saleToken.balanceOf(address(this));
+            require(balance > totalExpectSaleAmount.add(totalExpectOpenSaleAmount), "PublicSale: no withdrawable amount");
+            uint256 withdrawAmount = balance.sub(totalExpectSaleAmount.add(totalExpectOpenSaleAmount));
+            require(withdrawAmount != 0, "PublicSale: don't exist withdrawAmount");
+            saleToken.safeTransfer(msg.sender, withdrawAmount);
+            emit Withdrawal(msg.sender, withdrawAmount);
+        } else {
+            require(block.timestamp > endOpenSaleTime, "PublicSale: end the openSaleTime");
+            require(totalExpectSaleAmount.add(totalExpectOpenSaleAmount) > totalExSaleAmount.add(totalOpenSaleAmount), "PublicSale: don't exist withdrawAmount");
+
+            uint256 withdrawAmount = totalExpectSaleAmount.add(totalExpectOpenSaleAmount).sub(totalExSaleAmount).sub(totalOpenSaleAmount);
+            require(withdrawAmount != 0, "PublicSale: don't exist withdrawAmount");
+            // @harvey: need to check
+            totalExpectOpenSaleAmount = totalExpectOpenSaleAmount.sub(withdrawAmount);
+            saleToken.safeTransfer(msg.sender, withdrawAmount);
+            emit Withdrawal(msg.sender, withdrawAmount);
+        }
     }
 }

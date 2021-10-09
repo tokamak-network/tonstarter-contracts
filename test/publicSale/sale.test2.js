@@ -5,7 +5,7 @@ const { expect } = require("chai");
 const { solidity } = require("ethereum-waffle");
 chai.use(solidity);
 
-const { time } = require("@openzeppelin/test-helpers");
+const { time, expectEvent } = require("@openzeppelin/test-helpers");
 const { toBN, toWei, keccak256, fromWei } = require("web3-utils");
 
 const { getAddresses, findSigner, setupContracts } = require("./utils");
@@ -95,7 +95,9 @@ describe("Sale", () => {
         ethers.BigNumber.from('15'+'0'.repeat(21)),
         ethers.BigNumber.from('35'+'0'.repeat(21)),
         ethers.BigNumber.from('15'+'0'.repeat(22)),
-        ethers.BigNumber.from('6'+'0'.repeat(23))
+        ethers.BigNumber.from('6'+'0'.repeat(23)),
+        ethers.BigNumber.from('10'+'0'.repeat(21)),
+        ethers.BigNumber.from('15'+'0'.repeat(22)),
     ]
 
     let tierLimitSTOS = [
@@ -118,13 +120,20 @@ describe("Sale", () => {
         { number: 0, whitelistNumber: 0 }
     ]
 
+    let openSaleAmountAdjust ;
+    let totalDepositAmountPayToken;
+
     let tester1 = {
         account: null,
         lockTOSIds: [],
         balanceOf: 0,
         snapshot: 0,
         balanceOfAt: 0,
-        tier: 0
+        tier: 0,
+        exclusiveSalePayAmount: ethers.BigNumber.from('0'),
+        exclusiveSaleBuyAmount: ethers.BigNumber.from('0'),
+        depositAmountPayToken: ethers.BigNumber.from('0'),
+        openSaleBuyAmount: ethers.BigNumber.from('0'),
     }
     let tester2 = {
         account: null,
@@ -132,7 +141,11 @@ describe("Sale", () => {
         balanceOf: 0,
         snapshot: 0,
         balanceOfAt: 0,
-        tier: 0
+        tier: 0,
+        exclusiveSalePayAmount: ethers.BigNumber.from('0'),
+        exclusiveSaleBuyAmount: ethers.BigNumber.from('0'),
+        depositAmountPayToken: ethers.BigNumber.from('0'),
+        openSaleBuyAmount: ethers.BigNumber.from('0'),
     }
 
     let tester3 = {
@@ -141,7 +154,11 @@ describe("Sale", () => {
         balanceOf: 0,
         snapshot: 0,
         balanceOfAt: 0,
-        tier: 0
+        tier: 0,
+        exclusiveSalePayAmount: ethers.BigNumber.from('0'),
+        exclusiveSaleBuyAmount: ethers.BigNumber.from('0'),
+        depositAmountPayToken: ethers.BigNumber.from('0'),
+        openSaleBuyAmount: ethers.BigNumber.from('0'),
     }
 
     let tester4 = {
@@ -150,8 +167,39 @@ describe("Sale", () => {
         balanceOf: 0,
         snapshot: 0,
         balanceOfAt: 0,
-        tier: 0
+        tier: 0,
+        exclusiveSalePayAmount: ethers.BigNumber.from('0'),
+        exclusiveSaleBuyAmount: ethers.BigNumber.from('0'),
+        depositAmountPayToken: ethers.BigNumber.from('0'),
+        openSaleBuyAmount: ethers.BigNumber.from('0'),
     }
+
+    let tester5 = {
+        account: null,
+        lockTOSIds: [],
+        balanceOf: 0,
+        snapshot: 0,
+        balanceOfAt: 0,
+        tier: 0,
+        exclusiveSalePayAmount: ethers.BigNumber.from('0'),
+        exclusiveSaleBuyAmount: ethers.BigNumber.from('0'),
+        depositAmountPayToken: ethers.BigNumber.from('0'),
+        openSaleBuyAmount: ethers.BigNumber.from('0'),
+    }
+
+    let tester6 = {
+        account: null,
+        lockTOSIds: [],
+        balanceOf: 0,
+        snapshot: 0,
+        balanceOfAt: 0,
+        tier: 0,
+        exclusiveSalePayAmount: ethers.BigNumber.from('0'),
+        exclusiveSaleBuyAmount: ethers.BigNumber.from('0'),
+        depositAmountPayToken: ethers.BigNumber.from('0'),
+        openSaleBuyAmount: ethers.BigNumber.from('0'),
+    }
+
 
     before(async () => {
         const addresses = await getAddresses();
@@ -164,17 +212,83 @@ describe("Sale", () => {
         account3 = await findSigner(addresses[6]);
         account4 = await findSigner(addresses[7]);
         account5 = await findSigner(addresses[8]);
+        account6 = await findSigner(addresses[9]);
+        account7 = await findSigner(addresses[10]);
+
 
         deployer = saleTokenOwner;
         tester1.account = account1;
         tester2.account = account2;
         tester3.account = account3;
         tester4.account = account4;
+        tester5.account = account5;
+        tester6.account = account6;
 
         // for sTOS
         epochUnit = 60*60*1;  // 1시간
         maxTime = epochUnit * 156;
     });
+
+
+    function calculPayToken (payTokenNumber){
+        //return parseInt(payTokenNumber*saleTokenPrice/payTokenPrice);
+        return payTokenNumber.mul(ethers.BigNumber.from(saleTokenPrice+"")).div(ethers.BigNumber.from(payTokenPrice+""));
+    }
+
+    function calculSaleToken (saleTokenNumber){
+        return saleTokenNumber.mul(ethers.BigNumber.from(payTokenPrice+'')).div(ethers.BigNumber.from(saleTokenPrice+""));
+    }
+
+    async function calculTierAmount(user, lockTOS, _tierPercentage, _tierInfo)  {
+        let tier = await userTier(user.account, lockTOS);
+        if(user.tier > 0){
+            let salePossible = allocatedExclusiveSale.mul(_tierPercentage[user.tier-1]).div(_tierInfo[user.tier-1].whitelistNumber).div(10000);
+            return salePossible;
+        } else {
+            let tierAccount = tierInfo[tier-1].whitelistNumber +1;
+            let salePossible = allocatedExclusiveSale.mul(_tierPercentage[tier-1]).div(tierAccount).div(10000);
+            return salePossible;
+        }
+    }
+
+    async function userTier(user, lockTOS)  {
+        let tx = (await lockTOS.balanceOfAt(user.address, setSnapshot))
+
+        if(tx.gte(tierLimitSTOS[3])) return 4;
+        else if(tx.gte(tierLimitSTOS[2]))  return 3;
+        else if(tx.gte(tierLimitSTOS[1]))  return 2;
+        else if(tx.gte(tierLimitSTOS[0]))  return 1;
+        else  return 0;
+    }
+
+
+    async function checkCalculTierAmountPrev(_account, _tierPercentage){
+        let tier = await saleContract.calculTier(_account)
+        let tiersAccount = await saleContract.tiersAccount(tier)
+        let calculTierAmount = (await saleContract.calculTierAmount(_account))
+        tier = tier.toNumber();
+        tiersAccount = tiersAccount.toNumber();
+        let _tierAmount = ethers.BigNumber.from('0')
+        if(tier > 0 ){
+            _tierAmount = allocatedExclusiveSale.mul(ethers.BigNumber.from(_tierPercentage[tier-1]+"")).div(ethers.BigNumber.from("10000"))
+        }
+        if(tiersAccount > 0 ){
+            _tierAmount = _tierAmount.div(ethers.BigNumber.from(tiersAccount+""));
+        }
+        expect(calculTierAmount).to.be.equal(_tierAmount)
+    }
+
+    async function checkCalculTierAmount(_account, tierAmount){
+        let tier = await saleContract.calculTier(_account)
+        let tiersAccount = await saleContract.tiersAccount(tier)
+        let tx1 = (await saleContract.calculTierAmount(_account))
+
+        if(tier.toNumber() == 1) expect(tx1).to.be.equal(tierAmount[0])
+        else if(tier.toNumber() == 2) expect(tx1).to.be.equal(tierAmount[1])
+        else if(tier.toNumber() == 3) expect(tx1).to.be.equal(tierAmount[2])
+        else if(tier.toNumber() == 4) expect(tx1).to.be.equal(tierAmount[3])
+    }
+
 
     describe("Initialize TON, TOS, LockTOS", () => {
         it("Initialize TON ", async function () {
@@ -219,6 +333,12 @@ describe("Sale", () => {
             await (await tos.connect(deployer).mint(tester4.account.address, tosAmount)).wait();
             expect(await tos.balanceOf(tester4.account.address)).to.be.equal(tosAmount);
 
+            await (await tos.connect(deployer).mint(tester5.account.address, tosAmount)).wait();
+            expect(await tos.balanceOf(tester5.account.address)).to.be.equal(tosAmount);
+
+            await (await tos.connect(deployer).mint(tester6.account.address, tosAmount)).wait();
+            expect(await tos.balanceOf(tester6.account.address)).to.be.equal(tosAmount);
+
         });
 
 
@@ -235,7 +355,6 @@ describe("Sale", () => {
             });
             expect(id).to.be.equal(1);
             tierInfo[0].number++;
-
             tester1.lockTOSIds.push(id);
 
             id = await createLockWithPermit({
@@ -271,6 +390,30 @@ describe("Sale", () => {
             expect(id).to.be.equal(4);
             tierInfo[3].number++;
 
+
+            id = await createLockWithPermit({
+                user: tester5.account,
+                amount: sTOSSendAmount[4],
+                unlockWeeks: 1,
+                tos,
+                lockTOS,
+            });
+            tester5.lockTOSIds.push(id);
+            expect(id).to.be.equal(5);
+            //tierInfo[0].number++;
+
+
+            id = await createLockWithPermit({
+                user: tester6.account,
+                amount: sTOSSendAmount[5],
+                unlockWeeks: 2,
+                tos,
+                lockTOS,
+            });
+            tester6.lockTOSIds.push(id);
+            expect(id).to.be.equal(6);
+            tierInfo[2].number++;
+
             // ethers.provider.send("evm_increaseTime", [10])   // add 26 seconds
             // ethers.provider.send("evm_mine")      // mine the next block
 
@@ -293,12 +436,17 @@ describe("Sale", () => {
 
             tester4.balanceOfAt = (await lockTOS.balanceOfAt(tester4.account.address, setSnapshot))
             // console.log(tester4.balanceOfAt.toString(), ethers.utils.formatUnits(tester4.balanceOfAt,18) )
+            tester5.balanceOfAt = (await lockTOS.balanceOfAt(tester5.account.address, setSnapshot))
+
+            tester6.balanceOfAt = (await lockTOS.balanceOfAt(tester6.account.address, setSnapshot))
+
 
             expect(tester1.balanceOfAt).to.be.above(0);
             expect(tester2.balanceOfAt).to.be.above(0);
             expect(tester3.balanceOfAt).to.be.above(0);
             expect(tester4.balanceOfAt).to.be.above(0);
-
+            expect(tester5.balanceOfAt).to.be.above(0);
+            expect(tester6.balanceOfAt).to.be.above(0);
             // expect(await lockTOS.totalSupplyAt(snapshot)).to.be.equal(
             //     tester1.balanceOfAt.add(tester2.balanceOfAt)
             // );
@@ -341,6 +489,8 @@ describe("Sale", () => {
             await getToken.connect(getTokenOwner).transfer(account2.address, allocatedExclusiveSale)
             await getToken.connect(getTokenOwner).transfer(account3.address, allocatedExclusiveSale)
             await getToken.connect(getTokenOwner).transfer(account4.address, allocatedExclusiveSale)
+            await getToken.connect(getTokenOwner).transfer(account5.address, allocatedExclusiveSale)
+            await getToken.connect(getTokenOwner).transfer(account6.address, allocatedExclusiveSale)
 
         });
     });
@@ -431,16 +581,37 @@ describe("Sale", () => {
 
                 let tx = (await lockTOS.balanceOfAt(tester1.account.address, setSnapshot))
                 expect(tx).to.be.above(tierLimitSTOS[0])
-                tester1.tier = 1;
+                tester1.tier = await userTier(tester1.account, lockTOS);
+                expect(tester1.tier).to.be.eq(1)
+
+
                 let tx2 = (await lockTOS.balanceOfAt(tester2.account.address, setSnapshot))
                 expect(tx2).to.be.above(tierLimitSTOS[1])
-                tester1.tier = 2;
+                tester2.tier = await userTier(tester2.account, lockTOS);
+                expect(tester2.tier).to.be.eq(2)
+
                 let tx3 = (await lockTOS.balanceOfAt(tester3.account.address, setSnapshot))
                 expect(tx3).to.be.above(tierLimitSTOS[2])
-                tester1.tier = 3;
+                tester3.tier = await userTier(tester3.account, lockTOS);
+                expect(tester3.tier).to.be.eq(3)
+
                 let tx4 = (await lockTOS.balanceOfAt(tester4.account.address, setSnapshot))
                 expect(tx4).to.be.above(tierLimitSTOS[3])
-                tester1.tier = 4;
+                tester4.tier = await userTier(tester4.account, lockTOS);
+                expect(tester4.tier).to.be.eq(4)
+
+
+                let tx5 = (await lockTOS.balanceOfAt(tester5.account.address, setSnapshot))
+                // expect(tx5).to.be.above(tierLimitSTOS[0])
+                tester5.tier = await userTier(tester5.account, lockTOS);
+                expect(tester5.tier).to.be.eq(0)
+
+
+                let tx6 = (await lockTOS.balanceOfAt(tester6.account.address, setSnapshot))
+                expect(tx6).to.be.above(tierLimitSTOS[2])
+                tester6.tier = await userTier(tester6.account, lockTOS);
+                expect(tester6.tier).to.be.eq(3)
+
             })
 
             it('setting the ExclusiveTime caller not owner', async () => {
@@ -532,54 +703,17 @@ describe("Sale", () => {
         })
     })
 
-    function calculPayToken (payTokenNumber){
-        return parseInt(payTokenNumber*saleTokenPrice/payTokenPrice);
-    }
-
-    function calculSaleToken (saleTokenNumber){
-        return parseInt(saleTokenNumber*payTokenPrice/saleTokenPrice);
-    }
-
-    async function calculTierAmount(user, lockTOS, _tierPercentage, _tierInfo)  {
-        let tier = await userTier(user.account, lockTOS);
-        if(user.tier > 0){
-            let salePossible = allocatedExclusiveSale.mul(_tierPercentage[user.tier-1]).div(_tierInfo[user.tier-1].whitelistNumber).div(10000);
-            return salePossible;
-        } else {
-            let tierAccount = tierInfo[tier-1].whitelistNumber +1;
-            let salePossible = allocatedExclusiveSale.mul(_tierPercentage[tier-1]).div(tierAccount).div(10000);
-            return salePossible;
-        }
-    }
-
-    async function userTier(user, lockTOS)  {
-        let tx = (await lockTOS.balanceOfAt(user.address, setSnapshot))
-
-        if(tx.gte(tierLimitSTOS[3])) return 4;
-        else if(tx.gte(tierLimitSTOS[2]))  return 3;
-        else if(tx.gte(tierLimitSTOS[1]))  return 2;
-        else if(tx.gte(tierLimitSTOS[0]))  return 1;
-        else  return 0;
-    }
 
     describe("Sale", () => {
         describe("exclusiveSale Sale", () => {
             it("calculTierAmount test before addwhiteList", async () => {
 
-                for(let i=0; i< 4; i++){
-                    tierAmount[i] = allocatedExclusiveSale.mul(ethers.BigNumber.from(tierPercentage[i]+"")).div(ethers.BigNumber.from("10000")).div(ethers.BigNumber.from(tierInfo[i].number+""));
-                }
-
-                let tx = (await saleContract.calculTierAmount(account1.address))
-                expect(tx).to.be.equal(tierAmount[0])
-                //console.log('calculTierAmount',tierAmount[0],calculTierAmount(account1, lockTOS));
-
-                let tx2 = (await saleContract.calculTierAmount(account2.address))
-                expect(tx2).to.be.equal(tierAmount[1])
-                let tx3 = (await saleContract.calculTierAmount(account3.address))
-                expect(tx3).to.be.equal(tierAmount[2])
-                let tx4 = (await saleContract.calculTierAmount(account4.address))
-                expect(tx4).to.be.equal(tierAmount[3])
+                await checkCalculTierAmountPrev(account1.address, tierPercentage);
+                await checkCalculTierAmountPrev(account2.address, tierPercentage);
+                await checkCalculTierAmountPrev(account3.address, tierPercentage);
+                await checkCalculTierAmountPrev(account4.address, tierPercentage);
+                await checkCalculTierAmountPrev(account5.address, tierPercentage);
+                await checkCalculTierAmountPrev(account6.address, tierPercentage);
             })
 
             it("duration the time", async () => {
@@ -596,6 +730,7 @@ describe("Sale", () => {
                 tester1.tier = await userTier(tester1.account, lockTOS);
                 let tx2 = Number(await saleContract.connect(tester1.account).tiersAccount(tierNumber))
                 expect(tx2).to.be.equal(tierInfo[tierNumber-1].whitelistNumber)
+
 
                 tierNumber = 2;
                 let tx3 = Number(await saleContract.connect(tester2.account).tiersAccount(tierNumber))
@@ -627,45 +762,58 @@ describe("Sale", () => {
 
                 let tx9 = saleContract.connect(tester4.account).addWhiteList()
                 await expect(tx9).to.be.revertedWith("PublicSale: already attended")
+
+                tierNumber = 1;
+                tx = Number(await saleContract.connect(tester5.account).tiersAccount(tierNumber))
+                expect(tx).to.be.equal(1)
+
+                await expect(saleContract.connect(tester5.account).addWhiteList()).to.be.revertedWith("PublicSale: need to more sTOS")
+
+                tierNumber = 3;
+                tx = Number(await saleContract.connect(tester6.account).tiersAccount(tierNumber))
+                expect(tx).to.be.equal(1)
+                await saleContract.connect(tester6.account).addWhiteList()
+                tierInfo[tierNumber-1].whitelistNumber++;
+                tester4.tier = await userTier(tester6.account, lockTOS);
+                tx = Number(await saleContract.connect(tester6.account).tiersAccount(tierNumber))
+                expect(tx).to.be.equal(tierInfo[tierNumber-1].whitelistNumber)
+
             })
 
             it("how many input amount", async () => {
                 let payTokenNumber, saleTokenNumber;
 
-                payTokenNumber = 60000;
-                let tx = Number(await saleContract.calculPayToken(payTokenNumber))
-                expect(tx).to.be.equal(parseInt(calculPayToken(payTokenNumber)))
+                payTokenNumber = ethers.BigNumber.from("60000");
+                let tx = (await saleContract.calculPayToken(payTokenNumber))
+                expect(tx).to.be.equal((calculPayToken(payTokenNumber)))
 
-                payTokenNumber = 120000;
-                let tx2 = Number(await saleContract.calculPayToken(payTokenNumber))
-                expect(tx2).to.be.equal(parseInt(calculPayToken(payTokenNumber)))
+                payTokenNumber = ethers.BigNumber.from("120000");
+                let tx2 = (await saleContract.calculPayToken(payTokenNumber))
+                expect(tx2).to.be.equal((calculPayToken(payTokenNumber)))
 
+                payTokenNumber = ethers.BigNumber.from("220000");
+                let tx3 = (await saleContract.calculPayToken(payTokenNumber))
+                expect(tx3).to.be.equal((calculPayToken(payTokenNumber)))
 
-                payTokenNumber = 220000;
-                let tx3 = Number(await saleContract.calculPayToken(payTokenNumber))
-                expect(tx3).to.be.equal(parseInt(calculPayToken(payTokenNumber)))
-
-                payTokenNumber = 600000;
-                let tx4 = Number(await saleContract.calculPayToken(payTokenNumber))
-                expect(tx4).to.be.equal(parseInt(calculPayToken(payTokenNumber)))
+                payTokenNumber = ethers.BigNumber.from("600000");
+                let tx4 = (await saleContract.calculPayToken(payTokenNumber))
+                expect(tx4).to.be.equal((calculPayToken(payTokenNumber)))
 
             })
 
 
             it("calculTierAmount test after addwhiteList", async () => {
 
-                let tx = (await saleContract.calculTierAmount(tester1.account.address))
-                expect(await calculTierAmount(tester1, lockTOS, tierPercentage, tierInfo)).to.be.equal(tx)
+                for(let i=0; i< 4; i++){
+                    tierAmount[i] = allocatedExclusiveSale.mul(ethers.BigNumber.from(tierPercentage[i]+"")).div(ethers.BigNumber.from("10000")).div(ethers.BigNumber.from(tierInfo[i].number+""));
+                }
 
-                let tx2 = (await saleContract.calculTierAmount(tester2.account.address))
-                expect(await calculTierAmount(tester2, lockTOS, tierPercentage, tierInfo)).to.be.equal(tx2)
-
-                let tx3 = (await saleContract.calculTierAmount(tester3.account.address))
-                expect(await calculTierAmount(tester3, lockTOS, tierPercentage, tierInfo)).to.be.equal(tx3)
-
-                let tx4 = (await saleContract.calculTierAmount(tester4.account.address))
-                expect(await calculTierAmount(tester4, lockTOS, tierPercentage, tierInfo)).to.be.equal(tx4)
-
+                await checkCalculTierAmount(account1.address, tierAmount);
+                await checkCalculTierAmount(account2.address, tierAmount);
+                await checkCalculTierAmount(account3.address, tierAmount);
+                await checkCalculTierAmount(account4.address, tierAmount);
+                await checkCalculTierAmount(account5.address, tierAmount);
+                await checkCalculTierAmount(account6.address, tierAmount);
             })
 
             it("exclusiveSale before exclusive startTime", async () => {
@@ -688,37 +836,110 @@ describe("Sale", () => {
                 await expect(tx3).to.be.revertedWith("PublicSale: end the whitelistTime")
             })
 
-            it("exclusiveSale after exclusive startTime", async () => {
-                await getToken.connect(account1).approve(saleContract.address, 60)
-                await saleContract.connect(account1).exclusiveSale(60)
+            it("It can be purchased multiple times only for the allocated amount on ExclusiveSale", async () => {
+
+                let possibleSaleAmount = await saleContract.connect(account1).calculTierAmount(account1.address);
+                possibleSaleAmount = possibleSaleAmount.div(ethers.BigNumber.from('2'))
+                // console.log('possibleSaleAmount/2',ethers.utils.formatUnits(possibleSaleAmount.toString(),18));
+                let possiblePuchaseAmount = calculPayToken(possibleSaleAmount);
+                // console.log('possiblePuchaseAmount', ethers.utils.formatUnits(possiblePuchaseAmount.toString(),18));
+
+                await getToken.connect(account1).approve(saleContract.address, possiblePuchaseAmount)
+                await saleContract.connect(account1).exclusiveSale(possiblePuchaseAmount)
                 let tx = await saleContract.usersEx(account1.address)
-                expect(Number(tx.payAmount)).to.be.equal(60)
+                expect(tx.payAmount).to.be.equal(possiblePuchaseAmount)
 
-                await getToken.connect(account2).approve(saleContract.address, 120)
-                await saleContract.connect(account2).exclusiveSale(120)
+                await getToken.connect(account1).approve(saleContract.address, possiblePuchaseAmount)
+                await saleContract.connect(account1).exclusiveSale(possiblePuchaseAmount)
+                tx = await saleContract.usersEx(account1.address)
+                expect(tx.payAmount).to.be.equal(possiblePuchaseAmount.mul(ethers.BigNumber.from('2')))
+
+                tester1.exclusiveSalePayAmount = tx.payAmount;
+                tester1.exclusiveSaleBuyAmount = possibleSaleAmount.add(possibleSaleAmount);
+
+                await expect(saleContract.connect(account1).exclusiveSale(possiblePuchaseAmount)).to.be.revertedWith("PublicSale: just buy tier's allocated amount")
+            })
+            it("exclusiveSale after exclusive startTime", async () => {
+                let possibleSaleAmount = await saleContract.connect(account2).calculTierAmount(account2.address);
+                let possiblePuchaseAmount = calculPayToken(possibleSaleAmount);
+
+                await getToken.connect(account2).approve(saleContract.address, possiblePuchaseAmount)
+                await saleContract.connect(account2).exclusiveSale(possiblePuchaseAmount)
                 let tx2 = await saleContract.usersEx(account2.address)
-                expect(Number(tx2.payAmount)).to.be.equal(120)
+                expect(tx2.payAmount).to.be.equal(possiblePuchaseAmount)
 
-                await getToken.connect(account3).approve(saleContract.address, 220)
-                await saleContract.connect(account3).exclusiveSale(220)
+                tester2.exclusiveSalePayAmount = tx2.payAmount;
+                tester2.exclusiveSaleBuyAmount = possibleSaleAmount;
+            })
+
+            it("exclusiveSale after exclusive startTime : account3", async () => {
+                let possibleSaleAmount = await saleContract.connect(account3).calculTierAmount(account3.address);
+                let possiblePuchaseAmount = calculPayToken(possibleSaleAmount);
+                await getToken.connect(account3).approve(saleContract.address, possiblePuchaseAmount)
+                await saleContract.connect(account3).exclusiveSale(possiblePuchaseAmount)
                 let tx3 = await saleContract.usersEx(account3.address)
-                expect(Number(tx3.payAmount)).to.be.equal(220)
+                expect((tx3.payAmount)).to.be.equal(possiblePuchaseAmount)
 
-                await getToken.connect(account4).approve(saleContract.address, 600)
-                await saleContract.connect(account4).exclusiveSale(600)
-                let tx4 = await saleContract.usersEx(account4.address)
-                expect(Number(tx4.payAmount)).to.be.equal(600)
+                tester3.exclusiveSalePayAmount = tx3.payAmount;
+                tester3.exclusiveSaleBuyAmount = possibleSaleAmount;
+            })
 
-                let tx5 = Number(await saleContract.totalExPurchasedAmount())
-                expect(tx5).to.be.equal(1000)
-                let tx6 = Number(await saleContract.totalExSaleAmount())
-                expect(tx6).to.be.equal(1000000)
-                let tx7 = Number(await getToken.balanceOf(account5.address))
-                expect(tx7).to.be.equal(1000)
+            it("exclusiveSale after exclusive startTime : account4", async () => {
+                let possibleSaleAmount = await saleContract.connect(account4).calculTierAmount(account4.address);
+                let possiblePuchaseAmount = calculPayToken(possibleSaleAmount);
 
+                await getToken.connect(account4).approve(saleContract.address, possiblePuchaseAmount)
+                await saleContract.connect(account4).exclusiveSale(possiblePuchaseAmount)
+                let tx2 = await saleContract.usersEx(account4.address)
+                expect(tx2.payAmount).to.be.equal(possiblePuchaseAmount)
+
+                tester4.exclusiveSalePayAmount = tx2.payAmount;
+                tester4.exclusiveSaleBuyAmount = possibleSaleAmount;
+            })
+
+            it("Accounts not on the whitelist is reverted. : account5", async () => {
+                let possibleSaleAmount = await saleContract.connect(account5).calculTierAmount(account5.address);
+
+                expect(possibleSaleAmount).to.be.equal(ethers.BigNumber.from("0"))
+                await expect(saleContract.connect(account5).exclusiveSale(possibleSaleAmount)).to.be.revertedWith("PublicSale: zero");
+
+                await expect(saleContract.connect(account5).exclusiveSale(ethers.BigNumber.from("1000"))).to.be.revertedWith("PublicSale: not registered in whitelist");
+            })
+
+
+            it("exclusiveSale after exclusive startTime : account6", async () => {
+                let possibleSaleAmount = await saleContract.connect(account6).calculTierAmount(account6.address);
+                possibleSaleAmount = possibleSaleAmount.div(ethers.BigNumber.from('2'))
+                let possiblePuchaseAmount = calculPayToken(possibleSaleAmount);
+
+                await getToken.connect(account6).approve(saleContract.address, possiblePuchaseAmount)
+                await saleContract.connect(account6).exclusiveSale(possiblePuchaseAmount)
+                let tx2 = await saleContract.usersEx(account6.address)
+                expect(tx2.payAmount).to.be.equal(possiblePuchaseAmount)
+
+                tester6.exclusiveSalePayAmount = tx2.payAmount;
+                tester6.exclusiveSaleBuyAmount = possibleSaleAmount;
             })
         })
 
+        describe("withdraw test", () => {
+            it("withdraw fial when not owner ", async () => {
+                await expect(saleContract.connect(account6).withdraw()).to.be.revertedWith("Accessible: Caller is not an admin")
+            })
+            it("withdraw fial when no withdrawable amount ", async () => {
+                await expect(saleContract.connect(saleOwner).withdraw()).to.be.revertedWith("PublicSale: no withdrawable amount")
+            })
+            it("withdraw when it has a withdrawable amount ", async () => {
+                let amount = ethers.BigNumber.from('1','0'.repeat(20))
+                await saleToken.connect(saleTokenOwner).transfer(saleContract.address, amount)
+
+                let balanceOfProjectTokenBefore = await saleToken.balanceOf(saleContract.address)
+                await saleContract.connect(saleOwner).withdraw()
+                let balanceOfProjectTokenAfter = await saleToken.balanceOf(saleContract.address)
+
+                expect(balanceOfProjectTokenAfter).to.be.equal(balanceOfProjectTokenBefore.sub(amount))
+            })
+        })
         describe("openSale Sale", () => {
             it("deposit before depositTime", async () => {
                 let tx = saleContract.connect(account1).deposit(100)
@@ -730,26 +951,48 @@ describe("Sale", () => {
                 await ethers.provider.send('evm_mine');
             })
 
-            it("deposit after depositTime", async () => {
-                await getToken.connect(account1).approve(saleContract.address, 100)
-                await getToken.connect(account2).approve(saleContract.address, 100)
-                await getToken.connect(account3).approve(saleContract.address, 100)
-                await getToken.connect(account4).approve(saleContract.address, 100)
+            it("check the opensale's allocated amount after exclusive-end", async () => {
+                let totalPayAmount = tester1.exclusiveSalePayAmount.add(tester2.exclusiveSalePayAmount).add(tester3.exclusiveSalePayAmount).add(tester4.exclusiveSalePayAmount)
+                .add(tester5.exclusiveSalePayAmount).add(tester6.exclusiveSalePayAmount)
+                let totalPayAmountToSaleAmount = calculSaleToken(totalPayAmount);
+                openSaleAmountAdjust = await saleContract.totalExpectOpenSaleAmountView();
+                expect(openSaleAmountAdjust).to.be.equal(allocatedSaleAmount.sub(totalPayAmountToSaleAmount))
+            });
 
-                await saleContract.connect(account1).deposit(100)
-                await saleContract.connect(account2).deposit(100)
-                await saleContract.connect(account3).deposit(100)
-                await saleContract.connect(account4).deposit(100)
+            it("Can be deposited multiple times after depositTime : account1 ", async () => {
+                let tester = tester1
+                let account = account1
+                let balance = await getToken.balanceOf(account.address)
+                tester.depositAmountPayToken = balance.div(ethers.BigNumber.from('4'))
+                await getToken.connect(account).approve(saleContract.address, tester.depositAmountPayToken)
+                await saleContract.connect(account).deposit(tester.depositAmountPayToken)
 
-                let tx = await saleContract.usersOpen(account1.address)
-                expect(Number(tx.depositAmount)).to.be.equal(100)
-                let tx2 = await saleContract.usersOpen(account2.address)
-                expect(Number(tx2.depositAmount)).to.be.equal(100)
-                let tx3 = await saleContract.usersOpen(account3.address)
-                expect(Number(tx3.depositAmount)).to.be.equal(100)
-                let tx4 = await saleContract.usersOpen(account4.address)
-                expect(Number(tx4.depositAmount)).to.be.equal(100)
-            })
+                await getToken.connect(account).approve(saleContract.address, tester.depositAmountPayToken)
+                await saleContract.connect(account).deposit(tester.depositAmountPayToken)
+
+                tester.depositAmountPayToken = tester.depositAmountPayToken.add(tester.depositAmountPayToken)
+
+                let tx = await saleContract.usersOpen(account.address)
+                expect((tx.depositAmount)).to.be.equal(tester.depositAmountPayToken)
+            });
+
+            it("deposit after depositTime : account2 , account3, account6 ", async () => {
+                let testers = [tester2, tester3, tester6]
+                let accounts = [account2 , account3, account6]
+
+                for(let i = 0; i < 3; i++){
+                    let tester = testers[i]
+                    let account = accounts[i]
+
+                    let balance = await getToken.balanceOf(account.address)
+                    tester.depositAmountPayToken = balance.div(ethers.BigNumber.from('2'))
+                    await getToken.connect(account).approve(saleContract.address, tester.depositAmountPayToken)
+                    await saleContract.connect(account).deposit(tester.depositAmountPayToken)
+
+                    let tx = await saleContract.usersOpen(account.address)
+                    expect((tx.depositAmount)).to.be.equal(tester.depositAmountPayToken)
+                }
+            });
 
             it("duration the time", async () => {
                 await ethers.provider.send('evm_setNextBlockTimestamp', [openSaleStartTime]);
@@ -767,44 +1010,69 @@ describe("Sale", () => {
                 expect(account1.address).to.be.equal(tx)
             })
 
-            it("openSale function", async () => {
-                let tx = await saleContract.usersClaim(account1.address)
-                expect(Number(tx.totalClaimReward)).to.be.equal(60000)
-                let tx2 = await saleContract.usersClaim(account2.address)
-                expect(Number(tx2.totalClaimReward)).to.be.equal(120000)
-                let tx3 = await saleContract.usersClaim(account3.address)
-                expect(Number(tx3.totalClaimReward)).to.be.equal(220000)
-                let tx4 = await saleContract.usersClaim(account4.address)
-                expect(Number(tx4.totalClaimReward)).to.be.equal(600000)
-                let totaldeposit = await saleContract.totalDepositAmount()
-                expect(Number(totaldeposit)).to.be.equal(400)
+            it("check the totalClaimReward of userClaim : tester1, tester2, tester3, tester4, tester5, tester6", async () => {
+                let testers = [tester1, tester2, tester3, tester4, tester5, tester6]
+                let accounts = [account1, account2, account3, account4, account5, account6]
 
-                let beforeTON = Number(await getToken.balanceOf(account5.address))
-                expect(beforeTON).to.be.equal(1000)
-
-                await saleContract.connect(account1).openSale()
-                await saleContract.connect(account2).openSale()
-                await saleContract.connect(account3).openSale()
-                await saleContract.connect(account4).openSale()
-
-                let afterTON = Number(await getToken.balanceOf(account5.address))
-                expect(afterTON).to.be.equal(1400)
-
-                let tx5 = await saleContract.usersClaim(account1.address)
-                expect(Number(tx5.totalClaimReward)).to.be.equal(160000)
-                let tx6 = await saleContract.usersClaim(account2.address)
-                expect(Number(tx6.totalClaimReward)).to.be.equal(220000)
-                let tx7 = await saleContract.usersClaim(account3.address)
-                expect(Number(tx7.totalClaimReward)).to.be.equal(320000)
-                let tx8 = await saleContract.usersClaim(account4.address)
-                expect(Number(tx8.totalClaimReward)).to.be.equal(700000)
-
-                let tx9 = await saleContract.usersOpen(account1.address)
-                expect(Number(tx9.saleAmount)).to.be.equal(100000)
-                let tx10 = await saleContract.usersEx(account1.address)
-                expect(Number(tx10.saleAmount)).to.be.equal(60000)
+                for(let i = 0; i < 3; i++){
+                    let tester = testers[i]
+                    let account = accounts[i]
+                    let tx = await saleContract.usersClaim(account.address)
+                    let totalClaimReward = tester.exclusiveSaleBuyAmount;
+                    expect((tx.totalClaimReward)).to.be.equal(totalClaimReward)
+                }
             })
 
+            it("totalDepositAmountPayToken", async () => {
+
+                totalDepositAmountPayToken = tester1.depositAmountPayToken.add(tester2.depositAmountPayToken)
+                .add(tester3.depositAmountPayToken)
+                .add(tester4.depositAmountPayToken)
+                .add(tester5.depositAmountPayToken)
+                .add(tester6.depositAmountPayToken)
+            })
+            it("openSale : tester1, tester2, tester3, tester6", async () => {
+                let testers = [tester1, tester2, tester3, tester6]
+                let accounts = [account1, account2, account3, account6]
+
+                for(let i = 0; i < 3; i++){
+                    let tester = testers[i]
+                    let account = accounts[i]
+
+                    let myAvailableProjectSaleAmount = openSaleAmountAdjust.mul(tester.depositAmountPayToken).div(totalDepositAmountPayToken)
+                    let myAvailablePayAmount = calculPayToken(myAvailableProjectSaleAmount)
+                    let refundAmount = ethers.BigNumber.from('0')
+                    if(tester.depositAmountPayToken.gt(myAvailablePayAmount)) refundAmount = tester.depositAmountPayToken.sub(myAvailablePayAmount)
+
+                    let beforeTON = await getToken.balanceOf(account.address)
+                    let tx = await saleContract.connect(account).openSale()
+
+                    let afterTON = await getToken.balanceOf(account.address)
+                    if(refundAmount.gt(ethers.BigNumber.from('0'))){
+                        expect(afterTON).to.be.equal(beforeTON.add(refundAmount))
+                    }
+
+                    let usersOpen = await saleContract.usersOpen(account.address)
+                    tester.openSaleBuyAmount = tester.openSaleBuyAmount.add(usersOpen.saleAmount)
+                    expect(usersOpen.saleAmount).to.be.above(ethers.BigNumber.from('0'))
+
+                    tx = await saleContract.usersClaim(account.address)
+                    let totalClaimReward = tester.exclusiveSaleBuyAmount.add(tester.openSaleBuyAmount);
+                    expect((tx.totalClaimReward)).to.be.equal(totalClaimReward)
+
+                }
+            })
+
+            it("openSale : account4", async () => {
+                let tester = tester4
+                let account = account4
+                await expect(saleContract.connect(account).openSale()).to.be.revertedWith("PublicSale: not deposit")
+            })
+            it("openSale : account5", async () => {
+                let tester = tester5
+                let account = account5
+                await expect(saleContract.connect(account).openSale()).to.be.revertedWith("PublicSale: not deposit")
+            })
         })
     })
 
@@ -817,16 +1085,45 @@ describe("Sale", () => {
             await ethers.provider.send('evm_setNextBlockTimestamp', [claimStartTime]);
             await ethers.provider.send('evm_mine');
         })
-        it("claim period = 1, claim call the account1", async () => {
-            let expectClaim = Number(await saleContract.calculCalimAmount(account1.address))
-            let tx = await saleContract.usersClaim(account1.address)
-            expect(Number(tx.claimAmount)).to.be.equal(0)
-            await saleContract.connect(account1).claim()
-            let tx2 = await saleContract.usersClaim(account1.address)
-            // console.log("period1 :", Number(tx2.claimAmount))
-            expect(Number(tx2.claimAmount)).to.be.equal(expectClaim)
-            let tx3 = await saleToken.balanceOf(account1.address)
-            expect(Number(tx3)).to.be.equal(expectClaim)
+
+        it("claim period = 1, tester1, tester4", async () => {
+            let testers = [tester1, tester4]
+            let accounts = [account1, account4]
+
+            for(let i = 0; i < testers.length ; i++){
+                let tester = testers[i]
+                let account = accounts[i]
+                let totalClaimReward = tester.exclusiveSaleBuyAmount.add(tester.openSaleBuyAmount);
+                let expectClaim = (await saleContract.calculClaimAmount(account.address))
+                let tx = await saleContract.usersClaim(account.address)
+                expect(tx.claimAmount).to.be.equal(ethers.BigNumber.from('0'))
+                expect(tx.periodReward).to.be.equal(totalClaimReward.div(ethers.BigNumber.from(claimPeriod+"")))
+                expect(expectClaim).to.be.equal(tx.periodReward)
+
+                await saleContract.connect(account).claim()
+                let usersClaim = await saleContract.usersClaim(account.address)
+                expect(usersClaim.claimAmount).to.be.equal(expectClaim)
+
+                let balanceOfProjectToken = await saleToken.balanceOf(account.address)
+                expect(balanceOfProjectToken).to.be.equal(expectClaim)
+            }
+
+        })
+        it("claim period = 1, account5", async () => {
+            let tester = tester5
+            let account = account5
+
+            let totalClaimReward = tester.exclusiveSaleBuyAmount.add(tester.openSaleBuyAmount);
+            expect(totalClaimReward).to.be.equal(ethers.BigNumber.from('0'))
+
+            let expectClaim = (await saleContract.calculClaimAmount(account.address))
+            expect(expectClaim).to.be.equal(ethers.BigNumber.from('0'))
+
+            let tx = await saleContract.usersClaim(account.address)
+            expect(tx.claimAmount).to.be.equal(ethers.BigNumber.from('0'))
+            expect(expectClaim).to.be.equal(tx.periodReward)
+
+            await expect(saleContract.connect(account).claim()).to.be.revertedWith("PublicSale: need the participation")
         })
 
         it("duration the time to period = 2", async () => {
@@ -835,32 +1132,43 @@ describe("Sale", () => {
             await ethers.provider.send('evm_mine');
         })
 
-        it("claim period = 2, claim call the account1, account2", async () => {
-            let expectClaim = Number(await saleContract.calculCalimAmount(account1.address))
-            let expectClaim2 = Number(await saleContract.calculCalimAmount(account2.address))
+        it("claim period = 2, tester1", async () => {
+            let tester = tester1
+            let account = account1
 
-            let claimAmount1 = await saleContract.usersClaim(account1.address)
-            expect(Number(claimAmount1.claimAmount)).to.be.equal(26666)
+            let balanceOfProjectTokenBefore = await saleToken.balanceOf(account.address)
+            let totalClaimReward = tester.exclusiveSaleBuyAmount.add(tester.openSaleBuyAmount);
+            let expectClaim = (await saleContract.calculClaimAmount(account.address))
+            let usersClaim = await saleContract.usersClaim(account.address)
+            expect(expectClaim).to.be.equal(usersClaim.periodReward)
 
-            let claimAmount2 = await saleContract.usersClaim(account2.address)
-            expect(Number(claimAmount2.claimAmount)).to.be.equal(0)
+            await saleContract.connect(account).claim()
+            let usersClaimAfter = await saleContract.usersClaim(account.address)
+            expect(usersClaimAfter.claimAmount).to.be.equal(usersClaim.claimAmount.add(expectClaim))
 
-            await saleContract.connect(account1).claim()
-            await saleContract.connect(account2).claim()
+            let balanceOfProjectToken = await saleToken.balanceOf(account.address)
+            expect(balanceOfProjectToken).to.be.equal(balanceOfProjectTokenBefore.add(expectClaim))
 
-            let tx3 = await saleContract.usersClaim(account1.address)
-            // console.log("period2 :", Number(tx3.claimAmount))
-            expect(Number(tx3.claimAmount)).to.be.equal((Number(claimAmount1.claimAmount)+expectClaim))
-            let tx4 = await saleToken.balanceOf(account1.address)
-            expect(Number(tx4)).to.be.equal((Number(claimAmount1.claimAmount)+expectClaim))
+        })
 
-            let tx5 = await saleContract.usersClaim(account2.address)
-            expect(Number(tx5.claimAmount)).to.be.equal(expectClaim2)
-            let tx6 = await saleToken.balanceOf(account2.address)
-            expect(Number(tx6)).to.be.equal(expectClaim2)
+        it("claim period = 2, tester2", async () => {
+            let tester = tester2
+            let account = account2
 
-            //account1 = 26666 + 26666
-            //account2 = 73332
+            let balanceOfProjectTokenBefore = await saleToken.balanceOf(account.address)
+            let totalClaimReward = tester.exclusiveSaleBuyAmount.add(tester.openSaleBuyAmount);
+            let expectClaim = (await saleContract.calculClaimAmount(account.address))
+            let usersClaim = await saleContract.usersClaim(account.address)
+
+            expect(expectClaim).to.be.equal(usersClaim.periodReward.mul(ethers.BigNumber.from('2')))
+
+            await saleContract.connect(account).claim()
+            let usersClaimAfter = await saleContract.usersClaim(account.address)
+            expect(usersClaimAfter.claimAmount).to.be.equal(usersClaim.claimAmount.add(expectClaim))
+
+            let balanceOfProjectToken = await saleToken.balanceOf(account.address)
+            expect(balanceOfProjectToken).to.be.equal(balanceOfProjectTokenBefore.add(expectClaim))
+
         })
 
         it("duration the time to period = 3", async () => {
@@ -869,33 +1177,47 @@ describe("Sale", () => {
             await ethers.provider.send('evm_mine');
         })
 
-        it("claim period = 3, claim call the account1, account3", async () => {
-            let expectClaim = Number(await saleContract.calculCalimAmount(account1.address))
-            let expectClaim2 = Number(await saleContract.calculCalimAmount(account3.address))
+        it("claim period = 3, tester1, tester2", async () => {
+            let testers = [tester1, tester2]
+            let accounts = [account1, account2]
 
-            let claimAmount1 = await saleContract.usersClaim(account1.address)
-            expect(Number(claimAmount1.claimAmount)).to.be.equal(53332)
+            for(let i = 0; i < testers.length ; i++){
+                let tester = testers[i]
+                let account = accounts[i]
 
-            let claimAmount2 = await saleContract.usersClaim(account3.address)
-            expect(Number(claimAmount2.claimAmount)).to.be.equal(0)
+                let balanceOfProjectTokenBefore = await saleToken.balanceOf(account.address)
+                let totalClaimReward = tester.exclusiveSaleBuyAmount.add(tester.openSaleBuyAmount);
+                let expectClaim = (await saleContract.calculClaimAmount(account.address))
+                let usersClaim = await saleContract.usersClaim(account.address)
+                expect(expectClaim).to.be.equal(usersClaim.periodReward)
 
-            await saleContract.connect(account1).claim()
-            await saleContract.connect(account3).claim()
+                await saleContract.connect(account).claim()
+                let usersClaimAfter = await saleContract.usersClaim(account.address)
+                expect(usersClaimAfter.claimAmount).to.be.equal(usersClaim.claimAmount.add(expectClaim))
 
-            let tx3 = await saleContract.usersClaim(account1.address)
-            // console.log("period3 :", Number(tx3.claimAmount))
-            expect(Number(tx3.claimAmount)).to.be.equal((Number(claimAmount1.claimAmount)+expectClaim))
-            let tx4 = await saleToken.balanceOf(account1.address)
-            expect(Number(tx4)).to.be.equal((Number(claimAmount1.claimAmount)+expectClaim))
+                let balanceOfProjectToken = await saleToken.balanceOf(account.address)
+                expect(balanceOfProjectToken).to.be.equal(balanceOfProjectTokenBefore.add(expectClaim))
+            }
+        })
 
-            let tx5 = await saleContract.usersClaim(account3.address)
-            expect(Number(tx5.claimAmount)).to.be.equal(expectClaim2)
-            let tx6 = await saleToken.balanceOf(account3.address)
-            expect(Number(tx6)).to.be.equal(expectClaim2)
+        it("claim period = 3, tester3", async () => {
+            let tester = tester3
+            let account = account3
 
-            //account1 = 26666 + 26666 + 26666
-            //account2 = 73332
-            //account3 = 159999
+            let balanceOfProjectTokenBefore = await saleToken.balanceOf(account.address)
+            let totalClaimReward = tester.exclusiveSaleBuyAmount.add(tester.openSaleBuyAmount);
+            let expectClaim = (await saleContract.calculClaimAmount(account.address))
+            let usersClaim = await saleContract.usersClaim(account.address)
+
+            expect(expectClaim).to.be.equal(usersClaim.periodReward.mul(ethers.BigNumber.from('3')))
+
+            await saleContract.connect(account).claim()
+            let usersClaimAfter = await saleContract.usersClaim(account.address)
+            expect(usersClaimAfter.claimAmount).to.be.equal(usersClaim.claimAmount.add(expectClaim))
+
+            let balanceOfProjectToken = await saleToken.balanceOf(account.address)
+            expect(balanceOfProjectToken).to.be.equal(balanceOfProjectTokenBefore.add(expectClaim))
+
         })
 
         it("duration the time to period = 4", async () => {
@@ -904,34 +1226,74 @@ describe("Sale", () => {
             await ethers.provider.send('evm_mine');
         })
 
-        it("claim period = 4, claim call the account1, account4", async () => {
-            let expectClaim = Number(await saleContract.calculCalimAmount(account1.address))
-            let expectClaim2 = Number(await saleContract.calculCalimAmount(account4.address))
+        it("claim period = 4, tester1, tester2, tester3", async () => {
+            let testers = [tester1, tester2, tester3]
+            let accounts = [account1, account2, account3]
 
-            let claimAmount1 = await saleContract.usersClaim(account1.address)
-            expect(Number(claimAmount1.claimAmount)).to.be.equal(79998)
+            for(let i = 0; i < testers.length ; i++){
+                let tester = testers[i]
+                let account = accounts[i]
 
-            let claimAmount2 = await saleContract.usersClaim(account4.address)
-            expect(Number(claimAmount2.claimAmount)).to.be.equal(0)
+                let balanceOfProjectTokenBefore = await saleToken.balanceOf(account.address)
+                let totalClaimReward = tester.exclusiveSaleBuyAmount.add(tester.openSaleBuyAmount);
+                let expectClaim = (await saleContract.calculClaimAmount(account.address))
+                let usersClaim = await saleContract.usersClaim(account.address)
+                expect(expectClaim).to.be.equal(usersClaim.periodReward)
 
-            await saleContract.connect(account1).claim()
-            await saleContract.connect(account4).claim()
+                await saleContract.connect(account).claim()
+                let usersClaimAfter = await saleContract.usersClaim(account.address)
+                expect(usersClaimAfter.claimAmount).to.be.equal(usersClaim.claimAmount.add(expectClaim))
 
-            let tx3 = await saleContract.usersClaim(account1.address)
-            // console.log("period4 :", Number(tx3.claimAmount))
-            expect(Number(tx3.claimAmount)).to.be.equal((Number(claimAmount1.claimAmount)+expectClaim))
-            let tx4 = await saleToken.balanceOf(account1.address)
-            expect(Number(tx4)).to.be.equal((Number(claimAmount1.claimAmount)+expectClaim))
+                let balanceOfProjectToken = await saleToken.balanceOf(account.address)
+                expect(balanceOfProjectToken).to.be.equal(balanceOfProjectTokenBefore.add(expectClaim))
+            }
+        })
+        it("duration the time to period = 5", async () => {
+            let period5 = claimStartTime + (86400*4)
+            await ethers.provider.send('evm_setNextBlockTimestamp', [period5]);
+            await ethers.provider.send('evm_mine');
+        })
+        it("claim period = 5, tester1, tester2, tester3 ", async () => {
+            let testers = [tester1, tester2, tester3]
+            let accounts = [account1, account2, account3]
 
-            let tx5 = await saleContract.usersClaim(account4.address)
-            expect(Number(tx5.claimAmount)).to.be.equal(expectClaim2)
-            let tx6 = await saleToken.balanceOf(account4.address)
-            expect(Number(tx6)).to.be.equal(expectClaim2)
+            for(let i = 0; i < testers.length ; i++){
+                let tester = testers[i]
+                let account = accounts[i]
 
-            //account1 = 26666 + 26666 + 26666 + 26666
-            //account2 = 73332
-            //account3 = 159999
-            //account4 = 466664
+                let balanceOfProjectTokenBefore = await saleToken.balanceOf(account.address)
+                let totalClaimReward = tester.exclusiveSaleBuyAmount.add(tester.openSaleBuyAmount);
+                let expectClaim = (await saleContract.calculClaimAmount(account.address))
+                let usersClaim = await saleContract.usersClaim(account.address)
+                expect(expectClaim).to.be.equal(usersClaim.periodReward)
+
+                await saleContract.connect(account).claim()
+                let usersClaimAfter = await saleContract.usersClaim(account.address)
+                expect(usersClaimAfter.claimAmount).to.be.equal(usersClaim.claimAmount.add(expectClaim))
+
+                let balanceOfProjectToken = await saleToken.balanceOf(account.address)
+                expect(balanceOfProjectToken).to.be.equal(balanceOfProjectTokenBefore.add(expectClaim))
+            }
+        })
+
+        it("claim period = 5, tester4", async () => {
+            let tester = tester4
+            let account = account4
+
+            let balanceOfProjectTokenBefore = await saleToken.balanceOf(account.address)
+            let totalClaimReward = tester.exclusiveSaleBuyAmount.add(tester.openSaleBuyAmount);
+            let expectClaim = (await saleContract.calculClaimAmount(account.address))
+            let usersClaim = await saleContract.usersClaim(account.address)
+
+            expect(expectClaim).to.be.equal(usersClaim.periodReward.mul(ethers.BigNumber.from('4')))
+
+            await saleContract.connect(account).claim()
+            let usersClaimAfter = await saleContract.usersClaim(account.address)
+            expect(usersClaimAfter.claimAmount).to.be.equal(usersClaim.claimAmount.add(expectClaim))
+
+            let balanceOfProjectToken = await saleToken.balanceOf(account.address)
+            expect(balanceOfProjectToken).to.be.equal(balanceOfProjectTokenBefore.add(expectClaim))
+
         })
 
         it("duration the time to period = 6", async () => {
@@ -940,39 +1302,29 @@ describe("Sale", () => {
             await ethers.provider.send('evm_mine');
         })
 
-        it("claim period = 6, claim call the account1, account2", async () => {
-            let expectClaim = Number(await saleContract.calculCalimAmount(account1.address))
-            let expectClaim2 = Number(await saleContract.calculCalimAmount(account2.address))
+        it("claim period = 6, tester2, tester3, tester4", async () => {
+            let testers = [tester2, tester3, tester4]
+            let accounts = [account2, account3, account4]
 
-            let claimAmount1 = await saleContract.usersClaim(account1.address)
-            expect(Number(claimAmount1.claimAmount)).to.be.equal(106664)
-            let claimRemainAmount1 = Number(claimAmount1.totalClaimReward) - Number(claimAmount1.claimAmount)
-            expect(claimRemainAmount1).to.be.equal(expectClaim)
+            for(let i = 0; i < testers.length ; i++){
+                let tester = testers[i]
+                let account = accounts[i]
 
-            let claimAmount2 = await saleContract.usersClaim(account2.address)
-            expect(Number(claimAmount2.claimAmount)).to.be.equal(73332)
-            let claimRemainAmount2 = Number(claimAmount2.totalClaimReward) - Number(claimAmount2.claimAmount)
-            expect(claimRemainAmount2).to.be.equal(expectClaim2)
+                let balanceOfProjectTokenBefore = await saleToken.balanceOf(account.address)
+                let totalClaimReward = tester.exclusiveSaleBuyAmount.add(tester.openSaleBuyAmount);
+                let expectClaim = (await saleContract.calculClaimAmount(account.address))
+                let usersClaim = await saleContract.usersClaim(account.address)
+                expect(expectClaim).to.be.equal(totalClaimReward.sub(usersClaim.claimAmount))
 
-            await saleContract.connect(account1).claim()
-            await saleContract.connect(account2).claim()
+                await saleContract.connect(account).claim()
+                let usersClaimAfter = await saleContract.usersClaim(account.address)
+                expect(usersClaimAfter.claimAmount).to.be.equal(usersClaim.claimAmount.add(expectClaim))
 
-            let tx3 = await saleContract.usersClaim(account1.address)
-            // console.log("period4 :", Number(tx3.claimAmount))
-            expect(Number(tx3.claimAmount)).to.be.equal(Number(claimAmount1.totalClaimReward))
-            let tx4 = await saleToken.balanceOf(account1.address)
-            expect(Number(tx4)).to.be.equal(Number(claimAmount1.totalClaimReward))
-
-            let tx5 = await saleContract.usersClaim(account2.address)
-            expect(Number(tx5.claimAmount)).to.be.equal(Number(tx5.totalClaimReward))
-            let tx6 = await saleToken.balanceOf(account2.address)
-            expect(Number(tx6)).to.be.equal(Number(tx5.totalClaimReward))
-
-            //account1 = 160,000
-            //account2 = 220,000
-            //account3 = 159999
-            //account4 = 466664
+                let balanceOfProjectToken = await saleToken.balanceOf(account.address)
+                expect(balanceOfProjectToken).to.be.equal(balanceOfProjectTokenBefore.add(expectClaim))
+            }
         })
+
 
         it("duration the time to period end", async () => {
             let periodEnd = claimStartTime + (86400*7)
@@ -980,44 +1332,68 @@ describe("Sale", () => {
             await ethers.provider.send('evm_mine');
         })
 
-        it("claim period end, claim call the account1, account3, account4", async () => {
-            let expectClaim = Number(await saleContract.calculCalimAmount(account1.address))
-            expect(expectClaim).to.be.equal(0)
-            let expectClaim2 = Number(await saleContract.calculCalimAmount(account3.address))
-            let expectClaim3 = Number(await saleContract.calculCalimAmount(account4.address))
+        it("claim period end, tester1", async () => {
+            let tester = tester1
+            let account = account1
 
-            let claimAmount1 = await saleContract.usersClaim(account3.address)
-            expect(Number(claimAmount1.claimAmount)).to.be.equal(159999)
-            let claimRemainAmount1 = Number(claimAmount1.totalClaimReward) - Number(claimAmount1.claimAmount)
-            expect(claimRemainAmount1).to.be.equal(expectClaim2)
+            let balanceOfProjectTokenBefore = await saleToken.balanceOf(account.address)
+            let totalClaimReward = tester.exclusiveSaleBuyAmount.add(tester.openSaleBuyAmount);
+            let expectClaim = (await saleContract.calculClaimAmount(account.address))
+            let usersClaim = await saleContract.usersClaim(account.address)
 
-            let claimAmount2 = await saleContract.usersClaim(account4.address)
-            expect(Number(claimAmount2.claimAmount)).to.be.equal(466664)
-            let claimRemainAmount2 = Number(claimAmount2.totalClaimReward) - Number(claimAmount2.claimAmount)
-            expect(claimRemainAmount2).to.be.equal(expectClaim3)
+            expect(expectClaim).to.be.equal(totalClaimReward.sub(usersClaim.claimAmount))
 
-            // let revert = saleContract.connect(account1).claim()
-            // await expect(revert).to.be.revertedWith("user is already getAllreward")
+            await saleContract.connect(account).claim()
+            let usersClaimAfter = await saleContract.usersClaim(account.address)
+            expect(usersClaimAfter.claimAmount).to.be.equal(usersClaim.claimAmount.add(expectClaim))
 
-            await saleContract.connect(account3).claim()
-            await saleContract.connect(account4).claim()
+            let balanceOfProjectToken = await saleToken.balanceOf(account.address)
+            expect(balanceOfProjectToken).to.be.equal(balanceOfProjectTokenBefore.add(expectClaim))
 
+        })
+        it("claim period end, tester6", async () => {
+            let tester = tester6
+            let account = account6
 
-            let tx3 = await saleContract.usersClaim(account3.address)
-            // console.log("period4 :", Number(tx3.claimAmount))
-            expect(Number(tx3.claimAmount)).to.be.equal(Number(claimAmount1.totalClaimReward))
-            let tx4 = await saleToken.balanceOf(account3.address)
-            expect(Number(tx4)).to.be.equal(Number(claimAmount1.totalClaimReward))
+            let balanceOfProjectTokenBefore = await saleToken.balanceOf(account.address)
+            let totalClaimReward = tester.exclusiveSaleBuyAmount.add(tester.openSaleBuyAmount);
+            let expectClaim = (await saleContract.calculClaimAmount(account.address))
+            let usersClaim = await saleContract.usersClaim(account.address)
 
-            let tx5 = await saleContract.usersClaim(account4.address)
-            expect(Number(tx5.claimAmount)).to.be.equal(Number(tx5.totalClaimReward))
-            let tx6 = await saleToken.balanceOf(account4.address)
-            expect(Number(tx6)).to.be.equal(Number(tx5.totalClaimReward))
+            expect(expectClaim).to.be.equal(totalClaimReward.sub(usersClaim.claimAmount))
 
-            //account1 = 160,000
-            //account2 = 220,000
-            //account3 = 320,000
-            //account4 = 700,000
+            await saleContract.connect(account).claim()
+            let usersClaimAfter = await saleContract.usersClaim(account.address)
+            expect(usersClaimAfter.claimAmount).to.be.equal(usersClaim.claimAmount.add(expectClaim))
+
+            let balanceOfProjectToken = await saleToken.balanceOf(account.address)
+            expect(balanceOfProjectToken).to.be.equal(balanceOfProjectTokenBefore.add(expectClaim))
+
         })
     })
+
+    describe("withdraw test", () => {
+        it("withdraw fial when not owner ", async () => {
+            await expect(saleContract.connect(account6).withdraw()).to.be.revertedWith("Accessible: Caller is not an admin")
+        })
+
+        it("withdraw when it has a withdrawable amount ", async () => {
+
+            let totalSale = ethers.BigNumber.from('0')
+            let testers = [tester1, tester2, tester3, tester4,tester5,tester6]
+
+            for(let i=0; i< testers.length; i++ ){
+                let tester = testers[i]
+                totalSale = totalSale.add(tester.exclusiveSaleBuyAmount).add(tester.openSaleBuyAmount)
+            }
+
+            let refund = allocatedSaleAmount.sub(totalSale)
+            let balanceOfProjectTokenBefore = await saleToken.balanceOf(saleOwner.address)
+            await saleContract.connect(saleOwner).withdraw()
+            let balanceOfProjectTokenAfter = await saleToken.balanceOf(saleOwner.address)
+
+            expect(balanceOfProjectTokenAfter).to.be.equal(balanceOfProjectTokenBefore.add(refund))
+        })
+    })
+
 })
