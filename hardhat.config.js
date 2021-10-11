@@ -4,6 +4,7 @@ require("@nomiclabs/hardhat-etherscan");
 require("@nomiclabs/hardhat-waffle");
 require("@nomiclabs/hardhat-web3");
 //require("hardhat-gas-reporter");
+require('dotenv/config');
 
 require("dotenv").config();
 
@@ -21,16 +22,16 @@ require("dotenv").config();
 
 // const { ACCOUNT0_PK, ACCOUNT1_PK, ACCOUNT2_PK } = process.env;
 
-task("accounts", "Prints the list of accounts", async () => {
-  const accounts = await ethers.getSigners();
-  // const prov = await ethers.getDefaultProvider();
-  const provider = new ethers.providers.JsonRpcProvider();
+// task("accounts", "Prints the list of accounts", async () => {
+//   const accounts = await ethers.getSigners();
+//   // const prov = await ethers.getDefaultProvider();
+//   const provider = new ethers.providers.JsonRpcProvider();
 
-  for (const account of accounts) {
-    console.log(account.address);
-    console.log((await provider.getBalance(account.address)).toString());
-  }
-});
+//   for (const account of accounts) {
+//     console.log(account.address);
+//     console.log((await provider.getBalance(account.address)).toString());
+//   }
+// });
 
 module.exports = {
   defaultNetwork: "hardhat",
@@ -40,8 +41,7 @@ module.exports = {
     },
     rinkeby: {
       url: `https://rinkeby.infura.io/v3/${process.env.INFURA_API_KEY}`,
-      accounts: [ `${process.env.RINKEBY_PRIVATE_KEY}` ],
-      gasPrice: 20000000000
+      accounts: [ `${process.env.RINKEBY_PRIVATE_KEY}` ]
     },
     // rinkeby: {
     //   chainId: 4,
