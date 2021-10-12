@@ -92,23 +92,29 @@ contract PublicSale is
             (_openSaleTime[0] < _openSaleTime[1]) &&
                 (_openSaleTime[2] < _openSaleTime[3])
         );
-        snapshot = _snapshot;
-        startAddWhiteTime = _exclusiveTime[0];
-        endAddWhiteTime = _exclusiveTime[1];
-        startExclusiveTime = _exclusiveTime[2];
-        endExclusiveTime = _exclusiveTime[3];
-        startDepositTime = _openSaleTime[0];
-        endDepositTime = _openSaleTime[1];
-        startOpenSaleTime = _openSaleTime[2];
-        endOpenSaleTime = _openSaleTime[3];
-        startClaimTime = _claimTime[0];
-        claimInterval = _claimTime[1];
-        claimPeriod = _claimTime[2];
+        setSnapshot(_snapshot);
+        setExclusiveTime(
+            _exclusiveTime[0],
+            _exclusiveTime[1],
+            _exclusiveTime[2],
+            _exclusiveTime[3]
+        );
+        setOpenTime(
+            _openSaleTime[0],
+            _openSaleTime[1],
+            _openSaleTime[2],
+            _openSaleTime[3]
+        );
+        setClaim(
+            _claimTime[0],
+            _claimTime[1],
+            _claimTime[2]
+        );
     }
 
     /// @inheritdoc IPublicSale
     function setSnapshot(uint256 _snapshot)
-        external
+        public
         override
         onlyOwner
         nonZero(_snapshot)
@@ -123,7 +129,7 @@ contract PublicSale is
         uint256 _startExclusiveTime,
         uint256 _endExclusiveTime
     )
-        external
+        public
         override
         onlyOwner
         nonZero(_startAddWhiteTime)
@@ -145,7 +151,7 @@ contract PublicSale is
         uint256 _startOpenSaleTime,
         uint256 _endOpenSaleTime
     )
-        external
+        public
         override
         onlyOwner
         nonZero(_startDepositTime)
@@ -166,7 +172,7 @@ contract PublicSale is
         uint256 _claimInterval,
         uint256 _claimPeriod
     )
-        external
+        public
         override
         onlyOwner
         nonZero(_startClaimTime)
@@ -219,14 +225,18 @@ contract PublicSale is
         uint256[4] calldata _tier,
         uint256[4] calldata _tierPercent
     ) external onlyOwner {
-        tiers[1] = _tier[0];
-        tiers[2] = _tier[1];
-        tiers[3] = _tier[2];
-        tiers[4] = _tier[3];
-        tiersPercents[1] = _tierPercent[0];
-        tiersPercents[2] = _tierPercent[1];
-        tiersPercents[3] = _tierPercent[2];
-        tiersPercents[4] = _tierPercent[3];
+        setTier(
+            _tier[0],
+            _tier[1],
+            _tier[2],
+            _tier[3]
+        );
+        setTierPercents(
+            _tierPercent[0],
+            _tierPercent[1],
+            _tierPercent[2],
+            _tierPercent[3]
+        );
     }
 
     /// @inheritdoc IPublicSale
@@ -236,7 +246,7 @@ contract PublicSale is
         uint256 _tier3,
         uint256 _tier4
     )
-        external
+        public
         override
         onlyOwner
         nonZero(_tier1)
@@ -259,7 +269,7 @@ contract PublicSale is
         uint256 _tier3,
         uint256 _tier4
     )
-        external
+        public
         override
         onlyOwner
         nonZero(_tier1)
@@ -282,10 +292,14 @@ contract PublicSale is
         uint256[2] calldata _expectAmount,
         uint256[2] calldata _priceAmount
     ) external onlyOwner {
-        totalExpectSaleAmount = _expectAmount[0];
-        totalExpectOpenSaleAmount = _expectAmount[1];
-        saleTokenPrice = _priceAmount[0];
-        payTokenPrice = _priceAmount[1];
+        setSaleAmount(
+            _expectAmount[0],
+            _expectAmount[1]
+        );
+        setTokenPrice(
+            _priceAmount[0],
+            _priceAmount[1]
+        );
     }
 
     /// @inheritdoc IPublicSale
@@ -293,7 +307,7 @@ contract PublicSale is
         uint256 _totalExpectSaleAmount,
         uint256 _totalExpectOpenSaleAmount
     )
-        external
+        public
         override
         onlyOwner
         nonZero(_totalExpectSaleAmount.add(_totalExpectOpenSaleAmount))
@@ -306,7 +320,7 @@ contract PublicSale is
     /// @inheritdoc IPublicSale
     //토큰 가격설정 saleTokenPrice = 판매하는 토큰 가격, payTokenPrice = 지불할 토큰 가격
     function setTokenPrice(uint256 _saleTokenPrice, uint256 _payTokenPrice)
-        external
+        public
         override
         onlyOwner
         nonZero(_saleTokenPrice)
@@ -700,8 +714,7 @@ contract PublicSale is
         require(userOpen.depositAmount > 0, "PublicSale: no deposited amount");
         uint256 withdrawAmount = userOpen.depositAmount;
         userOpen.depositAmount = 0;
-        // @harvey: need to check
-        // userOpen.join = false;
+
         getToken.safeTransfer(msg.sender, withdrawAmount);
 
         emit DepositWithdrawal(msg.sender, withdrawAmount);
@@ -709,7 +722,6 @@ contract PublicSale is
 
     /// @inheritdoc IPublicSale
     function withdraw() external override onlyOwner{
-
         if(block.timestamp <= endOpenSaleTime){
             uint256 balance = saleToken.balanceOf(address(this));
             require(balance > totalExpectSaleAmount.add(totalExpectOpenSaleAmount), "PublicSale: no withdrawable amount");
@@ -723,7 +735,7 @@ contract PublicSale is
 
             uint256 withdrawAmount = totalExpectSaleAmount.add(totalExpectOpenSaleAmount).sub(totalExSaleAmount).sub(totalOpenSaleAmount);
             require(withdrawAmount != 0, "PublicSale: don't exist withdrawAmount");
-            // @harvey: need to check
+            // @harvey: need to check -> Expect를 건들지말고 withdraw bool 
             totalExpectOpenSaleAmount = totalExpectOpenSaleAmount.sub(withdrawAmount);
             saleToken.safeTransfer(msg.sender, withdrawAmount);
             emit Withdrawal(msg.sender, withdrawAmount);
