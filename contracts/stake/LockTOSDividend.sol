@@ -56,48 +56,18 @@ contract LockTOSDividend is
         distr.totalDistribution = distr.totalDistribution.add(_amount);
 
         uint256 weeklyEpoch = getCurrentWeeklyEpoch();
+        uint256 timestamp = genesis.add(weeklyEpoch.mul(epochUnit));
+        require(
+            ILockTOS(lockTOS).totalSupplyAt(timestamp) > 0,
+            "LOCKTOS does not exist"
+        );
+
         distr.tokensPerWeek[weeklyEpoch] = distr.tokensPerWeek[weeklyEpoch].add(
             _amount
         );
 
         IERC20(_token).transferFrom(msg.sender, address(this), _amount);
         emit Distribute(_token, _amount);
-    }
-
-    /// @inheritdoc ILockTOSDividend
-    function redistribute(address _token, uint256 _weeklyEpoch)
-        external
-        override
-    {
-        require(_weeklyEpoch < getCurrentWeeklyEpoch());
-        uint256 timestamp = genesis.add(_weeklyEpoch * epochUnit).add(epochUnit);
-
-        require(
-            ILockTOS(lockTOS).totalSupplyAt(timestamp) == 0,
-            "Locked Token exists for that epoch"
-        );
-
-        uint256 newEpoch = _weeklyEpoch.add(1);
-        uint256 newTimestamp = timestamp.add(epochUnit);
-        while (newTimestamp <= block.timestamp) {
-            if (ILockTOS(lockTOS).totalSupplyAt(newTimestamp) > 0) {
-                break;
-            }
-            newTimestamp = newTimestamp.add(epochUnit);
-            newEpoch = newEpoch.add(1);
-        }
-        require(
-            newTimestamp <= block.timestamp,
-            "Cannot find epoch to redistribute"
-        );
-
-        LibLockTOSDividend.Distribution storage distr = distributions[_token];
-        distr.tokensPerWeek[newEpoch] = distr.tokensPerWeek[newEpoch].add(
-            distr.tokensPerWeek[_weeklyEpoch]
-        );
-        distr.tokensPerWeek[_weeklyEpoch] = 0;
-
-        emit Redistribute(_token, _weeklyEpoch, newEpoch);
     }
 
     /// @inheritdoc ILockTOSDividend
@@ -233,7 +203,7 @@ contract LockTOSDividend is
         uint256 _tokensPerWeek
     ) internal view returns (uint256) {
         uint256 timestamp =
-            genesis.add(_weeklyEpoch.mul(epochUnit)).add(epochUnit);
+            genesis.add(_weeklyEpoch.mul(epochUnit));
         uint256 balance = ILockTOS(lockTOS).balanceOfLockAt(_lockId, timestamp);
         uint256 supply = ILockTOS(lockTOS).totalSupplyAt(timestamp);
         if (balance == 0 || supply == 0) {

@@ -64,13 +64,13 @@ task("rinkeby-deploy-lock-tos", "Deploy TOS").setAction(async () => {
   await (
     await lockTOSProxy.initialize(
       tosAddress,
-      parseInt(time.duration.days(1)),
-      parseInt(time.duration.days(156 * 1))
+      parseInt(time.duration.minutes(10)),
+      parseInt(time.duration.minutes(10) * 156)
     )
   ).wait();
 
   const adminAddress = "0x8c595DA827F4182bC0E3917BccA8e654DF8223E1";
-  await (await lockTOSProxy.transferAdmin(adminAddress)).wait();
+  await (await lockTOSProxy.addAdmin(adminAddress)).wait();
 
   await run("verify", {
     address: lockTOSAddress,
@@ -122,8 +122,9 @@ task("rinkeby-deploy-dividend-implementation", "Deploy TOS").setAction(async () 
 });
 
 task("rinkeby-deploy-dividend-pool", "Deploy TOS").setAction(async () => {
-  const { RINKEBY_DEPLOY_ACCOUNT: account, RINKEBY_LOCK_TOS_ADDRESS: lockTOSAddress } =
+  const { RINKEBY_DEPLOY_ACCOUNT: account } =
   process.env;
+  const lockTOSAddress = "0xEcd5a04E6Ae20da1B77DB90Fb33fB7a7a27784Af";
   const deployer = await findAccount(account);
 
   const dividendPool = await (await ethers.getContractFactory("LockTOSDividend"))
@@ -143,7 +144,7 @@ task("rinkeby-deploy-dividend-pool", "Deploy TOS").setAction(async () => {
   await (
     await dividendPoolProxy.initialize(
       lockTOSAddress,
-      parseInt(time.duration.days(1)),
+      parseInt(time.duration.minutes(10)),
     )
   ).wait();
 

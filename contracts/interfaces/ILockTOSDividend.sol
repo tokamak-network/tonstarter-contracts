@@ -12,8 +12,8 @@ interface ILockTOSDividend {
     /// @dev Distribute
     function distribute(address _token, uint256 _amount) external;
     
-    /// @dev Redistribute
-    function redistribute(address _token, uint256 _weeklyEpoch) external;
+    // /// @dev Redistribute
+    // function redistribute(address _token, uint256 _weeklyEpoch) external;
 
     /// @dev Get weekly epoch for `_timestamp`
     function getWeeklyEpoch(uint256 _timestamp) external view returns (uint256);
