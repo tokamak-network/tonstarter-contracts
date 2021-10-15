@@ -24,10 +24,6 @@ contract PublicSaleStorage  {
     }
 
     struct UserClaim {
-        bool exec;
-        uint256 totalClaimReward;
-        uint256 firstReward;
-        uint256 periodReward;
         uint256 claimAmount;
         uint256 refundAmount;
     }
@@ -41,8 +37,8 @@ contract PublicSaleStorage  {
 
     uint256 public startDepositTime = 0;        //청약 시작시간
     uint256 public endDepositTime = 0;          //청약 끝시간
-    uint256 public startOpenSaleTime = 0;       //openSale 시작시간
-    uint256 public endOpenSaleTime = 0;         //openSale 끝 시간
+    // uint256 public startOpenSaleTime = 0;       //openSale 시작시간
+    // uint256 public endOpenSaleTime = 0;         //openSale 끝 시간
 
     uint256 public startClaimTime = 0;
 

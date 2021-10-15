@@ -21,13 +21,9 @@ interface IPublicSale {
     /// @dev set information related to open sale
     /// @param _startDepositTime start time of deposit
     /// @param _endDepositTime end time of deposit
-    /// @param _startOpenSaleTime start time of open sale
-    /// @param _endOpenSaleTime start time of open sale
     function setOpenTime(
         uint256 _startDepositTime,
-        uint256 _endDepositTime,
-        uint256 _startOpenSaleTime,
-        uint256 _endOpenSaleTime
+        uint256 _endDepositTime
     ) external;
 
     /// @dev set information related to claim
