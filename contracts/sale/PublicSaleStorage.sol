@@ -46,7 +46,12 @@ contract PublicSaleStorage  {
 
     uint256 public startClaimTime = 0;
 
+    uint256 public totalUsers = 0;              //전체 세일 참여자 (라운드1,라운드2 포함, 유니크)
+    uint256 public totalRound1Users = 0;         //라운드 1 참여자
+    uint256 public totalRound2Users = 0;         //라운드 2 참여자
+
     uint256 public totalWhitelists = 0;         //총 화이트리스트 수 (exclusive)
+
     uint256 public totalExSaleAmount = 0;       //총 exclu 실제 판매토큰 양 (exclusive)
     uint256 public totalExPurchasedAmount = 0;  //총 지불토큰 받은 양 (exclusive)
 

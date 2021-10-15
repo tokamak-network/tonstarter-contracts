@@ -467,7 +467,7 @@ contract PublicSale is
         uint256 totalClaimReward = realSaleAmount;
         uint256 firstReward = totalClaimReward.mul(claimFirst).div(100);
         uint256 periodReward = (totalClaimReward.sub(firstReward)).div(claimPeriod.sub(1));
-;
+
         if (difftime < claimInterval) {
             return firstReward;
         } else {
@@ -546,11 +546,13 @@ contract PublicSale is
         UserInfoEx storage userEx = usersEx[msg.sender];
         require(userEx.join != true, "PublicSale: already attended");
 
-        if (!userEx.join) whitelists.push(msg.sender);
+        whitelists.push(msg.sender);
+        totalWhitelists = totalWhitelists.add(1);
+
         userEx.join = true;
         userEx.tier = tier;
         userEx.saleAmount = 0;
-        totalWhitelists = totalWhitelists.add(1);
+
         tiersAccount[tier] = tiersAccount[tier].add(1);
 
         emit AddedWhiteList(msg.sender, tier);
@@ -589,6 +591,10 @@ contract PublicSale is
         );
 
         UserClaim storage userClaim = usersClaim[msg.sender];
+        if(userEx.payAmount == 0) {
+            totalRound1Users = totalRound1Users.add(1);
+            totalUsers = totalUsers.add(1);
+        }
 
         userEx.payAmount = userEx.payAmount.add(_amount);
         userEx.saleAmount = userEx.saleAmount.add(tokenSaleAmount);
@@ -630,7 +636,12 @@ contract PublicSale is
         if (!userOpen.join) {
             depositors.push(msg.sender);
             userOpen.join = true;
+
+            totalRound2Users = totalRound2Users.add(1);
+            UserInfoEx storage userEx = usersEx[msg.sender];
+            if(userEx.payAmount == 0) totalUsers = totalUsers.add(1);
         }
+
         userOpen.depositAmount = userOpen.depositAmount.add(_amount);
         userOpen.saleAmount = 0;
         totalDepositAmount = totalDepositAmount.add(_amount);
