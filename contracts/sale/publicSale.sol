@@ -14,8 +14,6 @@ import "../interfaces/IPublicSale.sol";
 import "../common/AccessibleCommon.sol";
 import "./PublicSaleStorage.sol";
 
-import "hardhat/console.sol";
-
 contract PublicSale is
     PublicSaleStorage,
     AccessibleCommon,
@@ -436,44 +434,48 @@ contract PublicSale is
     }
 
     /// @inheritdoc IPublicSale
-    function calculClaimAmount(address _account)
+    function calculClaimAmount(address _account, uint256 _period)
         public
         view
         override
-        returns (uint256)
+        returns (uint256 _reward, uint256 _totalClaim)
     {
-        require(
-            block.timestamp >= startClaimTime,
-            "PublicSale: don't start claimTime"
-        );
+        if(block.timestamp < startClaimTime) return (0, 0);
+        if(_period > claimPeriod) return (0,0);
 
         UserClaim storage userClaim = usersClaim[_account];
         (, uint256 realSaleAmount, ) = totalSaleUserAmount(_account);
 
-
-        if (userClaim.claimAmount >= realSaleAmount || realSaleAmount == 0 ) return 0;
+        if (userClaim.claimAmount >= realSaleAmount || realSaleAmount == 0 ) return (0, 0);
 
         uint256 difftime = block.timestamp.sub(startClaimTime);
-
         uint256 totalClaimReward = realSaleAmount;
         uint256 firstReward = totalClaimReward.mul(claimFirst).div(100);
-
         uint256 periodReward = (totalClaimReward.sub(firstReward)).div(claimPeriod.sub(1));
-
-        if (difftime < claimInterval) {
-            return firstReward;
-        } else {
-            uint256 period = (difftime / claimInterval).add(1);
-
-            if (period >= claimPeriod) {
-                uint256 reward =
-                    totalClaimReward.sub(userClaim.claimAmount);
-
-                return reward;
+            
+        if(_period == 0) {
+            if (difftime < claimInterval) {
+                return (firstReward, totalClaimReward);
             } else {
-                uint256 reward = firstReward.add(periodReward.mul(period.sub(1))).sub(userClaim.claimAmount);
-
-                return reward;
+                uint256 period = (difftime / claimInterval).add(1);
+                if (period >= claimPeriod) {
+                    uint256 reward =
+                        totalClaimReward.sub(userClaim.claimAmount);
+                    return (reward, totalClaimReward);
+                } else {
+                    uint256 reward = firstReward.add(periodReward.mul(period.sub(1))).sub(userClaim.claimAmount);
+                    return (reward, totalClaimReward);
+                }
+            }
+        } else if(_period == 1){
+            return (firstReward, totalClaimReward);
+        } else {
+            if(_period == claimPeriod) {
+                uint256 reward = 
+                    totalClaimReward.sub((firstReward.add(periodReward.mul(claimPeriod.sub(2)))));
+                return (reward, totalClaimReward);
+            } else {
+                return (periodReward, totalClaimReward);
             }
         }
     }
@@ -542,11 +544,10 @@ contract PublicSale is
 
         whitelists.push(msg.sender);
         totalWhitelists = totalWhitelists.add(1);
-
+        
         userEx.join = true;
         userEx.tier = tier;
         userEx.saleAmount = 0;
-
         tiersAccount[tier] = tiersAccount[tier].add(1);
 
         emit AddedWhiteList(msg.sender, tier);
@@ -585,6 +586,7 @@ contract PublicSale is
         );
 
         UserClaim storage userClaim = usersClaim[msg.sender];
+
         if(userEx.payAmount == 0) {
             totalRound1Users = totalRound1Users.add(1);
             totalUsers = totalUsers.add(1);
@@ -628,7 +630,6 @@ contract PublicSale is
             UserInfoEx storage userEx = usersEx[msg.sender];
             if(userEx.payAmount == 0) totalUsers = totalUsers.add(1);
         }
-
         userOpen.depositAmount = userOpen.depositAmount.add(_amount);
         userOpen.saleAmount = 0;
         totalDepositAmount = totalDepositAmount.add(_amount);
@@ -653,7 +654,7 @@ contract PublicSale is
             "PublicSale: no purchase amount"
         );
 
-        uint256 reward = calculClaimAmount(msg.sender);
+        (uint256 reward, ) = calculClaimAmount(msg.sender, 0);
         require(reward > 0, "PublicSale: no reward");
         require(
             realSaleAmount.sub(userClaim.claimAmount) >= reward,
