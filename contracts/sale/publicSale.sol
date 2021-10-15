@@ -452,7 +452,7 @@ contract PublicSale is
         uint256 totalClaimReward = realSaleAmount;
         uint256 firstReward = totalClaimReward.mul(claimFirst).div(100);
         uint256 periodReward = (totalClaimReward.sub(firstReward)).div(claimPeriod.sub(1));
-            
+
         if(_period == 0) {
             if (difftime < claimInterval) {
                 return (firstReward, totalClaimReward);
@@ -471,7 +471,7 @@ contract PublicSale is
             return (firstReward, totalClaimReward);
         } else {
             if(_period == claimPeriod) {
-                uint256 reward = 
+                uint256 reward =
                     totalClaimReward.sub((firstReward.add(periodReward.mul(claimPeriod.sub(2)))));
                 return (reward, totalClaimReward);
             } else {
@@ -516,6 +516,7 @@ contract PublicSale is
     function totalOpenSaleAmount() public view returns (uint256){
         uint256 _calculSaleToken = calculSaleToken(totalDepositAmount);
         uint256 _totalAmount = totalExpectOpenSaleAmountView();
+
         if(_calculSaleToken < _totalAmount) return _calculSaleToken;
         else return _totalAmount;
     }
@@ -544,7 +545,7 @@ contract PublicSale is
 
         whitelists.push(msg.sender);
         totalWhitelists = totalWhitelists.add(1);
-        
+
         userEx.join = true;
         userEx.tier = tier;
         userEx.saleAmount = 0;
@@ -679,6 +680,7 @@ contract PublicSale is
 
     /// @inheritdoc IPublicSale
     function withdraw() external override onlyOwner{
+
         if(block.timestamp <= endDepositTime){
             uint256 balance = saleToken.balanceOf(address(this));
             require(balance > totalExpectSaleAmount.add(totalExpectOpenSaleAmount), "PublicSale: no withdrawable amount");
@@ -694,6 +696,7 @@ contract PublicSale is
             require(totalExpectSaleAmount.add(totalExpectOpenSaleAmount) > totalExSaleAmount.add(saleAmount), "PublicSale: don't exist withdrawAmount");
 
             uint256 withdrawAmount = totalExpectSaleAmount.add(totalExpectOpenSaleAmount).sub(totalExSaleAmount).sub(saleAmount);
+
             require(withdrawAmount != 0, "PublicSale: don't exist withdrawAmount");
             saleToken.safeTransfer(msg.sender, withdrawAmount);
             emit Withdrawal(msg.sender, withdrawAmount);
