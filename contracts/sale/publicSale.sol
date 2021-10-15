@@ -14,6 +14,8 @@ import "../interfaces/IPublicSale.sol";
 import "../common/AccessibleCommon.sol";
 import "./PublicSaleStorage.sol";
 
+import "hardhat/console.sol";
+
 contract PublicSale is
     PublicSaleStorage,
     AccessibleCommon,
@@ -444,27 +446,33 @@ contract PublicSale is
             block.timestamp >= startClaimTime,
             "PublicSale: don't start claimTime"
         );
+
         UserClaim storage userClaim = usersClaim[_account];
         (, uint256 realSaleAmount, ) = totalSaleUserAmount(_account);
+
 
         if (userClaim.claimAmount >= realSaleAmount || realSaleAmount == 0 ) return 0;
 
         uint256 difftime = block.timestamp.sub(startClaimTime);
+
         uint256 totalClaimReward = realSaleAmount;
         uint256 firstReward = totalClaimReward.mul(claimFirst).div(100);
+
         uint256 periodReward = (totalClaimReward.sub(firstReward)).div(claimPeriod.sub(1));
 
         if (difftime < claimInterval) {
             return firstReward;
         } else {
             uint256 period = (difftime / claimInterval).add(1);
+
             if (period >= claimPeriod) {
                 uint256 reward =
                     totalClaimReward.sub(userClaim.claimAmount);
+
                 return reward;
             } else {
-                uint256 reward =
-                    (periodReward.mul(period.sub(1))).sub(userClaim.claimAmount).add(firstReward);
+                uint256 reward = firstReward.add(periodReward.mul(period.sub(1))).sub(userClaim.claimAmount);
+
                 return reward;
             }
         }
@@ -642,7 +650,7 @@ contract PublicSale is
 
         require(
             realSaleAmount > 0,
-            "PublicSale: need the participation"
+            "PublicSale: no purchase amount"
         );
 
         uint256 reward = calculClaimAmount(msg.sender);
