@@ -80,7 +80,7 @@ contract PublicSale is
     function setAllValue(
         uint256 _snapshot,
         uint256[4] calldata _exclusiveTime,
-        uint256[4] calldata _openSaleTime,
+        uint256[2] calldata _openSaleTime,
         uint256[4] calldata _claimTime
     ) external onlyOwner beforeStartAddWhiteTime {
         require(
@@ -88,8 +88,7 @@ contract PublicSale is
                 (_exclusiveTime[2] < _exclusiveTime[3])
         );
         require(
-            (_openSaleTime[0] < _openSaleTime[1]) &&
-                (_openSaleTime[2] < _openSaleTime[3])
+            (_openSaleTime[0] < _openSaleTime[1])
         );
         setSnapshot(_snapshot);
         setExclusiveTime(
@@ -100,9 +99,7 @@ contract PublicSale is
         );
         setOpenTime(
             _openSaleTime[0],
-            _openSaleTime[1],
-            _openSaleTime[2],
-            _openSaleTime[3]
+            _openSaleTime[1]
         );
         setClaim(
             _claimTime[0],
@@ -147,23 +144,17 @@ contract PublicSale is
     /// @inheritdoc IPublicSale
     function setOpenTime(
         uint256 _startDepositTime,
-        uint256 _endDepositTime,
-        uint256 _startOpenSaleTime,
-        uint256 _endOpenSaleTime
+        uint256 _endDepositTime
     )
         public
         override
         onlyOwner
         nonZero(_startDepositTime)
         nonZero(_endDepositTime)
-        nonZero(_startOpenSaleTime)
-        nonZero(_endOpenSaleTime)
         beforeStartAddWhiteTime
     {
         startDepositTime = _startDepositTime;
         endDepositTime = _endDepositTime;
-        startOpenSaleTime = _startOpenSaleTime;
-        endOpenSaleTime = _endOpenSaleTime;
     }
 
     /// @inheritdoc IPublicSale
@@ -201,8 +192,6 @@ contract PublicSale is
             userEx.saleAmount = 0;
             UserClaim storage userClaim = usersClaim[whitelists[i]];
             userClaim.claimAmount = 0;
-            userClaim.periodReward = 0;
-            userClaim.totalClaimReward = 0;
         }
         for (uint256 j = 0; j < depositors.length; j++) {
             UserInfoOpen storage userOpen = usersOpen[depositors[j]];
@@ -212,8 +201,6 @@ contract PublicSale is
             userOpen.saleAmount = 0;
             UserClaim storage userClaim = usersClaim[depositors[j]];
             userClaim.claimAmount = 0;
-            userClaim.periodReward = 0;
-            userClaim.totalClaimReward = 0;
         }
         for (uint256 k = 1; k < 5; k++) {
             tiersAccount[k] = 0;
@@ -458,10 +445,9 @@ contract PublicSale is
             "PublicSale: don't start claimTime"
         );
         UserClaim storage userClaim = usersClaim[_account];
-        (uint256 realPayAmount, uint256 realSaleAmount, uint256 refundAmount) = totalSaleUserAmount(_account);
+        (, uint256 realSaleAmount, ) = totalSaleUserAmount(_account);
 
         if (userClaim.claimAmount >= realSaleAmount || realSaleAmount == 0 ) return 0;
-
 
         uint256 difftime = block.timestamp.sub(startClaimTime);
         uint256 totalClaimReward = realSaleAmount;
@@ -599,13 +585,6 @@ contract PublicSale is
         userEx.payAmount = userEx.payAmount.add(_amount);
         userEx.saleAmount = userEx.saleAmount.add(tokenSaleAmount);
 
-        userClaim.totalClaimReward = userClaim.totalClaimReward.add(
-            tokenSaleAmount
-        );
-        userClaim.firstReward = userClaim.totalClaimReward.mul(claimFirst).div(100);
-        uint256 periodReward = (userClaim.totalClaimReward.sub(userClaim.firstReward)).div(claimPeriod.sub(1));
-        userClaim.periodReward = periodReward;
-
         totalExPurchasedAmount = totalExPurchasedAmount.add(_amount);
         totalExSaleAmount = totalExSaleAmount.add(tokenSaleAmount);
 
@@ -661,27 +640,15 @@ contract PublicSale is
 
         (uint256 realPayAmount, uint256 realSaleAmount, uint256 refundAmount) = totalSaleUserAmount(msg.sender);
 
-        if(!userClaim.exec) {
-            userClaim.totalClaimReward = userClaim.totalClaimReward.add(
-                realSaleAmount
-            );
-            userClaim.firstReward = userClaim.totalClaimReward.mul(claimFirst).div(100);
-            uint256 periodReward = (userClaim.totalClaimReward.sub(userClaim.firstReward)).div(claimPeriod.sub(1));
-            userClaim.periodReward = periodReward;
-            userClaim.exec = true;
-        }
-
-        UserInfoOpen storage userOpen = usersOpen[msg.sender];
-
         require(
-            userClaim.totalClaimReward > 0,
+            realSaleAmount > 0,
             "PublicSale: need the participation"
         );
 
         uint256 reward = calculClaimAmount(msg.sender);
         require(reward > 0, "PublicSale: no reward");
         require(
-            userClaim.totalClaimReward.sub(userClaim.claimAmount) >= reward,
+            realSaleAmount.sub(userClaim.claimAmount) >= reward,
             "PublicSale: user is already getAllreward"
         );
         require(
@@ -703,7 +670,7 @@ contract PublicSale is
 
     /// @inheritdoc IPublicSale
     function withdraw() external override onlyOwner{
-        if(block.timestamp <= endOpenSaleTime){
+        if(block.timestamp <= endDepositTime){
             uint256 balance = saleToken.balanceOf(address(this));
             require(balance > totalExpectSaleAmount.add(totalExpectOpenSaleAmount), "PublicSale: no withdrawable amount");
             uint256 withdrawAmount = balance.sub(totalExpectSaleAmount.add(totalExpectOpenSaleAmount));
@@ -711,7 +678,7 @@ contract PublicSale is
             saleToken.safeTransfer(msg.sender, withdrawAmount);
             emit Withdrawal(msg.sender, withdrawAmount);
         } else {
-            require(block.timestamp > endOpenSaleTime, "PublicSale: end the openSaleTime");
+            require(block.timestamp > endDepositTime, "PublicSale: end the openSaleTime");
             require(!adminWithdraw, "already admin called withdraw");
             adminWithdraw = true;
             uint256 saleAmount = totalOpenSaleAmount();
