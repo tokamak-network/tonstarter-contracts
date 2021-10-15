@@ -458,22 +458,27 @@ contract PublicSale is
             "PublicSale: don't start claimTime"
         );
         UserClaim storage userClaim = usersClaim[_account];
-        if (userClaim.totalClaimReward == 0) return 0;
-        if (userClaim.totalClaimReward == userClaim.claimAmount) return 0;
+        (uint256 realPayAmount, uint256 realSaleAmount, uint256 refundAmount) = totalSaleUserAmount(_account);
+
+        if (userClaim.claimAmount >= realSaleAmount || realSaleAmount == 0 ) return 0;
+
 
         uint256 difftime = block.timestamp.sub(startClaimTime);
-
+        uint256 totalClaimReward = realSaleAmount;
+        uint256 firstReward = totalClaimReward.mul(claimFirst).div(100);
+        uint256 periodReward = (totalClaimReward.sub(firstReward)).div(claimPeriod.sub(1));
+;
         if (difftime < claimInterval) {
-            return userClaim.firstReward;
+            return firstReward;
         } else {
             uint256 period = (difftime / claimInterval).add(1);
             if (period >= claimPeriod) {
                 uint256 reward =
-                    userClaim.totalClaimReward.sub(userClaim.claimAmount);
+                    totalClaimReward.sub(userClaim.claimAmount);
                 return reward;
             } else {
                 uint256 reward =
-                    (userClaim.periodReward.mul(period.sub(1))).sub(userClaim.claimAmount).add(userClaim.firstReward);
+                    (periodReward.mul(period.sub(1))).sub(userClaim.claimAmount).add(firstReward);
                 return reward;
             }
         }
