@@ -37,7 +37,8 @@ interface IPublicSale {
     function setClaim(
         uint256 _startClaimTime,
         uint256 _claimInterval,
-        uint256 _claimPeriod
+        uint256 _claimPeriod,
+        uint256 _claimFirst
     ) external;
 
     /// @dev set information related to sale amount
@@ -71,9 +72,6 @@ interface IPublicSale {
         uint256 _tier3,
         uint256 _tier4
     ) external;
-
-    /// @dev set to endExclusiveSale (After the exclusive sale, the remaining allocation amount is sent to the open sale)
-    function endExclusiveSale() external;
 
     /// @dev set information related to token price
     /// @param _saleTokenPrice the sale token price
@@ -130,14 +128,8 @@ interface IPublicSale {
     /// @param _amount  amount
     function deposit(uint256 _amount) external;
 
-    /// @dev execute open sale
-    function openSale() external;
-
     /// @dev execute the claim
     function claim() external;
-
-    /// @dev Called when depositing and not participating in the sale, and need to recover the deposit.
-    function depositWithdraw() external;
 
     /// @dev execute the withdraw
     function withdraw() external;

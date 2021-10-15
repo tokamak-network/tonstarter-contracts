@@ -15,7 +15,7 @@ const { BigNumber } = require("ethers")
 const publicJson = require('../../artifacts/contracts/sale/PublicSale.sol/PublicSale.json')
 
 var abiPublic = publicJson.abi;
-const proxyAddress = "0x230f12eb4A37055dC0E11B3f7405c9EE94E71ee9"
+const proxyAddress = "0xE352fF539852620B35454466aBF85684Fd989397"
 const adminAddress = "0xf0B595d10a92A5a9BC3fFeA7e79f5d266b6035Ea"
 
 // let net = 'rinkeby'
@@ -38,31 +38,35 @@ async function setValue() {
     const publicSale = await ethers.getContractAt("PublicSale", proxyAddress);
     // const publicSale = await ethers.Contract("PublicSale", proxy, adminAddress);
 
-    let epochTime = 1633668934
-    let epochTimePeriod = 1800      //30분
+    let epochTime = 1634196000
+    let epochTimePeriod = 300      //10분 = 600 , 1분 = 60, 5분 = 300
     let epochTimeAdd = 1
-    let claimIntervalTime = 300
-    let snapshotTime = 1633668934
+    let claimIntervalTime = 120
+    let snapshotTime = 1634195940
 
     snapshot = snapshotTime
     whitelistStartTime = epochTime
-    whitelistEndTime = whitelistStartTime + (epochTimePeriod * epochTimeAdd)
+    whitelistEndTime = whitelistStartTime + (epochTimePeriod)
     exclusiveStartTime = whitelistEndTime
     exclusiveEndTime = exclusiveStartTime + (epochTimePeriod * epochTimeAdd)
     depositStartTime = exclusiveEndTime
-    depositEndTime = depositStartTime + (epochTimePeriod * epochTimeAdd)
+    depositEndTime = depositStartTime + (epochTimePeriod)
     openSaleStartTime = depositEndTime
-    openSaleEndTime = openSaleStartTime + (epochTimePeriod * epochTimeAdd)
+    openSaleEndTime = openSaleStartTime + (epochTimePeriod)
     claimStartTime = openSaleEndTime
     claimInterval = claimIntervalTime
     claimPeriod = 6
 
-    await publicSale.connect(deployer).setAllValue(
+    //4시 19분 스냅샷 (다오페이지 링크)
+    //4시 20분 시작 (5분단위)
+
+    let tx2 = await publicSale.connect(deployer).setAllValue(
         snapshot,
         [whitelistStartTime, whitelistEndTime, exclusiveStartTime, exclusiveEndTime],
         [depositStartTime, depositEndTime, openSaleStartTime, openSaleEndTime],
         [claimStartTime, claimInterval, claimPeriod]
     )
+    await tx2.wait()
 
     let tx = Number(await publicSale.snapshot())
     console.log("tx :", tx, ", snapshot : ", snapshot)
@@ -74,10 +78,10 @@ async function setAllTier() {
 
     const BASE_TEN = 10
     const decimals = 18
-    let tier1 = 100
-    let tier2 = 200
-    let tier3 = 1000
-    let tier4 = 4000
+    let tier1 = 600
+    let tier2 = 1200
+    let tier3 = 2200
+    let tier4 = 6000
     let bigTier1 = BigNumber.from(tier1).mul(BigNumber.from(BASE_TEN).pow(decimals))
     let bigTier2 = BigNumber.from(tier2).mul(BigNumber.from(BASE_TEN).pow(decimals))
     let bigTier3 = BigNumber.from(tier3).mul(BigNumber.from(BASE_TEN).pow(decimals))
@@ -99,6 +103,7 @@ async function setAllTier() {
 
 async function setAllAmount() {
     const [deployer] = await ethers.getSigners()
+    console.log(deployer.address)
     const publicSale = await ethers.getContractAt("PublicSale", proxyAddress);
 
     const BASE_TEN = 10
@@ -120,12 +125,12 @@ async function setAllAmount() {
     console.log("tx2 :", tx2, ", salePrice : ", salePrice)
 }
 
-// setValue()
-//     .then(() => process.exit(0))
-//     .catch(error => {
-//         console.error(error);
-//         process.exit(1);
-//     });
+setValue()
+    .then(() => process.exit(0))
+    .catch(error => {
+        console.error(error);
+        process.exit(1);
+    });
 
 // setAllTier()
 //     .then(() => process.exit(0))

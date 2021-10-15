@@ -24,9 +24,12 @@ contract PublicSaleStorage  {
     }
 
     struct UserClaim {
+        bool exec;
         uint256 totalClaimReward;
+        uint256 firstReward;
         uint256 periodReward;
         uint256 claimAmount;
+        uint256 refundAmount;
     }
 
     uint256 public snapshot = 0;
@@ -48,8 +51,6 @@ contract PublicSaleStorage  {
     uint256 public totalExPurchasedAmount = 0;  //총 지불토큰 받은 양 (exclusive)
 
     uint256 public totalDepositAmount;          //총 청약 한 양 (openSale)
-    uint256 public totalOpenSaleAmount;         //총 OpenSale 실제판매 토큰량 (openSale)
-    uint256 public totalOpenPurchasedAmount;    //총 지불토큰 받은양 (openSale)
 
     uint256 public totalExpectSaleAmount;       //예정된 판매토큰 양 (exclusive)
     uint256 public totalExpectOpenSaleAmount;   //예정된 판매 토큰량 (opensale)
@@ -59,6 +60,7 @@ contract PublicSaleStorage  {
 
     uint256 public claimInterval; //클레임 간격 (epochtime)
     uint256 public claimPeriod;   //클레임 횟수
+    uint256 public claimFirst;    //초기 클레임 percents
 
     address public getTokenOwner;
 
@@ -69,7 +71,7 @@ contract PublicSaleStorage  {
     address[] public depositors;
     address[] public whitelists;
 
-    bool public endExclusiveSaleExec; //endExclusiveSale 실행여부
+    bool public adminWithdraw; //withdraw 실행여부
 
     mapping (address => UserInfoEx) public usersEx;
     mapping (address => UserInfoOpen) public usersOpen;
