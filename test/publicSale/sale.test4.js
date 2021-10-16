@@ -961,25 +961,25 @@ describe("Sale", () => {
                 expect(openSaleAmountAdjust).to.be.equal(allocatedSaleAmount.sub(totalPayAmountToSaleAmount))
             });
 
-            it("Can be deposited multiple times after depositTime : account1 ", async () => {
+            it("deposit after depositTime : account1 ", async () => {
                 let tester = tester1
                 let account = account1
                 let balance = await getToken.balanceOf(account.address)
-                tester.depositAmountPayToken = balance.div(ethers.BigNumber.from('4'))
+                tester.depositAmountPayToken = balance.div(ethers.BigNumber.from('10000'))
                 await getToken.connect(account).approve(saleContract.address, tester.depositAmountPayToken)
                 await saleContract.connect(account).deposit(tester.depositAmountPayToken)
-
+                /*
                 await getToken.connect(account).approve(saleContract.address, tester.depositAmountPayToken)
                 await saleContract.connect(account).deposit(tester.depositAmountPayToken)
 
                 tester.depositAmountPayToken = tester.depositAmountPayToken.add(tester.depositAmountPayToken)
-
+                */
                 let tx = await saleContract.usersOpen(account.address)
 
                 expect((tx.depositAmount)).to.be.equal(tester.depositAmountPayToken)
 
             });
-
+            /*
             it("deposit after depositTime : account2 , account3, account6 ", async () => {
                 let testers = [tester2, tester3, tester6]
                 let accounts = [account2 , account3, account6]
@@ -1047,6 +1047,8 @@ describe("Sale", () => {
                 .add(tester5.depositAmountPayToken)
                 .add(tester6.depositAmountPayToken)
             })
+
+            */
         })
     })
 
@@ -1375,7 +1377,7 @@ describe("Sale", () => {
             await expect(saleContract.connect(account6).withdraw()).to.be.revertedWith("Accessible: Caller is not an admin")
         })
 
-        it("withdraw : No withdrawal amount ", async () => {
+        it("withdraw : After the sale, the remaining amount can be withdrawn. ", async () => {
 
             let totalSale = ethers.BigNumber.from('0')
             let totalRound1Sale = ethers.BigNumber.from('0')
@@ -1392,7 +1394,15 @@ describe("Sale", () => {
 
             expect(totalSale).to.be.equal(totalRound1Sale.add(totalRound2Sale))
 
-            await expect(saleContract.connect(saleOwner).withdraw()).to.be.revertedWith("PublicSale: don't exist withdrawAmount")
+            let withdrawalAmount = allocatedSaleAmount.sub(totalSale);
+            let balanceOfProjectTokenBefore = await saleToken.balanceOf(saleContract.address)
+            let balanceOfProjectOwnerBefore = await saleToken.balanceOf(saleOwner.address)
+            await saleContract.connect(saleOwner).withdraw();
+            let balanceOfProjectTokenAfter = await saleToken.balanceOf(saleContract.address)
+            let balanceOfProjectOwnerAfter = await saleToken.balanceOf(saleOwner.address)
+
+            expect(balanceOfProjectTokenBefore).to.be.equal(balanceOfProjectTokenAfter.add(withdrawalAmount))
+            expect(balanceOfProjectOwnerBefore).to.be.equal(balanceOfProjectOwnerAfter.sub(withdrawalAmount))
 
         })
     })
