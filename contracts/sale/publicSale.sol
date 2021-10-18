@@ -446,7 +446,8 @@ contract PublicSale is
         UserClaim storage userClaim = usersClaim[_account];
         (, uint256 realSaleAmount, ) = totalSaleUserAmount(_account);
 
-        if (userClaim.claimAmount >= realSaleAmount || realSaleAmount == 0 ) return (0, 0);
+        if (realSaleAmount == 0 ) return (0, 0);
+        if (userClaim.claimAmount >= realSaleAmount) return (0, realSaleAmount);
 
         uint256 difftime = block.timestamp.sub(startClaimTime);
         uint256 totalClaimReward = realSaleAmount;
@@ -455,7 +456,8 @@ contract PublicSale is
 
         if(_period == 0) {
             if (difftime < claimInterval) {
-                return (firstReward, totalClaimReward);
+                uint256 reward = firstReward.sub(userClaim.claimAmount);
+                return (reward, totalClaimReward);
             } else {
                 uint256 period = (difftime / claimInterval).add(1);
                 if (period >= claimPeriod) {
@@ -647,8 +649,10 @@ contract PublicSale is
             "PublicSale: don't start claimTime"
         );
         UserClaim storage userClaim = usersClaim[msg.sender];
+        UserInfoOpen storage userOpen = usersOpen[msg.sender];
 
-        (uint256 realPayAmount, uint256 realSaleAmount, uint256 refundAmount) = totalSaleUserAmount(msg.sender);
+        (, uint256 realSaleAmount, ) = totalSaleUserAmount(msg.sender);
+        (uint256 realPayAmount, ,uint256 refundAmount ) = openSaleUserAmount(msg.sender);
 
         require(
             realSaleAmount > 0,
@@ -669,8 +673,14 @@ contract PublicSale is
         userClaim.claimAmount = userClaim.claimAmount.add(reward);
 
         saleToken.safeTransfer(msg.sender, reward);
+        
+        if(!userClaim.exec && userOpen.join) {
+            require(realPayAmount > getToken.balanceOf(address(this)), "dont have ton");
+            getToken.safeTransfer(getTokenOwner, realPayAmount);
+        }
 
-        if(refundAmount > 0 && userClaim.refundAmount == 0){
+        if(refundAmount > 0 && userClaim.refundAmount == 0){            
+            require(refundAmount > getToken.balanceOf(address(this)), "dont have refund ton");
             userClaim.refundAmount = refundAmount;
             getToken.safeTransfer(msg.sender, refundAmount);
         }
@@ -680,7 +690,6 @@ contract PublicSale is
 
     /// @inheritdoc IPublicSale
     function withdraw() external override onlyOwner{
-
         if(block.timestamp <= endDepositTime){
             uint256 balance = saleToken.balanceOf(address(this));
             require(balance > totalExpectSaleAmount.add(totalExpectOpenSaleAmount), "PublicSale: no withdrawable amount");

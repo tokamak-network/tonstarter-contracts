@@ -15,7 +15,7 @@ const { BigNumber } = require("ethers")
 const publicJson = require('../../artifacts/contracts/sale/PublicSale.sol/PublicSale.json')
 
 var abiPublic = publicJson.abi;
-const proxyAddress = "0x004FC7C66C276bd3D59152435Ce582051b51426B"
+const proxyAddress = "0xab7B5E58FBcFeb1618EDd076F0f2c20eb20674a0"
 const adminAddress = "0xf0B595d10a92A5a9BC3fFeA7e79f5d266b6035Ea"
 
 // let net = 'rinkeby'
@@ -31,18 +31,18 @@ const adminAddress = "0xf0B595d10a92A5a9BC3fFeA7e79f5d266b6035Ea"
 let snapshot
 let whitelistStartTime, whitelistEndTime, exclusiveStartTime, exclusiveEndTime
 let depositStartTime, depositEndTime, openSaleStartTime, openSaleEndTime
-let claimStartTime, claimInterval, claimPeriod, claimFisrt
+let claimStartTime, claimInterval, claimPeriod, claimFirst
 
 async function setValue() {
     const [deployer] = await ethers.getSigners()
     const publicSale = await ethers.getContractAt("PublicSale", proxyAddress);
     // const publicSale = await ethers.Contract("PublicSale", proxy, adminAddress);
 
-    let epochTime = 1634196000
-    let epochTimePeriod = 300      //10분 = 600 , 1분 = 60, 5분 = 300
+    let epochTime = 1634551834
+    let epochTimePeriod = 180      //10분 = 600 , 1분 = 60, 5분 = 300
     let epochTimeAdd = 1
-    let claimIntervalTime = 120
-    let snapshotTime = 1634195940
+    let claimIntervalTime = 180
+    let snapshotTime = 1634544600
 
     snapshot = snapshotTime
     whitelistStartTime = epochTime
@@ -56,7 +56,7 @@ async function setValue() {
     claimStartTime = depositEndTime
     claimInterval = claimIntervalTime
     claimPeriod = 6
-    claimFisrt = 50
+    claimFirst = 50
 
     //4시 19분 스냅샷 (다오페이지 링크)
     //4시 20분 시작 (5분단위)
@@ -65,7 +65,7 @@ async function setValue() {
         snapshot,
         [whitelistStartTime, whitelistEndTime, exclusiveStartTime, exclusiveEndTime],
         [depositStartTime, depositEndTime],
-        [claimStartTime, claimInterval, claimPeriod, claimFisrt]
+        [claimStartTime, claimInterval, claimPeriod, claimFirst]
     )
     await tx2.wait()
 
@@ -96,7 +96,7 @@ async function setAllTier() {
         [bigTier1, bigTier2, bigTier3, bigTier4],
         [tierPercents1, tierPercents2, tierPercents3, tierPercents4]
     )
-    console.log(tx)
+    await tx.wait()
 
     let tx2 = Number(await publicSale.tiersPercents(1))
     console.log("tx2 :", tx2, ", tierPercents1 : ", tierPercents1)
@@ -120,7 +120,8 @@ async function setAllAmount() {
         [bigAmount1, bigAmount2],
         [salePrice, payPrice]
     )
-    console.log(tx)
+    await tx.wait()
+    // console.log(tx)
 
     let tx2 = Number(await publicSale.saleTokenPrice())
     console.log("tx2 :", tx2, ", salePrice : ", salePrice)

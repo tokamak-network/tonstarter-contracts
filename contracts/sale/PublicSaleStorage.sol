@@ -24,6 +24,7 @@ contract PublicSaleStorage  {
     }
 
     struct UserClaim {
+        bool exec;
         uint256 claimAmount;
         uint256 refundAmount;
     }
