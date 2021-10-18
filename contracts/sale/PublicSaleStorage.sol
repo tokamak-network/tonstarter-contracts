@@ -38,14 +38,13 @@ contract PublicSaleStorage  {
 
     uint256 public startDepositTime = 0;        //청약 시작시간
     uint256 public endDepositTime = 0;          //청약 끝시간
-    // uint256 public startOpenSaleTime = 0;       //openSale 시작시간
-    // uint256 public endOpenSaleTime = 0;         //openSale 끝 시간
 
     uint256 public startClaimTime = 0;
 
     uint256 public totalUsers = 0;              //전체 세일 참여자 (라운드1,라운드2 포함, 유니크)
     uint256 public totalRound1Users = 0;         //라운드 1 참여자
     uint256 public totalRound2Users = 0;         //라운드 2 참여자
+    uint256 public totalRound2UsersClaim = 0;    //라운드 2 참여자중 claim한사람
 
     uint256 public totalWhitelists = 0;         //총 화이트리스트 수 (exclusive)
 

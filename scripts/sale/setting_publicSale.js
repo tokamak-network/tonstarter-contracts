@@ -38,7 +38,7 @@ async function setValue() {
     const publicSale = await ethers.getContractAt("PublicSale", proxyAddress);
     // const publicSale = await ethers.Contract("PublicSale", proxy, adminAddress);
 
-    let epochTime = 1634551834
+    let epochTime = 1634556600
     let epochTimePeriod = 180      //10분 = 600 , 1분 = 60, 5분 = 300
     let epochTimeAdd = 1
     let claimIntervalTime = 180
@@ -109,8 +109,8 @@ async function setAllAmount() {
 
     const BASE_TEN = 10
     const decimals = 18
-    let exSaleAmount = 14000000
-    let openSaleAmount = 6000000
+    let exSaleAmount = 14000
+    let openSaleAmount = 6000
     let bigAmount1 = BigNumber.from(exSaleAmount).mul(BigNumber.from(BASE_TEN).pow(decimals))
     let bigAmount2 = BigNumber.from(openSaleAmount).mul(BigNumber.from(BASE_TEN).pow(decimals))
     let salePrice = 20

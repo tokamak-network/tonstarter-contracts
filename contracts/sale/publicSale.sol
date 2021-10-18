@@ -26,11 +26,7 @@ contract PublicSale is
     event AddedWhiteList(address indexed from, uint256 tier);
     event ExclusiveSaled(address indexed from, uint256 amount);
     event Deposited(address indexed from, uint256 amount);
-    event OpenSaled(
-        address indexed from,
-        uint256 realPayAmount,
-        uint256 returnAmount
-    );
+
     event Claimed(address indexed from, uint256 amount);
     event Withdrawal(address indexed from, uint256 amount);
     event DepositWithdrawal(address indexed from, uint256 amount);
@@ -507,8 +503,8 @@ contract PublicSale is
         if (realPayAmount < depositAmount) {
            returnAmount = depositAmount.sub(realPayAmount);
            realSaleAmount = calculSaleToken(realPayAmount);
-
         } else {
+            realPayAmount = userOpen.depositAmount;
             realSaleAmount = calculSaleToken(depositAmount);
         }
 
@@ -526,7 +522,7 @@ contract PublicSale is
     function totalOpenPurchasedAmount() public view returns (uint256){
         uint256 _calculSaleToken = calculSaleToken(totalDepositAmount);
         uint256 _totalAmount = totalExpectOpenSaleAmountView();
-        if(_calculSaleToken < _totalAmount) return calculPayToken(totalDepositAmount);
+        if(_calculSaleToken < _totalAmount) return totalDepositAmount;
         else return  calculPayToken(_totalAmount);
     }
 
@@ -587,8 +583,6 @@ contract PublicSale is
             salePossible >= userEx.saleAmount.add(tokenSaleAmount),
             "PublicSale: just buy tier's allocated amount"
         );
-
-        UserClaim storage userClaim = usersClaim[msg.sender];
 
         if(userEx.payAmount == 0) {
             totalRound1Users = totalRound1Users.add(1);
@@ -675,12 +669,12 @@ contract PublicSale is
         saleToken.safeTransfer(msg.sender, reward);
         
         if(!userClaim.exec && userOpen.join) {
-            require(realPayAmount > getToken.balanceOf(address(this)), "dont have ton");
-            getToken.safeTransfer(getTokenOwner, realPayAmount);
+            totalRound2UsersClaim = totalRound2UsersClaim.add(1);
+            userClaim.exec = true;
         }
 
         if(refundAmount > 0 && userClaim.refundAmount == 0){            
-            require(refundAmount > getToken.balanceOf(address(this)), "dont have refund ton");
+            require(refundAmount <= getToken.balanceOf(address(this)), "PublicSale: dont have refund ton");
             userClaim.refundAmount = refundAmount;
             getToken.safeTransfer(msg.sender, refundAmount);
         }
@@ -688,6 +682,19 @@ contract PublicSale is
         emit Claimed(msg.sender, reward);
     }
 
+    function depositWithdraw() external onlyOwner {
+        require(block.timestamp > endDepositTime,"PublicSale: need to end the depositTime");
+        uint256 getAmount;
+        if(totalRound2Users == totalRound2UsersClaim){
+            getAmount = getToken.balanceOf(address(this));
+        } else {
+            getAmount = totalOpenPurchasedAmount().sub(10 ether); 
+        }
+        require(getAmount <= getToken.balanceOf(address(this)), "PublicSale: no token to receive");
+        getToken.safeTransfer(getTokenOwner, getAmount);
+        emit DepositWithdrawal(msg.sender, getAmount);
+    }
+    
     /// @inheritdoc IPublicSale
     function withdraw() external override onlyOwner{
         if(block.timestamp <= endDepositTime){
