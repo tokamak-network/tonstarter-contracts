@@ -15,7 +15,7 @@ const { BigNumber } = require("ethers")
 const publicJson = require('../../artifacts/contracts/sale/PublicSale.sol/PublicSale.json')
 
 var abiPublic = publicJson.abi;
-const proxyAddress = "0xE352fF539852620B35454466aBF85684Fd989397"
+const proxyAddress = "0x004FC7C66C276bd3D59152435Ce582051b51426B"
 const adminAddress = "0xf0B595d10a92A5a9BC3fFeA7e79f5d266b6035Ea"
 
 // let net = 'rinkeby'
@@ -31,7 +31,7 @@ const adminAddress = "0xf0B595d10a92A5a9BC3fFeA7e79f5d266b6035Ea"
 let snapshot
 let whitelistStartTime, whitelistEndTime, exclusiveStartTime, exclusiveEndTime
 let depositStartTime, depositEndTime, openSaleStartTime, openSaleEndTime
-let claimStartTime, claimInterval, claimPeriod
+let claimStartTime, claimInterval, claimPeriod, claimFisrt
 
 async function setValue() {
     const [deployer] = await ethers.getSigners()
@@ -51,11 +51,12 @@ async function setValue() {
     exclusiveEndTime = exclusiveStartTime + (epochTimePeriod * epochTimeAdd)
     depositStartTime = exclusiveEndTime
     depositEndTime = depositStartTime + (epochTimePeriod)
-    openSaleStartTime = depositEndTime
-    openSaleEndTime = openSaleStartTime + (epochTimePeriod)
-    claimStartTime = openSaleEndTime
+    // openSaleStartTime = depositEndTime
+    // openSaleEndTime = openSaleStartTime + (epochTimePeriod)
+    claimStartTime = depositEndTime
     claimInterval = claimIntervalTime
     claimPeriod = 6
+    claimFisrt = 50
 
     //4시 19분 스냅샷 (다오페이지 링크)
     //4시 20분 시작 (5분단위)
@@ -63,8 +64,8 @@ async function setValue() {
     let tx2 = await publicSale.connect(deployer).setAllValue(
         snapshot,
         [whitelistStartTime, whitelistEndTime, exclusiveStartTime, exclusiveEndTime],
-        [depositStartTime, depositEndTime, openSaleStartTime, openSaleEndTime],
-        [claimStartTime, claimInterval, claimPeriod]
+        [depositStartTime, depositEndTime],
+        [claimStartTime, claimInterval, claimPeriod, claimFisrt]
     )
     await tx2.wait()
 
