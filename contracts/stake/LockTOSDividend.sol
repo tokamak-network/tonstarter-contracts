@@ -51,10 +51,6 @@ contract LockTOSDividend is
         override
         ifFree
     {
-        LibLockTOSDividend.Distribution storage distr = distributions[_token];
-
-        distr.totalDistribution = distr.totalDistribution.add(_amount);
-
         uint256 weeklyEpoch = getCurrentWeeklyEpoch();
         uint256 timestamp = genesis.add(weeklyEpoch.mul(epochUnit));
         require(
@@ -62,11 +58,14 @@ contract LockTOSDividend is
             "LOCKTOS does not exist"
         );
 
-        distr.tokensPerWeek[weeklyEpoch] = distr.tokensPerWeek[weeklyEpoch].add(
-            _amount
-        );
-
+        LibLockTOSDividend.Distribution storage distr = distributions[_token];
         IERC20(_token).transferFrom(msg.sender, address(this), _amount);
+
+        uint256 newBalance = IERC20(_token).balanceOf(address(this));
+        uint256 increment = newBalance.sub(distr.lastBalance);
+        distr.lastBalance = newBalance;
+        distr.totalDistribution = distr.totalDistribution.add(increment);
+        distr.tokensPerWeek[weeklyEpoch] = distr.tokensPerWeek[weeklyEpoch].add(increment);
         emit Distribute(_token, _amount);
     }
 
@@ -212,3 +211,22 @@ contract LockTOSDividend is
         return _tokensPerWeek.mul(balance).div(supply);
     }
 }
+
+
+/*
+distribute 10
+balance: 10
+
+claim: 2
+balance: 8
+
+claim: 2
+balance: 6
+
+claim: 4
+balance: 2
+
+distribute: 200
+balance: 250
+
+*/
