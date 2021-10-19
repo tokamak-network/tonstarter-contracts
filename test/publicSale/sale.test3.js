@@ -91,6 +91,12 @@ describe("Sale", () => {
     const tosAmount = ethers.BigNumber.from('10'+'0'.repeat(24));
     let deployer, user1, user2;
     let userLockInfo = [];
+    let fundreceiver = {
+        account: null,
+        balacneOfTON: ethers.BigNumber.from('0'),
+        round1fund: ethers.BigNumber.from('0'),
+        round2fund: ethers.BigNumber.from('0')
+    };
 
     let sTOSSendAmount = [
         ethers.BigNumber.from('15'+'0'.repeat(21)),
@@ -215,6 +221,8 @@ describe("Sale", () => {
         account5 = await findSigner(addresses[8]);
         account6 = await findSigner(addresses[9]);
         account7 = await findSigner(addresses[10]);
+        account8 = await findSigner(addresses[11]);
+        fundreceiver.account = account8;
 
 
         deployer = saleTokenOwner;
@@ -339,6 +347,9 @@ describe("Sale", () => {
 
             await (await tos.connect(deployer).mint(tester6.account.address, tosAmount)).wait();
             expect(await tos.balanceOf(tester6.account.address)).to.be.equal(tosAmount);
+
+
+            fundreceiver.balanceOfTON = await ton.balanceOf(fundreceiver.account.address);
 
         });
 
@@ -492,6 +503,7 @@ describe("Sale", () => {
             await getToken.connect(getTokenOwner).transfer(account4.address, allocatedExclusiveSale)
             await getToken.connect(getTokenOwner).transfer(account5.address, allocatedExclusiveSale)
             await getToken.connect(getTokenOwner).transfer(account6.address, allocatedExclusiveSale)
+
 
         });
     });
@@ -654,6 +666,14 @@ describe("Sale", () => {
                 let tx4 = Number(await saleContract.endAddWhiteTime())
                 expect(tx4).to.be.equal(whitelistEndTime)
             })
+
+
+            it('setting the getTokenOwner for fund-receive', async () => {
+                await saleContract.connect(saleOwner).changeTONOwner(fundreceiver.account.address)
+                expect(await ton.balanceOf(fundreceiver.account.address)).to.be.equal(ethers.BigNumber.from('0'))
+
+            });
+
 
         })
 
@@ -922,6 +942,7 @@ describe("Sale", () => {
                 tester6.exclusiveSalePayAmount = tx2.payAmount;
                 tester6.exclusiveSaleBuyAmount = possibleSaleAmount;
             })
+
         })
 
         describe("withdraw test", () => {
@@ -956,10 +977,19 @@ describe("Sale", () => {
             it("check the opensale's allocated amount after exclusive-end", async () => {
                 let totalPayAmount = tester1.exclusiveSalePayAmount.add(tester2.exclusiveSalePayAmount).add(tester3.exclusiveSalePayAmount).add(tester4.exclusiveSalePayAmount)
                 .add(tester5.exclusiveSalePayAmount).add(tester6.exclusiveSalePayAmount)
+
+                fundreceiver.round1fund = totalPayAmount;
+
                 let totalPayAmountToSaleAmount = calculSaleToken(totalPayAmount);
                 openSaleAmountAdjust = await saleContract.totalExpectOpenSaleAmountView();
                 expect(openSaleAmountAdjust).to.be.equal(allocatedSaleAmount.sub(totalPayAmountToSaleAmount))
             });
+
+            it("check the round1-fund", async () => {
+                let tonBalance = await ton.balanceOf(fundreceiver.account.address);
+                expect(tonBalance).to.be.equal(fundreceiver.round1fund)
+            });
+
 
             it("Can be deposited multiple times after depositTime : account1 ", async () => {
                 let tester = tester1
@@ -1001,6 +1031,10 @@ describe("Sale", () => {
                     expect(tester.openSaleBuyAmount).to.be.above(ethers.BigNumber.from('0'))
                 }
             });
+
+            it("depositWithdraw fail when it didn't start claimStartTime ", async () => {
+                await expect(saleContract.connect(saleOwner).depositWithdraw()).to.be.revertedWith("PublicSale: need to end the depositTime")
+            })
 
             it("duration the time", async () => {
                 await ethers.provider.send('evm_setNextBlockTimestamp', [depositEndTime+1]);
@@ -1048,17 +1082,44 @@ describe("Sale", () => {
                 .add(tester6.depositAmountPayToken)
             })
         })
-    })
 
-    describe("claim test", () => {
         it('claim before claimTime', async () => {
             let tx = saleContract.connect(account1).claim()
             await expect(tx).to.be.revertedWith("PublicSale: don't start claimTime")
         })
+    })
+
+    describe("check the round2-fund & depositWithdraw", () => {
+
+        it("depositWithdraw fail if not owner ", async () => {
+            await expect(saleContract.connect(account1).depositWithdraw()).to.be.revertedWith("Accessible: Caller is not an admin")
+        })
+
         it("duration the time to period = 1", async () => {
             await ethers.provider.send('evm_setNextBlockTimestamp', [claimStartTime]);
             await ethers.provider.send('evm_mine');
         })
+        it("depositWithdraw ", async () => {
+            await saleContract.connect(saleOwner).depositWithdraw();
+        })
+
+        it("cehck  round2-fund ", async () => {
+            let tonBalance = await ton.balanceOf(fundreceiver.account.address);
+
+            let round2fund = await saleContract.totalOpenPurchasedAmount();
+            fundreceiver.round2fund = round2fund;
+
+            expect(tonBalance).to.be.equal(fundreceiver.round2fund.add(fundreceiver.round1fund).sub(ethers.BigNumber.from('10000000000000000000')))
+        })
+
+    });
+
+    describe("claim test", () => {
+
+        // it("duration the time to period = 1", async () => {
+        //     await ethers.provider.send('evm_setNextBlockTimestamp', [claimStartTime]);
+        //     await ethers.provider.send('evm_mine');
+        // })
         it("check claim amount, ester1, tester2, tester3, tester4, tester5, tester6", async () => {
             let testers = [tester1, tester2, tester3, tester4, tester5, tester6]
             let accounts = [account1, account2, account3, account4, account5, account6]
@@ -1395,6 +1456,23 @@ describe("Sale", () => {
             await expect(saleContract.connect(saleOwner).withdraw()).to.be.revertedWith("PublicSale: don't exist withdrawAmount")
 
         })
+
     })
+
+    describe("take the all-fund ", () => {
+
+        it("depositWithdraw ", async () => {
+            await saleContract.connect(saleOwner).depositWithdraw();
+
+            let tonBalance = await ton.balanceOf(fundreceiver.account.address);
+            let allfund = fundreceiver.round2fund.add(fundreceiver.round1fund);
+
+            console.log('tonBalance',tonBalance.toString());
+            console.log('allfund', allfund.toString());
+
+            //expect(tonBalance).to.be.equal(allfund)
+        })
+
+    });
 
 })

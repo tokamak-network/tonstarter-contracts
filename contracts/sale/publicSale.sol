@@ -667,13 +667,13 @@ contract PublicSale is
         userClaim.claimAmount = userClaim.claimAmount.add(reward);
 
         saleToken.safeTransfer(msg.sender, reward);
-        
+
         if(!userClaim.exec && userOpen.join) {
             totalRound2UsersClaim = totalRound2UsersClaim.add(1);
             userClaim.exec = true;
         }
 
-        if(refundAmount > 0 && userClaim.refundAmount == 0){            
+        if(refundAmount > 0 && userClaim.refundAmount == 0){
             require(refundAmount <= getToken.balanceOf(address(this)), "PublicSale: dont have refund ton");
             userClaim.refundAmount = refundAmount;
             getToken.safeTransfer(msg.sender, refundAmount);
@@ -688,13 +688,13 @@ contract PublicSale is
         if(totalRound2Users == totalRound2UsersClaim){
             getAmount = getToken.balanceOf(address(this));
         } else {
-            getAmount = totalOpenPurchasedAmount().sub(10 ether); 
+            getAmount = totalOpenPurchasedAmount().sub(10 ether);
         }
         require(getAmount <= getToken.balanceOf(address(this)), "PublicSale: no token to receive");
         getToken.safeTransfer(getTokenOwner, getAmount);
         emit DepositWithdrawal(msg.sender, getAmount);
     }
-    
+
     /// @inheritdoc IPublicSale
     function withdraw() external override onlyOwner{
         if(block.timestamp <= endDepositTime){
