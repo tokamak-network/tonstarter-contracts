@@ -15,7 +15,7 @@ const { BigNumber } = require("ethers")
 const publicJson = require('../../artifacts/contracts/sale/PublicSale.sol/PublicSale.json')
 
 var abiPublic = publicJson.abi;
-const proxyAddress = "0xab7B5E58FBcFeb1618EDd076F0f2c20eb20674a0"
+const proxyAddress = "0xBef737D725993847c345647ebA096500FdAE71c6"
 const adminAddress = "0xf0B595d10a92A5a9BC3fFeA7e79f5d266b6035Ea"
 
 // let net = 'rinkeby'
@@ -38,28 +38,37 @@ async function setValue() {
     const publicSale = await ethers.getContractAt("PublicSale", proxyAddress);
     // const publicSale = await ethers.Contract("PublicSale", proxy, adminAddress);
 
-    let epochTime = 1634556600
-    let epochTimePeriod = 180      //10분 = 600 , 1분 = 60, 5분 = 300
+    let epochTime = 1635148800      //2021년 10월 25일 월요일 오후 5:00:00 GMT+09:00
+    let epochTimePeriod = 60      //10분 = 600 , 1분 = 60, 5분 = 300
     let epochTimeAdd = 1
-    let claimIntervalTime = 180
-    let snapshotTime = 1634544600
+    let claimIntervalTime = 2592000     //30Days
+    let snapshotTime = 1635148740   //2021년 10월 25일 월요일 오후 4:59:00 GMT+09:00
 
-    snapshot = snapshotTime
-    whitelistStartTime = epochTime
-    whitelistEndTime = whitelistStartTime + (epochTimePeriod)
-    exclusiveStartTime = whitelistEndTime
-    exclusiveEndTime = exclusiveStartTime + (epochTimePeriod * epochTimeAdd)
-    depositStartTime = exclusiveEndTime
-    depositEndTime = depositStartTime + (epochTimePeriod)
+    // snapshot = snapshotTime
+    // whitelistStartTime = epochTime
+    // whitelistEndTime = whitelistStartTime + (epochTimePeriod)
+    // exclusiveStartTime = whitelistEndTime
+    // exclusiveEndTime = exclusiveStartTime + (epochTimePeriod * epochTimeAdd)
+    // depositStartTime = exclusiveEndTime
+    // depositEndTime = depositStartTime + (epochTimePeriod)
     // openSaleStartTime = depositEndTime
     // openSaleEndTime = openSaleStartTime + (epochTimePeriod)
-    claimStartTime = depositEndTime
-    claimInterval = claimIntervalTime
+    // claimStartTime = depositEndTime
+    // claimInterval = claimIntervalTime
+    // claimPeriod = 6
+    // claimFirst = 50
+
+    snapshot = 1635148740               //2021년 10월 25일 월요일 오후 4:59:00 GMT+09:00
+    whitelistStartTime = 1635148800     //2021년 10월 25일 월요일 오후 5:00:00 GMT+09:00
+    whitelistEndTime = 1635321599       //2021년 10월 27일 수요일 오후 4:59:59 GMT+09:00
+    exclusiveStartTime = 1635321600     //2021년 10월 27일 수요일 오후 5:00:00 GMT+09:00
+    exclusiveEndTime = 1635494399       //2021년 10월 29일 금요일 오후 4:59:59 GMT+09:00
+    depositStartTime = 1635494400       //2021년 10월 29일 금요일 오후 5:00:00 GMT+09:00 
+    depositEndTime =   1636099199       //2021년 11월 5일 금요일 오후 4:59:59 GMT+09:00
+    claimStartTime = 1636099200         //2021년 11월 5일 금요일 오후 5:00:00 GMT+09:00
+    claimInterval = 2592000             //30Days
     claimPeriod = 6
     claimFirst = 50
-
-    //4시 19분 스냅샷 (다오페이지 링크)
-    //4시 20분 시작 (5분단위)
 
     let tx2 = await publicSale.connect(deployer).setAllValue(
         snapshot,
@@ -109,8 +118,8 @@ async function setAllAmount() {
 
     const BASE_TEN = 10
     const decimals = 18
-    let exSaleAmount = 14000
-    let openSaleAmount = 6000
+    let exSaleAmount = 17500000     //17,500,000
+    let openSaleAmount = 7500000    //7,500,000
     let bigAmount1 = BigNumber.from(exSaleAmount).mul(BigNumber.from(BASE_TEN).pow(decimals))
     let bigAmount2 = BigNumber.from(openSaleAmount).mul(BigNumber.from(BASE_TEN).pow(decimals))
     let salePrice = 20
@@ -127,12 +136,34 @@ async function setAllAmount() {
     console.log("tx2 :", tx2, ", salePrice : ", salePrice)
 }
 
-setValue()
-    .then(() => process.exit(0))
-    .catch(error => {
-        console.error(error);
-        process.exit(1);
-    });
+async function setSaletotalAmount() {
+    const [deployer] = await ethers.getSigners()
+    console.log(deployer.address)
+    const publicSale = await ethers.getContractAt("PublicSale", proxyAddress);
+
+    const BASE_TEN = 10
+    const decimals = 18
+    let exSaleAmount = 17500000     //17,500,000
+    let openSaleAmount = 7500000    //7,500,000
+    let bigAmount1 = BigNumber.from(exSaleAmount).mul(BigNumber.from(BASE_TEN).pow(decimals))
+    let bigAmount2 = BigNumber.from(openSaleAmount).mul(BigNumber.from(BASE_TEN).pow(decimals))
+
+    let tx = await publicSale.connect(deployer).setSaleAmount(bigAmount1, bigAmount2)
+    await tx.wait()
+
+    console.log("success")
+    // let tx2 = Number(await publicSale.totalExpectSaleAmount())
+    // console.log("tx2 :", tx2, ", bigAmount1 : ", bigAmount1)
+    // 17,500,000./000/000/000/000/000/000
+    //  7,500,000./000/000/000/000/000/000 
+}
+
+// setValue()
+//     .then(() => process.exit(0))
+//     .catch(error => {
+//         console.error(error);
+//         process.exit(1);
+//     });
 
 // setAllTier()
 //     .then(() => process.exit(0))
@@ -147,3 +178,10 @@ setValue()
 //         console.error(error);
 //         process.exit(1);
 //     });
+
+setSaletotalAmount()
+    .then(() => process.exit(0))
+    .catch(error => {
+        console.error(error);
+        process.exit(1);
+    });

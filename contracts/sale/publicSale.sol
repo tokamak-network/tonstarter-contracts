@@ -69,16 +69,18 @@ contract PublicSale is
         _;
     }
 
-    function changeTONOwner(address _address) external onlyOwner {
+    /// @inheritdoc IPublicSale
+    function changeTONOwner(address _address) external override onlyOwner {
         getTokenOwner = _address;
     }
 
+    /// @inheritdoc IPublicSale
     function setAllValue(
         uint256 _snapshot,
         uint256[4] calldata _exclusiveTime,
         uint256[2] calldata _openSaleTime,
         uint256[4] calldata _claimTime
-    ) external onlyOwner beforeStartAddWhiteTime {
+    ) external override onlyOwner beforeStartAddWhiteTime {
         require(
             (_exclusiveTime[0] < _exclusiveTime[1]) &&
                 (_exclusiveTime[2] < _exclusiveTime[3])
@@ -174,40 +176,11 @@ contract PublicSale is
         claimFirst = _claimFirst;
     }
 
-    function resetAllData() external onlyOwner {
-        startAddWhiteTime = 0;
-        totalWhitelists = 0;
-        totalExSaleAmount = 0;
-        totalExPurchasedAmount = 0;
-        totalDepositAmount = 0;
-
-        for (uint256 i = 0; i < whitelists.length; i++) {
-            UserInfoEx storage userEx = usersEx[whitelists[i]];
-            userEx.join = false;
-            userEx.payAmount = 0;
-            userEx.saleAmount = 0;
-            UserClaim storage userClaim = usersClaim[whitelists[i]];
-            userClaim.claimAmount = 0;
-        }
-        for (uint256 j = 0; j < depositors.length; j++) {
-            UserInfoOpen storage userOpen = usersOpen[depositors[j]];
-            userOpen.depositAmount = 0;
-            userOpen.join = false;
-            userOpen.payAmount = 0;
-            userOpen.saleAmount = 0;
-            UserClaim storage userClaim = usersClaim[depositors[j]];
-            userClaim.claimAmount = 0;
-        }
-        for (uint256 k = 1; k < 5; k++) {
-            tiersAccount[k] = 0;
-            tiersExAccount[k] = 0;
-        }
-    }
-
+    /// @inheritdoc IPublicSale
     function setAllTier(
         uint256[4] calldata _tier,
         uint256[4] calldata _tierPercent
-    ) external onlyOwner {
+    ) external override onlyOwner {
         setTier(
             _tier[0],
             _tier[1],
@@ -245,7 +218,6 @@ contract PublicSale is
     }
 
     /// @inheritdoc IPublicSale
-    //티어별 풀 중량 (6%면 600으로 입력 -> 소수점 2째까지 기록 하기 위함 (60% -> 6000/10000))
     function setTierPercents(
         uint256 _tier1,
         uint256 _tier2,
@@ -271,10 +243,11 @@ contract PublicSale is
         tiersPercents[4] = _tier4;
     }
 
+    /// @inheritdoc IPublicSale
     function setAllAmount(
         uint256[2] calldata _expectAmount,
         uint256[2] calldata _priceAmount
-    ) external onlyOwner {
+    ) external override onlyOwner {
         setSaleAmount(
             _expectAmount[0],
             _expectAmount[1]
@@ -301,7 +274,6 @@ contract PublicSale is
     }
 
     /// @inheritdoc IPublicSale
-    //토큰 가격설정 saleTokenPrice = 판매하는 토큰 가격, payTokenPrice = 지불할 토큰 가격
     function setTokenPrice(uint256 _saleTokenPrice, uint256 _payTokenPrice)
         public
         override
@@ -320,12 +292,12 @@ contract PublicSale is
         else return totalExpectOpenSaleAmount.add(totalRound1NonSaleAmount());
     }
 
-    function totalRound1NonSaleAmount() public view returns(uint256){
+    /// @inheritdoc IPublicSale
+    function totalRound1NonSaleAmount() public view override returns(uint256){
         return totalExpectSaleAmount.sub(totalExSaleAmount);
     }
 
     /// @inheritdoc IPublicSale
-    //saleToken 갯수 = payToken 갯수 * (payTokenPrice/saleTokenPrice)
     function calculSaleToken(uint256 _amount)
         public
         view
@@ -338,7 +310,6 @@ contract PublicSale is
     }
 
     /// @inheritdoc IPublicSale
-    //payToken 개수 = saleToken 개수 * (saleTokenPrice/payTokenPrice)
     function calculPayToken(uint256 _amount)
         public
         view
@@ -350,7 +321,6 @@ contract PublicSale is
     }
 
     /// @inheritdoc IPublicSale
-    //sTOS수량에 따라 티어등급을 나눈다.
     function calculTier(address _address)
         public
         view
@@ -379,8 +349,6 @@ contract PublicSale is
     }
 
     /// @inheritdoc IPublicSale
-    //내가 참여하게 되면 얼만큼 살 수 있는지 리턴, 참여했다면 현재 얼만큼 살 수 있는지 리턴 (exclusive)
-    //식 : 전체 판매 token양 * 티어의 배당 % / 티어참여인 수 -> 전체 100개 티어 60%, 티어참여인 수 = 3 -> 60개를 3명이서 나누어서 사니까 개인당 20개
     function calculTierAmount(address _address)
         public
         view
@@ -410,10 +378,6 @@ contract PublicSale is
     }
 
     /// @inheritdoc IPublicSale
-    //얼만큼 deposit하면 얼만큼 구매 가능한지 (OpenSale)
-    //_amount를 0을 입력하면 현재 얼만큼 구매가능한지 값이 return되고
-    //_amount에 값을 넣으면 _amount만큼 더 넣었을 때 얼만큼 더 구매가능해지는 지 확인합니다.
-    //식 : openSale에 판매할 토큰양 * (내가 deposit한 양/전체 deposit한 양) = 내가 구매할 수 있는 토큰 양
     function calculOpenSaleAmount(address _account, uint256 _amount)
         public
         view
@@ -478,7 +442,8 @@ contract PublicSale is
         }
     }
 
-    function totalSaleUserAmount(address user) public view returns (uint256 _realPayAmount, uint256 _realSaleAmount, uint256 _refundAmount) {
+    /// @inheritdoc IPublicSale
+    function totalSaleUserAmount(address user) public override view returns (uint256 _realPayAmount, uint256 _realSaleAmount, uint256 _refundAmount) {
         UserInfoEx storage userEx = usersEx[user];
 
         if(userEx.join){
@@ -489,7 +454,8 @@ contract PublicSale is
         }
     }
 
-    function openSaleUserAmount(address user) public view returns (uint256 _realPayAmount, uint256 _realSaleAmount, uint256 _refundAmount) {
+    /// @inheritdoc IPublicSale
+    function openSaleUserAmount(address user) public override view returns (uint256 _realPayAmount, uint256 _realSaleAmount, uint256 _refundAmount) {
         UserInfoOpen storage userOpen = usersOpen[user];
 
         if(!userOpen.join || userOpen.depositAmount == 0) return (0, 0, 0);
@@ -510,8 +476,9 @@ contract PublicSale is
 
         return (realPayAmount, realSaleAmount, returnAmount);
     }
-
-    function totalOpenSaleAmount() public view returns (uint256){
+    
+    /// @inheritdoc IPublicSale
+    function totalOpenSaleAmount() public override view returns (uint256){
         uint256 _calculSaleToken = calculSaleToken(totalDepositAmount);
         uint256 _totalAmount = totalExpectOpenSaleAmountView();
 
@@ -519,7 +486,8 @@ contract PublicSale is
         else return _totalAmount;
     }
 
-    function totalOpenPurchasedAmount() public view returns (uint256){
+    /// @inheritdoc IPublicSale
+    function totalOpenPurchasedAmount() public override view returns (uint256){
         uint256 _calculSaleToken = calculSaleToken(totalDepositAmount);
         uint256 _totalAmount = totalExpectOpenSaleAmountView();
         if(_calculSaleToken < _totalAmount) return totalDepositAmount;
@@ -553,9 +521,6 @@ contract PublicSale is
     }
 
     /// @inheritdoc IPublicSale
-    //payToken으로 saleToken을 구매하는 것이라 payToken을 approve후에 구매하여야한다.
-    //_amount는 payTokenAmount
-    //payToken은 getTokenOwner에게 가고 추후 saleToken을 살 수 있도록 기록한다.
     function exclusiveSale(uint256 _amount)
         external
         override
@@ -575,10 +540,7 @@ contract PublicSale is
         require(userEx.join == true, "PublicSale: not registered in whitelist");
         uint256 tokenSaleAmount = calculSaleToken(_amount);
         uint256 salePossible = calculTierAmount(msg.sender);
-        // require(
-        //     salePossible >= tokenSaleAmount,
-        //     "PublicSale: just buy whitelist amount"
-        // );
+
         require(
             salePossible >= userEx.saleAmount.add(tokenSaleAmount),
             "PublicSale: just buy tier's allocated amount"
@@ -605,8 +567,6 @@ contract PublicSale is
     }
 
     /// @inheritdoc IPublicSale
-    //approve하고 그 후 deposit한다 deposit할때는 payToken을 컨트랙트에 전송함.
-    //deposit은 무한대로 받을 수 있음
     function deposit(uint256 _amount) external override nonReentrant {
         require(
             block.timestamp >= startDepositTime,
@@ -646,7 +606,7 @@ contract PublicSale is
         UserInfoOpen storage userOpen = usersOpen[msg.sender];
 
         (, uint256 realSaleAmount, ) = totalSaleUserAmount(msg.sender);
-        (uint256 realPayAmount, ,uint256 refundAmount ) = openSaleUserAmount(msg.sender);
+        (, ,uint256 refundAmount ) = openSaleUserAmount(msg.sender);
 
         require(
             realSaleAmount > 0,
@@ -681,8 +641,9 @@ contract PublicSale is
 
         emit Claimed(msg.sender, reward);
     }
-
-    function depositWithdraw() external onlyOwner {
+    
+    /// @inheritdoc IPublicSale
+    function depositWithdraw() external override onlyOwner {
         require(block.timestamp > endDepositTime,"PublicSale: need to end the depositTime");
         uint256 getAmount;
         if(totalRound2Users == totalRound2UsersClaim){
