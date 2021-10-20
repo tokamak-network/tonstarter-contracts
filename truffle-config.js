@@ -8,6 +8,7 @@ module.exports = {
   contracts_build_directory : path.join(__dirname, "build/contracts"),
 
   networks: {
+    defaultNetwork: 'hardhat',
     localhost: {
       host: 'localhost',
       port: 9545,
@@ -16,7 +17,7 @@ module.exports = {
     },
     rinkeby: {
       provider: () => new HDWalletProvider(
-        process.env.MNEMONIC_HARDHAT, `https://rinkeby.infura.io/v3/${process.env.InfuraKey}`
+        process.env.MNEMONIC_HARDHAT, `https://rinkeby.infura.io/v3/${process.env.INFURA_API_KEY}`
       ),
       network_id: 4,
       gasPrice: 10e9,
