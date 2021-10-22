@@ -83,7 +83,6 @@ contract StakeUniswapV3Upgrade1 is
         _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
         _setupRole(ADMIN_ROLE, msg.sender);
 
-        miningIntervalSeconds = 15;
     }
 
     /// @dev receive ether - revert
@@ -610,13 +609,27 @@ contract StakeUniswapV3Upgrade1 is
 
                     if (secondsAbsolute > 0) {
                         if (_depositTokens.secondsInsideLast > 0) {
-                            secondsInsideDiff256 = secondsInside256.sub(
-                                uint256(_depositTokens.secondsInsideLast)
-                            );
+                            // unit32 문제로 더 작은 수가 나올수있다.
+                            if(secondsInside < _depositTokens.secondsInsideLast){
+                               secondsInsideDiff256 = secondsInside256.add(
+                                   uint256(type(uint32).max).sub(uint256(_depositTokens.secondsInsideLast))
+                                   ).sub(uint256(_depositTokens.secondsInsideLast));
+                            } else {
+                                secondsInsideDiff256 = secondsInside256.sub(
+                                    uint256(_depositTokens.secondsInsideLast)
+                                );
+                            }
                         } else {
-                            secondsInsideDiff256 = secondsInside256.sub(
-                                uint256(_depositTokens.secondsInsideInitial)
-                            );
+                            // unit32 문제로 더 작은 수가 나올수있다.
+                            if(secondsInside < _depositTokens.secondsInsideInitial){
+                                secondsInsideDiff256 = secondsInside256.add(
+                                    uint256(type(uint32).max).sub(uint256(_depositTokens.secondsInsideInitial))
+                                    ).sub(uint256(_depositTokens.secondsInsideInitial));
+                            } else {
+                                secondsInsideDiff256 = secondsInside256.sub(
+                                    uint256(_depositTokens.secondsInsideInitial)
+                                );
+                            }
                         }
 
                         if (

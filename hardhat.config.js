@@ -57,7 +57,7 @@ module.exports = {
       blockGasLimit: 524500000,
     },
     rinkeby: {
-      url: "https://rinkeby.infura.io/v3/9cb35f5029cb4604b3b7c1b2e92c6ac9",
+      url: `https://rinkeby.infura.io/v3/${process.env.InfuraKey}`,
       accounts: [`${ACCOUNT0_PK}`, `${ACCOUNT1_PK}`, `${ACCOUNT2_PK}`],
       gasMultiplier: 1.25 //,
       //gasPrice: 20000000000,
