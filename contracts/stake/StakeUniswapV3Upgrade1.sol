@@ -613,7 +613,7 @@ contract StakeUniswapV3Upgrade1 is
                             if(secondsInside < _depositTokens.secondsInsideLast){
                                secondsInsideDiff256 = secondsInside256.add(
                                    uint256(type(uint32).max).sub(uint256(_depositTokens.secondsInsideLast))
-                                   ).sub(uint256(_depositTokens.secondsInsideLast));
+                                   );
                             } else {
                                 secondsInsideDiff256 = secondsInside256.sub(
                                     uint256(_depositTokens.secondsInsideLast)
@@ -624,7 +624,7 @@ contract StakeUniswapV3Upgrade1 is
                             if(secondsInside < _depositTokens.secondsInsideInitial){
                                 secondsInsideDiff256 = secondsInside256.add(
                                     uint256(type(uint32).max).sub(uint256(_depositTokens.secondsInsideInitial))
-                                    ).sub(uint256(_depositTokens.secondsInsideInitial));
+                                    );
                             } else {
                                 secondsInsideDiff256 = secondsInside256.sub(
                                     uint256(_depositTokens.secondsInsideInitial)
@@ -642,9 +642,12 @@ contract StakeUniswapV3Upgrade1 is
                             nonMiningAmount = minableAmount.sub(miningAmount);
                         } else if (secondsInsideDiff256 > 0) {
                             miningAmount = minableAmount;
+                            nonMiningAmount = 0;
                         } else {
                             nonMiningAmount = minableAmount;
+                            miningAmount = 0;
                         }
+
                     }
                 }
             }

@@ -240,7 +240,7 @@ contract StakeUniswapV3Upgrade is
                             if(secondsInside < _depositTokens.secondsInsideLast){
                                secondsInsideDiff256 = secondsInside256.add(
                                    uint256(type(uint32).max).sub(uint256(_depositTokens.secondsInsideLast))
-                                   ).sub(uint256(_depositTokens.secondsInsideLast));
+                                   );
                             } else {
                                 secondsInsideDiff256 = secondsInside256.sub(
                                     uint256(_depositTokens.secondsInsideLast)
@@ -251,7 +251,7 @@ contract StakeUniswapV3Upgrade is
                             if(secondsInside < _depositTokens.secondsInsideInitial){
                                 secondsInsideDiff256 = secondsInside256.add(
                                     uint256(type(uint32).max).sub(uint256(_depositTokens.secondsInsideInitial))
-                                    ).sub(uint256(_depositTokens.secondsInsideInitial));
+                                    );
                             } else {
                                  secondsInsideDiff256 = secondsInside256.sub(
                                     uint256(_depositTokens.secondsInsideInitial)

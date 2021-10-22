@@ -48,6 +48,8 @@ async function main() {
   const tokenId7534 = ethers.BigNumber.from("7534");
   const tokenId7536 = ethers.BigNumber.from("7536");
   const tokenId7537 = ethers.BigNumber.from("7537");
+  const tokenId7549 = ethers.BigNumber.from("7549");
+  const tokenId7550 = ethers.BigNumber.from("7550");
 
   // let token = {
   //   id: tokenId3476,
@@ -66,8 +68,8 @@ async function main() {
   const tokenId3880 = ethers.BigNumber.from("3880");
 
   let token = {
-    id: tokenId7537,
-    name: '7537',
+    id: tokenId7550,
+    name: '7550',
     sender : user2
   }
 

@@ -45,11 +45,21 @@ async function main() {
   let tickUpper = 200340;
 
   const tokenId135149 = ethers.BigNumber.from("135149");
+  // case 1: 109556
+  const tokenId109556 = ethers.BigNumber.from("109556");
+
+  // case 2: 115616
+  const tokenId115616 = ethers.BigNumber.from("115616");
+
+  // test 1 : 135717
+  const tokenId135717 = ethers.BigNumber.from("135717");
+
   let token = {
-    id: tokenId135149,
-    name: '135149',
+    id: tokenId135717,
+    name: '135717',
     sender : user2
   }
+
 
   // let block = await ethers.provider.getBlock();
   // let currentTime = block.timestamp
@@ -72,7 +82,6 @@ async function main() {
     );
 
 
-
   // const block13421135 = await ethers.provider.getBlock(13421135)
   // console.log("\n block13421135:",  block13421135.timestamp);
   // 13421135 block :  1634280800 : Fri Oct 15 2021 15:53:20 GMT+0900 (한국 표준시)
@@ -84,8 +93,12 @@ async function main() {
   // let latestBlockNumber = 13452000
   // let startBlockNumber = 13349502
 
-  let latestBlockNumber = 13421139
-  let startBlockNumber = 13421135
+  // let latestBlockNumber = 13421139
+  // let startBlockNumber = 13421135
+
+  //case1
+  let latestBlockNumber = 13347570
+  let startBlockNumber = 13347568
 
   let interval = 1;
   try{
