@@ -40,6 +40,15 @@
 
 * "StakeUniswapV3Proxy": "0xC1349A9a33A0682804c390a3968e26E5a2366153"
 
+
+* "Stake2VaultUpgrade": "0x1536382e3529f5fad119832bbeb51eefd940bcd5"
+
+* "StakeUniswapV3Proxy2": "0x19953aa3532f4d002c56215d78ae1a7aa941739f"
+
+* "StakeUniswapV3Upgrade": "0x4817baca63297856c08c7ad9f911446038bb9b40"
+
+* "StakeUniswapV3Upgrade1": "0x26e5abd57aa2f45e235a1bc3eee307ce40ea9c82"
+
 ## Deployed StakeTONUpgrade
 
 * "StakeTONUpgrade": "0x52b49091d274f093dc813A4b76aB7a6E8f4f8e00"
