@@ -37,23 +37,17 @@ module.exports = {
   defaultNetwork: "hardhat",
   networks: {
     hardhat: {
-      chainId: 1337,
+      chainId: 31337,
     },
     rinkeby: {
-      url: `https://rinkeby.infura.io/v3/${process.env.INFURA_API_KEY}`,
-      accounts: [ `${process.env.RINKEBY_PRIVATE_KEY}` ],
-      gasPrice: 101000000000
+      url: `https://rinkeby.infura.io/v3/${process.env.InfuraKey}`,
+      accounts: [`${ACCOUNT0_PK}`, `${ACCOUNT1_PK}`, `${ACCOUNT2_PK}`],
+      gasMultiplier: 1.25 //,
+      //gasPrice: 20000000000,
     },
-    // rinkeby: {
-    //   chainId: 4,
-    //   url: `https://rinkeby.infura.io/v3/${process.env.InfuraKey}`,
-    //   accounts: [`${ACCOUNT0_PK}`, `${ACCOUNT1_PK}`, `${ACCOUNT2_PK}`],
-    //   gasMultiplier: 1.25,
-    //   gasPrice: 20000000000,
-    // },
     mainnet: {
-      url: `https://mainnet.infura.io/v3/${process.env.INFURA_API_KEY}`,
-      accounts: [ `${process.env.RINKEBY_PRIVATE_KEY}` ],
+      url: `https://mainnet.infura.io/v3/${process.env.InfuraKey}`,
+      accounts: [`${process.env.ACCOUNT0_PK}`, `${process.env.ACCOUNT1_PK}`, `${process.env.ACCOUNT2_PK}`],
       gasMultiplier: 1.25,
       gasPrice: 95000000000,
     },
