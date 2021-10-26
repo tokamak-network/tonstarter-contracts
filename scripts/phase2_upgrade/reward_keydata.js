@@ -42,13 +42,22 @@ async function main() {
 
   console.log("ADMIN_ROLE",ADMIN_ROLE);
 
+  // let key =  {
+  //   rewardToken: '0x73a54e5C054aA64C1AE7373C2B5474d8AFEa08bd',
+  //   pool: '0x516e1af7303a94f81e91e4ac29e20f4319d4ecaf',
+  //   startTime: 1634880600,
+  //   endTime: 1634884200,
+  //   refundee: '0x865264b30eb29A2978b9503B8AfE2A2DDa33eD7E'
+  // }
+
   let key =  {
     rewardToken: '0x73a54e5C054aA64C1AE7373C2B5474d8AFEa08bd',
     pool: '0x516e1af7303a94f81e91e4ac29e20f4319d4ecaf',
-    startTime: 1634880600,
-    endTime: 1634884200,
+    startTime: 1635231600,
+    endTime: 1635233400,
     refundee: '0x865264b30eb29A2978b9503B8AfE2A2DDa33eD7E'
   }
+
   const incentiveKeyAbi =
   'tuple(address rewardToken, address pool, uint256 startTime, uint256 endTime, address refundee)'
 
