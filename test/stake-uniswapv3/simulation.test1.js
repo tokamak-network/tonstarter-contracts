@@ -189,9 +189,9 @@ const tester2 = {
  */
 
 
-let stakePeriodDay = 60*60*24*1;
-let stakePeriodDayCount = 30;
-let stakePeriodMonth = 60*60*24*30;
+let stakePeriodDay = 60*60*24*30;
+let stakePeriodDayCount = 12;
+let stakePeriodMonth = 60*60*24*30*12;
 
 let init_datas = {
   initAmount: ethers.utils.parseUnits("2000", 18),
@@ -1321,7 +1321,7 @@ describe(" StakeUniswapV3 ", function () {
 
 
         i++;
-        if(i > 29) claimFlag = false;
+        if(i > 10) claimFlag = false;
       }
 
       //console.log('claim end ' );
