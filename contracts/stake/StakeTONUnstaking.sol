@@ -19,12 +19,12 @@ contract StakeTONUnstaking is AccessibleCommon {
     mapping(uint256 => address) public stakeTons;
 
     modifier nonZeroAddress(address _addr) {
-        require(_addr != address(0), "StakeTONControl2: zero address");
+        require(_addr != address(0), "StakeTONUnstaking: zero address");
         _;
     }
     modifier avaiableIndex(uint256 _index) {
-        require(_index > 0, "StakeTONControl2: can't use zero index");
-        require(_index <= countStakeTons, "StakeTONControl2: exceeded maxIndex");
+        require(_index > 0, "StakeTONUnstaking: can't use zero index");
+        require(_index <= countStakeTons, "StakeTONUnstaking: exceeded maxIndex");
         _;
     }
 
@@ -68,10 +68,10 @@ contract StakeTONUnstaking is AccessibleCommon {
     }
 
     function addStakeTons(address[] calldata _addr) external onlyOwner {
-        require(_addr.length > 0, "StakeTONControl: zero length");
+        require(_addr.length > 0, "StakeTONUnstaking: zero length");
         require(
             _addr.length == countStakeTons,
-            "StakeTONControl: diff countStakeTons"
+            "StakeTONUnstaking: diff countStakeTons"
         );
 
         for (uint256 i = 1; i <= _addr.length; i++) {
@@ -82,7 +82,7 @@ contract StakeTONUnstaking is AccessibleCommon {
 
     function requestUnstakingLayer2All() public nonZeroAddress(layer2)  {
         (bool can, bool[] memory canRequest, bool[] memory canRequestAll) = canRequestUnstakingLayer2All();
-        require(can, "StakeTONControl2: no available unstaking from layer2");
+        require(can, "StakeTONUnstaking: no available unstaking from layer2");
         for (uint256 i = 1; i <= countStakeTons; i++) {
 
             if(canRequestAll[i-1]) {
