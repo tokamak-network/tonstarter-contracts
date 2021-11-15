@@ -30,9 +30,40 @@ task("get-lock-tos-balances", "Deploy TOS").setAction(async () => {
         } else {
             tier = "Tier 4";
         }
-        console.log(holder, "\t", parseFloat(ethers.utils.formatEther(balance)).toFixed(3), "\t", tier);
+        console.log(`${holder}\t${parseFloat(ethers.utils.formatEther(balance)).toFixed(3)}\t${tier}`);
     }
 });
+
+task("get-lock-tos-snapshot", "Snapshot").setAction(async () => {
+    const lockTOSAddress = "0x69b4a202fa4039b42ab23adb725aa7b1e9eebd79";
+    const lockTOS = await ethers.getContractAt("LockTOS", lockTOSAddress);
+    const DOCTokenAddress = "0x0e498afce58dE8651B983F136256fA3b8d9703bc";
+    const DOCToken = await ethers.getContractAt("LockTOS", DOCTokenAddress);
+
+    const totalSupply = parseFloat(ethers.utils.formatEther(await lockTOS.totalSupply())).toFixed(2);
+    console.log({ totalSupply });
+
+    const activeHolders = await lockTOS.activeHolders();
+
+    const holdersWithBalance = [];
+    for (const holder of activeHolders) {
+        const balanceNow = parseFloat(ethers.utils.formatEther(await lockTOS.balanceOf(holder)));
+        holdersWithBalance.push({
+            holder: holder,
+            balance: balanceNow
+        });
+    }
+
+    holdersWithBalance.sort((a, b) => b.balance - a.balance);
+    const date = '2021.11.05';
+    for (const { holder, balance } of holdersWithBalance) {
+        const rat = parseFloat(balance / totalSupply);
+        const percentage = parseFloat((rat) * 100).toFixed(4);
+        const doc = rat * 62500;
+        console.log(`${date}\t${holder}\t${balance.toFixed(4)}\t${percentage}%\t${doc.toFixed(4)}`);
+    }
+});
+
 const balanceOfABI = [
     {
         "constant": true,
@@ -106,6 +137,51 @@ task("get-doc-tiers-sold", "Deploy TOS").setAction(async () => {
     console.log("Tier 4 Sold:\t", tiersSoldAmount[4]);
     
 });
+const PublicSaleABI = [
+    {
+        "constant": true,
+        "inputs": [],
+        "name": "totalWhitelists",
+        "outputs": [
+            {
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"        
+    },
+    {
+        "constant": true,
+        "inputs": [
+            {
+                "name": "_index",
+                "type": "uint256"
+            },
+        ],
+        "name": "whitelists",
+        "outputs": [
+            {
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    }
+]
+task("get-whitelists", "Deploy TOS").setAction(async () => {
+    const address = "0xbef737d725993847c345647eba096500fdae71c6";
+    const publicSale = new ethers.Contract(address, PublicSaleABI, ethers.provider);
+    const count = parseInt(await publicSale.totalWhitelists());
+    console.log({ count });
+    for (let i = 0; i < count; ++i) {
+        const addr = await publicSale.whitelists(i);
+        console.log(addr);
+    }
+});
 
 task("get-stos-lost", "Deploy TOS").setAction(async () => {
     const lockTOSAddress = "0x69b4a202fa4039b42ab23adb725aa7b1e9eebd79";
@@ -116,32 +192,35 @@ task("get-stos-lost", "Deploy TOS").setAction(async () => {
     const startDate = Math.floor((new Date(2021, 8, 18)).getTime()/ 1000); // 17th September
     const endDate = Math.floor((new Date(2021, 9, 21)).getTime() / 1000); // 20th October
     for (const holder of activeHolders) {
-        const startBalance = parseInt(
-            ethers.utils.formatEther(await lockTOS.balanceOfAt(holder, startDate))
-        );
-        const endBalance = parseInt(
-            ethers.utils.formatEther(await lockTOS.balanceOfAt(holder, endDate))
-        );
-        const balance = parseInt(
-            ethers.utils.formatEther(await lockTOS.balanceOf(holder))
-        );
-        
-        // console.log({ holder, startDate, endDate, startBalance, endBalance });
-        
-        // console.log(holder, ethers.utils.formatEther(balanceNow));
+        let change = 0;
+        let countDays = 0;
+        let lastBalance = null;
+        for(let loopTime = startDate; loopTime < endDate; loopTime += 86400) {
+            const balance = parseInt(
+                ethers.utils.formatEther(await lockTOS.balanceOfAt(holder, loopTime))
+            );
+            if (lastBalance != null) {
+                change += Math.min(0, balance - lastBalance);
+            }
+
+            lastBalance = balance;
+            countDays += 1;
+        }
+        const average = parseFloat(change / countDays);
+        const decrease = parseFloat(average).toFixed(2); 
+        console.log(`${holder}\t${change}\t${decrease}\t${countDays}`);
         holdersWithBalance.push({
-            holder: holder,
-            startBalance,
-            endBalance,
-            lost: endBalance - startBalance,
-            balance 
+            holder,
+            change,
+            countDays,
+            decrease,
         });
     }
 
-    holdersWithBalance.sort((a, b) => b.lost - a.lost);
+    holdersWithBalance.sort((a, b) => b.decrease - a.decrease);
 
-    console.log(`Address\tBalance\tStart\tEnd\tLost`);
-    for (const { holder, startBalance, endBalance, lost, balance } of holdersWithBalance) {
-        console.log(`${holder}\t${balance}\t${startBalance}\t${endBalance}\t${lost}`);
+    console.log(`Address\Change\tCount days\tAverage`);
+    for (const { holder, change, decrease, countDays } of holdersWithBalance) {
+        console.log(`${holder}\t${change}\t${countDays}\t${decrease}`);
     }
 });

@@ -348,6 +348,15 @@ describe("LockTOS", function () {
     expect(accum).to.be.closeTo(24000000, 1000);
   });
 
+  it("check claimable tokens", async function () {
+    for (const { account } of accounts) {
+      const { claimableAmounts, claimableTokens } = await dividend.getAvailableClaims(account.address);
+      //console.log({ amount: parseInt(claimableAmounts[0]) });
+      expect(claimableTokens[0]).to.be.equal(ton.address);
+      expect(parseInt(claimableAmounts[0])).to.be.greaterThan(0);
+    }
+  });
+
   it("should claim", async function () {
     let totalTonBalance = 0;
     for (const { account } of accounts) {
