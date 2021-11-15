@@ -35,8 +35,15 @@ contract LockTOSDividend is
     }
 
     /// @inheritdoc ILockTOSDividend
-    function claim(address _token) external override {
+    function claim(address _token) public override {
         _claimUpTo(_token, block.timestamp);
+    }
+
+    /// @inheritdoc ILockTOSDividend
+    function claimBatch(address[] calldata _tokens) external override {
+        for (uint i = 0; i < _tokens.length; ++i) {
+            claim(_tokens[i]);
+        }
     }
 
     /// @inheritdoc ILockTOSDividend
@@ -60,9 +67,13 @@ contract LockTOSDividend is
 
         LibLockTOSDividend.Distribution storage distr = distributions[_token];
         IERC20(_token).transferFrom(msg.sender, address(this), _amount);
+        if (distr.exists == false) {
+            distributedTokens.push(_token);
+        }
 
         uint256 newBalance = IERC20(_token).balanceOf(address(this));
         uint256 increment = newBalance.sub(distr.lastBalance);
+        distr.exists = true;
         distr.lastBalance = newBalance;
         distr.totalDistribution = distr.totalDistribution.add(increment);
         distr.tokensPerWeek[weeklyEpoch] = distr.tokensPerWeek[weeklyEpoch].add(increment);
@@ -106,8 +117,44 @@ contract LockTOSDividend is
     }
 
     /// @inheritdoc ILockTOSDividend
+    function getCurrentWeeklyEpochTimestamp() public view override returns (uint256) {
+        uint256 weeklyEpoch = getCurrentWeeklyEpoch();
+        uint256 timestamp = genesis.add(weeklyEpoch.mul(epochUnit));
+        return timestamp;
+    }
+
+    /// @inheritdoc ILockTOSDividend
+    function ifDistributionPossible() public view override returns (bool) {
+        uint256 timestamp = getCurrentWeeklyEpochTimestamp();
+        return ILockTOS(lockTOS).totalSupplyAt(timestamp) > 0;
+    }
+
+    /// @inheritdoc ILockTOSDividend
     function claimable(address _account, address _token) public view override returns (uint256) {
         return claimableForPeriod(_account, _token, genesis, block.timestamp);
+    }
+
+    /// @inheritdoc ILockTOSDividend
+    function getAvailableClaims(address _account) public view override returns (address[] memory claimableTokens, uint256[] memory claimableAmounts) {
+        uint256[] memory amounts = new uint256[](distributedTokens.length);
+        uint256 claimableCount = 0;
+        for (uint256 i = 0; i < distributedTokens.length; ++i) {
+            amounts[i] = claimable(_account, distributedTokens[i]);
+            if (amounts[i] > 0) {
+                claimableCount += 1;
+            }
+        }
+
+        claimableAmounts = new uint256[](claimableCount);
+        claimableTokens = new address[](claimableCount);
+        uint256 j = 0;
+        for (uint256 i = 0; i < distributedTokens.length; ++i) {
+            if (amounts[i] > 0) {
+                claimableAmounts[j] = amounts[i];
+                claimableTokens[j] = distributedTokens[i];
+                j++;
+            }
+        }
     }
 
     /// @inheritdoc ILockTOSDividend
@@ -211,22 +258,3 @@ contract LockTOSDividend is
         return _tokensPerWeek.mul(balance).div(supply);
     }
 }
-
-
-/*
-distribute 10
-balance: 10
-
-claim: 2
-balance: 8
-
-claim: 2
-balance: 6
-
-claim: 4
-balance: 2
-
-distribute: 200
-balance: 250
-
-*/
