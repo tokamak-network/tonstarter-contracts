@@ -40,14 +40,19 @@ contract UpgradePool is AccessibleCommon, DSMath {
     struct VaultInfo {
         address rewardToken;
         address poolAddress;
-        uint256 startTime;
-        uint256 endTime;
+        uint32 startTime;
+        uint32 endTime;
         uint256 tokenPerSecond;
         uint256 totalReward;
     }
 
     struct PoolInfo {
         uint256 startStakeTime;
+    }
+
+    struct ClaimInfo {
+        uint256 claimAmount;
+        uint32 claimTime;
     }
 
     struct PositionInfo {
@@ -108,9 +113,9 @@ contract UpgradePool is AccessibleCommon, DSMath {
         uint256 factor
     );
 
-    uint256[][] public vaultIds;
-
     INonfungiblePositionManager public nonfungiblePositionManager;
+
+    uint256 public miningPerSecond = 10;
 
     /// @dev UniswapV3 pool factory
     address public uniswapV3FactoryAddress;
@@ -139,6 +144,8 @@ contract UpgradePool is AccessibleCommon, DSMath {
     /// @dev user's tokenIds
     mapping(address => uint256[]) public userStakedTokenIds;
 
+    mapping(address => uint256[]) public vaultIds;
+
     /// @dev Total staked information of users
     mapping(address => LibUniswapV3Stake.StakedTotalTokenAmount)
         public userTotalStaked;
@@ -147,8 +154,16 @@ contract UpgradePool is AccessibleCommon, DSMath {
     mapping(uint256 => LibUniswapV3Stake.StakedTokenAmount)
         public stakedCoinageTokens;
 
+    /// @dev [poolAddress][programNumber] program에 대한 정보를 관리
     mapping (address => mapping(uint256 => VaultInfo)) public vaultInfo;
+    
+    /// @dev [poolAddress][programNumber][tokenId] Pool의 program에 Claim한 토큰들의 정보를 관리
+    mapping (address => mapping(uint256 => mapping(uint256 => ClaimInfo))) public claimInfo;
+
+    /// @dev [tokenId] -> tokenId는 어짜피 고유한 것이라서 다른 것과 안 묶어도됨
     mapping (uint256 => TokenInfo) public tokenInfo;
+
+    /// @dev [poolAddres]
     mapping (address => PoolInfo) public poolInfo;
 
     mapping (uint256 => mapping(uint256 => PositionInfo)) public positionInfo;
@@ -189,12 +204,12 @@ contract UpgradePool is AccessibleCommon, DSMath {
     function createVault(
         address _rewardToken,
         address _poolAddress,
-        uint256[2] calldata _times,
+        uint32[2] calldata _times,
         uint256 _tokenPerSecond,
         uint256 _totalReward
     ) external onlyOwner {
         require(block.timestamp < _times[0] && _times[0] < _times[1], "time setting incorrect");
-        vaultInfo[_poolAddress][vaultIds.length] = VaultInfo({
+        vaultInfo[_poolAddress][vaultIds[_poolAddress].length] = VaultInfo({
             rewardToken: _rewardToken,
             poolAddress: _poolAddress,
             startTime: _times[0],
@@ -202,7 +217,7 @@ contract UpgradePool is AccessibleCommon, DSMath {
             tokenPerSecond: _tokenPerSecond,
             totalReward: _totalReward
         });
-        vaultIds[_poolAddress].push(vaultIds.length);
+        vaultIds[_poolAddress].push(vaultIds[_poolAddress].length);
 
         IERC20(_rewardToken).safeTransferFrom(msg.sender, address(this), _totalReward);
     }
@@ -217,12 +232,12 @@ contract UpgradePool is AccessibleCommon, DSMath {
 
         if (
             block.timestamp >
-            (coinageLastMintBlockTimetamp.add(miningIntervalSeconds))
+            (coinageLastMintBlockTimetamp[_pool].add(miningIntervalSeconds))
         ) {
             uint256 miningInterval =
                 block.timestamp.sub(coinageLastMintBlockTimetamp[_pool]);
             uint256 miningAmount =
-                miningInterval.mul(IIStake2Vault(vault).miningPerSecond());
+                miningInterval.mul(miningPerSecond);
             uint256 prevTotalSupply =
                 IAutoRefactorCoinageWithTokenId(coinage[_pool]).totalSupply();
 
@@ -237,7 +252,7 @@ contract UpgradePool is AccessibleCommon, DSMath {
                             IAutoRefactorCoinageWithTokenId(coinage[_pool]).factor()
                         )
                     );
-                coinageLastMintBlockTimetamp = block.timestamp;
+                coinageLastMintBlockTimetamp[_pool] = block.timestamp;
 
                 emit MinedCoinage(
                     _pool,
@@ -248,6 +263,138 @@ contract UpgradePool is AccessibleCommon, DSMath {
                     afterTotalSupply,
                     factor
                 );
+            }
+        }
+    }
+
+    function claimMiningCoinage(address _pool, uint256 _vNum) public lock {
+        if (
+            block.timestamp >
+            (coinageLastMintBlockTimetamp[_pool].add(miningIntervalSeconds))
+        ) {
+            uint256 miningInterval =
+                block.timestamp.sub(coinageLastMintBlockTimetamp[_pool]);
+            uint256 miningAmount =
+                miningInterval.mul(miningPerSecond);
+            uint256 prevTotalSupply =
+                IAutoRefactorCoinageWithTokenId(coinage[_pool]).totalSupply();
+
+            if (miningAmount > 0 && prevTotalSupply > 0) {
+                uint256 afterTotalSupply =
+                    prevTotalSupply.add(miningAmount.mul(10**9));
+                uint256 factor =
+                    IAutoRefactorCoinageWithTokenId(coinage[_pool]).setFactor(
+                        _calcNewFactor(
+                            prevTotalSupply,
+                            afterTotalSupply,
+                            IAutoRefactorCoinageWithTokenId(coinage[_pool]).factor()
+                        )
+                    );
+                coinageLastMintBlockTimetamp[_pool] = block.timestamp;
+
+                emit MinedCoinage(
+                    _pool,
+                    block.timestamp,
+                    miningInterval,
+                    miningAmount,
+                    prevTotalSupply,
+                    afterTotalSupply,
+                    factor
+                );
+            }
+        }
+    }
+
+    /// @dev view mining information of tokenId
+    /// @param tokenId  tokenId
+    function getMiningTokenId(uint256 tokenId,uint256 _vNum)
+        public
+        view
+        returns (
+            uint256 miningAmount,
+            uint256 nonMiningAmount,
+            uint256 minableAmount,
+            uint160 secondsInside,
+            uint256 secondsInsideDiff256,
+            uint256 liquidity,
+            uint256 balanceOfTokenIdRay,
+            uint256 minableAmountRay,
+            uint256 secondsInside256,
+            uint256 secondsAbsolute256
+        )
+    {
+        TokenInfo storage token = tokenInfo[tokenId];
+        PoolInfo storage pool = poolInfo[token.poolAddress];
+        VaultInfo storage vault = vaultInfo[token.poolAddress][_vNum];
+        ClaimInfo storage claim = claimInfo[token.poolAddress][_vNum][tokenId];
+
+        if (
+            pool.startStakeTime < block.timestamp
+        ) {
+            TokenInfo storage token = tokenInfo[tokenId];
+
+            liquidity = token.liquidity;
+
+            uint32 secondsAbsolute = 0;
+            balanceOfTokenIdRay = IAutoRefactorCoinageWithTokenId(coinage[token.poolAddress])
+                .balanceOf(tokenId);
+
+            if (token.liquidity > 0 && balanceOfTokenIdRay > 0) {
+                if (balanceOfTokenIdRay > liquidity.mul(10**9)) {
+                    minableAmountRay = balanceOfTokenIdRay.sub(
+                        liquidity.mul(10**9)
+                    );
+                    minableAmount = minableAmountRay.div(10**9);
+                }
+                if (minableAmount > 0) {
+                    (, , secondsInside) = IUniswapV3Pool(token.poolAddress)
+                        .snapshotCumulativesInside(
+                        token.tickLower,
+                        token.tickUpper
+                    );
+                    secondsInside256 = uint256(secondsInside);
+
+                    if (claim.claimTime > 0) {
+                        secondsAbsolute = uint32(block.timestamp).sub(
+                            claim.claimTime
+                        );
+                    } else if (token.startTime > vault.startTime) {
+                        secondsAbsolute = uint32(block.timestamp).sub(
+                            token.startTime
+                        );
+                    } else {
+                        secondsAbsolute = uint32(block.timestamp).sub(
+                            vault.startTime
+                        );
+                    }
+                    secondsAbsolute256 = uint256(secondsAbsolute);
+
+                    if (secondsAbsolute > 0) {
+                        if (token.secondsInsideLast > 0) {
+                            secondsInsideDiff256 = secondsInside256.sub(
+                                uint256(token.secondsInsideLast)
+                            );
+                        } else {
+                            secondsInsideDiff256 = secondsInside256.sub(
+                                uint256(token.secondsInsideInitial)
+                            );
+                        }
+
+                        if (
+                            secondsInsideDiff256 < secondsAbsolute256 &&
+                            secondsInsideDiff256 > 0
+                        ) {
+                            miningAmount = minableAmount
+                                .mul(secondsInsideDiff256)
+                                .div(secondsAbsolute256);
+                            nonMiningAmount = minableAmount.sub(miningAmount);
+                        } else if(secondsInsideDiff256 > 0){
+                            miningAmount = minableAmount;
+                        } else {
+                            nonMiningAmount = minableAmount;
+                        }
+                    }
+                }
             }
         }
     }
@@ -311,7 +458,7 @@ contract UpgradePool is AccessibleCommon, DSMath {
 
         PoolInfo storage pool = poolInfo[token.poolAddress];
         // initial pool start time
-        if (pool.startStakeTime) pool.startStakeTime = block.timestamp;
+        if (pool.startStakeTime == 0) pool.startStakeTime = block.timestamp;
 
         token.owner = msg.sender;
         token.liquidity = liquidity;
@@ -362,12 +509,36 @@ contract UpgradePool is AccessibleCommon, DSMath {
 
 
 
+    function claim(uint256 tokenId, uint256 _vNum) external  {
+        TokenInfo storage token = tokenInfo[tokenId];
+        require(token.owner == msg.sender, "not staker");
+
+        require(token.claimLock == false, "StakeUniswapV3: claiming");
+        ClaimInfo storage claim = claimInfo[token.poolAddress][_vNum][tokenId];
+
+        require(claim.claimTime < uint32(block.timestamp.sub(miningIntervalSeconds)), "already claimed");       
+        
+        miningCoinage(token.poolAddress);
+
+        (
+            uint256 miningAmount,
+            uint256 nonMiningAmount,
+            uint256 minableAmount,
+            uint160 secondsInside,
+            ,
+            ,
+            ,
+            uint256 minableAmountRay,
+            ,
+
+        ) = getMiningTokenId(tokenId,_vNum);
 
 
-    function claim(uint256 _vNum) external onlyOwner {
-        VaultInfo storage vault = vaultInfo[_vNum];
+        token.claimLock = true;
 
-        (uint256 totalDepositAmount, uint256 totalMiningAmount, uint256 totalNonMiningAmount) = IStakeUniswapV3(vault.poolAddress).getUserStakedTotal(msg.sender);
+
+        token.claimLock = false;
+
     }
 
 
