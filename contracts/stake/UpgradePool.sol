@@ -491,7 +491,7 @@ contract UpgradePool is AccessibleCommon, DSMath {
         ClaimInfo storage claim = claimInfo[token.poolAddress][_vNum][tokenId];
         require(claim.claimTime < uint32(block.timestamp.sub(miningIntervalSeconds)), "already claimed");       
 
-        require(token.claimLock == false, "StakeUniswapV3: claiming");
+        require(token.claimLock == false, "claiming");
         token.claimLock = true;
         
         miningCoinage(token.poolAddress);
@@ -529,7 +529,7 @@ contract UpgradePool is AccessibleCommon, DSMath {
         vault.nonMiningAmountTotal = vault.nonMiningAmountTotal.add(nonMiningAmount);
 
         uint256 rewardBalance = IERC20(vault.rewardToken).balanceOf(address(this));
-        require(rewardBalance >= minableAmount, "Stake2Vault: not enough balance");
+        require(rewardBalance >= minableAmount, "not enough balance");
 
         require(IERC20(vault.rewardToken).transfer(msg.sender, miningAmount), "reward transfer fail");
 
@@ -543,6 +543,60 @@ contract UpgradePool is AccessibleCommon, DSMath {
             miningAmount,
             nonMiningAmount
         );
+    }
+
+    function allClaim(uint256 tokenId) external {
+        TokenInfo storage token = tokenInfo[tokenId];
+        require(token.owner == msg.sender, "not staker");
+
+        require(token.claimLock == false, "claiming");
+        token.claimLock = true;
+        miningCoinage(token.poolAddress);
+        
+        for(uint256 i = 0; i < vaultIds[token.poolAddress].length; i++) {
+            ClaimInfo storage claim = claimInfo[token.poolAddress][i][tokenId];
+            VaultInfo storage vault = vaultInfo[token.poolAddress][i];
+
+            (
+                uint256 miningAmount,
+                uint256 nonMiningAmount,
+                uint256 minableAmount,
+                uint160 secondsInside,
+                ,
+                ,
+                ,
+                uint256 minableAmountRay,
+                ,
+
+            ) = getMiningTokenId(tokenId,i);
+
+                    require(miningAmount > 0, "zero miningAmount");
+
+            claim.claimTime = uint32(block.timestamp);
+            claim.claimSecondInside = secondsInside;
+
+            IAutoRefactorCoinageWithTokenId(coinage[token.poolAddress]).burn(
+                msg.sender,
+                tokenId,
+                minableAmountRay
+            );
+
+            claim.claimTime = uint32(block.timestamp);
+            claim.claimAmount = claim.claimAmount.add(miningAmount);
+            claim.nonMiningAmount = claim.nonMiningAmount.add(nonMiningAmount);
+
+            vault.miningAmountTotal = vault.miningAmountTotal.add(miningAmount);
+            vault.nonMiningAmountTotal = vault.nonMiningAmountTotal.add(nonMiningAmount);
+
+            uint256 rewardBalance = IERC20(vault.rewardToken).balanceOf(address(this));
+            require(rewardBalance >= minableAmount, "not enough balance");
+
+            require(IERC20(vault.rewardToken).transfer(msg.sender, miningAmount), "reward transfer fail");
+
+        }
+
+        token.claimLock = false;
+
     }
 
 
