@@ -65,11 +65,35 @@
 
 * "StakeTONUnstaking": "0xf9381fB7167FC3e81849aE82960144274D1553C2"
 
+## Deployed related to pools
+
+* "StakeVaultFactory": "0x87d03e876d0FaDa4A347dae56Eff6F023B08543B"
+
+* "Stake2Vault": "0x6359722370754B2ca15DDa3a2f6fe000AE2e4327"
+
+* "StakeUniswapV3": "0xA4cc74701AaB6A3280C768dC669881a8a5fA1C77"
+
+* "StakeCoinageFactory": "0x27EEbEd0a0F17Bea0fdd1957ef9aAf1F770a6866"
+
+* "StakeUniswapV3Factory": "0x0cfaE39054263B9269B89568B802a69c99e67Bb7"
+
+* "Stake2Logic": "0x62c957BE256cD01695ddfE97d306A737aE179272"
+
+* "Stake2VaultProxy": "0xB9C3531f1230De8E775F386f3B57d6dCB3F0202a"
+
+* "StakeUniswapV3Proxy": "0xC1349A9a33A0682804c390a3968e26E5a2366153"
+
+
 ## Deployed related to DAO
 
 * "LockTOS": "0x47f9FEbB2456d71Aab621F683AD680D71aF1306d"
 
 * "LockTOSProxy": "0x69b4A202Fa4039B42ab23ADB725aA7b1e9EEBD79"
+
+* "LockTOSDividend": "0xd8a63c63400cce9515d0c03adbbaf8c8f94e3d71"
+
+* "LockTOSDividendProxy": "0x0f1174a204082c5e921015d6c785fe2b4aef8b17"
+
 
 ## Deployed related to PublicSale
 

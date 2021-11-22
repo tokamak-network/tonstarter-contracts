@@ -227,6 +227,7 @@ describe("LockTOSDividend", function () {
           await dividend
             .connect(account)
             .claimableForPeriod(
+              account.address,
               ton.address,
               currentTime,
               currentTime + ONE_WEEK
