@@ -28,17 +28,17 @@ const SeigManager = loadDeployed(process.env.NETWORK, "SeigManager");
 const StakeTONControl = loadDeployed(process.env.NETWORK, "StakeTONControl");
 
 // rinkeby
-const StakeTONUnstaking_Address = "0xeeEa9CA7a496651577ff1FD353570F8B70580955";
+const StakeTONUnstaking_Address = "0xf9381fB7167FC3e81849aE82960144274D1553C2";
 
 async function deployMain(defaultSender) {
   const [deployer, user1] = await ethers.getSigners();
 
-  const TOS_Address = tostoken;
-  const tos = await ethers.getContractAt("TOS", TOS_Address);
-  console.log("tos:", tos.address);
+  // const TOS_Address = tostoken;
+  // const tos = await ethers.getContractAt("TOS", TOS_Address);
+  // console.log("tos:", tos.address);
   const stakeTONUnstaking = await ethers.getContractAt("StakeTONUnstaking", StakeTONUnstaking_Address);
 
-    console.log("stakeTONUnstaking :", stakeTONUnstaking);
+   // console.log("stakeTONUnstaking :", stakeTONUnstaking);
 
 
   let can = await stakeTONUnstaking.canRequestUnstakingLayer2All();
@@ -59,9 +59,9 @@ async function deployMain(defaultSender) {
 }
 
 async function main() {
-  const [deployer, user1] = await ethers.getSigners();
-  const users = await ethers.getSigners();
-  console.log("Deploying contracts with the account:", deployer.address, process.env.NETWORK);
+  const [deployer] = await ethers.getSigners();
+
+  console.log("Deploying contracts with the account:", deployer.address);
 
   console.log("Account balance:", (await deployer.getBalance()).toString());
 
