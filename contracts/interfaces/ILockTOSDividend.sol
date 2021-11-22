@@ -3,6 +3,9 @@ pragma solidity ^0.7.6;
 
 
 interface ILockTOSDividend {
+    /// @dev Claim batch
+    function claimBatch(address[] calldata _tokens) external;
+
     /// @dev Claim
     function claim(address _token) external;
 
@@ -11,9 +14,15 @@ interface ILockTOSDividend {
 
     /// @dev Distribute
     function distribute(address _token, uint256 _amount) external;
+
+    /// @dev getCurrentWeeklyEpochTimestamp
+    function getCurrentWeeklyEpochTimestamp() external view returns (uint256);
+
+    /// @dev ifDistributionPossible
+    function ifDistributionPossible() external view returns (bool);
     
-    /// @dev Redistribute
-    function redistribute(address _token, uint256 _weeklyEpoch) external;
+    /// @dev getAvailableClaims
+    function getAvailableClaims(address _account) external view returns (address[] memory claimableTokens, uint256[] memory claimableAmounts);
 
     /// @dev Get weekly epoch for `_timestamp`
     function getWeeklyEpoch(uint256 _timestamp) external view returns (uint256);
@@ -34,8 +43,8 @@ interface ILockTOSDividend {
         returns (uint256);
 
     /// @dev Returns claimable amount
-    function claimable(address _token) external view returns (uint256);
+    function claimable(address _account, address _token) external view returns (uint256);
     
     /// @dev Returns claimable amount from `_timeStart` to `_timeEnd`
-    function claimableForPeriod(address _token, uint256 _timeStart, uint256 _timeEnd) external view returns (uint256);
+    function claimableForPeriod(address _account, address _token, uint256 _timeStart, uint256 _timeEnd) external view returns (uint256);
 }
