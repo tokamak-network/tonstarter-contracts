@@ -94,7 +94,6 @@
 
 * "LockTOSDividendProxy": "0x0f1174a204082c5e921015d6c785fe2b4aef8b17"
 
-
 ## Deployed related to PublicSale
 
 * "PublicSale": "0xA2C90A682DC0849e9Ed8B781E06a73441b5CA1e6"
