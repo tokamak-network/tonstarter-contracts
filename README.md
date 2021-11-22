@@ -63,6 +63,7 @@
 
 * "StakeTONControl": "0xacdded49ac67ba9c87b1bbc5cb248b1bd7dc0f19"
 
+* "StakeTONUnstaking": "0xf9381fB7167FC3e81849aE82960144274D1553C2"
 
 ## Deployed related to DAO
 
