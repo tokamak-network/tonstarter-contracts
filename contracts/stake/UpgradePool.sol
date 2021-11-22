@@ -25,21 +25,18 @@ contract UpgradePool is AccessibleCommon, DSMath {
     struct TokenInfo {
         address owner;
         address poolAddress;
-        uint256 stakeTime;
         uint128 liquidity;
         int24 tickLower;
         int24 tickUpper;
         uint32 startTime;
-        uint32 claimedTime;
         uint160 secondsInsideInitial;
         uint160 secondsInsideLast;
         bool claimLock;
-        bool withdraw;
     }
 
     struct VaultInfo {
+        address owner;
         address rewardToken;
-        address poolAddress;
         uint32 startTime;
         uint32 endTime;
         uint256 tokenPerSecond;
@@ -52,11 +49,21 @@ contract UpgradePool is AccessibleCommon, DSMath {
         uint256 startStakeTime;
     }
 
+    struct MiningInfo {
+        uint256 miningAmountTotal;
+        uint256 nonMiningAmountTotal;
+    }
+
     struct ClaimInfo {
         uint256 claimAmount;
         uint256 nonMiningAmount;
         uint32 claimTime;
         uint160 claimSecondInside;
+    }
+
+    struct IncentiveKey {
+        address poolAddress;
+        uint256 number;
     }
 
     struct PositionInfo {
@@ -178,7 +185,10 @@ contract UpgradePool is AccessibleCommon, DSMath {
     mapping (address => mapping(uint256 => VaultInfo)) public vaultInfo;
     
     /// @dev [poolAddress][programNumber][tokenId] Pool의 program에 Claim한 토큰들의 정보를 관리
-    mapping (address => mapping(uint256 => mapping(uint256 => ClaimInfo))) public claimInfo;
+    // mapping (address => mapping(uint256 => mapping(uint256 => ClaimInfo))) public claimInfo;
+
+    /// @dev [tokenId][IncentiveId] pool의 program에 claim한 토큰들의 정보를 관리 (incentiveId는 vault정보와 vNum을 조합해서 나온 해쉬값)
+    mapping(uint256 => mapping(bytes32 => ClaimInfo)) public claimInfo;
 
     /// @dev [tokenId] -> tokenId는 어짜피 고유한 것이라서 다른 것과 안 묶어도됨
     mapping (uint256 => TokenInfo) public tokenInfo;
@@ -230,25 +240,33 @@ contract UpgradePool is AccessibleCommon, DSMath {
     ) external onlyOwner {
         require(block.timestamp < _times[0] && _times[0] < _times[1], "time setting incorrect");
         vaultInfo[_poolAddress][vaultIds[_poolAddress].length] = VaultInfo({
+            owner: msg.sender,
             rewardToken: _rewardToken,
-            poolAddress: _poolAddress,
             startTime: _times[0],
             endTime: _times[1],
             tokenPerSecond: _tokenPerSecond,
             totalReward: _totalReward,
-            miningAmountTotal : 0,
-            nonMiningAmountTotal : 0
+            miningAmountTotal: 0,
+            nonMiningAmountTotal: 0
         });
+
         vaultIds[_poolAddress].push(vaultIds[_poolAddress].length);
 
         IERC20(_rewardToken).safeTransferFrom(msg.sender, address(this), _totalReward);
+    }
+
+    /// @dev create incentiveId, input the pool, owner, startTime, _vNum
+    function getIncentiveId(address pool, uint256 _vNum) public view returns (bytes32) {
+        VaultInfo memory vault = vaultInfo[pool][_vNum];
+        bytes32 incentiveId = keccak256(abi.encodePacked(pool,vault.startTime,vault.endTime,_vNum));
+        return incentiveId;
     }
 
     /// @dev mining on coinage, Mining conditions :  the sale start time must pass,
     /// the stake start time must pass, the vault mining start time (sale start time) passes,
     /// the mining interval passes, and the current total amount is not zero,
     function miningCoinage(address _pool) public lock {
-        PoolInfo storage pool = poolInfo[_pool];
+        PoolInfo memory pool = poolInfo[_pool];
         if (coinageLastMintBlockTimetamp[_pool] == 0)
             coinageLastMintBlockTimetamp[_pool] = pool.startStakeTime;
 
@@ -289,9 +307,7 @@ contract UpgradePool is AccessibleCommon, DSMath {
         }
     }
 
-    /// @dev view mining information of tokenId
-    /// @param tokenId  tokenId
-    function getMiningTokenId(uint256 tokenId,uint256 _vNum)
+    function getMiningToken(uint256 tokenId,uint256 _vNum)
         public
         view
         returns (
@@ -308,70 +324,107 @@ contract UpgradePool is AccessibleCommon, DSMath {
         )
     {
         TokenInfo storage token = tokenInfo[tokenId];
-        VaultInfo storage vault = vaultInfo[token.poolAddress][_vNum];
-        ClaimInfo storage claim = claimInfo[token.poolAddress][_vNum][tokenId];
 
-        if (vault.startTime < block.timestamp) {
-            liquidity = token.liquidity;
+        liquidity = token.liquidity;
 
-            uint32 secondsAbsolute = 0;
-            balanceOfTokenIdRay = IAutoRefactorCoinageWithTokenId(coinage[token.poolAddress])
-                .balanceOf(tokenId);
+        balanceOfTokenIdRay = IAutoRefactorCoinageWithTokenId(coinage[token.poolAddress])
+            .balanceOf(tokenId);
 
-            if (token.liquidity > 0 && balanceOfTokenIdRay > 0) {
-                if (balanceOfTokenIdRay > liquidity.mul(10**9)) {
-                    minableAmountRay = balanceOfTokenIdRay.sub(
-                        liquidity.mul(10**9)
-                    );
-                    minableAmount = minableAmountRay.mul(vault.tokenPerSecond).div(miningPerSecond).div(10**9);
-                }
-                if (minableAmount > 0) {
-                    (, , secondsInside) = IUniswapV3Pool(token.poolAddress)
-                        .snapshotCumulativesInside(
-                        token.tickLower,
-                        token.tickUpper
-                    );
-                    secondsInside256 = uint256(secondsInside);
+        if (token.liquidity > 0 && balanceOfTokenIdRay > 0) {
+            if (balanceOfTokenIdRay > liquidity.mul(10**9)) {
+                minableAmountRay = balanceOfTokenIdRay.sub(
+                    liquidity.mul(10**9)
+                );
+                minableAmount = minableAmountRay.div(10**9);
+            }
+            if (minableAmount > 0) {
+                (, , secondsInside) = IUniswapV3Pool(token.poolAddress)
+                    .snapshotCumulativesInside(
+                    token.tickLower,
+                    token.tickUpper
+                );
+                secondsInside256 = uint256(secondsInside);
 
-                    if (claim.claimTime > 0) {
-                        secondsAbsolute = uint32(block.timestamp).sub(
-                            claim.claimTime
-                        );
-                    } else {
-                        secondsAbsolute = uint32(block.timestamp).sub(
-                            token.startTime
-                        );
-                    }
-                    secondsAbsolute256 = uint256(secondsAbsolute);
-
-                    if (secondsAbsolute > 0) {
-                        if (claim.claimSecondInside > 0) {
-                            secondsInsideDiff256 = secondsInside256.sub(
-                                uint256(claim.claimSecondInside)
-                            );
-                        } else {
-                            secondsInsideDiff256 = secondsInside256.sub(
-                                uint256(token.secondsInsideInitial)
-                            );
-                        }
-
-                        if (
-                            secondsInsideDiff256 < secondsAbsolute256 &&
-                            secondsInsideDiff256 > 0
-                        ) {
-                            miningAmount = minableAmount
-                                .mul(secondsInsideDiff256)
-                                .div(secondsAbsolute256);
-                            nonMiningAmount = minableAmount.sub(miningAmount);
-                        } else if(secondsInsideDiff256 > 0){
-                            miningAmount = minableAmount;
-                        } else {
-                            nonMiningAmount = minableAmount;
-                        }
-                    }
-                }
+                (
+                    secondsAbsolute256,
+                    secondsInsideDiff256,
+                    miningAmount,
+                    nonMiningAmount
+                ) = calculClaimAmount(secondsInside256,_vNum,tokenId,minableAmount);
             }
         }
+        
+    }
+
+    /// @dev claimAmount calculation
+    function calculClaimAmount(
+        uint256 secondInside256,
+        uint256 _vNum,
+        uint256 _tokenId,
+        uint256 minableAmount
+    )
+        public
+        view
+        returns (
+            uint256 secondsAbsolute256,
+            uint256 secondsInsideDiff256,
+            uint256 miningAmount,
+            uint256 nonMiningAmount
+        )
+    {   
+        TokenInfo memory token = tokenInfo[_tokenId];
+        VaultInfo memory vault = vaultInfo[token.poolAddress][_vNum];
+
+        if(vault.startTime > block.timestamp) {
+            bytes32 incentiveId = getIncentiveId(token.poolAddress,_vNum);
+            ClaimInfo memory claim = claimInfo[_tokenId][incentiveId];
+
+            uint32 secondsAbsolute = 0;
+
+            uint256 calculMinable = minableAmount.mul(vault.tokenPerSecond).div(miningPerSecond);
+            
+            if (claim.claimTime > 0) {
+                secondsAbsolute = uint32(block.timestamp).sub(
+                    claim.claimTime
+                );
+            } else {
+                secondsAbsolute = uint32(block.timestamp).sub(
+                    token.startTime
+                );
+            }
+            secondsAbsolute256 = uint256(secondsAbsolute);
+
+            if (secondsAbsolute > 0) {
+                if (claim.claimSecondInside > 0) {
+                    secondsInsideDiff256 = secondInside256.sub(
+                        uint256(claim.claimSecondInside)
+                    );
+                } else {
+                    secondsInsideDiff256 = secondInside256.sub(
+                        uint256(token.secondsInsideInitial)
+                    );
+                }
+
+                if (
+                    secondsInsideDiff256 < secondsAbsolute256 &&
+                    secondsInsideDiff256 > 0
+                ) {
+                    miningAmount = calculMinable
+                        .mul(secondsInsideDiff256)
+                        .div(secondsAbsolute256);
+                    nonMiningAmount = calculMinable.sub(miningAmount);
+                } else if(secondsInsideDiff256 > 0){
+                    miningAmount = calculMinable;
+                } else {
+                    nonMiningAmount = calculMinable;
+                }
+            }
+
+            return (secondsAbsolute256,secondsInsideDiff256,miningAmount,nonMiningAmount);
+        } else {
+            return (0, 0, 0, 0);
+        }
+
     }
 
 
@@ -439,9 +492,7 @@ contract UpgradePool is AccessibleCommon, DSMath {
         token.liquidity = liquidity;
         token.tickLower = tickLower;
         token.tickUpper = tickUpper;
-        token.stakeTime = block.timestamp;
         token.startTime = uint32(block.timestamp);
-        token.claimedTime = 0;
         token.secondsInsideInitial = secondsInside;
         token.secondsInsideLast = 0;
 
@@ -488,7 +539,9 @@ contract UpgradePool is AccessibleCommon, DSMath {
         TokenInfo storage token = tokenInfo[tokenId];
         require(token.owner == msg.sender, "not staker");
 
-        ClaimInfo storage claim = claimInfo[token.poolAddress][_vNum][tokenId];
+        bytes32 incentiveId = getIncentiveId(token.poolAddress,_vNum);
+
+        ClaimInfo storage claim = claimInfo[tokenId][incentiveId];
         require(claim.claimTime < uint32(block.timestamp.sub(miningIntervalSeconds)), "already claimed");       
 
         require(token.claimLock == false, "claiming");
@@ -507,7 +560,7 @@ contract UpgradePool is AccessibleCommon, DSMath {
             uint256 minableAmountRay,
             ,
 
-        ) = getMiningTokenId(tokenId,_vNum);
+        ) = getMiningToken(tokenId,_vNum);
 
         require(miningAmount > 0, "zero miningAmount");
 
@@ -554,44 +607,47 @@ contract UpgradePool is AccessibleCommon, DSMath {
         miningCoinage(token.poolAddress);
         
         for(uint256 i = 0; i < vaultIds[token.poolAddress].length; i++) {
-            ClaimInfo storage claim = claimInfo[token.poolAddress][i][tokenId];
             VaultInfo storage vault = vaultInfo[token.poolAddress][i];
+            
+            if(vault.endTime > block.timestamp) {
+                bytes32 incentiveId = getIncentiveId(token.poolAddress,i);
+                ClaimInfo storage claim = claimInfo[tokenId][incentiveId];
+                (
+                    uint256 miningAmount,
+                    uint256 nonMiningAmount,
+                    uint256 minableAmount,
+                    uint160 secondsInside,
+                    ,
+                    ,
+                    ,
+                    uint256 minableAmountRay,
+                    ,
 
-            (
-                uint256 miningAmount,
-                uint256 nonMiningAmount,
-                uint256 minableAmount,
-                uint160 secondsInside,
-                ,
-                ,
-                ,
-                uint256 minableAmountRay,
-                ,
+                ) = getMiningToken(tokenId,i);
 
-            ) = getMiningTokenId(tokenId,i);
+                require(miningAmount > 0, "zero miningAmount");
 
-                    require(miningAmount > 0, "zero miningAmount");
+                claim.claimTime = uint32(block.timestamp);
+                claim.claimSecondInside = secondsInside;
 
-            claim.claimTime = uint32(block.timestamp);
-            claim.claimSecondInside = secondsInside;
+                IAutoRefactorCoinageWithTokenId(coinage[token.poolAddress]).burn(
+                    msg.sender,
+                    tokenId,
+                    minableAmountRay
+                );
 
-            IAutoRefactorCoinageWithTokenId(coinage[token.poolAddress]).burn(
-                msg.sender,
-                tokenId,
-                minableAmountRay
-            );
+                claim.claimTime = uint32(block.timestamp);
+                claim.claimAmount = claim.claimAmount.add(miningAmount);
+                claim.nonMiningAmount = claim.nonMiningAmount.add(nonMiningAmount);
 
-            claim.claimTime = uint32(block.timestamp);
-            claim.claimAmount = claim.claimAmount.add(miningAmount);
-            claim.nonMiningAmount = claim.nonMiningAmount.add(nonMiningAmount);
+                vault.miningAmountTotal = vault.miningAmountTotal.add(miningAmount);
+                vault.nonMiningAmountTotal = vault.nonMiningAmountTotal.add(nonMiningAmount);
 
-            vault.miningAmountTotal = vault.miningAmountTotal.add(miningAmount);
-            vault.nonMiningAmountTotal = vault.nonMiningAmountTotal.add(nonMiningAmount);
+                uint256 rewardBalance = IERC20(vault.rewardToken).balanceOf(address(this));
+                require(rewardBalance >= minableAmount, "not enough balance");
 
-            uint256 rewardBalance = IERC20(vault.rewardToken).balanceOf(address(this));
-            require(rewardBalance >= minableAmount, "not enough balance");
-
-            require(IERC20(vault.rewardToken).transfer(msg.sender, miningAmount), "reward transfer fail");
+                require(IERC20(vault.rewardToken).transfer(msg.sender, miningAmount), "reward transfer fail");
+            }
 
         }
 
