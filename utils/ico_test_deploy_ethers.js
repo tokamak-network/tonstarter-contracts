@@ -83,6 +83,7 @@ let StakeTONFactory, StakeDefiFactory,
   Stake2Logic, Stake2VaultLogic ,
   StakeTONLogic, StakeSimple , StakeUniswapV3Upgrade, StakeUniswapV3Upgrade1,
   Stake2VaultUpgrade, StakeUniswapV3Proxy2;
+let upgradePoolFactory,upgradePool;
 
 // plasma-evm-contracts
 let TON, WTON,
@@ -180,6 +181,8 @@ class ICO20Contracts {
     this.stake2VaultUpgrade = null;
     this.stakeUniswapV3Proxy2 = null;
 
+    this.upgradePool1 = null;
+
     this.AbiObject = {
       TON: null,
       WTON: null,
@@ -241,6 +244,7 @@ class ICO20Contracts {
 
 
     let owner = await this.findSigner(owner1);
+    // console.log(owner.address)
 
     // this = self;
     // console.log(' initializeICO20Contracts owner:',owner );
@@ -266,6 +270,8 @@ class ICO20Contracts {
 
     this.stakeVaultFactory = null;
     this.stakeSimpleFactory = null;
+
+    this.upgradePool1 = null;
 
     StakeTONProxyFactory = await ethers.getContractFactory("StakeTONProxyFactory");
     StakeTONLogic = await ethers.getContractFactory(
@@ -300,6 +306,9 @@ class ICO20Contracts {
 
     this.tos = await TOS.connect(owner).deploy(name, symbol, version);
     //this.stos = await STOS.connect(owner).deploy();
+
+    upgradePoolFactory = await ethers.getContractFactory("UpgradePool");
+    this.upgradePool1 = await upgradePoolFactory.connect(owner).deploy(owner.address);
 
     this.stakeregister = await StakeRegistry.connect(owner).deploy(this.tos.address);
 
@@ -400,7 +409,8 @@ class ICO20Contracts {
       stakeUniswapV3Upgrade: this.stakeUniswapV3Upgrade,
       stakeUniswapV3Upgrade1: this.stakeUniswapV3Upgrade1,
       stake2VaultUpgrade: this.stake2VaultUpgrade,
-      stakeUniswapV3Proxy2 : this.stakeUniswapV3Proxy2
+      stakeUniswapV3Proxy2 : this.stakeUniswapV3Proxy2,
+      upgradePool1 : this.upgradePool1
     };
     // console.log(' initializeICO20Contracts  :',returnData );
 
@@ -613,7 +623,8 @@ class ICO20Contracts {
       stakeUniswapV3Upgrade: this.stakeUniswapV3Upgrade,
       stakeUniswapV3Upgrade1: this.stakeUniswapV3Upgrade1,
       stake2VaultUpgrade: this.stake2VaultUpgrade,
-      stakeUniswapV3Proxy2 : this.stakeUniswapV3Proxy2
+      stakeUniswapV3Proxy2 : this.stakeUniswapV3Proxy2,
+      upgradePool1 : this.upgradePool1
     };
   };
 
