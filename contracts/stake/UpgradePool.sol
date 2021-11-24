@@ -7,7 +7,9 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "@uniswap/v3-periphery/contracts/interfaces/INonfungiblePositionManager.sol";
 import "@uniswap/v3-core/contracts/interfaces/IUniswapV3Pool.sol";
+import "@uniswap/v3-periphery/contracts/libraries/PoolAddress.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
+import "./CoinageFactorySLOT.sol";
 
 import "../common/AccessibleCommon.sol";
 import {DSMath} from "../libraries/DSMath.sol";
@@ -16,8 +18,11 @@ import "../libraries/LibUniswapV3Stake.sol";
 import "../interfaces/IStakeUniswapV3.sol";
 import "../interfaces/IAutoRefactorCoinageWithTokenId.sol";
 
+import "../interfaces/IStakeCoinageFactory.sol";
+import "../interfaces/IStakeRegistry.sol";
 
-contract UpgradePool is AccessibleCommon, DSMath {
+
+contract UpgradePool is AccessibleCommon, DSMath, CoinageFactorySLOT {
     using SafeERC20 for IERC20;
     using SafeMath for uint256;
     using SafeMath32 for uint32;
@@ -49,21 +54,11 @@ contract UpgradePool is AccessibleCommon, DSMath {
         uint256 startStakeTime;
     }
 
-    struct MiningInfo {
-        uint256 miningAmountTotal;
-        uint256 nonMiningAmountTotal;
-    }
-
     struct ClaimInfo {
         uint256 claimAmount;
         uint256 nonMiningAmount;
         uint32 claimTime;
         uint160 claimSecondInside;
-    }
-
-    struct IncentiveKey {
-        address poolAddress;
-        uint256 number;
     }
 
     struct PositionInfo {
@@ -253,6 +248,34 @@ contract UpgradePool is AccessibleCommon, DSMath {
         vaultIds[_poolAddress].push(vaultIds[_poolAddress].length);
 
         IERC20(_rewardToken).safeTransferFrom(msg.sender, address(this), _totalReward);
+    }
+
+    function setCoinageFactory(address _newCoinageFactory) external onlyOwner {
+        _setCoinageFactory(_newCoinageFactory);
+    }
+
+    function deployCoinage(address poolAddr) external onlyOwner {
+        require(
+            coinage[poolAddr] == address(0),
+            "alerady set coinage"
+        );
+        require(
+            _coinageFactory() != address(0),
+            "_coinageFactory is zero"
+        );
+        coinage[poolAddr] = IStakeCoinageFactory(_coinageFactory()).deploy(address(this));
+
+        require(
+            coinage[poolAddr] != address(0),
+            "deployed coinage is zero"
+        );
+    }
+
+    function setFactory(address nonfPosition, address uniFactory) external onlyOwner {
+        nonfungiblePositionManager = INonfungiblePositionManager(
+            nonfPosition
+        );
+        uniswapV3FactoryAddress = uniFactory;
     }
 
     /// @dev create incentiveId, input the pool, owner, startTime, _vNum

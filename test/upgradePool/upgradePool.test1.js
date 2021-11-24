@@ -217,7 +217,7 @@ describe("UpgradePool ", function () {
     stakeVaultFactory,
     stakeUniswapV3Upgrade1;
   let Stake2Logic, StakeUniswapV3, StakeUniswapV3Factory, Stake2Vault, StakeUniswapV3Upgrade1;
-  let upgradePool, upgradePoolContract, poolContract;
+  let upgradePool, upgradePoolContract, poolContract, upgradeCoinageFactory, upgradeCoinageFactoryContract;
   let upgradePoolAddress;
   let upgradePool1;
 
@@ -229,6 +229,7 @@ describe("UpgradePool ", function () {
   let nftPositionManager, weth;
   let accountlist;
   let user1, user2, user3, user4, user5, user6;
+  let admin;
   let defaultSender;
   let owner;
   let sqrtPrice;
@@ -248,6 +249,7 @@ describe("UpgradePool ", function () {
     user4 = await findSigner(accountlist[4]);
     user5 = await findSigner(accountlist[5]);
     user6 = await findSigner(accountlist[6]);
+    admin = await findSigner(accountlist[7]);
 
 
     sender = await ico20Contracts.findSigner(defaultSender);
@@ -666,13 +668,26 @@ describe("UpgradePool ", function () {
   });
 
   describe("# 6. Deploy UpgradePool", async function () {
+    it("deployCoinageFactory", async function () {
+      upgradeCoinageFactory = await ethers.getContractFactory("StakeCoinageFactory");
+      upgradeCoinageFactoryContract = await upgradeCoinageFactory.connect(owner).deploy();
+    })
     it("deployUpgradePool", async function () {
       this.timeout(1000000);
 
       upgradePool = await ethers.getContractFactory("UpgradePool");
-      upgradePoolContract = await upgradePool.connect(owner).deploy(user4.address);
+      upgradePoolContract = await upgradePool.connect(owner).deploy(admin.address);
       await upgradePoolContract.deployed();
       upgradePoolAddress = upgradePoolContract.address;
+
+      await upgradePoolContract.connect(admin).setFactory(
+        deployedUniswapV3.nftPositionManager.address,
+        deployedUniswapV3.coreFactory.address
+      );
+
+      await upgradePoolContract.connect(admin).setCoinageFactory(upgradeCoinageFactoryContract.address);
+
+      await upgradePoolContract.connect(admin).deployCoinage(pool_wton_tos_address);
     });
 
     // it("deploy UpgradePool1", async function () {
@@ -707,84 +722,56 @@ describe("UpgradePool ", function () {
 
     it("2. admin check", async () => {
       // console.log(upgradePoolContract.address);
-      let tx = await upgradePoolContract.isAdmin(user4.address)
+      let tx = await upgradePoolContract.isAdmin(admin.address)
       expect(tx).to.be.equal(true);
     })
 
     it("3. add admin check", async () => {
       // console.log(upgradePoolContract.address);
-      await upgradePoolContract.connect(user4).addAdmin(user5.address)
-      let tx = await upgradePoolContract.isAdmin(user5.address)
+      await upgradePoolContract.connect(admin).addAdmin(tester1.account.address)
+      let tx = await upgradePoolContract.isAdmin(tester1.account.address)
       expect(tx).to.be.equal(true);
+
+      await upgradePoolContract.connect(tester1.account).addAdmin(user5.address)
+      let tx2 = await upgradePoolContract.isAdmin(user5.address)
+      expect(tx2).to.be.equal(true);
       // console.log(tester1.tokens[0].toString());
       // console.log(tester2.tokens[0].toString());
     })
 
-    it("4. approve and transferFrom", async () => {
-      // console.log(deployedUniswapV3.nftPositionManager)
-      console.log("approve");
-      await deployedUniswapV3.nftPositionManager.connect(tester1.account).setApprovalForAll(user5.address, true);
+    // it("4. approve and transferFrom", async () => {
+    //   // console.log(deployedUniswapV3.nftPositionManager)
+    //   console.log("approve");
+    //   await deployedUniswapV3.nftPositionManager.connect(tester1.account).setApprovalForAll(user5.address, true);
       
-      await deployedUniswapV3.nftPositionManager.connect(tester1.account).transferFrom(tester1.account.address, user5.address, tester1.tokens[0]);
+    //   await deployedUniswapV3.nftPositionManager.connect(tester1.account).transferFrom(tester1.account.address, user5.address, tester1.tokens[0]);
 
-      let tx = await deployedUniswapV3.nftPositionManager.connect(user5).ownerOf(tester1.tokens[0]);
-      expect(tx).to.be.equal(user5.address);
-      console.log(tx);
+    //   let tx = await deployedUniswapV3.nftPositionManager.connect(user5).ownerOf(tester1.tokens[0]);
+    //   expect(tx).to.be.equal(user5.address);
+    // })
 
-      // await deployedUniswapV3.nftPositionManager
-      // .connect(tester1.account)
-      // .setApprovalForAll(upgradePool1.address, true);
+    it("4. staking the UgradePool before approve", async () => {
+      this.timeout(1000000);
+
+      await expect(
+        upgradePoolContract.connect(tester1.account).stake(tester1.tokens[0])
+      ).to.be.revertedWith("ERC721: transfer caller is not owner nor approved");
+    });
+
+    it("5. staking the UgradePool after approve", async () => {
+      this.timeout(1000000);
+      const tester = tester1;
+
+      console.log("1")
+      await deployedUniswapV3.nftPositionManager
+      .connect(tester.account)
+      .setApprovalForAll(upgradePoolContract.address, true);
+      console.log("2")
+      // console.log(poolContract);
+
+      await upgradePoolContract.connect(tester.account).stake(tester.tokens[0]);
+      console.log("3")
     })
-
-    // it("5. create Vault", async () => {
-    //   this.timeout(1000000);
-    //   await upgradePoolContract.connect(user5).createVault(
-
-    //   )
-    // })
-
-
-    // it("5. staking the UgradePool before approve", async () => {
-    //   this.timeout(1000000);
-
-    //   // poolContract = await ico20Contracts.getContract(
-    //   //   "UpgradePool",
-    //   //   upgradePoolContract.address,
-    //   //   tester1.account.address
-    //   // );
-    //   // console.log("tester1.account :", tester1.account)
-    //   // console.log("poolContarct:", poolContract)
-    //   // console.log(upgradePool1.address);
-    //   await expect(
-    //     upgradePoolContract.connect(user5).stake(tester1.tokens[0])
-    //   ).to.be.revertedWith("ERC721: transfer caller is not owner nor approved");
-    // });
-
-    // it("3. createVault", async () => {
-    //   this.timeout(1000000);
-    //   let tx = await upgradePoolContract.connect()
-    // })
-
-
-    // it("6. staking the UgradePool after approve", async () => {
-    //   this.timeout(1000000);
-    //   const tester = tester1;
-
-    //   // console.log(upgradePoolContract)
-
-    //   // poolContract = new ethers.Contract( upgradePoolContract.address, UpgradePool_ABI.abi, tester.account  );
-    //   // poolContract = await ethers.getContractAt("UpgradePool",  upgradePoolContract.address);
-    //   // console.log(poolContract.address);
-    //   console.log("1")
-    //   await deployedUniswapV3.nftPositionManager
-    //   .connect(user5)
-    //   .setApprovalForAll(upgradePool1.address, true);
-    //   console.log("2")
-    //   // console.log(poolContract);
-
-    //   await upgradePool1.connect(tester.account).stake(tester.tokens[0]);
-    //   console.log("3")
-    // })
 
   });
 
