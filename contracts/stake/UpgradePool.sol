@@ -398,7 +398,7 @@ contract UpgradePool is AccessibleCommon, DSMath, CoinageFactorySLOT {
         TokenInfo memory token = tokenInfo[_tokenId];
         VaultInfo memory vault = vaultInfo[token.poolAddress][_vNum];
 
-        if(vault.startTime > block.timestamp) {
+        if(vault.startTime < block.timestamp) {
             bytes32 incentiveId = getIncentiveId(token.poolAddress,_vNum);
             ClaimInfo memory claim = claimInfo[_tokenId][incentiveId];
 

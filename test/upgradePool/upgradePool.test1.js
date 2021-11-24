@@ -221,7 +221,9 @@ describe("UpgradePool ", function () {
   let upgradePoolAddress;
   let upgradePool1;
 
-  let tokenId1, tokenId2;
+  let user4tosAmount, tosPerSecond, totalReward;
+  let upPoolStartTime, upPoolEndTime;
+  let incentiveId;
 
   const stakeType = "2"; // stake type for uniswapV3 stake
 
@@ -266,6 +268,12 @@ describe("UpgradePool ", function () {
     tester2.tosAmount = ethers.utils.parseUnits("1000", 18);
     tester2.amount0Desired = ethers.utils.parseUnits("300", 18);
     tester2.amount1Desired = ethers.utils.parseUnits("300", 18);
+
+    user4tosAmount = ethers.utils.parseUnits("1000", 18);
+
+    tosPerSecond = ethers.utils.parseUnits("3", 18);
+
+    totalReward = ethers.utils.parseUnits("900", 18);
 
     sqrtPrice = encodePriceSqrt(1, 1);
   });
@@ -588,7 +596,6 @@ describe("UpgradePool ", function () {
             i
           );
         tester.tokens.push(tokenId);
-        tokenId1 = tokenId;
         const position = await deployedUniswapV3.nftPositionManager.positions(
           tokenId
         );
@@ -657,7 +664,6 @@ describe("UpgradePool ", function () {
             i
           );
         tester.tokens.push(tokenId);
-        tokenId2 = tokenId;
         const position = await deployedUniswapV3.nftPositionManager.positions(
           tokenId
         );
@@ -688,6 +694,12 @@ describe("UpgradePool ", function () {
       await upgradePoolContract.connect(admin).setCoinageFactory(upgradeCoinageFactoryContract.address);
 
       await upgradePoolContract.connect(admin).deployCoinage(pool_wton_tos_address);
+
+      await tos.mint(user4.address, user4tosAmount, {
+        from: defaultSender,
+      });
+      let tx = await tos.balanceOf(user4.address);
+      expect(tx).to.be.equal(user4tosAmount);
     });
 
     // it("deploy UpgradePool1", async function () {
@@ -732,8 +744,8 @@ describe("UpgradePool ", function () {
       let tx = await upgradePoolContract.isAdmin(tester1.account.address)
       expect(tx).to.be.equal(true);
 
-      await upgradePoolContract.connect(tester1.account).addAdmin(user5.address)
-      let tx2 = await upgradePoolContract.isAdmin(user5.address)
+      await upgradePoolContract.connect(tester1.account).addAdmin(user4.address)
+      let tx2 = await upgradePoolContract.isAdmin(user4.address)
       expect(tx2).to.be.equal(true);
       // console.log(tester1.tokens[0].toString());
       // console.log(tester2.tokens[0].toString());
@@ -762,16 +774,91 @@ describe("UpgradePool ", function () {
       this.timeout(1000000);
       const tester = tester1;
 
-      console.log("1")
       await deployedUniswapV3.nftPositionManager
       .connect(tester.account)
       .setApprovalForAll(upgradePoolContract.address, true);
-      console.log("2")
-      // console.log(poolContract);
 
       await upgradePoolContract.connect(tester.account).stake(tester.tokens[0]);
-      console.log("3")
+      const tokenInfo = await upgradePoolContract.tokenInfo(tester.tokens[0]);
+      // console.log(tokenInfo);
     })
+
+    it("6. create the Vault not admin", async () => {
+      let curBlock = await ethers.provider.getBlock();
+      upPoolStartTime = curBlock.timestamp + 50;
+      upPoolEndTime = upPoolStartTime + 300;
+      await expect(
+        upgradePoolContract.connect(tester2.account).createVault(
+          tos.address,
+          pool_wton_tos_address,
+          [upPoolStartTime,upPoolEndTime],
+          tosPerSecond,
+          totalReward
+        )
+      ).to.be.revertedWith("Accessible: Caller is not an admin");
+    })
+
+
+    it("7. create the Vault caller admin, not approve", async () => {
+      let curBlock = await ethers.provider.getBlock();
+      upPoolStartTime = curBlock.timestamp + 50;
+      upPoolEndTime = upPoolStartTime + 300;
+      await expect(
+        upgradePoolContract.connect(user4).createVault(
+          tos.address,
+          pool_wton_tos_address,
+          [upPoolStartTime,upPoolEndTime],
+          tosPerSecond,
+          totalReward
+        )
+      ).to.be.revertedWith("ERC20: transfer amount exceeds allowance");
+    })
+
+    it("8. create the Vault caller admin after approve", async () => {
+      await tos.connect(user4).approve(upgradePoolContract.address, totalReward);
+      let curBlock = await ethers.provider.getBlock();
+      upPoolStartTime = curBlock.timestamp + 50;
+      upPoolEndTime = upPoolStartTime + 300;
+
+      await upgradePoolContract.connect(user4).createVault(
+        tos.address,
+        pool_wton_tos_address,
+        [upPoolStartTime,upPoolEndTime],
+        tosPerSecond,
+        totalReward
+      );
+    })
+
+    it("9. check the vaultInfo", async() => {
+      let tx = await upgradePoolContract.vaultInfo(pool_wton_tos_address,0);
+      expect(tx.owner).to.be.equal(user4.address);
+      expect(tx.rewardToken).to.be.equal(tos.address);
+      expect(tx.startTime).to.be.equal(upPoolStartTime);
+      expect(tx.endTime).to.be.equal(upPoolEndTime);
+    })
+
+    it("10. claim the vault", async () => {
+      await ethers.provider.send('evm_setNextBlockTimestamp', [upPoolStartTime+10]);
+      await ethers.provider.send('evm_mine');
+
+      let tosBalace1 = await tos.balanceOf(tester1.account.address);
+      // console.log(Number(tosBalace1))
+
+      incentiveId = await upgradePoolContract.getIncentiveId(pool_wton_tos_address,0);
+
+      await upgradePoolContract.connect(tester1.account).oneClaim(tester1.tokens[0],0)
+      let tx = await upgradePoolContract.claimInfo(tester1.tokens[0],incentiveId)
+      // console.log(tx)
+
+      // console.log(Number(tx.claimAmount))
+
+      let tosBalace2 = await tos.balanceOf(tester1.account.address);
+      // console.log(Number(tosBalace2))
+      // console.log((Number(tosBalace1)+Number(tx.claimAmount)))
+      expect(Number(tosBalace2)).to.be.equal((Number(tosBalace1)+Number(tx.claimAmount)))
+    })
+
+
 
   });
 
