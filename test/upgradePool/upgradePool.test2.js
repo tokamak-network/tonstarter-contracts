@@ -751,41 +751,7 @@ describe("UpgradePool ", function () {
       // console.log(tester2.tokens[0].toString());
     })
 
-    // it("4. approve and transferFrom", async () => {
-    //   // console.log(deployedUniswapV3.nftPositionManager)
-    //   console.log("approve");
-    //   await deployedUniswapV3.nftPositionManager.connect(tester1.account).setApprovalForAll(user5.address, true);
-      
-    //   await deployedUniswapV3.nftPositionManager.connect(tester1.account).transferFrom(tester1.account.address, user5.address, tester1.tokens[0]);
-
-    //   let tx = await deployedUniswapV3.nftPositionManager.connect(user5).ownerOf(tester1.tokens[0]);
-    //   expect(tx).to.be.equal(user5.address);
-    // })
-
-    it("4. staking the UgradePool before approve", async () => {
-      this.timeout(1000000);
-
-      await expect(
-        upgradePoolContract.connect(tester1.account).stake(tester1.tokens[0])
-      ).to.be.revertedWith("ERC721: transfer caller is not owner nor approved");
-    });
-
-    it("5. staking the UgradePool after approve", async () => {
-      this.timeout(1000000);
-      const tester = tester1;
-      let curBlock = await ethers.provider.getBlock();
-      console.log("stakingTime : ", curBlock.timestamp);
-
-      await deployedUniswapV3.nftPositionManager
-      .connect(tester.account)
-      .setApprovalForAll(upgradePoolContract.address, true);
-
-      await upgradePoolContract.connect(tester.account).stake(tester.tokens[0]);
-      const tokenInfo = await upgradePoolContract.tokenInfo(tester.tokens[0]);
-      // console.log(tokenInfo);
-    })
-
-    it("6. create the Vault not admin", async () => {
+    it("3. create the Vault not admin", async () => {
       let curBlock = await ethers.provider.getBlock();
       upPoolStartTime = curBlock.timestamp + 50;
       upPoolEndTime = upPoolStartTime + 1000;
@@ -801,7 +767,7 @@ describe("UpgradePool ", function () {
     })
 
 
-    it("7. create the Vault caller admin, not approve", async () => {
+    it("4. create the Vault caller admin, not approve", async () => {
       let curBlock = await ethers.provider.getBlock();
       upPoolStartTime = curBlock.timestamp + 50;
       upPoolEndTime = upPoolStartTime + 1000;
@@ -816,7 +782,7 @@ describe("UpgradePool ", function () {
       ).to.be.revertedWith("ERC20: transfer amount exceeds allowance");
     })
 
-    it("8. create the Vault caller admin after approve", async () => {
+    it("5. create the Vault caller admin after approve", async () => {
       await tos.connect(user4).approve(upgradePoolContract.address, totalReward);
       let curBlock = await ethers.provider.getBlock();
       upPoolStartTime = curBlock.timestamp + 50;
@@ -831,7 +797,7 @@ describe("UpgradePool ", function () {
       );
     })
 
-    it("9. check the vaultInfo", async() => {
+    it("6. check the vaultInfo", async() => {
       let tx = await upgradePoolContract.vaultInfo(pool_wton_tos_address,0);
       expect(tx.owner).to.be.equal(user4.address);
       expect(tx.rewardToken).to.be.equal(tos.address);
@@ -839,64 +805,72 @@ describe("UpgradePool ", function () {
       expect(tx.endTime).to.be.equal(upPoolEndTime);
     })
 
-    it("10. getMiningTokenInfo", async () => {
+    it("7. staking the UgradePool before approve", async () => {
+      this.timeout(1000000);
+
+      await expect(
+        upgradePoolContract.connect(tester1.account).stake(tester1.tokens[0])
+      ).to.be.revertedWith("ERC721: transfer caller is not owner nor approved");
+    });
+
+    it("8. staking the UgradePool after approve", async () => {
+      this.timeout(1000000);
       await ethers.provider.send('evm_setNextBlockTimestamp', [upPoolStartTime]);
       await ethers.provider.send('evm_mine');
 
-      await upgradePoolContract.miningCoinage(pool_wton_tos_address);
+      const tester = tester1;
 
-      let tokenInfo = await upgradePoolContract.connect(tester1.account).getMiningToken(tester1.tokens[0],0)
-      console.log("tokenInfo.minableAmount :", Number(tokenInfo.minableAmount))
-      console.log("tokenInfo.miningAmount :", Number(tokenInfo.miningAmount))
-      console.log("tokenInfo.nonMiningAmount :", Number(tokenInfo.nonMiningAmount))
+      await deployedUniswapV3.nftPositionManager
+      .connect(tester.account)
+      .setApprovalForAll(upgradePoolContract.address, true);
 
-      let calculTime = await upgradePoolContract.calculTime(tester1.tokens[0],0,tokenInfo.miningAmount)
-      console.log("calculTime : ", Number(calculTime))
+      await upgradePoolContract.connect(tester.account).stake(tester.tokens[0]);
+      const tokenInfo = await upgradePoolContract.tokenInfo(tester.tokens[0]);
+      // console.log(tokenInfo);
     })
 
-    // it("10. claim the vault", async () => {
-    //   await ethers.provider.send('evm_setNextBlockTimestamp', [upPoolStartTime]);
-    //   await ethers.provider.send('evm_mine');
-    //   console.log("upPoolStartTime : ", upPoolStartTime);
 
-    //   let tosBalace1 = await tos.balanceOf(tester1.account.address);
-    //   console.log(Number(tosBalace1))
-    //   await tos.connect(tester1.account).transfer(user6.address, tosBalace1);
+    it("9. claim the vault", async () => {
+      await ethers.provider.send('evm_setNextBlockTimestamp', [upPoolStartTime+20]);
+      await ethers.provider.send('evm_mine');
+      let tosBalace1 = await tos.balanceOf(tester1.account.address);
+      console.log(Number(tosBalace1))
+      await tos.connect(tester1.account).transfer(user6.address, tosBalace1);
 
-    //   incentiveId = await upgradePoolContract.getIncentiveId(pool_wton_tos_address,0);
+      incentiveId = await upgradePoolContract.getIncentiveId(pool_wton_tos_address,0);
 
-    //   await upgradePoolContract.connect(tester1.account).oneClaim(tester1.tokens[0],0)
-    //   let tx = await upgradePoolContract.claimInfo(tester1.tokens[0],incentiveId)
-    //   // console.log(tx)
+      await upgradePoolContract.connect(tester1.account).oneClaim(tester1.tokens[0],0)
+      let tx = await upgradePoolContract.claimInfo(tester1.tokens[0],incentiveId)
+      // console.log(tx)
 
-    //   console.log(Number(tx.claimAmount))
+      console.log(Number(tx.claimAmount))
 
-    //   let tosBalace2 = await tos.balanceOf(tester1.account.address);
-    //   console.log(Number(tosBalace2))
-    //   // console.log((Number(tosBalace1)+Number(tx.claimAmount)))
-    //   expect(Number(tosBalace2)).to.be.equal(Number(tx.claimAmount))
-    // })
+      let tosBalace2 = await tos.balanceOf(tester1.account.address);
+      console.log(Number(tosBalace2))
+      // console.log((Number(tosBalace1)+Number(tx.claimAmount)))
+      expect(Number(tosBalace2)).to.be.equal(Number(tx.claimAmount))
+    })
 
-    // it("11. claim the vault endTime", async () => {
-    //   await ethers.provider.send('evm_setNextBlockTimestamp', [upPoolEndTime]);
-    //   await ethers.provider.send('evm_mine');
+    it("10. claim the vault endTime", async () => {
+      await ethers.provider.send('evm_setNextBlockTimestamp', [upPoolEndTime+1]);
+      await ethers.provider.send('evm_mine');
 
-    //   let tosBalace1 = await tos.balanceOf(tester1.account.address);
-    //   console.log(Number(tosBalace1))
+      let tosBalace1 = await tos.balanceOf(tester1.account.address);
+      console.log(Number(tosBalace1))
 
-    //   incentiveId = await upgradePoolContract.getIncentiveId(pool_wton_tos_address,0);
+      incentiveId = await upgradePoolContract.getIncentiveId(pool_wton_tos_address,0);
 
-    //   await upgradePoolContract.connect(tester1.account).oneClaim(tester1.tokens[0],0)
-    //   let tx = await upgradePoolContract.claimInfo(tester1.tokens[0],incentiveId)
-    //   // console.log(tx)
+      await upgradePoolContract.connect(tester1.account).oneClaim(tester1.tokens[0],0)
+      let tx = await upgradePoolContract.claimInfo(tester1.tokens[0],incentiveId)
+      // console.log(tx)
 
-    //   console.log(Number(tx.claimAmount))
+      console.log(Number(tx.claimAmount))
 
-    //   let tosBalace2 = await tos.balanceOf(tester1.account.address);
-    //   // console.log(Number(tosBalace2))
-    //   // console.log((Number(tosBalace1)+Number(tx.claimAmount)))
-    //   expect(Number(tosBalace2)).to.be.equal((Number(tosBalace1)+Number(tx.claimAmount)))
-    // })
+      let tosBalace2 = await tos.balanceOf(tester1.account.address);
+      console.log(Number(tosBalace2))
+      // console.log((Number(tosBalace1)+Number(tx.claimAmount)))
+      expect(Number(tosBalace2)).to.be.equal(Number(tx.claimAmount))
+    })
 
 
 
