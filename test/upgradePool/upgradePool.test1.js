@@ -839,64 +839,85 @@ describe("UpgradePool ", function () {
       expect(tx.endTime).to.be.equal(upPoolEndTime);
     })
 
-    it("10. getMiningTokenInfo", async () => {
-      await ethers.provider.send('evm_setNextBlockTimestamp', [upPoolStartTime]);
-      await ethers.provider.send('evm_mine');
-
-      await upgradePoolContract.miningCoinage(pool_wton_tos_address);
-
-      let tokenInfo = await upgradePoolContract.connect(tester1.account).getMiningToken(tester1.tokens[0],0)
-      console.log("tokenInfo.minableAmount :", Number(tokenInfo.minableAmount))
-      console.log("tokenInfo.miningAmount :", Number(tokenInfo.miningAmount))
-      console.log("tokenInfo.nonMiningAmount :", Number(tokenInfo.nonMiningAmount))
-
-      let calculTime = await upgradePoolContract.calculTime(tester1.tokens[0],0,tokenInfo.miningAmount)
-      console.log("calculTime : ", Number(calculTime))
-    })
-
-    // it("10. claim the vault", async () => {
+    // it("10. getMiningTokenInfo", async () => {
     //   await ethers.provider.send('evm_setNextBlockTimestamp', [upPoolStartTime]);
     //   await ethers.provider.send('evm_mine');
     //   console.log("upPoolStartTime : ", upPoolStartTime);
 
-    //   let tosBalace1 = await tos.balanceOf(tester1.account.address);
-    //   console.log(Number(tosBalace1))
-    //   await tos.connect(tester1.account).transfer(user6.address, tosBalace1);
+    //   await upgradePoolContract.miningCoinage(pool_wton_tos_address);
 
-    //   incentiveId = await upgradePoolContract.getIncentiveId(pool_wton_tos_address,0);
+      // let tokenInfo = await upgradePoolContract.connect(tester1.account).getMiningToken(tester1.tokens[0],0)
+      // console.log("tokenInfo.minableAmount :", Number(tokenInfo.minableAmount))
+      // console.log("tokenInfo.miningAmount :", Number(tokenInfo.miningAmount))
+      // console.log("tokenInfo.nonMiningAmount :", Number(tokenInfo.nonMiningAmount))
 
-    //   await upgradePoolContract.connect(tester1.account).oneClaim(tester1.tokens[0],0)
-    //   let tx = await upgradePoolContract.claimInfo(tester1.tokens[0],incentiveId)
-    //   // console.log(tx)
-
-    //   console.log(Number(tx.claimAmount))
-
-    //   let tosBalace2 = await tos.balanceOf(tester1.account.address);
-    //   console.log(Number(tosBalace2))
-    //   // console.log((Number(tosBalace1)+Number(tx.claimAmount)))
-    //   expect(Number(tosBalace2)).to.be.equal(Number(tx.claimAmount))
+    //   let calculTime = await upgradePoolContract.calculTime(tester1.tokens[0],0,tokenInfo.miningAmount)
+    //   console.log("calculTime : ", Number(calculTime))
     // })
 
-    // it("11. claim the vault endTime", async () => {
-    //   await ethers.provider.send('evm_setNextBlockTimestamp', [upPoolEndTime]);
-    //   await ethers.provider.send('evm_mine');
+    it("transfer tos", async () => {
+      let tosBalace1 = await tos.balanceOf(tester1.account.address);
+      console.log(Number(tosBalace1))
+      await tos.connect(tester1.account).transfer(user6.address, tosBalace1);
+      incentiveId = await upgradePoolContract.getIncentiveId(pool_wton_tos_address,0);
+    })
 
-    //   let tosBalace1 = await tos.balanceOf(tester1.account.address);
-    //   console.log(Number(tosBalace1))
+    it("10. claim the vault", async () => {
+      await ethers.provider.send('evm_setNextBlockTimestamp', [upPoolStartTime+499]);
+      await ethers.provider.send('evm_mine');
+      console.log("upPoolStartTime : ", upPoolStartTime);
 
-    //   incentiveId = await upgradePoolContract.getIncentiveId(pool_wton_tos_address,0);
 
-    //   await upgradePoolContract.connect(tester1.account).oneClaim(tester1.tokens[0],0)
-    //   let tx = await upgradePoolContract.claimInfo(tester1.tokens[0],incentiveId)
-    //   // console.log(tx)
+      // await upgradePoolContract.miningCoinage(pool_wton_tos_address); 
+      // let tokenInfo = await upgradePoolContract.connect(tester1.account).getMiningToken(tester1.tokens[0],0)
+      // console.log("tokenInfo.minableAmount :", Number(tokenInfo.minableAmount))
+      // console.log("tokenInfo.miningAmount :", Number(tokenInfo.miningAmount))
+      // console.log("tokenInfo.secondsInsideDiff256 :", Number(tokenInfo.secondsInsideDiff256))
+      // console.log("tokenInfo.secondsAbsolute256 :", Number(tokenInfo.secondsAbsolute256))
 
-    //   console.log(Number(tx.claimAmount))
+      // let calcumTime = await upgradePoolContract.connect(tester1.account).calculTime(tester1.tokens[0],0, tokenInfo.miningAmount);
+      // console.log("calcumTime :", Number(calcumTime))
 
-    //   let tosBalace2 = await tos.balanceOf(tester1.account.address);
-    //   // console.log(Number(tosBalace2))
-    //   // console.log((Number(tosBalace1)+Number(tx.claimAmount)))
-    //   expect(Number(tosBalace2)).to.be.equal((Number(tosBalace1)+Number(tx.claimAmount)))
-    // })
+      await upgradePoolContract.connect(tester1.account).oneClaim(tester1.tokens[0],0)
+      let tx = await upgradePoolContract.claimInfo(tester1.tokens[0],incentiveId)
+      console.log("claimTime :", Number(tx.claimTime))
+
+      console.log(Number(tx.claimAmount))
+
+      let tosBalace2 = await tos.balanceOf(tester1.account.address);
+      console.log(Number(tosBalace2))
+      expect(Number(tosBalace2)).to.be.equal(Number(tx.claimAmount))
+    })
+
+    it("11. claim the vault endTime", async () => {
+      await ethers.provider.send('evm_setNextBlockTimestamp', [upPoolEndTime-1]);
+      await ethers.provider.send('evm_mine');
+      console.log("upPoolEndTime : ", upPoolEndTime);
+
+      let tosBalace1 = await tos.balanceOf(tester1.account.address);
+      console.log(Number(tosBalace1))
+
+      await upgradePoolContract.miningCoinage(pool_wton_tos_address); 
+      let tokenInfo = await upgradePoolContract.connect(tester1.account).getMiningToken(tester1.tokens[0],0)
+      // console.log(tokenInfo)
+      console.log("tokenInfo.minableAmount :", Number(tokenInfo.minableAmount))
+      console.log("tokenInfo.miningAmount :", Number(tokenInfo.miningAmount))
+      console.log("tokenInfo.secondsInsideDiff256 :", Number(tokenInfo.secondsInsideDiff256))
+      console.log("tokenInfo.secondsAbsolute256 :", Number(tokenInfo.secondsAbsolute256))
+
+      let calcumTime = await upgradePoolContract.connect(tester1.account).calculTime(tester1.tokens[0],0, tokenInfo.miningAmount);
+      console.log("calcumTime :", Number(calcumTime))
+
+      await upgradePoolContract.connect(tester1.account).oneClaim(tester1.tokens[0],0)
+      let tx = await upgradePoolContract.claimInfo(tester1.tokens[0],incentiveId)
+      console.log("claimTime :", Number(tx.claimTime))
+
+      console.log(Number(tx.claimAmount))
+
+      let tosBalace2 = await tos.balanceOf(tester1.account.address);
+      console.log(Number(tosBalace2))
+      expect(Number(tosBalace2)).to.be.equal(Number(tx.claimAmount))
+    })
 
 
 
