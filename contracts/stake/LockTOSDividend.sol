@@ -213,7 +213,7 @@ contract LockTOSDividend is
         );
 
         distr.claimStartWeeklyEpoch[_lockId] = _weeklyEpoch.add(1);
-        distr.totalDistribution = distr.totalDistribution.sub(amountToClaim);
+        distr.lastBalance = distr.lastBalance.sub(amountToClaim);
         return amountToClaim;
     }
 
