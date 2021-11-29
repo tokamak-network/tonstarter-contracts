@@ -29,6 +29,7 @@ contract UpgradePool is AccessibleCommon, DSMath, CoinageFactorySLOT {
 
     struct TokenInfo {
         address owner;
+        uint256 idIndex;
         address poolAddress;
         uint128 liquidity;
         int24 tickLower;
@@ -37,6 +38,7 @@ contract UpgradePool is AccessibleCommon, DSMath, CoinageFactorySLOT {
         uint160 secondsInsideInitial;
         uint160 secondsInsideLast;
         bool claimLock;
+        bool withdraw;
     }
 
     struct VaultInfo {
@@ -55,7 +57,6 @@ contract UpgradePool is AccessibleCommon, DSMath, CoinageFactorySLOT {
 
     struct ClaimInfo {
         uint256 claimAmount;
-        uint256 nonMiningAmount;
         uint32 claimTime;
         uint160 claimSecondInside;
     }
@@ -133,6 +134,16 @@ contract UpgradePool is AccessibleCommon, DSMath, CoinageFactorySLOT {
         uint256 minableAmount
     );
 
+    /// @dev event on withdrawal
+    /// @param to the sender
+    /// @param tokenId the uniswapV3 Lp token
+    /// @param miningAmount the amount of mining
+    event WithdrawalToken(
+        address indexed to,
+        uint256 tokenId,
+        uint256 miningAmount
+    );
+
     INonfungiblePositionManager public nonfungiblePositionManager;
 
     uint256 public miningPerSecond = 1 ether;
@@ -165,7 +176,7 @@ contract UpgradePool is AccessibleCommon, DSMath, CoinageFactorySLOT {
     mapping(address => uint256[]) public userStakedTokenIds;
 
     mapping(address => uint256[]) public vaultIds;
-
+        
     /// @dev Total staked information of users
     mapping(address => LibUniswapV3Stake.StakedTotalTokenAmount)
         public userTotalStaked;
@@ -221,6 +232,29 @@ contract UpgradePool is AccessibleCommon, DSMath, CoinageFactorySLOT {
         uint256 oldFactor
     ) internal pure returns (uint256) {
         return rdiv(rmul(target, oldFactor), source);
+    }
+
+    /// @dev delete user's token storage of index place
+    /// @param _owner tokenId's owner
+    /// @param tokenId tokenId
+    /// @param _index owner's tokenId's index
+    function deleteUserToken(
+        address _owner,
+        uint256 tokenId,
+        uint256 _index
+    ) internal {
+        uint256 _tokenid = userStakedTokenIds[_owner][_index];
+        require(_tokenid == tokenId, "mismatch token");
+        uint256 lastIndex = (userStakedTokenIds[_owner].length).sub(1);
+        if (tokenId > 0 && _tokenid == tokenId) {
+            if (_index < lastIndex) {
+                uint256 tokenId_lastIndex =
+                    userStakedTokenIds[_owner][lastIndex];
+                userStakedTokenIds[_owner][_index] = tokenId_lastIndex;
+                tokenInfo[tokenId_lastIndex].idIndex = _index;
+            }
+            userStakedTokenIds[_owner].pop();
+        }
     }
 
     //address[0] = rewardToken, address[1] = poolAddress
@@ -547,6 +581,7 @@ contract UpgradePool is AccessibleCommon, DSMath, CoinageFactorySLOT {
         if (pool.startStakeTime == 0) pool.startStakeTime = block.timestamp;
 
         token.owner = msg.sender;
+        token.idIndex = userStakedTokenIds[msg.sender].length;
         token.liquidity = liquidity;
         token.tickLower = tickLower;
         token.tickUpper = tickUpper;
@@ -706,7 +741,61 @@ contract UpgradePool is AccessibleCommon, DSMath, CoinageFactorySLOT {
 
     }
 
+    function unstaking(uint256 tokenId) external {
+        TokenInfo storage token = tokenInfo[tokenId];
+        require(token.owner == msg.sender, "not staker");
 
+        require(
+            token.withdraw == false,
+            "StakeUniswapV3: withdrawing"
+        );
+        token.withdraw = true;
+
+        miningCoinage(token.poolAddress);
+
+        if (totalStakedAmount >= token.liquidity)
+            totalStakedAmount = totalStakedAmount.sub(token.liquidity);
+
+        if (totalTokens > 0) totalTokens = totalTokens.sub(1);
+
+        IAutoRefactorCoinageWithTokenId(coinage[token.poolAddress]).burnTokenId(
+            msg.sender,
+            tokenId
+        );
+
+        // storage  StakedTotalTokenAmount
+        LibUniswapV3Stake.StakedTotalTokenAmount storage _userTotalStaked =
+            userTotalStaked[msg.sender];
+        _userTotalStaked.totalDepositAmount = _userTotalStaked
+            .totalDepositAmount
+            .sub(token.liquidity);
+
+        deleteUserToken(token.owner, tokenId, token.idIndex);
+
+        delete tokenInfo[tokenId];
+        delete stakedCoinageTokens[tokenId];
+
+        if (_userTotalStaked.totalDepositAmount == 0) {
+            totalStakers = totalStakers.sub(1);
+            delete userTotalStaked[msg.sender];
+        }
+ 
+        nonfungiblePositionManager.safeTransferFrom(
+            address(this),
+            msg.sender,
+            tokenId
+        );
+
+        emit WithdrawalToken(
+            msg.sender,
+            tokenId,
+            0
+        );
+    }
+
+    function unstakingAllClaim(uint256 tokenId) external {
+
+    }
 
 
 }
