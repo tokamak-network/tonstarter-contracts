@@ -129,7 +129,8 @@ contract UpgradePool is AccessibleCommon, DSMath, CoinageFactorySLOT {
         address poolAddress,
         uint256 programNum,
         uint256 tokenId,
-        uint256 miningAmount
+        uint256 miningAmount,
+        uint256 minableAmount
     );
 
     INonfungiblePositionManager public nonfungiblePositionManager;
@@ -231,6 +232,8 @@ contract UpgradePool is AccessibleCommon, DSMath, CoinageFactorySLOT {
         uint256 _totalReward
     ) external onlyOwner {
         require(block.timestamp < _times[0] && _times[0] < _times[1], "time setting incorrect");
+        // uint32 time = _times[1].sub(_times[0]);
+        // uint256 _tokenPerSecond = _totalReward.div(time);
         vaultInfo[_poolAddress][vaultIds[_poolAddress].length] = VaultInfo({
             owner: msg.sender,
             rewardToken: _rewardToken,
@@ -244,6 +247,13 @@ contract UpgradePool is AccessibleCommon, DSMath, CoinageFactorySLOT {
         vaultIds[_poolAddress].push(vaultIds[_poolAddress].length);
 
         IERC20(_rewardToken).safeTransferFrom(msg.sender, address(this), _totalReward);
+    }
+
+    function setFactory(address nonfPosition, address uniFactory) external onlyOwner {
+        nonfungiblePositionManager = INonfungiblePositionManager(
+            nonfPosition
+        );
+        uniswapV3FactoryAddress = uniFactory;
     }
 
     function setCoinageFactory(address _newCoinageFactory) external onlyOwner {
@@ -267,14 +277,7 @@ contract UpgradePool is AccessibleCommon, DSMath, CoinageFactorySLOT {
         );
     }
 
-    function setFactory(address nonfPosition, address uniFactory) external onlyOwner {
-        nonfungiblePositionManager = INonfungiblePositionManager(
-            nonfPosition
-        );
-        uniswapV3FactoryAddress = uniFactory;
-    }
-
-    /// @dev create incentiveId, input the pool, owner, startTime, _vNum
+    /// @dev create incentiveId, input the poolAddr, _vNum
     function getIncentiveId(address pool, uint256 _vNum) public view returns (bytes32) {
         VaultInfo memory vault = vaultInfo[pool][_vNum];
         bytes32 incentiveId = keccak256(abi.encodePacked(pool,vault.startTime,vault.endTime,_vNum));
@@ -645,7 +648,8 @@ contract UpgradePool is AccessibleCommon, DSMath, CoinageFactorySLOT {
             token.poolAddress,
             _vNum,
             tokenId,
-            miningAmount
+            miningAmount,
+            minableAmount
         );
     }
 

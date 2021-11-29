@@ -890,7 +890,7 @@ describe("UpgradePool ", function () {
     })
 
     it("11. claim the vault endTime", async () => {
-      await ethers.provider.send('evm_setNextBlockTimestamp', [upPoolEndTime-1]);
+      await ethers.provider.send('evm_setNextBlockTimestamp', [upPoolEndTime+100000]);
       await ethers.provider.send('evm_mine');
       console.log("upPoolEndTime : ", upPoolEndTime);
 
