@@ -40,16 +40,20 @@ module.exports = {
       chainId: 31337,
     },
     rinkeby: {
-      url: `https://rinkeby.infura.io/v3/${process.env.InfuraKey}`,
-      accounts: [`${process.env.ACCOUNT0_PK}`, `${process.env.ACCOUNT1_PK}`, `${process.env.ACCOUNT2_PK}`],
-      gasMultiplier: 1.25 //,
-      //gasPrice: 20000000000,
+      url: `https://rinkeby.infura.io/v3/${process.env.INFURA_API_KEY}`,
+      accounts: [ `${process.env.RINKEBY_PRIVATE_KEY}` ]
     },
+    // rinkeby: {
+    //   url: `https://rinkeby.infura.io/v3/${process.env.InfuraKey}`,
+    //   accounts: [`${process.env.ACCOUNT0_PK}`, `${process.env.ACCOUNT1_PK}`, `${process.env.ACCOUNT2_PK}`],
+    //   gasMultiplier: 1.25 //,
+    //   //gasPrice: 20000000000,
+    // },
     mainnet: {
-      url: `https://mainnet.infura.io/v3/${process.env.InfuraKey}`,
-      accounts: [`${process.env.TONStarter_Deployer}` ],
+      url: `https://mainnet.infura.io/v3/${process.env.INFURA_API_KEY}`,
+      accounts: [ `${process.env.RINKEBY_PRIVATE_KEY}` ],
       gasMultiplier: 1.25,
-      gasPrice: 130000000000,
+      gasPrice: 95000000000,
     },
   },
   etherscan: {
