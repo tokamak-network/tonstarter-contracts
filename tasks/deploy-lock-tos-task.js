@@ -1,8 +1,49 @@
 const { findAccount } = require("./utils");
 const { time } = require("@openzeppelin/test-helpers");
+const { expect } = require("chai");
+
+task("mainnet-deploy-dividend-pool-implementation", "").setAction((async() =>{
+  const { MAINNET_DEPLOY_ACCOUNT: account } =
+    process.env;
+  const deployer = await findAccount(account);
+  const dividendPool = await (await ethers.getContractFactory("LockTOSDividend"))
+    .connect(deployer)
+    .deploy();
+  await dividendPool.deployed();
+  const dividendPoolAddress = dividendPool.address;
+  console.log("Dividend Pool Implementation: ", dividendPoolAddress);
+
+  await run("verify", {
+    address: dividendPoolAddress,
+    constructorArgsParams: [],
+  });
+}));
+
+task("mainnet-deploy-dividend-pool-proxy", "").setAction((async() =>{
+  console.log("One week: ", parseInt(time.duration.weeks(1)));
+
+  const { MAINNET_DEPLOY_ACCOUNT: account } =
+    process.env;
+  const deployer = await findAccount(account);
+  const dividendPoolAddress = "0xd8a63C63400cce9515D0C03ADbbAf8c8f94E3D71";
+  expect(dividendPoolAddress.length).greaterThan(0);
+
+  const dividendPoolProxy = await (await ethers.getContractFactory("LockTOSDividendProxy"))
+    .connect(deployer)
+    .deploy(dividendPoolAddress, deployer.address);
+  await dividendPoolProxy.deployed();
+  const dividendPoolProxyAddrress = dividendPoolProxy.address;
+  console.log("Dividend Pool Proxy: ", dividendPoolProxyAddrress);
+
+  await run("verify", {
+    address: dividendPoolProxyAddrress,
+    constructorArgsParams: [dividendPoolAddress, deployer.address],
+  });
+}));
+
 
 task("mainnet-deploy-lock-tos", "Deploy TOS").setAction(async () => {
-  const { MAINNET_DEPLOY_ACCOUNT: account, RINKEBY_TOS_ADDRESS: tosAddress } =
+  const { MAINNET_DEPLOY_ACCOUNT: account, MAINNET_TOS_ADDRESS: tosAddress } =
     process.env;
   const deployer = await findAccount(account);
 
@@ -69,8 +110,8 @@ task("rinkeby-deploy-lock-tos", "Deploy TOS").setAction(async () => {
     )
   ).wait();
 
-  // const adminAddress = "0x8c595DA827F4182bC0E3917BccA8e654DF8223E1";
-  // await (await lockTOSProxy.addAdmin(adminAddress)).wait();
+  const adminAddress = "0x8c595DA827F4182bC0E3917BccA8e654DF8223E1";
+  await (await lockTOSProxy.addAdmin(adminAddress)).wait();
 
   await run("verify", {
     address: lockTOSAddress,
@@ -131,18 +172,25 @@ task("rinkeby-upgrade-dividend-pool", "Deploy TOS").setAction(async () => {
     .connect(deployer)
     .deploy();
   await dividendPool.deployed();
+
   console.log("Dividend Pool: ", dividendPool.address);
   const dividendPoolAddress = dividendPool.address;
+  await run("verify", {
+    address: dividendPoolAddress,
+    constructorArgsParams: [],
+  });
 
-  const dividendPoolProxy = await ethers.getContractAt("LockTOSDividendProxy", "0x13ba98c0bff890caa980c7171a6c7162453cbb5b");  
-  await (await dividendPoolProxy.upgradeTo(dividendPoolAddress)).wait();
+  // const dividendPoolAddress = "0x9bed1dd65610691f4b352a08c6c87fa496f6f6c3";
 
+  const dividendPoolProxy = await ethers.getContractAt("LockTOSDividendProxy", "0x81b4667221acde3bd4ef94356dc9883c085d3023");  
+  console.log({ account}, deployer.address)
+  await (await dividendPoolProxy.connect(deployer).upgradeTo(dividendPoolAddress)).wait();
 });
 
 task("rinkeby-deploy-dividend-pool", "Deploy TOS").setAction(async () => {
   const { RINKEBY_DEPLOY_ACCOUNT: account } =
   process.env;
-  const lockTOSAddress = "0xc1AD56f88eF42e394a5f0739a8fF4984fE01689d";
+  const lockTOSAddress = "0x8f66FADcFff73DE561918052c070C445d68c0aF4";
   const deployer = await findAccount(account);
 
   const dividendPool = await (await ethers.getContractFactory("LockTOSDividend"))
@@ -167,7 +215,7 @@ task("rinkeby-deploy-dividend-pool", "Deploy TOS").setAction(async () => {
   ).wait();
 
   const adminAddress = "0x8c595DA827F4182bC0E3917BccA8e654DF8223E1";
-  await (await dividendPoolProxy.transferAdmin(adminAddress)).wait();
+  await (await dividendPoolProxy.addAdmin(adminAddress)).wait();
 
   await run("verify", {
     address: dividendPoolAddress,

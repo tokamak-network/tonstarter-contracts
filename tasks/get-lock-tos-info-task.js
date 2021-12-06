@@ -34,17 +34,34 @@ task("get-lock-tos-balances", "Deploy TOS").setAction(async () => {
     }
 });
 
+task("get-lock-tos-past-snapshot", "Snapshot").setAction(async () => {
+    const lockTOSAddress = "0x69b4a202fa4039b42ab23adb725aa7b1e9eebd79";
+    const lockTOS = await ethers.getContractAt("LockTOS", lockTOSAddress);
+    const activeHolders = await lockTOS.allHolders();
+    const holdersWithBalance = [];
+    const date = '2021-09-18';
+    const timestamp = Math.floor((new Date(date)).getTime() / 1000);
+    console.log({ timestamp });
+    const totalSupply = parseFloat(ethers.utils.formatEther(await lockTOS.totalSupplyAt(timestamp))).toFixed(2);
+    console.log({ totalSupply });
+    for (const holder of activeHolders) {
+        const balance = parseFloat(ethers.utils.formatEther(await lockTOS.balanceOfAt(holder, timestamp)));
+        holdersWithBalance.push({
+            holder: holder,
+            balance
+        });
+    }
+    holdersWithBalance.sort((a, b) => b.balance - a.balance);
+    for (const { holder, balance } of holdersWithBalance) {
+        console.log(`${date}\t${holder}\t${balance.toFixed(4)}\t`);
+    }
+});
+
 task("get-lock-tos-snapshot", "Snapshot").setAction(async () => {
     const lockTOSAddress = "0x69b4a202fa4039b42ab23adb725aa7b1e9eebd79";
     const lockTOS = await ethers.getContractAt("LockTOS", lockTOSAddress);
-    const DOCTokenAddress = "0x0e498afce58dE8651B983F136256fA3b8d9703bc";
-    const DOCToken = await ethers.getContractAt("LockTOS", DOCTokenAddress);
-
     const totalSupply = parseFloat(ethers.utils.formatEther(await lockTOS.totalSupply())).toFixed(2);
-    console.log({ totalSupply });
-
     const activeHolders = await lockTOS.activeHolders();
-
     const holdersWithBalance = [];
     for (const holder of activeHolders) {
         const balanceNow = parseFloat(ethers.utils.formatEther(await lockTOS.balanceOf(holder)));
@@ -61,6 +78,31 @@ task("get-lock-tos-snapshot", "Snapshot").setAction(async () => {
         const percentage = parseFloat((rat) * 100).toFixed(4);
         const doc = rat * 62500;
         console.log(`${date}\t${holder}\t${balance.toFixed(4)}\t${percentage}%\t${doc.toFixed(4)}`);
+    }
+});
+
+task("get-lock-tos-snapshot-history", "Snapshot").setAction(async () => {
+    const lockTOSAddress = "0x69b4a202fa4039b42ab23adb725aa7b1e9eebd79";
+    const lockTOS = await ethers.getContractAt("LockTOS", lockTOSAddress);
+    const totalSupply = parseFloat(ethers.utils.formatEther(await lockTOS.totalSupply())).toFixed(2);
+    const activeHolders = await lockTOS.activeHolders();
+    const holdersWithBalance = [];
+    const historyTime = "1638691200";
+    for (const holder of activeHolders) {
+        const balanceNow = parseFloat(ethers.utils.formatEther(await lockTOS.balanceOfAt(holder, historyTime)));
+        holdersWithBalance.push({
+            holder: holder,
+            balance: balanceNow
+        });
+    }
+
+    holdersWithBalance.sort((a, b) => b.balance - a.balance);
+    const date = '2021.12.05';
+    for (const { holder, balance } of holdersWithBalance) {
+        const rat = parseFloat(balance / totalSupply);
+        const percentage = parseFloat((rat) * 100).toFixed(4);
+        // const doc = rat * 62500;
+        console.log(`${date}\t${holder}\t${balance.toFixed(4)}\t${percentage}%\t`);
     }
 });
 
