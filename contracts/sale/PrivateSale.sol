@@ -236,6 +236,10 @@ contract PrivateSale is Ownable, ReentrancyGuard {
         }
     }
 
+    function _toRAY(uint256 v) internal pure returns (uint256) {
+        return v * 10 ** 9;
+    }
+
     function _toWAD(uint256 v) internal pure returns (uint256) {
         return v / 10 ** 9;
     }
@@ -266,11 +270,19 @@ contract PrivateSale is Ownable, ReentrancyGuard {
     function wtonBuy(
         uint256 _amount
     ) external {
-        IWTON(wton).transferFrom(msg.sender,address(this),_amount);
-        IWTON(wton).swapToTON(_amount);
-        uint256 tonAmount = _toWAD(_amount);
-        getToken.transfer(msg.sender,tonAmount);
-        buy(tonAmount);
+        uint256 userTon = getToken.balanceOf(msg.sender);
+        uint256 needUserWton;
+        if (userTon < _amount) {
+            uint256 needWton = _amount.sub(userTon);
+            needUserWton = _toRAY(needWton);
+            require(IWTON(wton).balanceOf(msg.sender) >= needUserWton, "need more wton");
+            IWTON(wton).transferFrom(msg.sender,address(this),needUserWton);
+            IWTON(wton).swapToTON(needUserWton);
+            getToken.transfer(msg.sender,needWton);
+            buy(_amount);
+        } else {
+            buy(_amount);
+        }
     }
     
     function wtonAndTonBuy(
@@ -312,7 +324,7 @@ contract PrivateSale is Ownable, ReentrancyGuard {
         );
 
         uint256 tokenAllowance = getToken.allowance(msg.sender, address(this));
-        require(tokenAllowance >= _amount, "ERC20: transfer amount exceeds allowance");
+        require(tokenAllowance >= _amount, "privateSale: transfer amount exceeds allowance");
 
         getToken.safeTransferFrom(msg.sender, address(this), _amount);
         getToken.safeTransfer(getTokenOwner, _amount);
