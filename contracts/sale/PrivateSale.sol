@@ -98,13 +98,8 @@ contract PrivateSale is Ownable, ReentrancyGuard {
 
 
     /// @dev basic setting
-    /// @param _saleTokenAddress saleTokenAddress (contract have token)
-    /// @param _getTokenAddress getTokenAddress (TON)
-    /// @param _getTokenOwner get TON transfer to wallet
-    constructor(address _saleTokenAddress, address _getTokenAddress, address _getTokenOwner, address _wton) {
-        saleToken = IERC20(_saleTokenAddress);
-        getToken = IERC20(_getTokenAddress);
-        getTokenOwner = _getTokenOwner;
+    /// @param _wton wtonAddress
+    constructor(address _wton) {
         wton = _wton;
     }
 
@@ -130,12 +125,25 @@ contract PrivateSale is Ownable, ReentrancyGuard {
         return tokenGetAmount;
     }
 
-    function changeTokenAddress(address _saleToken, address _getToken) external onlyOwner {
+    /// @dev address setting
+    /// @param _saleToken saleTokenAddress (contract have token)
+    /// @param _getToken getTokenAddress (TON)
+    /// @param _ownerToken get TON transfer to wallet
+    function addressSetting(
+        address _saleToken,
+        address _getToken,
+        address _ownerToken
+    ) external onlyOwner {
+        changeTokenAddress(_saleToken,_getToken);
+        changeGetAddress(_ownerToken);
+    }
+
+    function changeTokenAddress(address _saleToken, address _getToken) public onlyOwner {
         saleToken = IERC20(_saleToken);
         getToken = IERC20(_getToken);
     }
 
-    function changeGetAddress(address _address) external onlyOwner {
+    function changeGetAddress(address _address) public onlyOwner {
         getTokenOwner = _address;
     }
 
@@ -155,7 +163,7 @@ contract PrivateSale is Ownable, ReentrancyGuard {
         uint256 _claimTime
     ) public onlyOwner {
         settingSaleTime(_startTime,_endTime);
-        settingFisrtClaimTime(_firstTime);
+        settingFirstClaimTime(_firstTime);
         settingClaimTime(_claimTime);
     }
 
@@ -164,7 +172,7 @@ contract PrivateSale is Ownable, ReentrancyGuard {
         saleEndTime = _endTime;
     }
 
-    function settingFisrtClaimTime(uint256 _claimTime) public onlyOwner {
+    function settingFirstClaimTime(uint256 _claimTime) public onlyOwner {
         firstClaimTime = _claimTime;
     }
 
@@ -201,7 +209,7 @@ contract PrivateSale is Ownable, ReentrancyGuard {
         } else {
             uint period = (difftime.div(monthTime)).add(1);
             if (period >= 12) {
-                uint256 reward = user.totaloutputamount.sub(userclaim.claimAmount);
+                uint256 reward = user.totaloutputamount.sub(userclaim.claimAmount).sub(userclaim.firstClaimAmount);
                 return reward; 
             } else {
                 uint256 reward = (user.monthlyReward.mul(period)).sub(userclaim.claimAmount);
@@ -215,7 +223,7 @@ contract PrivateSale is Ownable, ReentrancyGuard {
         uint256 _preclaimamount,
         uint256 _monthlyReward,
         uint256 _usertotaloutput,
-        uint256 _fisrtReward
+        uint256 _firstReward
     ) internal view returns (uint256) {
         uint difftime = _nowtime.sub(claimStartTime);
         uint monthTime = 30 days;
@@ -227,7 +235,7 @@ contract PrivateSale is Ownable, ReentrancyGuard {
         } else {
             uint period = (difftime.div(monthTime)).add(1);
             if (period >= 12) {
-                uint256 reward = _usertotaloutput.sub(_preclaimamount).sub(_fisrtReward);
+                uint256 reward = _usertotaloutput.sub(_preclaimamount).sub(_firstReward);
                 return reward; 
             } else {
                 uint256 reward = (_monthlyReward.mul(period)).sub(_preclaimamount);
@@ -239,12 +247,8 @@ contract PrivateSale is Ownable, ReentrancyGuard {
     function _toRAY(uint256 v) internal pure returns (uint256) {
         return v * 10 ** 9;
     }
-
-    function _toWAD(uint256 v) internal pure returns (uint256) {
-        return v / 10 ** 9;
-    }
     
-    function addwhitelist(address _account,uint256 _amount) external onlyOwner {
+    function addWhiteList(address _account,uint256 _amount) external onlyOwner {
         WhiteList storage userwhite = usersWhite[_account];
         userwhite.amount = userwhite.amount.add(_amount);
 
@@ -260,46 +264,16 @@ contract PrivateSale is Ownable, ReentrancyGuard {
         }
     }
 
-    function delwhitelist(address _account, uint256 _amount) external onlyOwner {
+    function delWhiteList(address _account, uint256 _amount) external onlyOwner {
         WhiteList storage userwhite = usersWhite[_account];
         userwhite.amount = userwhite.amount.sub(_amount);
 
         emit delList(_account, _amount);
     }
 
-    function wtonBuy(
-        uint256 _amount
-    ) external {
-        uint256 userTon = getToken.balanceOf(msg.sender);
-        uint256 needUserWton;
-        if (userTon < _amount) {
-            uint256 needWton = _amount.sub(userTon);
-            needUserWton = _toRAY(needWton);
-            require(IWTON(wton).balanceOf(msg.sender) >= needUserWton, "need more wton");
-            IWTON(wton).transferFrom(msg.sender,address(this),needUserWton);
-            IWTON(wton).swapToTON(needUserWton);
-            getToken.transfer(msg.sender,needWton);
-            buy(_amount);
-        } else {
-            buy(_amount);
-        }
-    }
-    
-    function wtonAndTonBuy(
-        uint256 _tonAmount,
-        uint256 _wtonAmount
-    ) external {
-        IWTON(wton).transferFrom(msg.sender,address(this),_wtonAmount);
-        IWTON(wton).swapToTON(_wtonAmount);
-        uint256 tonAmount = _toWAD(_wtonAmount);
-        getToken.transfer(msg.sender,tonAmount);
-        uint256 amount = _tonAmount.add(tonAmount);
-        buy(amount);
-    }
-
     function buy(
         uint256 _amount
-    ) public {
+    ) external {
         require(saleStartTime != 0 && saleEndTime != 0, "need to setting saleTime");
         require(block.timestamp >= saleStartTime && block.timestamp <= saleEndTime, "privaSale period end");
         WhiteList storage userwhite = usersWhite[msg.sender];
@@ -316,18 +290,36 @@ contract PrivateSale is Ownable, ReentrancyGuard {
         UserInfoAmount storage user = usersAmount[msg.sender];
 
         uint256 tokenSaleAmount = calculSaleToken(_amount);
+        uint256 Saledtoken = totalSaleAmount.add(tokenSaleAmount);
         uint256 tokenBalance = saleToken.balanceOf(address(this));
 
         require(
-            tokenBalance >= tokenSaleAmount,
+            tokenBalance >= Saledtoken,
             "don't have token amount"
         );
 
-        uint256 tokenAllowance = getToken.allowance(msg.sender, address(this));
-        require(tokenAllowance >= _amount, "privateSale: transfer amount exceeds allowance");
+        uint256 tonAllowance = getToken.allowance(msg.sender, address(this));
+        uint256 tonBalance = getToken.balanceOf(msg.sender);
 
-        getToken.safeTransferFrom(msg.sender, address(this), _amount);
-        getToken.safeTransfer(getTokenOwner, _amount);
+        if(tonBalance < _amount) {
+            uint256 needUserWton;
+            uint256 needWton = _amount.sub(tonBalance);
+            needUserWton = _toRAY(needWton);
+            require(IWTON(wton).allowance(msg.sender, address(this)) >= needUserWton, "privateSale: wton amount exceeds allowance");
+            require(IWTON(wton).balanceOf(msg.sender) >= needUserWton, "need more wton");
+            IERC20(wton).safeTransferFrom(msg.sender,address(this),needUserWton);
+            IWTON(wton).swapToTON(needUserWton);
+            require(tonAllowance >= _amount.sub(needWton), "privateSale: ton amount exceeds allowance");
+            if(_amount.sub(needWton) > 0) {
+                getToken.safeTransferFrom(msg.sender, address(this), _amount.sub(needWton));   
+            }
+            getToken.safeTransfer(getTokenOwner, _amount);
+        } else {
+            require(tonAllowance >= _amount, "privateSale: ton amount exceeds allowance");
+
+            getToken.safeTransferFrom(msg.sender, address(this), _amount);
+            getToken.safeTransfer(getTokenOwner, _amount);
+        }
 
         user.inputamount = user.inputamount.add(_amount);
         user.totaloutputamount = user.totaloutputamount.add(tokenSaleAmount);

@@ -172,7 +172,7 @@ describe("PrivateSale", function () {
         tester3.account = await ico20Contracts.findSigner(user3);
         owner = sender;
     
-        tester1.wtonAmount = ethers.utils.parseUnits("1000", 27);
+        tester1.wtonAmount = ethers.utils.parseUnits("0", 27);
         tester1.tonAmount = ethers.utils.parseUnits("1000", 18);
         tester1.buyAmount = ethers.utils.parseUnits("1000", 18);
     
@@ -239,7 +239,7 @@ describe("PrivateSale", function () {
 
         it("2. privateSale init", async function () {
             privateSale = await ethers.getContractFactory("PrivateSale");
-            privateSaleContract = await privateSale.connect(admin).deploy(dom.address, ton.address, getTONaddress.address, wton.address)
+            privateSaleContract = await privateSale.connect(admin).deploy(wton.address)
         });
 
         it("3. transfer domAmount", async function() {
@@ -251,6 +251,18 @@ describe("PrivateSale", function () {
     })
 
     describe("# 3. setting test", async function () {
+        it('AddressSetting caller is owner', async () => {
+            await privateSaleContract.connect(admin).addressSetting(
+                dom.address,
+                ton.address, 
+                getTONaddress.address
+            )
+
+            expect(await privateSaleContract.saleToken()).to.be.equal(dom.address)
+            expect(await privateSaleContract.getToken()).to.be.equal(ton.address)
+            expect(await privateSaleContract.getTokenOwner()).to.be.equal(getTONaddress.address)
+        })
+        
         it('settingAll caller is not owner', async () => {
             let block = await ethers.provider.getBlock();
             saleStartTime = block.timestamp + 10;
@@ -309,7 +321,7 @@ describe("PrivateSale", function () {
         })
 
         it("addwhitelist", async () => {
-            await privateSaleContract.connect(admin).addwhitelist(
+            await privateSaleContract.connect(admin).addWhiteList(
                 tester1.account.address,
                 tester1.buyAmount
             )
@@ -342,12 +354,12 @@ describe("PrivateSale", function () {
 
         it("buy caller is whitelist and exact amount before approve", async () => {
             await expect(privateSaleContract.connect(tester1.account).buy(tester1.buyAmount)
-            ).to.be.revertedWith("privateSale: transfer amount exceeds allowance");    
+            ).to.be.revertedWith("privateSale: ton amount exceeds allowance");    
         })
 
         it("buy caller is whitelist and exact amount for account1 (only TON)", async () => {
             await ton.connect(tester1.account).approve(privateSaleContract.address,tester1.buyAmount)
-            await privateSaleContract.connect(tester1.account).wtonBuy(tester1.buyAmount);
+            await privateSaleContract.connect(tester1.account).buy(tester1.buyAmount);
             // await privateSaleContract.connect(tester1.account).buy(tester1.buyAmount);
             
             let tx = await privateSaleContract.usersAmount(tester1.account.address);
@@ -358,7 +370,10 @@ describe("PrivateSale", function () {
         it("buy ton and wton for account2", async () => {
             await ton.connect(tester2.account).approve(privateSaleContract.address,tester2.buyAmount)
             await wton.connect(tester2.account).approve(privateSaleContract.address,tester2.wtonAmount)
-            await privateSaleContract.connect(tester2.account).wtonBuy(tester2.buyAmount);
+            // console.log(wton)
+            let wtonallowance = await wton.allowance(tester2.account.address,privateSaleContract.address);
+            console.log(Number(wtonallowance))
+            await privateSaleContract.connect(tester2.account).buy(tester2.buyAmount);
             
             let tx = await privateSaleContract.usersAmount(tester2.account.address);
             expect(tx.totaloutputamount).to.be.equal(bigAccount2Total);
@@ -369,13 +384,15 @@ describe("PrivateSale", function () {
             await wton.connect(tester3.account).approve(privateSaleContract.address,tester3.wtonAmount)
             await ton.connect(tester3.account).approve(privateSaleContract.address,tester3.buyAmount)
             // await privateSaleContract.connect(tester3.account).wtonBuy(tester3.wtonAmount);
-            await privateSaleContract.connect(tester3.account).wtonBuy(tester3.buyAmount);
+            await privateSaleContract.connect(tester3.account).buy(tester3.buyAmount);
 
 
             let tx = await privateSaleContract.usersAmount(tester3.account.address);
             expect(tx.totaloutputamount).to.be.equal(bigAccount3Total);
             expect(tx.firstReward).to.be.equal(bigAccount3first); 
         })
+
+
     })
 
     describe("# 6. claim test", () => {
