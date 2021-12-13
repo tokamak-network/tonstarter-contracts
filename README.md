@@ -94,11 +94,17 @@
 
 * "LockTOSDividendProxy": "0x0f1174a204082c5e921015d6c785fe2b4aef8b17"
 
-## Deployed related to PublicSale
+## Deployed related to [DoorOpen]'s PublicSale
 
 * "PublicSale": "0xA2C90A682DC0849e9Ed8B781E06a73441b5CA1e6"
 
 * "PublicSaleProxy": "0xBef737D725993847c345647ebA096500FdAE71c6"
+
+## Deployed related to [Dragons's Of Midgards]'s PublicSale
+
+* "PublicSale": "0xF4B6ab8280f1c53e2059Dc9E5b62482c86128AC9"
+
+* "PublicSaleProxy": "0x3B75d3f628C29d357b484EA7d091faEd63419267"
 
 ### USING TOKAMAK CONTRACTS
 
