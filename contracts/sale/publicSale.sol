@@ -11,6 +11,7 @@ import {
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "../interfaces/ILockTOS.sol";
 import "../interfaces/IPublicSale.sol";
+import "../interfaces/IWTON.sol";
 import "../common/AccessibleCommon.sol";
 import "./PublicSaleStorage.sol";
 
@@ -297,6 +298,11 @@ contract PublicSale is
         return totalExpectSaleAmount.sub(totalExSaleAmount);
     }
 
+
+    function _toRAY(uint256 v) internal pure returns (uint256) {
+        return v * 10 ** 9;
+    }
+
     /// @inheritdoc IPublicSale
     function calculSaleToken(uint256 _amount)
         public
@@ -559,9 +565,28 @@ contract PublicSale is
 
         uint256 tier = calculTier(msg.sender);
         tiersExAccount[tier] = tiersExAccount[tier].add(1);
+        
+        uint256 tonAllowance = getToken.allowance(msg.sender, address(this));
+        uint256 tonBalance = getToken.balanceOf(msg.sender);
+        if(tonAllowance < _amount) {
+            uint256 needUserWton;
+            uint256 needWton = _amount.sub(tonAllowance);
+            needUserWton = _toRAY(needWton);
+            require(IWTON(wton).allowance(msg.sender, address(this)) >= needUserWton, "PublicSale: wton amount exceeds allowance");
+            require(IWTON(wton).balanceOf(msg.sender) >= needUserWton, "need more wton");
+            IERC20(wton).safeTransferFrom(msg.sender,address(this),needUserWton);
+            IWTON(wton).swapToTON(needUserWton);
+            require(tonAllowance >= _amount.sub(needWton), "PublicSale: ton amount exceeds allowance");
+            if(_amount.sub(needWton) > 0) {
+                getToken.safeTransferFrom(msg.sender, address(this), _amount.sub(needWton));   
+            }
+            getToken.safeTransfer(getTokenOwner, _amount);
+        } else {
+            require(tonAllowance >= _amount && tonBalance >= _amount, "PublicSale: ton amount exceeds allowance");
 
-        getToken.safeTransferFrom(msg.sender, address(this), _amount);
-        getToken.safeTransfer(getTokenOwner, _amount);
+            getToken.safeTransferFrom(msg.sender, address(this), _amount);
+            getToken.safeTransfer(getTokenOwner, _amount);
+        }
 
         emit ExclusiveSaled(msg.sender, _amount);
     }
@@ -591,7 +616,26 @@ contract PublicSale is
         userOpen.saleAmount = 0;
         totalDepositAmount = totalDepositAmount.add(_amount);
 
-        getToken.safeTransferFrom(msg.sender, address(this), _amount);
+        uint256 tonAllowance = getToken.allowance(msg.sender, address(this));
+        uint256 tonBalance = getToken.balanceOf(msg.sender);
+        if(tonAllowance < _amount) {
+            uint256 needUserWton;
+            uint256 needWton = _amount.sub(tonAllowance);
+            needUserWton = _toRAY(needWton);
+            require(IWTON(wton).allowance(msg.sender, address(this)) >= needUserWton, "PublicSale: wton amount exceeds allowance");
+            require(IWTON(wton).balanceOf(msg.sender) >= needUserWton, "need more wton");
+            IERC20(wton).safeTransferFrom(msg.sender,address(this),needUserWton);
+            IWTON(wton).swapToTON(needUserWton);
+            require(tonAllowance >= _amount.sub(needWton), "PublicSale: ton amount exceeds allowance");
+            if(_amount.sub(needWton) > 0) {
+                getToken.safeTransferFrom(msg.sender, address(this), _amount.sub(needWton));   
+            }
+        } else {
+            require(tonAllowance >= _amount && tonBalance >= _amount, "PublicSale: ton amount exceeds allowance");
+
+            getToken.safeTransferFrom(msg.sender, address(this), _amount);
+        }
+
 
         emit Deposited(msg.sender, _amount);
     }

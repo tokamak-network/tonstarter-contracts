@@ -19,6 +19,7 @@ interface IPublicSaleProxy {
         address _saleTokenAddress, 
         address _getTokenAddress, 
         address _getTokenOwner,
-        address _sTOS
+        address _sTOS,
+        address _wton
     ) external;
 }
