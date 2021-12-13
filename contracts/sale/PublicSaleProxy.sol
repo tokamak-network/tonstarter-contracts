@@ -100,12 +100,14 @@ contract PublicSaleProxy is
         address _saleTokenAddress, 
         address _getTokenAddress, 
         address _getTokenOwner,
-        address _sTOS
+        address _sTOS,
+        address _wton
     ) external override onlyOwner {
         require(snapshot == 0, "possible to setting the snapshot before");
         saleToken = IERC20(_saleTokenAddress);
         getToken = IERC20(_getTokenAddress);
         getTokenOwner = _getTokenOwner;
         sTOS = ILockTOS(_sTOS);
+        wton = _wton;
     }
 }

@@ -64,6 +64,7 @@ contract PublicSaleStorage  {
     uint256 public claimFirst;    //초기 클레임 percents
 
     address public getTokenOwner;
+    address public wton;
 
     IERC20 public saleToken;
     IERC20 public getToken;
