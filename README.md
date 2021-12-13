@@ -100,7 +100,7 @@
 
 * "PublicSaleProxy": "0xBef737D725993847c345647ebA096500FdAE71c6"
 
-## Deployed related to [Dragons's Of Midgards]'s PublicSale
+## Deployed related to [Dragons Of Midgard]'s PublicSale
 
 * "PublicSale": "0xF4B6ab8280f1c53e2059Dc9E5b62482c86128AC9"
 
