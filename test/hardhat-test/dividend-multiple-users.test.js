@@ -278,26 +278,11 @@ describe("LockTOS", function () {
   //   await redistributeTON(admin, redistributeInfo.weeklyEpoch);
   // });
 
-  it("should check tokens per week", async function () {  
-    const now = parseInt(await lockTOS.getCurrentTime());
-    const expected = [
-      { tokensPerWeek: 5000000 },
-      { tokensPerWeek: 0 },
-      { tokensPerWeek: 0 },
-      { tokensPerWeek: 0 },
-      { tokensPerWeek: 6000000 },
-      { tokensPerWeek: 0 },
-      { tokensPerWeek: 0 },
-      { tokensPerWeek: 6000000 },
-      { tokensPerWeek: 0 },
-      { tokensPerWeek: 0 },
-      { tokensPerWeek: 4000000 },
-      { tokensPerWeek: 0 },
-      { tokensPerWeek: 0 },
-      { tokensPerWeek: 0 },
-      { tokensPerWeek: 3000000 },
-    ];
+  it("should check tokens per week", async function () {
+    await ethers.provider.send("evm_increaseTime", [epochUnit]);
+    await ethers.provider.send("evm_mine");
 
+    const now = parseInt(await lockTOS.getCurrentTime());
     for (
       let currentTime = initialTime, i = 0;
       currentTime <= now;
@@ -320,19 +305,18 @@ describe("LockTOS", function () {
             .claimableForPeriod(
               account.address,
               ton.address,
-              currentTime - epochUnit,
+              currentTime ,
               currentTime
             )
         );
         accum += claimable;
       }
       console.log({ tokensPerWeek, accum });
-
-      // if (expected[i].tokensPerWeek > 0) {
-        // expect(accum).to.be.closeTo(expected[i].tokensPerWeek, 1000);
-      // }
+      expect(accum).to.be.closeTo(tokensPerWeek, 1000);
     }
 
+    await ethers.provider.send("evm_increaseTime", [parseInt(epochUnit)]);
+    await ethers.provider.send("evm_mine"); // mine the next block
     let accum = 0;
     for (const { account } of accounts) {
       const claimable = parseInt(

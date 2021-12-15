@@ -15,6 +15,6 @@ contract LockTOSDividendStorage {
     address public lockTOS;
     uint256 public genesis;
     mapping(address => LibLockTOSDividend.Distribution) public distributions;
-    address[] distributedTokens;
+    address[] public distributedTokens;
     uint256 internal free = 1;
 }
