@@ -190,7 +190,7 @@ task("rinkeby-upgrade-dividend-pool", "Deploy TOS").setAction(async () => {
 task("rinkeby-deploy-dividend-pool", "Deploy TOS").setAction(async () => {
   const { RINKEBY_DEPLOY_ACCOUNT: account } =
   process.env;
-  const lockTOSAddress = "0x8f66FADcFff73DE561918052c070C445d68c0aF4";
+  const lockTOSAddress = "0x8f66fadcfff73de561918052c070c445d68c0af4";
   const deployer = await findAccount(account);
 
   const dividendPool = await (await ethers.getContractFactory("LockTOSDividend"))

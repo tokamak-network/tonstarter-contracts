@@ -1,3 +1,93 @@
+const {
+  createLockWithPermit,
+} = require("../test/hardhat-test/helpers/lock-tos-helper");
+const { time } = require("@openzeppelin/test-helpers");
+
+task("get-lock-tos-balance-change-manually", "Deploy TOS").setAction(async () => {
+    const epochUnit = parseInt(time.duration.weeks(1));
+    const maxTime = epochUnit * 156;
+
+    const amount = ethers.utils.parseEther("600");
+    const slope = amount / maxTime;
+    const bias = slope * maxTime;
+    console.log({ slope, bias });
+    const balance1 = amount;
+    console.log({ balance1 });
+    const balance2 = bias - slope * parseInt(time.duration.days(1));
+    console.log({ balance2 });
+
+    const diff = parseFloat(
+        ethers.utils.formatEther((balance1 - balance2).toString())
+    ).toFixed(5);
+    console.log({ diff });
+});
+
+task("get-lock-tos-balance-change", "Deploy TOS").setAction(async () => {
+    const epochUnit = parseInt(time.duration.weeks(1));
+    const maxTime = epochUnit * 156;
+
+    let admin, user;
+    [admin, user] = await ethers.getSigners();
+    const tosAmount = ethers.utils.parseEther("64000");
+    console.log({ tosAmount });
+    
+    const name = "TONStarter";
+    const symbol = "TOS";
+    const version = "1.0";
+    const TOS = await ethers.getContractFactory("TOS");
+    const tos = await TOS.connect(admin).deploy(name, symbol, version);
+    await (await tos.connect(admin).mint(user.address, tosAmount)).wait();
+    await tos.deployed();
+
+
+    const lockTOSImpl = await (
+      await ethers.getContractFactory("LockTOS")
+    ).connect(admin).deploy();
+    await lockTOSImpl.deployed();
+
+    const lockTOSProxy = await (
+      await ethers.getContractFactory("LockTOSProxy")
+    ).connect(admin).deploy(lockTOSImpl.address, admin.address);
+    await lockTOSProxy.deployed();
+    await (
+      await lockTOSProxy.connect(admin).initialize(tos.address, epochUnit, maxTime)
+    ).wait();
+
+    const lockTOSArtifact = await hre.artifacts.readArtifact("LockTOS");
+    const lockTOS = new ethers.Contract(
+      lockTOSProxy.address,
+      lockTOSArtifact.abi,
+      ethers.provider
+    );
+
+    const lockId = await createLockWithPermit({
+        tos,
+        lockTOS,
+        user: user,
+        amount: tosAmount,
+        unlockWeeks: 156,
+    });
+
+    const balance1 = parseFloat(ethers.utils.formatEther(
+         await lockTOS.balanceOf(user.address)
+    ));
+    console.log({ balance1 });
+
+    await ethers.provider.send("evm_increaseTime", [
+      parseInt(time.duration.days(1)),
+    ]);
+    await ethers.provider.send("evm_mine"); // mine the next block
+
+    const balance2 = parseFloat(ethers.utils.formatEther(
+         await lockTOS.balanceOf(user.address)
+    ));
+    console.log({ balance2 });
+
+
+    const diff = parseFloat(balance1 - balance2).toFixed(5);
+    console.log({ diff });
+});
+
 task("get-lock-tos-balances", "Deploy TOS").setAction(async () => {
     const lockTOSAddress = "0x69b4a202fa4039b42ab23adb725aa7b1e9eebd79";
     const lockTOS = await ethers.getContractAt("LockTOS", lockTOSAddress);
@@ -39,7 +129,7 @@ task("get-lock-tos-past-snapshot", "Snapshot").setAction(async () => {
     const lockTOS = await ethers.getContractAt("LockTOS", lockTOSAddress);
     const activeHolders = await lockTOS.allHolders();
     const holdersWithBalance = [];
-    const date = '2021-09-18';
+    const date = '2021-12-18';
     const timestamp = Math.floor((new Date(date)).getTime() / 1000);
     console.log({ timestamp });
     const totalSupply = parseFloat(ethers.utils.formatEther(await lockTOS.totalSupplyAt(timestamp))).toFixed(2);
@@ -223,6 +313,20 @@ task("get-whitelists", "Deploy TOS").setAction(async () => {
         const addr = await publicSale.whitelists(i);
         console.log(addr);
     }
+});
+
+const { findAccount } = require("./utils");
+task("test-dividend", "Deploy TOS").setAction(async () => {
+    const { RINKEBY_DEPLOY_ACCOUNT: account } =
+    process.env;
+    const deployer = await findAccount(account);
+  
+    const address = "0x1f39F2319724239abfa2b1BFC75E6732828472E7";
+    const dividend = await ethers.getContractAt("LockTOSDividend", address);
+    const user = "0x8c595DA827F4182bC0E3917BccA8e654DF8223E1";
+    const token = "0x44d4F5d89E9296337b8c48a332B3b2fb2C190CD0";
+    const res = await dividend.connect(deployer).claimable(user, token);
+    console.log({ res });
 });
 
 task("get-stos-lost", "Deploy TOS").setAction(async () => {
