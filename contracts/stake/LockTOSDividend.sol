@@ -49,7 +49,7 @@ contract LockTOSDividend is
     /// @inheritdoc ILockTOSDividend
     function claimUpTo(address _token, uint256 _timestamp) external override {
         uint256 timestamp = Math.min(_timestamp, block.timestamp - epochUnit);
-        _claimUpTo(_token, _timestamp);
+        _claimUpTo(_token, timestamp);
     }
     
     function redistribute(address _token, uint256 _weeklyEpoch)
@@ -116,7 +116,7 @@ contract LockTOSDividend is
         override
         returns (uint256)
     {
-        return (_timestamp.sub(genesis)).div(epochUnit);
+        return _timestamp > genesis ? (_timestamp.sub(genesis)).div(epochUnit) : 0;
     }
 
     function epochToTimestamp(uint256 _epoch)
@@ -208,7 +208,7 @@ contract LockTOSDividend is
         if (epochEnd == 0) {
             return 0;
         }
-        
+
         uint256[] memory userLocks = ILockTOS(lockTOS).locksOf(_account);
         uint256 amountToClaim = 0;
         LibLockTOSDividend.Distribution storage distr = distributions[_token];
@@ -227,11 +227,12 @@ contract LockTOSDividend is
     /// @dev Claim rewards
     function _claimUpTo(address _token, uint256 _timestamp) internal ifFree {
         uint256 weeklyEpoch = getWeeklyEpoch(_timestamp);
-
         uint256[] memory userLocks = ILockTOS(lockTOS).locksOf(msg.sender);
         uint256 amountToClaim = 0;
         for (uint256 i = 0; i < userLocks.length; ++i) {
-            amountToClaim += _recordClaim(_token, userLocks[i], weeklyEpoch);
+            amountToClaim = amountToClaim.add(
+                _recordClaim(_token, userLocks[i], weeklyEpoch)
+            );
         }
         require(amountToClaim > 0, "Amount to be claimed is zero");
         IERC20(_token).transfer(msg.sender, amountToClaim);
