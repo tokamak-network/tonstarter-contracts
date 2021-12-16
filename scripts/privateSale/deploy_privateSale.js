@@ -16,8 +16,8 @@ async function main() {
     // let tonAddress = "0x2be5e8c109e2197D077D13A82dAead6a9b3433C5" //mainnet (getToken)
     let ownerAddress = "0xf0B595d10a92A5a9BC3fFeA7e79f5d266b6035Ea" //rinkeby (getTokenOwner)
     // let ownerAddress = ""   //mainnet (getTokenOwner)
-    let wtonAddress = "0x709bef48982bbfd6f2d4be24660832665f53406c"  //rinkeby (wtonToken)
-    // let wtonAddress = "0xc4A11aaf6ea915Ed7Ac194161d2fC9384F15bff2" //mainnet (wtonToken)
+    // let wtonAddress = "0x709bef48982bbfd6f2d4be24660832665f53406c"  //rinkeby (wtonToken)
+    let wtonAddress = "0xc4A11aaf6ea915Ed7Ac194161d2fC9384F15bff2" //mainnet (wtonToken)
 
 
     const privateSale = await ethers.getContractFactory('PrivateSale')

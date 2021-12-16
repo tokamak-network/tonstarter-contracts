@@ -138,6 +138,10 @@ contract PrivateSale is Ownable, ReentrancyGuard {
         changeGetAddress(_ownerToken);
     }
 
+    function changeWTONAddress(address _wton) external onlyOwner {
+        wton = _wton;
+    }
+
     function changeTokenAddress(address _saleToken, address _getToken) public onlyOwner {
         saleToken = IERC20(_saleToken);
         getToken = IERC20(_getToken);
@@ -323,7 +327,7 @@ contract PrivateSale is Ownable, ReentrancyGuard {
 
         user.inputamount = user.inputamount.add(_amount);
         user.totaloutputamount = user.totaloutputamount.add(tokenSaleAmount);
-        user.firstReward = user.totaloutputamount.mul(625).div(12500);
+        user.firstReward = user.totaloutputamount.mul(5).div(100);
         user.monthlyReward = (user.totaloutputamount.sub(user.firstReward)).div(12);
         user.inputTime = block.timestamp;
 
