@@ -11,7 +11,10 @@ import {
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "../interfaces/IWTON.sol";
 
-contract PrivateSale is Ownable, ReentrancyGuard {
+import { OnApprove } from "./OnApprove.sol";
+
+
+contract PrivateSale is Ownable, ReentrancyGuard, OnApprove {
     using SafeERC20 for IERC20;
     using SafeMath for uint256;
 
@@ -248,8 +251,18 @@ contract PrivateSale is Ownable, ReentrancyGuard {
         }
     }
 
+    /**
+     * @dev transform WAD to RAY
+     */
     function _toRAY(uint256 v) internal pure returns (uint256) {
         return v * 10 ** 9;
+    }
+
+    /**
+     * @dev transform RAY to WAD
+     */
+    function _toWAD(uint256 v) internal pure returns (uint256) {
+        return v / 10 ** 9;
     }
     
     function addWhiteList(address _account,uint256 _amount) external onlyOwner {
@@ -275,23 +288,56 @@ contract PrivateSale is Ownable, ReentrancyGuard {
         emit delList(_account, _amount);
     }
 
+    function onApprove(
+        address sender,
+        address spender,
+        uint256 amount,
+        bytes calldata data
+    ) external override returns (bool) {
+        require(msg.sender == address(getToken) || msg.sender == address(IWTON(wton)), "PrivateSale: only accept TON and WTON approve callback");
+        if(msg.sender == address(getToken)) {
+            uint256 wtonAmount = _decodeApproveData(data);
+            if(wtonAmount == 0){
+                buy(sender,amount);
+            } else {
+                uint256 totalAmount = amount + wtonAmount;
+                buy(sender,totalAmount);
+            }
+        } else if (msg.sender == address(IWTON(wton))) {
+            uint256 wtonAmount = _toWAD(amount);
+            buy(sender,wtonAmount);
+        }
+
+        return true;
+    }
+
+    function _decodeApproveData(
+        bytes memory data
+    ) public pure returns (uint256 approveData) {
+        assembly {
+            approveData := mload(add(data, 0x20))
+        }
+    }
+
     function buy(
+        address _sender,
         uint256 _amount
-    ) external {
+    ) public {
         require(saleStartTime != 0 && saleEndTime != 0, "need to setting saleTime");
         require(block.timestamp >= saleStartTime && block.timestamp <= saleEndTime, "privaSale period end");
-        WhiteList storage userwhite = usersWhite[msg.sender];
+        WhiteList storage userwhite = usersWhite[_sender];
         require(userwhite.amount >= _amount, "need to add whiteList amount");
-        _buy(_amount);
+        _buy(_sender,_amount);
         userwhite.amount = userwhite.amount.sub(_amount);
     }
 
     function _buy(
+        address _sender,
         uint256 _amount
     )
         internal
     {
-        UserInfoAmount storage user = usersAmount[msg.sender];
+        UserInfoAmount storage user = usersAmount[_sender];
 
         uint256 tokenSaleAmount = calculSaleToken(_amount);
         uint256 Saledtoken = totalSaleAmount.add(tokenSaleAmount);
@@ -302,26 +348,28 @@ contract PrivateSale is Ownable, ReentrancyGuard {
             "don't have token amount"
         );
 
-        uint256 tonAllowance = getToken.allowance(msg.sender, address(this));
-        uint256 tonBalance = getToken.balanceOf(msg.sender);
-
-        if(tonBalance < _amount) {
+        uint256 tonAllowance = getToken.allowance(_sender, address(this));
+        uint256 tonBalance = getToken.balanceOf(_sender);
+        if(tonAllowance > tonBalance) {
+            tonAllowance = tonBalance;  //tonAllowance가 tonBlance보다 더 클때 문제가 된다.
+        }
+        if(tonAllowance < _amount) {
             uint256 needUserWton;
-            uint256 needWton = _amount.sub(tonBalance);
+            uint256 needWton = _amount.sub(tonAllowance);
             needUserWton = _toRAY(needWton);
-            require(IWTON(wton).allowance(msg.sender, address(this)) >= needUserWton, "privateSale: wton amount exceeds allowance");
-            require(IWTON(wton).balanceOf(msg.sender) >= needUserWton, "need more wton");
-            IERC20(wton).safeTransferFrom(msg.sender,address(this),needUserWton);
+            require(IWTON(wton).allowance(_sender, address(this)) >= needUserWton, "privateSale: wton amount exceeds allowance");
+            require(IWTON(wton).balanceOf(_sender) >= needUserWton, "need more wton");
+            IERC20(wton).safeTransferFrom(_sender,address(this),needUserWton);
             IWTON(wton).swapToTON(needUserWton);
             require(tonAllowance >= _amount.sub(needWton), "privateSale: ton amount exceeds allowance");
             if(_amount.sub(needWton) > 0) {
-                getToken.safeTransferFrom(msg.sender, address(this), _amount.sub(needWton));   
+                getToken.safeTransferFrom(_sender, address(this), _amount.sub(needWton));   
             }
             getToken.safeTransfer(getTokenOwner, _amount);
         } else {
-            require(tonAllowance >= _amount, "privateSale: ton amount exceeds allowance");
+            require(tonAllowance >= _amount && tonBalance >= _amount, "privateSale: ton amount exceeds allowance");
 
-            getToken.safeTransferFrom(msg.sender, address(this), _amount);
+            getToken.safeTransferFrom(_sender, address(this), _amount);
             getToken.safeTransfer(getTokenOwner, _amount);
         }
 
