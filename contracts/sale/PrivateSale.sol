@@ -10,44 +10,15 @@ import {
 } from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "../interfaces/IWTON.sol";
+import "../interfaces/IPrivateSale.sol";
 
 import { OnApprove } from "./OnApprove.sol";
+import "./PrivateSaleStorage.sol";
 
 
-contract PrivateSale is Ownable, ReentrancyGuard, OnApprove {
+contract PrivateSale is PrivateSaleStorage, Ownable, ReentrancyGuard, OnApprove, IPrivateSale {
     using SafeERC20 for IERC20;
     using SafeMath for uint256;
-
-    
-    struct UserInfoAmount {
-        uint256 inputamount;
-        uint256 totaloutputamount;
-        uint256 inputTime;
-        uint256 monthlyReward;
-        uint256 firstReward;
-    }
-
-    struct UserInfoClaim {
-        uint256 claimTime;
-        uint256 claimAmount;
-        uint256 firstClaimAmount;
-        uint256 firstClaimTime;
-        bool first;
-    }
-
-    struct WhiteList {
-        uint256 amount;
-    }
-
-    event addList(
-        address account,
-        uint256 amount
-    );
-
-    event delList(
-        address account,
-        uint256 amount
-    );
 
     event Buyinfo(
         address user,
@@ -74,30 +45,16 @@ contract PrivateSale is Ownable, ReentrancyGuard, OnApprove {
         address user,
         uint256 withdrawAmount
     );
-    
-    address public getTokenOwner;       //받은 ton을 받을 주소
-    uint256 public totalGetAmount;      //총 TON받은양
-    uint256 public totalSaleAmount;     //총 판매토큰
 
-    uint256 public saleStartTime;           //sale시작 시간
-    uint256 public saleEndTime;             //sale끝 시간
+    event addList(
+        address account,
+        uint256 amount
+    );
 
-    uint256 public firstClaimTime;           //초기 claim 시간
-
-    uint256 public claimStartTime;  //6개월 뒤 claim시작 시간
-    uint256 public claimEndTime;    //claim시작시간 + 1년
-
-    uint256 public saleTokenPrice;  //판매토큰가격
-    uint256 public getTokenPrice;   //받는토큰가격(TON)
-
-    IERC20 public saleToken;        //판매할 token주소
-    IERC20 public getToken;         //TON 주소
-
-    address public wton;             //WTON 주소
-
-    mapping (address => UserInfoAmount) public usersAmount;
-    mapping (address => UserInfoClaim) public usersClaim;
-    mapping (address => WhiteList) public usersWhite;
+    event delList(
+        address account,
+        uint256 amount
+    );
 
 
     /// @dev basic setting
@@ -110,6 +67,7 @@ contract PrivateSale is Ownable, ReentrancyGuard, OnApprove {
     /// @param _amount input the TON amount
     function calculSaleToken(uint256 _amount)
         public
+        override
         view
         returns (uint256)
     {
@@ -121,6 +79,7 @@ contract PrivateSale is Ownable, ReentrancyGuard, OnApprove {
     /// @param _amount input the anotherTokenAmount
     function calculGetToken(uint256 _amount)
         public
+        override
         view
         returns (uint256)
     {
@@ -136,21 +95,21 @@ contract PrivateSale is Ownable, ReentrancyGuard, OnApprove {
         address _saleToken,
         address _getToken,
         address _ownerToken
-    ) external onlyOwner {
+    ) external override onlyOwner {
         changeTokenAddress(_saleToken,_getToken);
         changeGetAddress(_ownerToken);
     }
 
-    function changeWTONAddress(address _wton) external onlyOwner {
+    function changeWTONAddress(address _wton) external override onlyOwner {
         wton = _wton;
     }
 
-    function changeTokenAddress(address _saleToken, address _getToken) public onlyOwner {
+    function changeTokenAddress(address _saleToken, address _getToken) public override onlyOwner {
         saleToken = IERC20(_saleToken);
         getToken = IERC20(_getToken);
     }
 
-    function changeGetAddress(address _address) public onlyOwner {
+    function changeGetAddress(address _address) public override onlyOwner {
         getTokenOwner = _address;
     }
 
@@ -158,7 +117,7 @@ contract PrivateSale is Ownable, ReentrancyGuard, OnApprove {
         uint256[4] calldata _time,
         uint256 _saleTokenPrice,
         uint256 _getTokenPrice
-    ) external onlyOwner {
+    ) external override onlyOwner {
         settingPrivateTime(_time[0],_time[1],_time[2],_time[3]);
         setTokenPrice(_saleTokenPrice,_getTokenPrice);
     }
@@ -168,22 +127,22 @@ contract PrivateSale is Ownable, ReentrancyGuard, OnApprove {
         uint256 _endTime,
         uint256 _firstTime,
         uint256 _claimTime
-    ) public onlyOwner {
+    ) public override onlyOwner {
         settingSaleTime(_startTime,_endTime);
         settingFirstClaimTime(_firstTime);
         settingClaimTime(_claimTime);
     }
 
-    function settingSaleTime(uint256 _startTime,uint256 _endTime) public onlyOwner {
+    function settingSaleTime(uint256 _startTime,uint256 _endTime) public override onlyOwner {
         saleStartTime = _startTime;
         saleEndTime = _endTime;
     }
 
-    function settingFirstClaimTime(uint256 _claimTime) public onlyOwner {
+    function settingFirstClaimTime(uint256 _claimTime) public override onlyOwner {
         firstClaimTime = _claimTime;
     }
 
-    function settingClaimTime(uint256 _time) public onlyOwner {
+    function settingClaimTime(uint256 _time) public override onlyOwner {
         claimStartTime = _time;
         claimEndTime = _time.add(360 days);
     }
@@ -198,7 +157,7 @@ contract PrivateSale is Ownable, ReentrancyGuard, OnApprove {
 
     function claimAmount(
         address _account
-    ) external view returns (uint256) {
+    ) external override view returns (uint256) {
         UserInfoAmount memory user = usersAmount[_account];
 
         require(user.inputamount > 0, "user isn't buy");
@@ -265,14 +224,14 @@ contract PrivateSale is Ownable, ReentrancyGuard, OnApprove {
         return v / 10 ** 9;
     }
     
-    function addWhiteList(address _account,uint256 _amount) external onlyOwner {
+    function addWhiteList(address _account,uint256 _amount) external override onlyOwner {
         WhiteList storage userwhite = usersWhite[_account];
         userwhite.amount = userwhite.amount.add(_amount);
 
         emit addList(_account, _amount);
     }
 
-    function addWhiteListArray(address[] calldata _account, uint256[] calldata _amount) external onlyOwner {
+    function addWhiteListArray(address[] calldata _account, uint256[] calldata _amount) external override onlyOwner {
         for(uint i = 0; i < _account.length; i++) {
             WhiteList storage userwhite = usersWhite[_account[i]];
             userwhite.amount = userwhite.amount.add(_amount[i]);
@@ -281,7 +240,7 @@ contract PrivateSale is Ownable, ReentrancyGuard, OnApprove {
         }
     }
 
-    function delWhiteList(address _account, uint256 _amount) external onlyOwner {
+    function delWhiteList(address _account, uint256 _amount) external override onlyOwner {
         WhiteList storage userwhite = usersWhite[_account];
         userwhite.amount = userwhite.amount.sub(_amount);
 
@@ -322,7 +281,7 @@ contract PrivateSale is Ownable, ReentrancyGuard, OnApprove {
     function buy(
         address _sender,
         uint256 _amount
-    ) public {
+    ) public override {
         require(saleStartTime != 0 && saleEndTime != 0, "need to setting saleTime");
         require(block.timestamp >= saleStartTime && block.timestamp <= saleEndTime, "privaSale period end");
         WhiteList storage userwhite = usersWhite[_sender];
@@ -392,7 +351,7 @@ contract PrivateSale is Ownable, ReentrancyGuard, OnApprove {
         );
     }
 
-    function claim() external {
+    function claim() external override {
         require(firstClaimTime != 0 && saleEndTime != 0, "need to setting Time");
         require(block.timestamp > saleEndTime && block.timestamp > firstClaimTime, "need the fisrClaimtime");
         if(block.timestamp < claimStartTime) {
