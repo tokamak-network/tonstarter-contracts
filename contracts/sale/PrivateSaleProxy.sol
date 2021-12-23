@@ -4,15 +4,22 @@ pragma solidity ^0.7.6;
 import "../interfaces/IPrivateSaleProxy.sol";
 import {Address} from "@openzeppelin/contracts/utils/Address.sol";
 
+import { OnApprove } from "./OnApprove.sol";
 import "../common/AccessibleCommon.sol";
 import "./PrivateSaleStorage.sol";
+import "../interfaces/IWTON.sol";
+import "../interfaces/IPrivateSale.sol";
 
-
-contract PrivateSaleProxy is PrivateSaleStorage, AccessibleCommon, IPrivateSaleProxy {
+contract PrivateSaleProxy is 
+    PrivateSaleStorage, 
+    AccessibleCommon,
+    OnApprove,
+    IPrivateSaleProxy
+{
     event Upgraded(address indexed implementation, uint256 _index);
 
     /// @dev constructor of Stake1Proxy
-    constructor(address _logic) {
+    constructor(address _logic,address _admin) {
         //assert(IMPLEMENTATION_SLOT == bytes32(uint256(keccak256('eip1967.proxy.implementation')) - 1));
 
         require(_logic != address(0), "Stake1Proxy: logic is zero");
@@ -20,7 +27,7 @@ contract PrivateSaleProxy is PrivateSaleStorage, AccessibleCommon, IPrivateSaleP
         _setImplementation(_logic, 0, true);
 
         _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
-        _setupRole(ADMIN_ROLE, msg.sender);
+        _setupRole(ADMIN_ROLE, _admin);
         _setupRole(ADMIN_ROLE, address(this));
     }
 
@@ -196,6 +203,34 @@ contract PrivateSaleProxy is PrivateSaleStorage, AccessibleCommon, IPrivateSaleP
         }
     }
 
+    /// @dev Initialize
+    function initialize(
+        address _wton
+    ) external  onlyOwner {
+        wton = _wton;
+    }
 
+    function onApprove(
+        address sender,
+        address spender,
+        uint256 amount,
+        bytes calldata data
+    ) external override returns (bool) {
+        require(msg.sender == address(getToken) || msg.sender == address(IWTON(wton)), "PrivateSale: only accept TON and WTON approve callback");
+        if(msg.sender == address(getToken)) {
+            uint256 wtonAmount = IPrivateSale(address(this))._decodeApproveData(data);
+            if(wtonAmount == 0){
+                IPrivateSale(address(this)).buy(sender,amount);
+            } else {
+                uint256 totalAmount = amount + wtonAmount;
+                IPrivateSale(address(this)).buy(sender,totalAmount);
+            }
+        } else if (msg.sender == address(IWTON(wton))) {
+            uint256 wtonAmount = IPrivateSale(address(this))._toWAD(amount);
+            IPrivateSale(address(this)).buy(sender,wtonAmount);
+        }
+
+        return true;
+    }
 
 }

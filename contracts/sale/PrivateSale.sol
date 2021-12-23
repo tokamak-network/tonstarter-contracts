@@ -3,7 +3,6 @@
 pragma solidity ^0.7.6;
 
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import {
     ReentrancyGuard
@@ -11,12 +10,13 @@ import {
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "../interfaces/IWTON.sol";
 import "../interfaces/IPrivateSale.sol";
+import "../common/AccessibleCommon.sol";
 
 import { OnApprove } from "./OnApprove.sol";
 import "./PrivateSaleStorage.sol";
 
 
-contract PrivateSale is PrivateSaleStorage, Ownable, ReentrancyGuard, OnApprove, IPrivateSale {
+contract PrivateSale is PrivateSaleStorage, AccessibleCommon, ReentrancyGuard, OnApprove, IPrivateSale {
     using SafeERC20 for IERC20;
     using SafeMath for uint256;
 
@@ -55,13 +55,6 @@ contract PrivateSale is PrivateSaleStorage, Ownable, ReentrancyGuard, OnApprove,
         address account,
         uint256 amount
     );
-
-
-    /// @dev basic setting
-    /// @param _wton wtonAddress
-    constructor(address _wton) {
-        wton = _wton;
-    }
 
     /// @dev calculator the SaleAmount(input TON how many get the anotherToken)
     /// @param _amount input the TON amount
@@ -220,7 +213,7 @@ contract PrivateSale is PrivateSaleStorage, Ownable, ReentrancyGuard, OnApprove,
     /**
      * @dev transform RAY to WAD
      */
-    function _toWAD(uint256 v) internal pure returns (uint256) {
+    function _toWAD(uint256 v) public override pure returns (uint256) {
         return v / 10 ** 9;
     }
     
@@ -272,7 +265,7 @@ contract PrivateSale is PrivateSaleStorage, Ownable, ReentrancyGuard, OnApprove,
 
     function _decodeApproveData(
         bytes memory data
-    ) public pure returns (uint256 approveData) {
+    ) public override pure returns (uint256 approveData) {
         assembly {
             approveData := mload(add(data, 0x20))
         }

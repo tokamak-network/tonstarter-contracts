@@ -45,5 +45,5 @@ interface IPrivateSaleProxy {
     function getSelectorImplementation(bytes4 _selector)
         external
         view
-        returns (address impl);
+    returns (address impl);
 }
