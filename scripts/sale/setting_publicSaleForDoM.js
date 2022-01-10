@@ -15,7 +15,8 @@ const { BigNumber } = require("ethers")
 const publicJson = require('../../artifacts/contracts/sale/PublicSale.sol/PublicSale.json')
 
 var abiPublic = publicJson.abi;
-const proxyAddress = "0xeC0450DA5e4A7def22F0252A3D4cEBd0cbeB0580"
+const proxyAddress = "0xEb492922afa05D0D7704AD5c202f2ddCc386DA75"       //rinkeby
+// const proxyAddress = "0x3B75d3f628C29d357b484EA7d091faEd63419267"       //mainnet
 const adminAddress = "0xf0B595d10a92A5a9BC3fFeA7e79f5d266b6035Ea"
 
 // let net = 'rinkeby'
@@ -60,14 +61,16 @@ async function setValue() {
     // 1639468800,1639641599,1639641600,1639814399
     // 1639814400,1640159999
     // 1640160000,2592000,6,50
-    snapshot = 1639468740               //2021년 12월 14일 화요일 오후 4:59:00 GMT+09:00
-    whitelistStartTime = 1639468800     //2021년 12월 14일 화요일 오후 5:00:00 GMT+09:00
-    whitelistEndTime = 1639641599       //2021년 12월 16일 목요일 오후 4:59:59 GMT+09:00
-    exclusiveStartTime = 1639641600     //2021년 12월 16일 목요일 오후 5:00:00 GMT+09:00
-    exclusiveEndTime = 1639814399       //2021년 12월 18일 토요일 오후 4:59:59 GMT+09:00
-    depositStartTime = 1639814400       //2021년 12월 18일 토요일 오후 5:00:00 GMT+09:00 
-    depositEndTime =   1640159999       //2021년 12월 22일 수요일 오후 4:59:59 GMT+09:00
-    claimStartTime = 1640160000         //2021년 12월 22일 수요일 오후 5:00:00 GMT+09:00
+    // 1639468800,1639641599,1639641600,1639814399
+
+    snapshot = 1639382400               //2021년 12월 14일 화요일 오후 4:59:00 GMT+09:00
+    whitelistStartTime = 1639389600     //2021년 12월 14일 화요일 오후 5:00:00 GMT+09:00
+    whitelistEndTime = 1639391400       //2021년 12월 16일 목요일 오후 4:59:59 GMT+09:00
+    exclusiveStartTime = 1639391400     //2021년 12월 16일 목요일 오후 5:00:00 GMT+09:00
+    exclusiveEndTime = 1639393200       //2021년 12월 18일 토요일 오후 4:59:59 GMT+09:00
+    depositStartTime = 1639393200       //2021년 12월 18일 토요일 오후 5:00:00 GMT+09:00 
+    depositEndTime =   1639393800       //2021년 12월 22일 수요일 오후 4:59:59 GMT+09:00
+    claimStartTime = 1639393800         //2021년 12월 22일 수요일 오후 5:00:00 GMT+09:00
     claimInterval = 2592000             //30Days
     claimPeriod = 6
     claimFirst = 50
@@ -124,8 +127,10 @@ async function setAllAmount() {
     let openSaleAmount = 6000000    //6,000,000
     let bigAmount1 = BigNumber.from(exSaleAmount).mul(BigNumber.from(BASE_TEN).pow(decimals))
     let bigAmount2 = BigNumber.from(openSaleAmount).mul(BigNumber.from(BASE_TEN).pow(decimals))
-    let salePrice = 20                  //0.20달러
-    let payPrice = 633                //6.33달러
+    // let salePrice = 20                  //0.20달러
+    // let payPrice = 633                //6.33달러
+    let salePrice = 200                  //rinkeby
+    let payPrice = 10000                //rinkeby
 
     let tx = await publicSale.connect(deployer).setAllAmount(
         [bigAmount1, bigAmount2],
@@ -145,8 +150,8 @@ async function setSaletotalAmount() {
 
     const BASE_TEN = 10
     const decimals = 18
-    let exSaleAmount = 17500000     //17,500,000
-    let openSaleAmount = 7500000    //7,500,000
+    let exSaleAmount = 6000000     //6,000,000
+    let openSaleAmount = 6000000    //6,000,000
     let bigAmount1 = BigNumber.from(exSaleAmount).mul(BigNumber.from(BASE_TEN).pow(decimals))
     let bigAmount2 = BigNumber.from(openSaleAmount).mul(BigNumber.from(BASE_TEN).pow(decimals))
 
@@ -160,12 +165,12 @@ async function setSaletotalAmount() {
     //  7,500,000./000/000/000/000/000/000 
 }
 
-// setValue()
-//     .then(() => process.exit(0))
-//     .catch(error => {
-//         console.error(error);
-//         process.exit(1);
-//     });
+setValue()
+    .then(() => process.exit(0))
+    .catch(error => {
+        console.error(error);
+        process.exit(1);
+    });
 
 // setAllTier()
 //     .then(() => process.exit(0))
@@ -174,12 +179,12 @@ async function setSaletotalAmount() {
 //         process.exit(1);
 //     });
 
-setAllAmount()
-    .then(() => process.exit(0))
-    .catch(error => {
-        console.error(error);
-        process.exit(1);
-    });
+// setAllAmount()
+//     .then(() => process.exit(0))
+//     .catch(error => {
+//         console.error(error);
+//         process.exit(1);
+//     });
 
 // setSaletotalAmount()
 //     .then(() => process.exit(0))

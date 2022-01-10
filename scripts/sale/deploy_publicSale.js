@@ -8,7 +8,7 @@ async function main() {
     console.log("Deploying contract with the account :", deployer.address)
     
     //publicSaleProxy를 관리할 계정
-    // let ownerAddress = "0x47462B8062F87F63D84EBB9E0d931d38bD3F6F75" //mainnet
+    // let ownerAddress = "0xf0B595d10a92A5a9BC3fFeA7e79f5d266b6035Ea" //mainnet
     // let ownerAddress = "0xf0B595d10a92A5a9BC3fFeA7e79f5d266b6035Ea" //rinkeby
     let ownerAddress = "0xf0B595d10a92A5a9BC3fFeA7e79f5d266b6035Ea" //rinkeby
 
@@ -21,7 +21,7 @@ async function main() {
     // let docAddress = "0xb109f4c20bdb494a63e32aa035257fba0a4610a4" //rinkeby (saleToken)
     // let docAddress = "0x0e498afce58dE8651B983F136256fA3b8d9703bc" //mainnet (saleToken)
     let auraAddress = "0x14f9C438dD5008b1c269659AA3234cBcB431a844"   //rinkeby (saleToken)
-    // let auraAddress = ""   //mainnet (saleToken)
+    // let auraAddress = "0xaEC59E5b4f8DbF513e260500eA96EbA173F74149"   //mainnet (saleToken)
     let tonAddress = "0x44d4F5d89E9296337b8c48a332B3b2fb2C190CD0" //rinkeby (getToken)
     // let tonAddress = "0x2be5e8c109e2197D077D13A82dAead6a9b3433C5" //mainnet (getToken)
     // let sTOSAddress = "0xc1545632e67cefF8ECaB83072118271577e66aDc" //rinkeby (sTosToken)(sTOS의 proxy)
@@ -33,7 +33,7 @@ async function main() {
     
     //세일로 받은 TON을 관리할 주소
     let getTonOwner = "0x195c1D13fC588C0b1Ca8A78dd5771E0eE5A2EAe4" //rinkeby
-    // let getTonOwner = "0x642C239C9BEF6574FE3dc64B82dED55A30d0dc25" //mainnet
+    // let getTonOwner = "0x47462B8062F87F63D84EBB9E0d931d38bD3F6F75" //mainnet
 
     // let saleContractAddress = "0xF3eE74585c12620eB865C462D7D9Df75Ae5d9b95"  //rinkeby
 

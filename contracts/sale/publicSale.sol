@@ -15,10 +15,13 @@ import "../interfaces/IWTON.sol";
 import "../common/AccessibleCommon.sol";
 import "./PublicSaleStorage.sol";
 
+import { OnApprove } from "./OnApprove.sol";
+
 contract PublicSale is
     PublicSaleStorage,
     AccessibleCommon,
     ReentrancyGuard,
+    OnApprove,
     IPublicSale
 {
     using SafeERC20 for IERC20;
@@ -73,6 +76,44 @@ contract PublicSale is
     /// @inheritdoc IPublicSale
     function changeTONOwner(address _address) external override onlyOwner {
         getTokenOwner = _address;
+    }
+
+    function resetAllData() external onlyOwner {
+        startAddWhiteTime = 0;
+        totalWhitelists = 0;
+        totalExSaleAmount = 0;
+        totalExPurchasedAmount = 0;
+        totalDepositAmount = 0;
+        totalUsers = 0;
+        totalRound1Users = 0;
+        totalRound2Users = 0;
+        totalRound2UsersClaim = 0;
+
+        for (uint256 i = 0; i < whitelists.length; i++) {
+            UserInfoEx storage userEx = usersEx[whitelists[i]];
+            userEx.join = false;
+            userEx.payAmount = 0;
+            userEx.saleAmount = 0;
+            UserClaim storage userClaim = usersClaim[whitelists[i]];
+            userClaim.claimAmount = 0;
+            userClaim.refundAmount = 0;
+            userClaim.exec = false;
+        }
+        for (uint256 j = 0; j < depositors.length; j++) {
+            UserInfoOpen storage userOpen = usersOpen[depositors[j]];
+            userOpen.depositAmount = 0;
+            userOpen.join = false;
+            userOpen.payAmount = 0;
+            userOpen.saleAmount = 0;
+            UserClaim storage userClaim = usersClaim[depositors[j]];
+            userClaim.claimAmount = 0;
+            userClaim.refundAmount = 0;
+            userClaim.exec = false;
+        }
+        for (uint256 k = 1; k < 5; k++) {
+            tiersAccount[k] = 0;
+            tiersExAccount[k] = 0;
+        }
     }
 
     /// @inheritdoc IPublicSale
@@ -526,9 +567,69 @@ contract PublicSale is
         emit AddedWhiteList(msg.sender, tier);
     }
 
+    /**
+     * @dev transform RAY to WAD
+     */
+    function _toWAD(uint256 v) public pure returns (uint256) {
+        return v / 10 ** 9;
+    }
+
+    // OnApprove가 2가지 경우에 따라서 작동을 하게함.
+    function onApprove(
+        address sender,
+        address spender,
+        uint256 amount,
+        bytes calldata data
+    ) external override returns (bool) {
+        require(msg.sender == address(getToken) || msg.sender == address(IWTON(wton)), "PublicSale: only accept TON and WTON approve callback");
+        if(msg.sender == address(getToken)) {
+            uint256 wtonAmount = _decodeApproveData(data);
+            if(wtonAmount == 0){
+                if(block.timestamp >= startExclusiveTime && block.timestamp < endExclusiveTime) {
+                    exclusiveSale(sender,amount);
+                } else {
+                    require(block.timestamp >= startDepositTime && block.timestamp < endDepositTime, "PublicSale: not SaleTime");
+                    deposit(sender,amount);
+                }
+            } else {
+                uint256 totalAmount = amount + wtonAmount;
+                if(block.timestamp >= startExclusiveTime && block.timestamp < endExclusiveTime) {
+                    exclusiveSale(sender,totalAmount);
+                }
+                else {
+                    require(block.timestamp >= startDepositTime && block.timestamp < endDepositTime, "PublicSale: not SaleTime");
+                    deposit(sender,totalAmount);
+                }
+            }
+        } else if (msg.sender == address(IWTON(wton))) {
+            uint256 wtonAmount = _toWAD(amount);
+            if(block.timestamp >= startExclusiveTime && block.timestamp < endExclusiveTime) {
+                exclusiveSale(sender,wtonAmount);
+            }
+            else {
+                require(block.timestamp >= startDepositTime && block.timestamp < endDepositTime, "PublicSale: not SaleTime");
+                deposit(sender,wtonAmount);
+            }
+        }
+
+        return true;
+    }
+
+    function _decodeApproveData(
+        bytes memory data
+    ) public pure returns (uint256 approveData) {
+        assembly {
+            approveData := mload(add(data, 0x20))
+        }
+    }
+
+
     /// @inheritdoc IPublicSale
-    function exclusiveSale(uint256 _amount)
-        external
+    function exclusiveSale(
+        address _sender,
+        uint256 _amount
+    )
+        public
         override
         nonZero(_amount)
         nonZero(claimPeriod)
@@ -542,19 +643,22 @@ contract PublicSale is
             block.timestamp < endExclusiveTime,
             "PublicSale: end the exclusiveTime"
         );
-        UserInfoEx storage userEx = usersEx[msg.sender];
+        UserInfoEx storage userEx = usersEx[_sender];
         require(userEx.join == true, "PublicSale: not registered in whitelist");
         uint256 tokenSaleAmount = calculSaleToken(_amount);
-        uint256 salePossible = calculTierAmount(msg.sender);
+        uint256 salePossible = calculTierAmount(_sender);
 
         require(
             salePossible >= userEx.saleAmount.add(tokenSaleAmount),
             "PublicSale: just buy tier's allocated amount"
         );
 
+        uint256 tier = calculTier(_sender);
+
         if(userEx.payAmount == 0) {
             totalRound1Users = totalRound1Users.add(1);
             totalUsers = totalUsers.add(1);
+            tiersExAccount[tier] = tiersExAccount[tier].add(1);
         }
 
         userEx.payAmount = userEx.payAmount.add(_amount);
@@ -563,36 +667,44 @@ contract PublicSale is
         totalExPurchasedAmount = totalExPurchasedAmount.add(_amount);
         totalExSaleAmount = totalExSaleAmount.add(tokenSaleAmount);
 
-        uint256 tier = calculTier(msg.sender);
-        tiersExAccount[tier] = tiersExAccount[tier].add(1);
         
-        uint256 tonAllowance = getToken.allowance(msg.sender, address(this));
-        uint256 tonBalance = getToken.balanceOf(msg.sender);
+        uint256 tonAllowance = getToken.allowance(_sender, address(this));
+        uint256 tonBalance = getToken.balanceOf(_sender);
+        if(tonAllowance > tonBalance) {
+            tonAllowance = tonBalance; //tonAllowance가 tonBlance보다 더 클때 문제가 된다.
+        }
         if(tonAllowance < _amount) {
             uint256 needUserWton;
             uint256 needWton = _amount.sub(tonAllowance);
             needUserWton = _toRAY(needWton);
-            require(IWTON(wton).allowance(msg.sender, address(this)) >= needUserWton, "PublicSale: wton amount exceeds allowance");
-            require(IWTON(wton).balanceOf(msg.sender) >= needUserWton, "need more wton");
-            IERC20(wton).safeTransferFrom(msg.sender,address(this),needUserWton);
+            require(IWTON(wton).allowance(_sender, address(this)) >= needUserWton, "PublicSale: wton amount exceeds allowance");
+            require(IWTON(wton).balanceOf(_sender) >= needUserWton, "need more wton");
+            IERC20(wton).safeTransferFrom(_sender,address(this),needUserWton);
             IWTON(wton).swapToTON(needUserWton);
             require(tonAllowance >= _amount.sub(needWton), "PublicSale: ton amount exceeds allowance");
             if(_amount.sub(needWton) > 0) {
-                getToken.safeTransferFrom(msg.sender, address(this), _amount.sub(needWton));   
+                getToken.safeTransferFrom(_sender, address(this), _amount.sub(needWton));   
             }
             getToken.safeTransfer(getTokenOwner, _amount);
         } else {
             require(tonAllowance >= _amount && tonBalance >= _amount, "PublicSale: ton amount exceeds allowance");
 
-            getToken.safeTransferFrom(msg.sender, address(this), _amount);
+            getToken.safeTransferFrom(_sender, address(this), _amount);
             getToken.safeTransfer(getTokenOwner, _amount);
         }
 
-        emit ExclusiveSaled(msg.sender, _amount);
+        emit ExclusiveSaled(_sender, _amount);
     }
 
     /// @inheritdoc IPublicSale
-    function deposit(uint256 _amount) external override nonReentrant {
+    function deposit(
+        address _sender,
+        uint256 _amount
+    ) 
+        public 
+        override 
+        nonReentrant 
+    {
         require(
             block.timestamp >= startDepositTime,
             "PublicSale: don't start depositTime"
@@ -602,42 +714,45 @@ contract PublicSale is
             "PublicSale: end the depositTime"
         );
 
-        UserInfoOpen storage userOpen = usersOpen[msg.sender];
+        UserInfoOpen storage userOpen = usersOpen[_sender];
 
         if (!userOpen.join) {
-            depositors.push(msg.sender);
+            depositors.push(_sender);
             userOpen.join = true;
 
             totalRound2Users = totalRound2Users.add(1);
-            UserInfoEx storage userEx = usersEx[msg.sender];
+            UserInfoEx storage userEx = usersEx[_sender];
             if(userEx.payAmount == 0) totalUsers = totalUsers.add(1);
         }
         userOpen.depositAmount = userOpen.depositAmount.add(_amount);
         userOpen.saleAmount = 0;
         totalDepositAmount = totalDepositAmount.add(_amount);
 
-        uint256 tonAllowance = getToken.allowance(msg.sender, address(this));
-        uint256 tonBalance = getToken.balanceOf(msg.sender);
+        uint256 tonAllowance = getToken.allowance(_sender, address(this));
+        uint256 tonBalance = getToken.balanceOf(_sender);
+        if(tonAllowance > tonBalance) {
+            tonAllowance = tonBalance; //tonAllowance가 tonBlance보다 더 클때 문제가 된다.
+        }
         if(tonAllowance < _amount) {
             uint256 needUserWton;
             uint256 needWton = _amount.sub(tonAllowance);
             needUserWton = _toRAY(needWton);
-            require(IWTON(wton).allowance(msg.sender, address(this)) >= needUserWton, "PublicSale: wton amount exceeds allowance");
-            require(IWTON(wton).balanceOf(msg.sender) >= needUserWton, "need more wton");
-            IERC20(wton).safeTransferFrom(msg.sender,address(this),needUserWton);
+            require(IWTON(wton).allowance(_sender, address(this)) >= needUserWton, "PublicSale: wton amount exceeds allowance");
+            require(IWTON(wton).balanceOf(_sender) >= needUserWton, "need more wton");
+            IERC20(wton).safeTransferFrom(_sender,address(this),needUserWton);
             IWTON(wton).swapToTON(needUserWton);
             require(tonAllowance >= _amount.sub(needWton), "PublicSale: ton amount exceeds allowance");
             if(_amount.sub(needWton) > 0) {
-                getToken.safeTransferFrom(msg.sender, address(this), _amount.sub(needWton));   
+                getToken.safeTransferFrom(_sender, address(this), _amount.sub(needWton));   
             }
         } else {
             require(tonAllowance >= _amount && tonBalance >= _amount, "PublicSale: ton amount exceeds allowance");
 
-            getToken.safeTransferFrom(msg.sender, address(this), _amount);
+            getToken.safeTransferFrom(_sender, address(this), _amount);
         }
 
 
-        emit Deposited(msg.sender, _amount);
+        emit Deposited(_sender, _amount);
     }
 
     /// @inheritdoc IPublicSale

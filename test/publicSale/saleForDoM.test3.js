@@ -424,8 +424,14 @@ describe("Sale", () => {
                 wton.address            
             );
             saleContract = new ethers.Contract( PublicSaleContract.address, PublicSale_ABI.abi, ethers.provider );
+            //2,000,000의 판매량
             await saleToken.connect(saleTokenOwner).transfer(saleContract.address, totalBigAmount)
             
+            //account1 = WTON 60, TON 200
+            //account2 = WTON 400, TON 120
+            //account3 = WTON 300, TON 820
+            //account4 = WTON 0, TON 1100
+            //account6 = WTON 0, TON 300
             await getToken.connect(saleTokenOwner).transfer(account1.address, account1BigTONAmount)
             await wton.mint(account1.address, account1BigWTONAmount, {
                 from: defaultSender,
@@ -690,48 +696,84 @@ describe("Sale", () => {
 
             it("exclusiveSale after exclusive startTime", async () => {
                 let big60 = ethers.utils.parseUnits("60", 18);
-                // let account1TON = Number(await getToken.balanceOf(account1.address))
-                // let account1WTON = Number(await wton.balanceOf(account1.address))
+                let account1TON = Number(await getToken.balanceOf(account1.address))
+                let account1WTON = Number(await wton.balanceOf(account1.address))
+                let account2TON = Number(await getToken.balanceOf(account2.address))
+                let account2WTON = Number(await wton.balanceOf(account2.address))
+                let account3TON = Number(await getToken.balanceOf(account3.address))
+                let account3WTON = Number(await wton.balanceOf(account3.address))
+                let account4TON = Number(await getToken.balanceOf(account4.address))
+                let account4WTON = Number(await wton.balanceOf(account4.address))
+                let account6TON = Number(await getToken.balanceOf(account6.address))
+                let account6WTON = Number(await wton.balanceOf(account6.address))
+                
                 // let contractTON = Number(await getToken.balanceOf(account5.address))
-                // console.log("account1 TON :", account1TON)
-                // console.log("account1 WTON :", account1WTON)
                 // console.log("contract TON :", contractTON)
+                console.log("account1 TON :", account1TON)
+                console.log("account1 WTON :", account1WTON)
+                console.log("account2 TON :", account2TON)
+                console.log("account2 WTON :", account2WTON)
+                console.log("account3 TON :", account3TON)
+                console.log("account3 WTON :", account3WTON)
+                console.log("account4 TON :", account4TON)
+                console.log("account4 WTON :", account4WTON)
+                console.log("account6 TON :", account6TON)
+                console.log("account6 WTON :", account6WTON)
 
                 await wton.connect(account1).approve(saleContract.address, account1BigWTONAmount)
                 await saleContract.connect(account1).exclusiveSale(big60)
                 let tx = await saleContract.usersEx(account1.address)
                 expect(Number(tx.payAmount)).to.be.equal(Number(big60))
-                // let account1TON2 = Number(await getToken.balanceOf(account1.address))
-                // let account1WTON2 = Number(await wton.balanceOf(account1.address))
                 // let contractTON2 = Number(await getToken.balanceOf(account5.address))
-                // console.log("account1 TON2 :", account1TON2)
-                // console.log("account1 WTON2 :", account1WTON2)
                 // console.log("contract TON2 :", contractTON2)
                 // console.log(Number(tx.payAmount));
-
+                
                 
                 let big120 = ethers.utils.parseUnits("120", 18);
                 await getToken.connect(account2).approve(saleContract.address, big120)
                 await saleContract.connect(account2).exclusiveSale(big120)
                 let tx2 = await saleContract.usersEx(account2.address)
                 expect(Number(tx2.payAmount)).to.be.equal(Number(big120))
-
+                
                 let big220 = ethers.utils.parseUnits("220", 18);
                 await getToken.connect(account3).approve(saleContract.address, big220)
                 await saleContract.connect(account3).exclusiveSale(big220)
                 let tx3 = await saleContract.usersEx(account3.address)
                 expect(Number(tx3.payAmount)).to.be.equal(Number(big220))
-
+                
                 let big300 = ethers.utils.parseUnits("300", 18);
                 await getToken.connect(account4).approve(saleContract.address, big300)
                 await saleContract.connect(account4).exclusiveSale(big300)
                 let tx4 = await saleContract.usersEx(account4.address)
                 expect(Number(tx4.payAmount)).to.be.equal(Number(big300))
-
+                
                 await getToken.connect(account6).approve(saleContract.address, account6BigTONAmount)
                 await saleContract.connect(account6).exclusiveSale(account6BigTONAmount)
                 let tx5 = await saleContract.usersEx(account6.address)
                 expect(Number(tx5.payAmount)).to.be.equal(Number(account6BigTONAmount))
+                
+                
+                let account1TON2 = Number(await getToken.balanceOf(account1.address))
+                let account1WTON2 = Number(await wton.balanceOf(account1.address))
+                let account2TON2 = Number(await getToken.balanceOf(account2.address))
+                let account2WTON2 = Number(await wton.balanceOf(account2.address))
+                let account3TON2 = Number(await getToken.balanceOf(account3.address))
+                let account3WTON2 = Number(await wton.balanceOf(account3.address))
+                let account4TON2 = Number(await getToken.balanceOf(account4.address))
+                let account4WTON2 = Number(await wton.balanceOf(account4.address))
+                let account6TON2 = Number(await getToken.balanceOf(account6.address))
+                let account6WTON2 = Number(await wton.balanceOf(account6.address))
+                console.log("------------------------------------------------------")
+                console.log("account1 TON2 :", account1TON2)
+                console.log("account1 WTON2 :", account1WTON2)
+                console.log("account2 TON2 :", account2TON2)
+                console.log("account2 WTON2 :", account2WTON2)
+                console.log("account3 TON2 :", account3TON2)
+                console.log("account3 WTON2 :", account3WTON2)
+                console.log("account4 TON2 :", account4TON2)
+                console.log("account4 WTON2 :", account4WTON2)
+                console.log("account6 TON2 :", account6TON2)
+                console.log("account6 WTON2 :", account6WTON2)
 
                 let big1000 = ethers.utils.parseUnits("1000", 18);
                 let big1000000 = ethers.utils.parseUnits("1000000", 18);
@@ -775,15 +817,29 @@ describe("Sale", () => {
                 await wton.connect(account3).approve(saleContract.address, account3BigWTONAmount)           //300
                 await getToken.connect(account4).approve(saleContract.address, big800)                      //800
 
-                // let token2TON = await getToken.allowance(account4.address, saleContract.address);
-                // let account1Balance = Number(await getToken.balanceOf(account4.address))
-                // console.log("tonBalance : ",Number(account1Balance))
-                // console.log("tonAllowance : ",Number(token2TON))
-
-                // console.log("_amount : ",Number(big800))
-
+                let account1TON = Number(await getToken.balanceOf(account1.address))
+                let account1WTON = Number(await wton.balanceOf(account1.address))
+                let account2TON = Number(await getToken.balanceOf(account2.address))
                 let account2WTON = Number(await wton.balanceOf(account2.address))
+                let account3TON = Number(await getToken.balanceOf(account3.address))
+                let account3WTON = Number(await wton.balanceOf(account3.address))
+                let account4TON = Number(await getToken.balanceOf(account4.address))
+                let account4WTON = Number(await wton.balanceOf(account4.address))
+                let account6TON = Number(await getToken.balanceOf(account6.address))
+                let account6WTON = Number(await wton.balanceOf(account6.address))
+                
+                // let contractTON = Number(await getToken.balanceOf(account5.address))
+                // console.log("contract TON :", contractTON)
+                console.log("account1 TON :", account1TON)
+                console.log("account1 WTON :", account1WTON)
+                console.log("account2 TON :", account2TON)
                 console.log("account2 WTON :", account2WTON)
+                console.log("account3 TON :", account3TON)
+                console.log("account3 WTON :", account3WTON)
+                console.log("account4 TON :", account4TON)
+                console.log("account4 WTON :", account4WTON)
+                console.log("account6 TON :", account6TON)
+                console.log("account6 WTON :", account6WTON)
 
                 
                 await saleContract.connect(account1).deposit(big200)
@@ -791,8 +847,27 @@ describe("Sale", () => {
                 await saleContract.connect(account3).deposit(big600)
                 await saleContract.connect(account4).deposit(big800)
 
+                let account1TON2 = Number(await getToken.balanceOf(account1.address))
+                let account1WTON2 = Number(await wton.balanceOf(account1.address))
+                let account2TON2 = Number(await getToken.balanceOf(account2.address))
                 let account2WTON2 = Number(await wton.balanceOf(account2.address))
+                let account3TON2 = Number(await getToken.balanceOf(account3.address))
+                let account3WTON2 = Number(await wton.balanceOf(account3.address))
+                let account4TON2 = Number(await getToken.balanceOf(account4.address))
+                let account4WTON2 = Number(await wton.balanceOf(account4.address))
+                let account6TON2 = Number(await getToken.balanceOf(account6.address))
+                let account6WTON2 = Number(await wton.balanceOf(account6.address))
+                console.log("------------------------------------------------------")
+                console.log("account1 TON2 :", account1TON2)
+                console.log("account1 WTON2 :", account1WTON2)
+                console.log("account2 TON2 :", account2TON2)
                 console.log("account2 WTON2 :", account2WTON2)
+                console.log("account3 TON2 :", account3TON2)
+                console.log("account3 WTON2 :", account3WTON2)
+                console.log("account4 TON2 :", account4TON2)
+                console.log("account4 WTON2 :", account4WTON2)
+                console.log("account6 TON2 :", account6TON2)
+                console.log("account6 WTON2 :", account6WTON2)
 
 
 
@@ -1089,28 +1164,28 @@ describe("Sale", () => {
             expect(tx10).to.be.equal(2)
         })
 
-        it("resetData", async () => {
-            await saleContract.connect(saleOwner).resetAllData()
-            let tx = Number(await saleContract.totalWhitelists())
-            expect(tx).to.be.equal(0)
-            let tx2 = Number(await saleContract.totalExSaleAmount())
-            expect(tx2).to.be.equal(0)
-            let tx3 = Number(await saleContract.totalExPurchasedAmount())
-            expect(tx3).to.be.equal(0)
-            let tx4 = Number(await saleContract.totalDepositAmount())
-            expect(tx4).to.be.equal(0)
-            let tx5 = Number(await saleContract.totalOpenSaleAmount())
-            expect(tx5).to.be.equal(0)
-            let tx6 = Number(await saleContract.totalOpenPurchasedAmount())
-            expect(tx6).to.be.equal(0)
-            let tx7 = Number(await saleContract.tiersAccount(1))
-            expect(tx7).to.be.equal(0)
-            let tx8 = Number(await saleContract.tiersAccount(4))
-            expect(tx8).to.be.equal(0)
-            let tx9 = Number(await saleContract.tiersExAccount(1))
-            expect(tx9).to.be.equal(0)
-            let tx10 = Number(await saleContract.tiersExAccount(4))
-            expect(tx10).to.be.equal(0)
-        })
+        // it("resetData", async () => {
+        //     await saleContract.connect(saleOwner).resetAllData()
+        //     let tx = Number(await saleContract.totalWhitelists())
+        //     expect(tx).to.be.equal(0)
+        //     let tx2 = Number(await saleContract.totalExSaleAmount())
+        //     expect(tx2).to.be.equal(0)
+        //     let tx3 = Number(await saleContract.totalExPurchasedAmount())
+        //     expect(tx3).to.be.equal(0)
+        //     let tx4 = Number(await saleContract.totalDepositAmount())
+        //     expect(tx4).to.be.equal(0)
+        //     let tx5 = Number(await saleContract.totalOpenSaleAmount())
+        //     expect(tx5).to.be.equal(0)
+        //     let tx6 = Number(await saleContract.totalOpenPurchasedAmount())
+        //     expect(tx6).to.be.equal(0)
+        //     let tx7 = Number(await saleContract.tiersAccount(1))
+        //     expect(tx7).to.be.equal(0)
+        //     let tx8 = Number(await saleContract.tiersAccount(4))
+        //     expect(tx8).to.be.equal(0)
+        //     let tx9 = Number(await saleContract.tiersExAccount(1))
+        //     expect(tx9).to.be.equal(0)
+        //     let tx10 = Number(await saleContract.tiersExAccount(4))
+        //     expect(tx10).to.be.equal(0)
+        // })
     })
 })

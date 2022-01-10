@@ -54,7 +54,7 @@ module.exports = {
       url: `https://mainnet.infura.io/v3/${process.env.INFURA_API_KEY}`,
       accounts: [ `${process.env.RINKEBY_PRIVATE_KEY}` ],
       gasMultiplier: 1.25,
-      gasPrice: 95000000000,
+      gasPrice: 136000000000,
     },
   },
   etherscan: {
