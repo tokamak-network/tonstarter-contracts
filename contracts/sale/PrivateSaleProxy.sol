@@ -10,25 +10,24 @@ import "./PrivateSaleStorage.sol";
 import "../interfaces/IWTON.sol";
 import "../interfaces/IPrivateSale.sol";
 
-contract PrivateSaleProxy is 
-    PrivateSaleStorage, 
+contract PrivateSaleProxy is
+    PrivateSaleStorage,
     AccessibleCommon,
     OnApprove,
     IPrivateSaleProxy
 {
     event Upgraded(address indexed implementation, uint256 _index);
 
-    /// @dev constructor of Stake1Proxy
-    constructor(address _logic,address _admin) {
+    /// @dev constructor of PrivateSaleProxy
+    constructor(address _logic) {
         //assert(IMPLEMENTATION_SLOT == bytes32(uint256(keccak256('eip1967.proxy.implementation')) - 1));
 
-        require(_logic != address(0), "Stake1Proxy: logic is zero");
+        require(_logic != address(0), "PrivateSaleProxy: logic is zero");
 
         _setImplementation(_logic, 0, true);
 
         _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
-        _setupRole(ADMIN_ROLE, _admin);
-        _setupRole(ADMIN_ROLE, address(this));
+        _setupRole(ADMIN_ROLE, msg.sender);
     }
 
     /// @dev Set pause state
@@ -100,7 +99,7 @@ contract PrivateSaleProxy is
             _selectors.length > 0,
             "Stake1Proxy: _selectors's size is zero"
         );
-        require(aliveImplementation[_imp], "Stake1Proxy: _imp is not alive");
+        require(aliveImplementation[_imp], "PrivateSaleProxy: _imp is not alive");
 
         for (uint256 i = 0; i < _selectors.length; i++) {
             require(
