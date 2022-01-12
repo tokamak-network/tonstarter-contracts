@@ -9,10 +9,15 @@ import "../common/AccessibleCommon.sol";
 import "./PublicSaleStorage.sol";
 import "../stake/ProxyBase.sol";
 
+import { OnApprove } from "./OnApprove.sol";
+import "../interfaces/IWTON.sol";
+import "../interfaces/IPublicSale.sol";
+
 contract PublicSaleProxy is 
     PublicSaleStorage,
     AccessibleCommon,
     ProxyBase,
+    OnApprove,
     IPublicSaleProxy
 {
     event Upgraded(address indexed implementation);
@@ -109,5 +114,45 @@ contract PublicSaleProxy is
         getTokenOwner = _getTokenOwner;
         sTOS = ILockTOS(_sTOS);
         wton = _wton;
+    }
+
+    function onApprove(
+        address sender,
+        address spender,
+        uint256 amount,
+        bytes calldata data
+    ) external override returns (bool) {
+        require(msg.sender == address(getToken) || msg.sender == address(IWTON(wton)), "PublicSale: only accept TON and WTON approve callback");
+        if(msg.sender == address(getToken)) {
+            uint256 wtonAmount = IPublicSale(address(this))._decodeApproveData(data);
+            if(wtonAmount == 0){
+                if(block.timestamp >= startExclusiveTime && block.timestamp < endExclusiveTime) {
+                    IPublicSale(address(this)).exclusiveSale(sender,amount);
+                } else {
+                    require(block.timestamp >= startDepositTime && block.timestamp < endDepositTime, "PublicSale: not SaleTime");
+                    IPublicSale(address(this)).deposit(sender,amount);
+                }
+            } else {
+                uint256 totalAmount = amount + wtonAmount;
+                if(block.timestamp >= startExclusiveTime && block.timestamp < endExclusiveTime) {
+                    IPublicSale(address(this)).exclusiveSale(sender,totalAmount);
+                }
+                else {
+                    require(block.timestamp >= startDepositTime && block.timestamp < endDepositTime, "PublicSale: not SaleTime");
+                    IPublicSale(address(this)).deposit(sender,totalAmount);
+                }
+            }
+        } else if (msg.sender == address(IWTON(wton))) {
+            uint256 wtonAmount = IPublicSale(address(this))._toWAD(amount);
+            if(block.timestamp >= startExclusiveTime && block.timestamp < endExclusiveTime) {
+                IPublicSale(address(this)).exclusiveSale(sender,wtonAmount);
+            }
+            else {
+                require(block.timestamp >= startDepositTime && block.timestamp < endDepositTime, "PublicSale: not SaleTime");
+                IPublicSale(address(this)).deposit(sender,wtonAmount);
+            }
+        }
+
+        return true;
     }
 }

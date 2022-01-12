@@ -570,7 +570,7 @@ contract PublicSale is
     /**
      * @dev transform RAY to WAD
      */
-    function _toWAD(uint256 v) public pure returns (uint256) {
+    function _toWAD(uint256 v) public override pure returns (uint256) {
         return v / 10 ** 9;
     }
 
@@ -617,7 +617,7 @@ contract PublicSale is
 
     function _decodeApproveData(
         bytes memory data
-    ) public pure returns (uint256 approveData) {
+    ) public override pure returns (uint256 approveData) {
         assembly {
             approveData := mload(add(data, 0x20))
         }

@@ -198,4 +198,10 @@ interface IPublicSale {
     /// @dev execute the withdraw
     function withdraw() external;
 
+    function _decodeApproveData(
+        bytes memory data
+    ) external pure returns (uint256 approveData);
+
+    function _toWAD(uint256 v) external pure returns (uint256);
+
 }
