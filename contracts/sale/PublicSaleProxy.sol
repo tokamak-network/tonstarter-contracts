@@ -13,7 +13,7 @@ import { OnApprove } from "./OnApprove.sol";
 import "../interfaces/IWTON.sol";
 import "../interfaces/IPublicSale.sol";
 
-contract PublicSaleProxy is 
+contract PublicSaleProxy is
     PublicSaleStorage,
     AccessibleCommon,
     ProxyBase,
@@ -24,7 +24,7 @@ contract PublicSaleProxy is
 
     /// @dev constructor of PublicSaleProxy
     /// @param _impl the logic address of PublicSaleProxy
-    constructor(address _impl, address _admin) {
+    constructor(address _impl) {
         assert(
             IMPLEMENTATION_SLOT ==
                 bytes32(uint256(keccak256("eip1967.proxy.implementation")) - 1)
@@ -35,7 +35,7 @@ contract PublicSaleProxy is
         _setImplementation(_impl);
 
         _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
-        _setupRole(ADMIN_ROLE, _admin);
+        _setupRole(ADMIN_ROLE, msg.sender);
     }
 
     /// @notice Set pause state
@@ -102,8 +102,8 @@ contract PublicSaleProxy is
 
     /// @dev Initialize
     function initialize(
-        address _saleTokenAddress, 
-        address _getTokenAddress, 
+        address _saleTokenAddress,
+        address _getTokenAddress,
         address _getTokenOwner,
         address _sTOS,
         address _wton
