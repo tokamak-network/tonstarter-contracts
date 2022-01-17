@@ -27,7 +27,8 @@ async function main() {
     // let sTOSAddress = "0xc1545632e67cefF8ECaB83072118271577e66aDc" //rinkeby (sTosToken)(sTOS의 proxy)
     // let sTOSAddress = "0x8487632Aa57d663A84E836c212977a022346c50D" //rinkeby (sTOSToken2)
     // let sTOSAddress = "0xecd5a04e6ae20da1b77db90fb33fb7a7a27784af" //rinkeby (sTOSToken3)
-    let sTOSAddress = "0x8f66fadcfff73de561918052c070c445d68c0af4" //rinkeby (sTOSToken4)
+    // let sTOSAddress = "0x8f66fadcfff73de561918052c070c445d68c0af4" //rinkeby (sTOSToken4)
+    let sTOSAddress = "0x515218bA1cED69547c040f03d9DCEC7D3FdEdc33" //rinkeby (sTOSToken5)
 
     // let sTOSAddress = "0x69b4A202Fa4039B42ab23ADB725aA7b1e9EEBD79" //mainnet (sTOS)
     
@@ -41,7 +42,7 @@ async function main() {
     // let wtonAddress = "0xc4A11aaf6ea915Ed7Ac194161d2fC9384F15bff2" //mainnet (wtonToken)
     
     const saleProxy = await ethers.getContractFactory('PublicSaleProxy')
-    const proxyContract = await saleProxy.deploy(saleContract.address, ownerAddress)    
+    const proxyContract = await saleProxy.deploy(saleContract.address)    
     await proxyContract.deployed()
     console.log("proxyContract Address : ", proxyContract.address)
 
