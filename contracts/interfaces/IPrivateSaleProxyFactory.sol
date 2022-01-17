@@ -3,7 +3,7 @@ pragma solidity ^0.7.6;
 
 interface IPrivateSaleProxyFactory {
 
-    /// @dev Create a StakeTONProxy that can stake TON.
+    /// @dev Create a PrivateSaleProxy
     /// @param name name
     /// @param _logic the logic contract address used in proxy
     /// @param owner  owner address
