@@ -148,15 +148,15 @@ describe("LockTOS", function () {
     ]);
     await ethers.provider.send("evm_mine"); // mine the next block
 
-    userLockInfo.push({
-      lockId: await createLockWithPermit({
-        tos,
-        lockTOS,
-        user: user,
-        amount: 100000000,
-        unlockWeeks: 5,
-      }),
-    });
+    // userLockInfo.push({
+    //   lockId: await createLockWithPermit({
+    //     tos,
+    //     lockTOS,
+    //     user: user,
+    //     amount: 100000000,
+    //     unlockWeeks: 100,
+    //   }),
+    // });
 
     userLockInfo.push({
       lockId: await createLockWithPermit({
@@ -164,7 +164,7 @@ describe("LockTOS", function () {
         lockTOS,
         user: user,
         amount: 200000000,
-        unlockWeeks: 10,
+        unlockWeeks: 155,
       }),
     });
   });
@@ -172,28 +172,31 @@ describe("LockTOS", function () {
   let initialTime;
   it("Distribute, claim, and distribute", async function () {
     initialTime = parseInt(await lockTOS.getCurrentTime());
-    await ethers.provider.send("evm_increaseTime", [1 * epochUnit]);
-    await ethers.provider.send("evm_mine");
+    // await ethers.provider.send("evm_increaseTime", [1 * epochUnit]);
+    // await ethers.provider.send("evm_mine");
 
-    const firstDistributionAmount = 5000000;
-    await approveTON(admin, firstDistributionAmount);
-    await distributeTON(admin, firstDistributionAmount);
+    // const firstDistributionAmount = 5000000;
+    // await approveTON(admin, firstDistributionAmount);
+    // await distributeTON(admin, firstDistributionAmount);
+    
+    // await ethers.provider.send("evm_increaseTime", [1 * epochUnit]);
+    // await ethers.provider.send("evm_mine");
+
+    // const firstClaimable = parseInt(await dividend.claimable(user.address, ton.address));
+    // console.log({ firstClaimable });
+    // await (await dividend.connect(user).claim(ton.address)).wait();
     
     await ethers.provider.send("evm_increaseTime", [1 * epochUnit]);
     await ethers.provider.send("evm_mine");
-
-    const firstClaimable = parseInt(await dividend.claimable(user.address, ton.address));
-    console.log({ firstClaimable });
-    await (await dividend.connect(user).claim(ton.address)).wait();
-
 
     const secondDistributionAmount = 3000000;
     await approveTON(admin, secondDistributionAmount);
     await distributeTON(admin, secondDistributionAmount);
 
-    await ethers.provider.send("evm_increaseTime", [epochUnit]);
+    await ethers.provider.send("evm_increaseTime", [100 * epochUnit]);
     await ethers.provider.send("evm_mine");
 
+    await (await lockTOS.connect(admin).globalCheckpoint()).wait();
     const secondClaimable = parseInt(await dividend.claimable(user.address, ton.address));
     console.log({ secondClaimable });
     await (await dividend.connect(user).claim(ton.address)).wait();
