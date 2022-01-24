@@ -116,6 +116,44 @@ contract PublicSale is
         }
     }
 
+    function setAllsetting(
+        uint256[8] calldata _Tier,
+        uint256[4] calldata _amount,
+        uint256[11] calldata _time
+    ) external onlyOwner beforeStartAddWhiteTime {
+        setTier(
+            _Tier[0],_Tier[1],_Tier[2],_Tier[3]
+        );
+        setTierPercents(
+            _Tier[4],_Tier[5],_Tier[6],_Tier[7]
+        );
+        setSaleAmount(
+            _amount[0],
+            _amount[1]
+        );
+        setTokenPrice(
+            _amount[2],
+            _amount[3]
+        ); 
+        setSnapshot(_time[0]);
+        setExclusiveTime(
+            _time[1],
+            _time[2],
+            _time[3],
+            _time[4]
+        );
+        setOpenTime(
+            _time[5],
+            _time[6]
+        );
+        setClaim(
+            _time[7],
+            _time[8],
+            _time[9],
+            _time[10]
+        );
+    }
+
     /// @inheritdoc IPublicSale
     function setAllValue(
         uint256 _snapshot,
@@ -123,13 +161,6 @@ contract PublicSale is
         uint256[2] calldata _openSaleTime,
         uint256[4] calldata _claimTime
     ) external override onlyOwner beforeStartAddWhiteTime {
-        require(
-            (_exclusiveTime[0] < _exclusiveTime[1]) &&
-                (_exclusiveTime[2] < _exclusiveTime[3])
-        );
-        require(
-            (_openSaleTime[0] < _openSaleTime[1])
-        );
         setSnapshot(_snapshot);
         setExclusiveTime(
             _exclusiveTime[0],
@@ -175,6 +206,10 @@ contract PublicSale is
         nonZero(_endExclusiveTime)
         beforeStartAddWhiteTime
     {
+        require(
+            (_startAddWhiteTime < _endAddWhiteTime) &&
+                (_startExclusiveTime < _endExclusiveTime)
+        );
         startAddWhiteTime = _startAddWhiteTime;
         endAddWhiteTime = _endAddWhiteTime;
         startExclusiveTime = _startExclusiveTime;
@@ -193,6 +228,9 @@ contract PublicSale is
         nonZero(_endDepositTime)
         beforeStartAddWhiteTime
     {
+        require(
+            (_startDepositTime < _endDepositTime)
+        );
         startDepositTime = _startDepositTime;
         endDepositTime = _endDepositTime;
     }
