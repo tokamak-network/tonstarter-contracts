@@ -55,6 +55,7 @@ const createLock = async ({ lockTOS, user, amount, unlockTime }) => {
   await (await lockTOS.connect(user).createLock(amount, unlockTime)).wait();
 };
 
+///
 const createLockWithPermit = async ({
   user,
   amount,
@@ -63,7 +64,7 @@ const createLockWithPermit = async ({
   lockTOS,
 }) => {
   const nonce = parseInt(await tos.nonces(user.address));
-  const deadline = parseInt(await time.latest()) + 1000;
+  const deadline = parseInt(await time.latest()) + 10000;
   const rawSignature = await user._signTypedData(
     {
       chainId: parseInt(await network.provider.send("eth_chainId")),

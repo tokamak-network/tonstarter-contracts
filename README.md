@@ -94,6 +94,15 @@
 
 * "LockTOSDividendProxy": "0x0f1174a204082c5e921015d6c785fe2b4aef8b17"
 
+
+## Deployed LockTOSDividendProxy related to DAO
+
+* "LockTOSDividend": "0x842cfc8c20968067cfd5af2c0ffb5f9d3c742b72"
+
+* "LockTOSDividendProxy": "0x17332f84cc0bbad551cd16675f406a0a2c55e28c"
+
+
+
 ## Deployed related to [DoorOpen]'s PublicSale
 
 * "PublicSale": "0xA2C90A682DC0849e9Ed8B781E06a73441b5CA1e6"
@@ -225,3 +234,10 @@ Using the [hardhat-etherscan plugin](https://hardhat.org/plugins/nomiclabs-hardh
 ### To generate UML by sol2uml
 `sol2uml ./contracts`
 
+### private test scenario
+* TON = 20,000원 , DoM = 16원 => 1TON = 1,250 DoM
+* privateSaleTotalAmount = 12,500,000 DoM,  fisrtClaimTotalAmount = 625,000, 나머지 = 11,875,000, 매달 = 989,583.3333333~
+* account1 = 1000TON 삼, firstClaim = 62,500, 매달 98,958.33333, totalAmount = 1,250,000
+* account2 = 30000TON 삼, fisrtClaim = 187,500, 매달 296,874.99999, totalAmount = 3,750,000
+* account3 = 6000TON 삼, fisrtClaim = 375,000, 매달 593,749.999998, totalAmount = 7,500,000
+* saleStartTime = nowblock + 10, saleEndTime = startTime + 1day, fisrtClaimTime = endTime + 1day, claimTime = endTime + 180day
