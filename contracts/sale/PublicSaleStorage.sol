@@ -75,6 +75,10 @@ contract PublicSaleStorage  {
 
     bool public adminWithdraw; //withdraw 실행여부
 
+    uint256 public totalClaimCounts;
+    uint256[] public claimTimes;
+    uint256[] public claimPercents; 
+
     mapping (address => UserInfoEx) public usersEx;
     mapping (address => UserInfoOpen) public usersOpen;
     mapping (address => UserClaim) public usersClaim;

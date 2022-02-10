@@ -256,6 +256,27 @@ contract PublicSale is
         claimFirst = _claimFirst;
     }
 
+    function setEachClaim(
+        uint256 _claimCounts,
+        uint256[] calldata _claimTimes,
+        uint256[] calldata _claimPercents
+    )
+        public
+        onlyOwner
+        beforeStartAddWhiteTime
+    {
+        totalClaimCounts = _claimCounts;
+        uint256 i = 0;
+        uint256 y = 0;
+        for(i = 0; i < _claimCounts; i++) {
+            claimTimes.push(_claimTimes[i]);
+            claimPercents.push(_claimPercents[i]);
+            y = y + _claimPercents[i];
+        }
+
+        require(y == 100, "the percents sum are needed 100");
+    }
+
     /// @inheritdoc IPublicSale
     function setAllTier(
         uint256[4] calldata _tier,
@@ -525,6 +546,28 @@ contract PublicSale is
                 return (periodReward, totalClaimReward);
             }
         }
+    }
+    function currentRound() public view returns (uint256 round) {
+        for(uint256 i = totalClaimCounts; i > 0; i--) {
+            if(block.timestamp < claimTimes[0]){
+                round = 0;
+            } else if(block.timestamp < claimTimes[i-1] && i != 0) {
+                round = i-1;
+            } else if (block.timestamp > claimTimes[totalClaimCounts-1]) {
+                round = totalClaimCounts;
+            }
+        }
+    }
+
+    function calculClaimAmount2(address _account, uint256 _round) public view returns (uint256 amount) {
+        if(block.timestamp < startClaimTime) return (0);
+        if(_round > totalClaimCounts) return (0);
+ 
+        UserClaim storage userClaim = usersClaim[_account];
+        (, uint256 realSaleAmount, ) = totalSaleUserAmount(_account);
+
+        if (realSaleAmount == 0 ) return (0);
+        if (userClaim.claimAmount >= realSaleAmount) return (0);
     }
 
     /// @inheritdoc IPublicSale
