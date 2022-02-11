@@ -119,7 +119,9 @@ contract PublicSale is
     function setAllsetting(
         uint256[8] calldata _Tier,
         uint256[4] calldata _amount,
-        uint256[11] calldata _time
+        uint256[8] calldata _time,
+        uint256[] calldata _claimTimes,
+        uint256[] calldata _claimPercents
     ) external onlyOwner beforeStartAddWhiteTime {
         setTier(
             _Tier[0],_Tier[1],_Tier[2],_Tier[3]
@@ -146,37 +148,10 @@ contract PublicSale is
             _time[5],
             _time[6]
         );
-        setClaim(
+        setEachClaim(
             _time[7],
-            _time[8],
-            _time[9],
-            _time[10]
-        );
-    }
-
-    /// @inheritdoc IPublicSale
-    function setAllValue(
-        uint256 _snapshot,
-        uint256[4] calldata _exclusiveTime,
-        uint256[2] calldata _openSaleTime,
-        uint256[4] calldata _claimTime
-    ) external override onlyOwner beforeStartAddWhiteTime {
-        setSnapshot(_snapshot);
-        setExclusiveTime(
-            _exclusiveTime[0],
-            _exclusiveTime[1],
-            _exclusiveTime[2],
-            _exclusiveTime[3]
-        );
-        setOpenTime(
-            _openSaleTime[0],
-            _openSaleTime[1]
-        );
-        setClaim(
-            _claimTime[0],
-            _claimTime[1],
-            _claimTime[2],
-            _claimTime[3]
+            _claimTimes,
+            _claimPercents
         );
     }
 
@@ -233,27 +208,6 @@ contract PublicSale is
         );
         startDepositTime = _startDepositTime;
         endDepositTime = _endDepositTime;
-    }
-
-    /// @inheritdoc IPublicSale
-    function setClaim(
-        uint256 _startClaimTime,
-        uint256 _claimInterval,
-        uint256 _claimPeriod,
-        uint256 _claimFirst
-    )
-        public
-        override
-        onlyOwner
-        nonZero(_startClaimTime)
-        nonZero(_claimInterval)
-        nonZero(_claimPeriod)
-        beforeStartAddWhiteTime
-    {
-        startClaimTime = _startClaimTime;
-        claimInterval = _claimInterval;
-        claimPeriod = _claimPeriod;
-        claimFirst = _claimFirst;
     }
 
     function setEachClaim(
@@ -499,54 +453,6 @@ contract PublicSale is
         return openSalePossible;
     }
 
-    /// @inheritdoc IPublicSale
-    function calculClaimAmount(address _account, uint256 _period)
-        public
-        view
-        override
-        returns (uint256 _reward, uint256 _totalClaim)
-    {
-        if(block.timestamp < startClaimTime) return (0, 0);
-        if(_period > claimPeriod) return (0,0);
-
-        UserClaim storage userClaim = usersClaim[_account];
-        (, uint256 realSaleAmount, ) = totalSaleUserAmount(_account);
-
-        if (realSaleAmount == 0 ) return (0, 0);
-        if (userClaim.claimAmount >= realSaleAmount) return (0, realSaleAmount);
-
-        uint256 difftime = block.timestamp.sub(startClaimTime);
-        uint256 totalClaimReward = realSaleAmount;
-        uint256 firstReward = totalClaimReward.mul(claimFirst).div(100);
-        uint256 periodReward = (totalClaimReward.sub(firstReward)).div(claimPeriod.sub(1));
-
-        if(_period == 0) {
-            if (difftime < claimInterval) {
-                uint256 reward = firstReward.sub(userClaim.claimAmount);
-                return (reward, totalClaimReward);
-            } else {
-                uint256 period = (difftime / claimInterval).add(1);
-                if (period >= claimPeriod) {
-                    uint256 reward =
-                        totalClaimReward.sub(userClaim.claimAmount);
-                    return (reward, totalClaimReward);
-                } else {
-                    uint256 reward = firstReward.add(periodReward.mul(period.sub(1))).sub(userClaim.claimAmount);
-                    return (reward, totalClaimReward);
-                }
-            }
-        } else if(_period == 1){
-            return (firstReward, totalClaimReward);
-        } else {
-            if(_period == claimPeriod) {
-                uint256 reward =
-                    totalClaimReward.sub((firstReward.add(periodReward.mul(claimPeriod.sub(2)))));
-                return (reward, totalClaimReward);
-            } else {
-                return (periodReward, totalClaimReward);
-            }
-        }
-    }
     function currentRound() public view returns (uint256 round) {
         for(uint256 i = totalClaimCounts; i > 0; i--) {
             if(block.timestamp < claimTimes[0]){
@@ -559,15 +465,43 @@ contract PublicSale is
         }
     }
 
-    function calculClaimAmount2(address _account, uint256 _round) public view returns (uint256 amount) {
-        if(block.timestamp < startClaimTime) return (0);
-        if(_round > totalClaimCounts) return (0);
+    function calculClaimAmount(address _account, uint256 _period) 
+        public 
+        view 
+        override
+        returns (uint256 _reward, uint256 _totalClaim) 
+    {
+        if(block.timestamp < startClaimTime) return (0, 0);
+        if(_period > totalClaimCounts) return (0, 0);
  
         UserClaim storage userClaim = usersClaim[_account];
-        (, uint256 realSaleAmount, ) = totalSaleUserAmount(_account);
+        (, uint256 realSaleAmount, ) = totalSaleUserAmount(_account);   //유저가 총 구매한 token의 양을 Return 함
 
-        if (realSaleAmount == 0 ) return (0);
-        if (userClaim.claimAmount >= realSaleAmount) return (0);
+        if (realSaleAmount == 0 ) return (0, 0);
+        if (userClaim.claimAmount >= realSaleAmount) return (0, 0);    //userClaim.claimAmount  = contract에서 유저에게 준양
+
+        //해당 라운드에서 받아야하는 토큰의 양 -> (realSaleAmount * claimPercents[i] / 100) : 해당 라운드에서 받아야하는 토큰의 양
+        uint256 totalClaimReward = realSaleAmount;
+        uint256 round = currentRound();
+
+        uint256 expectedClaimAmount;
+        for(uint256 i = 0; i < round; i++) {
+            expectedClaimAmount = expectedClaimAmount + (totalClaimReward * claimPercents[i] / 100);
+        }
+
+        //Period를 0으로 넣으면 현재 내가 받는 양을 리턴해주고 1 이상을 넣으면 해당 라운드에서 받을 수 있는 토큰의 양을 리턴해줌
+        if(_period == 0) {    
+            if(totalClaimCounts == round) {  
+                uint256 amount = totalClaimReward - userClaim.claimAmount;
+                return (amount, totalClaimReward);
+            } else {
+                uint256 amount = expectedClaimAmount - userClaim.claimAmount;
+                return (amount, totalClaimReward);
+            }   
+        } else {
+            uint256 amount = (totalClaimReward * claimPercents[(_period.sub(1))] / 100);
+            return (amount, totalClaimReward);
+        }
     }
 
     /// @inheritdoc IPublicSale
@@ -713,7 +647,7 @@ contract PublicSale is
         public
         override
         nonZero(_amount)
-        nonZero(claimPeriod)
+        nonZero(totalClaimCounts)
         nonReentrant
     {
         require(
@@ -839,7 +773,7 @@ contract PublicSale is
     /// @inheritdoc IPublicSale
     function claim() external override {
         require(
-            block.timestamp >= startClaimTime,
+            block.timestamp >= claimTimes[0],
             "PublicSale: don't start claimTime"
         );
         UserClaim storage userClaim = usersClaim[msg.sender];

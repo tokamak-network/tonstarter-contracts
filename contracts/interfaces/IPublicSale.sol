@@ -6,18 +6,6 @@ interface IPublicSale {
     function changeTONOwner(
         address _address
     ) external; 
-
-    /// @dev set setAllValue
-    /// @param _snapshot _snapshot timestamp
-    /// @param _exclusiveTime[4] Round1 time setting
-    /// @param _openSaleTime[2] Round2 time setting
-    /// @param _claimTime[4] claimTime setting
-    function setAllValue(
-        uint256 _snapshot,
-        uint256[4] calldata _exclusiveTime,
-        uint256[2] calldata _openSaleTime,
-        uint256[4] calldata _claimTime
-    ) external;
     
     /// @dev set snapshot
     /// @param _snapshot _snapshot timestamp
@@ -41,17 +29,6 @@ interface IPublicSale {
     function setOpenTime(
         uint256 _startDepositTime,
         uint256 _endDepositTime
-    ) external;
-
-    /// @dev set information related to claim
-    /// @param _startClaimTime start time of claim
-    /// @param _claimInterval claim period seconds
-    /// @param _claimPeriod number of claims
-    function setClaim(
-        uint256 _startClaimTime,
-        uint256 _claimInterval,
-        uint256 _claimPeriod,
-        uint256 _claimFirst
     ) external;
 
     /// @dev set information related to tier and tierPercents
