@@ -57,7 +57,7 @@ describe("Sale", () => {
     //account1 -> 160,000 DOC -> 260TON 참여 -> 160 TON 구매 100 TON 환불
     //account2 -> 320,000 DOC -> 520TON 참여 -> 320 TON 구매 200 TON 환불
     //account3 -> 520,000 DOC -> 820TON 참여 -> 520 TON 구매 300 TON 환불
-    //account4 -> 600,000 DOC -> 1100TON 참여 -> 700 TON 구매 400 TON 환불
+    //account4 -> 700,000 DOC -> 1100TON 참여 -> 700 TON 구매 400 TON 환불
     //account6 -> 300,000 DOC -> 300TON 참여 -> 300 TON 구매
 
     //원하는 시간에 맞춰서 정해진 수량 배분 (총 6번 실행할 것 시간은 처음 클레임 시작 후 1분 후 2분 후 3분 후 4분 후 로 테스트)
@@ -67,11 +67,11 @@ describe("Sale", () => {
     //claimPercent4 = 20%
     //claimPercent5 = 10%
 
-    //account1 = 48,000 , 32,000 , 32,000, 32,000 , 32,000 , 16,000 -> 160,000 DOC
-    //account2 = 96,000 , 64,000 , 64,000, 64,000 , 64,000 , 32,000 -> 320,000 DOC
-    //account3 = 156,000 , 104,000 , 104,000, 104,000 , 104,000 , 52,000 -> 520,000 DOC
-    //account4 = 180,000 , 120,000 , 120,000, 120,000 , 120,000 , 60,000 -> 600,000 DOC
-    //account6 = 90,000 , 60,000 , 60,000, 60,000 , 60,000 , 30,000 -> 300,000 DOC
+    //account1 = 48,000 , 32,000 , 32,000, 32,000 , 16,000 -> 160,000 DOC
+    //account2 = 96,000 , 64,000 , 64,000, 64,000 , 32,000 -> 320,000 DOC
+    //account3 = 156,000 , 104,000 , 104,000, 104,000, 52,000 -> 520,000 DOC
+    //account4 = 210,000 , 140,000 , 140,000, 140,000 , 70,000 -> 700,000 DOC
+    //account6 = 90,000 , 60,000 , 60,000, 60,000 , 30,000 -> 300,000 DOC
 
     let claimPercent1 = 30;
     let claimPercent2 = 20;
@@ -515,16 +515,16 @@ describe("Sale", () => {
 
                 let tx = await saleContract.connect(saleOwner).saleTokenPrice()
                 let tx2 = await saleContract.connect(saleOwner).payTokenPrice()
-                console.log("tx : ", tx)
+                // console.log("tx : ", tx)
                 expect(tx).to.be.equal(saleTokenPrice)
-                console.log("tx : ", tx2)
+                // console.log("tx : ", tx2)
                 expect(tx2).to.be.equal(payTokenPrice)
 
                 let tx3 = Number(await saleContract.connect(saleOwner).totalExpectSaleAmount())
-                console.log("tx3 : ", tx3)
+                // console.log("tx3 : ", tx3)
                 expect(tx3).to.be.equal(Number(round1SaleAmount))
                 let tx4 = Number(await saleContract.connect(saleOwner).totalExpectOpenSaleAmount())
-                console.log("tx4 : ", tx4)
+                // console.log("tx4 : ", tx4)
                 expect(tx4).to.be.equal(Number(round2SaleAmount))
                 
                 let tx5 = Number(await saleContract.connect(saleOwner).tiers(1))
@@ -710,16 +710,17 @@ describe("Sale", () => {
                 
                 // let contractTON = Number(await getToken.balanceOf(account5.address))
                 // console.log("contract TON :", contractTON)
-                console.log("account1 TON :", account1TON)
-                console.log("account1 WTON :", account1WTON)
-                console.log("account2 TON :", account2TON)
-                console.log("account2 WTON :", account2WTON)
-                console.log("account3 TON :", account3TON)
-                console.log("account3 WTON :", account3WTON)
-                console.log("account4 TON :", account4TON)
-                console.log("account4 WTON :", account4WTON)
-                console.log("account6 TON :", account6TON)
-                console.log("account6 WTON :", account6WTON)
+
+                // console.log("account1 TON :", account1TON)
+                // console.log("account1 WTON :", account1WTON)
+                // console.log("account2 TON :", account2TON)
+                // console.log("account2 WTON :", account2WTON)
+                // console.log("account3 TON :", account3TON)
+                // console.log("account3 WTON :", account3WTON)
+                // console.log("account4 TON :", account4TON)
+                // console.log("account4 WTON :", account4WTON)
+                // console.log("account6 TON :", account6TON)
+                // console.log("account6 WTON :", account6WTON)
 
                 await wton.connect(account1).approveAndCall(saleContract.address, account1BigWTONAmount, 0);
                 // await wton.connect(account1).approve(saleContract.address, account1BigWTONAmount)
@@ -764,17 +765,17 @@ describe("Sale", () => {
                 let account4WTON2 = Number(await wton.balanceOf(account4.address))
                 let account6TON2 = Number(await getToken.balanceOf(account6.address))
                 let account6WTON2 = Number(await wton.balanceOf(account6.address))
-                console.log("------------------------------------------------------")
-                console.log("account1 TON2 :", account1TON2)
-                console.log("account1 WTON2 :", account1WTON2)
-                console.log("account2 TON2 :", account2TON2)
-                console.log("account2 WTON2 :", account2WTON2)
-                console.log("account3 TON2 :", account3TON2)
-                console.log("account3 WTON2 :", account3WTON2)
-                console.log("account4 TON2 :", account4TON2)
-                console.log("account4 WTON2 :", account4WTON2)
-                console.log("account6 TON2 :", account6TON2)
-                console.log("account6 WTON2 :", account6WTON2)
+                // console.log("------------------------------------------------------")
+                // console.log("account1 TON2 :", account1TON2)
+                // console.log("account1 WTON2 :", account1WTON2)
+                // console.log("account2 TON2 :", account2TON2)
+                // console.log("account2 WTON2 :", account2WTON2)
+                // console.log("account3 TON2 :", account3TON2)
+                // console.log("account3 WTON2 :", account3WTON2)
+                // console.log("account4 TON2 :", account4TON2)
+                // console.log("account4 WTON2 :", account4WTON2)
+                // console.log("account6 TON2 :", account6TON2)
+                // console.log("account6 WTON2 :", account6WTON2)
 
                 let big1000 = ethers.utils.parseUnits("1000", 18);
                 let big1000000 = ethers.utils.parseUnits("1000000", 18);
@@ -831,16 +832,17 @@ describe("Sale", () => {
                 
                 // let contractTON = Number(await getToken.balanceOf(account5.address))
                 // console.log("contract TON :", contractTON)
-                console.log("account1 TON :", account1TON)
-                console.log("account1 WTON :", account1WTON)
-                console.log("account2 TON :", account2TON)
-                console.log("account2 WTON :", account2WTON)
-                console.log("account3 TON :", account3TON)
-                console.log("account3 WTON :", account3WTON)
-                console.log("account4 TON :", account4TON)
-                console.log("account4 WTON :", account4WTON)
-                console.log("account6 TON :", account6TON)
-                console.log("account6 WTON :", account6WTON)
+
+                // console.log("account1 TON :", account1TON)
+                // console.log("account1 WTON :", account1WTON)
+                // console.log("account2 TON :", account2TON)
+                // console.log("account2 WTON :", account2WTON)
+                // console.log("account3 TON :", account3TON)
+                // console.log("account3 WTON :", account3WTON)
+                // console.log("account4 TON :", account4TON)
+                // console.log("account4 WTON :", account4WTON)
+                // console.log("account6 TON :", account6TON)
+                // console.log("account6 WTON :", account6WTON)
 
                 await getToken.connect(account1).approveAndCall(saleContract.address, big200, 0);
                 // await saleContract.connect(account1).deposit(big200)
@@ -873,19 +875,17 @@ describe("Sale", () => {
                 let account4WTON2 = Number(await wton.balanceOf(account4.address))
                 let account6TON2 = Number(await getToken.balanceOf(account6.address))
                 let account6WTON2 = Number(await wton.balanceOf(account6.address))
-                console.log("------------------------------------------------------")
-                console.log("account1 TON2 :", account1TON2)
-                console.log("account1 WTON2 :", account1WTON2)
-                console.log("account2 TON2 :", account2TON2)
-                console.log("account2 WTON2 :", account2WTON2)
-                console.log("account3 TON2 :", account3TON2)
-                console.log("account3 WTON2 :", account3WTON2)
-                console.log("account4 TON2 :", account4TON2)
-                console.log("account4 WTON2 :", account4WTON2)
-                console.log("account6 TON2 :", account6TON2)
-                console.log("account6 WTON2 :", account6WTON2)
-
-
+                // console.log("------------------------------------------------------")
+                // console.log("account1 TON2 :", account1TON2)
+                // console.log("account1 WTON2 :", account1WTON2)
+                // console.log("account2 TON2 :", account2TON2)
+                // console.log("account2 WTON2 :", account2WTON2)
+                // console.log("account3 TON2 :", account3TON2)
+                // console.log("account3 WTON2 :", account3WTON2)
+                // console.log("account4 TON2 :", account4TON2)
+                // console.log("account4 WTON2 :", account4WTON2)
+                // console.log("account6 TON2 :", account6TON2)
+                // console.log("account6 WTON2 :", account6WTON2)
 
                 let tx = await saleContract.usersOpen(account1.address)
                 expect(Number(tx.depositAmount)).to.be.equal(Number(account1BigTONAmount))
@@ -918,6 +918,9 @@ describe("Sale", () => {
             expect(Number(tx2.claimAmount)).to.be.equal(Number(expectClaim._reward))
             let tx3 = await saleToken.balanceOf(account1.address)
             expect(Number(tx3)).to.be.equal(Number(expectClaim._reward))
+
+            console.log("account1 amount : ", Number(tx3))
+            // account1 = 48,000
         })
 
         it("duration the time to claimTime2", async () => {
@@ -949,200 +952,211 @@ describe("Sale", () => {
             expect(Number(tx5.claimAmount)).to.be.equal(Number(expectClaim2._reward))
             let tx6 = await saleToken.balanceOf(account2.address)
             expect(Number(tx6)).to.be.equal(Number(expectClaim2._reward))
+            console.log("account1 amount : ", Number(tx4))
+            console.log("account2 amount : ", Number(tx6))
 
-            //account1 = 80,000 + 16,000
-            //account2 = 192,000
+            //account1 = 48,000 + 32,000 = 80,000
+            //account2 = 96,000 + 64,000 = 160,000
         })
 
-        // it("duration the time to period = 3", async () => {
-        //     let period3 = claimStartTime + (86400*2)
-        //     await ethers.provider.send('evm_setNextBlockTimestamp', [period3]);
-        //     await ethers.provider.send('evm_mine');
-        // })
+        it("duration the time to claimTime3", async () => {
+            await ethers.provider.send('evm_setNextBlockTimestamp', [claimTime3]);
+            await ethers.provider.send('evm_mine');
+        })
 
-        // it("claim period = 3, claim call the account1, account3", async () => {
-        //     let expectClaim = await saleContract.calculClaimAmount(account1.address, 3)
-        //     let expectClaim2 = await saleContract.calculClaimAmount(account3.address, 0)
-        //     let expectClaim3 = await saleContract.calculClaimAmount(account1.address, 1)
-        //     let expectClaim4 = await saleContract.calculClaimAmount(account1.address, 2)
+        it("claim claimTime3, claim call the account1, account3", async () => {
+            let expectClaim = await saleContract.calculClaimAmount(account1.address, 3)
+            let expectClaim2 = await saleContract.calculClaimAmount(account3.address, 0)
+            let expectClaim3 = await saleContract.calculClaimAmount(account1.address, 1)
+            let expectClaim4 = await saleContract.calculClaimAmount(account1.address, 2)
 
-        //     let claimAmount1 = await saleContract.usersClaim(account1.address)
-        //     expect(Number(claimAmount1.claimAmount)).to.be.equal(Number(expectClaim3._reward) + Number(expectClaim4._reward))
+            let claimAmount1 = await saleContract.usersClaim(account1.address)
+            expect(Number(claimAmount1.claimAmount)).to.be.equal(Number(expectClaim3._reward) + Number(expectClaim4._reward))
 
-        //     let claimAmount2 = await saleContract.usersClaim(account3.address)
-        //     expect(Number(claimAmount2.claimAmount)).to.be.equal(0)
+            let claimAmount2 = await saleContract.usersClaim(account3.address)
+            expect(Number(claimAmount2.claimAmount)).to.be.equal(0)
 
-        //     await saleContract.connect(account1).claim()
-        //     await saleContract.connect(account3).claim()
+            await saleContract.connect(account1).claim()
+            await saleContract.connect(account3).claim()
 
-        //     let tx3 = await saleContract.usersClaim(account1.address)
-        //     // console.log("period3 :", Number(tx3.claimAmount))
-        //     expect(Number(tx3.claimAmount)).to.be.equal((Number(claimAmount1.claimAmount)+Number(expectClaim._reward)))
-        //     let tx4 = await saleToken.balanceOf(account1.address)
-        //     expect(Number(tx4)).to.be.equal((Number(claimAmount1.claimAmount)+Number(expectClaim._reward)))
+            let tx3 = await saleContract.usersClaim(account1.address)
+            // console.log("period3 :", Number(tx3.claimAmount))
+            expect(Number(tx3.claimAmount)).to.be.equal((Number(claimAmount1.claimAmount)+Number(expectClaim._reward)))
+            let tx4 = await saleToken.balanceOf(account1.address)
+            expect(Number(tx4)).to.be.equal((Number(claimAmount1.claimAmount)+Number(expectClaim._reward)))
 
-        //     let tx5 = await saleContract.usersClaim(account3.address)
-        //     expect(Number(tx5.claimAmount)).to.be.equal(Number(expectClaim2._reward))
-        //     let tx6 = await saleToken.balanceOf(account3.address)
-        //     expect(Number(tx6)).to.be.equal(Number(expectClaim2._reward))
+            let tx5 = await saleContract.usersClaim(account3.address)
+            expect(Number(tx5.claimAmount)).to.be.equal(Number(expectClaim2._reward))
+            let tx6 = await saleToken.balanceOf(account3.address)
+            expect(Number(tx6)).to.be.equal(Number(expectClaim2._reward))
 
-        //     //account1 = 80,000 + 16,000 + 16,000
-        //     //account2 = 192,000
-        //     //account3 = 364,000
-        // })
+            console.log("account1 amount : ", Number(tx4))
+            console.log("account3 amount : ", Number(tx6))
 
-        // it("duration the time to period = 4", async () => {
-        //     let period4 = claimStartTime + (86400*3)
-        //     await ethers.provider.send('evm_setNextBlockTimestamp', [period4]);
-        //     await ethers.provider.send('evm_mine');
-        // })
+            //account1 = 48,000 + 32,000 + 32,000 = 112,000
+            //account2 = 96,000 + 64,000 = 160,000
+            //account3 = 156,000 + 104,000 + 104,000 = 364,000
+        })
 
-        // it("claim period = 4, claim call the account1, account4", async () => {
-        //     let expectClaim = await saleContract.calculClaimAmount(account1.address, 4)
-        //     let expectClaim2 = await saleContract.calculClaimAmount(account4.address, 0)
-        //     let expectClaim3 = await saleContract.calculClaimAmount(account1.address, 1)
-        //     let expectClaim4 = await saleContract.calculClaimAmount(account1.address, 2)
-        //     let expectClaim5 = await saleContract.calculClaimAmount(account1.address, 3)
+        it("duration the time to claimTime4", async () => {
+            await ethers.provider.send('evm_setNextBlockTimestamp', [claimTime4]);
+            await ethers.provider.send('evm_mine');
+        })
 
-        //     let claimAmount1 = await saleContract.usersClaim(account1.address)
-        //     expect(Number(claimAmount1.claimAmount)).to.be.equal(Number(expectClaim3._reward) + Number(expectClaim4._reward) + Number(expectClaim5._reward))
+        it("claim period = 4, claim call the account1, account4", async () => {
+            let expectClaim = await saleContract.calculClaimAmount(account1.address, 4)
+            let expectClaim2 = await saleContract.calculClaimAmount(account4.address, 0)
+            let expectClaim3 = await saleContract.calculClaimAmount(account1.address, 1)
+            let expectClaim4 = await saleContract.calculClaimAmount(account1.address, 2)
+            let expectClaim5 = await saleContract.calculClaimAmount(account1.address, 3)
 
-        //     let claimAmount2 = await saleContract.usersClaim(account4.address)
-        //     expect(Number(claimAmount2.claimAmount)).to.be.equal(0)
+            let claimAmount1 = await saleContract.usersClaim(account1.address)
+            expect(Number(claimAmount1.claimAmount)).to.be.equal(Number(expectClaim3._reward) + Number(expectClaim4._reward) + Number(expectClaim5._reward))
 
-        //     await saleContract.connect(account1).claim()
-        //     await saleContract.connect(account4).claim()
+            let claimAmount2 = await saleContract.usersClaim(account4.address)
+            expect(Number(claimAmount2.claimAmount)).to.be.equal(0)
 
-        //     let tx3 = await saleContract.usersClaim(account1.address)
-        //     // console.log("period4 :", Number(tx3.claimAmount))
-        //     expect(Number(tx3.claimAmount)).to.be.equal((Number(claimAmount1.claimAmount)+Number(expectClaim._reward)))
-        //     let tx4 = await saleToken.balanceOf(account1.address)
-        //     expect(Number(tx4)).to.be.equal((Number(claimAmount1.claimAmount)+Number(expectClaim._reward)))
+            await saleContract.connect(account1).claim()
+            await saleContract.connect(account4).claim()
 
-        //     let tx5 = await saleContract.usersClaim(account4.address)
-        //     expect(Number(tx5.claimAmount)).to.be.equal(Number(expectClaim2._reward))
-        //     let tx6 = await saleToken.balanceOf(account4.address)
-        //     expect(Number(tx6)).to.be.equal(Number(expectClaim2._reward))
+            let tx3 = await saleContract.usersClaim(account1.address)
+            // console.log("period4 :", Number(tx3.claimAmount))
+            expect(Number(tx3.claimAmount)).to.be.equal((Number(claimAmount1.claimAmount)+Number(expectClaim._reward)))
+            let tx4 = await saleToken.balanceOf(account1.address)
+            expect(Number(tx4)).to.be.equal((Number(claimAmount1.claimAmount)+Number(expectClaim._reward)))
 
-        //     //account1 = 80,000 + 16,000 + 16,000 + 16,000
-        //     //account2 = 160,000 + 32,000
-        //     //account3 = 260,000 + 52,000 + 52,000
-        //     //account4 = 350,000 + 70,000 + 70,000 + 70,000
-        // })
+            let tx5 = await saleContract.usersClaim(account4.address)
+            expect(Number(tx5.claimAmount)).to.be.equal(Number(expectClaim2._reward))
+            let tx6 = await saleToken.balanceOf(account4.address)
+            expect(Number(tx6)).to.be.equal(Number(expectClaim2._reward))
 
-        // it("duration the time to period = 6", async () => {
-        //     let period6 = claimStartTime + (86400*5)
-        //     await ethers.provider.send('evm_setNextBlockTimestamp', [period6]);
-        //     await ethers.provider.send('evm_mine');
-        // })
+            console.log("account1 amount : ", Number(tx4))
+            console.log("account4 amount : ", Number(tx6))
 
-        // it("claim period = 6, claim call the account1, account2", async () => {
-        //     let expectClaim = await saleContract.calculClaimAmount(account1.address, 5)
-        //     let expectClaim2 = await saleContract.calculClaimAmount(account2.address, 0)
-        //     let expectClaim3 = await saleContract.calculClaimAmount(account1.address, 1)
-        //     let expectClaim4 = await saleContract.calculClaimAmount(account1.address, 2)
-        //     let expectClaim5 = await saleContract.calculClaimAmount(account1.address, 3)
-        //     let expectClaim6 = await saleContract.calculClaimAmount(account1.address, 4)
-        //     let expectClaim7 = await saleContract.calculClaimAmount(account2.address, 1)
-        //     let expectClaim8 = await saleContract.calculClaimAmount(account2.address, 2)
+            //account1 = 48,000 + 32,000 + 32,000 + 32,000 = 144,000
+            //account2 = 96,000 + 64,000 = 160,000
+            //account3 = 156,000 + 104,000 + 104,000 = 364,000
+            //account4 = 210,000 + 140,000 + 140,000 + 140,000 = 630,000
+        })
 
-            
+        it("duration the time to claimTime5", async () => {
+            await ethers.provider.send('evm_setNextBlockTimestamp', [claimTime5]);
+            await ethers.provider.send('evm_mine');
+        })
 
-        //     let claimAmount1 = await saleContract.usersClaim(account1.address)
-        //     expect(Number(claimAmount1.claimAmount)).to.be.equal(Number(expectClaim3._reward) + Number(expectClaim4._reward) + Number(expectClaim5._reward) + Number(expectClaim6._reward))
+        it("claim claimTime5, claim call the account1, account2", async () => {
+            let expectClaim = await saleContract.calculClaimAmount(account1.address, 5)
+            let expectClaim2 = await saleContract.calculClaimAmount(account2.address, 0)
+            let expectClaim3 = await saleContract.calculClaimAmount(account1.address, 1)
+            let expectClaim4 = await saleContract.calculClaimAmount(account1.address, 2)
+            let expectClaim5 = await saleContract.calculClaimAmount(account1.address, 3)
+            let expectClaim6 = await saleContract.calculClaimAmount(account1.address, 4)
+            let expectClaim7 = await saleContract.calculClaimAmount(account2.address, 1)
+            let expectClaim8 = await saleContract.calculClaimAmount(account2.address, 2)
 
-        //     let claimAmount2 = await saleContract.usersClaim(account2.address)
-        //     expect(Number(claimAmount2.claimAmount)).to.be.equal(Number(expectClaim7._reward) + Number(expectClaim8._reward))
+            let claimAmount1 = await saleContract.usersClaim(account1.address)
+            expect(Number(claimAmount1.claimAmount)).to.be.equal(Number(expectClaim3._reward) + Number(expectClaim4._reward) + Number(expectClaim5._reward) + Number(expectClaim6._reward))
+
+            let claimAmount2 = await saleContract.usersClaim(account2.address)
+            expect(Number(claimAmount2.claimAmount)).to.be.equal(Number(expectClaim7._reward) + Number(expectClaim8._reward))
 
 
-        //     await saleContract.connect(account1).claim()
-        //     await saleContract.connect(account2).claim()
+            await saleContract.connect(account1).claim()
+            await saleContract.connect(account2).claim()
 
-        //     let tx3 = await saleContract.usersClaim(account1.address)
-        //     // console.log("period4 :", Number(tx3.claimAmount))
-        //     expect(Number(tx3.claimAmount)).to.be.equal(Number(expectClaim._totalClaim))
-        //     let tx4 = await saleToken.balanceOf(account1.address)
-        //     expect(Number(tx4)).to.be.equal(Number(expectClaim._totalClaim))
+            let tx3 = await saleContract.usersClaim(account1.address)
+            // console.log("period4 :", Number(tx3.claimAmount))
+            expect(Number(tx3.claimAmount)).to.be.equal(Number(expectClaim._totalClaim))
+            let tx4 = await saleToken.balanceOf(account1.address)
+            expect(Number(tx4)).to.be.equal(Number(expectClaim._totalClaim))
 
-        //     let tx5 = await saleContract.usersClaim(account2.address)
-        //     expect(Number(tx5.claimAmount)).to.be.equal(Number(expectClaim2._totalClaim))
-        //     let tx6 = await saleToken.balanceOf(account2.address)
-        //     expect(Number(tx6)).to.be.equal(Number(expectClaim2._totalClaim))
+            let tx5 = await saleContract.usersClaim(account2.address)
+            expect(Number(tx5.claimAmount)).to.be.equal(Number(expectClaim2._totalClaim))
+            let tx6 = await saleToken.balanceOf(account2.address)
+            expect(Number(tx6)).to.be.equal(Number(expectClaim2._totalClaim))
 
-        //     //account1 = 80,000 + 16,000 + 16,000 + 16,000 + 16,000 + 16,000
-        //     //account2 = 160,000 + 32,000 + 32,000 + 32,000 + 32,000 + 32,000
-        //     //account3 = 260,000 + 52,000 + 52,000
-        //     //account4 = 350,000 + 70,000 + 70,000 + 70,000
-        // })
+            console.log("account1 amount : ", Number(tx4))
+            console.log("account2 amount : ", Number(tx6))
 
-        // it("duration the time to period end", async () => {
-        //     let periodEnd = claimStartTime + (86400*7)
-        //     await ethers.provider.send('evm_setNextBlockTimestamp', [periodEnd]);
-        //     await ethers.provider.send('evm_mine');
-        // })
+            //account1 = 48,000 + 32,000 + 32,000 + 32,000 + 16,000 = 160,000
+            //account2 = 96,000 + 64,000 + 64,000 + 64,000 + 32,000 = 320,000
+            //account3 = 156,000 + 104,000 + 104,000 = 364,000
+            //account4 = 210,000 + 140,000 + 140,000 + 140,000 = 630,000
+        })
 
-        // it("claim period end, claim call the account1, account3, account4, account6", async () => {
-        //     let expectClaim = await saleContract.calculClaimAmount(account1.address, 0)
-        //     expect(Number(expectClaim._reward)).to.be.equal(0)
-        //     let expectClaim2 = await saleContract.calculClaimAmount(account3.address, 0)
-        //     let expectClaim3 = await saleContract.calculClaimAmount(account4.address, 0)
-        //     let expectClaim4 = await saleContract.calculClaimAmount(account6.address, 0)
-        //     let expectClaim5 = await saleContract.calculClaimAmount(account3.address, 1)
-        //     let expectClaim6 = await saleContract.calculClaimAmount(account3.address, 2)
-        //     let expectClaim7 = await saleContract.calculClaimAmount(account3.address, 3)
-        //     let expectClaim8 = await saleContract.calculClaimAmount(account4.address, 1)
-        //     let expectClaim9 = await saleContract.calculClaimAmount(account4.address, 2)
-        //     let expectClaim10 = await saleContract.calculClaimAmount(account4.address, 3)
-        //     let expectClaim11 = await saleContract.calculClaimAmount(account4.address, 4)
+        it("duration the time to period end", async () => {
+            let periodEnd = claimTime5 + (86400*7)
+            await ethers.provider.send('evm_setNextBlockTimestamp', [periodEnd]);
+            await ethers.provider.send('evm_mine');
+        })
 
-        //     let claimAmount1 = await saleContract.usersClaim(account3.address)
-        //     expect(Number(claimAmount1.claimAmount)).to.be.equal(Number(expectClaim5._reward) + Number(expectClaim6._reward) + Number(expectClaim7._reward))
+        it("claim period end, claim call the account1, account3, account4, account6", async () => {
+            let expectClaim = await saleContract.calculClaimAmount(account1.address, 0)
+            expect(Number(expectClaim._reward)).to.be.equal(0)
+            let expectClaim2 = await saleContract.calculClaimAmount(account3.address, 0)
+            let expectClaim3 = await saleContract.calculClaimAmount(account4.address, 0)
+            let expectClaim4 = await saleContract.calculClaimAmount(account6.address, 0)
+            let expectClaim5 = await saleContract.calculClaimAmount(account3.address, 1)
+            let expectClaim6 = await saleContract.calculClaimAmount(account3.address, 2)
+            let expectClaim7 = await saleContract.calculClaimAmount(account3.address, 3)
+            let expectClaim8 = await saleContract.calculClaimAmount(account4.address, 1)
+            let expectClaim9 = await saleContract.calculClaimAmount(account4.address, 2)
+            let expectClaim10 = await saleContract.calculClaimAmount(account4.address, 3)
+            let expectClaim11 = await saleContract.calculClaimAmount(account4.address, 4)
 
-        //     let claimAmount2 = await saleContract.usersClaim(account4.address)
-        //     expect(Number(claimAmount2.claimAmount)).to.be.equal(Number(expectClaim8._reward) + Number(expectClaim9._reward) + Number(expectClaim10._reward) + Number(expectClaim11._reward))
+            let claimAmount1 = await saleContract.usersClaim(account3.address)
+            expect(Number(claimAmount1.claimAmount)).to.be.equal(Number(expectClaim5._reward) + Number(expectClaim6._reward) + Number(expectClaim7._reward))
 
-        //     let claimAmount3 = await saleContract.usersClaim(account6.address)
-        //     expect(Number(expectClaim4._totalClaim)).to.be.equal(Number(expectClaim4._reward))
+            let claimAmount2 = await saleContract.usersClaim(account4.address)
+            expect(Number(claimAmount2.claimAmount)).to.be.equal(Number(expectClaim8._reward) + Number(expectClaim9._reward) + Number(expectClaim10._reward) + Number(expectClaim11._reward))
 
-        //     await saleContract.connect(account3).claim()
-        //     await saleContract.connect(account4).claim()
-        //     await saleContract.connect(account6).claim()
+            let claimAmount3 = await saleContract.usersClaim(account6.address)
+            expect(Number(expectClaim4._totalClaim)).to.be.equal(Number(expectClaim4._reward))
 
-        //     let tx3 = await saleContract.usersClaim(account3.address)
-        //     expect(Number(tx3.claimAmount)).to.be.equal(Number(expectClaim2._totalClaim))
-        //     let tx4 = await saleToken.balanceOf(account3.address)
-        //     expect(Number(tx4)).to.be.equal(Number(expectClaim2._totalClaim))
+            await saleContract.connect(account3).claim()
+            await saleContract.connect(account4).claim()
+            await saleContract.connect(account6).claim()
 
-        //     let tx5 = await saleContract.usersClaim(account4.address)
-        //     expect(Number(tx5.claimAmount)).to.be.equal(Number(expectClaim3._totalClaim))
-        //     let tx6 = await saleToken.balanceOf(account4.address)
-        //     expect(Number(tx6)).to.be.equal(Number(expectClaim3._totalClaim))
+            let tx3 = await saleContract.usersClaim(account3.address)
+            expect(Number(tx3.claimAmount)).to.be.equal(Number(expectClaim2._totalClaim))
+            let tx4 = await saleToken.balanceOf(account3.address)
+            expect(Number(tx4)).to.be.equal(Number(expectClaim2._totalClaim))
 
-        //     let tx7 = await saleToken.balanceOf(account6.address)
-        //     expect(Number(tx7)).to.be.equal(Number(expectClaim4._totalClaim))
+            let tx5 = await saleContract.usersClaim(account4.address)
+            expect(Number(tx5.claimAmount)).to.be.equal(Number(expectClaim3._totalClaim))
+            let tx6 = await saleToken.balanceOf(account4.address)
+            expect(Number(tx6)).to.be.equal(Number(expectClaim3._totalClaim))
 
-        //     //account1 = 80,000 + 16,000 + 16,000 + 16,000 + 16,000 + 16,000
-        //     //account2 = 160,000 + 32,000 + 32,000 + 32,000 + 32,000 + 32,000
-        //     //account3 = 260,000 + 52,000 + 52,000 + 52,000 + 52,000 + 52,000
-        //     //account4 = 350,000 + 70,000 + 70,000 + 70,000 + 70,000 + 70,000
-        //     //account6 = 150,000 + 30,000 + 30,000 + 30,000 + 30,000 + 30,000
-        // })
+            let tx7 = await saleToken.balanceOf(account6.address)
+            expect(Number(tx7)).to.be.equal(Number(expectClaim4._totalClaim))
+
+            console.log("account3 amount : ", Number(tx4))
+            console.log("account4 amount : ", Number(tx6))
+            console.log("account6 amount : ", Number(tx7))
+        
+
+            //account1 = 48,000 + 32,000 + 32,000 + 32,000 + 16,000 = 160,000
+            //account2 = 96,000 + 64,000 + 64,000 + 64,000 + 32,000 = 320,000
+            //account3 = 156,000 + 104,000 + 104,000 + 104,000 + 52,000 = 520,000
+            //account4 = 210,000 + 140,000 + 140,000 + 140,000 + 70,000 = 700,000
+            //account6 = 90,000 + 60,000 + 60,000 + 60,000 + 30,000 = 300,000
+        })
 
         it("deposit withdraw",async () => {
             let tx = saleContract.connect(account1).depositWithdraw()
             await expect(tx).to.be.revertedWith("Accessible: Caller is not an admin")
         })
 
-        // it("deposit withdraw", async () => {
-        //     let beforeBalance = Number(await getToken.balanceOf(account5.address));
-        //     // console.log(beforeBalance)
-        //     let beforeContract = Number(await getToken.balanceOf(saleContract.address));
-        //     // console.log(beforeContract)
-        //     await saleContract.connect(saleOwner).depositWithdraw()
-        //     let afterBalance = Number(await getToken.balanceOf(account5.address));
-        //     // console.log(afterBalance)
-        //     expect(afterBalance).to.be.equal(beforeContract+beforeBalance);
-        // })
+        it("deposit withdraw", async () => {
+            let beforeBalance = Number(await getToken.balanceOf(account5.address));
+            // console.log(beforeBalance)
+            let beforeContract = Number(await getToken.balanceOf(saleContract.address));
+            // console.log(beforeContract)
+            await saleContract.connect(saleOwner).depositWithdraw()
+            let afterBalance = Number(await getToken.balanceOf(account5.address));
+            // console.log(afterBalance)
+            expect(afterBalance).to.be.equal(beforeContract+beforeBalance);
+        })
 
         it("data check", async () => {
             let tx = Number(await saleContract.totalWhitelists())
@@ -1179,28 +1193,28 @@ describe("Sale", () => {
             expect(tx10).to.be.equal(2)
         })
 
-        // it("resetData", async () => {
-        //     await saleContract.connect(saleOwner).resetAllData()
-        //     let tx = Number(await saleContract.totalWhitelists())
-        //     expect(tx).to.be.equal(0)
-        //     let tx2 = Number(await saleContract.totalExSaleAmount())
-        //     expect(tx2).to.be.equal(0)
-        //     let tx3 = Number(await saleContract.totalExPurchasedAmount())
-        //     expect(tx3).to.be.equal(0)
-        //     let tx4 = Number(await saleContract.totalDepositAmount())
-        //     expect(tx4).to.be.equal(0)
-        //     let tx5 = Number(await saleContract.totalOpenSaleAmount())
-        //     expect(tx5).to.be.equal(0)
-        //     let tx6 = Number(await saleContract.totalOpenPurchasedAmount())
-        //     expect(tx6).to.be.equal(0)
-        //     let tx7 = Number(await saleContract.tiersAccount(1))
-        //     expect(tx7).to.be.equal(0)
-        //     let tx8 = Number(await saleContract.tiersAccount(4))
-        //     expect(tx8).to.be.equal(0)
-        //     let tx9 = Number(await saleContract.tiersExAccount(1))
-        //     expect(tx9).to.be.equal(0)
-        //     let tx10 = Number(await saleContract.tiersExAccount(4))
-        //     expect(tx10).to.be.equal(0)
-        // })
+        it("resetData", async () => {
+            await saleContract.connect(saleOwner).resetAllData()
+            let tx = Number(await saleContract.totalWhitelists())
+            expect(tx).to.be.equal(0)
+            let tx2 = Number(await saleContract.totalExSaleAmount())
+            expect(tx2).to.be.equal(0)
+            let tx3 = Number(await saleContract.totalExPurchasedAmount())
+            expect(tx3).to.be.equal(0)
+            let tx4 = Number(await saleContract.totalDepositAmount())
+            expect(tx4).to.be.equal(0)
+            let tx5 = Number(await saleContract.totalOpenSaleAmount())
+            expect(tx5).to.be.equal(0)
+            let tx6 = Number(await saleContract.totalOpenPurchasedAmount())
+            expect(tx6).to.be.equal(0)
+            let tx7 = Number(await saleContract.tiersAccount(1))
+            expect(tx7).to.be.equal(0)
+            let tx8 = Number(await saleContract.tiersAccount(4))
+            expect(tx8).to.be.equal(0)
+            let tx9 = Number(await saleContract.tiersExAccount(1))
+            expect(tx9).to.be.equal(0)
+            let tx10 = Number(await saleContract.tiersExAccount(4))
+            expect(tx10).to.be.equal(0)
+        })
     })
 })
