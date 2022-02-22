@@ -224,6 +224,9 @@ contract PublicSale is
         uint256 y = 0;
         for(i = 0; i < _claimCounts; i++) {
             claimTimes.push(_claimTimes[i]);
+            if(i != 0){
+                require(claimTimes[i-1] < claimTimes[i], "PublicSale: time value error");
+            }
             claimPercents.push(_claimPercents[i]);
             y = y + _claimPercents[i];
         }

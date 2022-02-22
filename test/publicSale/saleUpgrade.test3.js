@@ -121,12 +121,16 @@ describe("Sale", () => {
     let account1BigWTONAmount = ethers.utils.parseUnits("60", 27);
     let account2BigTONAmount = ethers.utils.parseUnits("120", 18);
     let account2BigWTONAmount = ethers.utils.parseUnits("400", 27);
-    let account3BigTONAmount = ethers.utils.parseUnits("820", 18);
+    let account3BigTONAmount = ethers.utils.parseUnits("520", 18);
     let account3BigWTONAmount = ethers.utils.parseUnits("300", 27);
     let account4BigTONAmount = ethers.utils.parseUnits("1100", 18);
     let account4BigWTONAmount = ethers.utils.parseUnits("1100", 27);
     let account6BigTONAmount = ethers.utils.parseUnits("300", 18);
 
+    let refundAmount1 = ethers.utils.parseUnits("100", 18);
+    let refundAmount2 = ethers.utils.parseUnits("200", 18);
+    let refundAmount3 = ethers.utils.parseUnits("300", 18);
+    let refundAmount4 = ethers.utils.parseUnits("400", 18);
 
     let setSnapshot;
     let blocktime;
@@ -245,11 +249,15 @@ describe("Sale", () => {
         //     erc20token = await ethers.getContractFactory("ERC20Mock");
         //     ton = await erc20token.connect(getTokenOwner).deploy("testTON", "TON");
         // });
+
+        //TOS Contract deploy
         it("Initialize TOS", async function () {
             const TOS = await ethers.getContractFactory("TOS");
             tos = await TOS.deploy(name, symbol, version);
             await tos.deployed();
         });
+
+        //LockTOS Contract deploy (need the TOS staking)
         it("Deploy LockTOS", async function () {
             lockTOSImpl = await (await ethers.getContractFactory("LockTOS")).deploy();
             await lockTOSImpl.deployed();
@@ -266,6 +274,7 @@ describe("Sale", () => {
             lockTOS = new ethers.Contract( lockTOSProxy.address, LockTOS_ABI.abi, ethers.provider );
         });
 
+        //give the TOS
         it("mint TOS to users", async function () {
             await (await tos.connect(deployer).mint(tester1.account.address, tosAmount)).wait();
             expect(await tos.balanceOf(tester1.account.address)).to.be.equal(tosAmount);
@@ -290,7 +299,8 @@ describe("Sale", () => {
                     defaultSender
                 );
             });
-    
+            
+            //ton, wton deploy
             it("2. tokamakContracts init  ", async function () {
                 this.timeout(1000000);
                 TokamakContractsDeployed =
@@ -329,7 +339,7 @@ describe("Sale", () => {
             });
         })
 
-
+        //TOS staking for get the sTOS balance
         it("should create locks for user", async function () {
             expect(await lockTOS.balanceOf(tester1.account.address)).to.be.equal(0);
             expect(await lockTOS.balanceOf(tester2.account.address)).to.be.equal(0);
@@ -420,15 +430,18 @@ describe("Sale", () => {
     });
 
     describe("Initialize PublicSale", () => {
-        it("Initialize Funcding Token", async function () {
+        //funding Token set(TON)
+        it("Initialize Funding Token", async function () {
             getToken = ton;
         });
 
+        //saleToken Deploy
         it("Initialize Sale Token", async function () {
             erc20token = await ethers.getContractFactory("ERC20Mock");
             saleToken = await erc20token.connect(saleTokenOwner).deploy("testDoM", "AURA");
         });
 
+        //deploy publicSale and publicSaleProxy and transfer TON, WTON
         it("Initialize PublicSale", async function () {
             let PublicSale = await ethers.getContractFactory("PublicSale");
             let deploySaleImpl = await PublicSale.connect(saleOwner).deploy();
@@ -445,13 +458,14 @@ describe("Sale", () => {
                 lockTOS.address,
                 wton.address            
             );
+
             saleContract = new ethers.Contract( PublicSaleContract.address, PublicSale_ABI.abi, ethers.provider );
             //2,000,000의 판매량
             await saleToken.connect(saleTokenOwner).transfer(saleContract.address, totalBigAmount)
             
             //account1 = WTON 60, TON 200
             //account2 = WTON 400, TON 120
-            //account3 = WTON 300, TON 820
+            //account3 = WTON 300, TON 520
             //account4 = WTON 0, TON 1100
             //account6 = WTON 0, TON 300
             await getToken.connect(saleTokenOwner).transfer(account1.address, account1BigTONAmount)
@@ -473,13 +487,15 @@ describe("Sale", () => {
 
     describe("setting", () => {
         describe("exclusiveSale setting", () => {
+            //checking the SaleToken balance
             it("check the balance (contract have the saleToken) ", async () => {
                 balance1 = await saleToken.balanceOf(saleContract.address)
     
                 expect(Number(balance1)).to.be.equal(Number(totalBigAmount))
             })
 
-            it('setAllsetting caller not owenr', async () => {
+            //setting owner test
+            it('setAllsetting caller not owner', async () => {
                 blocktime = Number(await time.latest())
                 whitelistStartTime = blocktime + 86400;
                 whitelistEndTime = whitelistStartTime + (86400*7);
@@ -503,7 +519,8 @@ describe("Sale", () => {
                 await expect(tx).to.be.revertedWith("Accessible: Caller is not an admin")
             })
 
-            it('setAllsetting caller owenr', async () => {
+            //PublicSale setting owner
+            it('setAllsetting caller owner', async () => {
 
                 await saleContract.connect(saleOwner).setAllsetting(
                     [100, 200, 1000, 4000, 600, 1200, 2200, 6000],
@@ -576,6 +593,7 @@ describe("Sale", () => {
     
     describe("Sale", () => {
         describe("exclusiveSale Sale", () => {
+            //calculTierAmount test
             it("calculTierAmount test before addwhiteList", async () => {
                 let big60000 = ethers.utils.parseUnits("60000", 18);
                 let big120000 = ethers.utils.parseUnits("120000", 18);
@@ -598,6 +616,7 @@ describe("Sale", () => {
                 await ethers.provider.send('evm_mine');
             })
 
+            //addwhiteList test and data check
             it("addwhiteList", async () => {
                 let tx = Number(await saleContract.connect(tester1.account).tiersAccount(1))
                 expect(tx).to.be.equal(0)
@@ -647,6 +666,7 @@ describe("Sale", () => {
                 expect(tx15).to.be.equal(Number(big300000))
             })
 
+            //calculate how many input ton amount
             it("how many input amount", async () => {
                 let tx = Number(await saleContract.calculPayToken(60000))
                 expect(tx).to.be.equal(60)
@@ -660,6 +680,7 @@ describe("Sale", () => {
                 expect(tx5).to.be.equal(300)
             })
 
+            //calculTierAmount test (before and after different)
             it("calculTierAmount test after addwhiteList", async () => {
                 let big60000 = ethers.utils.parseUnits("60000", 18);
                 let big120000 = ethers.utils.parseUnits("120000", 18);
@@ -676,7 +697,8 @@ describe("Sale", () => {
                 let tx5 = Number(await saleContract.calculTierAmount(account6.address))
                 expect(tx5).to.be.equal(Number(big300000))
             })
-
+            
+            //time condition test
             it("exclusiveSale before exclusive startTime", async () => {
                 await getToken.connect(account1).approve(saleContract.address, 60)
                 let tx = saleContract.connect(account1).exclusiveSale(account1.address,60)
@@ -690,11 +712,13 @@ describe("Sale", () => {
                 await time.increaseTo(exclusiveStartTime+86400);
             })
 
+            //time condition test
             it("addwhitelist after whitelistTIme", async () => {
                 let tx = saleContract.connect(account1).addWhiteList()
                 await expect(tx).to.be.revertedWith("PublicSale: end the whitelistTime")
             })
 
+            //round1 sale test
             it("exclusiveSale after exclusive startTime", async () => {
                 let big60 = ethers.utils.parseUnits("60", 18);
                 let account1TON = Number(await getToken.balanceOf(account1.address))
@@ -789,6 +813,7 @@ describe("Sale", () => {
         })
 
         describe("openSale Sale", () => {
+            //time condition test
             it("deposit before depositTime", async () => {
                 let tx = saleContract.connect(account1).deposit(account1.address,100)
                 await expect(tx).to.be.revertedWith("PublicSale: don't start depositTime")
@@ -799,14 +824,15 @@ describe("Sale", () => {
                 await ethers.provider.send('evm_mine');
             })
 
+            //round2 deposit
             it("deposit after depositTime", async () => {
                 account1Before = Number(await getToken.balanceOf(account1.address))
                 account2Before = Number(await getToken.balanceOf(account2.address))
                 account3Before = Number(await getToken.balanceOf(account3.address))
                 account4Before = Number(await getToken.balanceOf(account4.address))
 
-                let big10 = ethers.utils.parseUnits("10", 18);
-                await getToken.connect(saleTokenOwner).transfer(account1.address, big10)
+                // let big10 = ethers.utils.parseUnits("10", 18);
+                // await getToken.connect(saleTokenOwner).transfer(account1.address, big10)
                 
                 let big300 = ethers.utils.parseUnits("300", 18);
                 let big200 = ethers.utils.parseUnits("200", 18);
@@ -900,14 +926,18 @@ describe("Sale", () => {
     })
 
     describe("claim test", () => {
+        //time condition test
         it('claim before claimTime', async () => {
             let tx = saleContract.connect(account1).claim()
             await expect(tx).to.be.revertedWith("PublicSale: don't start claimTime")
         })
+        
         it("duration the time to claimTime1", async () => {
             await ethers.provider.send('evm_setNextBlockTimestamp', [claimTime1]);
             await ethers.provider.send('evm_mine');
         })
+
+        //claimTime1 account1 claim and balance check
         it("claim claimTime1, claim call the account1", async () => {
             let expectClaim = await saleContract.calculClaimAmount(account1.address, 0)
             let tx = await saleContract.usersClaim(account1.address)
@@ -928,6 +958,7 @@ describe("Sale", () => {
             await ethers.provider.send('evm_mine');
         })
 
+        //claimTime2 account1,account2 claim and balance check
         it("claim claimTime2, claim call the account1, account2", async () => {
             let expectClaim = await saleContract.calculClaimAmount(account1.address, 2)
             let expectClaim2 = await saleContract.calculClaimAmount(account2.address, 0)
@@ -964,6 +995,7 @@ describe("Sale", () => {
             await ethers.provider.send('evm_mine');
         })
 
+        //claimTime3 account1,account3 claim and balance check
         it("claim claimTime3, claim call the account1, account3", async () => {
             let expectClaim = await saleContract.calculClaimAmount(account1.address, 3)
             let expectClaim2 = await saleContract.calculClaimAmount(account3.address, 0)
@@ -1003,7 +1035,8 @@ describe("Sale", () => {
             await ethers.provider.send('evm_mine');
         })
 
-        it("claim period = 4, claim call the account1, account4", async () => {
+        //claimTime4 account1,account4 claim and balance check
+        it("claim claimTime4, claim call the account1, account4", async () => {
             let expectClaim = await saleContract.calculClaimAmount(account1.address, 4)
             let expectClaim2 = await saleContract.calculClaimAmount(account4.address, 0)
             let expectClaim3 = await saleContract.calculClaimAmount(account1.address, 1)
@@ -1044,6 +1077,7 @@ describe("Sale", () => {
             await ethers.provider.send('evm_mine');
         })
 
+        //claimTime5 account1,account2 claim and balance check
         it("claim claimTime5, claim call the account1, account2", async () => {
             let expectClaim = await saleContract.calculClaimAmount(account1.address, 5)
             let expectClaim2 = await saleContract.calculClaimAmount(account2.address, 0)
@@ -1090,7 +1124,8 @@ describe("Sale", () => {
             await ethers.provider.send('evm_mine');
         })
 
-        it("claim period end, claim call the account1, account3, account4, account6", async () => {
+        //claimTime5 account3, account4, account6 claim and balance check
+        it("claim period end, claim call the account3, account4, account6", async () => {
             let expectClaim = await saleContract.calculClaimAmount(account1.address, 0)
             expect(Number(expectClaim._reward)).to.be.equal(0)
             let expectClaim2 = await saleContract.calculClaimAmount(account3.address, 0)
@@ -1135,18 +1170,36 @@ describe("Sale", () => {
             console.log("account6 amount : ", Number(tx7))
         
 
-            //account1 = 48,000 + 32,000 + 32,000 + 32,000 + 16,000 = 160,000
-            //account2 = 96,000 + 64,000 + 64,000 + 64,000 + 32,000 = 320,000
-            //account3 = 156,000 + 104,000 + 104,000 + 104,000 + 52,000 = 520,000
-            //account4 = 210,000 + 140,000 + 140,000 + 140,000 + 70,000 = 700,000
+            //account1 = 48,000 + 32,000 + 32,000 + 32,000 + 16,000 = 160,000 , 100TON
+            //account2 = 96,000 + 64,000 + 64,000 + 64,000 + 32,000 = 320,000 , 200TON
+            //account3 = 156,000 + 104,000 + 104,000 + 104,000 + 52,000 = 520,000 , 300TON
+            //account4 = 210,000 + 140,000 + 140,000 + 140,000 + 70,000 = 700,000 , 400TON
             //account6 = 90,000 + 60,000 + 60,000 + 60,000 + 30,000 = 300,000
         })
 
+        //refund test
+        it("refund check", async () => {
+            let refund1 = await ton.balanceOf(account1.address)
+            expect(Number(refundAmount1)).to.be.equal(Number(refund1))
+            // console.log(Number(refund1))
+            let refund2 = await ton.balanceOf(account2.address)
+            expect(Number(refundAmount2)).to.be.equal(Number(refund2))
+            // console.log(Number(refund2))
+            let refund3 = await ton.balanceOf(account3.address)
+            expect(Number(refundAmount3)).to.be.equal(Number(refund3))
+            // console.log(Number(refund3))
+            let refund4 = await ton.balanceOf(account4.address)
+            expect(Number(refundAmount4)).to.be.equal(Number(refund4))
+            // console.log(Number(refund4))
+        })
+
+        //depositWithdraw admin test
         it("deposit withdraw",async () => {
             let tx = saleContract.connect(account1).depositWithdraw()
             await expect(tx).to.be.revertedWith("Accessible: Caller is not an admin")
         })
 
+        //depositWithdraw test (round2 deposit amount = afterBalance-beforeBalance)
         it("deposit withdraw", async () => {
             let beforeBalance = Number(await getToken.balanceOf(account5.address));
             // console.log(beforeBalance)
@@ -1193,6 +1246,7 @@ describe("Sale", () => {
             expect(tx10).to.be.equal(2)
         })
 
+        //reset test using the rinkeby
         it("resetData", async () => {
             await saleContract.connect(saleOwner).resetAllData()
             let tx = Number(await saleContract.totalWhitelists())

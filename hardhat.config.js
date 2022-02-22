@@ -3,7 +3,7 @@ require("@openzeppelin/hardhat-upgrades");
 require("@nomiclabs/hardhat-etherscan");
 require("@nomiclabs/hardhat-waffle");
 require("@nomiclabs/hardhat-web3");
-//require("hardhat-gas-reporter");
+require("hardhat-gas-reporter");
 require('dotenv/config');
 
 require("dotenv").config();
@@ -74,6 +74,11 @@ module.exports = {
     tests: "./test",
     cache: "./cache",
     artifacts: "./artifacts",
+  },
+  gasReporter: {
+    enabled: (process.env.REPORT_GAS) ? true : false,
+    currency: 'KRW',
+    gasPrice: 21
   },
   mocha: {
     timeout: 10000000,
