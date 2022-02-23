@@ -3,7 +3,6 @@
 pragma solidity ^0.7.6;
 
 import "../interfaces/IPublicSaleProxy.sol";
-import {Address} from "@openzeppelin/contracts/utils/Address.sol";
 
 import "../common/AccessibleCommon.sol";
 import "./PublicSaleStorage.sol";
@@ -22,10 +21,18 @@ contract PublicSaleProxy is
 {
     event Upgraded(address indexed implementation);
 
+    event Pause(address indexed addr, uint256 time);
+
     /// @dev constructor of PublicSaleProxy
+    constructor() {
+        _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
+        _setupRole(ADMIN_ROLE, msg.sender);
+    }
+
+    /// @dev set the logic
     /// @param _impl the logic address of PublicSaleProxy
-    constructor(address _impl) {
-        assert(
+    function setImplementation(address _impl) external onlyOwner {
+         assert(
             IMPLEMENTATION_SLOT ==
                 bytes32(uint256(keccak256("eip1967.proxy.implementation")) - 1)
         );
@@ -33,15 +40,13 @@ contract PublicSaleProxy is
         require(_impl != address(0), "PublicSaleProxy: logic is zero");
 
         _setImplementation(_impl);
-
-        _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
-        _setupRole(ADMIN_ROLE, msg.sender);
     }
 
     /// @notice Set pause state
     /// @param _pause true:pause or false:resume
     function setProxyPause(bool _pause) external override onlyOwner {
         pauseProxy = _pause;
+        emit Pause(msg.sender,block.timestamp);
     }
 
     /// @notice Set implementation contract

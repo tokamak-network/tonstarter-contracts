@@ -49,12 +49,14 @@ contract PublicSaleProxyFactory is AccessRoleCommon, IPublicSaleProxyFactory {
     {
         require(bytes(name).length > 0,"name is empty");
 
-        PublicSaleProxy proxy = new PublicSaleProxy(_logic);
+        PublicSaleProxy proxy = new PublicSaleProxy();
 
         require(
             address(proxy) != address(0),
             "proxy zero"
         );
+
+        proxy.setImplementation(_logic);
 
         proxy.initialize(
             saleAddresses[0],
@@ -62,7 +64,7 @@ contract PublicSaleProxyFactory is AccessRoleCommon, IPublicSaleProxyFactory {
             saleAddresses[2],
             saleAddresses[3],
             saleAddresses[4]
-            );
+        );
 
 
         proxy.grantRole(ADMIN_ROLE, _owner);
