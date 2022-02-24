@@ -6,14 +6,16 @@ interface IPublicSaleProxyFactory {
     /// @dev Create a PublicSaleProxyFactory
     /// @param name name
     /// @param _logic the logic contract address used in proxy
-    /// @param _owner  owner address
+    /// @param _owner proxyOwner address
     /// @param saleAddresses  [_saleTokenAddress,_getTokenAddress,_getTokenOwner,sTOS,wton]
+    /// @param basicAddresses basic[0] = TON, basic[1] = sTOS, basic[2] = wton
     /// @return proxy contract address
     function create(
         string calldata name,
         address _logic,
         address _owner,
-        address[5] calldata saleAddresses
+        address[3] calldata saleAddresses,
+        address[3] calldata basicAddresses
     )
         external
         returns (address);

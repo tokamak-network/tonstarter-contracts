@@ -4,30 +4,11 @@ pragma solidity ^0.7.6;
 
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "../interfaces/ILockTOS.sol";
+import "../libraries/LibPublicSale.sol";
 
 contract PublicSaleStorage  {
     /// @dev flag for pause proxy
     bool public pauseProxy;
-
-    struct UserInfoEx {
-        bool join;
-        uint tier;
-        uint256 payAmount;
-        uint256 saleAmount;
-    }
-
-    struct UserInfoOpen {
-        bool join;
-        uint256 depositAmount;
-        uint256 payAmount;
-        uint256 saleAmount;
-    }
-
-    struct UserClaim {
-        bool exec;
-        uint256 claimAmount;
-        uint256 refundAmount;
-    }
 
     uint256 public snapshot = 0;
 
@@ -63,6 +44,10 @@ contract PublicSaleStorage  {
     uint256 public claimPeriod;   //클레임 횟수
     uint256 public claimFirst;    //초기 클레임 percents
 
+    uint256 public liquidityVaultAmount; //liquidtyVault의 Amount
+
+    address public liquidityVaultAddress; //liquidityVault의 Address
+
     address public getTokenOwner;
     address public wton;
 
@@ -79,9 +64,9 @@ contract PublicSaleStorage  {
     uint256[] public claimTimes;
     uint256[] public claimPercents; 
 
-    mapping (address => UserInfoEx) public usersEx;
-    mapping (address => UserInfoOpen) public usersOpen;
-    mapping (address => UserClaim) public usersClaim;
+    mapping (address => LibPublicSale.UserInfoEx) public usersEx;
+    mapping (address => LibPublicSale.UserInfoOpen) public usersOpen;
+    mapping (address => LibPublicSale.UserClaim) public usersClaim;
 
     mapping (uint => uint256) public tiers;         //티어별 가격 설정
     mapping (uint => uint256) public tiersAccount;  //티어별 화이트리스트 참여자 숫자 기록

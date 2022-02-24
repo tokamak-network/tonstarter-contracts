@@ -108,15 +108,22 @@ contract PublicSaleProxy is
     /// @dev Initialize
     function initialize(
         address _saleTokenAddress,
-        address _getTokenAddress,
         address _getTokenOwner,
-        address _sTOS,
-        address _wton
+        address _vaultAddress
     ) external override onlyOwner {
         require(startAddWhiteTime == 0, "possible to setting the whiteTime before");
         saleToken = IERC20(_saleTokenAddress);
-        getToken = IERC20(_getTokenAddress);
         getTokenOwner = _getTokenOwner;
+        liquidityVaultAddress = _vaultAddress;
+    }
+
+    function changeBasicSet(
+        address _getTokenAddress,
+        address _sTOS,
+        address _wton
+    ) external onlyOwner {
+        require(startAddWhiteTime == 0, "possible to setting the whiteTime before");
+        getToken = IERC20(_getTokenAddress);
         sTOS = ILockTOS(_sTOS);
         wton = _wton;
     }

@@ -3,7 +3,6 @@
 pragma solidity ^0.7.6;
 
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import {
     ReentrancyGuard
@@ -14,6 +13,7 @@ import "../interfaces/IPublicSale.sol";
 import "../interfaces/IWTON.sol";
 import "../common/AccessibleCommon.sol";
 import "./PublicSaleStorage.sol";
+import "../libraries/LibPublicSale.sol";
 
 import { OnApprove } from "./OnApprove.sol";
 
@@ -90,22 +90,22 @@ contract PublicSale is
         totalRound2UsersClaim = 0;
 
         for (uint256 i = 0; i < whitelists.length; i++) {
-            UserInfoEx storage userEx = usersEx[whitelists[i]];
+            LibPublicSale.UserInfoEx storage userEx = usersEx[whitelists[i]];
             userEx.join = false;
             userEx.payAmount = 0;
             userEx.saleAmount = 0;
-            UserClaim storage userClaim = usersClaim[whitelists[i]];
+            LibPublicSale.UserClaim storage userClaim = usersClaim[whitelists[i]];
             userClaim.claimAmount = 0;
             userClaim.refundAmount = 0;
             userClaim.exec = false;
         }
         for (uint256 j = 0; j < depositors.length; j++) {
-            UserInfoOpen storage userOpen = usersOpen[depositors[j]];
+            LibPublicSale.UserInfoOpen storage userOpen = usersOpen[depositors[j]];
             userOpen.depositAmount = 0;
             userOpen.join = false;
             userOpen.payAmount = 0;
             userOpen.saleAmount = 0;
-            UserClaim storage userClaim = usersClaim[depositors[j]];
+            LibPublicSale.UserClaim storage userClaim = usersClaim[depositors[j]];
             userClaim.claimAmount = 0;
             userClaim.refundAmount = 0;
             userClaim.exec = false;
@@ -418,7 +418,7 @@ contract PublicSale is
         override
         returns (uint256)
     {
-        UserInfoEx storage userEx = usersEx[_address];
+        LibPublicSale.UserInfoEx storage userEx = usersEx[_address];
         uint256 tier = calculTier(_address);
         if (userEx.join == true && tier > 0) {
             uint256 salePossible =
@@ -447,7 +447,7 @@ contract PublicSale is
         override
         returns (uint256)
     {
-        UserInfoOpen storage userOpen = usersOpen[_account];
+        LibPublicSale.UserInfoOpen storage userOpen = usersOpen[_account];
         uint256 depositAmount = userOpen.depositAmount.add(_amount);
         uint256 openSalePossible =
             totalExpectOpenSaleAmountView().mul(depositAmount).div(
@@ -477,7 +477,7 @@ contract PublicSale is
         if(block.timestamp < startClaimTime) return (0, 0);
         if(_period > totalClaimCounts) return (0, 0);
  
-        UserClaim storage userClaim = usersClaim[_account];
+        LibPublicSale.UserClaim storage userClaim = usersClaim[_account];
         (, uint256 realSaleAmount, ) = totalSaleUserAmount(_account);   //유저가 총 구매한 token의 양을 Return 함
 
         if (realSaleAmount == 0 ) return (0, 0);
@@ -509,7 +509,7 @@ contract PublicSale is
 
     /// @inheritdoc IPublicSale
     function totalSaleUserAmount(address user) public override view returns (uint256 _realPayAmount, uint256 _realSaleAmount, uint256 _refundAmount) {
-        UserInfoEx storage userEx = usersEx[user];
+        LibPublicSale.UserInfoEx storage userEx = usersEx[user];
 
         if(userEx.join){
             (uint256 realPayAmount, uint256 realSaleAmount, uint256 refundAmount) = openSaleUserAmount(user);
@@ -521,7 +521,7 @@ contract PublicSale is
 
     /// @inheritdoc IPublicSale
     function openSaleUserAmount(address user) public override view returns (uint256 _realPayAmount, uint256 _realSaleAmount, uint256 _refundAmount) {
-        UserInfoOpen storage userOpen = usersOpen[user];
+        LibPublicSale.UserInfoOpen storage userOpen = usersOpen[user];
 
         if(!userOpen.join || userOpen.depositAmount == 0) return (0, 0, 0);
 
@@ -571,7 +571,7 @@ contract PublicSale is
         );
         uint256 tier = calculTier(msg.sender);
         require(tier >= 1, "PublicSale: need to more sTOS");
-        UserInfoEx storage userEx = usersEx[msg.sender];
+        LibPublicSale.UserInfoEx storage userEx = usersEx[msg.sender];
         require(userEx.join != true, "PublicSale: already attended");
 
         whitelists.push(msg.sender);
@@ -661,7 +661,7 @@ contract PublicSale is
             block.timestamp < endExclusiveTime,
             "PublicSale: end the exclusiveTime"
         );
-        UserInfoEx storage userEx = usersEx[_sender];
+        LibPublicSale.UserInfoEx storage userEx = usersEx[_sender];
         require(userEx.join == true, "PublicSale: not registered in whitelist");
         uint256 tokenSaleAmount = calculSaleToken(_amount);
         uint256 salePossible = calculTierAmount(_sender);
@@ -732,14 +732,14 @@ contract PublicSale is
             "PublicSale: end the depositTime"
         );
 
-        UserInfoOpen storage userOpen = usersOpen[_sender];
+        LibPublicSale.UserInfoOpen storage userOpen = usersOpen[_sender];
 
         if (!userOpen.join) {
             depositors.push(_sender);
             userOpen.join = true;
 
             totalRound2Users = totalRound2Users.add(1);
-            UserInfoEx storage userEx = usersEx[_sender];
+            LibPublicSale.UserInfoEx storage userEx = usersEx[_sender];
             if(userEx.payAmount == 0) totalUsers = totalUsers.add(1);
         }
         userOpen.depositAmount = userOpen.depositAmount.add(_amount);
@@ -779,8 +779,8 @@ contract PublicSale is
             block.timestamp >= claimTimes[0],
             "PublicSale: don't start claimTime"
         );
-        UserClaim storage userClaim = usersClaim[msg.sender];
-        UserInfoOpen storage userOpen = usersOpen[msg.sender];
+        LibPublicSale.UserClaim storage userClaim = usersClaim[msg.sender];
+        LibPublicSale.UserInfoOpen storage userOpen = usersOpen[msg.sender];
 
         (, uint256 realSaleAmount, ) = totalSaleUserAmount(msg.sender);
         (, ,uint256 refundAmount ) = openSaleUserAmount(msg.sender);

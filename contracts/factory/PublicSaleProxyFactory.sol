@@ -31,20 +31,21 @@ contract PublicSaleProxyFactory is AccessRoleCommon, IPublicSaleProxyFactory {
     }
 
     /// @inheritdoc IPublicSaleProxyFactory
+    /// @notice setAddress[0] = PublicSale, setAddress[1] = ProxyOwner setAddress[2] = vault , 
+    /// saleAddress[0] = _saleTokenAddress, saleAddress[1] = tonAddress
+    /// saleAddress[2] = tonGetAddress, saleAddress[3] = lockTOSAddress, saleAddress[4] = wtonAddress, saleAddress[5] = liquidityVaultAddress
     function create(
         string calldata name,
         address _logic,
         address _owner,
-        address[5] calldata saleAddresses
+        address[3] calldata saleAddresses,
+        address[3] calldata basicAddresses
     )
         external override
         nonZeroAddress(_logic)
-        nonZeroAddress(_owner)
         nonZeroAddress(saleAddresses[0])
         nonZeroAddress(saleAddresses[1])
         nonZeroAddress(saleAddresses[2])
-        nonZeroAddress(saleAddresses[3])
-        nonZeroAddress(saleAddresses[4])
         returns (address)
     {
         require(bytes(name).length > 0,"name is empty");
@@ -61,10 +62,15 @@ contract PublicSaleProxyFactory is AccessRoleCommon, IPublicSaleProxyFactory {
         proxy.initialize(
             saleAddresses[0],
             saleAddresses[1],
-            saleAddresses[2],
-            saleAddresses[3],
-            saleAddresses[4]
+            saleAddresses[2]
         );
+
+        proxy.changeBasicSet(
+            basicAddresses[0],
+            basicAddresses[1],
+            basicAddresses[2]
+        );
+
 
 
         proxy.grantRole(ADMIN_ROLE, _owner);
