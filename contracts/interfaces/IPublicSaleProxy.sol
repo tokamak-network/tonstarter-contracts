@@ -16,8 +16,8 @@ interface IPublicSaleProxy {
 
     /// @dev initialize
     function initialize(
-        address _saleTokenAddress,  
+        address _saleTokenAddress,
         address _getTokenOwner,
-        address _vaultAddresss
+        address _vaultAddress
     ) external;
 }

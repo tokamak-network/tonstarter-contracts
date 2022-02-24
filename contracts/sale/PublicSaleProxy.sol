@@ -25,6 +25,11 @@ contract PublicSaleProxy is
 
     /// @dev constructor of PublicSaleProxy
     constructor() {
+        assert(
+            IMPLEMENTATION_SLOT ==
+                bytes32(uint256(keccak256("eip1967.proxy.implementation")) - 1)
+        );
+        
         _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
         _setupRole(ADMIN_ROLE, msg.sender);
     }
@@ -32,11 +37,6 @@ contract PublicSaleProxy is
     /// @dev set the logic
     /// @param _impl the logic address of PublicSaleProxy
     function setImplementation(address _impl) external onlyOwner {
-         assert(
-            IMPLEMENTATION_SLOT ==
-                bytes32(uint256(keccak256("eip1967.proxy.implementation")) - 1)
-        );
-
         require(_impl != address(0), "PublicSaleProxy: logic is zero");
 
         _setImplementation(_impl);

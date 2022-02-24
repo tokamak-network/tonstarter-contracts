@@ -451,6 +451,8 @@ describe("Sale", () => {
             let PublicSaleProxy = await ethers.getContractFactory("PublicSaleProxy");
             let PublicSaleContract = await PublicSaleProxy.connect(saleOwner).deploy();
 
+            await PublicSaleContract.connect(saleOwner).setImplementation(deploySaleImpl.address);
+
             await PublicSaleContract.connect(saleOwner).initialize(
                 saleToken.address,
                 account5.address,
