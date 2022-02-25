@@ -30,7 +30,7 @@ contract PublicSale is
 
     event Claimed(address indexed from, uint256 amount);
     event Withdrawal(address indexed from, uint256 amount);
-    event DepositWithdrawal(address indexed from, uint256 amount);
+    event DepositWithdrawal(address indexed from, uint256 amount, uint256 liquidityAmount);
 
     modifier nonZero(uint256 _value) {
         require(_value > 0, "PublicSale: zero");
@@ -115,7 +115,7 @@ contract PublicSale is
 
     function setAllsetting(
         uint256[8] calldata _Tier,
-        uint256[4] calldata _amount,
+        uint256[5] calldata _amount,
         uint256[8] calldata _time,
         uint256[] calldata _claimTimes,
         uint256[] calldata _claimPercents
@@ -128,11 +128,12 @@ contract PublicSale is
         );
         setSaleAmount(
             _amount[0],
-            _amount[1]
+            _amount[1],
+            _amount[2]
         );
         setTokenPrice(
-            _amount[2],
-            _amount[3]
+            _amount[3],
+            _amount[4]
         ); 
         setSnapshot(_time[0]);
         setExclusiveTime(
@@ -300,12 +301,13 @@ contract PublicSale is
 
     /// @inheritdoc IPublicSale
     function setAllAmount(
-        uint256[2] calldata _expectAmount,
+        uint256[3] calldata _expectAmount,
         uint256[2] calldata _priceAmount
     ) external override onlyOwner {
         setSaleAmount(
             _expectAmount[0],
-            _expectAmount[1]
+            _expectAmount[1],
+            _expectAmount[2]
         );
         setTokenPrice(
             _priceAmount[0],
@@ -316,16 +318,18 @@ contract PublicSale is
     /// @inheritdoc IPublicSale
     function setSaleAmount(
         uint256 _totalExpectSaleAmount,
-        uint256 _totalExpectOpenSaleAmount
+        uint256 _totalExpectOpenSaleAmount,
+        uint256 _liquidityVaultAmount
     )
         public
         override
         onlyOwner
-        nonZero(_totalExpectSaleAmount.add(_totalExpectOpenSaleAmount))
+        nonZero(_totalExpectSaleAmount.add(_totalExpectOpenSaleAmount).add(liquidityVaultAmount))
         beforeStartAddWhiteTime
     {
         totalExpectSaleAmount = _totalExpectSaleAmount;
         totalExpectOpenSaleAmount = _totalExpectOpenSaleAmount;
+        liquidityVaultAmount = _liquidityVaultAmount;
     }
 
     /// @inheritdoc IPublicSale
@@ -778,15 +782,17 @@ contract PublicSale is
     /// @inheritdoc IPublicSale
     function depositWithdraw() external override onlyOwner {
         require(block.timestamp > endDepositTime,"PublicSale: need to end the depositTime");
+        uint256 liquidityTON = calculPayToken(liquidityVaultAmount);
         uint256 getAmount;
         if(totalRound2Users == totalRound2UsersClaim){
-            getAmount = getToken.balanceOf(address(this));
+            getAmount = getToken.balanceOf(address(this)).sub(liquidityTON);
         } else {
-            getAmount = totalOpenPurchasedAmount().sub(10 ether);
+            getAmount = totalOpenPurchasedAmount().sub(liquidityTON).sub(10 ether);
         }
         require(getAmount <= getToken.balanceOf(address(this)), "PublicSale: no token to receive");
+        getToken.safeTransfer(liquidityVaultAddress,liquidityTON);
         getToken.safeTransfer(getTokenOwner, getAmount);
-        emit DepositWithdrawal(msg.sender, getAmount);
+        emit DepositWithdrawal(msg.sender, getAmount, liquidityTON);
     }
 
     /// @inheritdoc IPublicSale

@@ -67,16 +67,18 @@ interface IPublicSale {
     /// @param _expectAmount[2] saleAmount setting
     /// @param _priceAmount[2] tokenPrice setting
     function setAllAmount(
-        uint256[2] calldata _expectAmount,
+        uint256[3] calldata _expectAmount,
         uint256[2] calldata _priceAmount
     ) external;
 
     /// @dev set information related to sale amount
     /// @param _totalExpectSaleAmount expected amount of exclusive sale
     /// @param _totalExpectOpenSaleAmount expected amount of open sale
+    /// @param _liquidityVaultAmount expected liquidity vault amount
     function setSaleAmount(
         uint256 _totalExpectSaleAmount,
-        uint256 _totalExpectOpenSaleAmount
+        uint256 _totalExpectOpenSaleAmount,
+        uint256 _liquidityVaultAmount
     ) external;
 
     /// @dev set information related to token price
