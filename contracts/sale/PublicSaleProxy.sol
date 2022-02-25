@@ -29,14 +29,14 @@ contract PublicSaleProxy is
             IMPLEMENTATION_SLOT ==
                 bytes32(uint256(keccak256("eip1967.proxy.implementation")) - 1)
         );
-        
+
         _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
         _setupRole(ADMIN_ROLE, msg.sender);
     }
 
     /// @dev set the logic
     /// @param _impl the logic address of PublicSaleProxy
-    function setImplementation(address _impl) external onlyOwner {
+    function setImplementation(address _impl) external override onlyOwner {
         require(_impl != address(0), "PublicSaleProxy: logic is zero");
 
         _setImplementation(_impl);
@@ -121,7 +121,7 @@ contract PublicSaleProxy is
         address _getTokenAddress,
         address _sTOS,
         address _wton
-    ) external onlyOwner {
+    ) external override onlyOwner {
         require(startAddWhiteTime == 0, "possible to setting the whiteTime before");
         getToken = IERC20(_getTokenAddress);
         sTOS = ILockTOS(_sTOS);

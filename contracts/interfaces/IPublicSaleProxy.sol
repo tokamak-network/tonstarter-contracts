@@ -2,6 +2,9 @@
 pragma solidity ^0.7.6;
 
 interface IPublicSaleProxy {
+    /// @dev set the logic
+    /// @param _impl publicSaleContract Address;
+    function setImplementation(address _impl) external;
     /// @dev Set pause state
     /// @param _pause true:pause or false:resume
     function setProxyPause(bool _pause) external;
@@ -19,5 +22,12 @@ interface IPublicSaleProxy {
         address _saleTokenAddress,
         address _getTokenOwner,
         address _vaultAddress
+    ) external;
+
+    /// @dev changeBasicSet
+    function changeBasicSet(
+        address _getTokenAddress,
+        address _sTOS,
+        address _wton
     ) external;
 }

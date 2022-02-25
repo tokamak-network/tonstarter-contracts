@@ -164,6 +164,8 @@ describe("Sale", () => {
     let account2Before, account2After;
     let account3Before, account3After;
     let account4Before, account4After;
+    let publicFactory;
+    let deploySaleImpl;
 
     let tester1 = {
         account: null,
@@ -214,6 +216,28 @@ describe("Sale", () => {
         tonAmount: null
     }
 
+    let saleContracts = [
+        {
+         name : "Test1",
+         owner : null,
+         contractAddress: null,
+         index : null,
+  
+        },
+        {
+         name : "Test2",
+         owner : null,
+         contractAddress: null,
+         index : null
+        },
+        {
+         name : "Test3",
+         owner : null,
+         contractAddress: null,
+         index : null
+        },
+    ]
+
     before(async () => {
         ico20Contracts = new ICO20Contracts();
 
@@ -230,6 +254,10 @@ describe("Sale", () => {
         account5 = await findSigner(addresses[8]);
         account6 = await findSigner(addresses[9]);
         vaultAddress = await findSigner(addresses[10]);
+
+        saleContracts[0].owner = saleOwner;
+        saleContracts[1].owner = account1;
+        saleContracts[2].owner = account2;
 
         deployer = saleTokenOwner;
         tester1.account = account1;
@@ -431,7 +459,7 @@ describe("Sale", () => {
 
     });
 
-    describe("Initialize PublicSale", () => {
+    describe("Initialize PublicSaleProxyFactroy and PublicSale", () => {
         //funding Token set(TON)
         it("Initialize Funding Token", async function () {
             getToken = ton;
@@ -443,29 +471,57 @@ describe("Sale", () => {
             saleToken = await erc20token.connect(saleTokenOwner).deploy("testDoM", "AURA");
         });
 
+        it("deploy PublicSlaeFactory", async () => {
+            const PublicSaleProxyFactory = await ethers.getContractFactory("PublicSaleProxyFactory");
+
+            publicFactory = await PublicSaleProxyFactory.connect(saleTokenOwner).deploy();
+
+            let code = await saleTokenOwner.provider.getCode(publicFactory.address);
+            expect(code).to.not.eq("0x");
+        })
+
         //deploy publicSale and publicSaleProxy and transfer TON, WTON
         it("Initialize PublicSale", async function () {
             let PublicSale = await ethers.getContractFactory("PublicSale");
-            let deploySaleImpl = await PublicSale.connect(saleOwner).deploy();
+            deploySaleImpl = await PublicSale.connect(saleOwner).deploy();
 
-            let PublicSaleProxy = await ethers.getContractFactory("PublicSaleProxy");
-            let PublicSaleContract = await PublicSaleProxy.connect(saleOwner).deploy();
+            let code = await saleOwner.provider.getCode(deploySaleImpl.address);
+            expect(code).to.not.eq("0x");
+        });
 
-            await PublicSaleContract.connect(saleOwner).setImplementation(deploySaleImpl.address);
+        it("deploy PublicSaleProxy from Factory", async () => {
 
-            await PublicSaleContract.connect(saleOwner).initialize(
-                saleToken.address,
-                account5.address,
-                vaultAddress.address            
+            let publicSaleContract = saleContracts[0];
+            let prevTotalCreatedContracts = await publicFactory.totalCreatedContracts();
+        
+            await publicFactory.connect(saleTokenOwner).create(
+                publicSaleContract.name,
+                deploySaleImpl.address,
+                publicSaleContract.owner.address,
+                [
+                    saleToken.address,
+                    account5.address,
+                    vaultAddress.address,
+                ],
+                [
+                    getToken.address,
+                    lockTOS.address,
+                    wton.address
+                ]
             );
+        
+            let afterTotalCreatedContracts = await publicFactory.totalCreatedContracts();
+        
+            publicSaleContract.index = prevTotalCreatedContracts;
+            expect(afterTotalCreatedContracts).to.be.equal(prevTotalCreatedContracts.add(1));
+        
+            let info = await publicFactory.connect(saleOwner).getContracts(publicSaleContract.index);
+            expect(info.name).to.be.equal(publicSaleContract.name);
+            publicSaleContract.contractAddress = info.contractAddress;
 
-            await PublicSaleContract.connect(saleOwner).changeBasicSet(
-                getToken.address,
-                lockTOS.address,
-                wton.address
-            )
-
-            saleContract = new ethers.Contract( PublicSaleContract.address, PublicSale_ABI.abi, ethers.provider );
+            saleContract = new ethers.Contract( publicSaleContract.contractAddress, PublicSale_ABI.abi, ethers.provider );
+            expect(await saleContract.isAdmin(saleTokenOwner.address)).to.be.equal(false);
+            expect(await saleContract.isAdmin(publicSaleContract.owner.address)).to.be.equal(true);
             //2,000,000의 판매량
             await saleToken.connect(saleTokenOwner).transfer(saleContract.address, totalBigAmount)
             

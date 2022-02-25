@@ -15,13 +15,10 @@ import "../common/AccessibleCommon.sol";
 import "./PublicSaleStorage.sol";
 import "../libraries/LibPublicSale.sol";
 
-import { OnApprove } from "./OnApprove.sol";
-
 contract PublicSale is
     PublicSaleStorage,
     AccessibleCommon,
     ReentrancyGuard,
-    OnApprove,
     IPublicSale
 {
     using SafeERC20 for IERC20;
@@ -590,47 +587,6 @@ contract PublicSale is
      */
     function _toWAD(uint256 v) public override pure returns (uint256) {
         return v / 10 ** 9;
-    }
-
-    // OnApprove가 2가지 경우에 따라서 작동을 하게함.
-    function onApprove(
-        address sender,
-        address spender,
-        uint256 amount,
-        bytes calldata data
-    ) external override returns (bool) {
-        require(msg.sender == address(getToken) || msg.sender == address(IWTON(wton)), "PublicSale: only accept TON and WTON approve callback");
-        if(msg.sender == address(getToken)) {
-            uint256 wtonAmount = _decodeApproveData(data);
-            if(wtonAmount == 0){
-                if(block.timestamp >= startExclusiveTime && block.timestamp < endExclusiveTime) {
-                    exclusiveSale(sender,amount);
-                } else {
-                    require(block.timestamp >= startDepositTime && block.timestamp < endDepositTime, "PublicSale: not SaleTime");
-                    deposit(sender,amount);
-                }
-            } else {
-                uint256 totalAmount = amount + wtonAmount;
-                if(block.timestamp >= startExclusiveTime && block.timestamp < endExclusiveTime) {
-                    exclusiveSale(sender,totalAmount);
-                }
-                else {
-                    require(block.timestamp >= startDepositTime && block.timestamp < endDepositTime, "PublicSale: not SaleTime");
-                    deposit(sender,totalAmount);
-                }
-            }
-        } else if (msg.sender == address(IWTON(wton))) {
-            uint256 wtonAmount = _toWAD(amount);
-            if(block.timestamp >= startExclusiveTime && block.timestamp < endExclusiveTime) {
-                exclusiveSale(sender,wtonAmount);
-            }
-            else {
-                require(block.timestamp >= startDepositTime && block.timestamp < endDepositTime, "PublicSale: not SaleTime");
-                deposit(sender,wtonAmount);
-            }
-        }
-
-        return true;
     }
 
     function _decodeApproveData(

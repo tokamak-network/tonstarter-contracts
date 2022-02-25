@@ -31,9 +31,9 @@ contract PublicSaleProxyFactory is AccessRoleCommon, IPublicSaleProxyFactory {
     }
 
     /// @inheritdoc IPublicSaleProxyFactory
-    /// @notice setAddress[0] = PublicSale, setAddress[1] = ProxyOwner setAddress[2] = vault , 
-    /// saleAddress[0] = _saleTokenAddress, saleAddress[1] = tonAddress
-    /// saleAddress[2] = tonGetAddress, saleAddress[3] = lockTOSAddress, saleAddress[4] = wtonAddress, saleAddress[5] = liquidityVaultAddress
+    /// @notice _logic = PublicSale, _owner = ontherProxyManagerMasterAddress setAddress[2] = vault , 
+    /// saleAddress[0] = _saleTokenAddress, saleAddress[1] = getTokenOwner, saleAddress[2] = liquidityVaultAddress
+    /// basicAddresses[0] = getToken , basicAddresses[1] = sTOS , basicAddresses[2] = wton
     function create(
         string calldata name,
         address _logic,
