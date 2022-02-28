@@ -13,7 +13,6 @@ library LibPublicSale {
         bool join;
         uint256 depositAmount;
         uint256 payAmount;
-        uint256 saleAmount;
     }
 
     struct UserClaim {

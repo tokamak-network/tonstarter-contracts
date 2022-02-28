@@ -101,7 +101,6 @@ contract PublicSale is
             userOpen.depositAmount = 0;
             userOpen.join = false;
             userOpen.payAmount = 0;
-            userOpen.saleAmount = 0;
             LibPublicSale.UserClaim storage userClaim = usersClaim[depositors[j]];
             userClaim.claimAmount = 0;
             userClaim.refundAmount = 0;
@@ -121,10 +120,10 @@ contract PublicSale is
         uint256[] calldata _claimPercents
     ) external onlyOwner beforeStartAddWhiteTime {
         setTier(
-            _Tier[0],_Tier[1],_Tier[2],_Tier[3]
+            _Tier[0], _Tier[1], _Tier[2], _Tier[3]
         );
         setTierPercents(
-            _Tier[4],_Tier[5],_Tier[6],_Tier[7]
+            _Tier[4], _Tier[5], _Tier[6], _Tier[7]
         );
         setSaleAmount(
             _amount[0],
@@ -181,7 +180,9 @@ contract PublicSale is
     {
         require(
             (_startAddWhiteTime < _endAddWhiteTime) &&
-                (_startExclusiveTime < _endExclusiveTime)
+            (_endAddWhiteTime < _startExclusiveTime) &&
+            (_startExclusiveTime < _endExclusiveTime), 
+            "PublicSale : Round1timeSet wrong"
         );
         startAddWhiteTime = _startAddWhiteTime;
         endAddWhiteTime = _endAddWhiteTime;
@@ -202,7 +203,8 @@ contract PublicSale is
         beforeStartAddWhiteTime
     {
         require(
-            (_startDepositTime < _endDepositTime)
+            (_startDepositTime < _endDepositTime),
+            "PublicSale : Round2timeSet wrong"
         );
         startDepositTime = _startDepositTime;
         endDepositTime = _endDepositTime;
@@ -220,9 +222,9 @@ contract PublicSale is
         totalClaimCounts = _claimCounts;
         uint256 i = 0;
         uint256 y = 0;
-        for(i = 0; i < _claimCounts; i++) {
+        for (i = 0; i < _claimCounts; i++) {
             claimTimes.push(_claimTimes[i]);
-            if(i != 0){
+            if (i != 0){
                 require(claimTimes[i-1] < claimTimes[i], "PublicSale: time value error");
             }
             claimPercents.push(_claimPercents[i]);
@@ -347,7 +349,7 @@ contract PublicSale is
 
     /// @inheritdoc IPublicSale
     function totalExpectOpenSaleAmountView() public view override returns(uint256){
-        if(block.timestamp < endExclusiveTime) return totalExpectOpenSaleAmount;
+        if (block.timestamp < endExclusiveTime) return totalExpectOpenSaleAmount;
         else return totalExpectOpenSaleAmount.add(totalRound1NonSaleAmount());
     }
 
@@ -458,10 +460,8 @@ contract PublicSale is
     }
 
     function currentRound() public view returns (uint256 round) {
-        for(uint256 i = totalClaimCounts; i > 0; i--) {
-            if(block.timestamp < claimTimes[0]){
-                round = 0;
-            } else if(block.timestamp < claimTimes[i-1] && i != 0) {
+        for (uint256 i = totalClaimCounts; i > 0; i--) {
+            if (block.timestamp < claimTimes[i-1]) {
                 round = i-1;
             } else if (block.timestamp > claimTimes[totalClaimCounts-1]) {
                 round = totalClaimCounts;
@@ -475,8 +475,8 @@ contract PublicSale is
         override
         returns (uint256 _reward, uint256 _totalClaim) 
     {
-        if(block.timestamp < startClaimTime) return (0, 0);
-        if(_period > totalClaimCounts) return (0, 0);
+        if (block.timestamp < startClaimTime) return (0, 0);
+        if (_period > totalClaimCounts) return (0, 0);
  
         LibPublicSale.UserClaim storage userClaim = usersClaim[_account];
         (, uint256 realSaleAmount, ) = totalSaleUserAmount(_account);   //유저가 총 구매한 token의 양을 Return 함
@@ -489,13 +489,13 @@ contract PublicSale is
         uint256 round = currentRound();
 
         uint256 expectedClaimAmount;
-        for(uint256 i = 0; i < round; i++) {
-            expectedClaimAmount = expectedClaimAmount + (totalClaimReward * claimPercents[i] / 100);
+        for (uint256 i = 0; i < round; i++) {
+            expectedClaimAmount = expectedClaimAmount.add((totalClaimReward.mul(claimPercents[i]).div(100)));
         }
 
         //Period를 0으로 넣으면 현재 내가 받는 양을 리턴해주고 1 이상을 넣으면 해당 라운드에서 받을 수 있는 토큰의 양을 리턴해줌
-        if(_period == 0) {    
-            if(totalClaimCounts == round) {  
+        if (_period == 0) {    
+            if (totalClaimCounts == round) {  
                 uint256 amount = totalClaimReward - userClaim.claimAmount;
                 return (amount, totalClaimReward);
             } else {
@@ -503,7 +503,7 @@ contract PublicSale is
                 return (amount, totalClaimReward);
             }   
         } else {
-            uint256 amount = (totalClaimReward * claimPercents[(_period.sub(1))] / 100);
+            uint256 amount = totalClaimReward.mul(claimPercents[(_period.sub(1))]).div(100);
             return (amount, totalClaimReward);
         }
     }
@@ -512,10 +512,10 @@ contract PublicSale is
     function totalSaleUserAmount(address user) public override view returns (uint256 _realPayAmount, uint256 _realSaleAmount, uint256 _refundAmount) {
         LibPublicSale.UserInfoEx storage userEx = usersEx[user];
 
-        if(userEx.join){
+        if (userEx.join) {
             (uint256 realPayAmount, uint256 realSaleAmount, uint256 refundAmount) = openSaleUserAmount(user);
             return ( realPayAmount.add(userEx.payAmount), realSaleAmount.add(userEx.saleAmount), refundAmount);
-        }else {
+        } else {
             return openSaleUserAmount(user);
         }
     }
@@ -524,7 +524,7 @@ contract PublicSale is
     function openSaleUserAmount(address user) public override view returns (uint256 _realPayAmount, uint256 _realSaleAmount, uint256 _refundAmount) {
         LibPublicSale.UserInfoOpen storage userOpen = usersOpen[user];
 
-        if(!userOpen.join || userOpen.depositAmount == 0) return (0, 0, 0);
+        if (!userOpen.join || userOpen.depositAmount == 0) return (0, 0, 0);
 
         uint256 openSalePossible = calculOpenSaleAmount(user, 0);
         uint256 realPayAmount = calculPayToken(openSalePossible);
@@ -548,7 +548,7 @@ contract PublicSale is
         uint256 _calculSaleToken = calculSaleToken(totalDepositAmount);
         uint256 _totalAmount = totalExpectOpenSaleAmountView();
 
-        if(_calculSaleToken < _totalAmount) return _calculSaleToken;
+        if (_calculSaleToken < _totalAmount) return _calculSaleToken;
         else return _totalAmount;
     }
 
@@ -556,7 +556,7 @@ contract PublicSale is
     function totalOpenPurchasedAmount() public override view returns (uint256){
         uint256 _calculSaleToken = calculSaleToken(totalDepositAmount);
         uint256 _totalAmount = totalExpectOpenSaleAmountView();
-        if(_calculSaleToken < _totalAmount) return totalDepositAmount;
+        if (_calculSaleToken < _totalAmount) return totalDepositAmount;
         else return  calculPayToken(_totalAmount);
     }
 
@@ -598,6 +598,53 @@ contract PublicSale is
     ) public override pure returns (uint256 approveData) {
         assembly {
             approveData := mload(add(data, 0x20))
+        }
+    }
+
+    function calculTONTransferAmount(
+        uint256 _amount,
+        address _sender
+    )
+        internal
+        nonZero(_amount)
+        nonZeroAddress(_sender)
+
+    {
+        uint256 tonAllowance = getToken.allowance(_sender, address(this));
+        uint256 tonBalance = getToken.balanceOf(_sender);
+
+        if (tonAllowance > tonBalance) {
+            tonAllowance = tonBalance; //tonAllowance가 tonBlance보다 더 클때 문제가 된다.
+        }
+        if (tonAllowance < _amount) {
+            uint256 needUserWton;
+            uint256 needWton = _amount.sub(tonAllowance);
+            needUserWton = _toRAY(needWton);
+            require(IWTON(wton).allowance(_sender, address(this)) >= needUserWton, "PublicSale: wton amount exceeds allowance");
+            require(IWTON(wton).balanceOf(_sender) >= needUserWton, "need more wton");
+            IERC20(wton).safeTransferFrom(_sender,address(this),needUserWton);
+            IWTON(wton).swapToTON(needUserWton);
+            require(tonAllowance >= _amount.sub(needWton), "PublicSale: ton amount exceeds allowance");
+            if (_amount.sub(needWton) > 0) {
+                getToken.safeTransferFrom(_sender, address(this), _amount.sub(needWton));   
+            }
+            if (block.timestamp < endExclusiveTime) {
+                getToken.safeTransfer(getTokenOwner, _amount);
+            }
+        } else {
+            require(tonAllowance >= _amount && tonBalance >= _amount, "PublicSale: ton amount exceeds allowance");
+            if (block.timestamp < endExclusiveTime) {
+                getToken.safeTransferFrom(_sender, address(this), _amount);
+                getToken.safeTransfer(getTokenOwner, _amount);
+            } else if (block.timestamp >= startDepositTime) {
+                getToken.safeTransferFrom(_sender, address(this), _amount);
+            }
+        }
+
+        if (block.timestamp < endExclusiveTime) {
+            emit ExclusiveSaled(_sender, _amount);
+        } else {
+            emit Deposited(_sender, _amount);
         }
     }
 
@@ -645,33 +692,7 @@ contract PublicSale is
         totalExPurchasedAmount = totalExPurchasedAmount.add(_amount);
         totalExSaleAmount = totalExSaleAmount.add(tokenSaleAmount);
 
-        
-        uint256 tonAllowance = getToken.allowance(_sender, address(this));
-        uint256 tonBalance = getToken.balanceOf(_sender);
-        if(tonAllowance > tonBalance) {
-            tonAllowance = tonBalance; //tonAllowance가 tonBlance보다 더 클때 문제가 된다.
-        }
-        if(tonAllowance < _amount) {
-            uint256 needUserWton;
-            uint256 needWton = _amount.sub(tonAllowance);
-            needUserWton = _toRAY(needWton);
-            require(IWTON(wton).allowance(_sender, address(this)) >= needUserWton, "PublicSale: wton amount exceeds allowance");
-            require(IWTON(wton).balanceOf(_sender) >= needUserWton, "need more wton");
-            IERC20(wton).safeTransferFrom(_sender,address(this),needUserWton);
-            IWTON(wton).swapToTON(needUserWton);
-            require(tonAllowance >= _amount.sub(needWton), "PublicSale: ton amount exceeds allowance");
-            if(_amount.sub(needWton) > 0) {
-                getToken.safeTransferFrom(_sender, address(this), _amount.sub(needWton));   
-            }
-            getToken.safeTransfer(getTokenOwner, _amount);
-        } else {
-            require(tonAllowance >= _amount && tonBalance >= _amount, "PublicSale: ton amount exceeds allowance");
-
-            getToken.safeTransferFrom(_sender, address(this), _amount);
-            getToken.safeTransfer(getTokenOwner, _amount);
-        }
-
-        emit ExclusiveSaled(_sender, _amount);
+        calculTONTransferAmount(_amount, _sender);
     }
 
     /// @inheritdoc IPublicSale
@@ -700,37 +721,12 @@ contract PublicSale is
 
             totalRound2Users = totalRound2Users.add(1);
             LibPublicSale.UserInfoEx storage userEx = usersEx[_sender];
-            if(userEx.payAmount == 0) totalUsers = totalUsers.add(1);
+            if (userEx.payAmount == 0) totalUsers = totalUsers.add(1);
         }
         userOpen.depositAmount = userOpen.depositAmount.add(_amount);
-        userOpen.saleAmount = 0;
         totalDepositAmount = totalDepositAmount.add(_amount);
 
-        uint256 tonAllowance = getToken.allowance(_sender, address(this));
-        uint256 tonBalance = getToken.balanceOf(_sender);
-        if(tonAllowance > tonBalance) {
-            tonAllowance = tonBalance; //tonAllowance가 tonBlance보다 더 클때 문제가 된다.
-        }
-        if(tonAllowance < _amount) {
-            uint256 needUserWton;
-            uint256 needWton = _amount.sub(tonAllowance);
-            needUserWton = _toRAY(needWton);
-            require(IWTON(wton).allowance(_sender, address(this)) >= needUserWton, "PublicSale: wton amount exceeds allowance");
-            require(IWTON(wton).balanceOf(_sender) >= needUserWton, "need more wton");
-            IERC20(wton).safeTransferFrom(_sender,address(this),needUserWton);
-            IWTON(wton).swapToTON(needUserWton);
-            require(tonAllowance >= _amount.sub(needWton), "PublicSale: ton amount exceeds allowance");
-            if(_amount.sub(needWton) > 0) {
-                getToken.safeTransferFrom(_sender, address(this), _amount.sub(needWton));   
-            }
-        } else {
-            require(tonAllowance >= _amount && tonBalance >= _amount, "PublicSale: ton amount exceeds allowance");
-
-            getToken.safeTransferFrom(_sender, address(this), _amount);
-        }
-
-
-        emit Deposited(_sender, _amount);
+        calculTONTransferAmount(_amount, _sender);
     }
 
     /// @inheritdoc IPublicSale
@@ -765,12 +761,12 @@ contract PublicSale is
 
         saleToken.safeTransfer(msg.sender, reward);
 
-        if(!userClaim.exec && userOpen.join) {
+        if (!userClaim.exec && userOpen.join) {
             totalRound2UsersClaim = totalRound2UsersClaim.add(1);
             userClaim.exec = true;
         }
 
-        if(refundAmount > 0 && userClaim.refundAmount == 0){
+        if (refundAmount > 0 && userClaim.refundAmount == 0){
             require(refundAmount <= getToken.balanceOf(address(this)), "PublicSale: dont have refund ton");
             userClaim.refundAmount = refundAmount;
             getToken.safeTransfer(msg.sender, refundAmount);
@@ -784,36 +780,33 @@ contract PublicSale is
         require(block.timestamp > endDepositTime,"PublicSale: need to end the depositTime");
         uint256 liquidityTON = calculPayToken(liquidityVaultAmount);
         uint256 getAmount;
-        if(totalRound2Users == totalRound2UsersClaim){
+        if (totalRound2Users == totalRound2UsersClaim){
             getAmount = getToken.balanceOf(address(this)).sub(liquidityTON);
         } else {
             getAmount = totalOpenPurchasedAmount().sub(liquidityTON).sub(10 ether);
         }
         require(getAmount <= getToken.balanceOf(address(this)), "PublicSale: no token to receive");
-        getToken.safeTransfer(liquidityVaultAddress,liquidityTON);
+        getToken.safeTransfer(liquidityVaultAddress, liquidityTON);
         getToken.safeTransfer(getTokenOwner, getAmount);
         emit DepositWithdrawal(msg.sender, getAmount, liquidityTON);
     }
 
     /// @inheritdoc IPublicSale
     function withdraw() external override onlyOwner{
-        if(block.timestamp <= endDepositTime){
+        if (block.timestamp <= endDepositTime){
             uint256 balance = saleToken.balanceOf(address(this));
             require(balance > totalExpectSaleAmount.add(totalExpectOpenSaleAmount), "PublicSale: no withdrawable amount");
             uint256 withdrawAmount = balance.sub(totalExpectSaleAmount.add(totalExpectOpenSaleAmount));
-            require(withdrawAmount != 0, "PublicSale: don't exist withdrawAmount");
             saleToken.safeTransfer(msg.sender, withdrawAmount);
             emit Withdrawal(msg.sender, withdrawAmount);
         } else {
-            require(block.timestamp > endDepositTime, "PublicSale: end the openSaleTime");
-            require(!adminWithdraw, "already admin called withdraw");
+            require(!adminWithdraw, "PublicSale: already admin called withdraw");
             adminWithdraw = true;
             uint256 saleAmount = totalOpenSaleAmount();
             require(totalExpectSaleAmount.add(totalExpectOpenSaleAmount) > totalExSaleAmount.add(saleAmount), "PublicSale: don't exist withdrawAmount");
 
             uint256 withdrawAmount = totalExpectSaleAmount.add(totalExpectOpenSaleAmount).sub(totalExSaleAmount).sub(saleAmount);
 
-            require(withdrawAmount != 0, "PublicSale: don't exist withdrawAmount");
             saleToken.safeTransfer(msg.sender, withdrawAmount);
             emit Withdrawal(msg.sender, withdrawAmount);
         }
