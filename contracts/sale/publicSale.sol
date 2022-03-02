@@ -71,45 +71,14 @@ contract PublicSale is
     }
 
     /// @inheritdoc IPublicSale
-    function changeTONOwner(address _address) external override onlyOwner {
+    function changeTONOwner(
+        address _address
+    ) 
+        external 
+        override
+        onlyOwner 
+    {
         getTokenOwner = _address;
-    }
-
-    function resetAllData() external onlyOwner {
-        startAddWhiteTime = 0;
-        totalWhitelists = 0;
-        totalExSaleAmount = 0;
-        totalExPurchasedAmount = 0;
-        totalDepositAmount = 0;
-        totalUsers = 0;
-        totalRound1Users = 0;
-        totalRound2Users = 0;
-        totalRound2UsersClaim = 0;
-
-        for (uint256 i = 0; i < whitelists.length; i++) {
-            LibPublicSale.UserInfoEx storage userEx = usersEx[whitelists[i]];
-            userEx.join = false;
-            userEx.payAmount = 0;
-            userEx.saleAmount = 0;
-            LibPublicSale.UserClaim storage userClaim = usersClaim[whitelists[i]];
-            userClaim.claimAmount = 0;
-            userClaim.refundAmount = 0;
-            userClaim.exec = false;
-        }
-        for (uint256 j = 0; j < depositors.length; j++) {
-            LibPublicSale.UserInfoOpen storage userOpen = usersOpen[depositors[j]];
-            userOpen.depositAmount = 0;
-            userOpen.join = false;
-            userOpen.payAmount = 0;
-            LibPublicSale.UserClaim storage userClaim = usersClaim[depositors[j]];
-            userClaim.claimAmount = 0;
-            userClaim.refundAmount = 0;
-            userClaim.exec = false;
-        }
-        for (uint256 k = 1; k < 5; k++) {
-            tiersAccount[k] = 0;
-            tiersExAccount[k] = 0;
-        }
     }
 
     function setAllsetting(
@@ -118,7 +87,12 @@ contract PublicSale is
         uint256[8] calldata _time,
         uint256[] calldata _claimTimes,
         uint256[] calldata _claimPercents
-    ) external onlyOwner beforeStartAddWhiteTime {
+    ) 
+        external
+        override 
+        onlyOwner 
+        beforeStartAddWhiteTime 
+    {
         setTier(
             _Tier[0], _Tier[1], _Tier[2], _Tier[3]
         );
@@ -153,7 +127,9 @@ contract PublicSale is
     }
 
     /// @inheritdoc IPublicSale
-    function setSnapshot(uint256 _snapshot)
+    function setSnapshot(
+        uint256 _snapshot
+    )
         public
         override
         onlyOwner
@@ -216,6 +192,7 @@ contract PublicSale is
         uint256[] calldata _claimPercents
     )
         public
+        override
         onlyOwner
         beforeStartAddWhiteTime
     {
@@ -335,7 +312,10 @@ contract PublicSale is
     }
 
     /// @inheritdoc IPublicSale
-    function setTokenPrice(uint256 _saleTokenPrice, uint256 _payTokenPrice)
+    function setTokenPrice(
+        uint256 _saleTokenPrice, 
+        uint256 _payTokenPrice
+    )
         public
         override
         onlyOwner
@@ -348,13 +328,23 @@ contract PublicSale is
     }
 
     /// @inheritdoc IPublicSale
-    function totalExpectOpenSaleAmountView() public view override returns(uint256){
+    function totalExpectOpenSaleAmountView() 
+        public 
+        view 
+        override 
+        returns(uint256)
+    {
         if (block.timestamp < endExclusiveTime) return totalExpectOpenSaleAmount;
         else return totalExpectOpenSaleAmount.add(totalRound1NonSaleAmount());
     }
 
     /// @inheritdoc IPublicSale
-    function totalRound1NonSaleAmount() public view override returns(uint256){
+    function totalRound1NonSaleAmount() 
+        public 
+        view 
+        override 
+        returns(uint256)
+    {
         return totalExpectSaleAmount.sub(totalExSaleAmount);
     }
 
@@ -460,52 +450,54 @@ contract PublicSale is
     }
 
     function currentRound() public view returns (uint256 round) {
-        for (uint256 i = totalClaimCounts; i > 0; i--) {
-            if (block.timestamp < claimTimes[i-1]) {
-                round = i-1;
-            } else if (block.timestamp > claimTimes[totalClaimCounts-1]) {
-                round = totalClaimCounts;
+        if (block.timestamp > claimTimes[totalClaimCounts-1]) {
+            return totalClaimCounts;
+        }
+        for (uint256 i = 0; i < totalClaimCounts; i++) {
+            if (block.timestamp < claimTimes[i]) {
+                return i;
             }
         }
     }
 
-    function calculClaimAmount(address _account, uint256 _period) 
+    function calculClaimAmount(address _account, uint256 _round) 
         public 
         view 
         override
-        returns (uint256 _reward, uint256 _totalClaim) 
+        returns (uint256 _reward, uint256 _totalClaim, uint256 _refundAmount) 
     {
-        if (block.timestamp < startClaimTime) return (0, 0);
-        if (_period > totalClaimCounts) return (0, 0);
+        if (block.timestamp < startClaimTime) return (0, 0, 0);
+        if (_round > totalClaimCounts) return (0, 0, 0);
  
         LibPublicSale.UserClaim storage userClaim = usersClaim[_account];
-        (, uint256 realSaleAmount, ) = totalSaleUserAmount(_account);   //유저가 총 구매한 token의 양을 Return 함
+        (, uint256 realSaleAmount, uint256 refundAmount) = totalSaleUserAmount(_account);   //유저가 총 구매한 token의 양을 Return 함
 
-        if (realSaleAmount == 0 ) return (0, 0);
-        if (userClaim.claimAmount >= realSaleAmount) return (0, 0);    //userClaim.claimAmount  = contract에서 유저에게 준양
+        if (realSaleAmount == 0 ) return (0, 0, 0);
+        if (userClaim.claimAmount >= realSaleAmount) return (0, 0, 0);    //userClaim.claimAmount  = contract에서 유저에게 준양
+
+        if (_round != 0) {
+            uint256 amount = realSaleAmount.mul(claimPercents[(_round.sub(1))]).div(100);
+            return (amount, realSaleAmount, refundAmount);
+        }
 
         //해당 라운드에서 받아야하는 토큰의 양 -> (realSaleAmount * claimPercents[i] / 100) : 해당 라운드에서 받아야하는 토큰의 양
-        uint256 totalClaimReward = realSaleAmount;
         uint256 round = currentRound();
 
+        if (totalClaimCounts == round && _round == 0) {  
+            uint256 amount = realSaleAmount - userClaim.claimAmount;
+            return (amount, realSaleAmount, refundAmount);
+        }
+        
         uint256 expectedClaimAmount;
         for (uint256 i = 0; i < round; i++) {
-            expectedClaimAmount = expectedClaimAmount.add((totalClaimReward.mul(claimPercents[i]).div(100)));
+            expectedClaimAmount = expectedClaimAmount.add((realSaleAmount.mul(claimPercents[i]).div(100)));
         }
 
-        //Period를 0으로 넣으면 현재 내가 받는 양을 리턴해주고 1 이상을 넣으면 해당 라운드에서 받을 수 있는 토큰의 양을 리턴해줌
-        if (_period == 0) {    
-            if (totalClaimCounts == round) {  
-                uint256 amount = totalClaimReward - userClaim.claimAmount;
-                return (amount, totalClaimReward);
-            } else {
-                uint256 amount = expectedClaimAmount - userClaim.claimAmount;
-                return (amount, totalClaimReward);
-            }   
-        } else {
-            uint256 amount = totalClaimReward.mul(claimPercents[(_period.sub(1))]).div(100);
-            return (amount, totalClaimReward);
-        }
+        //Round를 0으로 넣으면 현재 내가 받을 수 있는 양을 리턴해주고 1 이상을 넣으면 해당 라운드에서 받을 수 있는 토큰의 양을 리턴해줌
+        if (_round == 0) {    
+            uint256 amount = expectedClaimAmount - userClaim.claimAmount;
+            return (amount, realSaleAmount, refundAmount);
+        } 
     }
 
     /// @inheritdoc IPublicSale
@@ -533,8 +525,8 @@ contract PublicSale is
         uint256 returnAmount = 0;
 
         if (realPayAmount < depositAmount) {
-           returnAmount = depositAmount.sub(realPayAmount);
-           realSaleAmount = calculSaleToken(realPayAmount);
+            returnAmount = depositAmount.sub(realPayAmount);
+            realSaleAmount = calculSaleToken(realPayAmount);
         } else {
             realPayAmount = userOpen.depositAmount;
             realSaleAmount = calculSaleToken(depositAmount);
@@ -560,6 +552,10 @@ contract PublicSale is
         else return  calculPayToken(_totalAmount);
     }
 
+    function totalWhitelists() external view returns (uint256) {
+        return whitelists.length;
+    }
+
     /// @inheritdoc IPublicSale
     function addWhiteList() external override nonReentrant {
         require(
@@ -576,7 +572,6 @@ contract PublicSale is
         require(userEx.join != true, "PublicSale: already attended");
 
         whitelists.push(msg.sender);
-        totalWhitelists = totalWhitelists.add(1);
 
         userEx.join = true;
         userEx.tier = tier;
@@ -738,15 +733,11 @@ contract PublicSale is
         LibPublicSale.UserClaim storage userClaim = usersClaim[msg.sender];
         LibPublicSale.UserInfoOpen storage userOpen = usersOpen[msg.sender];
 
-        (, uint256 realSaleAmount, ) = totalSaleUserAmount(msg.sender);
-        (, ,uint256 refundAmount ) = openSaleUserAmount(msg.sender);
-
+        (uint256 reward, uint256 realSaleAmount, uint256 refundAmount) = calculClaimAmount(msg.sender, 0);
         require(
             realSaleAmount > 0,
             "PublicSale: no purchase amount"
         );
-
-        (uint256 reward, ) = calculClaimAmount(msg.sender, 0);
         require(reward > 0, "PublicSale: no reward");
         require(
             realSaleAmount.sub(userClaim.claimAmount) >= reward,

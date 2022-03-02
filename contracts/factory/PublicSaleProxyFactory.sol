@@ -71,8 +71,6 @@ contract PublicSaleProxyFactory is AccessRoleCommon, IPublicSaleProxyFactory {
             basicAddresses[2]
         );
 
-
-
         proxy.grantRole(ADMIN_ROLE, _owner);
         proxy.revokeRole(ADMIN_ROLE, address(this));
 

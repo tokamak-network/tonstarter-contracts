@@ -26,6 +26,7 @@ const {
 
 const LockTOS_ABI = require("../..//artifacts/contracts/stake/LockTOS.sol/LockTOS.json");
 const PublicSale_ABI = require('../../artifacts/contracts/sale/publicSale.sol/PublicSale.json');
+const PublicSaleTest_ABI = require('../../artifacts/contracts/sale/PublicSaleTest.sol/PublicSaleTest.json');
 // const PublicSaleForDoM_ABI = require('../../artifacts/contracts/sale/PublicSaleForDoM.sol/PublicSaleForDoM.json');
 
 const zeroAddress = "0x0000000000000000000000000000000000000000";
@@ -483,7 +484,7 @@ describe("Sale", () => {
 
         //deploy publicSale and publicSaleProxy and transfer TON, WTON
         it("Initialize PublicSale", async function () {
-            let PublicSale = await ethers.getContractFactory("PublicSale");
+            let PublicSale = await ethers.getContractFactory("PublicSaleTest");
             deploySaleImpl = await PublicSale.connect(saleOwner).deploy();
 
             let code = await saleOwner.provider.getCode(deploySaleImpl.address);
@@ -520,7 +521,7 @@ describe("Sale", () => {
             expect(info.name).to.be.equal(publicSaleContract.name);
             publicSaleContract.contractAddress = info.contractAddress;
 
-            saleContract = new ethers.Contract( publicSaleContract.contractAddress, PublicSale_ABI.abi, ethers.provider );
+            saleContract = new ethers.Contract( publicSaleContract.contractAddress, PublicSaleTest_ABI.abi, ethers.provider );
             expect(await saleContract.isAdmin(saleTokenOwner.address)).to.be.equal(false);
             expect(await saleContract.isAdmin(publicSaleContract.owner.address)).to.be.equal(true);
             //2,000,000의 판매량
@@ -727,6 +728,9 @@ describe("Sale", () => {
 
                 let tx15 = Number(await saleContract.calculTierAmount(account4.address))
                 expect(tx15).to.be.equal(Number(big300000))
+
+                let tx16 = Number(await saleContract.totalWhitelists())
+                expect(tx16).to.be.equal(5)
             })
 
             //calculate how many input ton amount

@@ -27,8 +27,6 @@ contract PublicSaleStorage  {
     uint256 public totalRound2Users = 0;         //라운드 2 참여자
     uint256 public totalRound2UsersClaim = 0;    //라운드 2 참여자중 claim한사람
 
-    uint256 public totalWhitelists = 0;         //총 화이트리스트 수 (exclusive)
-
     uint256 public totalExSaleAmount = 0;       //총 exclu 실제 판매토큰 양 (exclusive)
     uint256 public totalExPurchasedAmount = 0;  //총 지불토큰 받은 양 (exclusive)
 
