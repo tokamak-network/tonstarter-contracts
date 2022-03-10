@@ -5,6 +5,7 @@ pragma solidity ^0.7.6;
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "../interfaces/ILockTOS.sol";
 import "../libraries/LibPublicSale.sol";
+import "@uniswap/v3-periphery/contracts/interfaces/ISwapRouter.sol";
 
 contract PublicSaleStorage  {
     /// @dev flag for pause proxy
@@ -45,12 +46,15 @@ contract PublicSaleStorage  {
     uint256 public liquidityVaultAmount; //liquidtyVault의 Amount
 
     address public liquidityVaultAddress; //liquidityVault의 Address
+    ISwapRouter public uniswapRouter;
+    uint24 public constant poolFee = 3000;
 
     address public getTokenOwner;
     address public wton;
 
     IERC20 public saleToken;
     IERC20 public getToken;
+    IERC20 public tos;
     ILockTOS public sTOS;
 
     address[] public depositors;

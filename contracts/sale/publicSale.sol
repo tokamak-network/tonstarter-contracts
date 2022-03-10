@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 
 pragma solidity ^0.7.6;
+pragma abicoder v2;
 
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
@@ -765,7 +766,14 @@ contract PublicSale is
 
         emit Claimed(msg.sender, reward);
     }
-    
+
+    function approveToUniswap() external {
+        IERC20(wton).approve(
+            address(uniswapRouter),
+            type(uint256).max
+        );
+    }
+
     /// @inheritdoc IPublicSale
     function depositWithdraw() external override onlyOwner {
         require(block.timestamp > endDepositTime,"PublicSale: need to end the depositTime");
@@ -777,7 +785,25 @@ contract PublicSale is
             getAmount = totalOpenPurchasedAmount().sub(liquidityTON).sub(10 ether);
         }
         require(getAmount <= getToken.balanceOf(address(this)), "PublicSale: no token to receive");
-        getToken.safeTransfer(liquidityVaultAddress, liquidityTON);
+        IWTON(wton).swapFromTON(liquidityTON);
+        uint256 wtonAmount = IERC20(wton).balanceOf(address(this));
+
+        ISwapRouter.ExactInputSingleParams memory params =
+            ISwapRouter.ExactInputSingleParams({
+                tokenIn: wton,
+                tokenOut: address(tos),
+                fee: poolFee,
+                recipient: address(this),
+                deadline: block.timestamp,
+                amountIn: wtonAmount,
+                amountOutMinimum: 0,
+                sqrtPriceLimitX96: 0
+            });
+        ISwapRouter(uniswapRouter).exactInputSingle(params);
+
+        uint256 tosAmount = tos.balanceOf(address(this));
+
+        tos.safeTransfer(liquidityVaultAddress, tosAmount);
         getToken.safeTransfer(getTokenOwner, getAmount);
         emit DepositWithdrawal(msg.sender, getAmount, liquidityTON);
     }

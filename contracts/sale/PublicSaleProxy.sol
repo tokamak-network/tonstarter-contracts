@@ -120,12 +120,16 @@ contract PublicSaleProxy is
     function changeBasicSet(
         address _getTokenAddress,
         address _sTOS,
-        address _wton
+        address _wton,
+        address _uniswapRouter,
+        address _TOS
     ) external override onlyOwner {
         require(startAddWhiteTime == 0, "possible to setting the whiteTime before");
         getToken = IERC20(_getTokenAddress);
         sTOS = ILockTOS(_sTOS);
         wton = _wton;
+        uniswapRouter = ISwapRouter(_uniswapRouter);
+        tos = IERC20(_TOS);
     }
 
     function onApprove(

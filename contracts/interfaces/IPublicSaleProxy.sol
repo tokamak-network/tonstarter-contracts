@@ -28,6 +28,8 @@ interface IPublicSaleProxy {
     function changeBasicSet(
         address _getTokenAddress,
         address _sTOS,
-        address _wton
+        address _wton,
+        address _uniswapRouter,
+        address _TOS
     ) external;
 }
