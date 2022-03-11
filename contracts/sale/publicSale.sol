@@ -9,12 +9,11 @@ import {
     ReentrancyGuard
 } from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
-import "../interfaces/ILockTOS.sol";
 import "../interfaces/IPublicSale.sol";
 import "../interfaces/IWTON.sol";
+import "../interfaces/ITON.sol";
 import "../common/AccessibleCommon.sol";
 import "./PublicSaleStorage.sol";
-import "../libraries/LibPublicSale.sol";
 
 contract PublicSale is
     PublicSaleStorage,
@@ -606,8 +605,8 @@ contract PublicSale is
         nonZeroAddress(_sender)
 
     {
-        uint256 tonAllowance = getToken.allowance(_sender, address(this));
-        uint256 tonBalance = getToken.balanceOf(_sender);
+        uint256 tonAllowance = IERC20(getToken).allowance(_sender, address(this));
+        uint256 tonBalance = IERC20(getToken).balanceOf(_sender);
 
         if (tonAllowance > tonBalance) {
             tonAllowance = tonBalance; //tonAllowance가 tonBlance보다 더 클때 문제가 된다.
@@ -622,18 +621,18 @@ contract PublicSale is
             IWTON(wton).swapToTON(needUserWton);
             require(tonAllowance >= _amount.sub(needWton), "PublicSale: ton amount exceeds allowance");
             if (_amount.sub(needWton) > 0) {
-                getToken.safeTransferFrom(_sender, address(this), _amount.sub(needWton));   
+                IERC20(getToken).safeTransferFrom(_sender, address(this), _amount.sub(needWton));   
             }
             if (block.timestamp < endExclusiveTime) {
-                getToken.safeTransfer(getTokenOwner, _amount);
+                IERC20(getToken).safeTransfer(getTokenOwner, _amount);
             }
         } else {
             require(tonAllowance >= _amount && tonBalance >= _amount, "PublicSale: ton amount exceeds allowance");
             if (block.timestamp < endExclusiveTime) {
-                getToken.safeTransferFrom(_sender, address(this), _amount);
-                getToken.safeTransfer(getTokenOwner, _amount);
+                IERC20(getToken).safeTransferFrom(_sender, address(this), _amount);
+                IERC20(getToken).safeTransfer(getTokenOwner, _amount);
             } else if (block.timestamp >= startDepositTime) {
-                getToken.safeTransferFrom(_sender, address(this), _amount);
+                IERC20(getToken).safeTransferFrom(_sender, address(this), _amount);
             }
         }
 
@@ -759,9 +758,9 @@ contract PublicSale is
         }
 
         if (refundAmount > 0 && userClaim.refundAmount == 0){
-            require(refundAmount <= getToken.balanceOf(address(this)), "PublicSale: dont have refund ton");
+            require(refundAmount <= IERC20(getToken).balanceOf(address(this)), "PublicSale: dont have refund ton");
             userClaim.refundAmount = refundAmount;
-            getToken.safeTransfer(msg.sender, refundAmount);
+            IERC20(getToken).safeTransfer(msg.sender, refundAmount);
         }
 
         emit Claimed(msg.sender, reward);
@@ -774,17 +773,25 @@ contract PublicSale is
         );
     }
 
+    function approveToWTON() external {
+        IERC20(getToken).approve(
+            wton,
+            type(uint256).max
+        );
+    }
+
     /// @inheritdoc IPublicSale
     function depositWithdraw() external override onlyOwner {
         require(block.timestamp > endDepositTime,"PublicSale: need to end the depositTime");
         uint256 liquidityTON = calculPayToken(liquidityVaultAmount);
         uint256 getAmount;
         if (totalRound2Users == totalRound2UsersClaim){
-            getAmount = getToken.balanceOf(address(this)).sub(liquidityTON);
+            getAmount = IERC20(getToken).balanceOf(address(this)).sub(liquidityTON);
         } else {
             getAmount = totalOpenPurchasedAmount().sub(liquidityTON).sub(10 ether);
         }
-        require(getAmount <= getToken.balanceOf(address(this)), "PublicSale: no token to receive");
+        require(getAmount <= IERC20(getToken).balanceOf(address(this)), "PublicSale: no token to receive");
+        
         IWTON(wton).swapFromTON(liquidityTON);
         uint256 wtonAmount = IERC20(wton).balanceOf(address(this));
 
@@ -804,7 +811,7 @@ contract PublicSale is
         uint256 tosAmount = tos.balanceOf(address(this));
 
         tos.safeTransfer(liquidityVaultAddress, tosAmount);
-        getToken.safeTransfer(getTokenOwner, getAmount);
+        IERC20(getToken).safeTransfer(getTokenOwner, getAmount);
         emit DepositWithdrawal(msg.sender, getAmount, liquidityTON);
     }
 

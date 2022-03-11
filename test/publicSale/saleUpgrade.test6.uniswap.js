@@ -24,6 +24,24 @@ const {
     HASH_PHASE2_ETHTOS_Staking,
 } = require("../../utils/ico_test_deploy_ethers.js");
 
+const {
+    deployedUniswapV3Contracts,
+    FeeAmount,
+    TICK_SPACINGS,
+    getMinTick,
+    getMaxTick,
+    getNegativeOneTick,
+    getPositiveOneMaxTick,
+    encodePriceSqrt,
+    getUniswapV3Pool,
+    getBlock,
+    mintPosition2,
+    getTick,
+    // getMaxLiquidityPerTick,
+  } = require("./uniswap-v3/uniswap-v3-contracts");
+
+// let UniswapV3Factory = require('../abis/UniswapV3Factory.json');
+
 const LockTOS_ABI = require("../..//artifacts/contracts/stake/LockTOS.sol/LockTOS.json");
 const PublicSale_ABI = require('../../artifacts/contracts/sale/publicSale.sol/PublicSale.json');
 const PublicSaleTest_ABI = require('../../artifacts/contracts/sale/PublicSaleTest.sol/PublicSaleTest.json');
@@ -100,6 +118,7 @@ describe("Sale", () => {
     let account4;
     let account5;
     let account6;
+    let uniswapAccount;
     
     let ico20Contracts;
     let TokamakContractsDeployed;
@@ -159,6 +178,8 @@ describe("Sale", () => {
     const version = "1.0";
     // const tosAmount = ethers.BigNumber.from('100000000000000000000');
     const tosAmount = 100000000000;
+    const tosuniAmount = ethers.utils.parseUnits("1000000", 18);
+    const wtonuniAmount = ethers.utils.parseUnits("1000000", 27);
     let deployer, user1, user2;
     let defaultSender;
     let userLockInfo = [];
@@ -169,6 +190,8 @@ describe("Sale", () => {
     let publicFactory;
     let deploySaleImpl;
     let uniswapRouter;
+    let testTemp;
+    let wtonTosPool;
 
     let tester1 = {
         account: null,
@@ -241,6 +264,21 @@ describe("Sale", () => {
         },
     ]
 
+    let uniswapInfo={
+        poolfactory: "0x1F98431c8aD98523631AE4a59f267346ea31F984",
+        npm: "0xC36442b4a4522E871399CD717aBDD847Ab11FE88",
+        swapRouter: "0xE592427A0AEce92De3Edee1F18E0157C05861564",
+        wethUsdcPool: "0xfbDc20aEFB98a2dD3842023f21D17004eAefbe68",
+        wtonWethPool: "0xE032a3aEc591fF1Ca88122928161eA1053a098AC",
+        wtonTosPool: "0x516e1af7303a94f81e91e4ac29e20f4319d4ecaf",
+        wton: "0x709bef48982Bbfd6F2D4Be24660832665F53406C",
+        tos: "0x73a54e5C054aA64C1AE7373C2B5474d8AFEa08bd",
+        weth: "0xc778417e063141139fce010982780140aa0cd5ab",
+        usdc: "0x4dbcdf9b62e891a7cec5a2568c3f4faf9e8abe2b",
+        _fee: ethers.BigNumber.from("3000"),
+        NonfungibleTokenPositionDescriptor: "0x91ae842A5Ffd8d12023116943e72A606179294f3"
+    } 
+
     before(async () => {
         ico20Contracts = new ICO20Contracts();
 
@@ -258,6 +296,8 @@ describe("Sale", () => {
         account6 = await findSigner(addresses[9]);
         vaultAddress = await findSigner(addresses[10]);
         uniswapRouter = await findSigner(addresses[11]);
+        testTemp = await findSigner(addresses[12]); 
+        uniswapAccount = await findSigner(addresses[13]);
 
         saleContracts[0].owner = saleOwner;
         saleContracts[1].owner = account1;
@@ -289,6 +329,7 @@ describe("Sale", () => {
             const TOS = await ethers.getContractFactory("TOS");
             tos = await TOS.deploy(name, symbol, version);
             await tos.deployed();
+            uniswapInfo.tos = tos.address;
         });
 
         //LockTOS Contract deploy (need the TOS staking)
@@ -324,6 +365,9 @@ describe("Sale", () => {
 
             await (await tos.connect(deployer).mint(tester6.account.address, tosAmount)).wait();
             expect(await tos.balanceOf(tester6.account.address)).to.be.equal(tosAmount);
+
+            await (await tos.connect(deployer).mint(uniswapAccount.address, tosuniAmount)).wait();
+            expect(await tos.balanceOf(uniswapAccount.address)).to.be.equal(tosuniAmount);
         });
 
         describe("# 1. Deploy WTON, TON", async function() {
@@ -350,6 +394,12 @@ describe("Sale", () => {
                 await wton.mint(defaultSender, ethers.utils.parseUnits("1000", 27), {
                   from: defaultSender,
                 });
+
+                await wton.mint(uniswapAccount.address, wtonuniAmount, {
+                    from: defaultSender,
+                });
+
+                expect(await wton.balanceOf(uniswapAccount.address)).to.be.equal(wtonuniAmount);
     
                 // await ton.mint(tester1.account.address, tester1.tonAmount, {
                 //     from: defaultSender,
@@ -463,6 +513,80 @@ describe("Sale", () => {
 
     });
 
+    describe("UniswapV3 pool setting", () => {
+        it("deployedUniswapV3Contracts", async function () {
+            deployedUniswapV3 = await deployedUniswapV3Contracts();
+    
+            uniswapInfo.poolfactory = deployedUniswapV3.coreFactory.address;
+            uniswapInfo.npm = deployedUniswapV3.nftPositionManager.address;
+            uniswapInfo.swapRouter = deployedUniswapV3.swapRouter.address;
+            uniswapInfo.NonfungibleTokenPositionDescriptor = deployedUniswapV3.nftDescriptor.address;
+            // console.log(deployedUniswapV3.coreFactory);
+        });
+
+        it("deploy TEST address", async function () {
+           uniswapInfo.wethUsdcPool = testTemp.address;
+           uniswapInfo.wtonWethPool = testTemp.address;
+           uniswapInfo.wtonTosPool = testTemp.address;
+           uniswapInfo.wton = testTemp.address;
+        });
+
+        it("create WTON-TOS Pool", async () => {
+            let tx = await deployedUniswapV3.coreFactory.connect(uniswapAccount).createPool(wton.address,tos.address,FeeAmount.MEDIUM);
+            await tx.wait();
+            let getpoolAddress = await deployedUniswapV3.coreFactory.connect(uniswapAccount).getPool(wton.address,tos.address,FeeAmount.MEDIUM);
+            console.log(getpoolAddress);
+
+            wtonTosPool = await getUniswapV3Pool(getpoolAddress,uniswapAccount);
+            // console.log(wtonTosPool);
+            expect(await wtonTosPool.factory()).to.eq(deployedUniswapV3.coreFactory.address);
+            expect(await wtonTosPool.token0(), 'pool token0').to.eq(wton.address)
+            expect(await wtonTosPool.token1(), 'pool token1').to.eq(tos.address)
+            expect(await wtonTosPool.fee(), 'pool fee').to.eq(FeeAmount.MEDIUM)
+            let slot = await wtonTosPool.slot0();
+            expect(slot.sqrtPriceX96).to.be.equal(0);
+        })
+
+        it("set initSqrtPrice", async () => {
+            let sqrtPrice = encodePriceSqrt(1, 1);
+            await wtonTosPool.initialize(sqrtPrice);
+            let slot = await wtonTosPool.slot0();
+            expect(slot.sqrtPriceX96).to.be.gte(0);
+        })
+
+        // it("check the WTON-TOS Pool", async () => {
+        //     let lowerTick = getMinTick(TICK_SPACINGS[FeeAmount.MEDIUM]);
+        //     let upperTick = getMaxTick(TICK_SPACINGS[FeeAmount.MEDIUM]);
+
+        //     let liquidity = await wtonTosPool.liquidity();
+        //     // console.log("liquidity : ",Number(liquidity));
+        //     expect(liquidity).to.be.equal(0);
+        //     // let tx2 = await wtonTosPool.maxLiquidityPerTick();
+        //     // console.log("maxLiquidityPerTick", Number(tx2));
+        //     // let tx3 = await wtonTosPool.ticks(0);
+        //     // console.log("ticks : ", Number(tx3));
+
+        //     // let inputLiquidity = liquidity * 0.0002
+            
+        //     // let result = await wtonTosPool.connect(uniswapAccount).mint(uniswapAccount.address,lowerTick,upperTick,inputLiquidity,0)
+        //     // console.log(result);
+        // })
+
+        it("mint the WTON-TOS Pool", async () => {
+            let beforeliquidity = await wtonTosPool.liquidity();
+            expect(beforeliquidity).to.be.equal(0);
+
+            // console.log(deployedUniswapV3.nftPositionManager);
+            await tos.connect(uniswapAccount).approve(deployedUniswapV3.nftPositionManager.address,tosuniAmount)
+            await wton.connect(uniswapAccount).approve(deployedUniswapV3.nftPositionManager.address,wtonuniAmount)
+            await mintPosition2(wton.address,tos.address,tosuniAmount,wtonuniAmount,deployedUniswapV3.nftPositionManager,uniswapAccount);
+
+            let afterliquidity = await wtonTosPool.liquidity();
+            // console.log("liquidity : ",Number(liquidity));
+            expect(afterliquidity).to.be.gt(0);
+        })
+    })
+
     describe("Initialize PublicSaleProxyFactroy and PublicSale", () => {
         //funding Token set(TON)
         it("Initialize Funding Token", async function () {
@@ -511,7 +635,7 @@ describe("Sale", () => {
                     getToken.address,
                     lockTOS.address,
                     wton.address,
-                    uniswapRouter.address,
+                    deployedUniswapV3.swapRouter.address,
                     tos.address
                 ]
             );
@@ -1265,7 +1389,7 @@ describe("Sale", () => {
         })
 
         //depositWithdraw admin test
-        it("deposit withdraw",async () => {
+        it("deposit withdraw caller is not owenr",async () => {
             let tx = saleContract.connect(account1).depositWithdraw()
             await expect(tx).to.be.revertedWith("Accessible: Caller is not an admin")
         })
@@ -1285,6 +1409,29 @@ describe("Sale", () => {
         //     console.log(afterVault)
         //     expect(afterBalance+afterVault).to.be.equal(beforeContract+beforeBalance+befroeVault);
         // })
+
+        it("deposit withdraw caller is owner", async () => {
+            let beforeTonAmount = Number(await ton.balanceOf(saleContract.address));
+            console.log(beforeTonAmount);
+            let beforeTosAmount = Number(await tos.balanceOf(vaultAddress.address));
+            expect(beforeTosAmount).to.be.equal(0)
+
+            let allowanceBefore = Number(await ton.allowance(saleContract.address,wton.address));
+            expect(allowanceBefore).to.be.equal(0)
+            await saleContract.connect(saleOwner).approveToWTON();
+
+            let allowanceAfter = Number(await ton.allowance(saleContract.address,wton.address));
+            expect(allowanceAfter).to.be.gt(0)
+
+            await saleContract.connect(saleOwner).approveToUniswap();
+            await saleContract.connect(saleOwner).depositWithdraw();
+
+            let afterTonAmount = Number(await ton.balanceOf(saleContract.address));
+            console.log(afterTonAmount);
+            let afterTosAmount = Number(await tos.balanceOf(vaultAddress.address));
+            expect(afterTosAmount).to.be.gt(0)
+            console.log(afterTosAmount);
+        })
 
         it("data check", async () => {
             let tx = Number(await saleContract.totalWhitelists())

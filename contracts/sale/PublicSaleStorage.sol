@@ -51,9 +51,9 @@ contract PublicSaleStorage  {
 
     address public getTokenOwner;
     address public wton;
+    address public getToken;
 
     IERC20 public saleToken;
-    IERC20 public getToken;
     IERC20 public tos;
     ILockTOS public sTOS;
 
