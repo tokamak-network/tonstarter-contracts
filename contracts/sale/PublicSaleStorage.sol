@@ -43,8 +43,10 @@ contract PublicSaleStorage  {
     uint256 public claimPeriod;   //클레임 횟수
     uint256 public claimFirst;    //초기 클레임 percents
 
-    uint256 public liquidityVaultAmount; //liquidtyVault의 Amount
+    uint256 public hardCap;       //hardcap 수량 (ton 기준)
+    uint256 public changeTOS;     //ton -> tos로 변경하는 %
 
+    uint256 public liquidityVaultAmount; //liquidtyVault의 Amount
     address public liquidityVaultAddress; //liquidityVault의 Address
     ISwapRouter public uniswapRouter;
     uint24 public constant poolFee = 3000;

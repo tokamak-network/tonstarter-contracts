@@ -83,7 +83,7 @@ contract PublicSale is
 
     function setAllsetting(
         uint256[8] calldata _Tier,
-        uint256[5] calldata _amount,
+        uint256[7] calldata _amount,
         uint256[8] calldata _time,
         uint256[] calldata _claimTimes,
         uint256[] calldata _claimPercents
@@ -108,6 +108,10 @@ contract PublicSale is
             _amount[3],
             _amount[4]
         ); 
+        setHardcap(
+            _amount[5],
+            _amount[6]
+        );
         setSnapshot(_time[0]);
         setExclusiveTime(
             _time[1],
@@ -325,6 +329,21 @@ contract PublicSale is
     {
         saleTokenPrice = _saleTokenPrice;
         payTokenPrice = _payTokenPrice;
+    }
+
+    function setHardcap (
+        uint256 _hardcapAmount,
+        uint256 _changePercent
+    )
+        public
+        onlyOwner
+        nonZero(_hardcapAmount)
+        nonZero(_changePercent)
+        beforeStartAddWhiteTime
+    {
+        require(_changePercent <= 10 && _changePercent >= 5,"PublicSale: need to set 5~10%");
+        hardCap = _hardcapAmount;
+        changeTOS = _changePercent;
     }
 
     /// @inheritdoc IPublicSale
@@ -623,17 +642,9 @@ contract PublicSale is
             if (_amount.sub(needWton) > 0) {
                 IERC20(getToken).safeTransferFrom(_sender, address(this), _amount.sub(needWton));   
             }
-            if (block.timestamp < endExclusiveTime) {
-                IERC20(getToken).safeTransfer(getTokenOwner, _amount);
-            }
         } else {
             require(tonAllowance >= _amount && tonBalance >= _amount, "PublicSale: ton amount exceeds allowance");
-            if (block.timestamp < endExclusiveTime) {
-                IERC20(getToken).safeTransferFrom(_sender, address(this), _amount);
-                IERC20(getToken).safeTransfer(getTokenOwner, _amount);
-            } else if (block.timestamp >= startDepositTime) {
-                IERC20(getToken).safeTransferFrom(_sender, address(this), _amount);
-            }
+            IERC20(getToken).safeTransferFrom(_sender, address(this), _amount);
         }
 
         if (block.timestamp < endExclusiveTime) {
@@ -730,40 +741,48 @@ contract PublicSale is
             block.timestamp >= claimTimes[0],
             "PublicSale: don't start claimTime"
         );
-        LibPublicSale.UserClaim storage userClaim = usersClaim[msg.sender];
         LibPublicSale.UserInfoOpen storage userOpen = usersOpen[msg.sender];
-
-        (uint256 reward, uint256 realSaleAmount, uint256 refundAmount) = calculClaimAmount(msg.sender, 0);
-        require(
-            realSaleAmount > 0,
-            "PublicSale: no purchase amount"
-        );
-        require(reward > 0, "PublicSale: no reward");
-        require(
-            realSaleAmount.sub(userClaim.claimAmount) >= reward,
-            "PublicSale: user is already getAllreward"
-        );
-        require(
-            saleToken.balanceOf(address(this)) >= reward,
-            "PublicSale: dont have saleToken in pool"
-        );
-
-        userClaim.claimAmount = userClaim.claimAmount.add(reward);
-
-        saleToken.safeTransfer(msg.sender, reward);
-
-        if (!userClaim.exec && userOpen.join) {
-            totalRound2UsersClaim = totalRound2UsersClaim.add(1);
+        LibPublicSale.UserClaim storage userClaim = usersClaim[msg.sender];
+        uint256 hardcapcut = hardcapCalcul();
+        if (hardcapcut == 0) {
+            require(userClaim.exec != true, "PublicSale: already getRefund");
+            LibPublicSale.UserInfoEx storage userEx = usersEx[msg.sender];
+            uint256 refundTON = userEx.payAmount.add(userOpen.depositAmount);
             userClaim.exec = true;
-        }
+            saleToken.safeTransfer(msg.sender, refundTON);
+        } else {
+            (uint256 reward, uint256 realSaleAmount, uint256 refundAmount) = calculClaimAmount(msg.sender, 0);
+            require(
+                realSaleAmount > 0,
+                "PublicSale: no purchase amount"
+            );
+            require(reward > 0, "PublicSale: no reward");
+            require(
+                realSaleAmount.sub(userClaim.claimAmount) >= reward,
+                "PublicSale: already getAllreward"
+            );
+            require(
+                saleToken.balanceOf(address(this)) >= reward,
+                "PublicSale: dont have saleToken in pool"
+            );
 
-        if (refundAmount > 0 && userClaim.refundAmount == 0){
-            require(refundAmount <= IERC20(getToken).balanceOf(address(this)), "PublicSale: dont have refund ton");
-            userClaim.refundAmount = refundAmount;
-            IERC20(getToken).safeTransfer(msg.sender, refundAmount);
-        }
+            userClaim.claimAmount = userClaim.claimAmount.add(reward);
 
-        emit Claimed(msg.sender, reward);
+            saleToken.safeTransfer(msg.sender, reward);
+
+            if (!userClaim.exec && userOpen.join) {
+                totalRound2UsersClaim = totalRound2UsersClaim.add(1);
+                userClaim.exec = true;
+            }
+
+            if (refundAmount > 0 && userClaim.refundAmount == 0){
+                require(refundAmount <= IERC20(getToken).balanceOf(address(this)), "PublicSale: dont have refund ton");
+                userClaim.refundAmount = refundAmount;
+                IERC20(getToken).safeTransfer(msg.sender, refundAmount);
+            }
+
+            emit Claimed(msg.sender, reward);
+        }
     }
 
     function approveToUniswap() external {
@@ -780,15 +799,30 @@ contract PublicSale is
         );
     }
 
+    function hardcapCalcul() public view returns (uint256){
+        uint256 getAmount = totalExPurchasedAmount.add(totalOpenPurchasedAmount());
+        uint256 calculAmount;
+        if (getAmount >= hardCap) {
+            if (totalRound2Users == totalRound2UsersClaim){
+                return calculAmount = IERC20(getToken).balanceOf(address(this)).mul(changeTOS).div(100);
+            } else {
+                return calculAmount = totalExPurchasedAmount.add(totalOpenPurchasedAmount()).sub(5 ether).mul(changeTOS).div(100);
+            }
+        } else {
+            return 0;
+        }
+    }
+
     /// @inheritdoc IPublicSale
     function depositWithdraw() external override onlyOwner {
         require(block.timestamp > endDepositTime,"PublicSale: need to end the depositTime");
-        uint256 liquidityTON = calculPayToken(liquidityVaultAmount);
+        uint256 liquidityTON = hardcapCalcul();
         uint256 getAmount;
+        require(liquidityTON > 0, "PublicSale: don't pass the hardCap");
         if (totalRound2Users == totalRound2UsersClaim){
             getAmount = IERC20(getToken).balanceOf(address(this)).sub(liquidityTON);
         } else {
-            getAmount = totalOpenPurchasedAmount().sub(liquidityTON).sub(10 ether);
+            getAmount = totalExPurchasedAmount.add(totalOpenPurchasedAmount()).sub(liquidityTON).sub(10 ether);
         }
         require(getAmount <= IERC20(getToken).balanceOf(address(this)), "PublicSale: no token to receive");
         
