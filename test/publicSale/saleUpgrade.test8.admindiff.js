@@ -113,6 +113,8 @@ describe("Sale", () => {
     let vaultAmount = ethers.utils.parseUnits("500000", 18);            //500,000 token -> 500 TON
     let hardcapAmount = ethers.utils.parseUnits("100", 18);     
     let changeTOS = 10;
+    let minPer = 5;
+    let maxPer = 10;
 
     let account1;
     let account2;
@@ -194,6 +196,8 @@ describe("Sale", () => {
     let uniswapRouter;
     let testTemp;
     let wtonTosPool;
+
+    let upgradeAdmin;
 
     let tester1 = {
         account: null,
@@ -300,6 +304,7 @@ describe("Sale", () => {
         uniswapRouter = await findSigner(addresses[11]);
         testTemp = await findSigner(addresses[12]); 
         uniswapAccount = await findSigner(addresses[13]);
+        upgradeAdmin = await findSigner(addresses[14]);
 
         saleContracts[0].owner = saleOwner;
         saleContracts[1].owner = account1;
@@ -619,6 +624,61 @@ describe("Sale", () => {
             expect(code).to.not.eq("0x");
         });
 
+        it("setting the Proxy basicSet from not admin", async () => {
+            await expect(publicFactory.connect(account1).basicSet(
+                getToken.address,
+                wton.address,
+                lockTOS.address,
+                tos.address,
+                deployedUniswapV3.swapRouter.address
+            )).to.be.revertedWith("Accessible: Caller is not an admin");
+        });
+
+        it("setting the Proxy basicSet from admin", async () => {
+            await publicFactory.connect(saleTokenOwner).basicSet(
+                getToken.address,
+                wton.address,
+                lockTOS.address,
+                tos.address,
+                deployedUniswapV3.swapRouter.address
+            )
+
+            let tx = await publicFactory.tonAddress();
+            expect(tx).to.be.equal(getToken.address);
+        });
+
+        it("setMaxMin from not admin", async () => {
+            await expect(publicFactory.connect(account1).setMaxMin(
+                minPer,
+                maxPer
+            )).to.be.revertedWith("Accessible: Caller is not an admin");
+        });
+
+        it("setMaxMin from admin", async () => {
+            await publicFactory.connect(saleTokenOwner).setMaxMin(
+                minPer,
+                maxPer
+            );
+
+            let tx = await publicFactory.minTOS();
+            expect(tx).to.be.equal(minPer);
+        });
+
+        it("setUpgradeAdmin from not admin", async () => {
+            await expect(publicFactory.connect(account1).setUpgradeAdmin(
+                upgradeAdmin.address
+            )).to.be.revertedWith("Accessible: Caller is not an admin");
+        });
+
+        it("setUpgradeAdmin from admin", async () => {
+            await publicFactory.connect(saleTokenOwner).setUpgradeAdmin(
+                upgradeAdmin.address
+            );
+
+            let tx = await publicFactory.upgradeAdmin();
+            expect(tx).to.be.equal(upgradeAdmin.address);
+        });
+
         it("deploy PublicSaleProxy from Factory", async () => {
 
             let publicSaleContract = saleContracts[0];
@@ -632,13 +692,6 @@ describe("Sale", () => {
                     saleToken.address,
                     account5.address,
                     vaultAddress.address,
-                ],
-                [
-                    getToken.address,
-                    lockTOS.address,
-                    wton.address,
-                    deployedUniswapV3.swapRouter.address,
-                    tos.address
                 ]
             );
         
@@ -653,6 +706,8 @@ describe("Sale", () => {
 
             saleContract = new ethers.Contract( publicSaleContract.contractAddress, PublicSaleTest_ABI.abi, ethers.provider );
             expect(await saleContract.isAdmin(saleTokenOwner.address)).to.be.equal(false);
+            expect(await saleContract.isAdmin(upgradeAdmin.address)).to.be.equal(true);
+            expect(await saleContract.isProxyAdmin(upgradeAdmin.address)).to.be.equal(true);
             expect(await saleContract.isAdmin(publicSaleContract.owner.address)).to.be.equal(true);
             //2,000,000의 판매량
             await saleToken.connect(saleTokenOwner).transfer(saleContract.address, totalBigAmount)
@@ -1390,29 +1445,7 @@ describe("Sale", () => {
             // console.log(Number(refund4))
         })
 
-        //depositWithdraw admin test
-        it("deposit withdraw caller is not owenr",async () => {
-            let tx = saleContract.connect(account1).depositWithdraw()
-            await expect(tx).to.be.revertedWith("Accessible: Caller is not an admin")
-        })
-
-        // //depositWithdraw test (round2 deposit amount = afterBalance-beforeBalance)
-        // it("deposit withdraw", async () => {
-        //     let beforeBalance = Number(await getToken.balanceOf(account5.address));
-        //     console.log(beforeBalance)
-        //     let beforeContract = Number(await getToken.balanceOf(saleContract.address));
-        //     console.log(beforeContract)
-        //     let befroeVault = Number(await getToken.balanceOf(vaultAddress.address));
-        //     console.log(befroeVault)
-        //     await saleContract.connect(saleOwner).depositWithdraw()
-        //     let afterBalance = Number(await getToken.balanceOf(account5.address));
-        //     console.log(afterBalance)
-        //     let afterVault = Number(await getToken.balanceOf(vaultAddress.address));
-        //     console.log(afterVault)
-        //     expect(afterBalance+afterVault).to.be.equal(beforeContract+beforeBalance+befroeVault);
-        // })
-
-        it("deposit withdraw caller is owner", async () => {
+        it("deposit withdraw caller is anybody", async () => {
             let beforeTonAmount = Number(await ton.balanceOf(saleContract.address));
             console.log(beforeTonAmount);
             let beforeTosAmount = Number(await tos.balanceOf(vaultAddress.address));
@@ -1426,7 +1459,7 @@ describe("Sale", () => {
             expect(allowanceAfter).to.be.gt(0)
 
             await saleContract.connect(saleOwner).approveToUniswap();
-            await saleContract.connect(saleOwner).depositWithdraw();
+            await saleContract.connect(account1).depositWithdraw();
 
             let afterTonAmount = Number(await ton.balanceOf(saleContract.address));
             console.log(afterTonAmount);

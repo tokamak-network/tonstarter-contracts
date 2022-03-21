@@ -8,17 +8,25 @@ interface IPublicSaleProxyFactory {
     /// @param _logic the logic contract address used in proxy
     /// @param _owner proxyOwner address
     /// @param saleAddresses  [_saleTokenAddress,_getTokenAddress,_getTokenOwner,sTOS,wton]
-    /// @param basicAddresses basic[0] = TON, basic[1] = sTOS, basic[2] = wton, basic[3] = uniswapRouter, basic[4] = TOS
     /// @return proxy contract address
     function create(
         string calldata name,
         address _logic,
         address _owner,
-        address[3] calldata saleAddresses,
-        address[5] calldata basicAddresses
+        address[3] calldata saleAddresses
     )
         external
         returns (address);
+
+    /// @dev setting the basicAddress
+    function basicSet(
+        address _tonAddress,
+        address _wtonAddress,
+        address _sTOSAddress,
+        address _tosAddress,
+        address _uniRAddress
+    )
+        external;
 
     /// @dev Last generated contract information
     function lastestCreated() external view returns (address contractAddress, string memory name);

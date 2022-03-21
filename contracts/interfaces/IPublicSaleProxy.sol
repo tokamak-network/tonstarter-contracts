@@ -32,4 +32,12 @@ interface IPublicSaleProxy {
         address _uniswapRouter,
         address _TOS
     ) external;
+
+    /// @dev set Max,Min
+    /// @param _min wton->tos min Percent
+    /// @param _max wton->tos max Percent
+    function setMaxMinPercent(
+        uint256 _min,
+        uint256 _max
+    ) external;
 }

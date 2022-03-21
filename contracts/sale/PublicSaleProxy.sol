@@ -4,7 +4,7 @@ pragma solidity ^0.7.6;
 
 import "../interfaces/IPublicSaleProxy.sol";
 
-import "../common/AccessibleCommon.sol";
+import "../common/ProxyAccessCommon.sol";
 import "./PublicSaleStorage.sol";
 import "../stake/ProxyBase.sol";
 
@@ -14,7 +14,7 @@ import "../interfaces/IPublicSale.sol";
 
 contract PublicSaleProxy is
     PublicSaleStorage,
-    AccessibleCommon,
+    ProxyAccessCommon,
     ProxyBase,
     OnApprove,
     IPublicSaleProxy
@@ -30,13 +30,14 @@ contract PublicSaleProxy is
                 bytes32(uint256(keccak256("eip1967.proxy.implementation")) - 1)
         );
 
-        _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
-        _setupRole(ADMIN_ROLE, msg.sender);
+        _setRoleAdmin(PROJECT_ADMIN_ROLE, PROJECT_ADMIN_ROLE);
+        _setupRole(PROJECT_ADMIN_ROLE, msg.sender);
+        _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
     }
 
     /// @dev set the logic
     /// @param _impl the logic address of PublicSaleProxy
-    function setImplementation(address _impl) external override onlyOwner {
+    function setImplementation(address _impl) external override onlyProxyOwner {
         require(_impl != address(0), "PublicSaleProxy: logic is zero");
 
         _setImplementation(_impl);
@@ -51,7 +52,7 @@ contract PublicSaleProxy is
 
     /// @notice Set implementation contract
     /// @param impl New implementation contract address
-    function upgradeTo(address impl) external override onlyOwner {
+    function upgradeTo(address impl) external override onlyProxyOwner {
         require(impl != address(0), "PublicSaleProxy: input is zero");
         require(_implementation() != impl, "PublicSaleProxy: same");
         _setImplementation(impl);
@@ -110,7 +111,7 @@ contract PublicSaleProxy is
         address _saleTokenAddress,
         address _getTokenOwner,
         address _vaultAddress
-    ) external override onlyOwner {
+    ) external override onlyProxyOwner {
         require(startAddWhiteTime == 0, "possible to setting the whiteTime before");
         saleToken = IERC20(_saleTokenAddress);
         getTokenOwner = _getTokenOwner;
@@ -123,13 +124,22 @@ contract PublicSaleProxy is
         address _wton,
         address _uniswapRouter,
         address _TOS
-    ) external override onlyOwner {
+    ) external override onlyProxyOwner {
         require(startAddWhiteTime == 0, "possible to setting the whiteTime before");
         getToken = _getTokenAddress;
         sTOS = ILockTOS(_sTOS);
         wton = _wton;
         uniswapRouter = ISwapRouter(_uniswapRouter);
         tos = IERC20(_TOS);
+    }
+
+    function setMaxMinPercent(
+        uint256 _min,
+        uint256 _max
+    ) external override onlyProxyOwner {
+        require(_min < _max, "need min < max");
+        minPer = _min;
+        maxPer = _max;
     }
 
     function onApprove(

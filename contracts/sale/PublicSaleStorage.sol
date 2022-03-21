@@ -45,8 +45,9 @@ contract PublicSaleStorage  {
 
     uint256 public hardCap;       //hardcap 수량 (ton 기준)
     uint256 public changeTOS;     //ton -> tos로 변경하는 %
+    uint256 public minPer;        //변경하는 % min
+    uint256 public maxPer;        //변경하는 % max
 
-    uint256 public liquidityVaultAmount; //liquidtyVault의 Amount
     address public liquidityVaultAddress; //liquidityVault의 Address
     ISwapRouter public uniswapRouter;
     uint24 public constant poolFee = 3000;

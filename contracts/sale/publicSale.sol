@@ -12,12 +12,12 @@ import "@openzeppelin/contracts/math/SafeMath.sol";
 import "../interfaces/IPublicSale.sol";
 import "../interfaces/IWTON.sol";
 import "../interfaces/ITON.sol";
-import "../common/AccessibleCommon.sol";
+import "../common/ProxyAccessCommon.sol";
 import "./PublicSaleStorage.sol";
 
 contract PublicSale is
     PublicSaleStorage,
-    AccessibleCommon,
+    ProxyAccessCommon,
     ReentrancyGuard,
     IPublicSale
 {
@@ -83,7 +83,7 @@ contract PublicSale is
 
     function setAllsetting(
         uint256[8] calldata _Tier,
-        uint256[7] calldata _amount,
+        uint256[6] calldata _amount,
         uint256[8] calldata _time,
         uint256[] calldata _claimTimes,
         uint256[] calldata _claimPercents
@@ -101,16 +101,15 @@ contract PublicSale is
         );
         setSaleAmount(
             _amount[0],
-            _amount[1],
-            _amount[2]
+            _amount[1]
         );
         setTokenPrice(
-            _amount[3],
-            _amount[4]
+            _amount[2],
+            _amount[3]
         ); 
         setHardcap(
-            _amount[5],
-            _amount[6]
+            _amount[4],
+            _amount[5]
         );
         setSnapshot(_time[0]);
         setExclusiveTime(
@@ -284,13 +283,12 @@ contract PublicSale is
 
     /// @inheritdoc IPublicSale
     function setAllAmount(
-        uint256[3] calldata _expectAmount,
+        uint256[2] calldata _expectAmount,
         uint256[2] calldata _priceAmount
     ) external override onlyOwner {
         setSaleAmount(
             _expectAmount[0],
-            _expectAmount[1],
-            _expectAmount[2]
+            _expectAmount[1]
         );
         setTokenPrice(
             _priceAmount[0],
@@ -301,18 +299,16 @@ contract PublicSale is
     /// @inheritdoc IPublicSale
     function setSaleAmount(
         uint256 _totalExpectSaleAmount,
-        uint256 _totalExpectOpenSaleAmount,
-        uint256 _liquidityVaultAmount
+        uint256 _totalExpectOpenSaleAmount
     )
         public
         override
         onlyOwner
-        nonZero(_totalExpectSaleAmount.add(_totalExpectOpenSaleAmount).add(liquidityVaultAmount))
+        nonZero(_totalExpectSaleAmount.add(_totalExpectOpenSaleAmount))
         beforeStartAddWhiteTime
     {
         totalExpectSaleAmount = _totalExpectSaleAmount;
         totalExpectOpenSaleAmount = _totalExpectOpenSaleAmount;
-        liquidityVaultAmount = _liquidityVaultAmount;
     }
 
     /// @inheritdoc IPublicSale
@@ -814,7 +810,7 @@ contract PublicSale is
     }
 
     /// @inheritdoc IPublicSale
-    function depositWithdraw() external override onlyOwner {
+    function depositWithdraw() external override {
         require(block.timestamp > endDepositTime,"PublicSale: need to end the depositTime");
         uint256 liquidityTON = hardcapCalcul();
         uint256 getAmount;

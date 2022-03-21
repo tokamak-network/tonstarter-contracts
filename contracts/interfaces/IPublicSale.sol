@@ -9,13 +9,13 @@ interface IPublicSale {
 
     /// @dev set the allsetting
     /// @param _Tier _Tier[0~3] : set the sTOS Tier standard, _Tier[4~7] : set the Tier percents
-    /// @param _amount _amount[0] : Round1 Sale Amount, _amount[1] : Round2 Sale Amount, _amount[2] : liquidityVault TokenAmount, _amount[3] : saleToken Price, _amount[4] : TON Price, _amount[5] : hardcap amount, _amount[6] : ton to tos %
+    /// @param _amount _amount[0] : Round1 Sale Amount, _amount[1] : Round2 Sale Amount, _amount[2] : saleToken Price, _amount[3] : TON Price, _amount[4] : hardcap amount, _amount[5] : ton to tos %
     /// @param _time _time[0] : sTOS snapshot time, _time[1] : whitelist startTime, _time[2] : whitelist endTime, _time[3] : round1 sale startTime, _time[4] : round1 sale endTime, _time[5] : round2 deposit startTime, _time[6] : round2 deposit endTime, _time[7] : totalClaimCounts
     /// @param _claimTimes _claimTimes[] : claim time array
     /// @param _claimPercents _claimPercents[] : claim percents array (this is need sum 100)
     function setAllsetting(
         uint256[8] calldata _Tier,
-        uint256[7] calldata _amount,
+        uint256[6] calldata _amount,
         uint256[8] calldata _time,
         uint256[] calldata _claimTimes,
         uint256[] calldata _claimPercents
@@ -91,18 +91,16 @@ interface IPublicSale {
     /// @param _expectAmount[2] saleAmount setting
     /// @param _priceAmount[2] tokenPrice setting
     function setAllAmount(
-        uint256[3] calldata _expectAmount,
+        uint256[2] calldata _expectAmount,
         uint256[2] calldata _priceAmount
     ) external;
 
     /// @dev set information related to sale amount
     /// @param _totalExpectSaleAmount expected amount of exclusive sale
     /// @param _totalExpectOpenSaleAmount expected amount of open sale
-    /// @param _liquidityVaultAmount expected liquidity vault amount
     function setSaleAmount(
         uint256 _totalExpectSaleAmount,
-        uint256 _totalExpectOpenSaleAmount,
-        uint256 _liquidityVaultAmount
+        uint256 _totalExpectOpenSaleAmount
     ) external;
 
     /// @dev set information related to token price

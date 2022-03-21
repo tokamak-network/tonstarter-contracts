@@ -3,10 +3,10 @@ pragma solidity ^0.7.6;
 
 import "../interfaces/IPublicSaleProxyFactory.sol";
 import {PublicSaleProxy} from "../sale/PublicSaleProxy.sol";
-import "../common/AccessRoleCommon.sol";
+import "../common/AccessibleCommon.sol";
 
 /// @title A factory that creates a PublicSaleProxy
-contract PublicSaleProxyFactory is AccessRoleCommon, IPublicSaleProxyFactory {
+contract PublicSaleProxyFactory is AccessibleCommon, IPublicSaleProxyFactory {
 
     event CreatedPublicSaleProxy(address contractAddress, string name);
 
@@ -22,24 +22,37 @@ contract PublicSaleProxyFactory is AccessRoleCommon, IPublicSaleProxyFactory {
     /// @dev Total number of contracts created
     uint256 public totalCreatedContracts ;
 
+    uint256 public minTOS;
+    uint256 public maxTOS;
+
+    address public tonAddress;
+    address public wtonAddress;
+    address public sTOSAddress;
+    address public tosAddress;
+    address public uniRouterAddress;
+    
+    address public upgradeAdmin;
+
     /// @dev Contract information by index
     mapping(uint256 => ContractInfo) public createdContracts;
 
     /// @dev constructor of PublicSaleProxyFactory
     constructor() {
         totalCreatedContracts = 0;
+
+        _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
+        _setupRole(ADMIN_ROLE, msg.sender);
+        upgradeAdmin = msg.sender;
     }
 
     /// @inheritdoc IPublicSaleProxyFactory
     /// @notice _logic = PublicSale, _owner = ontherProxyManagerMasterAddress
     /// saleAddress[0] = _saleTokenAddress, saleAddress[1] = getTokenOwner, saleAddress[2] = liquidityVaultAddress
-    /// basicAddresses[0] = getToken(TON) , basicAddresses[1] = sTOS , basicAddresses[2] = wton, basicAddresses[3] = uniswapRouter, basicAddresses[4] = TOS
     function create(
         string calldata name,
         address _logic,
         address _owner,
-        address[3] calldata saleAddresses,
-        address[5] calldata basicAddresses
+        address[3] calldata saleAddresses
     )
         external override
         nonZeroAddress(_logic)
@@ -57,6 +70,9 @@ contract PublicSaleProxyFactory is AccessRoleCommon, IPublicSaleProxyFactory {
             "proxy zero"
         );
 
+        proxy.addProxyAdmin(upgradeAdmin);
+        proxy.addAdmin(upgradeAdmin);
+        proxy.addAdmin(_owner);
         proxy.setImplementation(_logic);
 
         proxy.initialize(
@@ -66,15 +82,19 @@ contract PublicSaleProxyFactory is AccessRoleCommon, IPublicSaleProxyFactory {
         );
 
         proxy.changeBasicSet(
-            basicAddresses[0],
-            basicAddresses[1],
-            basicAddresses[2],
-            basicAddresses[3],
-            basicAddresses[4]
+            tonAddress,
+            sTOSAddress,
+            wtonAddress,
+            uniRouterAddress,
+            tosAddress
         );
 
-        proxy.grantRole(ADMIN_ROLE, _owner);
-        proxy.revokeRole(ADMIN_ROLE, address(this));
+        proxy.setMaxMinPercent(
+            minTOS,
+            maxTOS
+        );
+
+        proxy.removeAdmin();
 
         createdContracts[totalCreatedContracts] = ContractInfo(address(proxy), name);
         totalCreatedContracts++;
@@ -83,6 +103,49 @@ contract PublicSaleProxyFactory is AccessRoleCommon, IPublicSaleProxyFactory {
 
         return address(proxy);
     }
+
+    /// @inheritdoc IPublicSaleProxyFactory
+    function basicSet(
+        address _tonAddress,
+        address _wtonAddress,
+        address _sTOSAddress,
+        address _tosAddress,
+        address _uniRAddress
+    )
+        external 
+        override
+        onlyOwner
+    {
+        tonAddress = _tonAddress;
+        wtonAddress = _wtonAddress;
+        sTOSAddress = _sTOSAddress;
+        tosAddress = _tosAddress;
+        uniRouterAddress = _uniRAddress;
+    }
+
+    function setUpgradeAdmin(
+        address addr
+    )   
+        external 
+        onlyOwner
+        nonZeroAddress(addr)
+    {
+        require(addr != upgradeAdmin, "same addrs");
+        upgradeAdmin = addr;
+    }
+
+    function setMaxMin(
+        uint256 _min,
+        uint256 _max
+    )
+        external
+        onlyOwner
+    {
+        require(_min < _max, "need min < max");
+        minTOS = _min;
+        maxTOS = _max;
+    }
+    
 
     /// @inheritdoc IPublicSaleProxyFactory
     function lastestCreated() external view override returns (address contractAddress, string memory name){
