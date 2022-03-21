@@ -745,7 +745,7 @@ contract PublicSale is
             LibPublicSale.UserInfoEx storage userEx = usersEx[msg.sender];
             uint256 refundTON = userEx.payAmount.add(userOpen.depositAmount);
             userClaim.exec = true;
-            saleToken.safeTransfer(msg.sender, refundTON);
+            IERC20(getToken).safeTransfer(msg.sender, refundTON);
         } else {
             (uint256 reward, uint256 realSaleAmount, uint256 refundAmount) = calculClaimAmount(msg.sender, 0);
             require(
