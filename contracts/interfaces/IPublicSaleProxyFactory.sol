@@ -8,12 +8,14 @@ interface IPublicSaleProxyFactory {
     /// @param _logic the logic contract address used in proxy
     /// @param _owner proxyOwner address
     /// @param saleAddresses  [_saleTokenAddress,_getTokenAddress,_getTokenOwner,sTOS,wton]
+    /// @param _index liquidityVault index
     /// @return proxy contract address
     function create(
         string calldata name,
         address _logic,
         address _owner,
-        address[3] calldata saleAddresses
+        address[3] calldata saleAddresses,
+        uint256 _index
     )
         external
         returns (address);

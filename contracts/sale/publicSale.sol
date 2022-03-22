@@ -596,9 +596,6 @@ contract PublicSale is
         emit AddedWhiteList(msg.sender, tier);
     }
 
-    /**
-     * @dev transform RAY to WAD
-     */
     function _toWAD(uint256 v) public override pure returns (uint256) {
         return v / 10 ** 9;
     }
@@ -847,8 +844,8 @@ contract PublicSale is
 
     /// @inheritdoc IPublicSale
     function withdraw() external override onlyOwner{
+        uint256 balance = saleToken.balanceOf(address(this));
         if (block.timestamp <= endDepositTime){
-            uint256 balance = saleToken.balanceOf(address(this));
             require(balance > totalExpectSaleAmount.add(totalExpectOpenSaleAmount), "PublicSale: no withdrawable amount");
             uint256 withdrawAmount = balance.sub(totalExpectSaleAmount.add(totalExpectOpenSaleAmount));
             saleToken.safeTransfer(msg.sender, withdrawAmount);
@@ -858,9 +855,11 @@ contract PublicSale is
             adminWithdraw = true;
             uint256 saleAmount = totalOpenSaleAmount();
             require(totalExpectSaleAmount.add(totalExpectOpenSaleAmount) > totalExSaleAmount.add(saleAmount), "PublicSale: don't exist withdrawAmount");
-
             uint256 withdrawAmount = totalExpectSaleAmount.add(totalExpectOpenSaleAmount).sub(totalExSaleAmount).sub(saleAmount);
-
+            uint256 amount = hardcapCalcul();
+            if(amount == 0) {
+                withdrawAmount = balance;
+            }
             saleToken.safeTransfer(msg.sender, withdrawAmount);
             emit Withdrawal(msg.sender, withdrawAmount);
         }

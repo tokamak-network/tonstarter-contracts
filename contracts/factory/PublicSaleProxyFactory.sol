@@ -4,6 +4,8 @@ pragma solidity ^0.7.6;
 import "../interfaces/IPublicSaleProxyFactory.sol";
 import {PublicSaleProxy} from "../sale/PublicSaleProxy.sol";
 import "../common/AccessibleCommon.sol";
+import "../interfaces/IVaultFactory.sol";
+
 
 /// @title A factory that creates a PublicSaleProxy
 contract PublicSaleProxyFactory is AccessibleCommon, IPublicSaleProxyFactory {
@@ -30,7 +32,8 @@ contract PublicSaleProxyFactory is AccessibleCommon, IPublicSaleProxyFactory {
     address public sTOSAddress;
     address public tosAddress;
     address public uniRouterAddress;
-    
+
+    address public vaultFactory;    
     address public upgradeAdmin;
 
     /// @dev Contract information by index
@@ -52,7 +55,8 @@ contract PublicSaleProxyFactory is AccessibleCommon, IPublicSaleProxyFactory {
         string calldata name,
         address _logic,
         address _owner,
-        address[3] calldata saleAddresses
+        address[3] calldata saleAddresses,
+        uint256 _index
     )
         external override
         nonZeroAddress(_logic)
@@ -69,6 +73,9 @@ contract PublicSaleProxyFactory is AccessibleCommon, IPublicSaleProxyFactory {
             address(proxy) != address(0),
             "proxy zero"
         );
+
+        (address initialVault, ) = IVaultFactory(vaultFactory).getContracts(_index);
+        require(initialVault == saleAddresses[2], "another liquidityVault");
 
         proxy.addProxyAdmin(upgradeAdmin);
         proxy.addAdmin(upgradeAdmin);
@@ -144,6 +151,16 @@ contract PublicSaleProxyFactory is AccessibleCommon, IPublicSaleProxyFactory {
         require(_min < _max, "need min < max");
         minTOS = _min;
         maxTOS = _max;
+    }
+
+    function setVault(
+        address _vaultFactory
+    )
+        external
+        onlyOwner
+    {
+        require(vaultFactory != _vaultFactory, "same addrs");
+        vaultFactory = _vaultFactory;
     }
     
 
