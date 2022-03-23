@@ -5,6 +5,7 @@ import "../interfaces/IPublicSaleProxyFactory.sol";
 import {PublicSaleProxy} from "../sale/PublicSaleProxy.sol";
 import "../common/AccessibleCommon.sol";
 import "../interfaces/IVaultFactory.sol";
+import "hardhat/console.sol";
 
 
 /// @title A factory that creates a PublicSaleProxy
@@ -74,7 +75,9 @@ contract PublicSaleProxyFactory is AccessibleCommon, IPublicSaleProxyFactory {
             "proxy zero"
         );
 
+        console.log("contract");
         (address initialVault, ) = IVaultFactory(vaultFactory).getContracts(_index);
+        console.log("initialVault : %s",initialVault);
         require(initialVault == saleAddresses[2], "another liquidityVault");
 
         proxy.addProxyAdmin(upgradeAdmin);
