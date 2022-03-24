@@ -856,17 +856,25 @@ describe("Sale", () => {
             expect(tx2).to.be.equal(initialVaultFactory.address);
         });
 
+        it("deploy PublicSaleProxy from Factory but not match the liquidtyAddress", async () => {
+            let publicSaleContract = saleContracts[0];
+            await expect(publicFactory.connect(saleTokenOwner).create(
+                publicSaleContract.name,
+                deploySaleImpl.address,
+                publicSaleContract.owner.address,
+                [
+                    saleToken.address,
+                    account5.address,
+                    vaultAddress,
+                ],
+                0
+            )).to.be.revertedWith("another liquidityVault");
+        })
+
         it("deploy PublicSaleProxy from Factory", async () => {
             let publicSaleContract = saleContracts[0];
             let prevTotalCreatedContracts = await publicFactory.totalCreatedContracts();
-            console.log("1")
-            console.log(publicSaleContract.name)
-            console.log(deploySaleImpl.address)
-            console.log(publicSaleContract.owner.address)
-            console.log(saleToken.address)
-            console.log(account5.address)
-            console.log(vaultAddress)
-            console.log("------")
+
             await publicFactory.connect(saleTokenOwner).create(
                 publicSaleContract.name,
                 deploySaleImpl.address,
@@ -878,7 +886,6 @@ describe("Sale", () => {
                 ],
                 1
             );
-            console.log("2")
         
             let afterTotalCreatedContracts = await publicFactory.totalCreatedContracts();
         
