@@ -5,7 +5,9 @@ import "../interfaces/IPublicSaleProxyFactory.sol";
 import {PublicSaleProxy} from "../sale/PublicSaleProxy.sol";
 import "../common/AccessibleCommon.sol";
 import "../interfaces/IVaultFactory.sol";
+import "../interfaces/IEventLog.sol";
 import "hardhat/console.sol";
+
 
 
 /// @title A factory that creates a PublicSaleProxy
@@ -34,7 +36,10 @@ contract PublicSaleProxyFactory is AccessibleCommon, IPublicSaleProxyFactory {
     address public tosAddress;
     address public uniRouterAddress;
 
-    address public vaultFactory;    
+    address public vaultFactory;
+    address public logEventAddress;
+
+    address public publicLogic;    
     address public upgradeAdmin;
 
     /// @dev Contract information by index
@@ -50,17 +55,16 @@ contract PublicSaleProxyFactory is AccessibleCommon, IPublicSaleProxyFactory {
     }
 
     /// @inheritdoc IPublicSaleProxyFactory
-    /// @notice _logic = PublicSale, _owner = ontherProxyManagerMasterAddress
+    /// @notice _logic = PublicSale, _owner = contract admin
     /// saleAddress[0] = _saleTokenAddress, saleAddress[1] = getTokenOwner, saleAddress[2] = liquidityVaultAddress
     function create(
         string calldata name,
-        address _logic,
         address _owner,
         address[3] calldata saleAddresses,
         uint256 _index
     )
         external override
-        nonZeroAddress(_logic)
+        nonZeroAddress(_owner)
         nonZeroAddress(saleAddresses[0])
         nonZeroAddress(saleAddresses[1])
         nonZeroAddress(saleAddresses[2])
@@ -75,15 +79,13 @@ contract PublicSaleProxyFactory is AccessibleCommon, IPublicSaleProxyFactory {
             "proxy zero"
         );
 
-        console.log("contract");
         (address initialVault, ) = IVaultFactory(vaultFactory).getContracts(_index);
-        console.log("initialVault : %s",initialVault);
         require(initialVault == saleAddresses[2], "another liquidityVault");
 
         proxy.addProxyAdmin(upgradeAdmin);
         proxy.addAdmin(upgradeAdmin);
         proxy.addAdmin(_owner);
-        proxy.setImplementation(_logic);
+        proxy.setImplementation(publicLogic);
 
         proxy.initialize(
             saleAddresses[0],
@@ -109,6 +111,15 @@ contract PublicSaleProxyFactory is AccessibleCommon, IPublicSaleProxyFactory {
         createdContracts[totalCreatedContracts] = ContractInfo(address(proxy), name);
         totalCreatedContracts++;
 
+        bytes memory abiencode = abi.encode(address(proxy), name);
+
+        IEventLog(logEventAddress).logEvent(
+            keccak256("PublicSaleProxyFactory"),
+            keccak256("CreatedPublicSaleProxy"),
+            address(this),
+            abiencode
+        );
+
         emit CreatedPublicSaleProxy(address(proxy), name);
 
         return address(proxy);
@@ -116,27 +127,25 @@ contract PublicSaleProxyFactory is AccessibleCommon, IPublicSaleProxyFactory {
 
     /// @inheritdoc IPublicSaleProxyFactory
     function basicSet(
-        address _tonAddress,
-        address _wtonAddress,
-        address _sTOSAddress,
-        address _tosAddress,
-        address _uniRAddress
+        address[6] calldata _basicAddress
     )
         external 
         override
         onlyOwner
     {
-        tonAddress = _tonAddress;
-        wtonAddress = _wtonAddress;
-        sTOSAddress = _sTOSAddress;
-        tosAddress = _tosAddress;
-        uniRouterAddress = _uniRAddress;
+        tonAddress = _basicAddress[0];
+        wtonAddress = _basicAddress[1];
+        sTOSAddress = _basicAddress[2];
+        tosAddress = _basicAddress[3];
+        uniRouterAddress = _basicAddress[4];
+        publicLogic = _basicAddress[5];
     }
 
     function setUpgradeAdmin(
         address addr
     )   
-        external 
+        external
+        override 
         onlyOwner
         nonZeroAddress(addr)
     {
@@ -149,6 +158,7 @@ contract PublicSaleProxyFactory is AccessibleCommon, IPublicSaleProxyFactory {
         uint256 _max
     )
         external
+        override
         onlyOwner
     {
         require(_min < _max, "need min < max");
@@ -160,10 +170,22 @@ contract PublicSaleProxyFactory is AccessibleCommon, IPublicSaleProxyFactory {
         address _vaultFactory
     )
         external
+        override
         onlyOwner
     {
-        require(vaultFactory != _vaultFactory, "same addrs");
+        require(_vaultFactory != vaultFactory, "same addrs");
         vaultFactory = _vaultFactory;
+    }
+
+    function setEventLog(
+        address _addr
+    )
+        external
+        override
+        onlyOwner
+    {   
+        require(_addr != logEventAddress, "same addrs");
+        logEventAddress = _addr;
     }
     
 
@@ -171,8 +193,8 @@ contract PublicSaleProxyFactory is AccessibleCommon, IPublicSaleProxyFactory {
     function lastestCreated() external view override returns (address contractAddress, string memory name){
         if(totalCreatedContracts > 0){
             return (createdContracts[totalCreatedContracts-1].contractAddress, createdContracts[totalCreatedContracts-1].name );
-        }else {
-            return (address(0), '');
+        } else {
+            return (address(0), "");
         }
     }
 
@@ -180,8 +202,8 @@ contract PublicSaleProxyFactory is AccessibleCommon, IPublicSaleProxyFactory {
     function getContracts(uint256 _index) external view override returns (address contractAddress, string memory name){
         if(_index < totalCreatedContracts){
             return (createdContracts[_index].contractAddress, createdContracts[_index].name);
-        }else {
-            return (address(0), '');
+        } else {
+            return (address(0), "");
         }
     }
 

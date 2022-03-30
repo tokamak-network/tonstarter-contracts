@@ -48,6 +48,7 @@ const PublicSaleTest_ABI = require('../../artifacts/contracts/sale/PublicSaleTes
 // const PublicSaleForDoM_ABI = require('../../artifacts/contracts/sale/PublicSaleForDoM.sol/PublicSaleForDoM.json');
 const LiquidtyVault = require("../../abis/InitialLiquidityVaultFactory.json");
 const LiquidtyVaultLogic = require("../../abis/InitialLiquidityVault.json");
+const EventLog_ABI = require("../../abis/EventLog.json");
 
 const zeroAddress = "0x0000000000000000000000000000000000000000";
 
@@ -203,6 +204,7 @@ describe("Sale", () => {
     let initialVaultLogic;
 
     let addressVault;
+    let eventLogAddress;
 
     let upgradeAdmin;
 
@@ -340,14 +342,6 @@ describe("Sale", () => {
     });
 
     describe("Initialize TON, TOS, LockTOS", () => {
-        // it("Initialize TON ", async function () {
-        //     // this.timeout(1000000);
-        //     // let dummy;
-        //     // ({ dummy, ton } = await setupContracts(deployer.address));
-        //     erc20token = await ethers.getContractFactory("ERC20Mock");
-        //     ton = await erc20token.connect(getTokenOwner).deploy("testTON", "TON");
-        // });
-
         //saleToken Deploy
         it("Initialize Sale Token", async function () {
             erc20token = await ethers.getContractFactory("ERC20Mock");
@@ -584,24 +578,6 @@ describe("Sale", () => {
             expect(slot.sqrtPriceX96).to.be.gte(0);
         })
 
-        // it("check the WTON-TOS Pool", async () => {
-        //     let lowerTick = getMinTick(TICK_SPACINGS[FeeAmount.MEDIUM]);
-        //     let upperTick = getMaxTick(TICK_SPACINGS[FeeAmount.MEDIUM]);
-
-        //     let liquidity = await wtonTosPool.liquidity();
-        //     // console.log("liquidity : ",Number(liquidity));
-        //     expect(liquidity).to.be.equal(0);
-        //     // let tx2 = await wtonTosPool.maxLiquidityPerTick();
-        //     // console.log("maxLiquidityPerTick", Number(tx2));
-        //     // let tx3 = await wtonTosPool.ticks(0);
-        //     // console.log("ticks : ", Number(tx3));
-
-        //     // let inputLiquidity = liquidity * 0.0002
-            
-        //     // let result = await wtonTosPool.connect(uniswapAccount).mint(uniswapAccount.address,lowerTick,upperTick,inputLiquidity,0)
-        //     // console.log(result);
-        // })
-
         it("mint the WTON-TOS Pool", async () => {
             let beforeliquidity = await wtonTosPool.liquidity();
             expect(beforeliquidity).to.be.equal(0);
@@ -754,6 +730,20 @@ describe("Sale", () => {
 
     })
 
+    describe("deploy the eventLog", () => {
+        it("deploy the eventLog", async () => {
+            const contract = await (
+                await ethers.getContractFactory(
+                    EventLog_ABI.abi,
+                    EventLog_ABI.bytecode
+                )
+            ).deploy();
+            await contract.deployed();
+            // let tx = await contract.deployed();
+            eventLogAddress = contract.address;
+        })
+    })
+
     describe("Initialize PublicSaleProxyFactroy and PublicSale", () => {
         //funding Token set(TON)
         it("Initialize Funding Token", async function () {
@@ -780,21 +770,27 @@ describe("Sale", () => {
 
         it("setting the Proxy basicSet from not admin", async () => {
             await expect(publicFactory.connect(account1).basicSet(
-                getToken.address,
-                wton.address,
-                lockTOS.address,
-                tos.address,
-                deployedUniswapV3.swapRouter.address
+                [
+                    getToken.address,
+                    wton.address,
+                    lockTOS.address,
+                    tos.address,
+                    deployedUniswapV3.swapRouter.address,
+                    deploySaleImpl.address
+                ]
             )).to.be.revertedWith("Accessible: Caller is not an admin");
         });
 
         it("setting the Proxy basicSet from admin", async () => {
             await publicFactory.connect(saleTokenOwner).basicSet(
-                getToken.address,
-                wton.address,
-                lockTOS.address,
-                tos.address,
-                deployedUniswapV3.swapRouter.address
+                [
+                    getToken.address,
+                    wton.address,
+                    lockTOS.address,
+                    tos.address,
+                    deployedUniswapV3.swapRouter.address,
+                    deploySaleImpl.address
+                ]
             )
 
             let tx = await publicFactory.tonAddress();
@@ -856,11 +852,24 @@ describe("Sale", () => {
             expect(tx2).to.be.equal(initialVaultFactory.address);
         });
 
+        it("setEventLog from not admin", async () => {
+            await expect(publicFactory.connect(account1).setEventLog(
+                eventLogAddress
+            )).to.be.revertedWith("Accessible: Caller is not an admin");
+        })
+
+        it("setEventLog from admin", async () => {
+            await publicFactory.connect(saleTokenOwner).setEventLog(
+                eventLogAddress
+            );
+            let tx = await publicFactory.logEventAddress()
+            expect(tx).to.be.equal(eventLogAddress);
+        })
+
         it("deploy PublicSaleProxy from Factory but not match the liquidtyAddress", async () => {
             let publicSaleContract = saleContracts[0];
             await expect(publicFactory.connect(saleTokenOwner).create(
                 publicSaleContract.name,
-                deploySaleImpl.address,
                 publicSaleContract.owner.address,
                 [
                     saleToken.address,
@@ -877,7 +886,6 @@ describe("Sale", () => {
 
             await publicFactory.connect(saleTokenOwner).create(
                 publicSaleContract.name,
-                deploySaleImpl.address,
                 publicSaleContract.owner.address,
                 [
                     saleToken.address,

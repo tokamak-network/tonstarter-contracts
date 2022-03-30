@@ -28,16 +28,16 @@ async function verifyTest() {
     console.log("finish")
 }
 
-// main()
-//     .then(() => process.exit(0))
-//     .catch(error => {
-//         console.error(error);
-//         process.exit(1);
-//     });
-
-verifyTest()
+main()
     .then(() => process.exit(0))
     .catch(error => {
         console.error(error);
         process.exit(1);
     });
+
+// verifyTest()
+//     .then(() => process.exit(0))
+//     .catch(error => {
+//         console.error(error);
+//         process.exit(1);
+//     });
