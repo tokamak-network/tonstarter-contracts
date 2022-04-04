@@ -778,20 +778,6 @@ contract PublicSale is
         }
     }
 
-    function approveToUniswap() external {
-        IERC20(wton).approve(
-            address(uniswapRouter),
-            type(uint256).max
-        );
-    }
-
-    function approveToWTON() external {
-        IERC20(getToken).approve(
-            wton,
-            type(uint256).max
-        );
-    }
-
     function hardcapCalcul() public view returns (uint256){
         uint256 getAmount = totalExPurchasedAmount.add(totalOpenPurchasedAmount());
         uint256 calculAmount;

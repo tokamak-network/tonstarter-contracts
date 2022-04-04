@@ -131,6 +131,14 @@ contract PublicSaleProxy is
         wton = _wton;
         uniswapRouter = ISwapRouter(_uniswapRouter);
         tos = IERC20(_TOS);
+        IERC20(wton).approve(
+            address(uniswapRouter),
+            type(uint256).max
+        );
+        IERC20(getToken).approve(
+            wton,
+            type(uint256).max
+        );
     }
 
     function setMaxMinPercent(

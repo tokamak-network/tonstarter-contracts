@@ -1651,14 +1651,14 @@ describe("Sale", () => {
             let beforeTosAmount = Number(await tos.balanceOf(vaultAddress));
             expect(beforeTosAmount).to.be.equal(0)
 
-            let allowanceBefore = Number(await ton.allowance(saleContract.address,wton.address));
-            expect(allowanceBefore).to.be.equal(0)
-            await saleContract.connect(saleOwner).approveToWTON();
+            // let allowanceBefore = Number(await ton.allowance(saleContract.address,wton.address));
+            // expect(allowanceBefore).to.be.equal(0)
+            // await saleContract.connect(saleOwner).approveToWTON();
 
-            let allowanceAfter = Number(await ton.allowance(saleContract.address,wton.address));
-            expect(allowanceAfter).to.be.gt(0)
+            // let allowanceAfter = Number(await ton.allowance(saleContract.address,wton.address));
+            // expect(allowanceAfter).to.be.gt(0)
 
-            await saleContract.connect(saleOwner).approveToUniswap();
+            // await saleContract.connect(saleOwner).approveToUniswap();
             await saleContract.connect(account1).depositWithdraw();
 
             let afterTonAmount = Number(await ton.balanceOf(saleContract.address));
