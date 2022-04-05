@@ -26,7 +26,7 @@ let stakeInfos = []
 
 async function main() {
 
-    await getData(stakeContract5);
+    await getData(stakeContract1);
 
 }
 
@@ -41,16 +41,16 @@ async function getData(contractAddress) {
 
     console.log( 'contract ', contract.address);
     let balance = await TONContract.balanceOf(contract.address);
-    console.log( 'TON balanceOf ', balance.toString());
+    console.log( 'TON balanceOf ', ethers.utils.formatUnits(balance.toString(), 18).toString() );
     balance = await TOSContract.balanceOf(contract.address);
-    console.log( 'TOS balanceOf ', balance.toString());
+    console.log( 'TOS balanceOf ', ethers.utils.formatUnits(balance.toString(), 18).toString() );
     balance = await WTONContract.balanceOf(contract.address);
-    console.log( 'WTON balanceOf ', balance.toString());
+    console.log( 'WTON balanceOf ', ethers.utils.formatUnits(balance.toString(), 27).toString() );
     balance = await SeigManagerContract.stakeOf(Layer2, contract.address);
-    console.log( 'SeigManagerContract stakeOf ', balance.toString());
+    console.log( 'SeigManagerContract stakeOf ', ethers.utils.formatUnits(balance.toString(), 27).toString());
 
     balance = await DepositManagerContract.pendingUnstaked(Layer2, contract.address);
-    console.log( 'DepositManagerContract pending ', balance.toString());
+    console.log( 'DepositManagerContract pending ', ethers.utils.formatUnits(balance.toString(), 27).toString());
 
     // let balance = await TONContract.balanceOf(Vault);
     // console.log( 'TON balanceOf ', balance.toString());
@@ -90,13 +90,13 @@ async function getData(contractAddress) {
       }
       console.log('==== block ', i);
       for(let k=0; k< stakeInfos.length; k++){
-        console.log( k,'    ', stakeInfos[k].account, '    ',stakeInfos[k].amount.toString(),'    ', stakeInfos[k].withdraw,'    ',  stakeInfos[k].canReward.toString());
+        console.log( k,'    ', stakeInfos[k].account, '    ',ethers.utils.formatUnits(stakeInfos[k].amount.toString(), 18),'    ', stakeInfos[k].withdraw,'    ',  ethers.utils.formatUnits(stakeInfos[k].canReward.toString(), 18) );
       }
       //allEvents = [...allEvents, ...events]
     }
     console.log('==== end block ', i );
     for(let h=0; h< stakeInfos.length; h++){
-      console.log( h,'    ', stakeInfos[h].account, '    ',stakeInfos[h].amount.toString(),'    ', stakeInfos[h].withdraw,'    ',  stakeInfos[h].canReward.toString());
+      console.log( h,'    ', stakeInfos[h].account, '    ',ethers.utils.formatUnits(stakeInfos[h].amount.toString(), 18),'    ', stakeInfos[h].withdraw,'    ',  ethers.utils.formatUnits(stakeInfos[h].canReward.toString(), 18) );
     }
 
     return null;
@@ -104,7 +104,7 @@ async function getData(contractAddress) {
 
 
   function add(user, amount, withdraw, canReward) {
-
+    //console.log('stakers.includes(user)',user, stakers.includes(user));
     if(!stakers.includes(user)) {
        let data = {
           account: user,
@@ -113,6 +113,7 @@ async function getData(contractAddress) {
           canReward: canReward
         }
         stakeInfos.push(data);
+        stakers.push(user);
      } else {
        for(let i=0; i< stakeInfos.length ; i++){
           if(stakeInfos[i].account == user){
@@ -131,7 +132,7 @@ main()
   .catch((error) => {
 
     for(i=0; i< stakeInfos.length; i++){
-      console.log( i,'    ', stakeInfos[i].account, '    ',stakeInfos[i].amount.toString(),'    ', stakeInfos[i].withdraw,'    ',  stakeInfos[i].canReward.toString());
+      console.log( i,'    ', stakeInfos[i].account, '    ',ethers.utils.formatUnits(stakeInfos[i].amount.toString(), 18),'    ', stakeInfos[i].withdraw,'    ',  ethers.utils.formatUnits(stakeInfos[i].canReward.toString(),18) );
     }
 
     console.error(error);
