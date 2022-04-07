@@ -12,6 +12,52 @@ async function main() {
     console.log("AddressContract Address: ", AddressContract.address)
     await AddressContract.deployed()
 
+    //rinkeby
+    const publicSaleLogic = "0xaf2aDD0Ca634aEf705344473cF8D56F51be949D4"
+    const tonAddress = "0x44d4F5d89E9296337b8c48a332B3b2fb2C190CD0"
+    const wtonAddress = "0x709bef48982Bbfd6F2D4Be24660832665F53406C"
+    const lockTOSAddress = "0xc1545632e67cefF8ECaB83072118271577e66aDc"
+    const tosAddress = "0x73a54e5C054aA64C1AE7373C2B5474d8AFEa08bd"
+    const uniRouter = "0xE592427A0AEce92De3Edee1F18E0157C05861564"
+    
+    const minPer = 5
+    const maxPer = 10
+
+    const initialLiuiqidty = "0xBb3E39360Df9a024cbf4ABa28e0B8F4421e7525F"
+
+    const upgradeaddr = "0x8c595DA827F4182bC0E3917BccA8e654DF8223E1"
+
+    const eventAddr = "0xDdbb09f74ED25F056785655810Cc35c4BD453741"
+    const eventAddr2 = "0x6eAb73266e1BDE7D823f278414e928e67C78FE20"
+
+    await AddressContract.basicSet(
+        [
+            tonAddress,
+            wtonAddress,
+            lockTOSAddress,
+            tosAddress,
+            uniRouter,
+            publicSaleLogic
+        ]
+    )
+
+    await AddressContract.setMaxMin(
+        minPer,
+        maxPer
+    )
+
+    await AddressContract.setUpgradeAdmin(
+        upgradeaddr
+    )
+
+    await AddressContract.setVault(
+        initialLiuiqidty
+    )
+
+    await AddressContract.setEventLog(
+        eventAddr2
+    )
+
     console.log("finish")
 }
 
