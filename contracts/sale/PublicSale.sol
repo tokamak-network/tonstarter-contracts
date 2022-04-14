@@ -93,6 +93,8 @@ contract PublicSale is
         onlyOwner
         beforeStartAddWhiteTime
     {
+        require((_amount[0]+_amount[1]) <= IERC20(saleToken).balanceOf(address(this)), "need to input the token");
+        require(_time[6] < _claimTimes[0], "claimTime after round2");
         setTier(
             _Tier[0], _Tier[1], _Tier[2], _Tier[3]
         );
