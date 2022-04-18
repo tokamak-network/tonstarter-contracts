@@ -881,7 +881,7 @@ describe("Sale", () => {
                 5,
                 8,
                 12
-            )).to.be.revertedWith( "tier set error");
+            )).to.be.revertedWith("tier set error");
         })
 
         it("set sTOSstandard from admin", async () => {

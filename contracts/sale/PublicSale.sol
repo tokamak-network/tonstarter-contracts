@@ -70,7 +70,6 @@ contract PublicSale is
         _;
     }
 
-    /// @inheritdoc IPublicSale
     function changeTONOwner(
         address _address
     )
@@ -92,8 +91,10 @@ contract PublicSale is
         override
         onlyOwner
         beforeStartAddWhiteTime
-    {   
-        require(_time[6] < _claimTimes[0], "time er");
+    {
+        uint256 balance = saleToken.balanceOf(address(this));
+        require((_amount[0] + _amount[1]) <= balance, "amount err");
+        require(_time[6] < _claimTimes[0], "time err");
         setTier(
             _Tier[0], _Tier[1], _Tier[2], _Tier[3]
         );
@@ -162,7 +163,7 @@ contract PublicSale is
             (_startAddWhiteTime < _endAddWhiteTime) &&
             (_endAddWhiteTime < _startExclusiveTime) &&
             (_startExclusiveTime < _endExclusiveTime),
-            "PublicSale : Round1time er"
+            "PublicSale : Round1time err"
         );
         startAddWhiteTime = _startAddWhiteTime;
         endAddWhiteTime = _endAddWhiteTime;
@@ -184,7 +185,7 @@ contract PublicSale is
     {
         require(
             (_startDepositTime < _endDepositTime),
-            "PublicSale : Round2time er"
+            "PublicSale : Round2time err"
         );
         startDepositTime = _startDepositTime;
         endDepositTime = _endDepositTime;
@@ -206,13 +207,13 @@ contract PublicSale is
         for (i = 0; i < _claimCounts; i++) {
             claimTimes.push(_claimTimes[i]);
             if (i != 0){
-                require(claimTimes[i-1] < claimTimes[i], "PublicSale: claimtime er");
+                require(claimTimes[i-1] < claimTimes[i], "PublicSale: claimtime err");
             }
             claimPercents.push(_claimPercents[i]);
             y = y + _claimPercents[i];
         }
 
-        require(y == 100, "claimPercents er");
+        require(y == 100, "claimPercents err");
     }
 
     /// @inheritdoc IPublicSale
@@ -635,16 +636,16 @@ contract PublicSale is
             uint256 needUserWton;
             uint256 needWton = _amount.sub(tonAllowance);
             needUserWton = _toRAY(needWton);
-            require(IWTON(wton).allowance(_sender, address(this)) >= needUserWton, "PublicSale: wton amount exceeds allowance");
+            require(IWTON(wton).allowance(_sender, address(this)) >= needUserWton, "PublicSale: wton exceeds allowance");
             require(IWTON(wton).balanceOf(_sender) >= needUserWton, "need more wton");
             IERC20(wton).safeTransferFrom(_sender,address(this),needUserWton);
             IWTON(wton).swapToTON(needUserWton);
-            require(tonAllowance >= _amount.sub(needWton), "PublicSale: ton amount exceeds allowance");
+            require(tonAllowance >= _amount.sub(needWton), "PublicSale: ton exceeds allowance");
             if (_amount.sub(needWton) > 0) {
                 IERC20(getToken).safeTransferFrom(_sender, address(this), _amount.sub(needWton));
             }
         } else {
-            require(tonAllowance >= _amount && tonBalance >= _amount, "PublicSale: ton amount exceeds allowance");
+            require(tonAllowance >= _amount && tonBalance >= _amount, "PublicSale: ton exceeds allowance");
             IERC20(getToken).safeTransferFrom(_sender, address(this), _amount);
         }
 
