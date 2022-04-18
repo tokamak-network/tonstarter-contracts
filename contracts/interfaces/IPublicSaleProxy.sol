@@ -40,4 +40,16 @@ interface IPublicSaleProxy {
         uint256 _min,
         uint256 _max
     ) external;
+
+    /// @dev set sTOSstandrard
+    /// @param _tier1 tier1 standrard
+    /// @param _tier2 tier2 standrard
+    /// @param _tier3 tier3 standrard
+    /// @param _tier4 tier4 standrard
+    function setSTOSstandard(
+        uint256 _tier1,
+        uint256 _tier2,
+        uint256 _tier3,
+        uint256 _tier4
+    ) external;
 }

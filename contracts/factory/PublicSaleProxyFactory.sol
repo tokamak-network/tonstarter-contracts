@@ -41,6 +41,11 @@ contract PublicSaleProxyFactory is AccessibleCommon, IPublicSaleProxyFactory {
 
     address public publicLogic;    
     address public upgradeAdmin;
+    
+    uint256 public tier1;
+    uint256 public tier2;
+    uint256 public tier3;
+    uint256 public tier4;
 
     /// @dev Contract information by index
     mapping(uint256 => ContractInfo) public createdContracts;
@@ -104,6 +109,13 @@ contract PublicSaleProxyFactory is AccessibleCommon, IPublicSaleProxyFactory {
         proxy.setMaxMinPercent(
             minTOS,
             maxTOS
+        );
+
+        proxy.setSTOSstandard(
+            tier1,
+            tier2,
+            tier3,
+            tier4
         );
 
         proxy.removeAdmin();
@@ -187,6 +199,29 @@ contract PublicSaleProxyFactory is AccessibleCommon, IPublicSaleProxyFactory {
         require(_addr != logEventAddress, "same addrs");
         logEventAddress = _addr;
     }
+
+    function setSTOS(
+        uint256 _tier1,
+        uint256 _tier2,
+        uint256 _tier3,
+        uint256 _tier4
+    ) 
+        external
+        override
+        onlyOwner
+    {
+        require(
+            (_tier1 < _tier2) &&
+            (_tier2 < _tier3) &&
+            (_tier3 < _tier4),
+            "tier set error"
+        );
+        tier1 = _tier1;
+        tier2 = _tier2;
+        tier3 = _tier3;
+        tier4 = _tier4;
+    }
+    
     
 
     /// @inheritdoc IPublicSaleProxyFactory

@@ -55,6 +55,19 @@ interface IPublicSaleProxyFactory {
     )
         external;
 
+    /// @dev set the sTOSstandard
+    /// @param _tier1 tier1 STOS
+    /// @param _tier2 tier1 STOS
+    /// @param _tier3 tier1 STOS
+    /// @param _tier4 tier1 STOS
+    function setSTOS(
+        uint256 _tier1,
+        uint256 _tier2,
+        uint256 _tier3,
+        uint256 _tier4
+    ) 
+        external;
+
     /// @dev Last generated contract information
     function lastestCreated() external view returns (address contractAddress, string memory name);
 

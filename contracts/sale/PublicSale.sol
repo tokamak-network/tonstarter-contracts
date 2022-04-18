@@ -92,9 +92,8 @@ contract PublicSale is
         override
         onlyOwner
         beforeStartAddWhiteTime
-    {
-        require((_amount[0]+_amount[1]) <= IERC20(saleToken).balanceOf(address(this)), "need to input the token");
-        require(_time[6] < _claimTimes[0], "claimTime after round2");
+    {   
+        require(_time[6] < _claimTimes[0], "time er");
         setTier(
             _Tier[0], _Tier[1], _Tier[2], _Tier[3]
         );
@@ -163,7 +162,7 @@ contract PublicSale is
             (_startAddWhiteTime < _endAddWhiteTime) &&
             (_endAddWhiteTime < _startExclusiveTime) &&
             (_startExclusiveTime < _endExclusiveTime),
-            "PublicSale : Round1timeSet wrong"
+            "PublicSale : Round1time er"
         );
         startAddWhiteTime = _startAddWhiteTime;
         endAddWhiteTime = _endAddWhiteTime;
@@ -185,7 +184,7 @@ contract PublicSale is
     {
         require(
             (_startDepositTime < _endDepositTime),
-            "PublicSale : Round2timeSet wrong"
+            "PublicSale : Round2time er"
         );
         startDepositTime = _startDepositTime;
         endDepositTime = _endDepositTime;
@@ -207,13 +206,13 @@ contract PublicSale is
         for (i = 0; i < _claimCounts; i++) {
             claimTimes.push(_claimTimes[i]);
             if (i != 0){
-                require(claimTimes[i-1] < claimTimes[i], "PublicSale: time value error");
+                require(claimTimes[i-1] < claimTimes[i], "PublicSale: claimtime er");
             }
             claimPercents.push(_claimPercents[i]);
             y = y + _claimPercents[i];
         }
 
-        require(y == 100, "the percents sum are needed 100");
+        require(y == 100, "claimPercents er");
     }
 
     /// @inheritdoc IPublicSale
@@ -221,6 +220,13 @@ contract PublicSale is
         uint256[4] calldata _tier,
         uint256[4] calldata _tierPercent
     ) external override onlyOwner {
+        require(
+            stanTier1 <= _tier[0] &&
+            stanTier2 <= _tier[1] &&
+            stanTier3 <= _tier[2] &&
+            stanTier4 <= _tier[3],
+            "tier set error"
+        );
         setTier(
             _tier[0],
             _tier[1],
@@ -339,7 +345,7 @@ contract PublicSale is
         nonZero(_changePercent)
         beforeStartAddWhiteTime
     {
-        require(_changePercent <= 10 && _changePercent >= 5,"PublicSale: need to set 5~10%");
+        require(_changePercent <= maxPer && _changePercent >= minPer,"PublicSale: need to set min,max");
         hardCap = _hardcapAmount;
         changeTOS = _changePercent;
     }

@@ -48,6 +48,11 @@ contract PublicSaleStorage  {
     uint256 public minPer;        //변경하는 % min
     uint256 public maxPer;        //변경하는 % max
 
+    uint256 public stanTier1;     //최소 기준 Tier1
+    uint256 public stanTier2;     //최소 기준 Tier2
+    uint256 public stanTier3;     //최소 기준 Tier3
+    uint256 public stanTier4;     //최소 기준 Tier4
+
     address public liquidityVaultAddress; //liquidityVault의 Address
     ISwapRouter public uniswapRouter;
     uint24 public constant poolFee = 3000;

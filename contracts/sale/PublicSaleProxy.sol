@@ -150,6 +150,24 @@ contract PublicSaleProxy is
         maxPer = _max;
     }
 
+    function setSTOSstandard(
+        uint256 _tier1,
+        uint256 _tier2,
+        uint256 _tier3,
+        uint256 _tier4
+    ) external override onlyProxyOwner {
+        require(
+            (_tier1 < _tier2) &&
+            (_tier2 < _tier3) &&
+            (_tier3 < _tier4),
+            "tier set error"
+        );
+        stanTier1 = _tier1;
+        stanTier2 = _tier2;
+        stanTier3 = _tier3;
+        stanTier4 = _tier4;
+    }
+
     function onApprove(
         address sender,
         address spender,
