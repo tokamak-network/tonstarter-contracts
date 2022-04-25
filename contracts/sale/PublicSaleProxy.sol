@@ -116,6 +116,7 @@ contract PublicSaleProxy is
         saleToken = IERC20(_saleTokenAddress);
         getTokenOwner = _getTokenOwner;
         liquidityVaultAddress = _vaultAddress;
+        deployTime = block.timestamp;
     }
 
     function changeBasicSet(
