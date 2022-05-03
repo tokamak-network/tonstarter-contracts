@@ -95,7 +95,8 @@ contract PublicSale is
         uint256 balance = saleToken.balanceOf(address(this));
         require((_amount[0] + _amount[1]) <= balance, "amount err");
         require(_time[6] < _claimTimes[0], "time err");
-        require((deployTime + 604800) < _time[0], "snapshot need later");
+        require((deployTime + delayTime) < _time[0], "snapshot need later");
+        require(_time[0] < _time[1], "whitelist before snapshot");
         setTier(
             _Tier[0], _Tier[1], _Tier[2], _Tier[3]
         );

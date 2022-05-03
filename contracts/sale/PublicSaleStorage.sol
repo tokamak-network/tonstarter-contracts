@@ -13,6 +13,7 @@ contract PublicSaleStorage  {
 
     uint256 public snapshot = 0;
     uint256 public deployTime;              //contract 배포된 시간
+    uint256 public delayTime;               //contract와 snapshot사이 시간
 
     uint256 public startAddWhiteTime = 0;
     uint256 public endAddWhiteTime = 0;

@@ -25,6 +25,15 @@ interface IPublicSaleProxyFactory {
     )
         external;
 
+    /// @dev setting the address, value
+    /// @param _addr [upgradeAdmin, initailVault, eventLog]
+    /// @param _value [minTOS, maxTOS, sTOSTier1, sTOSTier2, sTOSTier3, sTOSTier4, delayTime]
+    function allSet(
+        address[3] calldata _addr,
+        uint256[7] calldata _value
+    ) 
+        external;
+
     /// @dev setting the admin
     /// @param addr ontherProxyManagerMasterAddress
     function setUpgradeAdmin(
@@ -66,6 +75,13 @@ interface IPublicSaleProxyFactory {
         uint256 _tier3,
         uint256 _tier4
     ) 
+        external;
+
+    /// @dev set the delayTime
+    /// @param _delay tier1 STOS
+    function setDelay(
+        uint256 _delay
+    )
         external;
 
     /// @dev Last generated contract information

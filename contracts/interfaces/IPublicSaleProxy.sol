@@ -52,4 +52,10 @@ interface IPublicSaleProxy {
         uint256 _tier3,
         uint256 _tier4
     ) external;
+
+    /// @dev set delayTime
+    /// @param _delay delayTime
+    function setDelayTime(
+        uint256 _delay
+    ) external;
 }

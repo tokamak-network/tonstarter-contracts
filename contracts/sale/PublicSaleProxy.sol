@@ -169,6 +169,12 @@ contract PublicSaleProxy is
         stanTier4 = _tier4;
     }
 
+    function setDelayTime(
+        uint256 _delay
+    ) external override onlyProxyOwner {
+        delayTime = _delay;
+    }
+
     function onApprove(
         address sender,
         address spender,

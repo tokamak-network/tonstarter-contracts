@@ -47,6 +47,8 @@ contract PublicSaleProxyFactory is AccessibleCommon, IPublicSaleProxyFactory {
     uint256 public tier3;
     uint256 public tier4;
 
+    uint256 public delayTime;
+
     /// @dev Contract information by index
     mapping(uint256 => ContractInfo) public createdContracts;
 
@@ -118,6 +120,11 @@ contract PublicSaleProxyFactory is AccessibleCommon, IPublicSaleProxyFactory {
             tier4
         );
 
+        proxy.setDelayTime(
+            delayTime
+        );
+
+
         proxy.removeAdmin();
 
         createdContracts[totalCreatedContracts] = ContractInfo(address(proxy), name);
@@ -153,10 +160,26 @@ contract PublicSaleProxyFactory is AccessibleCommon, IPublicSaleProxyFactory {
         publicLogic = _basicAddress[5];
     }
 
+    function allSet(
+        address[3] calldata _addr,
+        uint256[7] calldata _value
+    ) 
+        external
+        override
+        onlyOwner
+    {
+        setUpgradeAdmin(_addr[0]);
+        setVault(_addr[1]);
+        setEventLog(_addr[2]);
+        setMaxMin(_value[0],_value[1]);
+        setSTOS(_value[2],_value[3],_value[4],_value[5]);
+        setDelay(_value[6]);
+    }
+
     function setUpgradeAdmin(
         address addr
     )   
-        external
+        public
         override 
         onlyOwner
         nonZeroAddress(addr)
@@ -165,23 +188,10 @@ contract PublicSaleProxyFactory is AccessibleCommon, IPublicSaleProxyFactory {
         upgradeAdmin = addr;
     }
 
-    function setMaxMin(
-        uint256 _min,
-        uint256 _max
-    )
-        external
-        override
-        onlyOwner
-    {
-        require(_min < _max, "need min < max");
-        minTOS = _min;
-        maxTOS = _max;
-    }
-
     function setVault(
         address _vaultFactory
     )
-        external
+        public
         override
         onlyOwner
     {
@@ -192,12 +202,25 @@ contract PublicSaleProxyFactory is AccessibleCommon, IPublicSaleProxyFactory {
     function setEventLog(
         address _addr
     )
-        external
+        public
         override
         onlyOwner
     {   
         require(_addr != logEventAddress, "same addrs");
         logEventAddress = _addr;
+    }
+
+    function setMaxMin(
+        uint256 _min,
+        uint256 _max
+    )
+        public
+        override
+        onlyOwner
+    {
+        require(_min < _max, "need min < max");
+        minTOS = _min;
+        maxTOS = _max;
     }
 
     function setSTOS(
@@ -206,7 +229,7 @@ contract PublicSaleProxyFactory is AccessibleCommon, IPublicSaleProxyFactory {
         uint256 _tier3,
         uint256 _tier4
     ) 
-        external
+        public
         override
         onlyOwner
     {
@@ -220,6 +243,17 @@ contract PublicSaleProxyFactory is AccessibleCommon, IPublicSaleProxyFactory {
         tier2 = _tier2;
         tier3 = _tier3;
         tier4 = _tier4;
+    }
+
+    function setDelay(
+        uint256 _delay
+    )
+        public
+        override
+        onlyOwner
+    {
+        require(delayTime != _delay, "same value");
+        delayTime = _delay;
     }
     
     
