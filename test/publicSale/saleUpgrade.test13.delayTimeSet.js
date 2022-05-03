@@ -1115,6 +1115,18 @@ describe("Sale", () => {
                 await expect(tx).to.be.revertedWith("Accessible: Caller is not an admin")
             })
 
+            it("setAllsetting snapshot error", async () => {
+                let smallsnapshot = setSnapshot-100;
+                let tx = saleContract.connect(saleOwner).setAllsetting(
+                    [100, 200, 1000, 4000, 600, 1200, 2200, 6000],
+                    [round1SaleAmount, round2SaleAmount, saleTokenPrice, payTokenPrice, hardcapAmount, changeTOS],
+                    [smallsnapshot, whitelistStartTime, whitelistEndTime, exclusiveStartTime, exclusiveEndTime, depositStartTime, depositEndTime, claimCounts],
+                    [claimTime1,claimTime2,claimTime3,claimTime4,claimTime5],
+                    [claimPercent1,claimPercent2,claimPercent3,claimPercent4,claimPercent5]
+                )
+                await expect(tx).to.be.revertedWith("snapshot need later")
+            })
+
             //PublicSale setting owner
             it('setAllsetting caller owner', async () => {
 
