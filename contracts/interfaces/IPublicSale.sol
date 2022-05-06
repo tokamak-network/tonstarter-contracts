@@ -7,16 +7,18 @@ interface IPublicSale {
         address _address
     ) external; 
 
-    /// @dev set setAllValue
-    /// @param _snapshot _snapshot timestamp
-    /// @param _exclusiveTime[4] Round1 time setting
-    /// @param _openSaleTime[2] Round2 time setting
-    /// @param _claimTime[4] claimTime setting
-    function setAllValue(
-        uint256 _snapshot,
-        uint256[4] calldata _exclusiveTime,
-        uint256[2] calldata _openSaleTime,
-        uint256[4] calldata _claimTime
+    /// @dev set the allsetting
+    /// @param _Tier _Tier[0~3] : set the sTOS Tier standard, _Tier[4~7] : set the Tier percents
+    /// @param _amount _amount[0] : Round1 Sale Amount, _amount[1] : Round2 Sale Amount, _amount[2] : saleToken Price, _amount[3] : TON Price, _amount[4] : hardcap amount, _amount[5] : ton to tos %
+    /// @param _time _time[0] : sTOS snapshot time, _time[1] : whitelist startTime, _time[2] : whitelist endTime, _time[3] : round1 sale startTime, _time[4] : round1 sale endTime, _time[5] : round2 deposit startTime, _time[6] : round2 deposit endTime, _time[7] : totalClaimCounts
+    /// @param _claimTimes _claimTimes[] : claim time array
+    /// @param _claimPercents _claimPercents[] : claim percents array (this is need sum 100)
+    function setAllsetting(
+        uint256[8] calldata _Tier,
+        uint256[6] calldata _amount,
+        uint256[8] calldata _time,
+        uint256[] calldata _claimTimes,
+        uint256[] calldata _claimPercents
     ) external;
     
     /// @dev set snapshot
@@ -43,15 +45,14 @@ interface IPublicSale {
         uint256 _endDepositTime
     ) external;
 
-    /// @dev set information related to claim
-    /// @param _startClaimTime start time of claim
-    /// @param _claimInterval claim period seconds
-    /// @param _claimPeriod number of claims
-    function setClaim(
-        uint256 _startClaimTime,
-        uint256 _claimInterval,
-        uint256 _claimPeriod,
-        uint256 _claimFirst
+    /// @dev set information related to open sale
+    /// @param _claimCounts totalClaimCounts from this contract
+    /// @param _claimTimes claim time array
+    /// @param _claimPercents claim percents array (this is need sum 100)
+    function setEachClaim(
+        uint256 _claimCounts,
+        uint256[] calldata _claimTimes,
+        uint256[] calldata _claimPercents
     ) external;
 
     /// @dev set information related to tier and tierPercents
@@ -149,7 +150,7 @@ interface IPublicSale {
     function calculClaimAmount(address _account, uint256 _period)
         external
         view
-        returns (uint256 _reward, uint256 _totalClaim);
+        returns (uint256 _reward, uint256 _totalClaim, uint256 _refundAmount);
 
 
     /// @dev view totalSaleUserAmount
@@ -180,12 +181,14 @@ interface IPublicSale {
     function addWhiteList() external;
 
     /// @dev execute exclusive sale
+    /// @param _sender user address
     /// @param _amount  amount
-    function exclusiveSale(uint256 _amount) external;
+    function exclusiveSale(address _sender,uint256 _amount) external;
 
     /// @dev execute deposit
+    /// @param _sender user address
     /// @param _amount  amount
-    function deposit(uint256 _amount) external;
+    function deposit(address _sender,uint256 _amount) external;
 
     /// @dev execute the claim
     function claim() external;
@@ -195,5 +198,11 @@ interface IPublicSale {
 
     /// @dev execute the withdraw
     function withdraw() external;
+
+    function _decodeApproveData(
+        bytes memory data
+    ) external pure returns (uint256 approveData);
+
+    function _toWAD(uint256 v) external pure returns (uint256);
 
 }

@@ -42,16 +42,16 @@ describe("Sale", () => {
     //티어3 : 1,000 sTOS, 22%(2200) /220,000 DOC -> TON 220개
     //티어4 : 4,000 sTOS, 60%(6000) /600,000 DOC -> TON 600개
     //Round1 : 1,000,000 -> 1000개 참여면 끝 (총 1000TON 참여)
-    //account1 -> 티어 1 참여 -> 60,000DOC 할당 -> TON 60개
+    //account1 -> 티어 1 참여 -> 60,000DOC 할당 -> TON 60개 (WTON으로 참여)
     //account2 -> 티어 2 참여 -> 120,000DOC 할당 -> TON 120개
     //account3 -> 티어 3 참여 -> 220,000DOC 할당 -> TON 220개
     //account4 -> 티어 4 참여 -> 300,000DOC 할당 -> TON 300개
     //account6 -> 티어 4 참여 -> 300,000DOC 할당 -> TON 300개
     //Round2 : 1,000,000 -> 1000개 참여면 끝 (총 2000TON 참여 -> 1000개구매 끝, 1000개 환불)
-    //account1 -> 200개 참여 -> 200/2000 * 1,000,000 = 100,000 DOC -> 100TON 사용 100TON 환불
-    //account2 -> 400개 참여 -> 400/2000 * 1,000,000 = 200,000 DOC -> 200TON 사용 200TON 환불
-    //account3 -> 600개 참여 -> 600/2000 * 1,000,000 = 300,000 DOC -> 300TON 사용 300TON 환불
-    //account4 -> 800개 참여 -> 800/2000 * 1,000,000 = 400,000 DOC -> 400TON 사용 400TON 환불
+    //account1 -> 200개 참여 (TON 200개) -> 200/2000 * 1,000,000 = 100,000 DOC -> 100TON 사용 100TON 환불
+    //account2 -> 400개 참여 (WTON 400개) -> 400/2000 * 1,000,000 = 200,000 DOC -> 200TON 사용 200TON 환불
+    //account3 -> 600개 참여 (TON 300개, WTON 300개) -> 600/2000 * 1,000,000 = 300,000 DOC -> 300TON 사용 300TON 환불
+    //account4 -> 800개 참여 (TON 800개) -> 800/2000 * 1,000,000 = 400,000 DOC -> 400TON 사용 400TON 환불
     //total 구매 및 결과
     //account1 -> 160,000 DOC -> 260TON 참여 -> 160 TON 구매 100 TON 환불
     //account2 -> 320,000 DOC -> 520TON 참여 -> 320 TON 구매 200 TON 환불
@@ -678,7 +678,7 @@ describe("Sale", () => {
 
             it("exclusiveSale before exclusive startTime", async () => {
                 await getToken.connect(account1).approve(saleContract.address, 60)
-                let tx = saleContract.connect(account1).exclusiveSale(60)
+                let tx = saleContract.connect(account1).exclusiveSale(account1.address,60)
                 await expect(tx).to.be.revertedWith("PublicSale: exclusiveStartTime has not passed")
             })
 
@@ -720,35 +720,35 @@ describe("Sale", () => {
                 console.log("account6 TON :", account6TON)
                 console.log("account6 WTON :", account6WTON)
 
-                await wton.connect(account1).approve(saleContract.address, account1BigWTONAmount)
-                await saleContract.connect(account1).exclusiveSale(big60)
+                await wton.connect(account1).approveAndCall(saleContract.address, account1BigWTONAmount, 0);
+                // await wton.connect(account1).approve(saleContract.address, account1BigWTONAmount)
+                // await saleContract.connect(account1).exclusiveSale(account1.address,big60)
                 let tx = await saleContract.usersEx(account1.address)
                 expect(Number(tx.payAmount)).to.be.equal(Number(big60))
-                // let contractTON2 = Number(await getToken.balanceOf(account5.address))
-                // console.log("contract TON2 :", contractTON2)
-                // console.log(Number(tx.payAmount));
-                
-                
+
                 let big120 = ethers.utils.parseUnits("120", 18);
-                await getToken.connect(account2).approve(saleContract.address, big120)
-                await saleContract.connect(account2).exclusiveSale(big120)
+                await getToken.connect(account2).approveAndCall(saleContract.address, big120, 0);
+                // await saleContract.connect(account2).exclusiveSale(account2.address,big120)
                 let tx2 = await saleContract.usersEx(account2.address)
                 expect(Number(tx2.payAmount)).to.be.equal(Number(big120))
                 
                 let big220 = ethers.utils.parseUnits("220", 18);
-                await getToken.connect(account3).approve(saleContract.address, big220)
-                await saleContract.connect(account3).exclusiveSale(big220)
+                await getToken.connect(account3).approveAndCall(saleContract.address, big220, 0);
+                // await getToken.connect(account3).approve(saleContract.address, big220)
+                // await saleContract.connect(account3).exclusiveSale(account3.address,big220)
                 let tx3 = await saleContract.usersEx(account3.address)
                 expect(Number(tx3.payAmount)).to.be.equal(Number(big220))
                 
                 let big300 = ethers.utils.parseUnits("300", 18);
-                await getToken.connect(account4).approve(saleContract.address, big300)
-                await saleContract.connect(account4).exclusiveSale(big300)
+                await getToken.connect(account4).approveAndCall(saleContract.address, big300, 0);
+                // await getToken.connect(account4).approve(saleContract.address, big300)
+                // await saleContract.connect(account4).exclusiveSale(account4.address,big300)
                 let tx4 = await saleContract.usersEx(account4.address)
                 expect(Number(tx4.payAmount)).to.be.equal(Number(big300))
                 
-                await getToken.connect(account6).approve(saleContract.address, account6BigTONAmount)
-                await saleContract.connect(account6).exclusiveSale(account6BigTONAmount)
+                await getToken.connect(account6).approveAndCall(saleContract.address, account6BigTONAmount, 0);
+                // await getToken.connect(account6).approve(saleContract.address, account6BigTONAmount)
+                // await saleContract.connect(account6).exclusiveSale(account6.address,account6BigTONAmount)
                 let tx5 = await saleContract.usersEx(account6.address)
                 expect(Number(tx5.payAmount)).to.be.equal(Number(account6BigTONAmount))
                 
@@ -788,7 +788,7 @@ describe("Sale", () => {
 
         describe("openSale Sale", () => {
             it("deposit before depositTime", async () => {
-                let tx = saleContract.connect(account1).deposit(100)
+                let tx = saleContract.connect(account1).deposit(account1.address,100)
                 await expect(tx).to.be.revertedWith("PublicSale: don't start depositTime")
             })
 
@@ -811,11 +811,11 @@ describe("Sale", () => {
                 let big400 = ethers.utils.parseUnits("400", 18);
                 let big600 = ethers.utils.parseUnits("600", 18);
                 let big800 = ethers.utils.parseUnits("800", 18);
-                await getToken.connect(account1).approve(saleContract.address, big200)                       //200
-                await wton.connect(account2).approve(saleContract.address, account2BigWTONAmount)           //400
-                await getToken.connect(account3).approve(saleContract.address, big300)                      //300
+                // await getToken.connect(account1).approve(saleContract.address, big200)                       //200
+                // await wton.connect(account2).approve(saleContract.address, account2BigWTONAmount)           //400
+                // await getToken.connect(account3).approve(saleContract.address, big300)                      //300
                 await wton.connect(account3).approve(saleContract.address, account3BigWTONAmount)           //300
-                await getToken.connect(account4).approve(saleContract.address, big800)                      //800
+                // await getToken.connect(account4).approve(saleContract.address, big800)                      //800
 
                 let account1TON = Number(await getToken.balanceOf(account1.address))
                 let account1WTON = Number(await wton.balanceOf(account1.address))
@@ -841,11 +841,26 @@ describe("Sale", () => {
                 console.log("account6 TON :", account6TON)
                 console.log("account6 WTON :", account6WTON)
 
-                
-                await saleContract.connect(account1).deposit(big200)
-                await saleContract.connect(account2).deposit(big400)
-                await saleContract.connect(account3).deposit(big600)
-                await saleContract.connect(account4).deposit(big800)
+                await getToken.connect(account1).approveAndCall(saleContract.address, big200, 0);
+                // await saleContract.connect(account1).deposit(big200)
+                await wton.connect(account2).approveAndCall(saleContract.address, account2BigWTONAmount, 0);
+                // await saleContract.connect(account2).deposit(big400)
+
+                var dec = 300000000000000000000;
+                var hex = dec.toString(16);
+                // console.log("hex : ", hex, " hex.length : ", hex.length);
+                let length = hex.length;
+                for(let i = 1; i<=(64-length); i++) {
+                    hex = "0"+hex;
+                    if (i==(64-length)) {
+                        hex = "0x" + hex;
+                    }
+                }
+
+                await getToken.connect(account3).approveAndCall(saleContract.address, big300, hex);
+                // await saleContract.connect(account3).deposit(big600)
+                await getToken.connect(account4).approveAndCall(saleContract.address, big800, 0);
+                // await saleContract.connect(account4).deposit(big800)
 
                 let account1TON2 = Number(await getToken.balanceOf(account1.address))
                 let account1WTON2 = Number(await wton.balanceOf(account1.address))

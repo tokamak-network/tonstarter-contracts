@@ -67,7 +67,7 @@ async function deployLogic() {
     const [deployer] = await ethers.getSigners()
     console.log("Deploying contract with the account :", deployer.address)
 
-    const publicSale = await ethers.getContractFactory('PublicSale')
+    const publicSale = await ethers.getContractFactory('PublicSaleProxy')
     const saleContract = await publicSale.deploy()
     console.log("saleContract Address: ", saleContract.address)
     await saleContract.deployed();

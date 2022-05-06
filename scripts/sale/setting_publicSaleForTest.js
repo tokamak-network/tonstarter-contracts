@@ -15,7 +15,7 @@ const { BigNumber } = require("ethers")
 const publicJson = require('../../artifacts/contracts/sale/PublicSale.sol/PublicSale.json')
 
 var abiPublic = publicJson.abi;
-const proxyAddress = "0xEb492922afa05D0D7704AD5c202f2ddCc386DA75"       //rinkeby
+const proxyAddress = "0x7851E7002DE43576FE390e7904e7F59C44B13AAD"       //rinkeby
 // const proxyAddress = "0x3B75d3f628C29d357b484EA7d091faEd63419267"       //mainnet
 const adminAddress = "0xf0B595d10a92A5a9BC3fFeA7e79f5d266b6035Ea"
 
@@ -63,15 +63,15 @@ async function setValue() {
     // 1640160000,2592000,6,50
     // 1639468800,1639641599,1639641600,1639814399
 
-    snapshot = 1639382400               //2021년 12월 14일 화요일 오후 4:59:00 GMT+09:00
-    whitelistStartTime = 1639389600     //2021년 12월 14일 화요일 오후 5:00:00 GMT+09:00
-    whitelistEndTime = 1639391400       //2021년 12월 16일 목요일 오후 4:59:59 GMT+09:00
-    exclusiveStartTime = 1639391400     //2021년 12월 16일 목요일 오후 5:00:00 GMT+09:00
-    exclusiveEndTime = 1639393200       //2021년 12월 18일 토요일 오후 4:59:59 GMT+09:00
-    depositStartTime = 1639393200       //2021년 12월 18일 토요일 오후 5:00:00 GMT+09:00 
-    depositEndTime =   1639393800       //2021년 12월 22일 수요일 오후 4:59:59 GMT+09:00
-    claimStartTime = 1639393800         //2021년 12월 22일 수요일 오후 5:00:00 GMT+09:00
-    claimInterval = 2592000             //30Days
+    snapshot = 1642411080               //
+    whitelistStartTime = 1642413180     //
+    whitelistEndTime = 1642413300       //
+    exclusiveStartTime = 1642413300     //
+    exclusiveEndTime = 1642413600       //
+    depositStartTime = 1642413600       //
+    depositEndTime =   1642413660       //
+    claimStartTime = 1642413660         //
+    claimInterval = 60             //
     claimPeriod = 6
     claimFirst = 50
 
@@ -165,6 +165,19 @@ async function setSaletotalAmount() {
     //  7,500,000./000/000/000/000/000/000 
 }
 
+async function resetData() {
+    const [deployer] = await ethers.getSigners()
+    console.log(deployer.address)
+    const publicSale = await ethers.getContractAt("PublicSale", proxyAddress);
+
+    let tx = await publicSale.connect(deployer).resetAllData()
+    await tx.wait()
+
+    console.log("success");
+    let tx2 = Number(await publicSale.startAddWhiteTime())
+    console.log("tx2(0) :", tx2)
+}
+
 setValue()
     .then(() => process.exit(0))
     .catch(error => {
@@ -187,6 +200,13 @@ setValue()
 //     });
 
 // setSaletotalAmount()
+//     .then(() => process.exit(0))
+//     .catch(error => {
+//         console.error(error);
+//         process.exit(1);
+//     });
+
+// resetData()
 //     .then(() => process.exit(0))
 //     .catch(error => {
 //         console.error(error);

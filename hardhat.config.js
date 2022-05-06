@@ -3,7 +3,7 @@ require("@openzeppelin/hardhat-upgrades");
 require("@nomiclabs/hardhat-etherscan");
 require("@nomiclabs/hardhat-waffle");
 require("@nomiclabs/hardhat-web3");
-//require("hardhat-gas-reporter");
+require("hardhat-gas-reporter");
 require('dotenv/config');
 
 require("dotenv").config();
@@ -45,24 +45,24 @@ module.exports = {
     hardhat: {
       chainId: 31337,
     },
-    rinkeby: {
-      chainId: 4,
-      url: "https://eth-rinkeby.alchemyapi.io/v2/5gNmfCGyn5VQ1IQ_V-NwBVbXG5jCbhLK",
-      accounts: [`${ACCOUNT0_PK}`, `${ACCOUNT1_PK}`],
-      gasMultiplier: 1.25,
-      gasPrice: 20000000000,
-    },
     // rinkeby: {
-    //   url: `https://rinkeby.infura.io/v3/${process.env.InfuraKey}`,
-    //   accounts: [`${process.env.ACCOUNT0_PK}`, `${process.env.ACCOUNT1_PK}`, `${process.env.ACCOUNT2_PK}`],
-    //   gasMultiplier: 1.25 //,
-    //   //gasPrice: 20000000000,
+    //   chainId: 4,
+    //   url: "https://eth-rinkeby.alchemyapi.io/v2/5gNmfCGyn5VQ1IQ_V-NwBVbXG5jCbhLK",
+    //   accounts: [`${ACCOUNT0_PK}`, `${ACCOUNT1_PK}`],
+    //   gasMultiplier: 1.25,
+    //   gasPrice: 20000000000,
     // },
+    rinkeby: {
+      url: `https://rinkeby.infura.io/v3/${process.env.InfuraKey}`,
+      accounts: [`${process.env.ACCOUNT0_PK}`, `${process.env.ACCOUNT1_PK}`, `${process.env.ACCOUNT2_PK}`],
+      gasMultiplier: 1.25 //,
+      //gasPrice: 20000000000,
+    },
     mainnet: {
       url: `https://mainnet.infura.io/v3/${process.env.InfuraKey}`,
       accounts: [`${TONSTARTER_DEPLOYER_PK}`, `${ACCOUNT1_PK}`],
       gasMultiplier: 1.25,
-      gasPrice: 140000000000,
+      gasPrice: 50000000000
     },
   },
   etherscan: {
@@ -82,6 +82,11 @@ module.exports = {
     tests: "./test",
     cache: "./cache",
     artifacts: "./artifacts",
+  },
+  gasReporter: {
+    enabled: (process.env.REPORT_GAS) ? true : false,
+    currency: 'KRW',
+    gasPrice: 21
   },
   mocha: {
     timeout: 10000000,

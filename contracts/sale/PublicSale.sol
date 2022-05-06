@@ -1,23 +1,23 @@
 // SPDX-License-Identifier: MIT
 
 pragma solidity ^0.7.6;
+pragma abicoder v2;
 
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import {
     ReentrancyGuard
 } from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
-import "../interfaces/ILockTOS.sol";
 import "../interfaces/IPublicSale.sol";
 import "../interfaces/IWTON.sol";
-import "../common/AccessibleCommon.sol";
+import "../interfaces/ITON.sol";
+import "../common/ProxyAccessCommon.sol";
 import "./PublicSaleStorage.sol";
 
 contract PublicSale is
     PublicSaleStorage,
-    AccessibleCommon,
+    ProxyAccessCommon,
     ReentrancyGuard,
     IPublicSale
 {
@@ -30,7 +30,7 @@ contract PublicSale is
 
     event Claimed(address indexed from, uint256 amount);
     event Withdrawal(address indexed from, uint256 amount);
-    event DepositWithdrawal(address indexed from, uint256 amount);
+    event DepositWithdrawal(address indexed from, uint256 amount, uint256 liquidityAmount);
 
     modifier nonZero(uint256 _value) {
         require(_value > 0, "PublicSale: zero");
@@ -70,46 +70,73 @@ contract PublicSale is
         _;
     }
 
-    /// @inheritdoc IPublicSale
-    function changeTONOwner(address _address) external override onlyOwner {
+    function changeTONOwner(
+        address _address
+    )
+        external
+        override
+        onlyOwner
+    {
         getTokenOwner = _address;
     }
 
-    /// @inheritdoc IPublicSale
-    function setAllValue(
-        uint256 _snapshot,
-        uint256[4] calldata _exclusiveTime,
-        uint256[2] calldata _openSaleTime,
-        uint256[4] calldata _claimTime
-    ) external override onlyOwner beforeStartAddWhiteTime {
-        require(
-            (_exclusiveTime[0] < _exclusiveTime[1]) &&
-                (_exclusiveTime[2] < _exclusiveTime[3])
+    function setAllsetting(
+        uint256[8] calldata _Tier,
+        uint256[6] calldata _amount,
+        uint256[8] calldata _time,
+        uint256[] calldata _claimTimes,
+        uint256[] calldata _claimPercents
+    )
+        external
+        override
+        onlyOwner
+        beforeStartAddWhiteTime
+    {
+        uint256 balance = saleToken.balanceOf(address(this));
+        require((_amount[0] + _amount[1]) <= balance, "amount err");
+        require(_time[6] < _claimTimes[0], "time err");
+        require((deployTime + delayTime) < _time[0], "snapshot need later");
+        require(_time[0] < _time[1], "whitelist before snapshot");
+        setTier(
+            _Tier[0], _Tier[1], _Tier[2], _Tier[3]
         );
-        require(
-            (_openSaleTime[0] < _openSaleTime[1])
+        setTierPercents(
+            _Tier[4], _Tier[5], _Tier[6], _Tier[7]
         );
-        setSnapshot(_snapshot);
+        setSaleAmount(
+            _amount[0],
+            _amount[1]
+        );
+        setTokenPrice(
+            _amount[2],
+            _amount[3]
+        );
+        setHardcap(
+            _amount[4],
+            _amount[5]
+        );
+        setSnapshot(_time[0]);
         setExclusiveTime(
-            _exclusiveTime[0],
-            _exclusiveTime[1],
-            _exclusiveTime[2],
-            _exclusiveTime[3]
+            _time[1],
+            _time[2],
+            _time[3],
+            _time[4]
         );
         setOpenTime(
-            _openSaleTime[0],
-            _openSaleTime[1]
+            _time[5],
+            _time[6]
         );
-        setClaim(
-            _claimTime[0],
-            _claimTime[1],
-            _claimTime[2],
-            _claimTime[3]
+        setEachClaim(
+            _time[7],
+            _claimTimes,
+            _claimPercents
         );
     }
 
     /// @inheritdoc IPublicSale
-    function setSnapshot(uint256 _snapshot)
+    function setSnapshot(
+        uint256 _snapshot
+    )
         public
         override
         onlyOwner
@@ -134,6 +161,12 @@ contract PublicSale is
         nonZero(_endExclusiveTime)
         beforeStartAddWhiteTime
     {
+        require(
+            (_startAddWhiteTime < _endAddWhiteTime) &&
+            (_endAddWhiteTime < _startExclusiveTime) &&
+            (_startExclusiveTime < _endExclusiveTime),
+            "PublicSale : Round1time err"
+        );
         startAddWhiteTime = _startAddWhiteTime;
         endAddWhiteTime = _endAddWhiteTime;
         startExclusiveTime = _startExclusiveTime;
@@ -152,29 +185,37 @@ contract PublicSale is
         nonZero(_endDepositTime)
         beforeStartAddWhiteTime
     {
+        require(
+            (_startDepositTime < _endDepositTime),
+            "PublicSale : Round2time err"
+        );
         startDepositTime = _startDepositTime;
         endDepositTime = _endDepositTime;
     }
 
-    /// @inheritdoc IPublicSale
-    function setClaim(
-        uint256 _startClaimTime,
-        uint256 _claimInterval,
-        uint256 _claimPeriod,
-        uint256 _claimFirst
+    function setEachClaim(
+        uint256 _claimCounts,
+        uint256[] calldata _claimTimes,
+        uint256[] calldata _claimPercents
     )
         public
         override
         onlyOwner
-        nonZero(_startClaimTime)
-        nonZero(_claimInterval)
-        nonZero(_claimPeriod)
         beforeStartAddWhiteTime
     {
-        startClaimTime = _startClaimTime;
-        claimInterval = _claimInterval;
-        claimPeriod = _claimPeriod;
-        claimFirst = _claimFirst;
+        totalClaimCounts = _claimCounts;
+        uint256 i = 0;
+        uint256 y = 0;
+        for (i = 0; i < _claimCounts; i++) {
+            claimTimes.push(_claimTimes[i]);
+            if (i != 0){
+                require(claimTimes[i-1] < claimTimes[i], "PublicSale: claimtime err");
+            }
+            claimPercents.push(_claimPercents[i]);
+            y = y + _claimPercents[i];
+        }
+
+        require(y == 100, "claimPercents err");
     }
 
     /// @inheritdoc IPublicSale
@@ -182,6 +223,13 @@ contract PublicSale is
         uint256[4] calldata _tier,
         uint256[4] calldata _tierPercent
     ) external override onlyOwner {
+        require(
+            stanTier1 <= _tier[0] &&
+            stanTier2 <= _tier[1] &&
+            stanTier3 <= _tier[2] &&
+            stanTier4 <= _tier[3],
+            "tier set error"
+        );
         setTier(
             _tier[0],
             _tier[1],
@@ -275,7 +323,10 @@ contract PublicSale is
     }
 
     /// @inheritdoc IPublicSale
-    function setTokenPrice(uint256 _saleTokenPrice, uint256 _payTokenPrice)
+    function setTokenPrice(
+        uint256 _saleTokenPrice,
+        uint256 _payTokenPrice
+    )
         public
         override
         onlyOwner
@@ -287,14 +338,39 @@ contract PublicSale is
         payTokenPrice = _payTokenPrice;
     }
 
+    function setHardcap (
+        uint256 _hardcapAmount,
+        uint256 _changePercent
+    )
+        public
+        onlyOwner
+        nonZero(_hardcapAmount)
+        nonZero(_changePercent)
+        beforeStartAddWhiteTime
+    {
+        require(_changePercent <= maxPer && _changePercent >= minPer,"PublicSale: need to set min,max");
+        hardCap = _hardcapAmount;
+        changeTOS = _changePercent;
+    }
+
     /// @inheritdoc IPublicSale
-    function totalExpectOpenSaleAmountView() public view override returns(uint256){
-        if(block.timestamp < endExclusiveTime) return totalExpectOpenSaleAmount;
+    function totalExpectOpenSaleAmountView()
+        public
+        view
+        override
+        returns(uint256)
+    {
+        if (block.timestamp < endExclusiveTime) return totalExpectOpenSaleAmount;
         else return totalExpectOpenSaleAmount.add(totalRound1NonSaleAmount());
     }
 
     /// @inheritdoc IPublicSale
-    function totalRound1NonSaleAmount() public view override returns(uint256){
+    function totalRound1NonSaleAmount()
+        public
+        view
+        override
+        returns(uint256)
+    {
         return totalExpectSaleAmount.sub(totalExSaleAmount);
     }
 
@@ -361,7 +437,7 @@ contract PublicSale is
         override
         returns (uint256)
     {
-        UserInfoEx storage userEx = usersEx[_address];
+        LibPublicSale.UserInfoEx storage userEx = usersEx[_address];
         uint256 tier = calculTier(_address);
         if (userEx.join == true && tier > 0) {
             uint256 salePossible =
@@ -390,7 +466,7 @@ contract PublicSale is
         override
         returns (uint256)
     {
-        UserInfoOpen storage userOpen = usersOpen[_account];
+        LibPublicSale.UserInfoOpen storage userOpen = usersOpen[_account];
         uint256 depositAmount = userOpen.depositAmount.add(_amount);
         uint256 openSalePossible =
             totalExpectOpenSaleAmountView().mul(depositAmount).div(
@@ -399,72 +475,74 @@ contract PublicSale is
         return openSalePossible;
     }
 
-    /// @inheritdoc IPublicSale
-    function calculClaimAmount(address _account, uint256 _period)
+    function currentRound() public view returns (uint256 round) {
+        if (block.timestamp > claimTimes[totalClaimCounts-1]) {
+            return totalClaimCounts;
+        }
+        for (uint256 i = 0; i < totalClaimCounts; i++) {
+            if (block.timestamp < claimTimes[i]) {
+                return i;
+            }
+        }
+    }
+
+    function calculClaimAmount(address _account, uint256 _round)
         public
         view
         override
-        returns (uint256 _reward, uint256 _totalClaim)
+        returns (uint256 _reward, uint256 _totalClaim, uint256 _refundAmount)
     {
-        if(block.timestamp < startClaimTime) return (0, 0);
-        if(_period > claimPeriod) return (0,0);
+        if (block.timestamp < startClaimTime) return (0, 0, 0);
+        if (_round > totalClaimCounts) return (0, 0, 0);
 
-        UserClaim storage userClaim = usersClaim[_account];
-        (, uint256 realSaleAmount, ) = totalSaleUserAmount(_account);
+        LibPublicSale.UserClaim storage userClaim = usersClaim[_account];
+        (, uint256 realSaleAmount, uint256 refundAmount) = totalSaleUserAmount(_account);   //유저가 총 구매한 token의 양을 Return 함
 
-        if (realSaleAmount == 0 ) return (0, 0);
-        if (userClaim.claimAmount >= realSaleAmount) return (0, realSaleAmount);
+        if (realSaleAmount == 0 ) return (0, 0, 0);
+        if (userClaim.claimAmount >= realSaleAmount) return (0, 0, 0);    //userClaim.claimAmount  = contract에서 유저에게 준양
 
-        uint256 difftime = block.timestamp.sub(startClaimTime);
-        uint256 totalClaimReward = realSaleAmount;
-        uint256 firstReward = totalClaimReward.mul(claimFirst).div(100);
-        uint256 periodReward = (totalClaimReward.sub(firstReward)).div(claimPeriod.sub(1));
+        if (_round != 0) {
+            uint256 amount = realSaleAmount.mul(claimPercents[(_round.sub(1))]).div(100);
+            return (amount, realSaleAmount, refundAmount);
+        }
 
-        if(_period == 0) {
-            if (difftime < claimInterval) {
-                uint256 reward = firstReward.sub(userClaim.claimAmount);
-                return (reward, totalClaimReward);
-            } else {
-                uint256 period = (difftime / claimInterval).add(1);
-                if (period >= claimPeriod) {
-                    uint256 reward =
-                        totalClaimReward.sub(userClaim.claimAmount);
-                    return (reward, totalClaimReward);
-                } else {
-                    uint256 reward = firstReward.add(periodReward.mul(period.sub(1))).sub(userClaim.claimAmount);
-                    return (reward, totalClaimReward);
-                }
-            }
-        } else if(_period == 1){
-            return (firstReward, totalClaimReward);
-        } else {
-            if(_period == claimPeriod) {
-                uint256 reward =
-                    totalClaimReward.sub((firstReward.add(periodReward.mul(claimPeriod.sub(2)))));
-                return (reward, totalClaimReward);
-            } else {
-                return (periodReward, totalClaimReward);
-            }
+        //해당 라운드에서 받아야하는 토큰의 양 -> (realSaleAmount * claimPercents[i] / 100) : 해당 라운드에서 받아야하는 토큰의 양
+        uint256 round = currentRound();
+
+        if (totalClaimCounts == round && _round == 0) {
+            uint256 amount = realSaleAmount - userClaim.claimAmount;
+            return (amount, realSaleAmount, refundAmount);
+        }
+
+        uint256 expectedClaimAmount;
+        for (uint256 i = 0; i < round; i++) {
+            expectedClaimAmount = expectedClaimAmount.add((realSaleAmount.mul(claimPercents[i]).div(100)));
+        }
+
+        //Round를 0으로 넣으면 현재 내가 받을 수 있는 양을 리턴해주고 1 이상을 넣으면 해당 라운드에서 받을 수 있는 토큰의 양을 리턴해줌
+        if (_round == 0) {
+            uint256 amount = expectedClaimAmount - userClaim.claimAmount;
+            return (amount, realSaleAmount, refundAmount);
         }
     }
 
     /// @inheritdoc IPublicSale
     function totalSaleUserAmount(address user) public override view returns (uint256 _realPayAmount, uint256 _realSaleAmount, uint256 _refundAmount) {
-        UserInfoEx storage userEx = usersEx[user];
+        LibPublicSale.UserInfoEx storage userEx = usersEx[user];
 
-        if(userEx.join){
+        if (userEx.join) {
             (uint256 realPayAmount, uint256 realSaleAmount, uint256 refundAmount) = openSaleUserAmount(user);
             return ( realPayAmount.add(userEx.payAmount), realSaleAmount.add(userEx.saleAmount), refundAmount);
-        }else {
+        } else {
             return openSaleUserAmount(user);
         }
     }
 
     /// @inheritdoc IPublicSale
     function openSaleUserAmount(address user) public override view returns (uint256 _realPayAmount, uint256 _realSaleAmount, uint256 _refundAmount) {
-        UserInfoOpen storage userOpen = usersOpen[user];
+        LibPublicSale.UserInfoOpen storage userOpen = usersOpen[user];
 
-        if(!userOpen.join || userOpen.depositAmount == 0) return (0, 0, 0);
+        if (!userOpen.join || userOpen.depositAmount == 0) return (0, 0, 0);
 
         uint256 openSalePossible = calculOpenSaleAmount(user, 0);
         uint256 realPayAmount = calculPayToken(openSalePossible);
@@ -473,8 +551,8 @@ contract PublicSale is
         uint256 returnAmount = 0;
 
         if (realPayAmount < depositAmount) {
-           returnAmount = depositAmount.sub(realPayAmount);
-           realSaleAmount = calculSaleToken(realPayAmount);
+            returnAmount = depositAmount.sub(realPayAmount);
+            realSaleAmount = calculSaleToken(realPayAmount);
         } else {
             realPayAmount = userOpen.depositAmount;
             realSaleAmount = calculSaleToken(depositAmount);
@@ -482,13 +560,13 @@ contract PublicSale is
 
         return (realPayAmount, realSaleAmount, returnAmount);
     }
-    
+
     /// @inheritdoc IPublicSale
     function totalOpenSaleAmount() public override view returns (uint256){
         uint256 _calculSaleToken = calculSaleToken(totalDepositAmount);
         uint256 _totalAmount = totalExpectOpenSaleAmountView();
 
-        if(_calculSaleToken < _totalAmount) return _calculSaleToken;
+        if (_calculSaleToken < _totalAmount) return _calculSaleToken;
         else return _totalAmount;
     }
 
@@ -496,8 +574,12 @@ contract PublicSale is
     function totalOpenPurchasedAmount() public override view returns (uint256){
         uint256 _calculSaleToken = calculSaleToken(totalDepositAmount);
         uint256 _totalAmount = totalExpectOpenSaleAmountView();
-        if(_calculSaleToken < _totalAmount) return totalDepositAmount;
+        if (_calculSaleToken < _totalAmount) return totalDepositAmount;
         else return  calculPayToken(_totalAmount);
+    }
+
+    function totalWhitelists() external view returns (uint256) {
+        return whitelists.length;
     }
 
     /// @inheritdoc IPublicSale
@@ -512,11 +594,10 @@ contract PublicSale is
         );
         uint256 tier = calculTier(msg.sender);
         require(tier >= 1, "PublicSale: need to more sTOS");
-        UserInfoEx storage userEx = usersEx[msg.sender];
+        LibPublicSale.UserInfoEx storage userEx = usersEx[msg.sender];
         require(userEx.join != true, "PublicSale: already attended");
 
         whitelists.push(msg.sender);
-        totalWhitelists = totalWhitelists.add(1);
 
         userEx.join = true;
         userEx.tier = tier;
@@ -526,12 +607,67 @@ contract PublicSale is
         emit AddedWhiteList(msg.sender, tier);
     }
 
+    function _toWAD(uint256 v) public override pure returns (uint256) {
+        return v / 10 ** 9;
+    }
+
+    function _decodeApproveData(
+        bytes memory data
+    ) public override pure returns (uint256 approveData) {
+        assembly {
+            approveData := mload(add(data, 0x20))
+        }
+    }
+
+    function calculTONTransferAmount(
+        uint256 _amount,
+        address _sender
+    )
+        internal
+        nonZero(_amount)
+        nonZeroAddress(_sender)
+
+    {
+        uint256 tonAllowance = IERC20(getToken).allowance(_sender, address(this));
+        uint256 tonBalance = IERC20(getToken).balanceOf(_sender);
+
+        if (tonAllowance > tonBalance) {
+            tonAllowance = tonBalance; //tonAllowance가 tonBlance보다 더 클때 문제가 된다.
+        }
+        if (tonAllowance < _amount) {
+            uint256 needUserWton;
+            uint256 needWton = _amount.sub(tonAllowance);
+            needUserWton = _toRAY(needWton);
+            require(IWTON(wton).allowance(_sender, address(this)) >= needUserWton, "PublicSale: wton exceeds allowance");
+            require(IWTON(wton).balanceOf(_sender) >= needUserWton, "need more wton");
+            IERC20(wton).safeTransferFrom(_sender,address(this),needUserWton);
+            IWTON(wton).swapToTON(needUserWton);
+            require(tonAllowance >= _amount.sub(needWton), "PublicSale: ton exceeds allowance");
+            if (_amount.sub(needWton) > 0) {
+                IERC20(getToken).safeTransferFrom(_sender, address(this), _amount.sub(needWton));
+            }
+        } else {
+            require(tonAllowance >= _amount && tonBalance >= _amount, "PublicSale: ton exceeds allowance");
+            IERC20(getToken).safeTransferFrom(_sender, address(this), _amount);
+        }
+
+        if (block.timestamp < endExclusiveTime) {
+            emit ExclusiveSaled(_sender, _amount);
+        } else {
+            emit Deposited(_sender, _amount);
+        }
+    }
+
+
     /// @inheritdoc IPublicSale
-    function exclusiveSale(uint256 _amount)
-        external
+    function exclusiveSale(
+        address _sender,
+        uint256 _amount
+    )
+        public
         override
         nonZero(_amount)
-        nonZero(claimPeriod)
+        nonZero(totalClaimCounts)
         nonReentrant
     {
         require(
@@ -542,19 +678,22 @@ contract PublicSale is
             block.timestamp < endExclusiveTime,
             "PublicSale: end the exclusiveTime"
         );
-        UserInfoEx storage userEx = usersEx[msg.sender];
+        LibPublicSale.UserInfoEx storage userEx = usersEx[_sender];
         require(userEx.join == true, "PublicSale: not registered in whitelist");
         uint256 tokenSaleAmount = calculSaleToken(_amount);
-        uint256 salePossible = calculTierAmount(msg.sender);
+        uint256 salePossible = calculTierAmount(_sender);
 
         require(
             salePossible >= userEx.saleAmount.add(tokenSaleAmount),
             "PublicSale: just buy tier's allocated amount"
         );
 
+        uint256 tier = calculTier(_sender);
+
         if(userEx.payAmount == 0) {
             totalRound1Users = totalRound1Users.add(1);
             totalUsers = totalUsers.add(1);
+            tiersExAccount[tier] = tiersExAccount[tier].add(1);
         }
 
         userEx.payAmount = userEx.payAmount.add(_amount);
@@ -563,36 +702,18 @@ contract PublicSale is
         totalExPurchasedAmount = totalExPurchasedAmount.add(_amount);
         totalExSaleAmount = totalExSaleAmount.add(tokenSaleAmount);
 
-        uint256 tier = calculTier(msg.sender);
-        tiersExAccount[tier] = tiersExAccount[tier].add(1);
-        
-        uint256 tonAllowance = getToken.allowance(msg.sender, address(this));
-        uint256 tonBalance = getToken.balanceOf(msg.sender);
-        if(tonAllowance < _amount) {
-            uint256 needUserWton;
-            uint256 needWton = _amount.sub(tonAllowance);
-            needUserWton = _toRAY(needWton);
-            require(IWTON(wton).allowance(msg.sender, address(this)) >= needUserWton, "PublicSale: wton amount exceeds allowance");
-            require(IWTON(wton).balanceOf(msg.sender) >= needUserWton, "need more wton");
-            IERC20(wton).safeTransferFrom(msg.sender,address(this),needUserWton);
-            IWTON(wton).swapToTON(needUserWton);
-            require(tonAllowance >= _amount.sub(needWton), "PublicSale: ton amount exceeds allowance");
-            if(_amount.sub(needWton) > 0) {
-                getToken.safeTransferFrom(msg.sender, address(this), _amount.sub(needWton));   
-            }
-            getToken.safeTransfer(getTokenOwner, _amount);
-        } else {
-            require(tonAllowance >= _amount && tonBalance >= _amount, "PublicSale: ton amount exceeds allowance");
-
-            getToken.safeTransferFrom(msg.sender, address(this), _amount);
-            getToken.safeTransfer(getTokenOwner, _amount);
-        }
-
-        emit ExclusiveSaled(msg.sender, _amount);
+        calculTONTransferAmount(_amount, _sender);
     }
 
     /// @inheritdoc IPublicSale
-    function deposit(uint256 _amount) external override nonReentrant {
+    function deposit(
+        address _sender,
+        uint256 _amount
+    )
+        public
+        override
+        nonReentrant
+    {
         require(
             block.timestamp >= startDepositTime,
             "PublicSale: don't start depositTime"
@@ -602,123 +723,140 @@ contract PublicSale is
             "PublicSale: end the depositTime"
         );
 
-        UserInfoOpen storage userOpen = usersOpen[msg.sender];
+        LibPublicSale.UserInfoOpen storage userOpen = usersOpen[_sender];
 
         if (!userOpen.join) {
-            depositors.push(msg.sender);
+            depositors.push(_sender);
             userOpen.join = true;
 
             totalRound2Users = totalRound2Users.add(1);
-            UserInfoEx storage userEx = usersEx[msg.sender];
-            if(userEx.payAmount == 0) totalUsers = totalUsers.add(1);
+            LibPublicSale.UserInfoEx storage userEx = usersEx[_sender];
+            if (userEx.payAmount == 0) totalUsers = totalUsers.add(1);
         }
         userOpen.depositAmount = userOpen.depositAmount.add(_amount);
-        userOpen.saleAmount = 0;
         totalDepositAmount = totalDepositAmount.add(_amount);
 
-        uint256 tonAllowance = getToken.allowance(msg.sender, address(this));
-        uint256 tonBalance = getToken.balanceOf(msg.sender);
-        if(tonAllowance < _amount) {
-            uint256 needUserWton;
-            uint256 needWton = _amount.sub(tonAllowance);
-            needUserWton = _toRAY(needWton);
-            require(IWTON(wton).allowance(msg.sender, address(this)) >= needUserWton, "PublicSale: wton amount exceeds allowance");
-            require(IWTON(wton).balanceOf(msg.sender) >= needUserWton, "need more wton");
-            IERC20(wton).safeTransferFrom(msg.sender,address(this),needUserWton);
-            IWTON(wton).swapToTON(needUserWton);
-            require(tonAllowance >= _amount.sub(needWton), "PublicSale: ton amount exceeds allowance");
-            if(_amount.sub(needWton) > 0) {
-                getToken.safeTransferFrom(msg.sender, address(this), _amount.sub(needWton));   
-            }
-        } else {
-            require(tonAllowance >= _amount && tonBalance >= _amount, "PublicSale: ton amount exceeds allowance");
-
-            getToken.safeTransferFrom(msg.sender, address(this), _amount);
-        }
-
-
-        emit Deposited(msg.sender, _amount);
+        calculTONTransferAmount(_amount, _sender);
     }
 
     /// @inheritdoc IPublicSale
     function claim() external override {
         require(
-            block.timestamp >= startClaimTime,
+            block.timestamp >= claimTimes[0],
             "PublicSale: don't start claimTime"
         );
-        UserClaim storage userClaim = usersClaim[msg.sender];
-        UserInfoOpen storage userOpen = usersOpen[msg.sender];
-
-        (, uint256 realSaleAmount, ) = totalSaleUserAmount(msg.sender);
-        (, ,uint256 refundAmount ) = openSaleUserAmount(msg.sender);
-
-        require(
-            realSaleAmount > 0,
-            "PublicSale: no purchase amount"
-        );
-
-        (uint256 reward, ) = calculClaimAmount(msg.sender, 0);
-        require(reward > 0, "PublicSale: no reward");
-        require(
-            realSaleAmount.sub(userClaim.claimAmount) >= reward,
-            "PublicSale: user is already getAllreward"
-        );
-        require(
-            saleToken.balanceOf(address(this)) >= reward,
-            "PublicSale: dont have saleToken in pool"
-        );
-
-        userClaim.claimAmount = userClaim.claimAmount.add(reward);
-
-        saleToken.safeTransfer(msg.sender, reward);
-
-        if(!userClaim.exec && userOpen.join) {
-            totalRound2UsersClaim = totalRound2UsersClaim.add(1);
+        LibPublicSale.UserInfoOpen storage userOpen = usersOpen[msg.sender];
+        LibPublicSale.UserClaim storage userClaim = usersClaim[msg.sender];
+        uint256 hardcapcut = hardcapCalcul();
+        if (hardcapcut == 0) {
+            require(userClaim.exec != true, "PublicSale: already getRefund");
+            LibPublicSale.UserInfoEx storage userEx = usersEx[msg.sender];
+            uint256 refundTON = userEx.payAmount.add(userOpen.depositAmount);
             userClaim.exec = true;
-        }
-
-        if(refundAmount > 0 && userClaim.refundAmount == 0){
-            require(refundAmount <= getToken.balanceOf(address(this)), "PublicSale: dont have refund ton");
-            userClaim.refundAmount = refundAmount;
-            getToken.safeTransfer(msg.sender, refundAmount);
-        }
-
-        emit Claimed(msg.sender, reward);
-    }
-    
-    /// @inheritdoc IPublicSale
-    function depositWithdraw() external override onlyOwner {
-        require(block.timestamp > endDepositTime,"PublicSale: need to end the depositTime");
-        uint256 getAmount;
-        if(totalRound2Users == totalRound2UsersClaim){
-            getAmount = getToken.balanceOf(address(this));
+            IERC20(getToken).safeTransfer(msg.sender, refundTON);
         } else {
-            getAmount = totalOpenPurchasedAmount().sub(10 ether);
+            (uint256 reward, uint256 realSaleAmount, uint256 refundAmount) = calculClaimAmount(msg.sender, 0);
+            require(
+                realSaleAmount > 0,
+                "PublicSale: no purchase amount"
+            );
+            require(reward > 0, "PublicSale: no reward");
+            require(
+                realSaleAmount.sub(userClaim.claimAmount) >= reward,
+                "PublicSale: already getAllreward"
+            );
+            require(
+                saleToken.balanceOf(address(this)) >= reward,
+                "PublicSale: dont have saleToken in pool"
+            );
+
+            userClaim.claimAmount = userClaim.claimAmount.add(reward);
+
+            saleToken.safeTransfer(msg.sender, reward);
+
+            if (!userClaim.exec && userOpen.join) {
+                totalRound2UsersClaim = totalRound2UsersClaim.add(1);
+                userClaim.exec = true;
+            }
+
+            if (refundAmount > 0 && userClaim.refundAmount == 0){
+                require(refundAmount <= IERC20(getToken).balanceOf(address(this)), "PublicSale: dont have refund ton");
+                userClaim.refundAmount = refundAmount;
+                IERC20(getToken).safeTransfer(msg.sender, refundAmount);
+            }
+
+            emit Claimed(msg.sender, reward);
         }
-        require(getAmount <= getToken.balanceOf(address(this)), "PublicSale: no token to receive");
-        getToken.safeTransfer(getTokenOwner, getAmount);
-        emit DepositWithdrawal(msg.sender, getAmount);
+    }
+
+    function hardcapCalcul() public view returns (uint256){
+        uint256 getAmount = totalExPurchasedAmount.add(totalOpenPurchasedAmount());
+        uint256 calculAmount;
+        if (getAmount >= hardCap) {
+            if (totalRound2Users == totalRound2UsersClaim){
+                return calculAmount = IERC20(getToken).balanceOf(address(this)).mul(changeTOS).div(100);
+            } else {
+                return calculAmount = totalExPurchasedAmount.add(totalOpenPurchasedAmount()).sub(5 ether).mul(changeTOS).div(100);
+            }
+        } else {
+            return 0;
+        }
+    }
+
+    /// @inheritdoc IPublicSale
+    function depositWithdraw() external override {
+        require(block.timestamp > endDepositTime,"PublicSale: need to end the depositTime");
+        uint256 liquidityTON = hardcapCalcul();
+        uint256 getAmount;
+        require(liquidityTON > 0, "PublicSale: don't pass the hardCap");
+        if (totalRound2Users == totalRound2UsersClaim){
+            getAmount = IERC20(getToken).balanceOf(address(this)).sub(liquidityTON);
+        } else {
+            getAmount = totalExPurchasedAmount.add(totalOpenPurchasedAmount()).sub(liquidityTON).sub(10 ether);
+        }
+        require(getAmount <= IERC20(getToken).balanceOf(address(this)), "PublicSale: no token to receive");
+
+        IWTON(wton).swapFromTON(liquidityTON);
+        uint256 wtonAmount = IERC20(wton).balanceOf(address(this));
+
+        ISwapRouter.ExactInputSingleParams memory params =
+            ISwapRouter.ExactInputSingleParams({
+                tokenIn: wton,
+                tokenOut: address(tos),
+                fee: poolFee,
+                recipient: address(this),
+                deadline: block.timestamp,
+                amountIn: wtonAmount,
+                amountOutMinimum: 0,
+                sqrtPriceLimitX96: 0
+            });
+        ISwapRouter(uniswapRouter).exactInputSingle(params);
+
+        uint256 tosAmount = tos.balanceOf(address(this));
+
+        tos.safeTransfer(liquidityVaultAddress, tosAmount);
+        IERC20(getToken).safeTransfer(getTokenOwner, getAmount);
+        emit DepositWithdrawal(msg.sender, getAmount, liquidityTON);
     }
 
     /// @inheritdoc IPublicSale
     function withdraw() external override onlyOwner{
-        if(block.timestamp <= endDepositTime){
-            uint256 balance = saleToken.balanceOf(address(this));
+        uint256 balance = saleToken.balanceOf(address(this));
+        if (block.timestamp <= endDepositTime){
             require(balance > totalExpectSaleAmount.add(totalExpectOpenSaleAmount), "PublicSale: no withdrawable amount");
             uint256 withdrawAmount = balance.sub(totalExpectSaleAmount.add(totalExpectOpenSaleAmount));
-            require(withdrawAmount != 0, "PublicSale: don't exist withdrawAmount");
             saleToken.safeTransfer(msg.sender, withdrawAmount);
             emit Withdrawal(msg.sender, withdrawAmount);
         } else {
-            require(block.timestamp > endDepositTime, "PublicSale: end the openSaleTime");
-            require(!adminWithdraw, "already admin called withdraw");
+            require(!adminWithdraw, "PublicSale: already admin called withdraw");
             adminWithdraw = true;
             uint256 saleAmount = totalOpenSaleAmount();
             require(totalExpectSaleAmount.add(totalExpectOpenSaleAmount) > totalExSaleAmount.add(saleAmount), "PublicSale: don't exist withdrawAmount");
-
             uint256 withdrawAmount = totalExpectSaleAmount.add(totalExpectOpenSaleAmount).sub(totalExSaleAmount).sub(saleAmount);
-
-            require(withdrawAmount != 0, "PublicSale: don't exist withdrawAmount");
+            uint256 amount = hardcapCalcul();
+            if(amount == 0) {
+                withdrawAmount = balance;
+            }
             saleToken.safeTransfer(msg.sender, withdrawAmount);
             emit Withdrawal(msg.sender, withdrawAmount);
         }
