@@ -25,6 +25,15 @@ interface IPublicSaleProxyFactory {
     )
         external;
 
+    /// @dev setting the address, value
+    /// @param _addr [upgradeAdmin, initailVault, eventLog]
+    /// @param _value [minTOS, maxTOS, sTOSTier1, sTOSTier2, sTOSTier3, sTOSTier4, delayTime]
+    function allSet(
+        address[3] calldata _addr,
+        uint256[7] calldata _value
+    ) 
+        external;
+
     /// @dev setting the admin
     /// @param addr ontherProxyManagerMasterAddress
     function setUpgradeAdmin(
@@ -52,6 +61,26 @@ interface IPublicSaleProxyFactory {
     /// @param _addr logContract addr
     function setEventLog(
         address _addr
+    )
+        external;
+
+    /// @dev set the sTOSstandard
+    /// @param _tier1 tier1 STOS
+    /// @param _tier2 tier1 STOS
+    /// @param _tier3 tier1 STOS
+    /// @param _tier4 tier1 STOS
+    function setSTOS(
+        uint256 _tier1,
+        uint256 _tier2,
+        uint256 _tier3,
+        uint256 _tier4
+    ) 
+        external;
+
+    /// @dev set the delayTime
+    /// @param _delay tier1 STOS
+    function setDelay(
+        uint256 _delay
     )
         external;
 

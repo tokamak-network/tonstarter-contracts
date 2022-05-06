@@ -12,6 +12,8 @@ contract PublicSaleStorage  {
     bool public pauseProxy;
 
     uint256 public snapshot = 0;
+    uint256 public deployTime;              //contract 배포된 시간
+    uint256 public delayTime;               //contract와 snapshot사이 시간
 
     uint256 public startAddWhiteTime = 0;
     uint256 public endAddWhiteTime = 0;
@@ -47,6 +49,11 @@ contract PublicSaleStorage  {
     uint256 public changeTOS;     //ton -> tos로 변경하는 %
     uint256 public minPer;        //변경하는 % min
     uint256 public maxPer;        //변경하는 % max
+
+    uint256 public stanTier1;     //최소 기준 Tier1
+    uint256 public stanTier2;     //최소 기준 Tier2
+    uint256 public stanTier3;     //최소 기준 Tier3
+    uint256 public stanTier4;     //최소 기준 Tier4
 
     address public liquidityVaultAddress; //liquidityVault의 Address
     ISwapRouter public uniswapRouter;
