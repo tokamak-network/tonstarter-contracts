@@ -61,6 +61,7 @@ task("rinkeby-deploy-lock-tos", "Deploy TOS").setAction(async () => {
   console.log("LockTOSProxy: ", lockTOSProxy.address);
   const lockTOSProxyAddress = lockTOSProxy.address;
 
+  /*
   await (
     await lockTOSProxy.initialize(
       tosAddress,
@@ -69,9 +70,11 @@ task("rinkeby-deploy-lock-tos", "Deploy TOS").setAction(async () => {
     )
   ).wait();
 
+
   const adminAddress = "0x8c595DA827F4182bC0E3917BccA8e654DF8223E1";
   await (await lockTOSProxy.transferAdmin(adminAddress)).wait();
 
+  */
   await run("verify", {
     address: lockTOSAddress,
     constructorArgsParams: [],
