@@ -141,6 +141,7 @@ contract PublicSale is
         override
         onlyOwner
         nonZero(_snapshot)
+        beforeStartAddWhiteTime
     {
         snapshot = _snapshot;
     }
@@ -837,28 +838,5 @@ contract PublicSale is
         tos.safeTransfer(liquidityVaultAddress, tosAmount);
         IERC20(getToken).safeTransfer(getTokenOwner, getAmount);
         emit DepositWithdrawal(msg.sender, getAmount, liquidityTON);
-    }
-
-    /// @inheritdoc IPublicSale
-    function withdraw() external override onlyOwner{
-        uint256 balance = saleToken.balanceOf(address(this));
-        if (block.timestamp <= endDepositTime){
-            require(balance > totalExpectSaleAmount.add(totalExpectOpenSaleAmount), "PublicSale: no withdrawable amount");
-            uint256 withdrawAmount = balance.sub(totalExpectSaleAmount.add(totalExpectOpenSaleAmount));
-            saleToken.safeTransfer(msg.sender, withdrawAmount);
-            emit Withdrawal(msg.sender, withdrawAmount);
-        } else {
-            require(!adminWithdraw, "PublicSale: already admin called withdraw");
-            adminWithdraw = true;
-            uint256 saleAmount = totalOpenSaleAmount();
-            require(totalExpectSaleAmount.add(totalExpectOpenSaleAmount) > totalExSaleAmount.add(saleAmount), "PublicSale: don't exist withdrawAmount");
-            uint256 withdrawAmount = totalExpectSaleAmount.add(totalExpectOpenSaleAmount).sub(totalExSaleAmount).sub(saleAmount);
-            uint256 amount = hardcapCalcul();
-            if(amount == 0) {
-                withdrawAmount = balance;
-            }
-            saleToken.safeTransfer(msg.sender, withdrawAmount);
-            emit Withdrawal(msg.sender, withdrawAmount);
-        }
     }
 }

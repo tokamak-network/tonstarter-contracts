@@ -763,7 +763,7 @@ describe("Sale", () => {
 
         //deploy publicSale and publicSaleProxy and transfer TON, WTON
         it("Initialize PublicSale", async function () {
-            let PublicSale = await ethers.getContractFactory("PublicSaleTest");
+            let PublicSale = await ethers.getContractFactory("PublicSale");
             deploySaleImpl = await PublicSale.connect(saleOwner).deploy();
 
             let code = await saleOwner.provider.getCode(deploySaleImpl.address);
@@ -1864,28 +1864,28 @@ describe("Sale", () => {
         })
 
         //reset test using the rinkeby
-        it("resetData", async () => {
-            await saleContract.connect(saleOwner).resetAllData()
-            let tx = Number(await saleContract.totalWhitelists())
-            expect(tx).to.be.equal(0)
-            let tx2 = Number(await saleContract.totalExSaleAmount())
-            expect(tx2).to.be.equal(0)
-            let tx3 = Number(await saleContract.totalExPurchasedAmount())
-            expect(tx3).to.be.equal(0)
-            let tx4 = Number(await saleContract.totalDepositAmount())
-            expect(tx4).to.be.equal(0)
-            let tx5 = Number(await saleContract.totalOpenSaleAmount())
-            expect(tx5).to.be.equal(0)
-            let tx6 = Number(await saleContract.totalOpenPurchasedAmount())
-            expect(tx6).to.be.equal(0)
-            let tx7 = Number(await saleContract.tiersAccount(1))
-            expect(tx7).to.be.equal(0)
-            let tx8 = Number(await saleContract.tiersAccount(4))
-            expect(tx8).to.be.equal(0)
-            let tx9 = Number(await saleContract.tiersExAccount(1))
-            expect(tx9).to.be.equal(0)
-            let tx10 = Number(await saleContract.tiersExAccount(4))
-            expect(tx10).to.be.equal(0)
-        })
+        // it("resetData", async () => {
+        //     await saleContract.connect(saleOwner).resetAllData()
+        //     let tx = Number(await saleContract.totalWhitelists())
+        //     expect(tx).to.be.equal(0)
+        //     let tx2 = Number(await saleContract.totalExSaleAmount())
+        //     expect(tx2).to.be.equal(0)
+        //     let tx3 = Number(await saleContract.totalExPurchasedAmount())
+        //     expect(tx3).to.be.equal(0)
+        //     let tx4 = Number(await saleContract.totalDepositAmount())
+        //     expect(tx4).to.be.equal(0)
+        //     let tx5 = Number(await saleContract.totalOpenSaleAmount())
+        //     expect(tx5).to.be.equal(0)
+        //     let tx6 = Number(await saleContract.totalOpenPurchasedAmount())
+        //     expect(tx6).to.be.equal(0)
+        //     let tx7 = Number(await saleContract.tiersAccount(1))
+        //     expect(tx7).to.be.equal(0)
+        //     let tx8 = Number(await saleContract.tiersAccount(4))
+        //     expect(tx8).to.be.equal(0)
+        //     let tx9 = Number(await saleContract.tiersExAccount(1))
+        //     expect(tx9).to.be.equal(0)
+        //     let tx10 = Number(await saleContract.tiersExAccount(4))
+        //     expect(tx10).to.be.equal(0)
+        // })
     })
 })
