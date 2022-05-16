@@ -330,7 +330,7 @@ contract PublicSale is
         public
         override
         onlyOwner
-        nonZero(_totalExpectSaleAmount.add(_totalExpectOpenSaleAmount))
+        nonZero(_totalExpectSaleAmount)
         beforeStartAddWhiteTime
     {
         totalExpectSaleAmount = _totalExpectSaleAmount;
