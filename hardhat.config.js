@@ -46,24 +46,28 @@ module.exports = {
       chainId: 31337,
     },
     rinkeby: {
-      chainId: 4,
-      url: "https://eth-rinkeby.alchemyapi.io/v2/5gNmfCGyn5VQ1IQ_V-NwBVbXG5jCbhLK",
-      accounts: [`${ACCOUNT0_PK}`, `${ACCOUNT1_PK}`],
-      gasMultiplier: 1.25,
-      gasPrice: 20000000000,
+      url: `https://rinkeby.infura.io/v3/${process.env.INFURA_API_KEY}`,
+      accounts: [ `${process.env.RINKEBY_PRIVATE_KEY}` ],
     },
+    // rinkeby: {
+    //   chainId: 4,
+    //   url: "https://eth-rinkeby.alchemyapi.io/v2/5gNmfCGyn5VQ1IQ_V-NwBVbXG5jCbhLK",
+    //   accounts: [`${ACCOUNT0_PK}`, `${ACCOUNT1_PK}`],
+    //   gasMultiplier: 1.25,
+    //   gasPrice: 20000000000,
+    // },
     // rinkeby: {
     //   url: `https://rinkeby.infura.io/v3/${process.env.InfuraKey}`,
     //   accounts: [`${process.env.ACCOUNT0_PK}`, `${process.env.ACCOUNT1_PK}`, `${process.env.ACCOUNT2_PK}`],
     //   gasMultiplier: 1.25 //,
     //   //gasPrice: 20000000000,
     // },
-    mainnet: {
-      url: `https://mainnet.infura.io/v3/${process.env.InfuraKey}`,
-      accounts: [`${TONSTARTER_DEPLOYER_PK}`, `${ACCOUNT1_PK}`],
-      gasMultiplier: 1.25,
-      gasPrice: 140000000000,
-    },
+    // mainnet: {
+    //   url: `https://mainnet.infura.io/v3/${process.env.InfuraKey}`,
+    //   accounts: [`${TONSTARTER_DEPLOYER_PK}`, `${ACCOUNT1_PK}`],
+    //   gasMultiplier: 1.25,
+    //   gasPrice: 140000000000,
+    // },
   },
   etherscan: {
     apiKey: process.env.ETHERSCAN_API_KEY
