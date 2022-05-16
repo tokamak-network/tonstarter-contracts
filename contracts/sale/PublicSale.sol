@@ -3,7 +3,6 @@
 pragma solidity ^0.7.6;
 pragma abicoder v2;
 
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import {
     ReentrancyGuard
@@ -14,6 +13,15 @@ import "../interfaces/IWTON.sol";
 import "../interfaces/ITON.sol";
 import "../common/ProxyAccessCommon.sol";
 import "./PublicSaleStorage.sol";
+
+interface IIERC20Burnable {
+    /**
+     * @dev Destroys `amount` tokens from the caller.
+     *
+     * See {ERC20-_burn}.
+     */
+    function burn(uint256 amount) external ;
+}
 
 contract PublicSale is
     PublicSaleStorage,
@@ -93,10 +101,16 @@ contract PublicSale is
         beforeStartAddWhiteTime
     {
         uint256 balance = saleToken.balanceOf(address(this));
-        require((_amount[0] + _amount[1]) <= balance, "amount err");
+        require((_amount[0] + _amount[1]) <= balance && 1 ether <= balance, "amount err");
         require(_time[6] < _claimTimes[0], "time err");
         require((deployTime + delayTime) < _time[0], "snapshot need later");
         require(_time[0] < _time[1], "whitelist before snapshot");
+        require(_claimTimes.length > 0 &&  _claimTimes.length == _claimPercents.length, "need the claimSet");
+        
+        if(snapshot != 0) {
+            require(isProxyAdmin(msg.sender), "only DAO can set");
+        }
+
         setTier(
             _Tier[0], _Tier[1], _Tier[2], _Tier[3]
         );
@@ -344,14 +358,68 @@ contract PublicSale is
         uint256 _changePercent
     )
         public
+        override
         onlyOwner
-        nonZero(_hardcapAmount)
         nonZero(_changePercent)
         beforeStartAddWhiteTime
     {
         require(_changePercent <= maxPer && _changePercent >= minPer,"PublicSale: need to set min,max");
         hardCap = _hardcapAmount;
         changeTOS = _changePercent;
+    }
+
+    function distributionByRounds(
+        uint256 startRound,
+        uint256 endRound
+    ) 
+        public
+        view
+        returns(uint256[] memory)
+    {   
+        if(startRound == 0) {
+            startRound = 1;
+        }
+        if(totalClaimCounts < startRound) {
+            startRound = totalClaimCounts;
+        }
+        if(endRound < startRound) {
+            endRound = startRound;
+        }
+        if(totalClaimCounts < endRound || endRound == 0) {
+            endRound = totalClaimCounts;
+        }
+
+        uint length = endRound.sub(startRound.sub(1));
+        uint256[] memory claims = new uint256[](length);
+
+        if(block.timestamp > endExclusiveTime && startRound != 0 ) {
+            for(uint256 i = 0; i < length; i++) {
+                uint256 amount = (((totalExSaleAmount.add(totalOpenSaleAmount())).mul(claimPercents[startRound.add(i).sub(1)])).div(100));
+                claims[i] = amount;
+            }
+        } 
+        else {
+            for(uint256 i = 0; i < length; i++) {
+                uint256 amount = (((totalExpectSaleAmount.add(totalExpectOpenSaleAmount)).mul(claimPercents[startRound.add(i).sub(1)])).div(100));
+                claims[i] = amount;
+            }
+        }
+        return claims;
+    }
+
+    function distributionByRound(
+        uint256 _round
+    )
+        public
+        view
+        returns(uint256)
+    {
+        if(block.timestamp > endExclusiveTime && _round != 0) {
+            return (((totalExSaleAmount.add(totalOpenSaleAmount())).mul(claimPercents[(_round-1)])).div(100));
+
+        } else {
+            return 0;
+        }
     }
 
     /// @inheritdoc IPublicSale
@@ -833,10 +901,13 @@ contract PublicSale is
             });
         ISwapRouter(uniswapRouter).exactInputSingle(params);
 
+        uint256 burnAmount = totalExpectSaleAmount.add(totalExpectOpenSaleAmount).sub(totalOpenSaleAmount()).sub(totalExSaleAmount);
+
         uint256 tosAmount = tos.balanceOf(address(this));
 
         tos.safeTransfer(liquidityVaultAddress, tosAmount);
         IERC20(getToken).safeTransfer(getTokenOwner, getAmount);
+        IIERC20Burnable(address(saleToken)).burn(burnAmount);
         emit DepositWithdrawal(msg.sender, getAmount, liquidityTON);
     }
 }

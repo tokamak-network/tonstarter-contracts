@@ -109,6 +109,14 @@ interface IPublicSale {
     function setTokenPrice(uint256 _saleTokenPrice, uint256 _payTokenPrice)
         external;
 
+    /// @dev set information related to token price
+    /// @param _hardcapAmount the sale token price
+    /// @param _changePercent  the funding(pay) token price
+    function setHardcap (
+        uint256 _hardcapAmount,
+        uint256 _changePercent
+    ) external;
+
     /// @dev view totalExpectOpenSaleAmount
     function totalExpectOpenSaleAmountView()
         external
