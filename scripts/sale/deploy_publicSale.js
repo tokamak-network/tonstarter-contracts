@@ -99,16 +99,16 @@ async function deployLogicTest() {
 //         process.exit(1);
 //     });
 
-// deployLogic()
-//     .then(() => process.exit(0))
-//     .catch(error => {
-//         console.error(error);
-//         process.exit(1);
-//     });
-
-deployLogicTest()
+deployLogic()
     .then(() => process.exit(0))
     .catch(error => {
         console.error(error);
         process.exit(1);
     });
+
+// deployLogicTest()
+//     .then(() => process.exit(0))
+//     .catch(error => {
+//         console.error(error);
+//         process.exit(1);
+//     });

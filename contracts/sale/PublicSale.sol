@@ -859,14 +859,10 @@ contract PublicSale is
     }
 
     function hardcapCalcul() public view returns (uint256){
-        uint256 getAmount = totalExPurchasedAmount.add(totalOpenPurchasedAmount());
+        uint256 totalPurchaseTONamount = totalExPurchasedAmount.add(totalOpenPurchasedAmount());
         uint256 calculAmount;
-        if (getAmount >= hardCap) {
-            if (totalRound2Users == totalRound2UsersClaim){
-                return calculAmount = IERC20(getToken).balanceOf(address(this)).mul(changeTOS).div(100);
-            } else {
-                return calculAmount = totalExPurchasedAmount.add(totalOpenPurchasedAmount()).sub(5 ether).mul(changeTOS).div(100);
-            }
+        if (totalPurchaseTONamount >= hardCap) {
+            return calculAmount = totalPurchaseTONamount.mul(changeTOS).div(100);
         } else {
             return 0;
         }
@@ -878,10 +874,11 @@ contract PublicSale is
         uint256 liquidityTON = hardcapCalcul();
         uint256 getAmount;
         require(liquidityTON > 0, "PublicSale: don't pass the hardCap");
+        require(adminWithdraw != true, "PublicSale: already get the TON");
         if (totalRound2Users == totalRound2UsersClaim){
             getAmount = IERC20(getToken).balanceOf(address(this)).sub(liquidityTON);
         } else {
-            getAmount = totalExPurchasedAmount.add(totalOpenPurchasedAmount()).sub(liquidityTON).sub(10 ether);
+            getAmount = totalExPurchasedAmount.add(totalOpenPurchasedAmount()).sub(liquidityTON).sub(2 ether);
         }
         require(getAmount <= IERC20(getToken).balanceOf(address(this)), "PublicSale: no token to receive");
 
@@ -905,6 +902,7 @@ contract PublicSale is
 
         uint256 tosAmount = tos.balanceOf(address(this));
 
+        adminWithdraw = true;
         tos.safeTransfer(liquidityVaultAddress, tosAmount);
         IERC20(getToken).safeTransfer(getTokenOwner, getAmount);
         IIERC20Burnable(address(saleToken)).burn(burnAmount);

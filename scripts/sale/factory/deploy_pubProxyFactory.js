@@ -18,7 +18,7 @@ async function main() {
     // const publicSaleLogic = "0x3695e5f76Eb010f891a4233661CdC4CB68D9C17c"
     // const publicSaleLogic = "0x96f664D36301917991BB39085C36245661D687f7"
     // const publicSaleLogic = "0x1De31ADca817e9FA7da3D5ae58F262F839E199eC"
-    const publicSaleLogic = "0x1De31ADca817e9FA7da3D5ae58F262F839E199eC"
+    const publicSaleLogic = "0xB4c7C152f906B284c20D6b02c96E97C7ad89eF60"
 
     const tonAddress = "0x44d4F5d89E9296337b8c48a332B3b2fb2C190CD0"
     const wtonAddress = "0x709bef48982Bbfd6F2D4Be24660832665F53406C"
