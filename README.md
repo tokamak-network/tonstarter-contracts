@@ -90,9 +90,9 @@
 
 * "LockTOSProxy": "0x69b4A202Fa4039B42ab23ADB725aA7b1e9EEBD79"
 
-* "LockTOSDividend": "0xd8a63c63400cce9515d0c03adbbaf8c8f94e3d71"
+* ~~"LockTOSDividend": "0xd8a63c63400cce9515d0c03adbbaf8c8f94e3d71"~~
 
-* "LockTOSDividendProxy": "0x0f1174a204082c5e921015d6c785fe2b4aef8b17"
+* ~~"LockTOSDividendProxy": "0x0f1174a204082c5e921015d6c785fe2b4aef8b17"~~
 
 
 ## Deployed LockTOSDividendProxy related to DAO
