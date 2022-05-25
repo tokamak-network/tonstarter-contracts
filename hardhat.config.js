@@ -16,7 +16,7 @@ require("./tasks/uniswap-v3-mint-position-task");
 require("./tasks/uniswap-v3-swap-task");
 require("./tasks/view-tasks");
 require("./tasks/abi-retriever");
-
+require("./tasks/stos-holders-info");
 // require("./tasks-rewardprogram/testcase");
 
 const {
@@ -60,7 +60,7 @@ module.exports = {
     },
     mainnet: {
       url: `https://mainnet.infura.io/v3/${process.env.InfuraKey}`,
-      accounts: [`${TONSTARTER_DEPLOYER_PK}`, `${ACCOUNT1_PK}`],
+      accounts: [`${process.env.ACCOUNT0_PK}` ],
       gasMultiplier: 1.25,
       gasPrice: 50000000000
     },

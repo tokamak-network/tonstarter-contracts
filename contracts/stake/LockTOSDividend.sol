@@ -51,7 +51,7 @@ contract LockTOSDividend is
         uint256 timestamp = Math.min(_timestamp, block.timestamp - epochUnit);
         _claimUpTo(_token, timestamp);
     }
-    
+
     function redistribute(address _token, uint256 _weeklyEpoch)
         external
         // override
@@ -160,7 +160,7 @@ contract LockTOSDividend is
         uint256 timestamp = genesis.add(weeklyEpoch.mul(epochUnit)) + epochUnit;
         return timestamp;
     }
-    
+
     /// @inheritdoc ILockTOSDividend
     function ifDistributionPossible() public view override returns (bool) {
         uint256 timestamp = getCurrentWeeklyEpochTimestamp();
@@ -273,7 +273,7 @@ contract LockTOSDividend is
         uint256 accumulated = 0;
         while (epochIterator <= epochLimit) {
             accumulated = accumulated.add(
-                _calculateClaimPerEpoch( 
+                _calculateClaimPerEpoch(
                     _lockId,
                     epochIterator,
                     _distr.tokensPerWeek[epochIterator]
