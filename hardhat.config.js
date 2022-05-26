@@ -62,6 +62,17 @@ module.exports = {
       gasMultiplier: 1.25,
       gasPrice: 50000000000,
     },
+    //harvey setting
+    // rinkeby: {
+    //   url: `https://rinkeby.infura.io/v3/${process.env.INFURA_API_KEY}`,
+    //   accounts: [ `${process.env.RINKEBY_PRIVATE_KEY}` ],
+    // },
+    // mainnet: {
+    //   url: `https://mainnet.infura.io/v3/${process.env.INFURA_API_KEY}`,
+    //   accounts: [ `${process.env.MAINNET_PRIVATE_KEY}` ],
+    //   gasMultiplier: 1.25,
+    //   gasPrice: 20000000000
+    // },
   },
   etherscan: {
     apiKey: process.env.ETHERSCAN_API_KEY,
