@@ -185,7 +185,7 @@ contract LockTOSv2Logic0 is
         lockedBalances[user][_lockId] = lockedNew;
         allLocks[_lockId] = lockedNew;
 
-        IERC20(tos).transfer(user, amount);
+        // IERC20(tos).transfer(user, amount);
         emit LockWithdrawn(user, _lockId, amount);
     }
 
@@ -528,10 +528,10 @@ contract LockTOSv2Logic0 is
         lockPointHistory[_lockId].push(userPoint);
 
         // Transfer TOS
-        require(
-            IERC20(tos).transferFrom(_addr, address(this), _value),
-            "LockTOS: fail transferFrom"
-        );
+        // require(
+        //     IERC20(tos).transferFrom(_addr, address(this), _value),
+        //     "LockTOS: fail transferFrom"
+        // );
     }
 
 
