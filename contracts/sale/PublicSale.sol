@@ -157,6 +157,10 @@ contract PublicSale is
         nonZero(_snapshot)
         beforeStartAddWhiteTime
     {
+        if(snapshot != 0) {
+            require(isProxyAdmin(msg.sender), "only DAO can set");
+        }
+
         snapshot = _snapshot;
     }
 
@@ -176,6 +180,10 @@ contract PublicSale is
         nonZero(_endExclusiveTime)
         beforeStartAddWhiteTime
     {
+        if(startAddWhiteTime != 0) {
+            require(isProxyAdmin(msg.sender), "only DAO can set");
+        }
+
         require(
             (_startAddWhiteTime < _endAddWhiteTime) &&
             (_endAddWhiteTime < _startExclusiveTime) &&
@@ -200,10 +208,15 @@ contract PublicSale is
         nonZero(_endDepositTime)
         beforeStartAddWhiteTime
     {
+        if(startDepositTime != 0) {
+            require(isProxyAdmin(msg.sender), "only DAO can set");
+        }
+
         require(
             (_startDepositTime < _endDepositTime),
             "PublicSale : Round2time err"
         );
+
         startDepositTime = _startDepositTime;
         endDepositTime = _endDepositTime;
     }
@@ -218,6 +231,10 @@ contract PublicSale is
         onlyOwner
         beforeStartAddWhiteTime
     {
+        if(totalClaimCounts != 0) {
+            require(isProxyAdmin(msg.sender), "only DAO can set");
+        }
+        
         totalClaimCounts = _claimCounts;
         uint256 i = 0;
         uint256 y = 0;
@@ -275,6 +292,9 @@ contract PublicSale is
         nonZero(_tier4)
         beforeStartAddWhiteTime
     {
+        if(tiers[1] != 0) {
+            require(isProxyAdmin(msg.sender), "only DAO can set");
+        }
         tiers[1] = _tier1;
         tiers[2] = _tier2;
         tiers[3] = _tier3;
@@ -297,6 +317,9 @@ contract PublicSale is
         nonZero(_tier4)
         beforeStartAddWhiteTime
     {
+        if(tiersPercents[1] != 0) {
+            require(isProxyAdmin(msg.sender), "only DAO can set");
+        }
         require(
             _tier1.add(_tier2).add(_tier3).add(_tier4) == 10000,
             "PublicSale: Sum should be 10000"
@@ -333,6 +356,9 @@ contract PublicSale is
         nonZero(_totalExpectSaleAmount)
         beforeStartAddWhiteTime
     {
+        if(totalExpectSaleAmount != 0) {
+            require(isProxyAdmin(msg.sender), "only DAO can set");
+        }
         totalExpectSaleAmount = _totalExpectSaleAmount;
         totalExpectOpenSaleAmount = _totalExpectOpenSaleAmount;
     }
@@ -349,6 +375,9 @@ contract PublicSale is
         nonZero(_payTokenPrice)
         beforeStartAddWhiteTime
     {
+        if(saleTokenPrice != 0) {
+            require(isProxyAdmin(msg.sender), "only DAO can set");
+        }
         saleTokenPrice = _saleTokenPrice;
         payTokenPrice = _payTokenPrice;
     }
@@ -363,6 +392,9 @@ contract PublicSale is
         nonZero(_changePercent)
         beforeStartAddWhiteTime
     {
+        if(changeTOS != 0) {
+            require(isProxyAdmin(msg.sender), "only DAO can set");
+        }
         require(_changePercent <= maxPer && _changePercent >= minPer,"PublicSale: need to set min,max");
         hardCap = _hardcapAmount;
         changeTOS = _changePercent;

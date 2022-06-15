@@ -1471,12 +1471,13 @@ describe("Sale", () => {
 
         it("deposit withdraw caller is anybody", async () => {
             let beforeTonAmount = Number(await ton.balanceOf(saleContract.address));
-            // console.log(beforeTonAmount);
+            console.log("beforeTonAmount", beforeTonAmount);
             let beforeTosAmount = Number(await tos.balanceOf(vaultAddress));
             expect(beforeTosAmount).to.be.equal(0)
+            
 
             let beforeTokenAmount = Number(await saleToken.balanceOf(saleContract.address))
-            console.log("beforeTokenAmount :", beforeTokenAmount)
+            console.log("beforeSaleTokenAmount :", beforeTokenAmount)
             expect(beforeTokenAmount).to.be.gt(0)
 
             let talExSaleAmount = Number(await saleContract.totalExpectSaleAmount());
@@ -1489,12 +1490,15 @@ describe("Sale", () => {
             expect(beforeTokenAmount).to.be.equal(remainAmount)
 
 
+            let allowanceBefore = Number(await ton.allowance(saleContract.address,wton.address));
+            console.log("salecontract to wton allowanceBefore :", allowanceBefore)
+            expect(allowanceBefore).to.be.gt(0)
 
-            // let allowanceBefore = Number(await ton.allowance(saleContract.address,wton.address));
             // expect(allowanceBefore).to.be.equal(0)
             // await saleContract.connect(saleOwner).approveToWTON();
 
             // let allowanceAfter = Number(await ton.allowance(saleContract.address,wton.address));
+            // expect(allowanceAfter).to.be.gt(0)
             // expect(allowanceAfter).to.be.gt(0)
 
             // await saleContract.connect(saleOwner).approveToUniswap();
@@ -1503,13 +1507,21 @@ describe("Sale", () => {
             let afterTonAmount = Number(await ton.balanceOf(saleContract.address));
             console.log("afterTonAmount :", afterTonAmount);
             expect(afterTonAmount).to.be.equal(0)
+            let afterTosAmountPublic = Number(await tos.balanceOf(saleContract.address));
+            console.log("afterTosAmountPublic : ", afterTosAmountPublic);
+            expect(afterTosAmountPublic).to.be.equal(0)
             let afterTosAmount = Number(await tos.balanceOf(vaultAddress));
             expect(afterTosAmount).to.be.gt(0)
-            console.log(afterTosAmount);
+            console.log("liquidity Vault have afterTosAmount : ", afterTosAmount);
 
             let afterTokenAmount = Number(await saleToken.balanceOf(saleContract.address))
             console.log("afterTokenAmount: ",afterTokenAmount)
             expect(afterTokenAmount).to.be.equal(0)
+        })
+
+        it("saleToken test", async () => {
+            let tx = await saleContract.saleToken();
+            console.log("saleToken :", tx);
         })
 
     })

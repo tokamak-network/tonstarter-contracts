@@ -46,33 +46,33 @@ module.exports = {
     hardhat: {
       chainId: 31337,
     },
-    rinkeby: {
-      url: `https://rinkeby.infura.io/v3/${process.env.InfuraKey}`,
-      accounts: [
-        `${process.env.ACCOUNT0_PK}`,
-        `${process.env.ACCOUNT1_PK}`,
-        `${process.env.ACCOUNT2_PK}`,
-      ],
-      gasMultiplier: 1.25, //,
-      // gasPrice: 20000000000,
-    },
-    mainnet: {
-      url: `https://mainnet.infura.io/v3/${process.env.InfuraKey}`,
-      accounts: [`${TONSTARTER_DEPLOYER_PK}`, `${ACCOUNT1_PK}`],
-      gasMultiplier: 1.25,
-      gasPrice: 50000000000,
-    },
-    //harvey setting
     // rinkeby: {
-    //   url: `https://rinkeby.infura.io/v3/${process.env.INFURA_API_KEY}`,
-    //   accounts: [ `${process.env.RINKEBY_PRIVATE_KEY}` ],
+    //   url: `https://rinkeby.infura.io/v3/${process.env.InfuraKey}`,
+    //   accounts: [
+    //     `${process.env.ACCOUNT0_PK}`,
+    //     `${process.env.ACCOUNT1_PK}`,
+    //     `${process.env.ACCOUNT2_PK}`,
+    //   ],
+    //   gasMultiplier: 1.25, //,
+    //   // gasPrice: 20000000000,
     // },
     // mainnet: {
-    //   url: `https://mainnet.infura.io/v3/${process.env.INFURA_API_KEY}`,
-    //   accounts: [ `${process.env.MAINNET_PRIVATE_KEY}` ],
+    //   url: `https://mainnet.infura.io/v3/${process.env.InfuraKey}`,
+    //   accounts: [`${TONSTARTER_DEPLOYER_PK}`, `${ACCOUNT1_PK}`],
     //   gasMultiplier: 1.25,
-    //   gasPrice: 20000000000
+    //   gasPrice: 50000000000,
     // },
+    //harvey setting
+    rinkeby: {
+      url: `https://rinkeby.infura.io/v3/${process.env.INFURA_API_KEY}`,
+      accounts: [ `${process.env.RINKEBY_PRIVATE_KEY}` ],
+    },
+    mainnet: {
+      url: `https://mainnet.infura.io/v3/${process.env.INFURA_API_KEY}`,
+      accounts: [ `${process.env.MAINNET_PRIVATE_KEY}` ],
+      gasMultiplier: 1.25,
+      gasPrice: 48000000000
+    },
   },
   etherscan: {
     apiKey: process.env.ETHERSCAN_API_KEY,
@@ -95,8 +95,11 @@ module.exports = {
   gasReporter: {
     enabled: !!process.env.REPORT_GAS,
     currency: "KRW",
-    gasPrice: 21,
+    gasPrice: 30,
+    // onlyCalledMethods: false,
+    // showMethodSig: true,
   },
+  blockGasLimit: 300000000,
   mocha: {
     timeout: 10000000,
   },
