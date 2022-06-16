@@ -4,7 +4,7 @@ require("@nomiclabs/hardhat-etherscan");
 require("@nomiclabs/hardhat-waffle");
 require("@nomiclabs/hardhat-web3");
 require("hardhat-gas-reporter");
-require('dotenv/config');
+require("dotenv/config");
 
 require("dotenv").config();
 require("./tasks/get-lock-tos-info-task");
@@ -54,19 +54,23 @@ module.exports = {
     // },
     rinkeby: {
       url: `https://rinkeby.infura.io/v3/${process.env.InfuraKey}`,
-      accounts: [`${process.env.ACCOUNT0_PK}`, `${process.env.ACCOUNT1_PK}`, `${process.env.ACCOUNT2_PK}`],
-      gasMultiplier: 1.25 //,
-      //gasPrice: 20000000000,
+      accounts: [
+        `${process.env.ACCOUNT0_PK}`,
+        `${process.env.ACCOUNT1_PK}`,
+        `${process.env.ACCOUNT2_PK}`,
+      ],
+      gasMultiplier: 1.25, //,
+      // gasPrice: 20000000000,
     },
     mainnet: {
       url: `https://mainnet.infura.io/v3/${process.env.InfuraKey}`,
       accounts: [`${TONSTARTER_DEPLOYER_PK}`, `${ACCOUNT1_PK}`],
       gasMultiplier: 1.25,
-      gasPrice: 50000000000
+      gasPrice: 50000000000,
     },
   },
   etherscan: {
-    apiKey: process.env.ETHERSCAN_API_KEY
+    apiKey: process.env.ETHERSCAN_API_KEY,
   },
   solidity: {
     version: "0.7.6",
@@ -84,9 +88,9 @@ module.exports = {
     artifacts: "./artifacts",
   },
   gasReporter: {
-    enabled: (process.env.REPORT_GAS) ? true : false,
-    currency: 'KRW',
-    gasPrice: 21
+    enabled: !!process.env.REPORT_GAS,
+    currency: "KRW",
+    gasPrice: 21,
   },
   mocha: {
     timeout: 10000000,
