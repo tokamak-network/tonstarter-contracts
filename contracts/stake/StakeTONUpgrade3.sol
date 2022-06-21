@@ -178,20 +178,12 @@ contract StakeTONUpgrade3 is StakeTONStorage, AccessibleCommon {
             );
 
         } else if (paytoken == address(0)) {
-            require(
-                staked.releasedAmount <= amount,
-                "StakeTONUpgrade3: Amount wrong"
-            );
             staked.releasedAmount = amount;
             address payable self = address(uint160(address(this)));
             require(self.balance >= amount, "StakeTONUpgrade3: insuffient ETH");
             (bool success, ) = msg.sender.call{value: amount}("");
             require(success, "StakeTONUpgrade3: withdraw failed.");
         } else {
-            require(
-                staked.releasedAmount <= amount,
-                "StakeTONUpgrade3: Amount wrong"
-            );
             staked.releasedAmount = amount;
             require(
                 ITOS3(paytoken).transfer(msg.sender, amount),

@@ -90,10 +90,6 @@ contract StakeSimple is Stake1Storage, AccessibleCommon, IStakeSimple {
 
         LibTokenStake1.StakedAmount storage staked = userStaked[msg.sender];
         require(!staked.released, "StakeSimple: Already withdraw");
-        require(
-            staked.releasedAmount <= staked.amount,
-            "StakeSimple: Amount wrong"
-        );
 
         staked.released = true;
         staked.releasedBlock = block.number;

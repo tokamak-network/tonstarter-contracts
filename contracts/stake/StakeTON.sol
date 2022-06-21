@@ -121,14 +121,12 @@ contract StakeTON is TokamakStaker, IStakeTON {
 
             tonWithdraw(ton, wton, tonAmount, wtonAmount, tosAmount);
         } else if (paytoken == address(0)) {
-            require(staked.releasedAmount <= amount, "StakeTON: Amount wrong");
             staked.releasedAmount = amount;
             address payable self = address(uint160(address(this)));
             require(self.balance >= amount, "StakeTON: insuffient ETH");
             (bool success, ) = msg.sender.call{value: amount}("");
             require(success, "StakeTON: withdraw failed.");
         } else {
-            require(staked.releasedAmount <= amount, "StakeTON: Amount wrong");
             staked.releasedAmount = amount;
             require(
                 IIERC20(paytoken).transfer(msg.sender, amount),
