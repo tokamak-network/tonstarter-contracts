@@ -6,8 +6,6 @@ import {PublicSaleProxy} from "../sale/PublicSaleProxy.sol";
 import "../common/AccessibleCommon.sol";
 import "../interfaces/IVaultFactory.sol";
 import "../interfaces/IEventLog.sol";
-import "hardhat/console.sol";
-
 
 
 /// @title A factory that creates a PublicSaleProxy

@@ -3,6 +3,8 @@
 pragma solidity >=0.6.0 <0.8.0;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/ERC20Burnable.sol";
+
 
 /**
  * @title ERC20Mock
@@ -10,9 +12,9 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
  * Note they can later distribute these tokens as they wish using `transfer` and other
  * `ERC20` functions.
  */
-contract ERC20Mock is ERC20 {
-    uint256 public constant INITIAL_SUPPLY = 100000000 * (10**18);
 
+contract ERC20Mock is ERC20, ERC20Burnable {
+    uint256 public constant INITIAL_SUPPLY = 1000000000 * (10**18);
     /**
      * @dev Constructor that gives msg.sender all of existing tokens.
      */
