@@ -204,10 +204,20 @@ contract PrivateSaleProxy is
     }
 
     /// @dev Initialize
+    /// @param _wton wtonAddress
+    /// @param _saleToken saleTokenAddress
+    /// @param _getToken tonAddress(usually)
+    /// @param _getTokenOwner TON get Address
     function initialize(
-        address _wton
+        address _wton,
+        address _saleToken,
+        address _getToken,
+        address _getTokenOwner
     ) external  onlyOwner {
         wton = _wton;
+        saleToken = IERC20(_saleToken);
+        getToken = IERC20(_getToken);
+        getTokenOwner = _getTokenOwner;
     }
 
     function onApprove(

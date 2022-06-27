@@ -16,7 +16,13 @@ import { OnApprove } from "./OnApprove.sol";
 import "./PrivateSaleStorage.sol";
 
 
-contract PrivateSale is PrivateSaleStorage, AccessibleCommon, ReentrancyGuard, OnApprove, IPrivateSale {
+contract PrivateSale is 
+    PrivateSaleStorage, 
+    AccessibleCommon, 
+    ReentrancyGuard, 
+    OnApprove, 
+    IPrivateSale 
+{
     using SafeERC20 for IERC20;
     using SafeMath for uint256;
 
@@ -24,9 +30,7 @@ contract PrivateSale is PrivateSaleStorage, AccessibleCommon, ReentrancyGuard, O
         address user,
         uint256 inputAmount,
         uint256 totalOutPutamount,
-        uint256 inputTime,
-        uint256 monthlyReward,
-        uint256 firstReward
+        uint256 inputTime
     );
 
     event FirstClaiminfo(
@@ -106,38 +110,46 @@ contract PrivateSale is PrivateSaleStorage, AccessibleCommon, ReentrancyGuard, O
         getTokenOwner = _address;
     }
 
-    function settingAll(
-        uint256[4] calldata _time,
-        uint256 _saleTokenPrice,
-        uint256 _getTokenPrice
-    ) external override onlyOwner {
-        settingPrivateTime(_time[0],_time[1],_time[2],_time[3]);
-        setTokenPrice(_saleTokenPrice,_getTokenPrice);
+    /**
+     * @notice AllsettingFunction
+     * @param  _saleTime _saleTime[0] = SalestartTime, _saleTime[1] = SaleEndTime
+     * @param  _tokenPrice _tokenPrice[0] = saleTokenPrice, _tokenPrice[1] = TONTokenPrice
+     * @param  _claimCounts claimTotalCounts
+     * @param  _claimTimes _claimTimeArray
+     * @param  _claimPercents claimPercents
+     */
+    function setAllsetting(
+        uint256[2] calldata _saleTime,
+        uint256[2] calldata _tokenPrice,
+        uint16 _claimCounts,
+        uint256[] calldata _claimTimes,
+        uint256[] calldata _claimPercents
+    ) external onlyOwner {
+        settingSaleTime(
+            _saleTime[0],
+            _saleTime[1]
+        );
+        setTokenPrice(
+            _tokenPrice[0],
+            _tokenPrice[1]
+        );
+        setClaimArray(
+            _claimCounts,
+            _claimTimes,
+            _claimPercents
+        );
     }
 
-    function settingPrivateTime(
+    function settingSaleTime(
         uint256 _startTime,
-        uint256 _endTime,
-        uint256 _firstTime,
-        uint256 _claimTime
-    ) public override onlyOwner {
-        settingSaleTime(_startTime,_endTime);
-        settingFirstClaimTime(_firstTime);
-        settingClaimTime(_claimTime);
-    }
-
-    function settingSaleTime(uint256 _startTime,uint256 _endTime) public override onlyOwner {
+        uint256 _endTime
+    )
+        public 
+        override 
+        onlyOwner 
+    {
         saleStartTime = _startTime;
         saleEndTime = _endTime;
-    }
-
-    function settingFirstClaimTime(uint256 _claimTime) public override onlyOwner {
-        firstClaimTime = _claimTime;
-    }
-
-    function settingClaimTime(uint256 _time) public override onlyOwner {
-        claimStartTime = _time;
-        claimEndTime = _time.add(360 days);
     }
 
     function setTokenPrice(uint256 _saleTokenPrice, uint256 _getTokenPrice)
@@ -148,17 +160,37 @@ contract PrivateSale is PrivateSaleStorage, AccessibleCommon, ReentrancyGuard, O
         getTokenPrice = _getTokenPrice;
     }
 
+    function setClaimArray(
+        uint16 _claimCounts,
+        uint256[] calldata _claimTimes,
+        uint256[] calldata _claimPercents
+    ) public onlyOwner {
+        totalClaimCounts = _claimCounts;
+        uint256 i = 0;
+        uint256 y = 0;
+        for (i = 0; i < _claimCounts; i++) {
+            claimTimes.push(_claimTimes[i]);
+            if (i != 0){
+                require(claimTimes[i-1] < claimTimes[i], "PublicSale: claimtime err");
+            }
+            claimPercents.push(_claimPercents[i]);
+            y = y + _claimPercents[i];
+        }
+
+        require(y == 100, "claimPercents err");
+    }
+
     function claimAmount(
         address _account
     ) external override view returns (uint256) {
         UserInfoAmount memory user = usersAmount[_account];
 
         require(user.inputamount > 0, "user isn't buy");
-        require(block.timestamp > claimStartTime, "need to time for claim");
+        require(block.timestamp > claimTimes[0], "need to time for claim");
         
         UserInfoClaim memory userclaim = usersClaim[msg.sender];
 
-        uint difftime = block.timestamp.sub(claimStartTime);
+        uint difftime = block.timestamp.sub(claimTimes[0]);
         uint monthTime = 30 days;
 
         if (difftime < monthTime) {
@@ -201,6 +233,29 @@ contract PrivateSale is PrivateSaleStorage, AccessibleCommon, ReentrancyGuard, O
                 return reward;
             }
         }
+    }
+
+    function currentRound() public view returns (uint256 round) {
+        if (block.timestamp > claimTimes[totalClaimCounts-1]) {
+            return totalClaimCounts;
+        }
+        for (uint256 i = 0; i < totalClaimCounts; i++) {
+            if (block.timestamp < claimTimes[i]) {
+                return i;
+            }
+        }
+    }
+
+    function calculClaimAmount2(address _account, uint256 _round)
+        public
+        view
+        returns (uint256 _amount, uint256 _claimAmount, uint256 _totalClaim)
+    {
+        if (block.timestamp < claimTimes[0]) return (0,0,0);
+
+        UserInfoAmount storage user = usersAmount[_account];
+        
+        
     }
 
     /**
@@ -302,6 +357,7 @@ contract PrivateSale is PrivateSaleStorage, AccessibleCommon, ReentrancyGuard, O
 
         uint256 tonAllowance = getToken.allowance(_sender, address(this));
         uint256 tonBalance = getToken.balanceOf(_sender);
+
         if(tonAllowance > tonBalance) {
             tonAllowance = tonBalance;  //tonAllowance가 tonBlance보다 더 클때 문제가 된다.
         }
@@ -327,9 +383,7 @@ contract PrivateSale is PrivateSaleStorage, AccessibleCommon, ReentrancyGuard, O
 
         user.inputamount = user.inputamount.add(_amount);
         user.totaloutputamount = user.totaloutputamount.add(tokenSaleAmount);
-        user.firstReward = user.totaloutputamount.mul(5).div(100);
-        user.monthlyReward = (user.totaloutputamount.sub(user.firstReward)).div(12);
-        user.inputTime = block.timestamp;
+        user.getAmount = user.getAmount;
 
         totalGetAmount = totalGetAmount.add(_amount);
         totalSaleAmount = totalSaleAmount.add(tokenSaleAmount);
@@ -338,50 +392,26 @@ contract PrivateSale is PrivateSaleStorage, AccessibleCommon, ReentrancyGuard, O
             msg.sender, 
             user.inputamount, 
             user.totaloutputamount,
-            user.inputTime,
-            user.monthlyReward,
-            user.firstReward
+            block.timestamp
         );
     }
 
     function claim() external override {
-        require(firstClaimTime != 0 && saleEndTime != 0, "need to setting Time");
-        require(block.timestamp > saleEndTime && block.timestamp > firstClaimTime, "need the fisrClaimtime");
-        if(block.timestamp < claimStartTime) {
-            firstClaim();
-        } else if(claimStartTime < block.timestamp){
-            _claim();
-        }
-    }
-
-
-    function firstClaim() public {
-        UserInfoAmount storage user = usersAmount[msg.sender];
-        UserInfoClaim storage userclaim = usersClaim[msg.sender];
-
-        require(user.inputamount > 0, "need to buy the token");
-        require(userclaim.firstClaimAmount == 0, "already getFirstreward");
-
-        userclaim.firstClaimAmount = userclaim.firstClaimAmount.add(user.firstReward);
-        userclaim.firstClaimTime = block.timestamp;
-
-        saleToken.safeTransfer(msg.sender, user.firstReward);
-
-        emit FirstClaiminfo(msg.sender, userclaim.firstClaimAmount, userclaim.firstClaimTime);
+        require(saleEndTime != 0, "need to setting Time");
+        require(block.timestamp > saleEndTime, "need the endSale");
+        require(block.timestamp > claimTimes[0], "need the claimTime");
+        _claim();
+        
     }
 
     function _claim() public {
-        require(block.timestamp >= claimStartTime, "need the time for claim");
+        require(block.timestamp >= claimTimes[0], "need the time for claim");
 
         UserInfoAmount storage user = usersAmount[msg.sender];
         UserInfoClaim storage userclaim = usersClaim[msg.sender];
 
         require(user.inputamount > 0, "need to buy the token");
         require(!(user.totaloutputamount == (userclaim.claimAmount.add(userclaim.firstClaimAmount))), "already getAllreward");
-
-        if(userclaim.firstClaimAmount == 0) {
-            firstClaim();
-        }
 
         uint256 giveTokenAmount = calculClaimAmount(block.timestamp, userclaim.claimAmount, user.monthlyReward, user.totaloutputamount, userclaim.firstClaimAmount);
     

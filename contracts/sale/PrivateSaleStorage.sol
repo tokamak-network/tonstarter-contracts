@@ -9,9 +9,7 @@ contract PrivateSaleStorage {
     struct UserInfoAmount {
         uint256 inputamount;
         uint256 totaloutputamount;
-        uint256 inputTime;
-        uint256 monthlyReward;
-        uint256 firstReward;
+        uint256 getAmount;
     }
 
     struct UserInfoClaim {
@@ -33,10 +31,10 @@ contract PrivateSaleStorage {
     uint256 public saleStartTime;           //sale시작 시간
     uint256 public saleEndTime;             //sale끝 시간
 
-    uint256 public firstClaimTime;           //초기 claim 시간
+    // uint256 public firstClaimTime;           //초기 claim 시간
 
-    uint256 public claimStartTime;  //6개월 뒤 claim시작 시간
-    uint256 public claimEndTime;    //claim시작시간 + 1년
+    // uint256 public claimStartTime;  //6개월 뒤 claim시작 시간
+    // uint256 public claimEndTime;    //claim시작시간 + 1년
 
     uint256 public saleTokenPrice;  //판매토큰가격
     uint256 public getTokenPrice;   //받는토큰가격(TON)
@@ -45,6 +43,12 @@ contract PrivateSaleStorage {
     IERC20 public getToken;         //TON 주소
 
     address public wton;             //WTON 주소
+
+    uint256 public totalAllocatedAmount;
+    uint16 public totalClaimCounts;
+
+    uint256[] public claimTimes;
+    uint256[] public claimPercents; 
 
     mapping (address => UserInfoAmount) public usersAmount;
     mapping (address => UserInfoClaim) public usersClaim;
