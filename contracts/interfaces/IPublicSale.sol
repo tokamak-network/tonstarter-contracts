@@ -109,7 +109,7 @@ interface IPublicSale {
     function setTokenPrice(uint256 _saleTokenPrice, uint256 _payTokenPrice)
         external;
 
-    /// @dev set information related to token price
+    /// @dev set the minimum getTONAmount and TON -> TOS change Percents
     /// @param _hardcapAmount the sale token price
     /// @param _changePercent  the funding(pay) token price
     function setHardcap (

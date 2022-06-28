@@ -4,7 +4,7 @@ pragma solidity ^0.7.6;
 import "../interfaces/IPrivateSaleProxy.sol";
 import {Address} from "@openzeppelin/contracts/utils/Address.sol";
 
-import { OnApprove } from "./OnApprove.sol";
+import { OnApprove2 } from "./OnApprove2.sol";
 import "../common/AccessibleCommon.sol";
 import "./PrivateSaleStorage.sol";
 import "../interfaces/IWTON.sol";
@@ -13,10 +13,11 @@ import "../interfaces/IPrivateSale.sol";
 contract PrivateSaleProxy is 
     PrivateSaleStorage, 
     AccessibleCommon,
-    OnApprove,
+    OnApprove2,
     IPrivateSaleProxy
 {
     event Upgraded(address indexed implementation, uint256 _index);
+    // mapping(bytes4 => bool) internal _supportedInterfaces;
 
     /// @dev constructor of Stake1Proxy
     constructor(address _logic,address _admin) {
@@ -29,7 +30,14 @@ contract PrivateSaleProxy is
         _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
         _setupRole(ADMIN_ROLE, _admin);
         _setupRole(ADMIN_ROLE, address(this));
+
+        // bytes4 OnApproveSelector= bytes4(keccak256("onApprove(address,address,uint256,bytes)"));
+        // _registerInterface(OnApproveSelector);
     }
+
+    // function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
+    //     return _supportedInterfaces[interfaceId] || super.supportsInterface(interfaceId);
+    // }
 
     /// @dev Set pause state
     /// @param _pause true:pause or false:resume
@@ -65,6 +73,8 @@ contract PrivateSaleProxy is
     {
         return _implementation(_index);
     }
+
+    
 
     /// @dev set the implementation address and status of the proxy[index]
     /// @param newImplementation Address of the new implementation.
@@ -220,27 +230,29 @@ contract PrivateSaleProxy is
         getTokenOwner = _getTokenOwner;
     }
 
-    function onApprove(
-        address sender,
-        address spender,
-        uint256 amount,
-        bytes calldata data
-    ) external override returns (bool) {
-        require(msg.sender == address(getToken) || msg.sender == address(IWTON(wton)), "PrivateSale: only accept TON and WTON approve callback");
-        if(msg.sender == address(getToken)) {
-            uint256 wtonAmount = IPrivateSale(address(this))._decodeApproveData(data);
-            if(wtonAmount == 0){
-                IPrivateSale(address(this)).buy(sender,amount);
-            } else {
-                uint256 totalAmount = amount + wtonAmount;
-                IPrivateSale(address(this)).buy(sender,totalAmount);
-            }
-        } else if (msg.sender == address(IWTON(wton))) {
-            uint256 wtonAmount = IPrivateSale(address(this))._toWAD(amount);
-            IPrivateSale(address(this)).buy(sender,wtonAmount);
-        }
+    // function onApprove(
+    //     address sender,
+    //     address spender,
+    //     uint256 amount,
+    //     bytes calldata data
+    // ) external override returns (bool) {
+    //     require(msg.sender == address(getToken) || msg.sender == address(IWTON(wton)), "PrivateSale: only accept TON and WTON approve callback");
+    //     address claimAddress = IPrivateSale(address(this)).decodeAddressData(data);
+    //     if(msg.sender == address(getToken)) {
+    //         IPrivateSale(address(this)).buy(sender,claimAddress,amount);
+    //         // uint256 wtonAmount = IPrivateSale(address(this))._decodeApproveData(data);
+    //         // if(wtonAmount == 0){
+    //         //     IPrivateSale(address(this)).buy(sender,amount);
+    //         // } else {
+    //         //     uint256 totalAmount = amount + wtonAmount;
+    //         //     IPrivateSale(address(this)).buy(sender,totalAmount);
+    //         // }
+    //     } else if (msg.sender == address(IWTON(wton))) {
+    //         uint256 wtonAmount = IPrivateSale(address(this))._toWAD(amount);
+    //         IPrivateSale(address(this)).buy(sender,claimAddress,wtonAmount);
+    //     }
 
-        return true;
-    }
+    //     return true;
+    // }
 
 }

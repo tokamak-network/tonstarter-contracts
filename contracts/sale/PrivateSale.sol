@@ -196,24 +196,24 @@ contract PrivateSale is
     function calculClaimAmount(address _account, uint16 _round)
         public
         view
-        returns (uint256 _amount, uint256 _claimAmount, uint256 _totalClaim)
+        returns (uint256 _amount)
     {
-        if (block.timestamp < claimTimes[0]) return (0,0,0);
+        if (block.timestamp < claimTimes[0]) return 0;
 
         UserInfoAmount memory user = usersAmount[_account];
-        if(user.inputamount == 0) return (0,0,0);
+        if(user.inputamount == 0) return 0;
 
         if (totalClaimCounts == _round ) {
-            return (user.totaloutputamount.sub(user.getAmount), user.getAmount, user.totaloutputamount);
+            return user.totaloutputamount.sub(user.getAmount);
         }
 
         uint256 roundClaimPercent;
-        for (uint16 i = 0; i < totalClaimCounts; i++) {
+        for (uint16 i = 0; i < _round; i++) {
             roundClaimPercent = roundClaimPercent.add(claimPercents[i]);
         }
         
         uint256 userGetAmount = user.totaloutputamount.mul(roundClaimPercent).div(100);
-        return (userGetAmount.sub(user.getAmount), user.getAmount, user.totaloutputamount);
+        return userGetAmount.sub(user.getAmount);
     }
 
     /**
@@ -260,7 +260,9 @@ contract PrivateSale is
         bytes calldata data
     ) external override returns (bool) {
         require(msg.sender == address(getToken) || msg.sender == address(IWTON(wton)), "PrivateSale: only accept TON and WTON approve callback");
+        
         address claimAddress = decodeAddressData(data);
+        
         if(msg.sender == address(getToken)) {
             buy(sender,claimAddress,amount);
             // uint256 wtonAmount = _decodeApproveData(data);
@@ -274,7 +276,7 @@ contract PrivateSale is
             uint256 wtonAmount = _toWAD(amount);
             buy(sender,claimAddress,wtonAmount);
         }
-
+        
         return true;
     }
 
@@ -315,6 +317,7 @@ contract PrivateSale is
         require(block.timestamp >= saleStartTime && block.timestamp <= saleEndTime, "privaSale period end");
         WhiteList storage userwhite = usersWhite[_sender];
         require(userwhite.amount >= _amount, "need to add whiteList amount");
+
         _buy(_sender,_claimAddress,_amount);
         userwhite.amount = userwhite.amount.sub(_amount);
     }
@@ -399,7 +402,7 @@ contract PrivateSale is
         require(user.inputamount > 0, "need to buy the token");
         require(user.totaloutputamount > user.getAmount, "already getAllreward");
 
-        (uint256 giveTokenAmount, ,) = calculClaimAmount(msg.sender, currentRound());
+        uint256 giveTokenAmount = calculClaimAmount(msg.sender, currentRound());
     
         require(user.totaloutputamount.sub(user.getAmount) >= giveTokenAmount, "user is already getAllreward");
         require(saleToken.balanceOf(address(this)) >= giveTokenAmount, "dont have saleToken in pool");
