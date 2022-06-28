@@ -27,28 +27,23 @@ interface IPrivateSale {
 
     function changeGetAddress(address _address) external;
 
-    function settingAll(
-        uint256[4] calldata _time,
-        uint256 _saleTokenPrice,
-        uint256 _getTokenPrice
-    ) external;
-
-    function settingPrivateTime(
-        uint256 _startTime,
-        uint256 _endTime,
-        uint256 _firstTime,
-        uint256 _claimTime
+    function setAllsetting(
+        uint256[2] calldata _saleTime,
+        uint256[2] calldata _tokenPrice,
+        uint16 _claimCounts,
+        uint256[] calldata _claimTimes,
+        uint256[] calldata _claimPercents
     ) external;
 
     function settingSaleTime(uint256 _startTime,uint256 _endTime) external;
 
-    function settingFirstClaimTime(uint256 _claimTime) external;
+    function setTokenPrice(uint256 _saleTokenPrice, uint256 _getTokenPrice) external;
 
-    function settingClaimTime(uint256 _time) external;
-    
-    function claimAmount(
-        address _account
-    ) external view returns (uint256);
+    function setClaimArray(
+        uint16 _claimCounts,
+        uint256[] calldata _claimTimes,
+        uint256[] calldata _claimPercents
+    ) external;
 
     function addWhiteList(address _account,uint256 _amount) external;
 
@@ -58,14 +53,23 @@ interface IPrivateSale {
 
     function buy(
         address _sender,
+        address _claimAddress,
         uint256 _amount
     ) external;
 
     function claim() external;
 
-    function _decodeApproveData(
+    function decodeApproveData(
         bytes memory data
     ) external pure returns (uint256 approveData);
+
+    function decodeAddressData(
+        bytes memory data
+    ) external pure returns (address claimAddress_);
+
+    function encodeAddressData(
+        address _claimAddress
+    ) external pure returns (bytes memory data);
 
     function _toWAD(uint256 v) external pure returns (uint256);
 

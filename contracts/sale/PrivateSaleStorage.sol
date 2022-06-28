@@ -10,14 +10,7 @@ contract PrivateSaleStorage {
         uint256 inputamount;
         uint256 totaloutputamount;
         uint256 getAmount;
-    }
-
-    struct UserInfoClaim {
-        uint256 claimTime;
-        uint256 claimAmount;
-        uint256 firstClaimAmount;
-        uint256 firstClaimTime;
-        bool first;
+        address inputAddress;
     }
 
     struct WhiteList {
@@ -30,11 +23,6 @@ contract PrivateSaleStorage {
 
     uint256 public saleStartTime;           //sale시작 시간
     uint256 public saleEndTime;             //sale끝 시간
-
-    // uint256 public firstClaimTime;           //초기 claim 시간
-
-    // uint256 public claimStartTime;  //6개월 뒤 claim시작 시간
-    // uint256 public claimEndTime;    //claim시작시간 + 1년
 
     uint256 public saleTokenPrice;  //판매토큰가격
     uint256 public getTokenPrice;   //받는토큰가격(TON)
@@ -51,7 +39,6 @@ contract PrivateSaleStorage {
     uint256[] public claimPercents; 
 
     mapping (address => UserInfoAmount) public usersAmount;
-    mapping (address => UserInfoClaim) public usersClaim;
     mapping (address => WhiteList) public usersWhite;
 
     /// @dev flag for pause proxy
