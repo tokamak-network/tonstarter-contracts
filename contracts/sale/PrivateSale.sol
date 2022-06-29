@@ -212,8 +212,8 @@ contract PrivateSale is
             roundClaimPercent = roundClaimPercent.add(claimPercents[i]);
         }
         
-        uint256 userGetAmount = user.totaloutputamount.mul(roundClaimPercent).div(100);
-        return userGetAmount.sub(user.getAmount);
+        uint256 userGetAmount = (user.totaloutputamount.mul(roundClaimPercent).div(100)).sub(user.getAmount);
+        return userGetAmount;
     }
 
     /**

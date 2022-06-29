@@ -505,7 +505,7 @@ describe("PrivateSale", function () {
             ).to.be.revertedWith("need the claimTime");   
         })
 
-        it("claim round1", async () => {
+        it("claim round1 for account1", async () => {
             await ethers.provider.send('evm_setNextBlockTimestamp', [claim1Times+10]);
             await ethers.provider.send('evm_mine');
 
@@ -525,175 +525,102 @@ describe("PrivateSale", function () {
 
             let afterTokenAmount = await dom.balanceOf(tester1.claimAccount.address);
             expect(afterTokenAmount).to.be.equal(claimAmountConractexpect);
-
         })
 
-        it("claim round2", async () => {
+        it("claim round2 for account2, account3", async () => {
+            await ethers.provider.send('evm_setNextBlockTimestamp', [claim2Times+5]);
+            await ethers.provider.send('evm_mine');
+
+            let round = await privateSaleContract.connect(tester2.claimAccount).currentRound(); 
+            expect(round).to.be.equal(2);
+
+            let claimAmountConractexpect = await privateSaleContract.calculClaimAmount(tester2.claimAccount.address,round);
+            // console.log("claimAmountConractexpect : ", Number(claimAmountConractexpect));
+            let claimAmountConractexpect2 = await privateSaleContract.calculClaimAmount(tester3.claimAccount.address,round);
+            // console.log("claimAmountConractexpect2 : ", Number(claimAmountConractexpect2));
+
+            let beforeTokenAmount = await dom.balanceOf(tester2.claimAccount.address);
+            expect(beforeTokenAmount).to.be.equal(0);
+
+            let beforeTokenAmount2 = await dom.balanceOf(tester3.claimAccount.address);
+            expect(beforeTokenAmount2).to.be.equal(0);
+
+            let calculdirectAmount = bigAccount2Total * (claim1Percents+claim2Percents) / 100;
+            // console.log("calculdirectAmount : ", calculdirectAmount);
+
+            let calculdirectAmount2 = bigAccount3Total * (claim1Percents+claim2Percents) / 100;
+            // console.log("calculdirectAmount2 : ", calculdirectAmount2);
+
+            await privateSaleContract.connect(tester2.claimAccount).claim(); 
+            await privateSaleContract.connect(tester3.claimAccount).claim(); 
+
+            let afterTokenAmount = await dom.balanceOf(tester2.claimAccount.address);
+            expect(afterTokenAmount).to.be.equal(claimAmountConractexpect);
+            let afterTokenAmount2 = await dom.balanceOf(tester3.claimAccount.address);
+            expect(afterTokenAmount2).to.be.equal(claimAmountConractexpect2);
+        })
+
+        it("claim round4 for account1", async () => {
+            await ethers.provider.send('evm_setNextBlockTimestamp', [claim4Times+5]);
+            await ethers.provider.send('evm_mine');
+
+            let round = await privateSaleContract.connect(tester1.claimAccount).currentRound(); 
+            expect(round).to.be.equal(4);
+
+            let claimAmountConractexpect = await privateSaleContract.calculClaimAmount(tester1.claimAccount.address,round);
+            console.log("claimAmountConractexpect : ", Number(claimAmountConractexpect));
+
+            let beforeTokenAmount = await dom.balanceOf(tester1.claimAccount.address);
+            let beforeGetTokenAmount = await privateSaleContract.usersAmount(tester1.claimAccount.address)
+            // console.log(Number(beforeGetTokenAmount.getAmount));
+            expect(beforeTokenAmount).to.be.equal(beforeGetTokenAmount.getAmount);
+
+            let calculdirectAmount = bigAccount1Total * (claim1Percents+claim2Percents+claim3Percents+claim4Percents) / 100;
+            console.log("calculdirectAmount : ", calculdirectAmount);
+            expect(Number(claimAmountConractexpect)+Number(beforeTokenAmount)).to.be.equal(calculdirectAmount);
+
+            await privateSaleContract.connect(tester1.claimAccount).claim(); 
             
+            let afterTokenAmount = await dom.balanceOf(tester1.claimAccount.address);
+            expect(Number(afterTokenAmount)).to.be.equal(calculdirectAmount);
         })
 
 
-        it("claim round3", async () => {
+        it("claim round5 for account1, account2, account3", async () => {
+            await ethers.provider.send('evm_setNextBlockTimestamp', [claim5Times+5]);
+            await ethers.provider.send('evm_mine');
+
+            let round = await privateSaleContract.connect(tester1.claimAccount).currentRound(); 
+            expect(round).to.be.equal(5);
+
+            let claimAmountConractexpect = await privateSaleContract.calculClaimAmount(tester1.claimAccount.address,round);
+            console.log("claimAmountConractexpect : ", Number(claimAmountConractexpect));
+
+            let beforeTokenAmount = await dom.balanceOf(tester1.claimAccount.address);
+            let beforeGetTokenAmount = await privateSaleContract.usersAmount(tester1.claimAccount.address)
+            // console.log(Number(beforeGetTokenAmount.getAmount));
+            expect(beforeTokenAmount).to.be.equal(beforeGetTokenAmount.getAmount);
+
+            let calculdirectAmount = bigAccount1Total
+            let calculdirectAmount2 = bigAccount2Total
+            let calculdirectAmount3 = bigAccount3Total
+            console.log("calculdirectAmount : ", Number(calculdirectAmount));
+            console.log("calculdirectAmount2 : ", Number(calculdirectAmount2));
+            console.log("calculdirectAmount3 : ", Number(calculdirectAmount3));
+            // expect(Number(claimAmountConractexpect)+Number(beforeTokenAmount)).to.be.equal(calculdirectAmount);
+
+            await privateSaleContract.connect(tester1.claimAccount).claim(); 
+            await privateSaleContract.connect(tester2.claimAccount).claim(); 
+            await privateSaleContract.connect(tester3.claimAccount).claim(); 
             
-        })
-
-
-        it("claim round4", async () => {
-            
-        })
-
-
-        it("claim round5", async () => {
-            
+            let afterTokenAmount = await dom.balanceOf(tester1.claimAccount.address);
+            let afterTokenAmount2 = await dom.balanceOf(tester2.claimAccount.address);
+            let afterTokenAmount3 = await dom.balanceOf(tester3.claimAccount.address);
+            expect(Number(afterTokenAmount)).to.be.equal(Number(calculdirectAmount));
+            expect(Number(afterTokenAmount2)).to.be.equal(Number(calculdirectAmount2));
+            expect(Number(afterTokenAmount3)).to.be.equal(Number(calculdirectAmount3));
         })
     })
 
-    // describe("# 6. claim test", () => {
-    //     it("firstClaim before fisrClaimtime", async () => {
-    //         await expect(privateSaleContract.connect(tester1.account).claim()
-    //         ).to.be.revertedWith("need the fisrClaimtime");    
-    //     })
-
-    //     it("firstClaim after fisrClaimtime", async () => {
-    //         await ethers.provider.send('evm_setNextBlockTimestamp', [firstClaimTime+10]);
-    //         await ethers.provider.send('evm_mine');
-
-    //         let balance = await dom.balanceOf(tester1.account.address);
-    //         expect(balance).to.be.equal(0)
-
-    //         // await privateSaleContract.connect(tester1.account).firstClaim();
-    //         await privateSaleContract.connect(tester1.account).claim();
-    //         let balance2 = await dom.balanceOf(tester1.account.address);
-    //         // console.log(Number(balance2))
-    //         let user1 = await privateSaleContract.usersAmount(tester1.account.address);
-    //         expect(user1.firstReward).to.be.equal(balance2)
-    //     })
-
-    //     it("firstClaim about account3", async () => {
-    //         let acc3balance = await dom.balanceOf(tester3.account.address);
-    //         expect(acc3balance).to.be.equal(0)
-
-    //         await privateSaleContract.connect(tester3.account).claim();
-
-    //         let acc3balance2 = await dom.balanceOf(tester3.account.address);
-    //         let user3 = await privateSaleContract.usersAmount(tester3.account.address);
-    //         expect(user3.firstReward).to.be.equal(acc3balance2)
-    //     })
-
-    //     it("reply firstClaim", async () => {
-    //         await expect(privateSaleContract.connect(tester3.account).claim()
-    //         ).to.be.revertedWith("already getFirstreward");
-    //     })
-
-    //     it("claim 1month about account1, account2", async () => {
-    //         await ethers.provider.send('evm_setNextBlockTimestamp', [claimStartTime+10]);
-    //         await ethers.provider.send('evm_mine');
-
-    //         await privateSaleContract.connect(tester1.account).claim();
-    //         await privateSaleContract.connect(tester2.account).claim();
-            
-    //         let user1 = await privateSaleContract.usersAmount(tester1.account.address);
-    //         let user2 = await privateSaleContract.usersAmount(tester2.account.address);
-    //         let acc1balance = await dom.balanceOf(tester1.account.address);
-    //         let acc2balance = await dom.balanceOf(tester2.account.address);
-            
-    //         expect(Number(user1.firstReward)+Number(user1.monthlyReward)).to.be.equal(Number(acc1balance))
-    //         expect(Number(user2.firstReward)+Number(user2.monthlyReward)).to.be.equal(Number(acc2balance))
-    //     })
-
-    //     it("claim 2month about account1, account3", async () => {
-    //         let after1month = claimStartTime + (oneday*30)
-    //         await ethers.provider.send('evm_setNextBlockTimestamp', [after1month]);
-    //         await ethers.provider.send('evm_mine');
-
-    //         await privateSaleContract.connect(tester1.account).claim();
-    //         await privateSaleContract.connect(tester3.account).claim();
-
-    //         let user1 = await privateSaleContract.usersAmount(tester1.account.address);
-    //         let user3 = await privateSaleContract.usersAmount(tester3.account.address);
-    //         let acc1balance = await dom.balanceOf(tester1.account.address);
-    //         let acc3balance = await dom.balanceOf(tester3.account.address);
-
-    //         let user1monthlyReward = Number(user1.monthlyReward)
-    //         let user3monthlyReward = Number(user3.monthlyReward)
-    //         let user1Reward = user1monthlyReward * 2
-    //         let user3Reward = user3monthlyReward * 2
-
-    //         expect(user1Reward+Number(user1.firstReward)).to.be.equal(Number(acc1balance))
-    //         expect(user3Reward+Number(user3.firstReward)).to.be.equal(Number(acc3balance))
-    //     })
-
-    //     it("claim 6month about account2, account3", async () => {
-    //         let after5month = claimStartTime + ((oneday*30)*5)
-    //         await ethers.provider.send('evm_setNextBlockTimestamp', [after5month]);
-    //         await ethers.provider.send('evm_mine');
-
-    //         await privateSaleContract.connect(tester2.account).claim();
-    //         await privateSaleContract.connect(tester3.account).claim();
-
-    //         let user2 = await privateSaleContract.usersAmount(tester2.account.address);
-    //         let user3 = await privateSaleContract.usersAmount(tester3.account.address);
-    //         let acc2balance = await dom.balanceOf(tester2.account.address);
-    //         let acc3balance = await dom.balanceOf(tester3.account.address);
-
-    //         let user2monthlyReward = Number(user2.monthlyReward)
-    //         let user3monthlyReward = Number(user3.monthlyReward)
-    //         let user2Reward = user2monthlyReward * 6
-    //         let user3Reward = user3monthlyReward * 6
-
-    //         expect(user2Reward+Number(user2.firstReward)).to.be.equal(Number(acc2balance))
-    //         expect(user3Reward+Number(user3.firstReward)).to.be.equal(Number(acc3balance))
-    //     })
-
-    //     it("claim 10month abount account1", async () => {
-    //         let after9month = claimStartTime + ((oneday*30)*9)
-    //         await ethers.provider.send('evm_setNextBlockTimestamp', [after9month]);
-    //         await ethers.provider.send('evm_mine');
-
-    //         await privateSaleContract.connect(tester1.account).claim();
-
-    //         let user1 = await privateSaleContract.usersAmount(tester1.account.address);
-    //         let acc1balance = await dom.balanceOf(tester1.account.address);
-
-    //         let user1monthlyReward = Number(user1.monthlyReward)
-    //         let user1Reward = user1monthlyReward * 10
-
-    //         expect(user1Reward+Number(user1.firstReward)).to.be.equal(Number(acc1balance))
-    //     })
-
-    //     it("claim 12month about account1, account2, account3", async () => {
-    //         let after11month = claimStartTime + ((oneday*30)*11)
-    //         await ethers.provider.send('evm_setNextBlockTimestamp', [after11month]);
-    //         await ethers.provider.send('evm_mine');
-
-    //         await privateSaleContract.connect(tester1.account).claim();
-    //         await privateSaleContract.connect(tester2.account).claim();
-    //         await privateSaleContract.connect(tester3.account).claim();
-
-    //         let user1 = await privateSaleContract.usersAmount(tester1.account.address);
-    //         let user2 = await privateSaleContract.usersAmount(tester2.account.address);
-    //         let user3 = await privateSaleContract.usersAmount(tester3.account.address);
-    //         let acc1balance = await dom.balanceOf(tester1.account.address);
-    //         let acc2balance = await dom.balanceOf(tester2.account.address);
-    //         let acc3balance = await dom.balanceOf(tester3.account.address);
-
-    //         // console.log(Number(user1.totaloutputamount))
-    //         // console.log(Number(user2.totaloutputamount))
-    //         // console.log(Number(user3.totaloutputamount))
-
-    //         // let user1monthlyReward = Number(user1.monthlyReward)
-    //         // let user2monthlyReward = Number(user2.monthlyReward)
-    //         // let user3monthlyReward = Number(user3.monthlyReward)
-    //         // let user1Reward = user1monthlyReward * 9
-    //         // let user2Reward = user2monthlyReward * 6
-    //         // let user3Reward = user3monthlyReward * 6
-            
-    //         // expect(user1Reward+Number(user1.firstReward)).to.be.equal(Number(acc1balance))
-    //         // expect(user2Reward+Number(user2.firstReward)).to.be.equal(Number(acc2balance))
-    //         // expect(user3Reward+Number(user3.firstReward)).to.be.equal(Number(acc3balance))
-    //         expect(Number(user1.totaloutputamount)).to.be.equal(Number(acc1balance))
-    //         expect(Number(user2.totaloutputamount)).to.be.equal(Number(acc2balance))
-    //         expect(Number(user3.totaloutputamount)).to.be.equal(Number(acc3balance))
-    //     })
-    // })
+    
 })
