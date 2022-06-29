@@ -145,7 +145,6 @@ contract TokamakStakeUpgrade3 is
         uint256 _amountOutMinimum,
         uint256 _deadline,
         uint160 _sqrtPriceLimitX96,
-        address factory,
         uint8 slippage,
         int24 curTick
     ) external lock onlyClosed {
@@ -155,7 +154,7 @@ contract TokamakStakeUpgrade3 is
 
         //--
         require(slippage > 0 && slippage <= 10, "It is not allowed slippage.");
-        IIUniswapV3Pool pool = IIUniswapV3Pool(getPoolAddress(factory));
+        IIUniswapV3Pool pool = IIUniswapV3Pool(getPoolAddress());
         require(address(pool) != address(0), "pool didn't exist");
 
         (uint160 sqrtPriceX96, int24 tick,,,,,) =  pool.slot0();
@@ -246,8 +245,9 @@ contract TokamakStakeUpgrade3 is
         emit ExchangedWTONtoTOS(msg.sender, amountIn, amountOut);
     }
 
-    function getPoolAddress(address factory) public view returns(address) {
-         return IIUniswapV3Factory(factory).getPool(wton, ton, 3000);
+    function getPoolAddress() public view returns(address) {
+        address factory = 0x1F98431c8aD98523631AE4a59f267346ea31F984;
+        return IIUniswapV3Factory(factory).getPool(wton, token, 3000);
     }
 
     function getDecimals(address token0, address token1) public view returns(uint256 token0Decimals, uint256 token1Decimals) {
@@ -257,5 +257,15 @@ contract TokamakStakeUpgrade3 is
     function getPriceX96FromSqrtPriceX96(uint160 sqrtPriceX96) public pure returns(uint256 priceX96) {
         return FullMath.mulDiv(sqrtPriceX96, sqrtPriceX96, FixedPoint96.Q96);
     }
+
+    function currentTick(address factory) public view returns(uint160 sqrtPriceX96, int24 tick) {
+        address getPool = getPoolAddress();
+        if(getPool != address(0)) {
+            (uint160 sqrtPriceX96, int24 tick,,,,,) =  IIUniswapV3Pool(getPool).slot0();
+            return (sqrtPriceX96, tick);
+        }
+        return (0, 0);
+    }
+
 
 }
