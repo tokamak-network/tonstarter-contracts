@@ -258,7 +258,7 @@ contract TokamakStakeUpgrade3 is
         return FullMath.mulDiv(sqrtPriceX96, sqrtPriceX96, FixedPoint96.Q96);
     }
 
-    function currentTick(address factory) public view returns(uint160 sqrtPriceX96, int24 tick) {
+    function currentTick() public view returns(uint160 sqrtPriceX96, int24 tick) {
         address getPool = getPoolAddress();
         if(getPool != address(0)) {
             (uint160 sqrtPriceX96, int24 tick,,,,,) =  IIUniswapV3Pool(getPool).slot0();
