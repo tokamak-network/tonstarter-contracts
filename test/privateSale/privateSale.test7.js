@@ -124,6 +124,7 @@ describe("PrivateSale", function () {
     let accountlist;
     let user1, user2, user3, user4, user5, user6;
     let admin;
+    let lowerAdmin;
     let defaultSender;
     let owner;
     let getTONaddress;
@@ -190,6 +191,8 @@ describe("PrivateSale", function () {
         tester1.claimAccount = await findSigner(accountlist[9]);
         tester2.claimAccount = await findSigner(accountlist[10]);
         tester3.claimAccount = await findSigner(accountlist[11]);
+        lowerAdmin = await findSigner(accountlist[11]);
+
     
         sender = await ico20Contracts.findSigner(defaultSender);
         tester1.account = await ico20Contracts.findSigner(user1);
@@ -291,6 +294,10 @@ describe("PrivateSale", function () {
     })
 
     describe("# 3. setting test", async function () {
+        it("add lowerAdmin", async () => {
+            await privateSaleContract.connect(admin).addAdmin(lowerAdmin.address)
+        })
+
         it('AddressSetting check', async () => {
             expect(await privateSaleContract.wton()).to.be.equal(wton.address)
             expect(await privateSaleContract.saleToken()).to.be.equal(dom.address)
@@ -317,7 +324,28 @@ describe("PrivateSale", function () {
             )).to.be.revertedWith('Accessible: Caller is not an admin')
         })
 
-        it('settingAll caller is owner', async () => {
+        it("settingPause true, lowerAdmin don't setting", async () => {
+            await privateSaleProxyContract.connect(admin).setSettingPause(true);
+
+            let block = await ethers.provider.getBlock();
+            saleStartTime = block.timestamp + 10;
+            saleEndTime = saleStartTime + oneday;
+            claim1Times = saleEndTime + oneday;
+            claim2Times = claim1Times + 20;
+            claim3Times = claim2Times + 20;
+            claim4Times = claim3Times + 20;
+            claim5Times = claim4Times + 20;
+
+            await expect(privateSaleContract.connect(lowerAdmin).setAllsetting(
+                [saleStartTime,saleEndTime],
+                [domPrice,tonPrice],
+                claimCounts,
+                [claim1Times,claim2Times,claim3Times,claim4Times,claim5Times],
+                [claim1Percents,claim2Percents,claim3Percents,claim4Percents,claim5Percents]
+            )).to.be.revertedWith("setting is Pause")
+        })
+
+        it("settingPause true, Admin can setting", async () => {
             let block = await ethers.provider.getBlock();
             saleStartTime = block.timestamp + 10;
             saleEndTime = saleStartTime + oneday;
@@ -328,6 +356,35 @@ describe("PrivateSale", function () {
             claim5Times = claim4Times + 20;
 
             await privateSaleContract.connect(admin).setAllsetting(
+                [saleStartTime,saleEndTime],
+                [domPrice,tonPrice],
+                claimCounts,
+                [claim1Times,claim2Times,claim3Times,claim4Times,claim5Times],
+                [claim1Percents,claim2Percents,claim3Percents,claim4Percents,claim5Percents]
+            )
+
+            expect(await privateSaleContract.saleStartTime()).to.be.equal(saleStartTime)
+            expect(await privateSaleContract.saleEndTime()).to.be.equal(saleEndTime)
+            expect(await privateSaleContract.saleTokenPrice()).to.be.equal(domPrice)
+            expect(await privateSaleContract.getTokenPrice()).to.be.equal(tonPrice)
+            expect(await privateSaleContract.totalClaimCounts()).to.be.equal(claimCounts)
+        })
+
+        it("settingPause false", async () => {
+            await privateSaleProxyContract.connect(admin).setSettingPause(false);
+        })
+
+        it('settingAll caller is owner', async () => {
+            let block = await ethers.provider.getBlock();
+            saleStartTime = block.timestamp + 10;
+            saleEndTime = saleStartTime + oneday;
+            claim1Times = saleEndTime + oneday;
+            claim2Times = claim1Times + 20;
+            claim3Times = claim2Times + 20;
+            claim4Times = claim3Times + 20;
+            claim5Times = claim4Times + 20;
+
+            await privateSaleContract.connect(lowerAdmin).setAllsetting(
                 [saleStartTime,saleEndTime],
                 [domPrice,tonPrice],
                 claimCounts,

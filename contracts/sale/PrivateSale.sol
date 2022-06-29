@@ -10,7 +10,7 @@ import {
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "../interfaces/IWTON.sol";
 import "../interfaces/IPrivateSale.sol";
-import "../common/AccessibleCommon.sol";
+import "../common/ProxyAccessCommon.sol";
 
 import { OnApprove } from "./OnApprove.sol";
 import "./PrivateSaleStorage.sol";
@@ -18,7 +18,7 @@ import "./PrivateSaleStorage.sol";
 
 contract PrivateSale is 
     PrivateSaleStorage, 
-    AccessibleCommon, 
+    ProxyAccessCommon, 
     ReentrancyGuard, 
     OnApprove, 
     IPrivateSale 
@@ -53,6 +53,11 @@ contract PrivateSale is
         uint256 amount
     );
 
+    modifier settingCheck() {
+        require(!pauseSetting || isProxyAdmin(msg.sender), "setting is Pause");
+        _;
+    }
+
     /// @dev calculator the SaleAmount(input TON how many get the anotherToken)
     /// @param _amount input the TON amount
     function calculSaleToken(uint256 _amount)
@@ -85,21 +90,41 @@ contract PrivateSale is
         address _saleToken,
         address _getToken,
         address _ownerToken
-    ) external override onlyOwner {
+    ) 
+        external 
+        override 
+        onlyOwner 
+        settingCheck
+    {
         changeTokenAddress(_saleToken,_getToken);
         changeGetAddress(_ownerToken);
     }
 
-    function changeWTONAddress(address _wton) external override onlyOwner {
+    function changeWTONAddress(address _wton) 
+        external 
+        override 
+        onlyOwner
+        settingCheck 
+    {
         wton = _wton;
     }
 
-    function changeTokenAddress(address _saleToken, address _getToken) public override onlyOwner {
+    function changeTokenAddress(address _saleToken, address _getToken) 
+        public 
+        override 
+        onlyOwner
+        settingCheck 
+    {
         saleToken = IERC20(_saleToken);
         getToken = IERC20(_getToken);
     }
 
-    function changeGetAddress(address _address) public override onlyOwner {
+    function changeGetAddress(address _address) 
+        public 
+        override 
+        onlyOwner 
+        settingCheck
+    {
         getTokenOwner = _address;
     }
 
@@ -120,7 +145,8 @@ contract PrivateSale is
     ) 
         external
         override 
-        onlyOwner 
+        onlyOwner
+        settingCheck 
     {
         settingSaleTime(
             _saleTime[0],
@@ -144,6 +170,7 @@ contract PrivateSale is
         public 
         override 
         onlyOwner 
+        settingCheck
     {
         saleStartTime = _startTime;
         saleEndTime = _endTime;
@@ -153,6 +180,7 @@ contract PrivateSale is
         public
         override
         onlyOwner
+        settingCheck
     {
         saleTokenPrice = _saleTokenPrice;
         getTokenPrice = _getTokenPrice;
@@ -165,8 +193,14 @@ contract PrivateSale is
     ) 
         public
         override
-        onlyOwner 
+        onlyOwner
+        settingCheck 
     {
+        if(totalClaimCounts != 0) {
+            delete claimTimes;
+            delete claimPercents;
+        }
+
         totalClaimCounts = _claimCounts;
         uint256 i = 0;
         uint256 y = 0;

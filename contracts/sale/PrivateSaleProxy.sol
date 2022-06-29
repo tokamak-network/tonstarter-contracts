@@ -5,14 +5,15 @@ import "../interfaces/IPrivateSaleProxy.sol";
 import {Address} from "@openzeppelin/contracts/utils/Address.sol";
 
 import { OnApprove2 } from "./OnApprove2.sol";
-import "../common/AccessibleCommon.sol";
 import "./PrivateSaleStorage.sol";
 import "../interfaces/IWTON.sol";
 import "../interfaces/IPrivateSale.sol";
 
+import "../common/ProxyAccessCommon.sol";
+
 contract PrivateSaleProxy is 
     PrivateSaleStorage, 
-    AccessibleCommon,
+    ProxyAccessCommon,
     OnApprove2,
     IPrivateSaleProxy
 {
@@ -27,22 +28,21 @@ contract PrivateSaleProxy is
 
         _setImplementation(_logic, 0, true);
 
-        _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
-        _setupRole(ADMIN_ROLE, _admin);
-        _setupRole(ADMIN_ROLE, address(this));
-
-        // bytes4 OnApproveSelector= bytes4(keccak256("onApprove(address,address,uint256,bytes)"));
-        // _registerInterface(OnApproveSelector);
+        _setRoleAdmin(PROJECT_ADMIN_ROLE, PROJECT_ADMIN_ROLE);
+        _setupRole(PROJECT_ADMIN_ROLE, _admin);
+        _setupRole(DEFAULT_ADMIN_ROLE, _admin);
     }
-
-    // function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
-    //     return _supportedInterfaces[interfaceId] || super.supportsInterface(interfaceId);
-    // }
 
     /// @dev Set pause state
     /// @param _pause true:pause or false:resume
-    function setProxyPause(bool _pause) external override onlyOwner {
+    function setProxyPause(bool _pause) external override onlyProxyOwner {
         pauseProxy = _pause;
+    }
+
+    /// @dev Set pause state
+    /// @param _pause true:pause or false:resume
+    function setSettingPause(bool _pause) external onlyProxyOwner {
+        pauseSetting = _pause;
     }
 
     /// @dev Set implementation contract
@@ -51,7 +51,7 @@ contract PrivateSaleProxy is
     function upgradeTo(address impl, uint256 _index)
         external
         override
-        onlyOwner
+        onlyProxyOwner
     {
         require(impl != address(0), "input is zero");
         require(_implementation(_index) != impl, "same");
@@ -84,7 +84,7 @@ contract PrivateSaleProxy is
         address newImplementation,
         uint256 _index,
         bool _alive
-    ) external override onlyOwner {
+    ) external override onlyProxyOwner {
         _setImplementation(newImplementation, _index, _alive);
     }
 
@@ -94,7 +94,7 @@ contract PrivateSaleProxy is
     function setAliveImplementation(address newImplementation, bool _alive)
         public
         override
-        onlyOwner
+        onlyProxyOwner
     {
         _setAliveImplementation(newImplementation, _alive);
     }
@@ -105,7 +105,7 @@ contract PrivateSaleProxy is
     function setSelectorImplementations(
         bytes4[] calldata _selectors,
         address _imp
-    ) public override onlyOwner {
+    ) public override onlyProxyOwner {
         require(
             _selectors.length > 0,
             "Stake1Proxy: _selectors's size is zero"
@@ -223,36 +223,10 @@ contract PrivateSaleProxy is
         address _saleToken,
         address _getToken,
         address _getTokenOwner
-    ) external  onlyOwner {
+    ) external  onlyProxyOwner {
         wton = _wton;
         saleToken = IERC20(_saleToken);
         getToken = IERC20(_getToken);
         getTokenOwner = _getTokenOwner;
     }
-
-    // function onApprove(
-    //     address sender,
-    //     address spender,
-    //     uint256 amount,
-    //     bytes calldata data
-    // ) external override returns (bool) {
-    //     require(msg.sender == address(getToken) || msg.sender == address(IWTON(wton)), "PrivateSale: only accept TON and WTON approve callback");
-    //     address claimAddress = IPrivateSale(address(this)).decodeAddressData(data);
-    //     if(msg.sender == address(getToken)) {
-    //         IPrivateSale(address(this)).buy(sender,claimAddress,amount);
-    //         // uint256 wtonAmount = IPrivateSale(address(this))._decodeApproveData(data);
-    //         // if(wtonAmount == 0){
-    //         //     IPrivateSale(address(this)).buy(sender,amount);
-    //         // } else {
-    //         //     uint256 totalAmount = amount + wtonAmount;
-    //         //     IPrivateSale(address(this)).buy(sender,totalAmount);
-    //         // }
-    //     } else if (msg.sender == address(IWTON(wton))) {
-    //         uint256 wtonAmount = IPrivateSale(address(this))._toWAD(amount);
-    //         IPrivateSale(address(this)).buy(sender,claimAddress,wtonAmount);
-    //     }
-
-    //     return true;
-    // }
-
 }

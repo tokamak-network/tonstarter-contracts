@@ -44,6 +44,8 @@ contract PrivateSaleStorage {
     /// @dev flag for pause proxy
     bool public pauseProxy;
 
+    bool public pauseSetting;
+
     /// @dev implementation of proxy index
     mapping(uint256 => address) public proxyImplementation;
 
