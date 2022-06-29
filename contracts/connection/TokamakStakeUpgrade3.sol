@@ -12,6 +12,7 @@ import "@openzeppelin/contracts/math/SafeMath.sol";
 import "../libraries/FixedPoint96.sol";
 import "../libraries/FullMath.sol";
 import "../libraries/TickMath.sol";
+import "../libraries/OracleLibrary.sol";
 
 import "../common/AccessibleCommon.sol";
 
@@ -163,9 +164,15 @@ contract TokamakStakeUpgrade3 is
         // int24 tickSpacings = 60;
         // int24 acceptTickInterval = 8;
 
+        // require(
+        //     acceptMinTick(tick, 60, 8) <= curTick
+        //     && curTick < acceptMaxTick(tick, 60, 8),
+        //     "It's not allowed changed tick range."
+        // );
+        int24 timeWeightedAverageTick = OracleLibrary.consult(address(pool), 60);
         require(
-            acceptMinTick(tick, 60, 8) <= curTick
-            && curTick < acceptMaxTick(tick, 60, 8),
+            acceptMinTick(timeWeightedAverageTick, 60, 8) <= curTick
+            && curTick < acceptMaxTick(timeWeightedAverageTick, 60, 4),
             "It's not allowed changed tick range."
         );
 
