@@ -9,8 +9,9 @@ import {IIIDepositManager} from "../interfaces/IIIDepositManager.sol";
 import {IISeigManager} from "../interfaces/IISeigManager.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
 
-import '../libraries/FixedPoint96.sol';
-import '../libraries/FullMath.sol';
+import "../libraries/FixedPoint96.sol";
+import "../libraries/FullMath.sol";
+import "../libraries/TickMath.sol";
 
 import "../common/AccessibleCommon.sol";
 
@@ -138,12 +139,10 @@ contract TokamakStakeUpgrade3 is
     /// @dev exchange holded WTON to TOS using uniswap
     /// @param _amountIn the input amount
     /// @param _amountOutMinimum the minimun output amount
-    /// @param _deadline deadline
     /// @param _sqrtPriceLimitX96 sqrtPriceLimitX96
     function exchangeWTONtoTOS(
         uint256 _amountIn,
         uint256 _amountOutMinimum,
-        uint256 _deadline,
         uint160 _sqrtPriceLimitX96,
         uint8 slippage,
         int24 curTick
@@ -159,12 +158,21 @@ contract TokamakStakeUpgrade3 is
 
         (uint160 sqrtPriceX96, int24 tick,,,,,) =  pool.slot0();
         require(sqrtPriceX96 > 0, "pool is not initialized");
-        require(tick == curTick, "already tick was changed.");
+
+        // uint24 fee = 3000;
+        // int24 tickSpacings = 60;
+        // int24 acceptTickInterval = 8;
+
+        require(
+            acceptMinTick(tick, 60, 8) <= curTick
+            && curTick < acceptMaxTick(tick, 60, 8),
+            "It's not allowed changed tick range."
+        );
+
         // ---
         uint256 amountIn = _amountIn;
         uint256 amountOutMinimum = _amountOutMinimum;
         uint160 sqrtPriceLimitX96 = _sqrtPriceLimitX96;
-        uint256 deadline = _deadline;
 
         {
             uint256 _amountWTON = IERC20BASE2(wton).balanceOf(address(this));
@@ -223,7 +231,7 @@ contract TokamakStakeUpgrade3 is
                 tokenOut: token,
                 fee: uint24(_fee),
                 recipient: address(this),
-                deadline: deadline,
+                deadline: block.timestamp + 1000,
                 amountIn: amountIn,
                 amountOutMinimum: amountOutMinimum,
                 sqrtPriceLimitX96: sqrtPriceLimitX96
@@ -267,5 +275,31 @@ contract TokamakStakeUpgrade3 is
         return (0, 0);
     }
 
+    function getMiniTick(int24 tickSpacings) public view returns (int24){
+           return (TickMath.MIN_TICK / tickSpacings) * tickSpacings ;
+    }
+
+    function getMaxTick(int24 tickSpacings) public view  returns (int24){
+           return (TickMath.MAX_TICK / tickSpacings) * tickSpacings ;
+    }
+
+    function acceptMinTick(int24 _tick, int24 _tickSpacings, int24 _acceptTickInterval) public returns (int24)
+    {
+
+        int24 _minTick = getMiniTick(_tickSpacings);
+        int24 _acceptMinTick = _tick - (_tickSpacings * _acceptTickInterval);
+
+        if(_minTick < _acceptMinTick) return _acceptMinTick;
+        else return _minTick;
+    }
+
+    function acceptMaxTick(int24 _tick, int24 _tickSpacings, int24 _acceptTickInterval) public returns (int24)
+    {
+        int24 _maxTick = getMaxTick(_tickSpacings);
+        int24 _acceptMinTick = _tick + (_tickSpacings * _acceptTickInterval);
+
+        if(_maxTick < _acceptMinTick) return _maxTick;
+        else return _acceptMinTick;
+    }
 
 }
