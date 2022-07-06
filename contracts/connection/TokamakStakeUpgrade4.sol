@@ -76,7 +76,7 @@ interface ITokamakRegistry2 {
 }
 
 /// @title The connector that integrates tokamak
-contract TokamakStakeUpgrade3 is
+contract TokamakStakeUpgrade4 is
     StakeTONStorage,
     AccessibleCommon
 {
@@ -134,26 +134,27 @@ contract TokamakStakeUpgrade3 is
     }
 
     function version() external pure returns (string memory) {
-        return "phase1.upgrade.v3";
+        return "phase1.upgrade.v4";
+    }
+
+    function getQuoteAtTick(
+        int24 tick,
+        uint128 amountIn,
+        address baseToken,
+        address quoteToken
+    ) public pure returns (uint256 amountOut) {
+        return OracleLibrary.getQuoteAtTick(tick, amountIn, baseToken, quoteToken);
     }
 
     /// @dev exchange holded WTON to TOS using uniswap
-    /// @param _amountIn the input amount
-    /// @param _amountOutMinimum the minimun output amount
-    /// @param _sqrtPriceLimitX96 sqrtPriceLimitX96
+    /// @param amountIn the input amount
     function exchangeWTONtoTOS(
-        uint256 _amountIn,
-        uint256 _amountOutMinimum,
-        uint160 _sqrtPriceLimitX96,
-        uint8 slippage,
-        int24 curTick
+        uint256 amountIn
     ) external lock onlyClosed {
+        require(amountIn > 0, "zero input amount");
         require(block.number <= endBlock, "TokamakStaker: period end");
-
         checkTokamak();
 
-        //--
-        require(slippage > 0 && slippage <= 10, "It is not allowed slippage.");
         IIUniswapV3Pool pool = IIUniswapV3Pool(getPoolAddress());
         require(address(pool) != address(0), "pool didn't exist");
 
@@ -162,24 +163,17 @@ contract TokamakStakeUpgrade3 is
 
         // uint24 fee = 3000;
         // int24 tickSpacings = 60;
-        // int24 acceptTickInterval = 8;
-
-        // require(
-        //     acceptMinTick(tick, 60, 8) <= curTick
-        //     && curTick < acceptMaxTick(tick, 60, 8),
-        //     "It's not allowed changed tick range."
-        // );
-        int24 timeWeightedAverageTick = OracleLibrary.consult(address(pool), 60);
+        // int24 acceptTickChangeInterval = 8; +=5% 까지만 허용
+        // minimumTickInterval = 18; 가격이 떨어져도 +-10프로, 수수료가 있어서 2틱정도 더내림
+        int24 timeWeightedAverageTick = OracleLibrary.consult(address(pool), 120);
         require(
-            acceptMinTick(timeWeightedAverageTick, 60, 8) <= curTick
-            && curTick < acceptMaxTick(timeWeightedAverageTick, 60, 4),
+            acceptMinTick(timeWeightedAverageTick, 60, 8) <= tick
+            && tick < acceptMaxTick(timeWeightedAverageTick, 60, 8),
             "It's not allowed changed tick range."
         );
 
-        // ---
-        uint256 amountIn = _amountIn;
-        uint256 amountOutMinimum = _amountOutMinimum;
-        uint160 sqrtPriceLimitX96 = _sqrtPriceLimitX96;
+        (uint256 amountOutMinimum, , uint160 sqrtPriceLimitX96)
+            = limitPrameters(amountIn, address(pool), wton, token, 18);
 
         {
             uint256 _amountWTON = IERC20BASE2(wton).balanceOf(address(this));
@@ -213,9 +207,11 @@ contract TokamakStakeUpgrade3 is
                     holdAmount.sub(totalStakedAmount.mul(10**9)) >= amountIn,
                 "TokamakStaker:insufficient"
             );
-            if (_amountWTON < amountIn) {
+
+            uint256 _amountIn = amountIn;
+            if (_amountWTON < _amountIn) {
                 bytes memory data = abi.encode(swapProxy, swapProxy);
-                uint256 swapTON = amountIn.sub(_amountWTON).div(10**9);
+                uint256 swapTON = _amountIn.sub(_amountWTON).div(10**9);
                 require(
                     ITON(ton).approveAndCall(wton, swapTON, data),
                     "TokamakStaker:exchangeWTONtoTOS approveAndCall fail"
@@ -238,24 +234,12 @@ contract TokamakStakeUpgrade3 is
                 tokenOut: token,
                 fee: uint24(_fee),
                 recipient: address(this),
-                deadline: block.timestamp + 1000,
+                deadline: block.timestamp + 100,
                 amountIn: amountIn,
                 amountOutMinimum: amountOutMinimum,
                 sqrtPriceLimitX96: sqrtPriceLimitX96
             });
         uint256 amountOut = ISwapRouter(uniswapRouter).exactInputSingle(params);
-
-        //--
-        uint256 price = getPriceX96FromSqrtPriceX96(sqrtPriceX96);
-        uint256 _slippage = uint256(slippage);
-        (uint160 sqrtPriceX961,,,,,,) =  pool.slot0();
-        uint256 price1 = getPriceX96FromSqrtPriceX96(sqrtPriceX961);
-
-        uint256 lower = price.mul( 1000 - (_slippage * 1000 / 200) ).div(1000) ;
-        uint256 upper = price.mul( 1000 + (_slippage * 1000 / 200) ).div(1000) ;
-
-        require(lower <= price1 && price1 < upper, "out of acceptable price range");
-        //--
 
         emit ExchangedWTONtoTOS(msg.sender, amountIn, amountOut);
     }
@@ -273,24 +257,15 @@ contract TokamakStakeUpgrade3 is
         return FullMath.mulDiv(sqrtPriceX96, sqrtPriceX96, FixedPoint96.Q96);
     }
 
-    function currentTick() public view returns(uint160 sqrtPriceX96, int24 tick) {
-        address getPool = getPoolAddress();
-        if(getPool != address(0)) {
-            (uint160 sqrtPriceX96, int24 tick,,,,,) =  IIUniswapV3Pool(getPool).slot0();
-            return (sqrtPriceX96, tick);
-        }
-        return (0, 0);
-    }
-
-    function getMiniTick(int24 tickSpacings) public view returns (int24){
+    function getMiniTick(int24 tickSpacings) public pure returns (int24){
            return (TickMath.MIN_TICK / tickSpacings) * tickSpacings ;
     }
 
-    function getMaxTick(int24 tickSpacings) public view  returns (int24){
+    function getMaxTick(int24 tickSpacings) public pure  returns (int24){
            return (TickMath.MAX_TICK / tickSpacings) * tickSpacings ;
     }
 
-    function acceptMinTick(int24 _tick, int24 _tickSpacings, int24 _acceptTickInterval) public returns (int24)
+    function acceptMinTick(int24 _tick, int24 _tickSpacings, int24 _acceptTickInterval) public pure returns (int24)
     {
 
         int24 _minTick = getMiniTick(_tickSpacings);
@@ -300,13 +275,51 @@ contract TokamakStakeUpgrade3 is
         else return _minTick;
     }
 
-    function acceptMaxTick(int24 _tick, int24 _tickSpacings, int24 _acceptTickInterval) public returns (int24)
+    function acceptMaxTick(int24 _tick, int24 _tickSpacings, int24 _acceptTickInterval) public pure returns (int24)
     {
         int24 _maxTick = getMaxTick(_tickSpacings);
         int24 _acceptMinTick = _tick + (_tickSpacings * _acceptTickInterval);
 
         if(_maxTick < _acceptMinTick) return _maxTick;
         else return _acceptMinTick;
+    }
+
+    function limitPrameters(
+        uint256 amountIn,
+        address _pool,
+        address token0,
+        address token1,
+        int24 acceptTickCounts
+    ) public view returns  (uint256 amountOutMinimum, uint256 priceLimit, uint160 sqrtPriceX96Limit)
+    {
+        IIUniswapV3Pool pool = IIUniswapV3Pool(_pool);
+        (, int24 tick,,,,,) =  pool.slot0();
+
+        int24 _tick = tick;
+        if(token0 < token1) {
+            _tick = tick - acceptTickCounts * 60;
+            if(_tick < TickMath.MIN_TICK ) _tick =  TickMath.MIN_TICK ;
+        } else {
+            _tick = tick + acceptTickCounts * 60;
+            if(_tick > TickMath.MAX_TICK ) _tick =  TickMath.MAX_TICK ;
+        }
+        address token1_ = token1;
+        address token0_ = token0;
+        return (
+              getQuoteAtTick(
+                _tick,
+                uint128(amountIn),
+                token0_,
+                token1_
+                ),
+             getQuoteAtTick(
+                _tick,
+                uint128(10**27),
+                token0_,
+                token1_
+             ),
+             TickMath.getSqrtRatioAtTick(_tick)
+        );
     }
 
 }
