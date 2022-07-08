@@ -3,7 +3,6 @@
 pragma solidity ^0.7.6;
 pragma abicoder v2;
 
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import {
     ReentrancyGuard
@@ -14,6 +13,15 @@ import "../interfaces/IWTON.sol";
 import "../interfaces/ITON.sol";
 import "../common/ProxyAccessCommon.sol";
 import "./PublicSaleStorage.sol";
+
+interface IIERC20Burnable {
+    /**
+     * @dev Destroys `amount` tokens from the caller.
+     *
+     * See {ERC20-_burn}.
+     */
+    function burn(uint256 amount) external ;
+}
 
 contract PublicSale is
     PublicSaleStorage,
@@ -93,10 +101,16 @@ contract PublicSale is
         beforeStartAddWhiteTime
     {
         uint256 balance = saleToken.balanceOf(address(this));
-        require((_amount[0] + _amount[1]) <= balance, "amount err");
+        require((_amount[0] + _amount[1]) <= balance && 1 ether <= balance, "amount err");
         require(_time[6] < _claimTimes[0], "time err");
         require((deployTime + delayTime) < _time[0], "snapshot need later");
         require(_time[0] < _time[1], "whitelist before snapshot");
+        require(_claimTimes.length > 0 &&  _claimTimes.length == _claimPercents.length, "need the claimSet");
+        
+        if(snapshot != 0) {
+            require(isProxyAdmin(msg.sender), "only DAO can set");
+        }
+
         setTier(
             _Tier[0], _Tier[1], _Tier[2], _Tier[3]
         );
@@ -141,7 +155,12 @@ contract PublicSale is
         override
         onlyOwner
         nonZero(_snapshot)
+        beforeStartAddWhiteTime
     {
+        if(snapshot != 0) {
+            require(isProxyAdmin(msg.sender), "only DAO can set");
+        }
+
         snapshot = _snapshot;
     }
 
@@ -161,6 +180,10 @@ contract PublicSale is
         nonZero(_endExclusiveTime)
         beforeStartAddWhiteTime
     {
+        if(startAddWhiteTime != 0) {
+            require(isProxyAdmin(msg.sender), "only DAO can set");
+        }
+
         require(
             (_startAddWhiteTime < _endAddWhiteTime) &&
             (_endAddWhiteTime < _startExclusiveTime) &&
@@ -185,10 +208,15 @@ contract PublicSale is
         nonZero(_endDepositTime)
         beforeStartAddWhiteTime
     {
+        if(startDepositTime != 0) {
+            require(isProxyAdmin(msg.sender), "only DAO can set");
+        }
+
         require(
             (_startDepositTime < _endDepositTime),
             "PublicSale : Round2time err"
         );
+
         startDepositTime = _startDepositTime;
         endDepositTime = _endDepositTime;
     }
@@ -203,6 +231,10 @@ contract PublicSale is
         onlyOwner
         beforeStartAddWhiteTime
     {
+        if(totalClaimCounts != 0) {
+            require(isProxyAdmin(msg.sender), "only DAO can set");
+        }
+        
         totalClaimCounts = _claimCounts;
         uint256 i = 0;
         uint256 y = 0;
@@ -260,6 +292,9 @@ contract PublicSale is
         nonZero(_tier4)
         beforeStartAddWhiteTime
     {
+        if(tiers[1] != 0) {
+            require(isProxyAdmin(msg.sender), "only DAO can set");
+        }
         tiers[1] = _tier1;
         tiers[2] = _tier2;
         tiers[3] = _tier3;
@@ -282,6 +317,9 @@ contract PublicSale is
         nonZero(_tier4)
         beforeStartAddWhiteTime
     {
+        if(tiersPercents[1] != 0) {
+            require(isProxyAdmin(msg.sender), "only DAO can set");
+        }
         require(
             _tier1.add(_tier2).add(_tier3).add(_tier4) == 10000,
             "PublicSale: Sum should be 10000"
@@ -315,9 +353,12 @@ contract PublicSale is
         public
         override
         onlyOwner
-        nonZero(_totalExpectSaleAmount.add(_totalExpectOpenSaleAmount))
+        nonZero(_totalExpectSaleAmount)
         beforeStartAddWhiteTime
     {
+        if(totalExpectSaleAmount != 0) {
+            require(isProxyAdmin(msg.sender), "only DAO can set");
+        }
         totalExpectSaleAmount = _totalExpectSaleAmount;
         totalExpectOpenSaleAmount = _totalExpectOpenSaleAmount;
     }
@@ -334,6 +375,9 @@ contract PublicSale is
         nonZero(_payTokenPrice)
         beforeStartAddWhiteTime
     {
+        if(saleTokenPrice != 0) {
+            require(isProxyAdmin(msg.sender), "only DAO can set");
+        }
         saleTokenPrice = _saleTokenPrice;
         payTokenPrice = _payTokenPrice;
     }
@@ -343,14 +387,71 @@ contract PublicSale is
         uint256 _changePercent
     )
         public
+        override
         onlyOwner
-        nonZero(_hardcapAmount)
         nonZero(_changePercent)
         beforeStartAddWhiteTime
     {
+        if(changeTOS != 0) {
+            require(isProxyAdmin(msg.sender), "only DAO can set");
+        }
         require(_changePercent <= maxPer && _changePercent >= minPer,"PublicSale: need to set min,max");
         hardCap = _hardcapAmount;
         changeTOS = _changePercent;
+    }
+
+    function distributionByRounds(
+        uint256 startRound,
+        uint256 endRound
+    ) 
+        public
+        view
+        returns(uint256[] memory)
+    {   
+        if(startRound == 0) {
+            startRound = 1;
+        }
+        if(totalClaimCounts < startRound) {
+            startRound = totalClaimCounts;
+        }
+        if(endRound < startRound) {
+            endRound = startRound;
+        }
+        if(totalClaimCounts < endRound || endRound == 0) {
+            endRound = totalClaimCounts;
+        }
+
+        uint length = endRound.sub(startRound.sub(1));
+        uint256[] memory claims = new uint256[](length);
+
+        if(block.timestamp > endExclusiveTime && startRound != 0 ) {
+            for(uint256 i = 0; i < length; i++) {
+                uint256 amount = (((totalExSaleAmount.add(totalOpenSaleAmount())).mul(claimPercents[startRound.add(i).sub(1)])).div(100));
+                claims[i] = amount;
+            }
+        } 
+        else {
+            for(uint256 i = 0; i < length; i++) {
+                uint256 amount = (((totalExpectSaleAmount.add(totalExpectOpenSaleAmount)).mul(claimPercents[startRound.add(i).sub(1)])).div(100));
+                claims[i] = amount;
+            }
+        }
+        return claims;
+    }
+
+    function distributionByRound(
+        uint256 _round
+    )
+        public
+        view
+        returns(uint256)
+    {
+        if(block.timestamp > endExclusiveTime && _round != 0) {
+            return (((totalExSaleAmount.add(totalOpenSaleAmount())).mul(claimPercents[(_round-1)])).div(100));
+
+        } else {
+            return 0;
+        }
     }
 
     /// @inheritdoc IPublicSale
@@ -790,14 +891,10 @@ contract PublicSale is
     }
 
     function hardcapCalcul() public view returns (uint256){
-        uint256 getAmount = totalExPurchasedAmount.add(totalOpenPurchasedAmount());
+        uint256 totalPurchaseTONamount = totalExPurchasedAmount.add(totalOpenPurchasedAmount());
         uint256 calculAmount;
-        if (getAmount >= hardCap) {
-            if (totalRound2Users == totalRound2UsersClaim){
-                return calculAmount = IERC20(getToken).balanceOf(address(this)).mul(changeTOS).div(100);
-            } else {
-                return calculAmount = totalExPurchasedAmount.add(totalOpenPurchasedAmount()).sub(5 ether).mul(changeTOS).div(100);
-            }
+        if (totalPurchaseTONamount >= hardCap) {
+            return calculAmount = totalPurchaseTONamount.mul(changeTOS).div(100);
         } else {
             return 0;
         }
@@ -809,10 +906,11 @@ contract PublicSale is
         uint256 liquidityTON = hardcapCalcul();
         uint256 getAmount;
         require(liquidityTON > 0, "PublicSale: don't pass the hardCap");
+        require(adminWithdraw != true, "PublicSale: already get the TON");
         if (totalRound2Users == totalRound2UsersClaim){
             getAmount = IERC20(getToken).balanceOf(address(this)).sub(liquidityTON);
         } else {
-            getAmount = totalExPurchasedAmount.add(totalOpenPurchasedAmount()).sub(liquidityTON).sub(10 ether);
+            getAmount = totalExPurchasedAmount.add(totalOpenPurchasedAmount()).sub(liquidityTON).sub(2 ether);
         }
         require(getAmount <= IERC20(getToken).balanceOf(address(this)), "PublicSale: no token to receive");
 
@@ -832,33 +930,14 @@ contract PublicSale is
             });
         ISwapRouter(uniswapRouter).exactInputSingle(params);
 
+        uint256 burnAmount = totalExpectSaleAmount.add(totalExpectOpenSaleAmount).sub(totalOpenSaleAmount()).sub(totalExSaleAmount);
+
         uint256 tosAmount = tos.balanceOf(address(this));
 
+        adminWithdraw = true;
         tos.safeTransfer(liquidityVaultAddress, tosAmount);
         IERC20(getToken).safeTransfer(getTokenOwner, getAmount);
+        IIERC20Burnable(address(saleToken)).burn(burnAmount);
         emit DepositWithdrawal(msg.sender, getAmount, liquidityTON);
-    }
-
-    /// @inheritdoc IPublicSale
-    function withdraw() external override onlyOwner{
-        uint256 balance = saleToken.balanceOf(address(this));
-        if (block.timestamp <= endDepositTime){
-            require(balance > totalExpectSaleAmount.add(totalExpectOpenSaleAmount), "PublicSale: no withdrawable amount");
-            uint256 withdrawAmount = balance.sub(totalExpectSaleAmount.add(totalExpectOpenSaleAmount));
-            saleToken.safeTransfer(msg.sender, withdrawAmount);
-            emit Withdrawal(msg.sender, withdrawAmount);
-        } else {
-            require(!adminWithdraw, "PublicSale: already admin called withdraw");
-            adminWithdraw = true;
-            uint256 saleAmount = totalOpenSaleAmount();
-            require(totalExpectSaleAmount.add(totalExpectOpenSaleAmount) > totalExSaleAmount.add(saleAmount), "PublicSale: don't exist withdrawAmount");
-            uint256 withdrawAmount = totalExpectSaleAmount.add(totalExpectOpenSaleAmount).sub(totalExSaleAmount).sub(saleAmount);
-            uint256 amount = hardcapCalcul();
-            if(amount == 0) {
-                withdrawAmount = balance;
-            }
-            saleToken.safeTransfer(msg.sender, withdrawAmount);
-            emit Withdrawal(msg.sender, withdrawAmount);
-        }
     }
 }

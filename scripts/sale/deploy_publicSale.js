@@ -72,7 +72,17 @@ async function deployLogic() {
     console.log("saleContract Address: ", saleContract.address)
     await saleContract.deployed();
     console.log("finish");
+}
 
+async function deployLogicTest() {
+    const [deployer] = await ethers.getSigners()
+    console.log("Deploying contract with the account :", deployer.address)
+
+    const publicSale = await ethers.getContractFactory('PublicSaleTest')
+    const saleContract = await publicSale.deploy()
+    console.log("saleContract Address: ", saleContract.address)
+    await saleContract.deployed();
+    console.log("finish");
 }
 
 // main()
@@ -95,3 +105,10 @@ deployLogic()
         console.error(error);
         process.exit(1);
     });
+
+// deployLogicTest()
+//     .then(() => process.exit(0))
+//     .catch(error => {
+//         console.error(error);
+//         process.exit(1);
+//     });

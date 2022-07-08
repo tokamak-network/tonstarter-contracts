@@ -23,6 +23,7 @@ const ton = loadDeployed(process.env.NETWORK, "TON");
 const StakeTONProxy2 = loadDeployed(process.env.NETWORK, "StakeTONProxy2");
 const StakeTONUpgrade2 = loadDeployed(process.env.NETWORK, "StakeTONUpgrade2");
 const StakeTONUpgrade3 = loadDeployed(process.env.NETWORK, "StakeTONUpgrade3");
+const TokamakStakeUpgrade4 = loadDeployed(process.env.NETWORK, "TokamakStakeUpgrade4");
 
 async function deployMain(defaultSender) {
   const [deployer, user1] = await ethers.getSigners();
@@ -38,40 +39,41 @@ async function deployMain(defaultSender) {
   const isAdmin = await stakeTON1.isAdmin(deployer.address);
   console.log("isAdmin PHASE1_TON_1_ADDRESS", deployer.address, isAdmin);
 
-  const tx1 = await stakeTON1.setImplementation2(StakeTONUpgrade2, 0, true);
+  const tx1 = await stakeTON1.setImplementation2(TokamakStakeUpgrade4, 2, true);
   console.log(
-    "setImplementation2 PHASE1_TON_1_ADDRESS StakeTONUpgrade2 ",
+    "setImplementation2 PHASE1_TON_1_ADDRESS TokamakStakeUpgrade4 ",
     tx1.hash
   );
   printGasUsedOfUnits(
-    "setImplementation2 PHASE1_TON_1_ADDRESS StakeTONUpgrade2",
+    "setImplementation2 PHASE1_TON_1_ADDRESS TokamakStakeUpgrade4",
     tx1
   );
 
-  const tx2 = await stakeTON1.setImplementation2(StakeTONUpgrade3, 1, true);
-  console.log(
-    "setImplementation2 PHASE1_TON_1_ADDRESS StakeTONUpgrade3",
-    tx2.hash
-  );
-  printGasUsedOfUnits(
-    "setImplementation2 PHASE1_TON_1_ADDRESS StakeTONUpgrade3",
-    tx2
-  );
+  await tx1.wait();
+
+  let _func_exchangeWTONtoTOS = Web3EthAbi.encodeFunctionSignature("exchangeWTONtoTOS(uint256)");
+  let _func_getPoolAddress = Web3EthAbi.encodeFunctionSignature("getPoolAddress()");
+  let _func_acceptMinTick = Web3EthAbi.encodeFunctionSignature("acceptMinTick(int24,int24,int24)");
+  let _func_acceptMaxTick = Web3EthAbi.encodeFunctionSignature("acceptMaxTick(int24,int24,int24)");
+  let _func_limitPrameters = Web3EthAbi.encodeFunctionSignature("limitPrameters(uint256,address,address,address,int24)");
+
+  console.log("_func_exchangeWTONtoTOS",_func_exchangeWTONtoTOS);
+  console.log("_func_getPoolAddress",_func_getPoolAddress);
+  console.log("_func_acceptMinTick",_func_acceptMinTick);
+  console.log("_func_acceptMaxTick",_func_acceptMaxTick);
+  console.log("_func_limitPrameters",_func_limitPrameters);
 
 
-  const _func1 = Web3EthAbi.encodeFunctionSignature("withdraw()");
-  const _func3 = Web3EthAbi.encodeFunctionSignature("version()");
-  console.log("_func1 withdraw()", _func1);
   const tx3 = await stakeTON1.setSelectorImplementations2(
-    [_func1, _func3],
+    [_func_exchangeWTONtoTOS,_func_getPoolAddress,_func_acceptMinTick,_func_acceptMaxTick,_func_limitPrameters],
     StakeTONUpgrade3
   );
   console.log(
-    "setSelectorImplementations2 PHASE1_TON_1_ADDRESS withdraw",
+    "setSelectorImplementations2 PHASE1_TON_1_ADDRESS ",
     tx3.hash
   );
   printGasUsedOfUnits(
-    "setSelectorImplementations2 PHASE1_TON_1_ADDRESS withdraw",
+    "setSelectorImplementations2 PHASE1_TON_1_ADDRESS ",
     tx3
   );
 

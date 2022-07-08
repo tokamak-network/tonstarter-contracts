@@ -38,6 +38,19 @@ const {
   getEndTime,
 } = require("../../utils/deploy_common.js");
 
+
+// for rinkeby test
+const periods = [
+  {
+    name: process.env.PHASE1_TON_1_NAME,
+    period: process.env.PHASE1_TON_1_PERIOD,
+    startTime: process.env.PHASE1_TON_MINING_STARTTIME,
+    endTime: 0 ,
+    periodBlocks: 0
+  }
+];
+console.log(periods);
+
 /*
 // for rinkeby
 const periods = [
@@ -71,6 +84,7 @@ const periods = [
   }
 ];
 */
+ /*
 // for mainnet
 const periods = [
   {
@@ -109,7 +123,7 @@ const periods = [
     periodBlocks: 0,
   },
 ];
-
+*/
 async function main() {
   const [deployer, user1] = await ethers.getSigners();
   const users = await ethers.getSigners();
