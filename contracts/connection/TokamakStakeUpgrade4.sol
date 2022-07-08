@@ -2,7 +2,6 @@
 pragma solidity ^0.7.6;
 pragma abicoder v2;
 
-import "../interfaces/ITokamakStaker.sol";
 import {ITON} from "../interfaces/ITON.sol";
 import {IIStake1Vault} from "../interfaces/IIStake1Vault.sol";
 import {IIIDepositManager} from "../interfaces/IIIDepositManager.sol";
@@ -153,6 +152,7 @@ contract TokamakStakeUpgrade4 is
     ) external lock onlyClosed {
         require(amountIn > 0, "zero input amount");
         require(block.number <= endBlock, "TokamakStaker: period end");
+
         checkTokamak();
 
         IIUniswapV3Pool pool = IIUniswapV3Pool(getPoolAddress());

@@ -39,9 +39,8 @@ async function main() {
   const tos = await ethers.getContractAt("TOS", tostoken);
   console.log("tos:", tos.address);
 
-
   //================================================
-  let vault = '0x8A3Bd92E58a6FBc988BA54944FE038F02D59eFD0';
+  let vault = '0xbac8ea42e4301200b8bb6580e87224f2114f2980';
 
   let balance = await tos.balanceOf(vault);
   console.log("tos balance", vault,  utils.formatUnits(balance.toString(), 18) , 'TOS' );

@@ -43,7 +43,7 @@ async function main() {
   console.log("tos:", tos.address);
 
   //= ===============================================
-  const vault = "0x0bbd39eBDd7D0704a3b5E2Aa57f2fF0eea2188B4";
+  const vault = "0xbac8ea42e4301200b8bb6580e87224f2114f2980";
   const tx = await tos
     .connect(deployer)
     .mint(vault, utils.parseUnits(process.env.PHASE1_TON_ALLOCATED, 18));
