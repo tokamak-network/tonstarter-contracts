@@ -84,9 +84,12 @@ task("mainnet-deploy-lock-tos", "Deploy TOS").setAction(async () => {
 });
 
 task("rinkeby-deploy-lock-tos", "Deploy TOS").setAction(async () => {
-  const { RINKEBY_DEPLOY_ACCOUNT: account, RINKEBY_TOS_ADDRESS: tosAddress } =
-    process.env;
-  const deployer = await findAccount(account);
+  // const { RINKEBY_DEPLOY_ACCOUNT: account, RINKEBY_TOS_ADDRESS: tosAddress } =
+  //   process.env;
+   //const deployer = await findAccount(account);
+
+  const tosAddress =   "0x73a54e5C054aA64C1AE7373C2B5474d8AFEa08bd" ;
+  const [deployer] = await ethers.getSigners();
 
   const lockTOS = await (await ethers.getContractFactory("LockTOS"))
     .connect(deployer)
@@ -102,20 +105,19 @@ task("rinkeby-deploy-lock-tos", "Deploy TOS").setAction(async () => {
   console.log("LockTOSProxy: ", lockTOSProxy.address);
   const lockTOSProxyAddress = lockTOSProxy.address;
 
-  /*
   await (
     await lockTOSProxy.initialize(
       tosAddress,
-      parseInt(time.duration.minutes(30)),
-      parseInt(time.duration.minutes(30) * 156)
+      604800,
+      94348800
     )
   ).wait();
 
-
+    /*
   const adminAddress = "0x8c595DA827F4182bC0E3917BccA8e654DF8223E1";
   await (await lockTOSProxy.addAdmin(adminAddress)).wait();
-
   */
+
   await run("verify", {
     address: lockTOSAddress,
     constructorArgsParams: [],
