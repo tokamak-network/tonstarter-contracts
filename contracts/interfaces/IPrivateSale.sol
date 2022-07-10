@@ -32,7 +32,7 @@ interface IPrivateSale {
         uint256[2] calldata _tokenPrice,
         uint16 _claimCounts,
         uint256[] calldata _claimTimes,
-        uint256[] calldata _claimPercents
+        uint32[] calldata _claimPercents
     ) external;
 
     function settingSaleTime(uint256 _startTime,uint256 _endTime) external;
@@ -42,7 +42,7 @@ interface IPrivateSale {
     function setClaimArray(
         uint16 _claimCounts,
         uint256[] calldata _claimTimes,
-        uint256[] calldata _claimPercents
+        uint32[] calldata _claimPercents
     ) external;
 
     function addWhiteList(address _account,uint256 _amount) external;
@@ -51,8 +51,7 @@ interface IPrivateSale {
 
     function delWhiteList(address _account, uint256 _amount) external;
 
-    function buy(
-        address _sender,
+    function directBuy(
         address _claimAddress,
         uint256 _amount
     ) external;

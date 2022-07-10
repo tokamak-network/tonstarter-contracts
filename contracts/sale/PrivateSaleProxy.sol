@@ -39,12 +39,6 @@ contract PrivateSaleProxy is
         pauseProxy = _pause;
     }
 
-    /// @dev Set pause state
-    /// @param _pause true:pause or false:resume
-    function setSettingPause(bool _pause) external onlyProxyOwner {
-        pauseSetting = _pause;
-    }
-
     /// @dev Set implementation contract
     /// @param impl New implementation contract address
     /// @param _index index of proxy
@@ -73,8 +67,6 @@ contract PrivateSaleProxy is
     {
         return _implementation(_index);
     }
-
-    
 
     /// @dev set the implementation address and status of the proxy[index]
     /// @param newImplementation Address of the new implementation.

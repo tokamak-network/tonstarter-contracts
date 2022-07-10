@@ -58,6 +58,13 @@ contract PrivateSale is
         _;
     }
 
+    /// @dev Set pause state
+    /// @param _pause true:pause or false:resume
+    function setSettingPause(bool _pause) external onlyProxyOwner {
+        pauseSetting = _pause;
+    }
+
+
     /// @dev calculator the SaleAmount(input TON how many get the anotherToken)
     /// @param _amount input the TON amount
     function calculSaleToken(uint256 _amount)
@@ -141,7 +148,7 @@ contract PrivateSale is
         uint256[2] calldata _tokenPrice,
         uint16 _claimCounts,
         uint256[] calldata _claimTimes,
-        uint256[] calldata _claimPercents
+        uint32[] calldata _claimPercents
     ) 
         external
         override 
@@ -189,7 +196,7 @@ contract PrivateSale is
     function setClaimArray(
         uint16 _claimCounts,
         uint256[] calldata _claimTimes,
-        uint256[] calldata _claimPercents
+        uint32[] calldata _claimPercents
     ) 
         public
         override
@@ -203,7 +210,7 @@ contract PrivateSale is
 
         totalClaimCounts = _claimCounts;
         uint256 i = 0;
-        uint256 y = 0;
+        uint32 y = 0;
         for (i = 0; i < _claimCounts; i++) {
             claimTimes.push(_claimTimes[i]);
             if (i != 0){
@@ -213,7 +220,7 @@ contract PrivateSale is
             y = y + _claimPercents[i];
         }
 
-        require(y == 100, "claimPercents err");
+        require(y == 10000, "claimPercents err");
     }
 
     function currentRound() public view returns (uint16 round) {
@@ -246,7 +253,7 @@ contract PrivateSale is
             roundClaimPercent = roundClaimPercent.add(claimPercents[i]);
         }
         
-        uint256 userGetAmount = (user.totaloutputamount.mul(roundClaimPercent).div(100)).sub(user.getAmount);
+        uint256 userGetAmount = (user.totaloutputamount.mul(roundClaimPercent).div(10000)).sub(user.getAmount);
         return userGetAmount;
     }
 
@@ -299,13 +306,6 @@ contract PrivateSale is
         
         if(msg.sender == address(getToken)) {
             buy(sender,claimAddress,amount);
-            // uint256 wtonAmount = _decodeApproveData(data);
-            // if(wtonAmount == 0){
-            //     buy(sender,amount);
-            // } else {
-            //     uint256 totalAmount = amount + wtonAmount;
-            //     buy(sender,totalAmount);
-            // }
         } else if (msg.sender == address(IWTON(wton))) {
             uint256 wtonAmount = _toWAD(amount);
             buy(sender,claimAddress,wtonAmount);
@@ -342,11 +342,24 @@ contract PrivateSale is
         }
     }
 
+    function directBuy(
+        address _claimAddress,
+        uint256 _amount
+    ) public override {
+        require(saleStartTime != 0 && saleEndTime != 0, "need to setting saleTime");
+        require(block.timestamp >= saleStartTime && block.timestamp <= saleEndTime, "privaSale period end");
+        WhiteList storage userwhite = usersWhite[msg.sender];
+        require(userwhite.amount >= _amount, "need to add whiteList amount");
+
+        _buy(msg.sender,_claimAddress,_amount);
+        userwhite.amount = userwhite.amount.sub(_amount);
+    }
+
     function buy(
         address _sender,
         address _claimAddress,
         uint256 _amount
-    ) public override {
+    ) internal {
         require(saleStartTime != 0 && saleEndTime != 0, "need to setting saleTime");
         require(block.timestamp >= saleStartTime && block.timestamp <= saleEndTime, "privaSale period end");
         WhiteList storage userwhite = usersWhite[_sender];

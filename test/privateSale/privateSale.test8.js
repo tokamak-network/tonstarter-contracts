@@ -152,19 +152,33 @@ describe("PrivateSale", function () {
     let account1tonAllowance;
     let account2wtonAllowance;
 
-    let claimCounts = 5;
+    let claimCounts = 12;
 
     let claim1Times;
     let claim2Times;
     let claim3Times;
     let claim4Times;
     let claim5Times;
+    let claim6Times;
+    let claim7Times;
+    let claim8Times;
+    let claim9Times;
+    let claim10Times;
+    let claim11Times;
+    let claim12Times;
 
-    let claim1Percents = 2000;
-    let claim2Percents = 2000;
-    let claim3Percents = 2000;
-    let claim4Percents = 2000;
-    let claim5Percents = 2000;
+    let claim1Percents = 833;
+    let claim2Percents = 833;
+    let claim3Percents = 833;
+    let claim4Percents = 833;
+    let claim5Percents = 833;
+    let claim6Percents = 833;
+    let claim7Percents = 833;
+    let claim8Percents = 833;
+    let claim9Percents = 833;
+    let claim10Percents = 833;
+    let claim11Percents = 833;
+    let claim12Percents = 837;
     
     //시나리오
     //tester1 : ton으로 1000개 구매, tester2 : ton으로 3000개 wton으로 0개 구매, tester3 : wton으로 6000개 구매
@@ -317,13 +331,20 @@ describe("PrivateSale", function () {
             claim3Times = claim2Times + 20;
             claim4Times = claim3Times + 20;
             claim5Times = claim4Times + 20;
+            claim6Times = claim5Times + 20;
+            claim7Times = claim6Times + 20;
+            claim8Times = claim7Times + 20;
+            claim9Times = claim8Times + 20;
+            claim10Times = claim9Times + 20;
+            claim11Times = claim10Times + 20;
+            claim12Times = claim11Times + 20;
 
             await expect(privateSaleContract.connect(user4).setAllsetting(
                 [saleStartTime,saleEndTime],
                 [domPrice,tonPrice],
                 claimCounts,
-                [claim1Times,claim2Times,claim3Times,claim4Times,claim5Times],
-                [claim1Percents,claim2Percents,claim3Percents,claim4Percents,claim5Percents]
+                [claim1Times,claim2Times,claim3Times,claim4Times,claim5Times,claim6Times,claim7Times,claim8Times,claim9Times,claim10Times,claim11Times,claim12Times],
+                [claim1Percents,claim2Percents,claim3Percents,claim4Percents,claim5Percents,claim6Percents,claim7Percents,claim8Percents,claim9Percents,claim10Percents,claim11Percents,claim12Percents]
             )).to.be.revertedWith('Accessible: Caller is not an admin')
         })
 
@@ -338,13 +359,20 @@ describe("PrivateSale", function () {
             claim3Times = claim2Times + 20;
             claim4Times = claim3Times + 20;
             claim5Times = claim4Times + 20;
+            claim6Times = claim5Times + 20;
+            claim7Times = claim6Times + 20;
+            claim8Times = claim7Times + 20;
+            claim9Times = claim8Times + 20;
+            claim10Times = claim9Times + 20;
+            claim11Times = claim10Times + 20;
+            claim12Times = claim11Times + 20;
 
             await expect(privateSaleContract.connect(lowerAdmin).setAllsetting(
                 [saleStartTime,saleEndTime],
                 [domPrice,tonPrice],
                 claimCounts,
-                [claim1Times,claim2Times,claim3Times,claim4Times,claim5Times],
-                [claim1Percents,claim2Percents,claim3Percents,claim4Percents,claim5Percents]
+                [claim1Times,claim2Times,claim3Times,claim4Times,claim5Times,claim6Times,claim7Times,claim8Times,claim9Times,claim10Times,claim11Times,claim12Times],
+                [claim1Percents,claim2Percents,claim3Percents,claim4Percents,claim5Percents,claim6Percents,claim7Percents,claim8Percents,claim9Percents,claim10Percents,claim11Percents,claim12Percents]
             )).to.be.revertedWith("setting is Pause")
         })
 
@@ -357,13 +385,20 @@ describe("PrivateSale", function () {
             claim3Times = claim2Times + 20;
             claim4Times = claim3Times + 20;
             claim5Times = claim4Times + 20;
+            claim6Times = claim5Times + 20;
+            claim7Times = claim6Times + 20;
+            claim8Times = claim7Times + 20;
+            claim9Times = claim8Times + 20;
+            claim10Times = claim9Times + 20;
+            claim11Times = claim10Times + 20;
+            claim12Times = claim11Times + 20;
 
             await privateSaleContract.connect(admin).setAllsetting(
                 [saleStartTime,saleEndTime],
                 [domPrice,tonPrice],
                 claimCounts,
-                [claim1Times,claim2Times,claim3Times,claim4Times,claim5Times],
-                [claim1Percents,claim2Percents,claim3Percents,claim4Percents,claim5Percents]
+                [claim1Times,claim2Times,claim3Times,claim4Times,claim5Times,claim6Times,claim7Times,claim8Times,claim9Times,claim10Times,claim11Times,claim12Times],
+                [claim1Percents,claim2Percents,claim3Percents,claim4Percents,claim5Percents,claim6Percents,claim7Percents,claim8Percents,claim9Percents,claim10Percents,claim11Percents,claim12Percents]
             )
 
             expect(await privateSaleContract.saleStartTime()).to.be.equal(saleStartTime)
@@ -386,13 +421,20 @@ describe("PrivateSale", function () {
             claim3Times = claim2Times + 20;
             claim4Times = claim3Times + 20;
             claim5Times = claim4Times + 20;
+            claim6Times = claim5Times + 20;
+            claim7Times = claim6Times + 20;
+            claim8Times = claim7Times + 20;
+            claim9Times = claim8Times + 20;
+            claim10Times = claim9Times + 20;
+            claim11Times = claim10Times + 20;
+            claim12Times = claim11Times + 20;
 
             await privateSaleContract.connect(lowerAdmin).setAllsetting(
                 [saleStartTime,saleEndTime],
                 [domPrice,tonPrice],
                 claimCounts,
-                [claim1Times,claim2Times,claim3Times,claim4Times,claim5Times],
-                [claim1Percents,claim2Percents,claim3Percents,claim4Percents,claim5Percents]
+                [claim1Times,claim2Times,claim3Times,claim4Times,claim5Times,claim6Times,claim7Times,claim8Times,claim9Times,claim10Times,claim11Times,claim12Times],
+                [claim1Percents,claim2Percents,claim3Percents,claim4Percents,claim5Percents,claim6Percents,claim7Percents,claim8Percents,claim9Percents,claim10Percents,claim11Percents,claim12Percents]
             )
 
             expect(await privateSaleContract.saleStartTime()).to.be.equal(saleStartTime)
@@ -542,7 +584,7 @@ describe("PrivateSale", function () {
             let beforeTokenAmount = await dom.balanceOf(tester1.claimAccount.address);
             expect(beforeTokenAmount).to.be.equal(0);
 
-            let calculdirectAmount = bigAccount1Total * claim1Percents / 100;
+            let calculdirectAmount = bigAccount1Total * claim1Percents / 10000;
             console.log("calculdirectAmount : ", calculdirectAmount);
 
             await privateSaleContract.connect(tester1.claimAccount).claim(); 
@@ -570,10 +612,10 @@ describe("PrivateSale", function () {
             let beforeTokenAmount2 = await dom.balanceOf(tester3.claimAccount.address);
             expect(beforeTokenAmount2).to.be.equal(0);
 
-            let calculdirectAmount = bigAccount2Total * (claim1Percents+claim2Percents) / 100;
+            let calculdirectAmount = bigAccount2Total * (claim1Percents+claim2Percents) / 10000;
             // console.log("calculdirectAmount : ", calculdirectAmount);
 
-            let calculdirectAmount2 = bigAccount3Total * (claim1Percents+claim2Percents) / 100;
+            let calculdirectAmount2 = bigAccount3Total * (claim1Percents+claim2Percents) / 10000;
             // console.log("calculdirectAmount2 : ", calculdirectAmount2);
 
             await privateSaleContract.connect(tester2.claimAccount).claim(); 
@@ -585,38 +627,12 @@ describe("PrivateSale", function () {
             expect(afterTokenAmount2).to.be.equal(claimAmountConractexpect2);
         })
 
-        // it("claim round4 for account1", async () => {
-        //     await ethers.provider.send('evm_setNextBlockTimestamp', [claim4Times+5]);
-        //     await ethers.provider.send('evm_mine');
-
-        //     let round = await privateSaleContract.connect(tester1.claimAccount).currentRound(); 
-        //     expect(round).to.be.equal(4);
-
-        //     let claimAmountConractexpect = await privateSaleContract.calculClaimAmount(tester1.claimAccount.address,round);
-        //     console.log("claimAmountConractexpect : ", Number(claimAmountConractexpect));
-
-        //     let beforeTokenAmount = await dom.balanceOf(tester1.claimAccount.address);
-        //     let beforeGetTokenAmount = await privateSaleContract.usersAmount(tester1.claimAccount.address)
-        //     // console.log(Number(beforeGetTokenAmount.getAmount));
-        //     expect(beforeTokenAmount).to.be.equal(beforeGetTokenAmount.getAmount);
-
-        //     let calculdirectAmount = bigAccount1Total * (claim1Percents+claim2Percents+claim3Percents+claim4Percents) / 100;
-        //     console.log("calculdirectAmount : ", calculdirectAmount);
-        //     expect(Number(claimAmountConractexpect)+Number(beforeTokenAmount)).to.be.equal(calculdirectAmount);
-
-        //     await privateSaleContract.connect(tester1.claimAccount).claim(); 
-            
-        //     let afterTokenAmount = await dom.balanceOf(tester1.claimAccount.address);
-        //     expect(Number(afterTokenAmount)).to.be.equal(calculdirectAmount);
-        // })
-
-
-        it("claim round5 for account1, account2, account3", async () => {
-            await ethers.provider.send('evm_setNextBlockTimestamp', [claim5Times+5]);
+        it("claim round12 for account1, account2, account3", async () => {
+            await ethers.provider.send('evm_setNextBlockTimestamp', [claim12Times+5]);
             await ethers.provider.send('evm_mine');
 
             let round = await privateSaleContract.connect(tester1.claimAccount).currentRound(); 
-            expect(round).to.be.equal(5);
+            expect(round).to.be.equal(12);
 
             let claimAmountConractexpect = await privateSaleContract.calculClaimAmount(tester1.claimAccount.address,round);
             console.log("claimAmountConractexpect : ", Number(claimAmountConractexpect));
