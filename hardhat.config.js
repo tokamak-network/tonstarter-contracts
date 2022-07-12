@@ -17,7 +17,7 @@ require("./tasks/uniswap-v3-mint-position-task");
 require("./tasks/uniswap-v3-swap-task");
 require("./tasks/view-tasks");
 require("./tasks/abi-retriever");
-require("./tasks/stos-holders-info");
+require("./tasks/stos-info");
 // require("./tasks-rewardprogram/testcase");
 
 // const {
@@ -44,7 +44,21 @@ module.exports = {
   defaultNetwork: "hardhat",
   networks: {
     hardhat: {
+      accounts: {
+        count: 5,
+      },
+      forking: {
+        url: `https://mainnet.infura.io/v3/${process.env.InfuraKey}`,
+        blockNumber: 15125232,
+      },
+    },
+    local: {
       chainId: 31337,
+      url: `http://127.0.0.1:8545/`,
+      // accounts: [
+      //   `${process.env.ACCOUNT0_PK}`,
+      //   `${process.env.ACCOUNT1_PK}`
+      // ]
     },
     // rinkeby: {
     //   url: `https://rinkeby.infura.io/v3/${process.env.InfuraKey}`,
@@ -75,7 +89,7 @@ module.exports = {
     },
     mainnet: {
       url: `https://mainnet.infura.io/v3/${process.env.INFURA_API_KEY}`,
-      accounts: [ `${process.env.MAINNET_PRIVATE_KEY}` ],
+      // accounts: [ `${process.env.MAINNET_PRIVATE_KEY}` ],
       gasMultiplier: 1.25,
       gasPrice: 50000000000,
     },

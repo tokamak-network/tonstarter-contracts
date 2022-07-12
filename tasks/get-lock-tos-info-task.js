@@ -5,6 +5,7 @@ const { time } = require("@openzeppelin/test-helpers");
 
 const Web3EthAbi = require('web3-eth-abi');
 task("get-lock-tos-balance-change-manually", "Deploy TOS").setAction(async () => {
+
     const epochUnit = parseInt(time.duration.weeks(1));
     const maxTime = epochUnit * 156;
 
@@ -40,14 +41,6 @@ task("get-lock-tos-balance-change", "Deploy TOS").setAction(async () => {
     const tos = await TOS.connect(admin).deploy(name, symbol, version);
     await (await tos.connect(admin).mint(user.address, tosAmount)).wait();
     await tos.deployed();
-
-  const name = "TONStarter";
-  const symbol = "TOS";
-  const version = "1.0";
-  const TOS = await ethers.getContractFactory("TOS");
-  const tos = await TOS.connect(admin).deploy(name, symbol, version);
-  await (await tos.connect(admin).mint(user.address, tosAmount)).wait();
-  await tos.deployed();
 
   const lockTOSImpl = await (await ethers.getContractFactory("LockTOS"))
     .connect(admin)
@@ -244,6 +237,7 @@ const balanceOfABI = [
   },
 ];
 
+
 task("get-doc-tiers-sold", "Deploy TOS").setAction(async () => {
   const lockTOSAddress = "0x69b4a202fa4039b42ab23adb725aa7b1e9eebd79";
   const lockTOS = await ethers.getContractAt("LockTOS", lockTOSAddress);
@@ -286,14 +280,14 @@ task("get-doc-tiers-sold", "Deploy TOS").setAction(async () => {
       tier = "Tier 4";
       tiersSoldAmount[4] += docBalance;
     }
-
     console.log("No Tier Sold:\t", tiersSoldAmount[0]);
     console.log("Tier 1 Sold:\t", tiersSoldAmount[1]);
     console.log("Tier 2 Sold:\t", tiersSoldAmount[2]);
     console.log("Tier 3 Sold:\t", tiersSoldAmount[3]);
     console.log("Tier 4 Sold:\t", tiersSoldAmount[4]);
-
+  }
 });
+
 const PublicSaleABI = [
     {
         "constant": true,
@@ -399,9 +393,8 @@ task("get-stos-lost", "Deploy TOS").setAction(async () => {
       countDays,
       decrease,
     });
-  }
 
-  holdersWithBalance.sort((a, b) => b.decrease - a.decrease);
+    holdersWithBalance.sort((a, b) => b.decrease - a.decrease);
 
     console.log(`Address\Change\tCount days\tAverage`);
     for (const { holder, change, decrease, countDays } of holdersWithBalance) {
@@ -457,5 +450,5 @@ task("get-exclusive-saled", "Deploy TOS").setAction(async () => {
         }
         console.log('length', res.length);
       });
-
 });
+

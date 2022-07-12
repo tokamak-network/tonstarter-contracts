@@ -17,6 +17,8 @@ import "./LockTOSStorage.sol";
 import "./ProxyBase.sol";
 import "./LockTOSv2Storage.sol";
 
+// import "hardhat/console.log";
+
 contract LockTOSv2Logic0 is
     LockTOSStorage,
     AccessibleCommon,
@@ -102,6 +104,73 @@ contract LockTOSv2Logic0 is
     /// @inheritdoc ILockTOSv2Action0
     function increaseAmountByStaker(address user, uint256 _lockId, uint256 _value) external override onlyStaker {
         depositFor(user, _lockId, _value);
+    }
+
+    function increaseAmountOfIds(
+        address[] memory users,
+        uint256[] memory _lockIds,
+        uint256[] memory _values,
+        uint256 curTime
+    )
+        external onlyOwner
+    {
+        require(
+            users.length > 0
+            && users.length ==  _lockIds.length
+            && users.length ==  _values.length ,
+            "wrong length"
+        );
+
+        uint256 len = users.length;
+        //console.log("increaseAmountOfIds len %s", len);
+
+        for (uint256 i = 0; i < len; i++){
+            address _account = users[i];
+            uint256 _id = _lockIds[i];
+            uint256 _value = _values[i];
+            LibLockTOS.LockedBalance memory lock = lockedBalances[_account][_id];
+            if (lock.withdrawn == false  && _value > 0) {
+                //console.log("increaseAmountOfIds _id %s , _value %s", _id, _value);
+
+                cumulativeTOSAmount.add(_value);
+
+                // ==========================
+
+                LibLockTOS.LockedBalance memory lockedOld = lock;
+                LibLockTOS.LockedBalance memory lockedNew =
+                    LibLockTOS.LockedBalance({
+                        amount: lockedOld.amount,
+                        start: lockedOld.start,
+                        end: lockedOld.end,
+                        withdrawn: false
+                    });
+
+                // Make new lock
+                lockedNew.amount = lockedNew.amount.add(_value);
+
+                // Checkpoint
+                _checkpointForSync(lockedNew, lockedOld, curTime);
+
+                // Save new lock
+                lockedBalances[_account][_id] = lockedNew;
+                allLocks[_id] = lockedNew;
+                //console.log("Save new lock _id %s ", _id);
+
+                // Save user point,
+                int256 userSlope = lockedNew.amount.mul(MULTIPLIER).div(maxTime).toInt256();
+                int256 userBias = userSlope.mul(lockedNew.end.sub(curTime).toInt256());
+                LibLockTOS.Point memory userPoint =
+                    LibLockTOS.Point({
+                        timestamp: curTime,
+                        slope: userSlope,
+                        bias: userBias
+                    });
+                lockPointHistory[_id].push(userPoint);
+                // ==========================
+                // emit LockDeposited(_account, _id, _value);
+            }
+        }
+
     }
 
     /// @inheritdoc ILockTOSv2Action0
@@ -534,6 +603,81 @@ contract LockTOSv2Logic0 is
         // );
     }
 
+    function _checkpointForSync(
+        LibLockTOS.LockedBalance memory lockedNew,
+        LibLockTOS.LockedBalance memory lockedOld,
+        uint256 curTime
+    ) internal {
+        uint256 timestamp = curTime;
+        LibLockTOS.SlopeChange memory changeNew =
+            LibLockTOS.SlopeChange({slope: 0, bias: 0, changeTime: 0});
+        LibLockTOS.SlopeChange memory changeOld =
+            LibLockTOS.SlopeChange({slope: 0, bias: 0, changeTime: 0});
+
+        // Initialize slope changes
+        if (lockedNew.end > timestamp && lockedNew.amount > 0) {
+            changeNew.slope = lockedNew
+                .amount
+                .mul(MULTIPLIER)
+                .div(maxTime)
+                .toInt256();
+            changeNew.bias = changeNew.slope
+                .mul(lockedNew.end.sub(timestamp).toInt256());
+            changeNew.changeTime = lockedNew.end;
+        }
+        if (lockedOld.end > timestamp && lockedOld.amount > 0) {
+            changeOld.slope = lockedOld
+                .amount
+                .mul(MULTIPLIER)
+                .div(maxTime)
+                .toInt256();
+            changeOld.bias = changeOld.slope
+                .mul(lockedOld.end.sub(timestamp).toInt256());
+            changeOld.changeTime = lockedOld.end;
+        }
+
+        // Record history gaps
+        LibLockTOS.Point memory currentWeekPoint = _recordHistoryPoints();
+        currentWeekPoint.bias = currentWeekPoint.bias.add(
+            changeNew.bias.sub(changeOld.bias)
+        );
+        currentWeekPoint.slope = currentWeekPoint.slope.add(
+            changeNew.slope.sub(changeOld.slope)
+        );
+        currentWeekPoint.bias = currentWeekPoint.bias > 0
+            ? currentWeekPoint.bias
+            : 0;
+        currentWeekPoint.slope = currentWeekPoint.slope > 0
+            ? currentWeekPoint.slope
+            : 0;
+        pointHistory[pointHistory.length - 1] = currentWeekPoint;
+
+        // Update slope changes
+        _updateSlopeChangesForSync(changeNew, changeOld, curTime);
+    }
+
+    function _updateSlopeChangesForSync(
+        LibLockTOS.SlopeChange memory changeNew,
+        LibLockTOS.SlopeChange memory changeOld,
+        uint256 curTIme
+    ) internal {
+        int256 deltaSlopeNew = slopeChanges[changeNew.changeTime];
+        int256 deltaSlopeOld = slopeChanges[changeOld.changeTime];
+        if (changeOld.changeTime > curTIme) {
+            deltaSlopeOld = deltaSlopeOld.add(changeOld.slope);
+            if (changeOld.changeTime == changeNew.changeTime) {
+                deltaSlopeOld = deltaSlopeOld.sub(changeNew.slope);
+            }
+            slopeChanges[changeOld.changeTime] = deltaSlopeOld;
+        }
+        if (
+            changeNew.changeTime > curTIme &&
+            changeNew.changeTime > changeOld.changeTime
+        ) {
+            deltaSlopeNew = deltaSlopeNew.sub(changeNew.slope);
+            slopeChanges[changeNew.changeTime] = deltaSlopeNew;
+        }
+    }
 
     function _checkpoint(
         LibLockTOS.LockedBalance memory lockedNew,
@@ -680,4 +824,9 @@ contract LockTOSv2Logic0 is
     function currentStakedTotalTOS() external view returns (uint256) {
         return IERC20(tos).balanceOf(address(this));
     }
+
+    function version2() external pure returns (bool) {
+        return true;
+    }
+
 }
