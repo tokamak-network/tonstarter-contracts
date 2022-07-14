@@ -246,10 +246,10 @@ const increaseLockTOSAmounts = async (lockTosAddress, blockNumber, adminAddress,
           //break;
         }
       }
- }
+}
 
 
- const compareLockTOSAmounts = async (lockTosAddress, blockNumber) => {
+const compareLockTOSAmounts = async (lockTosAddress, blockNumber) => {
     const [admin] = await ethers.getSigners();
 
     const addLockTosInfos = JSON.parse(await fs.readFileSync("./data/stos-ids-"+blockNumber+".json"));
@@ -295,12 +295,17 @@ const increaseLockTOSAmounts = async (lockTosAddress, blockNumber, adminAddress,
 
             let id = ethers.BigNumber.from(ids[i]);
             let amount = ethers.BigNumber.from(amounts[i]);
-            let profit = parseInt(profits[i]);
+            let profit = profits[i];
+            let info = await lockTOS.locksInfo(id);
 
-            if(profit > 0){
-                let info = await lockTOS.locksInfo(id);
-
+            if(profit != "0"){
                 if(info.amount.gt(amount)) {
+                    console.log('ok ', id.toString(), 'original ', amount.toString(), ',profit',profit, 'increase',info.amount.toString() );
+                } else {
+                    console.log('wrong ', id.toString(), 'original ', amount.toString(), ',profit',profit, 'increase',info.amount.toString());
+                }
+            } else {
+                if(info.amount.eq(amount)) {
                     console.log('ok ', id.toString(), 'original ', amount.toString(), ',profit',profit, 'increase',info.amount.toString() );
                 } else {
                     console.log('wrong ', id.toString(), 'original ', amount.toString(), ',profit',profit, 'increase',info.amount.toString());
@@ -312,8 +317,188 @@ const increaseLockTOSAmounts = async (lockTosAddress, blockNumber, adminAddress,
         console.log('compareLockTOSAmoutn error', start, end, error);
     }
 
+}
+
+
+const migrateStakeAndeLockTOS = async (stakeAddress, blockNumber, adminAddress, round) => {
+    //const [admin] = await ethers.getSigners();
+    console.log('stakeAddress',stakeAddress);
+    console.log('adminAddress',adminAddress);
+    console.log('round',round);
+
+    round = parseInt(round) ;
+    // await hre.network.provider.send('hardhat_impersonateAccount',[adminAddress]);
+    // await hre.network.provider.send('hardhat_setBalance',[adminAddress, "0x10000000000000000000000000"]);
+    let admin = await hre.ethers.getSigner(adminAddress) ;
+    console.log('admin',admin.address);
+
+    const addLockTosInfos = JSON.parse(await fs.readFileSync("./data/stos-ids-"+blockNumber+".json"));
+
+    const StakingV2ABI = require("../../abis/StakingV2.json").abi;
+
+    const stakingV2 = new ethers.Contract(
+        stakeAddress,
+        StakingV2ABI,
+        ethers.provider
+      );
+
+    if(addLockTosInfos.ids == null) return;
+
+    let len = addLockTosInfos.ids.length;
+    let currentTime = addLockTosInfos.timestamp;
+    let ids = addLockTosInfos.ids;
+    let accounts = addLockTosInfos.accounts;
+    let amounts = addLockTosInfos.amounts;
+    let ends = addLockTosInfos.ends;
+    let profits = addLockTosInfos.profits;
+    console.log('len',len)
+    console.log('currentTime',currentTime)
+    // console.log('accounts',accounts)
+    // console.log('amounts',amounts)
+    // console.log('ends',ends)
+    // console.log('profits',profits)
+
+    let batchSize = 100; //360
+    let loopCount = Math.floor(len/batchSize)+1;
+
+    let maxRound = loopCount -1;
+    console.log('loopCount',loopCount, 'maxRound',maxRound, 'round', round);
+    let c = 0;
+    //for(c = 0; c < loopCount; c++){
+    if(round <= maxRound){
+        c = round;
+        let start = c * batchSize;
+        let end = start + batchSize;
+        if(end > addLockTosInfos.ids.length)  end = addLockTosInfos.ids.length;
+
+        console.log('start',start)
+        console.log('end',end)
+
+
+        let idList = [];
+        let accountList = [];
+        let amountList = [];
+        // let profitList = [];
+        let endList = [];
+
+        try{
+            if(!ids) return;
+            if(!accounts) return;
+            if(!amounts) return;
+            if(!ends) return;
+            if(!profits) return;
+
+            for(let i = start; i < end; i++){
+                idList.push(ethers.BigNumber.from(ids[i]));
+                accountList.push(accounts[i]);
+                amountList.push(ethers.BigNumber.from(amounts[i]));
+                endList.push(ethers.BigNumber.from(ends[i]));
+                // profitList.push(ethers.BigNumber.from(profits[i]));
+            }
+            console.log(c, 'idList',idList)
+            // console.log(c, 'accountList',accountList)
+            // console.log(c, 'amountList',amountList)
+            // console.log(c, 'endList',endList)
+
+            let tx = await stakingV2.connect(admin).syncSTOS(
+                        accountList,
+                        amountList,
+                        endList,
+                        idList
+                    );
+
+            console.log(c, 'migrateStakeAndeLockTOS end ',start, end, tx.hash)
+
+            await tx.wait();
+            //await timeout(5);
+
+        }catch(error){
+          console.log('migrateStakeAndeLockTOS error',c, start, end, error);
+          //break;
+        }
+      }
  }
 
+
+
+
+ const compareStakeAnfLockTOSAmounts = async (stakeAddress, lockTosAddress, blockNumber) => {
+    const [admin] = await ethers.getSigners();
+
+    const addLockTosInfos = JSON.parse(await fs.readFileSync("./data/stos-ids-"+blockNumber+".json"));
+    const StakingV2ABI = require("../../abis/StakingV2.json").abi;
+    const lockTosABI = require("../../abis/LockTOSv2Logic0.json").abi;
+
+    const stakingV2 = new ethers.Contract(
+        stakeAddress,
+        StakingV2ABI,
+        ethers.provider
+      );
+
+    const lockTOS = new ethers.Contract(
+        lockTosAddress,
+        lockTosABI,
+        ethers.provider
+      );
+
+    if(addLockTosInfos.ids == null) return;
+
+    let len = addLockTosInfos.ids.length;
+    let currentTime = addLockTosInfos.timestamp;
+    let ids = addLockTosInfos.ids;
+    let accounts = addLockTosInfos.accounts;
+    let amounts = addLockTosInfos.amounts;
+    let ends = addLockTosInfos.ends;
+    let profits = addLockTosInfos.profits;
+    console.log('len',len)
+
+    let start = 0;
+    let end = addLockTosInfos.ids.length;
+
+    console.log('start',start)
+    console.log('end',end)
+
+    let idList = [];
+    let accountList = [];
+    let amountList = [];
+    let profitList = [];
+
+    try{
+        if(!ids) return;
+        if(!accounts) return;
+        if(!amounts) return;
+        if(!ends) return;
+        if(!profits) return;
+
+        for(let i = start; i < end; i++){
+
+            let id = ethers.BigNumber.from(ids[i]);
+            let amount = ethers.BigNumber.from(amounts[i]);
+            let profit = profits[i];
+            let lockTosInfo = await lockTOS.locksInfo(id);
+            let stakeId = await stakingV2.lockTOSId(id);
+            let stakeInfo = await stakingV2.allStakings(stakeId);
+            LTOS
+            if(profit != "0"){
+                if(info.amount.gt(amount)) {
+                    console.log('ok ', id.toString(), 'original ', amount.toString(), ',profit',profit, 'increase',info.amount.toString() );
+                } else {
+                    console.log('wrong ', id.toString(), 'original ', amount.toString(), ',profit',profit, 'increase',info.amount.toString());
+                }
+            } else {
+                if(info.amount.eq(amount)) {
+                    console.log('ok ', id.toString(), 'original ', amount.toString(), ',profit',profit, 'increase',info.amount.toString() );
+                } else {
+                    console.log('wrong ', id.toString(), 'original ', amount.toString(), ',profit',profit, 'increase',info.amount.toString());
+                }
+            }
+        }
+
+    }catch(error){
+        console.log('compareStakeAnfLockTOSAmounts error', start, end, error);
+    }
+
+}
 
 function timeout(sec) {
     return new Promise((resolve) => {
@@ -326,5 +511,7 @@ module.exports = {
     getStosBalances,
     getlockIds,
     increaseLockTOSAmounts,
-    compareLockTOSAmounts
+    compareLockTOSAmounts,
+    migrateStakeAndeLockTOS,
+    compareStakeAnfLockTOSAmounts
 }

@@ -5,7 +5,9 @@ const {
   getStosBalances,
   getlockIds,
   increaseLockTOSAmounts,
-  compareLockTOSAmounts
+  compareLockTOSAmounts,
+  migrateStakeAndeLockTOS,
+  compareStakeAnfLockTOSAmounts
 } = require("../test/lockTos/tosv2-migration");
 
 task("get-stos-holder-list", "Retrieve sTos holder list into a file")
@@ -32,11 +34,20 @@ task("get-lock-tos-list", "Retrieve sTos holder list into a file")
   })
 
 
-task("compare-lock-tos-v2", "Retrieve sTos holder list into a file")
+task("compare-lock-tos-v2", "Check lockTosV2 amount")
   .addParam("lockTosAddress", "LockTOS Address")
   .addParam("blockNumber", "blockNumber")
   .setAction(async ({ lockTosAddress, blockNumber}) => {
     await compareLockTOSAmounts(lockTosAddress, blockNumber);
+  })
+
+
+task("compare-stake-and-lock-tos", "Check lockTosV2 and Stake amount")
+  .addParam("stakeAddress", "Stake Address")
+  .addParam("lockTosAddress", "LockTOS Address")
+  .addParam("blockNumber", "blockNumber")
+  .setAction(async ({ stakeAddress, lockTosAddress, blockNumber}) => {
+    await compareStakeAnfLockTOSAmounts(stakeAddress, lockTosAddress, blockNumber);
   })
 
 task("increase-lock-tos", "Increase lockTos")
@@ -47,6 +58,17 @@ task("increase-lock-tos", "Increase lockTos")
   .setAction(async ({ lockTosAddress, blockNumber, adminAddress, round}) => {
 
     await increaseLockTOSAmounts(lockTosAddress, blockNumber, adminAddress, round);
+  })
+
+
+task("migrate-stake-lock-tos", "Increase lockTos")
+  .addParam("stakeAddress", "Stake Address")
+  .addParam("blockNumber", "blockNumber")
+  .addParam("adminAddress", "admin Address")
+  .addParam("round", "round")
+  .setAction(async ({ stakeAddress, blockNumber, adminAddress, round}) => {
+
+    await migrateStakeAndeLockTOS(stakeAddress, blockNumber, adminAddress, round);
   })
 
 
@@ -114,7 +136,39 @@ task("deploy-lock-tos-v2", "Depoly LockTosV2")
         constructorArgsParams: [],
       });
       */
-  })
+})
+
+task("set-stake-lock-tos2", "Set Stake in LockTosV2")
+  .addParam("stakeAddress", "Stake Address")
+  .addParam("lockTosAddress", "LockTOS Address")
+  .addParam("adminAddress", "admin Address")
+  .setAction(async ({lockTosAddress, adminAddress}) => {
+      const { RINKEBY_DEPLOY_ACCOUNT: account } = process.env;
+
+      const accounts = await ethers.getSigners();
+      const deployer = accounts[0];
+      console.log("deployer: ", deployer.address);
+
+      await hre.network.provider.send('hardhat_impersonateAccount',[adminAddress]);
+      await hre.network.provider.send('hardhat_setBalance',[adminAddress, "0x10000000000000000000000000"]);
+      let admin = await hre.ethers.getSigner(adminAddress) ;
+      console.log("admin", admin.address);
+
+      const lockTosABI = require("../../abis/LockTOSv2Logic0.json").abi;
+
+      const lockTOS = new ethers.Contract(
+        lockTosAddress,
+        lockTosABI,
+        ethers.provider
+      );
+
+      let tx = await lockTOS.connect(admin).setStaker(stakeAddress);
+      console.log("setStaker: ",   tx.hash);
+      await tx.wait();
+
+      let staker = await lockTOS.connect(admin).staker();
+      console.log("staker: ",   staker);
+})
 
   /*
   task("set-lock-tos-v2-proxy", "Depoly LockTosV2")
