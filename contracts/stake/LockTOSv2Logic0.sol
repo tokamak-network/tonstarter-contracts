@@ -197,6 +197,39 @@ contract LockTOSv2Logic0 is
         emit LockUnlockTimeIncreased(user, _lockId, unlockTime);
     }
 
+
+    function increaseAmountUnlockTimeByStaker(address user, uint256 _lockId, uint256 _value, uint256 _unlockWeeks)
+        external override onlyStaker
+    {
+
+        require(_value > 0, "Value locked should be non-zero");
+        require(_unlockWeeks > 0, "Unlock period less than a week");
+
+        LibLockTOS.LockedBalance memory lock = lockedBalances[user][_lockId];
+        require(lock.withdrawn == false, "Lock is withdrawn");
+        require(lock.start > 0, "Lock does not exist");
+        require(lock.end > block.timestamp, "Lock time is finished");
+
+        uint256 unlockTime = lock.end.add(_unlockWeeks.mul(epochUnit));
+        unlockTime = unlockTime.div(epochUnit).mul(epochUnit);
+        require(
+            unlockTime - block.timestamp < maxTime,
+            "Max unlock time is 3 years"
+        );
+        require(lock.end < unlockTime, "New lock time must be greater");
+        require(lock.amount > 0, "No existing locked TOS");
+
+        cumulativeTOSAmount = cumulativeTOSAmount.add(_value);
+        cumulativeEpochUnit = cumulativeEpochUnit.add(_unlockWeeks);
+
+        _deposit(user, _lockId, _value, unlockTime);
+
+        emit LockDeposited(user, _lockId, _value);
+        emit LockUnlockTimeIncreased(user, _lockId, unlockTime);
+    }
+
+
+
     /// @inheritdoc ILockTOSv2Action0
     function withdrawAllByStaker(address user) external override ifFree onlyStaker{
         uint256[] storage locks = userLocks[user];
