@@ -197,11 +197,10 @@ contract LockTOSv2Logic0 is
         emit LockUnlockTimeIncreased(user, _lockId, unlockTime);
     }
 
-
+    /// @inheritdoc ILockTOSv2Action0
     function increaseAmountUnlockTimeByStaker(address user, uint256 _lockId, uint256 _value, uint256 _unlockWeeks)
         external override onlyStaker
     {
-
         require(_value > 0, "Value locked should be non-zero");
         require(_unlockWeeks > 0, "Unlock period less than a week");
 

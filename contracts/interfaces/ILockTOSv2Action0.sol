@@ -94,8 +94,12 @@ interface ILockTOSv2Action0 {
         external
         returns (uint256 lockId);
 
-    /// @dev Increase
+    /// @dev Increase UnlockTime
     function increaseUnlockTimeByStaker(address user, uint256 _lockId, uint256 unlockTime) external;
+
+
+    /// @dev Increase amount and UnlockTime
+    function increaseAmountUnlockTimeByStaker(address user, uint256 _lockId, uint256 _value, uint256 _unlockWeeks) external;
 
     /// @dev Withdraw all TOS
     function withdrawAllByStaker(address user) external;
@@ -104,7 +108,7 @@ interface ILockTOSv2Action0 {
     function withdrawByStaker(address user, uint256 _lockId) external;
 
 
-     ///=== onlyStaker
+     ///=== onlyOwner
 
     /// @dev set MaxTime
     function setMaxTime(uint256 _maxTime) external;
