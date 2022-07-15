@@ -287,10 +287,9 @@ describe("PrivateSale", function () {
             privateSalelogicContract = await privateSale.connect(admin).deploy()
 
             privateSaleProxy = await ethers.getContractFactory("PrivateSaleProxy");
-            privateSaleProxyContract = await privateSaleProxy.connect(admin).deploy(
-                privateSalelogicContract.address, 
-                admin.address
-            );
+            privateSaleProxyContract = await privateSaleProxy.connect(admin).deploy();
+
+            await privateSaleProxyContract.connect(admin).upgradeTo(privateSalelogicContract.address);
 
             await privateSaleProxyContract.connect(admin).initialize(
                 wton.address,
