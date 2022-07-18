@@ -177,7 +177,7 @@ task("get-lock-tos-snapshot", "Snapshot").setAction(async () => {
   }
 
     holdersWithBalance.sort((a, b) => b.balance - a.balance);
-    const date = '2022.06.18';
+    const date = '2022.07.14';
     for (const { holder, balance } of holdersWithBalance) {
         const rat = parseFloat(balance / totalSupply);
         const percentage = parseFloat((rat) * 100).toFixed(4);
@@ -452,3 +452,47 @@ task("get-exclusive-saled", "Deploy TOS").setAction(async () => {
       });
 });
 
+
+task("get-lock-tos-balance-snapshot", "Snapshot")
+  .addParam("lockTosAddress", "lockTOSAddress")
+  .addParam("blockNumber", "blockNumber")
+  .setAction(async ({lockTosAddress, blockNumber}) => {
+
+    const lockTOS = await ethers.getContractAt("LockTOS", lockTosAddress);
+    lockTOS.defaultBlock = blockNumber;
+
+    let totalBN = await lockTOS.totalSupply();
+
+    const totalSupply = parseFloat(
+      ethers.utils.formatEther(totalBN)
+    ).toFixed(2);
+
+    const activeHolders = await lockTOS.activeHolders();
+    const holdersWithBalance = [];
+
+    for (const holder of activeHolders) {
+
+      let balance_ = await lockTOS.balanceOf(holder);
+      let lockAmount_ = await lockTOS.totalLockedAmountOf(holder);
+
+      const balanceNow = parseFloat(
+        ethers.utils.formatEther(balance_)
+      );
+      const lockAmountNow = parseFloat(
+        ethers.utils.formatEther(lockAmount_)
+      );
+      holdersWithBalance.push({
+        holder: holder,
+        balance: balanceNow,
+        lockAmount: lockAmountNow
+      });
+    }
+
+    holdersWithBalance.sort((a, b) => b.balance - a.balance);
+
+    for (const { holder, balance, lockAmount } of holdersWithBalance) {
+        const rat = parseFloat(balance / totalSupply);
+        const percentage = parseFloat((rat) * 100).toFixed(4);
+        console.log(`${holder}\t${balance.toFixed(4)}\t${percentage}%\t${lockAmount.toFixed(4)}`);
+    }
+});

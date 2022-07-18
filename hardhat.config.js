@@ -88,8 +88,8 @@ module.exports = {
       // gasPrice: 20000000000,
     },
     mainnet: {
-      url: `https://mainnet.infura.io/v3/${process.env.INFURA_API_KEY}`,
-      // accounts: [ `${process.env.MAINNET_PRIVATE_KEY}` ],
+      url: `https://mainnet.infura.io/v3/${process.env.InfuraKey}`,
+      accounts: [ `${process.env.ACCOUNT0_PK}` ],
       gasMultiplier: 1.25,
       gasPrice: 50000000000,
     },
