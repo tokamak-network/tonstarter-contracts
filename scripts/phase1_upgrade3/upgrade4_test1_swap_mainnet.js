@@ -32,17 +32,20 @@ const StakeTONUpgrade3 = loadDeployed(process.env.NETWORK, "StakeTONUpgrade3");
 const wtonABI = require("../../abis/TOS.json");
 const TokamakStakeUpgrade4ABI = require("../../abis/TokamakStakeUpgrade4.json");
 
+// TON #1 컨트랙 주소 : "0x9a8294566960ab244d78d266ffe0f284cdf728f1"
+// TON #2 컨트랙 주소 : "0x7da4E8Ab0bB29a6772b6231b01ea372994c2A49A"
+
+let PHASE1_TON_1_ADDRESS = "0x9a8294566960ab244d78d266ffe0f284cdf728f1";
 
 async function deployMain(defaultSender) {
   const [deployer, user1] = await ethers.getSigners();
 
   const wtonContract = await ethers.getContractAt(wtonABI.abi, wton, ethers.provider);
   console.log("wton:", wton);
-  let wtonbalance = await wtonContract.balanceOf(process.env.PHASE1_TON_1_ADDRESS);
+  let wtonbalance = await wtonContract.balanceOf(PHASE1_TON_1_ADDRESS);
   console.log("wtonbalance:", wtonbalance.toString());
 
-
-  const StakeTON1 = await ethers.getContractAt(TokamakStakeUpgrade4ABI.abi, process.env.PHASE1_TON_1_ADDRESS, ethers.provider);
+  const StakeTON1 = await ethers.getContractAt(TokamakStakeUpgrade4ABI.abi, PHASE1_TON_1_ADDRESS, ethers.provider);
   console.log("StakeTON1:", StakeTON1.address);
 
   let getPoolAddress = await StakeTON1.getPoolAddress();
@@ -51,10 +54,10 @@ async function deployMain(defaultSender) {
   let totalStakedAmount = await StakeTON1.totalStakedAmount();
   console.log("totalStakedAmount:", totalStakedAmount.toString());
 
-  let tx = await StakeTON1.connect(deployer).exchangeWTONtoTOS(
-      wtonbalance.sub(ethers.BigNumber.from("80000000000000000000000000000"))
-    );
-  console.log("exchangeWTONtoTOS:", tx);
+  // let tx = await StakeTON1.connect(deployer).exchangeWTONtoTOS(
+  //     wtonbalance.sub(ethers.BigNumber.from("80000000000000000000000000000"))
+  //   );
+  // console.log("exchangeWTONtoTOS:", tx);
 
   return null;
 }
@@ -65,6 +68,10 @@ async function main() {
   console.log("Deploying contracts with the account:", deployer.address, process.env.NETWORK);
 
   console.log("Account balance:", (await deployer.getBalance()).toString());
+
+  // let _func_exchangeWTONtoTOS_old = Web3EthAbi.encodeFunctionSignature("exchangeWTONtoTOS(uint256,uint256,uint256,uint160,uint256)");
+
+  // console.log("_func_exchangeWTONtoTOS_old",_func_exchangeWTONtoTOS_old);
 
   contracts = await deployMain(deployer);
 
