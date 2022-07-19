@@ -115,6 +115,12 @@
 
 * "PublicSaleProxy": "0x3B75d3f628C29d357b484EA7d091faEd63419267"
 
+
+## Deployed TokamakStakeUpgrade4 ( exchangeWTONtoTOS )
+
+* "TokamakStakeUpgrade4": "0x523ed202d3591b70cc4ab19d10bde036eae3361f"
+
+
 ### USING TOKAMAK CONTRACTS
 
 * "TON": "0x2be5e8c109e2197D077D13A82dAead6a9b3433C5"
