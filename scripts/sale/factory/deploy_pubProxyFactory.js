@@ -42,7 +42,7 @@ async function main() {
     // const eventAddr2 = "0x4aAd46a82c1D6fB74c5f552CFB947cB05870F0c6"
 
     //mainnet
-    const publicSaleLogic = ""
+    const publicSaleLogic = "0x603d3cbDA429ad08dF95B13A502784276B0f0B41"
     const tonAddress = "0x2be5e8c109e2197D077D13A82dAead6a9b3433C5"
     const wtonAddress = "0xc4A11aaf6ea915Ed7Ac194161d2fC9384F15bff2"
     const lockTOSAddress = "0x69b4A202Fa4039B42ab23ADB725aA7b1e9EEBD79"
@@ -52,7 +52,7 @@ async function main() {
     const minPer = 5
     const maxPer = 10
 
-    const initialLiuiqidty = ""
+    const initialLiuiqidty = "0xcf9A97F0CBBc2eB588E3e4301773d13267616F10"
     const eventAddr2 = "0x508d5FaDA6871348A5b4fb66f4A1F58b187Ce9Bd"
     const upgradeaddr = "0x15280a52E79FD4aB35F4B9Acbb376DCD72b44Fd1"
 
