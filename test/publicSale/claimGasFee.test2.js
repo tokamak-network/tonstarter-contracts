@@ -431,7 +431,7 @@ describe("publicSale", () => {
             let code = await saleTokenOwner.provider.getCode(publicProxy.address);
             expect(code).to.not.eq("0x");
 
-            const PublicSale = await ethers.getContractFactory("PublicSale");
+            const PublicSale = await ethers.getContractFactory("PublicSale2");
             publicLogic = await PublicSale.connect(saleTokenOwner).deploy();
 
             let code1 = await saleTokenOwner.provider.getCode(publicLogic.address);
@@ -473,7 +473,7 @@ describe("publicSale", () => {
                 600
             )
 
-            publicSaleContract = new ethers.Contract(publicProxy.address, PublicSale_ABI.abi, ethers.provider);
+            publicSaleContract = new ethers.Contract(publicProxy.address, PublicSale2_ABI.abi, ethers.provider);
         })
 
         it("send the token", async () => {
