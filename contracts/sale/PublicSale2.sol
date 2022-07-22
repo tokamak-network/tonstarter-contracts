@@ -423,15 +423,29 @@ contract PublicSale2 is
 
         uint length = endRound.sub(startRound.sub(1));
         uint256[] memory claims = new uint256[](length);
-
+        uint256 subClaimPercent = claimPercents[(endRound-1)].sub(claimPercents[(startRound-1)]);
         if(block.timestamp > endExclusiveTime && startRound != 0 ) {
             for(uint256 i = 0; i < length; i++) {
-                uint256 amount = (((totalExSaleAmount.add(totalOpenSaleAmount())).mul(claimPercents[startRound.add(i).sub(1)])).div(100));
+                // 실제판매량들 실제판매 시간 이후 계산
+                // uint256 amount = (((totalExSaleAmount.add(totalOpenSaleAmount())).mul(claimPercents[startRound.add(i).sub(1)])).div(100));
+                if(i > 1) {
+                    subClaimPercent = claimPercents[(i-1)].sub(claimPercents[(i-2)]);
+                } else {
+                    subClaimPercent = claimPercents[(i-1)];
+                }
+                uint256 amount = (((totalExSaleAmount.add(totalOpenSaleAmount())).mul(subClaimPercent)).div(100));
                 claims[i] = amount;
             }
         } else {
             for(uint256 i = 0; i < length; i++) {
-                uint256 amount = (((totalExpectSaleAmount.add(totalExpectOpenSaleAmount)).mul(claimPercents[startRound.add(i).sub(1)])).div(100));
+                // 판매 예정값들 아직 판매시간 안되었을때 계산
+                // uint256 amount = (((totalExpectSaleAmount.add(totalExpectOpenSaleAmount)).mul(claimPercents[startRound.add(i).sub(1)])).div(100));
+                 if(i > 1) {
+                    subClaimPercent = claimPercents[(i-1)].sub(claimPercents[(i-2)]);
+                } else {
+                    subClaimPercent = claimPercents[(i-1)];
+                }
+                uint256 amount = (((totalExpectSaleAmount.add(totalExpectOpenSaleAmount)).mul(subClaimPercent)).div(100));
                 claims[i] = amount;
             }
         }
@@ -446,8 +460,13 @@ contract PublicSale2 is
         returns(uint256)
     {
         if(block.timestamp > endExclusiveTime && _round != 0) {
-            return (((totalExSaleAmount.add(totalOpenSaleAmount())).mul(claimPercents[(_round-1)])).div(100));
-
+            // return (((totalExSaleAmount.add(totalOpenSaleAmount())).mul(claimPercents[(_round-1)])).div(100));
+            if(_round == 1) {
+                return (((totalExSaleAmount.add(totalOpenSaleAmount())).mul(claimPercents[(_round-1)])).div(100));
+            } else {
+                uint256 subClaimPercent = claimPercents[(_round-1)].sub(claimPercents[(_round-2)]);
+                return (((totalExSaleAmount.add(totalOpenSaleAmount())).mul(subClaimPercent)).div(100));
+            }
         } else {
             return 0;
         }
