@@ -58,36 +58,14 @@ contract PrivateSale is
         _;
     }
 
+    /* ========== onlyPolicyOwner ========== */
     /// @dev Set pause state
     /// @param _pause true:pause or false:resume
     function setSettingPause(bool _pause) external onlyProxyOwner {
         pauseSetting = _pause;
     }
 
-
-    /// @dev calculator the SaleAmount(input TON how many get the anotherToken)
-    /// @param _amount input the TON amount
-    function calculSaleToken(uint256 _amount)
-        public
-        override
-        view
-        returns (uint256)
-    {
-        uint256 tokenSaleAmount = _amount.mul(getTokenPrice).div(saleTokenPrice);
-        return tokenSaleAmount;
-    }
-
-    /// @dev calculator the getAmount(want to get _amount how many input the TON?)
-    /// @param _amount input the anotherTokenAmount
-    function calculGetToken(uint256 _amount)
-        public
-        override
-        view
-        returns (uint256)
-    {
-        uint256 tokenGetAmount = _amount.mul(saleTokenPrice).div(getTokenPrice);
-        return tokenGetAmount;
-    }
+    /* ========== onlyOwner ========== */
 
     /// @dev address setting
     /// @param _saleToken saleTokenAddress (contract have token)
@@ -223,6 +201,55 @@ contract PrivateSale is
         require(y == 10000, "claimPercents err");
     }
 
+    function addWhiteList(address _account,uint256 _amount) external override onlyOwner {
+        WhiteList storage userwhite = usersWhite[_account];
+        userwhite.amount = userwhite.amount.add(_amount);
+
+        emit AddList(_account, _amount);
+    }
+
+    function addWhiteListArray(address[] calldata _account, uint256[] calldata _amount) external override onlyOwner {
+        for(uint i = 0; i < _account.length; i++) {
+            WhiteList storage userwhite = usersWhite[_account[i]];
+            userwhite.amount = userwhite.amount.add(_amount[i]);
+
+            emit AddList(_account[i], _amount[i]);
+        }
+    }
+
+    function delWhiteList(address _account, uint256 _amount) external override onlyOwner {
+        WhiteList storage userwhite = usersWhite[_account];
+        userwhite.amount = userwhite.amount.sub(_amount);
+
+        emit DelList(_account, _amount);
+    }
+
+    /* ========== VIEW ========== */
+
+    /// @dev calculator the SaleAmount(input TON how many get the anotherToken)
+    /// @param _amount input the TON amount
+    function calculSaleToken(uint256 _amount)
+        public
+        override
+        view
+        returns (uint256)
+    {
+        uint256 tokenSaleAmount = _amount.mul(getTokenPrice).div(saleTokenPrice);
+        return tokenSaleAmount;
+    }
+
+    /// @dev calculator the getAmount(want to get _amount how many input the TON?)
+    /// @param _amount input the anotherTokenAmount
+    function calculGetToken(uint256 _amount)
+        public
+        override
+        view
+        returns (uint256)
+    {
+        uint256 tokenGetAmount = _amount.mul(saleTokenPrice).div(getTokenPrice);
+        return tokenGetAmount;
+    }
+
     function currentRound() public view returns (uint16 round) {
         if (block.timestamp > claimTimes[totalClaimCounts-1]) {
             return totalClaimCounts;
@@ -270,49 +297,6 @@ contract PrivateSale is
     function _toWAD(uint256 v) public override pure returns (uint256) {
         return v / 10 ** 9;
     }
-    
-    function addWhiteList(address _account,uint256 _amount) external override onlyOwner {
-        WhiteList storage userwhite = usersWhite[_account];
-        userwhite.amount = userwhite.amount.add(_amount);
-
-        emit AddList(_account, _amount);
-    }
-
-    function addWhiteListArray(address[] calldata _account, uint256[] calldata _amount) external override onlyOwner {
-        for(uint i = 0; i < _account.length; i++) {
-            WhiteList storage userwhite = usersWhite[_account[i]];
-            userwhite.amount = userwhite.amount.add(_amount[i]);
-
-            emit AddList(_account[i], _amount[i]);
-        }
-    }
-
-    function delWhiteList(address _account, uint256 _amount) external override onlyOwner {
-        WhiteList storage userwhite = usersWhite[_account];
-        userwhite.amount = userwhite.amount.sub(_amount);
-
-        emit DelList(_account, _amount);
-    }
-
-    function onApprove(
-        address sender,
-        address spender,
-        uint256 amount,
-        bytes calldata data
-    ) external override returns (bool) {
-        require(msg.sender == address(getToken) || msg.sender == address(IWTON(wton)), "PrivateSale: only accept TON and WTON approve callback");
-        
-        address claimAddress = decodeAddressData(data);
-        
-        if(msg.sender == address(getToken)) {
-            buy(sender,claimAddress,amount);
-        } else if (msg.sender == address(IWTON(wton))) {
-            uint256 wtonAmount = _toWAD(amount);
-            buy(sender,claimAddress,wtonAmount);
-        }
-        
-        return true;
-    }
 
     function decodeApproveData(
         bytes memory data
@@ -340,6 +324,32 @@ contract PrivateSale is
         assembly {
             mstore(add(data, 0x20), _claimAddress)
         }
+    }
+
+    function saleTokenAddress() external view returns (address saleAddress_) {
+        return address(saleToken);
+    }
+
+    /* ========== Anyone can execute ========== */
+
+    function onApprove(
+        address sender,
+        address spender,
+        uint256 amount,
+        bytes calldata data
+    ) external override returns (bool) {
+        require(msg.sender == address(getToken) || msg.sender == address(IWTON(wton)), "PrivateSale: only accept TON and WTON approve callback");
+        
+        address claimAddress = decodeAddressData(data);
+        
+        if(msg.sender == address(getToken)) {
+            buy(sender,claimAddress,amount);
+        } else if (msg.sender == address(IWTON(wton))) {
+            uint256 wtonAmount = _toWAD(amount);
+            buy(sender,claimAddress,wtonAmount);
+        }
+        
+        return true;
     }
 
     function directBuy(
@@ -462,7 +472,13 @@ contract PrivateSale is
     }
 
 
-    function withdraw(uint256 _amount) external onlyOwner {
+    function withdraw(
+        uint256 _amount
+    ) 
+        external 
+        onlyOwner
+        settingCheck 
+    {
         require(
             saleToken.balanceOf(address(this)) >= _amount,
             "dont have token amount"

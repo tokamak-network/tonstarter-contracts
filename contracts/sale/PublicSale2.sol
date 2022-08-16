@@ -1,5 +1,4 @@
 // SPDX-License-Identifier: MIT
-
 pragma solidity ^0.7.6;
 pragma abicoder v2;
 
@@ -13,6 +12,32 @@ import "../interfaces/IWTON.sol";
 import "../interfaces/ITON.sol";
 import "../common/ProxyAccessCommon.sol";
 import "./PublicSaleStorage.sol";
+
+import "../libraries/TickMath.sol";
+import "../libraries/OracleLibrary.sol";
+
+interface IIUniswapV3Factory {
+    function getPool(address,address,uint24) external view returns (address);
+}
+
+interface IIUniswapV3Pool {
+    function token0() external view returns (address);
+    function token1() external view returns (address);
+
+    function slot0()
+        external
+        view
+        returns (
+            uint160 sqrtPriceX96,
+            int24 tick,
+            uint16 observationIndex,
+            uint16 observationCardinality,
+            uint16 observationCardinalityNext,
+            uint8 feeProtocol,
+            bool unlocked
+        );
+
+}
 
 interface IIERC20Burnable {
     /**
@@ -31,6 +56,8 @@ contract PublicSale2 is
 {
     using SafeERC20 for IERC20;
     using SafeMath for uint256;
+
+    bool public exchangeTOS;
 
     event AddedWhiteList(address indexed from, uint256 tier);
     event ExclusiveSaled(address indexed from, uint256 amount);
@@ -473,6 +500,7 @@ contract PublicSale2 is
     }
 
     /// @inheritdoc IPublicSale
+    //1라운드에서 미판매된 물량 + 2라운드 판매에 정해진 물량
     function totalExpectOpenSaleAmountView()
         public
         view
@@ -690,9 +718,14 @@ contract PublicSale2 is
     }
 
     /// @inheritdoc IPublicSale
+    //2라운드에서 판매로 이용된 TON양
     function totalOpenPurchasedAmount() public override view returns (uint256){
+        //2라운드 총 입금된 양을 판매토큰 수량으로 변경 (1)
         uint256 _calculSaleToken = calculSaleToken(totalDepositAmount);
+        //2라운드 총 판매 토큰 수량 (2)
         uint256 _totalAmount = totalExpectOpenSaleAmountView();
+        // (1)이 (2)보다 작으면 2라운드 판매량이 100%가 아님 -> 판매량은 그래도 입금된 양이됨
+        // (1)이 (2)보다 크면 2라운드 판매량이 100%를 넘었음 -> 판매량은 2라운드 판매 토큰 수량이 됨
         if (_calculSaleToken < _totalAmount) return totalDepositAmount;
         else return  calculPayToken(_totalAmount);
     }
@@ -909,9 +942,11 @@ contract PublicSale2 is
     }
 
     function hardcapCalcul() public view returns (uint256){
+        //1차 2차 라운드에서 토큰판매에 대한 TON양
         uint256 totalPurchaseTONamount = totalExPurchasedAmount.add(totalOpenPurchasedAmount());
         uint256 calculAmount;
         if (totalPurchaseTONamount >= hardCap) {
+            //토큰판매에 대한 TON양 중 TOS로 변경해야할 TON양을 리턴함
             return calculAmount = totalPurchaseTONamount.mul(changeTOS).div(100);
         } else {
             return 0;
@@ -919,6 +954,7 @@ contract PublicSale2 is
     }
 
     /// @inheritdoc IPublicSale
+    //TON보상 중 liquidityVault로 가야하는 수량의 TON이 다 옮겨지고 난 후에 이걸 실행해서 TON분배 Vault로 TON을 이동
     function depositWithdraw() external override {
         require(block.timestamp > endDepositTime,"PublicSale: need to end the depositTime");
         uint256 liquidityTON = hardcapCalcul();
@@ -957,5 +993,157 @@ contract PublicSale2 is
         IERC20(getToken).safeTransfer(getTokenOwner, getAmount);
         IIERC20Burnable(address(saleToken)).burn(burnAmount);
         emit DepositWithdrawal(msg.sender, getAmount, liquidityTON);
+    }
+
+    function tonWithdraw() external {
+        // uint256 wtonAmount = IERC20(wton).balanceOf(address(this));
+        require(adminWithdraw != true && exchangeTOS == true,"PublicSale : need the exchangeWTONtoTOS");
+
+        uint256 getAmount;
+        uint256 liquidityTON = hardcapCalcul();
+        if (totalRound2Users == totalRound2UsersClaim){
+            getAmount = IERC20(getToken).balanceOf(address(this)).sub(liquidityTON);
+        } else {
+            getAmount = totalExPurchasedAmount.add(totalOpenPurchasedAmount()).sub(liquidityTON).sub(2 ether);
+        }        
+        require(getAmount <= IERC20(getToken).balanceOf(address(this)), "PublicSale: no token to receive");
+        
+        adminWithdraw = true;
+        IERC20(getToken).safeTransfer(getTokenOwner, getAmount);
+    }
+
+    //판매 후 TON밖에 없으니까 TON을 WTON으로 바꿔줌
+    //최초 실행 분기점은 WTON 유무로 판별 가능함
+    //amountIn은 wton의 수량이다.
+    function exchangeWTONtoTOS(
+        uint256 amountIn
+    ) external {
+        require(amountIn > 0, "zero input amount");
+        require(block.timestamp > endDepositTime,"PublicSale: need to end the depositTime");
+
+        //hardCap이 넘었는지 확인
+        uint256 liquidityTON = hardcapCalcul();
+        require(liquidityTON > 0, "PublicSale: don't pass the hardCap");
+
+        IIUniswapV3Pool pool = IIUniswapV3Pool(getPoolAddress());
+        require(address(pool) != address(0), "pool didn't exist");
+
+        (uint160 sqrtPriceX96, int24 tick,,,,,) =  pool.slot0();
+        require(sqrtPriceX96 > 0, "pool is not initialized");
+
+        // uint24 fee = 3000;
+        // int24 tickSpacings = 60;
+        // int24 acceptTickChangeInterval = 8; +=5% 까지만 허용
+        // minimumTickInterval = 18; 가격이 떨어져도 +-10프로, 수수료가 있어서 2틱정도 더내림
+        int24 timeWeightedAverageTick = OracleLibrary.consult(address(pool), 120);
+        require(
+            acceptMinTick(timeWeightedAverageTick, 60, 8) <= tick
+            && tick < acceptMaxTick(timeWeightedAverageTick, 60, 8),
+            "It's not allowed changed tick range."
+        );
+
+        (uint256 amountOutMinimum, , uint160 sqrtPriceLimitX96)
+            = limitPrameters(amountIn, address(pool), wton, address(saleToken), 18);
+
+        // 초기 한번만 ton을 wton으로 변경한다.
+        uint256 wtonAmount = IERC20(wton).balanceOf(address(this));
+        require(wtonAmount >= amountIn, "PublicSale : amountIn is too large");
+        //wton이 없으면 ton을 변경한적이 없다는 가정하에 변경
+        if(wtonAmount == 0) {
+            IWTON(wton).swapFromTON(liquidityTON);
+            exchangeTOS = true;
+        }
+
+        //변경 뒤 입력한 amount만큼 스왑해줌
+        ISwapRouter.ExactInputSingleParams memory params =
+            ISwapRouter.ExactInputSingleParams({
+                tokenIn: wton,
+                tokenOut: address(tos),
+                fee: poolFee,
+                recipient: address(this),
+                deadline: block.timestamp + 100,
+                amountIn: amountIn,
+                amountOutMinimum: amountOutMinimum,
+                sqrtPriceLimitX96: sqrtPriceLimitX96
+            });
+        uint256 amountOut = ISwapRouter(uniswapRouter).exactInputSingle(params);
+
+        // uint256 tosAmount = tos.balanceOf(address(this));
+        tos.safeTransfer(liquidityVaultAddress, amountOut);
+    }
+
+    function getQuoteAtTick(
+        int24 tick,
+        uint128 amountIn,
+        address baseToken,
+        address quoteToken
+    ) public pure returns (uint256 amountOut) {
+        return OracleLibrary.getQuoteAtTick(tick, amountIn, baseToken, quoteToken);
+    }
+
+    function getPoolAddress() public view returns(address) {
+        address factory = 0x1F98431c8aD98523631AE4a59f267346ea31F984;
+        return IIUniswapV3Factory(factory).getPool(wton, address(tos), 3000);
+    }
+
+    function getMiniTick(int24 tickSpacings) public pure returns (int24){
+        return (TickMath.MIN_TICK / tickSpacings) * tickSpacings ;
+    }
+
+    function getMaxTick(int24 tickSpacings) public pure  returns (int24){
+        return (TickMath.MAX_TICK / tickSpacings) * tickSpacings ;
+    }
+
+    function acceptMinTick(int24 _tick, int24 _tickSpacings, int24 _acceptTickInterval) public pure returns (int24) {
+        int24 _minTick = getMiniTick(_tickSpacings);
+        int24 _acceptMinTick = _tick - (_tickSpacings * _acceptTickInterval);
+
+        if(_minTick < _acceptMinTick) return _acceptMinTick;
+        else return _minTick;
+    }
+
+    function acceptMaxTick(int24 _tick, int24 _tickSpacings, int24 _acceptTickInterval) public pure returns (int24) {
+        int24 _maxTick = getMaxTick(_tickSpacings);
+        int24 _acceptMinTick = _tick + (_tickSpacings * _acceptTickInterval);
+
+        if(_maxTick < _acceptMinTick) return _maxTick;
+        else return _acceptMinTick;
+    }
+    
+    function limitPrameters(
+        uint256 amountIn,
+        address _pool,
+        address token0,
+        address token1,
+        int24 acceptTickCounts
+    ) public view returns  (uint256 amountOutMinimum, uint256 priceLimit, uint160 sqrtPriceX96Limit) {
+        IIUniswapV3Pool pool = IIUniswapV3Pool(_pool);
+        (, int24 tick,,,,,) =  pool.slot0();
+
+        int24 _tick = tick;
+        if(token0 < token1) {
+            _tick = tick - acceptTickCounts * 60;
+            if(_tick < TickMath.MIN_TICK ) _tick =  TickMath.MIN_TICK ;
+        } else {
+            _tick = tick + acceptTickCounts * 60;
+            if(_tick > TickMath.MAX_TICK ) _tick =  TickMath.MAX_TICK ;
+        }
+        address token1_ = token1;
+        address token0_ = token0;
+        return (
+              getQuoteAtTick(
+                _tick,
+                uint128(amountIn),
+                token0_,
+                token1_
+                ),
+             getQuoteAtTick(
+                _tick,
+                uint128(10**27),
+                token0_,
+                token1_
+             ),
+             TickMath.getSqrtRatioAtTick(_tick)
+        );
     }
 }

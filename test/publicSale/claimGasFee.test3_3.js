@@ -1990,5 +1990,6 @@ describe("publicSale", () => {
         it("claim period end, claim call account6", async () => {
             await publicSaleContract.connect(account6).claim()
         })
+        
     })
 })
