@@ -20,21 +20,25 @@ interface IPublicSale2 {
         uint256[] calldata _claimTimes,
         uint256[] calldata _claimPercents
     ) external;
-    
-    ///@dev set time
-    /// @param _snapshot _snapshot timestamp
+
+    /// @dev set information related to exclusive sale
     /// @param _startAddWhiteTime start time of addwhitelist
     /// @param _endAddWhiteTime end time of addwhitelist
     /// @param _startExclusiveTime start time of exclusive sale
     /// @param _endExclusiveTime start time of exclusive sale
-    /// @param _startDepositTime start time of deposit
-    /// @param _endDepositTime end time of deposit
-    function setTimeSet(
-        uint256 _snapshot,
+    function setExclusiveTime(
         uint256 _startAddWhiteTime,
         uint256 _endAddWhiteTime,
         uint256 _startExclusiveTime,
-        uint256 _endExclusiveTime,
+        uint256 _endExclusiveTime
+    ) external;
+
+    /// @dev set information related to open sale
+    /// @param _snapshot _snapshot timestamp
+    /// @param _startDepositTime start time of deposit
+    /// @param _endDepositTime end time of deposit
+    function setOpenTime(
+        uint256 _snapshot,
         uint256 _startDepositTime,
         uint256 _endDepositTime
     ) external;
@@ -82,31 +86,17 @@ interface IPublicSale2 {
     ) external;
 
     /// @dev set information related to saleAmount and tokenPrice
-    /// @param _expectAmount[2] saleAmount setting
-    /// @param _priceAmount[2] tokenPrice setting
-    function setAllAmount(
-        uint256[2] calldata _expectAmount,
-        uint256[2] calldata _priceAmount
-    ) external;
-
-    /// @dev set information related to sale amount
     /// @param _totalExpectSaleAmount expected amount of exclusive sale
     /// @param _totalExpectOpenSaleAmount expected amount of open sale
-    function setSaleAmount(
-        uint256 _totalExpectSaleAmount,
-        uint256 _totalExpectOpenSaleAmount
-    ) external;
-
-    /// @dev set information related to token price
     /// @param _saleTokenPrice the sale token price
     /// @param _payTokenPrice  the funding(pay) token price
-    function setTokenPrice(uint256 _saleTokenPrice, uint256 _payTokenPrice)
-        external;
-
-    /// @dev set information related to token price
     /// @param _hardcapAmount the sale token price
     /// @param _changePercent  the funding(pay) token price
-    function setHardcap (
+    function setAllAmount(
+        uint256 _totalExpectSaleAmount,
+        uint256 _totalExpectOpenSaleAmount,
+        uint256 _saleTokenPrice,
+        uint256 _payTokenPrice,
         uint256 _hardcapAmount,
         uint256 _changePercent
     ) external;

@@ -7,14 +7,9 @@ import {
     ReentrancyGuard
 } from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
-import "../interfaces/IPublicSale.sol";
-import "../interfaces/IWTON.sol";
-import "../interfaces/ITON.sol";
+import "../interfaces/IPublicSale2.sol";
 import "../common/ProxyAccessCommon.sol";
 import "./PublicSaleStorage.sol";
-
-import "../libraries/TickMath.sol";
-import "../libraries/OracleLibrary.sol";
 
 import "../libraries/LibPublicSale2.sol";
 
@@ -27,11 +22,17 @@ interface IIERC20Burnable {
     function burn(uint256 amount) external ;
 }
 
+interface IIWTON {
+    function swapToTON(uint256 wtonAmount) external returns (bool);
+
+    function swapFromTON(uint256 tonAmount) external returns (bool);
+}
+
 contract PublicSale2 is
     PublicSaleStorage,
     ProxyAccessCommon,
     ReentrancyGuard,
-    IPublicSale
+    IPublicSale2
 {
     using SafeERC20 for IERC20;
     using SafeMath for uint256;
@@ -123,19 +124,14 @@ contract PublicSale2 is
         setTierPercents(
             _Tier[4], _Tier[5], _Tier[6], _Tier[7]
         );
-        setSaleAmount(
+        setAllAmount(
             _amount[0],
-            _amount[1]
-        );
-        setTokenPrice(
+            _amount[1],
             _amount[2],
-            _amount[3]
-        );
-        setHardcap(
+            _amount[3],
             _amount[4],
             _amount[5]
         );
-        setSnapshot(_time[0]);
         setExclusiveTime(
             _time[1],
             _time[2],
@@ -143,6 +139,7 @@ contract PublicSale2 is
             _time[4]
         );
         setOpenTime(
+            _time[0],
             _time[5],
             _time[6]
         );
@@ -153,24 +150,7 @@ contract PublicSale2 is
         );
     }
 
-    /// @inheritdoc IPublicSale
-    function setSnapshot(
-        uint256 _snapshot
-    )
-        public
-        override
-        onlyOwner
-        nonZero(_snapshot)
-        beforeStartAddWhiteTime
-    {
-        if(snapshot != 0) {
-            require(isProxyAdmin(msg.sender), "only DAO can set");
-        }
-
-        snapshot = _snapshot;
-    }
-
-    /// @inheritdoc IPublicSale
+    /// @inheritdoc IPublicSale2
     function setExclusiveTime(
         uint256 _startAddWhiteTime,
         uint256 _endAddWhiteTime,
@@ -202,19 +182,21 @@ contract PublicSale2 is
         endExclusiveTime = _endExclusiveTime;
     }
 
-    /// @inheritdoc IPublicSale
+    /// @inheritdoc IPublicSale2
     function setOpenTime(
+        uint256 _snapshot,
         uint256 _startDepositTime,
         uint256 _endDepositTime
     )
         public
         override
         onlyOwner
+        nonZero(_snapshot)
         nonZero(_startDepositTime)
         nonZero(_endDepositTime)
         beforeStartAddWhiteTime
     {
-        if(startDepositTime != 0) {
+         if(snapshot != 0) {
             require(isProxyAdmin(msg.sender), "only DAO can set");
         }
 
@@ -223,6 +205,7 @@ contract PublicSale2 is
             "PublicSale : Round2time err"
         );
 
+        snapshot = _snapshot;
         startDepositTime = _startDepositTime;
         endDepositTime = _endDepositTime;
     }
@@ -256,7 +239,7 @@ contract PublicSale2 is
         require(y == 100, "claimPercents err");
     }
 
-    /// @inheritdoc IPublicSale
+    /// @inheritdoc IPublicSale2
     function setAllTier(
         uint256[4] calldata _tier,
         uint256[4] calldata _tierPercent
@@ -282,7 +265,7 @@ contract PublicSale2 is
         );
     }
 
-    /// @inheritdoc IPublicSale
+    /// @inheritdoc IPublicSale2
     function setTier(
         uint256 _tier1,
         uint256 _tier2,
@@ -307,7 +290,7 @@ contract PublicSale2 is
         tiers[4] = _tier4;
     }
 
-    /// @inheritdoc IPublicSale
+    /// @inheritdoc IPublicSale2
     function setTierPercents(
         uint256 _tier1,
         uint256 _tier2,
@@ -336,150 +319,115 @@ contract PublicSale2 is
         tiersPercents[4] = _tier4;
     }
 
-    /// @inheritdoc IPublicSale
+    /// @inheritdoc IPublicSale2
     function setAllAmount(
-        uint256[2] calldata _expectAmount,
-        uint256[2] calldata _priceAmount
-    ) external override onlyOwner {
-        setSaleAmount(
-            _expectAmount[0],
-            _expectAmount[1]
-        );
-        setTokenPrice(
-            _priceAmount[0],
-            _priceAmount[1]
-        );
-    }
-
-    /// @inheritdoc IPublicSale
-    function setSaleAmount(
         uint256 _totalExpectSaleAmount,
-        uint256 _totalExpectOpenSaleAmount
-    )
+        uint256 _totalExpectOpenSaleAmount,
+        uint256 _saleTokenPrice,
+        uint256 _payTokenPrice,
+        uint256 _hardcapAmount,
+        uint256 _changePercent
+    ) 
         public
-        override
+        override 
         onlyOwner
-        nonZero(_totalExpectSaleAmount)
-        beforeStartAddWhiteTime
+        beforeStartAddWhiteTime 
     {
         if(totalExpectSaleAmount != 0) {
             require(isProxyAdmin(msg.sender), "only DAO can set");
         }
+        require(_changePercent <= maxPer && _changePercent >= minPer,"PublicSale: need to set min,max");
+        
         totalExpectSaleAmount = _totalExpectSaleAmount;
         totalExpectOpenSaleAmount = _totalExpectOpenSaleAmount;
-    }
-
-    /// @inheritdoc IPublicSale
-    function setTokenPrice(
-        uint256 _saleTokenPrice,
-        uint256 _payTokenPrice
-    )
-        public
-        override
-        onlyOwner
-        nonZero(_saleTokenPrice)
-        nonZero(_payTokenPrice)
-        beforeStartAddWhiteTime
-    {
-        if(saleTokenPrice != 0) {
-            require(isProxyAdmin(msg.sender), "only DAO can set");
-        }
         saleTokenPrice = _saleTokenPrice;
         payTokenPrice = _payTokenPrice;
-    }
-
-    function setHardcap (
-        uint256 _hardcapAmount,
-        uint256 _changePercent
-    )
-        public
-        override
-        onlyOwner
-        nonZero(_changePercent)
-        beforeStartAddWhiteTime
-    {
-        if(changeTOS != 0) {
-            require(isProxyAdmin(msg.sender), "only DAO can set");
-        }
-        require(_changePercent <= maxPer && _changePercent >= minPer,"PublicSale: need to set min,max");
         hardCap = _hardcapAmount;
         changeTOS = _changePercent;
     }
 
-    function distributionByRounds(
-        uint256 startRound,
-        uint256 endRound
-    ) 
-        public
-        view
-        returns(uint256[] memory)
-    {   
-        if(startRound == 0) {
-            startRound = 1;
-        }
-        if(totalClaimCounts < startRound) {
-            startRound = totalClaimCounts;
-        }
-        if(endRound < startRound) {
-            endRound = startRound;
-        }
-        if(totalClaimCounts < endRound || endRound == 0) {
-            endRound = totalClaimCounts;
-        }
+    // function distributionByRounds(
+    //     uint256 startRound,
+    //     uint256 endRound
+    // ) 
+    //     public
+    //     view
+    //     returns(uint256[] memory)
+    // {   
+    //     if(startRound == 0) {
+    //         startRound = 1;
+    //     }
+    //     if(totalClaimCounts < startRound) {
+    //         startRound = totalClaimCounts;
+    //     }
+    //     if(endRound < startRound) {
+    //         endRound = startRound;
+    //     }
+    //     if(totalClaimCounts < endRound || endRound == 0) {
+    //         endRound = totalClaimCounts;
+    //     }
 
-        uint length = endRound.sub(startRound.sub(1));
-        uint256[] memory claims = new uint256[](length);
-        uint256 subClaimPercent = claimPercents[(endRound-1)].sub(claimPercents[(startRound-1)]);
-        if(block.timestamp > endExclusiveTime && startRound != 0 ) {
-            for(uint256 i = 0; i < length; i++) {
-                // 실제판매량들 실제판매 시간 이후 계산
-                // uint256 amount = (((totalExSaleAmount.add(totalOpenSaleAmount())).mul(claimPercents[startRound.add(i).sub(1)])).div(100));
-                if(i > 1) {
-                    subClaimPercent = claimPercents[(i-1)].sub(claimPercents[(i-2)]);
-                } else {
-                    subClaimPercent = claimPercents[(i-1)];
-                }
-                uint256 amount = (((totalExSaleAmount.add(totalOpenSaleAmount())).mul(subClaimPercent)).div(100));
-                claims[i] = amount;
-            }
-        } else {
-            for(uint256 i = 0; i < length; i++) {
-                // 판매 예정값들 아직 판매시간 안되었을때 계산
-                // uint256 amount = (((totalExpectSaleAmount.add(totalExpectOpenSaleAmount)).mul(claimPercents[startRound.add(i).sub(1)])).div(100));
-                 if(i > 1) {
-                    subClaimPercent = claimPercents[(i-1)].sub(claimPercents[(i-2)]);
-                } else {
-                    subClaimPercent = claimPercents[(i-1)];
-                }
-                uint256 amount = (((totalExpectSaleAmount.add(totalExpectOpenSaleAmount)).mul(subClaimPercent)).div(100));
-                claims[i] = amount;
-            }
-        }
-        return claims;
-    }
+    //     uint length = endRound.sub(startRound.sub(1));
+    //     uint256[] memory claims = new uint256[](length);
+    //     uint256 subClaimPercent = claimPercents[(endRound-1)].sub(claimPercents[(startRound-1)]);
+    //     if(block.timestamp > endExclusiveTime && startRound != 0 ) {
+    //         for(uint256 i = 0; i < length; i++) {
+    //             if(i > 1) {
+    //                 subClaimPercent = claimPercents[(i-1)].sub(claimPercents[(i-2)]);
+    //             } else {
+    //                 subClaimPercent = claimPercents[(i-1)];
+    //             }
+    //             uint256 amount = (((totalExSaleAmount.add(totalOpenSaleAmount())).mul(subClaimPercent)).div(100));
+    //             claims[i] = amount;
+    //         }
+    //     } else {
+    //         for(uint256 i = 0; i < length; i++) {
+    //              if(i > 1) {
+    //                 subClaimPercent = claimPercents[(i-1)].sub(claimPercents[(i-2)]);
+    //             } else {
+    //                 subClaimPercent = claimPercents[(i-1)];
+    //             }
+    //             uint256 amount = (((totalExpectSaleAmount.add(totalExpectOpenSaleAmount)).mul(subClaimPercent)).div(100));
+    //             claims[i] = amount;
+    //         }
+    //     }
+    //     return claims;
+    // }
 
-    function distributionByRound(
-        uint256 _round
-    )
-        public
-        view
-        returns(uint256)
+    // function distributionByRound(
+    //     uint256 _round
+    // )
+    //     public
+    //     view
+    //     returns(uint256)
+    // {
+    //     if(block.timestamp > endExclusiveTime && _round != 0) {
+    //         if(_round == 1) {
+    //             return (((totalExSaleAmount.add(totalOpenSaleAmount())).mul(claimPercents[(_round-1)])).div(100));
+    //         } else {
+    //             uint256 subClaimPercent = claimPercents[(_round-1)].sub(claimPercents[(_round-2)]);
+    //             return (((totalExSaleAmount.add(totalOpenSaleAmount())).mul(subClaimPercent)).div(100));
+    //         }
+    //     } else {
+    //         return 0;
+    //     }
+    // }
+
+    function getClaims() public view
+        returns (
+            uint256[] memory
+        )
     {
-        if(block.timestamp > endExclusiveTime && _round != 0) {
-            // return (((totalExSaleAmount.add(totalOpenSaleAmount())).mul(claimPercents[(_round-1)])).div(100));
-            if(_round == 1) {
-                return (((totalExSaleAmount.add(totalOpenSaleAmount())).mul(claimPercents[(_round-1)])).div(100));
-            } else {
-                uint256 subClaimPercent = claimPercents[(_round-1)].sub(claimPercents[(_round-2)]);
-                return (((totalExSaleAmount.add(totalOpenSaleAmount())).mul(subClaimPercent)).div(100));
-            }
-        } else {
-            return 0;
+        uint256 len = claimPercents.length;
+        uint256[] memory _claimPercents = new uint256[](len);
+
+        for (uint256 i = 0; i < len; i++) {
+            _claimPercents[i] = claimPercents[i];
         }
+        return (_claimPercents);
     }
 
-    /// @inheritdoc IPublicSale
-    //1라운드에서 미판매된 물량 + 2라운드 판매에 정해진 물량
+    /// @inheritdoc IPublicSale2
     function totalExpectOpenSaleAmountView()
         public
         view
@@ -490,7 +438,7 @@ contract PublicSale2 is
         else return totalExpectOpenSaleAmount.add(totalRound1NonSaleAmount());
     }
 
-    /// @inheritdoc IPublicSale
+    /// @inheritdoc IPublicSale2
     function totalRound1NonSaleAmount()
         public
         view
@@ -505,7 +453,11 @@ contract PublicSale2 is
         return v * 10 ** 9;
     }
 
-    /// @inheritdoc IPublicSale
+    function _toWAD(uint256 v) public override pure returns (uint256) {
+        return v / 10 ** 9;
+    }
+
+    /// @inheritdoc IPublicSale2
     function calculSaleToken(uint256 _amount)
         public
         view
@@ -517,7 +469,7 @@ contract PublicSale2 is
         return tokenSaleAmount;
     }
 
-    /// @inheritdoc IPublicSale
+    /// @inheritdoc IPublicSale2
     function calculPayToken(uint256 _amount)
         public
         view
@@ -528,7 +480,7 @@ contract PublicSale2 is
         return tokenPayAmount;
     }
 
-    /// @inheritdoc IPublicSale
+    /// @inheritdoc IPublicSale2
     function calculTier(address _address)
         public
         view
@@ -556,7 +508,7 @@ contract PublicSale2 is
         return tier;
     }
 
-    /// @inheritdoc IPublicSale
+    /// @inheritdoc IPublicSale2
     function calculTierAmount(address _address)
         public
         view
@@ -585,7 +537,7 @@ contract PublicSale2 is
         }
     }
 
-    /// @inheritdoc IPublicSale
+    /// @inheritdoc IPublicSale2
     function calculOpenSaleAmount(address _account, uint256 _amount)
         public
         view
@@ -622,10 +574,10 @@ contract PublicSale2 is
         if (_round > totalClaimCounts) return (0, 0, 0);
 
         LibPublicSale.UserClaim storage userClaim = usersClaim[_account];
-        (, uint256 realSaleAmount, uint256 refundAmount) = totalSaleUserAmount(_account);   //유저가 총 구매한 token의 양을 Return 함
+        (, uint256 realSaleAmount, uint256 refundAmount) = totalSaleUserAmount(_account);  
 
         if (realSaleAmount == 0 ) return (0, 0, 0);
-        if (userClaim.claimAmount >= realSaleAmount) return (0, 0, 0);    //userClaim.claimAmount  = contract에서 유저에게 준양
+        if (userClaim.claimAmount >= realSaleAmount) return (0, 0, 0);   
 
         uint256 round = currentRound();
 
@@ -635,8 +587,6 @@ contract PublicSale2 is
             return (amount, realSaleAmount, refundAmount);
         }
 
-        //해당 라운드에서 받아야하는 토큰의 양 -> (realSaleAmount * claimPercents[i] / 100) : 해당 라운드에서 받아야하는 토큰의 양
-        //Round를 0으로 넣으면 현재 내가 받을 수 있는 양을 리턴해주고 1 이상을 넣으면 해당 라운드에서 받을 수 있는 토큰의 양을 리턴해줌
         if(_round == 0) {
             amount = realSaleAmount.mul(claimPercents[round.sub(1)]).div(100);
             amount = amount - userClaim.claimAmount;
@@ -652,7 +602,7 @@ contract PublicSale2 is
         }
     }
 
-    /// @inheritdoc IPublicSale
+    /// @inheritdoc IPublicSale2
     function totalSaleUserAmount(address user) public override view returns (uint256 _realPayAmount, uint256 _realSaleAmount, uint256 _refundAmount) {
         LibPublicSale.UserInfoEx storage userEx = usersEx[user];
 
@@ -664,7 +614,7 @@ contract PublicSale2 is
         }
     }
 
-    /// @inheritdoc IPublicSale
+    /// @inheritdoc IPublicSale2
     function openSaleUserAmount(address user) public override view returns (uint256 _realPayAmount, uint256 _realSaleAmount, uint256 _refundAmount) {
         LibPublicSale.UserInfoOpen storage userOpen = usersOpen[user];
 
@@ -687,7 +637,7 @@ contract PublicSale2 is
         return (realPayAmount, realSaleAmount, returnAmount);
     }
 
-    /// @inheritdoc IPublicSale
+    /// @inheritdoc IPublicSale2
     function totalOpenSaleAmount() public override view returns (uint256){
         uint256 _calculSaleToken = calculSaleToken(totalDepositAmount);
         uint256 _totalAmount = totalExpectOpenSaleAmountView();
@@ -696,15 +646,10 @@ contract PublicSale2 is
         else return _totalAmount;
     }
 
-    /// @inheritdoc IPublicSale
-    //2라운드에서 판매로 이용된 TON양
+    /// @inheritdoc IPublicSale2
     function totalOpenPurchasedAmount() public override view returns (uint256){
-        //2라운드 총 입금된 양을 판매토큰 수량으로 변경 (1)
         uint256 _calculSaleToken = calculSaleToken(totalDepositAmount);
-        //2라운드 총 판매 토큰 수량 (2)
         uint256 _totalAmount = totalExpectOpenSaleAmountView();
-        // (1)이 (2)보다 작으면 2라운드 판매량이 100%가 아님 -> 판매량은 그래도 입금된 양이됨
-        // (1)이 (2)보다 크면 2라운드 판매량이 100%를 넘었음 -> 판매량은 2라운드 판매 토큰 수량이 됨
         if (_calculSaleToken < _totalAmount) return totalDepositAmount;
         else return  calculPayToken(_totalAmount);
     }
@@ -713,7 +658,7 @@ contract PublicSale2 is
         return whitelists.length;
     }
 
-    /// @inheritdoc IPublicSale
+    /// @inheritdoc IPublicSale2
     function addWhiteList() external override nonReentrant {
         require(
             block.timestamp >= startAddWhiteTime,
@@ -736,10 +681,6 @@ contract PublicSale2 is
         tiersAccount[tier] = tiersAccount[tier].add(1);
 
         emit AddedWhiteList(msg.sender, tier);
-    }
-
-    function _toWAD(uint256 v) public override pure returns (uint256) {
-        return v / 10 ** 9;
     }
 
     function _decodeApproveData(
@@ -769,10 +710,10 @@ contract PublicSale2 is
             uint256 needUserWton;
             uint256 needWton = _amount.sub(tonAllowance);
             needUserWton = _toRAY(needWton);
-            require(IWTON(wton).allowance(_sender, address(this)) >= needUserWton, "PublicSale: wton exceeds allowance");
-            require(IWTON(wton).balanceOf(_sender) >= needUserWton, "need more wton");
+            require(IERC20(wton).allowance(_sender, address(this)) >= needUserWton, "PublicSale: wton exceeds allowance");
+            require(IERC20(wton).balanceOf(_sender) >= needUserWton, "need more wton");
             IERC20(wton).safeTransferFrom(_sender,address(this),needUserWton);
-            IWTON(wton).swapToTON(needUserWton);
+            IIWTON(wton).swapToTON(needUserWton);
             require(tonAllowance >= _amount.sub(needWton), "PublicSale: ton exceeds allowance");
             if (_amount.sub(needWton) > 0) {
                 IERC20(getToken).safeTransferFrom(_sender, address(this), _amount.sub(needWton));
@@ -790,7 +731,7 @@ contract PublicSale2 is
     }
 
 
-    /// @inheritdoc IPublicSale
+    /// @inheritdoc IPublicSale2
     function exclusiveSale(
         address _sender,
         uint256 _amount
@@ -836,7 +777,7 @@ contract PublicSale2 is
         calculTONTransferAmount(_amount, _sender);
     }
 
-    /// @inheritdoc IPublicSale
+    /// @inheritdoc IPublicSale2
     function deposit(
         address _sender,
         uint256 _amount
@@ -870,7 +811,7 @@ contract PublicSale2 is
         calculTONTransferAmount(_amount, _sender);
     }
 
-    /// @inheritdoc IPublicSale
+    /// @inheritdoc IPublicSale2
     function claim() external override {
         require(
             block.timestamp >= claimTimes[0],
@@ -921,19 +862,16 @@ contract PublicSale2 is
     }
 
     function hardcapCalcul() public view returns (uint256){
-        //1차 2차 라운드에서 토큰판매에 대한 TON양
         uint256 totalPurchaseTONamount = totalExPurchasedAmount.add(totalOpenPurchasedAmount());
         uint256 calculAmount;
         if (totalPurchaseTONamount >= hardCap) {
-            //토큰판매에 대한 TON양 중 TOS로 변경해야할 TON양을 리턴함
             return calculAmount = totalPurchaseTONamount.mul(changeTOS).div(100);
         } else {
             return 0;
         }
     }
 
-    /// @inheritdoc IPublicSale
-    //TON보상 중 liquidityVault로 가야하는 수량의 TON이 다 옮겨지고 난 후에 이걸 실행해서 TON분배 Vault로 TON을 이동
+    /// @inheritdoc IPublicSale2
     function depositWithdraw() external override {
         require(adminWithdraw != true && exchangeTOS == true,"PublicSale : need the exchangeWTONtoTOS");
 
@@ -947,15 +885,15 @@ contract PublicSale2 is
         require(getAmount <= IERC20(getToken).balanceOf(address(this)), "PublicSale: no token to receive");
         
         adminWithdraw = true;
-        IERC20(getToken).safeTransfer(getTokenOwner, getAmount);
 
         uint256 burnAmount = totalExpectSaleAmount.add(totalExpectOpenSaleAmount).sub(totalOpenSaleAmount()).sub(totalExSaleAmount);
         IIERC20Burnable(address(saleToken)).burn(burnAmount);
 
+        IERC20(getToken).safeTransfer(getTokenOwner, getAmount);
+
         emit DepositWithdrawal(msg.sender, getAmount, liquidityTON);
     }
 
-    //amountIn은 wton의 수량이다.
     function exchangeWTONtoTOS(
         uint256 amountIn
     ) external {
@@ -981,16 +919,13 @@ contract PublicSale2 is
         (uint256 amountOutMinimum, , uint160 sqrtPriceLimitX96)
             = LibPublicSale2.limitPrameters(amountIn, address(pool), wton, address(saleToken), 18);
 
-        // 초기 한번만 ton을 wton으로 변경한다.
         uint256 wtonAmount = IERC20(wton).balanceOf(address(this));
         require(wtonAmount >= amountIn, "PublicSale : amountIn is too large");
-        //wton이 없으면 ton을 변경한적이 없다는 가정하에 변경
         if(wtonAmount == 0) {
-            IWTON(wton).swapFromTON(liquidityTON);
+            IIWTON(wton).swapFromTON(liquidityTON);
             exchangeTOS = true;
         }
 
-        //변경 뒤 입력한 amount만큼 스왑해줌
         ISwapRouter.ExactInputSingleParams memory params =
             ISwapRouter.ExactInputSingleParams({
                 tokenIn: wton,
