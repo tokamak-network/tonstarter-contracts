@@ -16,28 +16,7 @@ import "./PublicSaleStorage.sol";
 import "../libraries/TickMath.sol";
 import "../libraries/OracleLibrary.sol";
 
-interface IIUniswapV3Factory {
-    function getPool(address,address,uint24) external view returns (address);
-}
-
-interface IIUniswapV3Pool {
-    function token0() external view returns (address);
-    function token1() external view returns (address);
-
-    function slot0()
-        external
-        view
-        returns (
-            uint160 sqrtPriceX96,
-            int24 tick,
-            uint16 observationIndex,
-            uint16 observationCardinality,
-            uint16 observationCardinalityNext,
-            uint8 feeProtocol,
-            bool unlocked
-        );
-
-}
+import "../libraries/LibPublicSale2.sol";
 
 interface IIERC20Burnable {
     /**
@@ -986,7 +965,7 @@ contract PublicSale2 is
         uint256 liquidityTON = hardcapCalcul();
         require(liquidityTON > 0, "PublicSale: don't pass the hardCap");
 
-        IIUniswapV3Pool pool = IIUniswapV3Pool(getPoolAddress());
+        IIUniswapV3Pool pool = IIUniswapV3Pool(LibPublicSale2.getPoolAddress(wton, address(tos)));
         require(address(pool) != address(0), "pool didn't exist");
 
         (uint160 sqrtPriceX96, int24 tick,,,,,) =  pool.slot0();
@@ -994,13 +973,13 @@ contract PublicSale2 is
 
         int24 timeWeightedAverageTick = OracleLibrary.consult(address(pool), 120);
         require(
-            acceptMinTick(timeWeightedAverageTick, 60, 8) <= tick
-            && tick < acceptMaxTick(timeWeightedAverageTick, 60, 8),
+            LibPublicSale2.acceptMinTick(timeWeightedAverageTick, 60, 8) <= tick
+            && tick < LibPublicSale2.acceptMaxTick(timeWeightedAverageTick, 60, 8),
             "It's not allowed changed tick range."
         );
 
         (uint256 amountOutMinimum, , uint160 sqrtPriceLimitX96)
-            = limitPrameters(amountIn, address(pool), wton, address(saleToken), 18);
+            = LibPublicSale2.limitPrameters(amountIn, address(pool), wton, address(saleToken), 18);
 
         // 초기 한번만 ton을 wton으로 변경한다.
         uint256 wtonAmount = IERC20(wton).balanceOf(address(this));
@@ -1026,79 +1005,5 @@ contract PublicSale2 is
         uint256 amountOut = ISwapRouter(uniswapRouter).exactInputSingle(params);
         tos.safeTransfer(liquidityVaultAddress, amountOut);
     }
-
-    function getQuoteAtTick(
-        int24 tick,
-        uint128 amountIn,
-        address baseToken,
-        address quoteToken
-    ) public pure returns (uint256 amountOut) {
-        return OracleLibrary.getQuoteAtTick(tick, amountIn, baseToken, quoteToken);
-    }
-
-    function getPoolAddress() public view returns(address) {
-        address factory = 0x1F98431c8aD98523631AE4a59f267346ea31F984;
-        return IIUniswapV3Factory(factory).getPool(wton, address(tos), 3000);
-    }
-
-    function getMiniTick(int24 tickSpacings) public pure returns (int24){
-        return (TickMath.MIN_TICK / tickSpacings) * tickSpacings ;
-    }
-
-    function getMaxTick(int24 tickSpacings) public pure  returns (int24){
-        return (TickMath.MAX_TICK / tickSpacings) * tickSpacings ;
-    }
-
-    function acceptMinTick(int24 _tick, int24 _tickSpacings, int24 _acceptTickInterval) public pure returns (int24) {
-        int24 _minTick = getMiniTick(_tickSpacings);
-        int24 _acceptMinTick = _tick - (_tickSpacings * _acceptTickInterval);
-
-        if(_minTick < _acceptMinTick) return _acceptMinTick;
-        else return _minTick;
-    }
-
-    function acceptMaxTick(int24 _tick, int24 _tickSpacings, int24 _acceptTickInterval) public pure returns (int24) {
-        int24 _maxTick = getMaxTick(_tickSpacings);
-        int24 _acceptMinTick = _tick + (_tickSpacings * _acceptTickInterval);
-
-        if(_maxTick < _acceptMinTick) return _maxTick;
-        else return _acceptMinTick;
-    }
     
-    function limitPrameters(
-        uint256 amountIn,
-        address _pool,
-        address token0,
-        address token1,
-        int24 acceptTickCounts
-    ) public view returns  (uint256 amountOutMinimum, uint256 priceLimit, uint160 sqrtPriceX96Limit) {
-        IIUniswapV3Pool pool = IIUniswapV3Pool(_pool);
-        (, int24 tick,,,,,) =  pool.slot0();
-
-        int24 _tick = tick;
-        if(token0 < token1) {
-            _tick = tick - acceptTickCounts * 60;
-            if(_tick < TickMath.MIN_TICK ) _tick =  TickMath.MIN_TICK ;
-        } else {
-            _tick = tick + acceptTickCounts * 60;
-            if(_tick > TickMath.MAX_TICK ) _tick =  TickMath.MAX_TICK ;
-        }
-        address token1_ = token1;
-        address token0_ = token0;
-        return (
-              getQuoteAtTick(
-                _tick,
-                uint128(amountIn),
-                token0_,
-                token1_
-                ),
-             getQuoteAtTick(
-                _tick,
-                uint128(10**27),
-                token0_,
-                token1_
-             ),
-             TickMath.getSqrtRatioAtTick(_tick)
-        );
-    }
 }
