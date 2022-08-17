@@ -185,8 +185,14 @@ interface IPublicSale2 {
     /// @dev execute the claim
     function claim() external;
 
-    /// @dev execute the claim
+    /// @dev execute the depositWithdraw
     function depositWithdraw() external;
+
+    /// @dev execute the exchangeWTONtoTOS
+    function exchangeWTONtoTOS(
+        uint256 amountIn
+    ) 
+        external;
 
     function _decodeApproveData(
         bytes memory data

@@ -45,6 +45,7 @@ const {
 const LockTOS_ABI = require("../..//artifacts/contracts/stake/LockTOS.sol/LockTOS.json");
 const PublicSale_ABI = require('../../artifacts/contracts/sale/publicSale.sol/PublicSale.json');
 const PublicSaleTest_ABI = require('../../artifacts/contracts/sale/PublicSaleTest.sol/PublicSaleTest.json');
+const PublicSale2_ABI = require('../../artifacts/contracts/sale/PublicSale2.sol/PublicSale2.json');
 // const PublicSaleForDoM_ABI = require('../../artifacts/contracts/sale/PublicSaleForDoM.sol/PublicSaleForDoM.json');
 const LiquidtyVault = require("../../abis/InitialLiquidityVaultFactory.json");
 const LiquidtyVaultLogic = require("../../abis/InitialLiquidityVault.json");
@@ -89,12 +90,15 @@ describe("Sale", () => {
     //claimPercent4 = 20%
     //claimPercent5 = 10%
 
-    //account1 = 48,000 , 32,000 , 32,000, 32,000 , 16,000 -> 160,000 DOC
-    //account2 = 96,000 , 64,000 , 64,000, 64,000 , 32,000 -> 320,000 DOC
-    //account3 = 156,000 , 104,000 , 104,000, 104,000, 52,000 -> 520,000 DOC
-    //account4 = 210,000 , 140,000 , 140,000, 140,000 , 70,000 -> 700,000 DOC
-    //account6 = 90,000 , 60,000 , 60,000, 60,000 , 30,000 -> 300,000 DOC
 
+    //account들 총 TON창여량
+    //account1 = 110TON
+    //account2 = 220TON
+    //account3 = 370TON
+    //account4 = 500TON
+    //account6 = 300TON
+
+    //account이 받는 DOC양
     //account1 = 33,000 , 22,000 , 22,000, 22,000 , 11,000 -> 110,000 DOC
     //account2 = 66,000 , 44,000 , 44,000, 44,000 , 22,000 -> 220,000 DOC
     //account3 = 111,000 , 74,000 , 74,000, 74,000, 37,000 -> 370,000 DOC
@@ -108,6 +112,9 @@ describe("Sale", () => {
     //round5 = 150,000
 
     //total = 1,500,000
+
+    //판매자가 받을 TON양
+    //총 1500TON 중 10% 제외 -> 1350TON
     let testTotalSalesAmount = ethers.utils.parseUnits("1500000", 18);
 
 
@@ -172,6 +179,11 @@ describe("Sale", () => {
     let account4BigTONAmount = ethers.utils.parseUnits("1100", 18);
     let account4BigWTONAmount = ethers.utils.parseUnits("1100", 27);
     let account6BigTONAmount = ethers.utils.parseUnits("300", 18);
+    
+    let contracthaveTON = ethers.utils.parseUnits("1500", 18);
+    let getTokenOwnerHaveTON = ethers.utils.parseUnits("1350", 18);
+    let contractChangeWTON1 = ethers.utils.parseUnits("150", 27);
+    // let contractChangeWTON2 = ethers.utils.parseUnits("40", 27);
 
     let refundAmount1 = ethers.utils.parseUnits("100", 18);
     let refundAmount2 = ethers.utils.parseUnits("200", 18);
@@ -470,61 +482,61 @@ describe("Sale", () => {
 
     });
 
-    // describe("UniswapV3 pool setting", () => {
-    //     it("deployedUniswapV3Contracts", async function () {
-    //         deployedUniswapV3 = await deployedUniswapV3Contracts();
+    describe("UniswapV3 pool setting", () => {
+        it("deployedUniswapV3Contracts", async function () {
+            deployedUniswapV3 = await deployedUniswapV3Contracts();
     
-    //         uniswapInfo.poolfactory = deployedUniswapV3.coreFactory.address;
-    //         uniswapInfo.npm = deployedUniswapV3.nftPositionManager.address;
-    //         uniswapInfo.swapRouter = deployedUniswapV3.swapRouter.address;
-    //         uniswapInfo.NonfungibleTokenPositionDescriptor = deployedUniswapV3.nftDescriptor.address;
-    //         // console.log(deployedUniswapV3.coreFactory);
-    //     });
+            uniswapInfo.poolfactory = deployedUniswapV3.coreFactory.address;
+            uniswapInfo.npm = deployedUniswapV3.nftPositionManager.address;
+            uniswapInfo.swapRouter = deployedUniswapV3.swapRouter.address;
+            uniswapInfo.NonfungibleTokenPositionDescriptor = deployedUniswapV3.nftDescriptor.address;
+            // console.log(deployedUniswapV3.coreFactory);
+        });
 
-    //     it("deploy TEST address", async function () {
-    //        uniswapInfo.wethUsdcPool = testTemp.address;
-    //        uniswapInfo.wtonWethPool = testTemp.address;
-    //        uniswapInfo.wtonTosPool = testTemp.address;
-    //        uniswapInfo.wton = testTemp.address;
-    //     });
+        it("deploy TEST address", async function () {
+           uniswapInfo.wethUsdcPool = testTemp.address;
+           uniswapInfo.wtonWethPool = testTemp.address;
+           uniswapInfo.wtonTosPool = testTemp.address;
+           uniswapInfo.wton = testTemp.address;
+        });
 
-    //     it("create WTON-TOS Pool", async () => {
-    //         let tx = await deployedUniswapV3.coreFactory.connect(uniswapAccount).createPool(wton.address,tos.address,FeeAmount.MEDIUM);
-    //         await tx.wait();
-    //         let getpoolAddress = await deployedUniswapV3.coreFactory.connect(uniswapAccount).getPool(wton.address,tos.address,FeeAmount.MEDIUM);
-    //         console.log(getpoolAddress);
+        it("create WTON-TOS Pool", async () => {
+            let tx = await deployedUniswapV3.coreFactory.connect(uniswapAccount).createPool(wton.address,tos.address,FeeAmount.MEDIUM);
+            await tx.wait();
+            let getpoolAddress = await deployedUniswapV3.coreFactory.connect(uniswapAccount).getPool(wton.address,tos.address,FeeAmount.MEDIUM);
+            console.log(getpoolAddress);
 
-    //         wtonTosPool = await getUniswapV3Pool(getpoolAddress,uniswapAccount);
-    //         // console.log(wtonTosPool);
-    //         expect(await wtonTosPool.factory()).to.eq(deployedUniswapV3.coreFactory.address);
-    //         expect(await wtonTosPool.token0(), 'pool token0').to.eq(wton.address)
-    //         expect(await wtonTosPool.token1(), 'pool token1').to.eq(tos.address)
-    //         expect(await wtonTosPool.fee(), 'pool fee').to.eq(FeeAmount.MEDIUM)
-    //         let slot = await wtonTosPool.slot0();
-    //         expect(slot.sqrtPriceX96).to.be.equal(0);
-    //     })
+            wtonTosPool = await getUniswapV3Pool(getpoolAddress,uniswapAccount);
+            // console.log(wtonTosPool);
+            expect(await wtonTosPool.factory()).to.eq(deployedUniswapV3.coreFactory.address);
+            expect(await wtonTosPool.token0(), 'pool token0').to.eq(wton.address)
+            expect(await wtonTosPool.token1(), 'pool token1').to.eq(tos.address)
+            expect(await wtonTosPool.fee(), 'pool fee').to.eq(FeeAmount.MEDIUM)
+            let slot = await wtonTosPool.slot0();
+            expect(slot.sqrtPriceX96).to.be.equal(0);
+        })
 
-    //     it("set initSqrtPrice", async () => {
-    //         let sqrtPrice = encodePriceSqrt(1, 1);
-    //         await wtonTosPool.initialize(sqrtPrice);
-    //         let slot = await wtonTosPool.slot0();
-    //         expect(slot.sqrtPriceX96).to.be.gte(0);
-    //     })
+        it("set initSqrtPrice", async () => {
+            let sqrtPrice = encodePriceSqrt(1, 1);
+            await wtonTosPool.initialize(sqrtPrice);
+            let slot = await wtonTosPool.slot0();
+            expect(slot.sqrtPriceX96).to.be.gte(0);
+        })
 
-    //     it("mint the WTON-TOS Pool", async () => {
-    //         let beforeliquidity = await wtonTosPool.liquidity();
-    //         expect(beforeliquidity).to.be.equal(0);
+        it("mint the WTON-TOS Pool", async () => {
+            let beforeliquidity = await wtonTosPool.liquidity();
+            expect(beforeliquidity).to.be.equal(0);
 
-    //         // console.log(deployedUniswapV3.nftPositionManager);
-    //         await tos.connect(uniswapAccount).approve(deployedUniswapV3.nftPositionManager.address,tosuniAmount)
-    //         await wton.connect(uniswapAccount).approve(deployedUniswapV3.nftPositionManager.address,wtonuniAmount)
-    //         await mintPosition2(wton.address,tos.address,tosuniAmount,wtonuniAmount,deployedUniswapV3.nftPositionManager,uniswapAccount);
+            // console.log(deployedUniswapV3.nftPositionManager);
+            await tos.connect(uniswapAccount).approve(deployedUniswapV3.nftPositionManager.address,tosuniAmount)
+            await wton.connect(uniswapAccount).approve(deployedUniswapV3.nftPositionManager.address,wtonuniAmount)
+            await mintPosition2(wton.address,tos.address,tosuniAmount,wtonuniAmount,deployedUniswapV3.nftPositionManager,uniswapAccount);
 
-    //         let afterliquidity = await wtonTosPool.liquidity();
-    //         // console.log("liquidity : ",Number(liquidity));
-    //         expect(afterliquidity).to.be.gt(0);
-    //     })
-    // })
+            let afterliquidity = await wtonTosPool.liquidity();
+            // console.log("liquidity : ",Number(liquidity));
+            expect(afterliquidity).to.be.gt(0);
+        })
+    })
 
     describe("initial LiquidityVault deploy & setting", () => {
         it("deploy initialLiquidityFactory", async () => {
@@ -743,8 +755,8 @@ describe("Sale", () => {
                 ]
             )
 
-            let tx = await publicFactory.tonAddress();
-            expect(tx).to.be.equal(getToken.address);
+            let tx = await publicFactory.publicLogic();
+            expect(tx).to.be.equal(deploySaleImpl.address);
         });
 
 
@@ -760,8 +772,8 @@ describe("Sale", () => {
                 ]
             )
 
-            let tx = await publicFactory.tonAddress();
-            expect(tx).to.be.equal(getToken.address);
+            let tx = await publicFactory.publicLogic();
+            expect(tx).to.be.equal(deploySaleImpl2.address);
         });
         
         it("set allset from admin", async () => {
@@ -821,7 +833,7 @@ describe("Sale", () => {
             expect(info.name).to.be.equal(publicSaleContract.name);
             publicSaleContract.contractAddress = info.contractAddress;
 
-            saleContract = new ethers.Contract( publicSaleContract.contractAddress, PublicSaleTest_ABI.abi, ethers.provider );
+            saleContract = new ethers.Contract( publicSaleContract.contractAddress, PublicSale2_ABI.abi, ethers.provider );
             let deployTime1 = await saleContract.deployTime();
             console.log(Number(deployTime1))
             deployTime = Number(await time.latest())
@@ -1480,6 +1492,31 @@ describe("Sale", () => {
             expect(Number(tx4.refundAmount)).to.be.equal(0)
         })
 
+        it("contract have 1500TON", async () => {
+            let checkTON = await ton.balanceOf(saleContract.address);
+            expect(Number(checkTON)).to.be.eq(Number(contracthaveTON));
+        })
+
+        it("depositWithdraw test before exchangeWTONtoTOS", async () => {
+            let tx = saleContract.connect(saleOwner).depositWithdraw();
+            await expect(tx).to.be.revertedWith("PublicSale : need the exchangeWTONtoTOS")
+        })
+        
+        it("exchangeWTONtoTOS test", async () => {
+            await saleContract.connect(saleOwner).exchangeWTONtoTOS(contractChangeWTON1);
+        })
+
+        it("depositWithdraw test after exchangeWTONtoTOS", async () => {
+            let balance1 = await ton.balanceOf(account5.address);
+            expect(Number(balance1)).to.be.equal(0);
+            await saleContract.connect(saleOwner).depositWithdraw();
+
+            let balance2 = await ton.balanceOf(account5.address);
+            expect(Number(balance2)).to.be.equal(getTokenOwnerHaveTON);
+        })
+
+
+
         // it("deposit withdraw caller is anybody", async () => {
         //     let beforeTonAmount = Number(await ton.balanceOf(saleContract.address));
         //     console.log("beforeTonAmount", beforeTonAmount);
@@ -1528,11 +1565,6 @@ describe("Sale", () => {
         //     console.log("afterTokenAmount: ",afterTokenAmount)
         //     expect(afterTokenAmount).to.be.equal(0)
         // })
-
-        it("saleToken test", async () => {
-            let tx = await saleContract.saleToken();
-            console.log("saleToken :", tx);
-        })
 
     })
 })

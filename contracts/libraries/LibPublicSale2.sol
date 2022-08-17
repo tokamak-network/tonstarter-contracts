@@ -37,8 +37,10 @@ library LibPublicSale2 {
         return OracleLibrary.getQuoteAtTick(tick, amountIn, baseToken, quoteToken);
     }
 
-    function getPoolAddress(address _wton, address _tos) public view returns(address) {
+    function getPoolAddress() public view returns(address) {
         address factory = 0x1F98431c8aD98523631AE4a59f267346ea31F984;
+        address _wton = 0x709bef48982Bbfd6F2D4Be24660832665F53406C;
+        address _tos = 0x73a54e5C054aA64C1AE7373C2B5474d8AFEa08bd;
         return IIUniswapV3Factory(factory).getPool(_wton, _tos, 3000);
     }
 

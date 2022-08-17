@@ -24,7 +24,6 @@ interface IIERC20Burnable {
 
 interface IIWTON {
     function swapToTON(uint256 wtonAmount) external returns (bool);
-
     function swapFromTON(uint256 tonAmount) external returns (bool);
 }
 
@@ -346,73 +345,6 @@ contract PublicSale2 is
         changeTOS = _changePercent;
     }
 
-    // function distributionByRounds(
-    //     uint256 startRound,
-    //     uint256 endRound
-    // ) 
-    //     public
-    //     view
-    //     returns(uint256[] memory)
-    // {   
-    //     if(startRound == 0) {
-    //         startRound = 1;
-    //     }
-    //     if(totalClaimCounts < startRound) {
-    //         startRound = totalClaimCounts;
-    //     }
-    //     if(endRound < startRound) {
-    //         endRound = startRound;
-    //     }
-    //     if(totalClaimCounts < endRound || endRound == 0) {
-    //         endRound = totalClaimCounts;
-    //     }
-
-    //     uint length = endRound.sub(startRound.sub(1));
-    //     uint256[] memory claims = new uint256[](length);
-    //     uint256 subClaimPercent = claimPercents[(endRound-1)].sub(claimPercents[(startRound-1)]);
-    //     if(block.timestamp > endExclusiveTime && startRound != 0 ) {
-    //         for(uint256 i = 0; i < length; i++) {
-    //             if(i > 1) {
-    //                 subClaimPercent = claimPercents[(i-1)].sub(claimPercents[(i-2)]);
-    //             } else {
-    //                 subClaimPercent = claimPercents[(i-1)];
-    //             }
-    //             uint256 amount = (((totalExSaleAmount.add(totalOpenSaleAmount())).mul(subClaimPercent)).div(100));
-    //             claims[i] = amount;
-    //         }
-    //     } else {
-    //         for(uint256 i = 0; i < length; i++) {
-    //              if(i > 1) {
-    //                 subClaimPercent = claimPercents[(i-1)].sub(claimPercents[(i-2)]);
-    //             } else {
-    //                 subClaimPercent = claimPercents[(i-1)];
-    //             }
-    //             uint256 amount = (((totalExpectSaleAmount.add(totalExpectOpenSaleAmount)).mul(subClaimPercent)).div(100));
-    //             claims[i] = amount;
-    //         }
-    //     }
-    //     return claims;
-    // }
-
-    // function distributionByRound(
-    //     uint256 _round
-    // )
-    //     public
-    //     view
-    //     returns(uint256)
-    // {
-    //     if(block.timestamp > endExclusiveTime && _round != 0) {
-    //         if(_round == 1) {
-    //             return (((totalExSaleAmount.add(totalOpenSaleAmount())).mul(claimPercents[(_round-1)])).div(100));
-    //         } else {
-    //             uint256 subClaimPercent = claimPercents[(_round-1)].sub(claimPercents[(_round-2)]);
-    //             return (((totalExSaleAmount.add(totalOpenSaleAmount())).mul(subClaimPercent)).div(100));
-    //         }
-    //     } else {
-    //         return 0;
-    //     }
-    // }
-
     function getClaims() public view
         returns (
             uint256[] memory
@@ -730,7 +662,6 @@ contract PublicSale2 is
         }
     }
 
-
     /// @inheritdoc IPublicSale2
     function exclusiveSale(
         address _sender,
@@ -880,15 +811,13 @@ contract PublicSale2 is
         if (totalRound2Users == totalRound2UsersClaim){
             getAmount = IERC20(getToken).balanceOf(address(this)).sub(liquidityTON);
         } else {
-            getAmount = totalExPurchasedAmount.add(totalOpenPurchasedAmount()).sub(liquidityTON).sub(2 ether);
+            getAmount = totalExPurchasedAmount.add(totalOpenPurchasedAmount()).sub(liquidityTON);
         }        
-        require(getAmount <= IERC20(getToken).balanceOf(address(this)), "PublicSale: no token to receive");
-        
+        require(getAmount <= IERC20(getToken).balanceOf(address(this)), "PublicSale: no token to receive");        
         adminWithdraw = true;
 
         uint256 burnAmount = totalExpectSaleAmount.add(totalExpectOpenSaleAmount).sub(totalOpenSaleAmount()).sub(totalExSaleAmount);
         IIERC20Burnable(address(saleToken)).burn(burnAmount);
-
         IERC20(getToken).safeTransfer(getTokenOwner, getAmount);
 
         emit DepositWithdrawal(msg.sender, getAmount, liquidityTON);
@@ -896,14 +825,17 @@ contract PublicSale2 is
 
     function exchangeWTONtoTOS(
         uint256 amountIn
-    ) external {
+    ) 
+        external
+        override
+    {
         require(amountIn > 0, "zero input amount");
         require(block.timestamp > endDepositTime,"PublicSale: need to end the depositTime");
 
         uint256 liquidityTON = hardcapCalcul();
         require(liquidityTON > 0, "PublicSale: don't pass the hardCap");
 
-        IIUniswapV3Pool pool = IIUniswapV3Pool(LibPublicSale2.getPoolAddress(wton, address(tos)));
+        IIUniswapV3Pool pool = IIUniswapV3Pool(LibPublicSale2.getPoolAddress());
         require(address(pool) != address(0), "pool didn't exist");
 
         (uint160 sqrtPriceX96, int24 tick,,,,,) =  pool.slot0();
@@ -917,13 +849,14 @@ contract PublicSale2 is
         );
 
         (uint256 amountOutMinimum, , uint160 sqrtPriceLimitX96)
-            = LibPublicSale2.limitPrameters(amountIn, address(pool), wton, address(saleToken), 18);
-
+            = LibPublicSale2.limitPrameters(amountIn, address(pool), wton, address(tos), 18);
+        
         uint256 wtonAmount = IERC20(wton).balanceOf(address(this));
-        require(wtonAmount >= amountIn, "PublicSale : amountIn is too large");
         if(wtonAmount == 0) {
             IIWTON(wton).swapFromTON(liquidityTON);
             exchangeTOS = true;
+        } else {
+            require(wtonAmount >= amountIn, "PublicSale : amountIn is too large");
         }
 
         ISwapRouter.ExactInputSingleParams memory params =
@@ -932,7 +865,7 @@ contract PublicSale2 is
                 tokenOut: address(tos),
                 fee: poolFee,
                 recipient: address(this),
-                deadline: block.timestamp + 100,
+                deadline: block.timestamp,
                 amountIn: amountIn,
                 amountOutMinimum: amountOutMinimum,
                 sqrtPriceLimitX96: sqrtPriceLimitX96
