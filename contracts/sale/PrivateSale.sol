@@ -284,6 +284,10 @@ contract PrivateSale is
         return userGetAmount;
     }
 
+    function saleTokenAddress() public view returns (address) {
+        return address(saleToken);
+    }
+
     /**
      * @dev transform WAD to RAY
      */
@@ -324,10 +328,6 @@ contract PrivateSale is
         assembly {
             mstore(add(data, 0x20), _claimAddress)
         }
-    }
-
-    function saleTokenAddress() external view returns (address saleAddress_) {
-        return address(saleToken);
     }
 
     /* ========== Anyone can execute ========== */
