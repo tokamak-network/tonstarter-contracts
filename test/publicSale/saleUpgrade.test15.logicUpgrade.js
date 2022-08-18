@@ -182,8 +182,10 @@ describe("Sale", () => {
     
     let contracthaveTON = ethers.utils.parseUnits("1500", 18);
     let getTokenOwnerHaveTON = ethers.utils.parseUnits("1350", 18);
-    let contractChangeWTON1 = ethers.utils.parseUnits("150", 27);
-    // let contractChangeWTON2 = ethers.utils.parseUnits("40", 27);
+    let contractChangeWTON1 = ethers.utils.parseUnits("100", 27);
+    let contractChangeWTON2 = ethers.utils.parseUnits("50", 27);
+    let contractChangeWTON3 = ethers.utils.parseUnits("150", 27);
+    let contractChangeWTON4 = ethers.utils.parseUnits("1", 27);
 
     let refundAmount1 = ethers.utils.parseUnits("100", 18);
     let refundAmount2 = ethers.utils.parseUnits("200", 18);
@@ -233,6 +235,8 @@ describe("Sale", () => {
     let initialliquidityVault;
     let initialVaultFactory;
     let initialVaultLogic;
+
+    let tosWtonPoolAddress;
 
     let addressVault;
     let eventLogAddress;
@@ -505,12 +509,19 @@ describe("Sale", () => {
             await tx.wait();
             let getpoolAddress = await deployedUniswapV3.coreFactory.connect(uniswapAccount).getPool(wton.address,tos.address,FeeAmount.MEDIUM);
             console.log(getpoolAddress);
+            tosWtonPoolAddress = getpoolAddress;
 
             wtonTosPool = await getUniswapV3Pool(getpoolAddress,uniswapAccount);
             // console.log(wtonTosPool);
             expect(await wtonTosPool.factory()).to.eq(deployedUniswapV3.coreFactory.address);
-            expect(await wtonTosPool.token0(), 'pool token0').to.eq(wton.address)
-            expect(await wtonTosPool.token1(), 'pool token1').to.eq(tos.address)
+            // expect(await wtonTosPool.token0(), 'pool token0').to.eq(wton.address)
+            // expect(await wtonTosPool.token1(), 'pool token1').to.eq(tos.address)
+            let token0 = await wtonTosPool.token0()
+            console.log("token0 :",token0)
+            let token1 = await wtonTosPool.token1()
+            console.log("token1 :",token1)
+            console.log("wton.address : ", wton.address)
+            console.log("tos.address : ", tos.address)
             expect(await wtonTosPool.fee(), 'pool fee').to.eq(FeeAmount.MEDIUM)
             let slot = await wtonTosPool.slot0();
             expect(slot.sqrtPriceX96).to.be.equal(0);
@@ -530,7 +541,7 @@ describe("Sale", () => {
             // console.log(deployedUniswapV3.nftPositionManager);
             await tos.connect(uniswapAccount).approve(deployedUniswapV3.nftPositionManager.address,tosuniAmount)
             await wton.connect(uniswapAccount).approve(deployedUniswapV3.nftPositionManager.address,wtonuniAmount)
-            await mintPosition2(wton.address,tos.address,tosuniAmount,wtonuniAmount,deployedUniswapV3.nftPositionManager,uniswapAccount);
+            await mintPosition2(tos.address,wton.address,tosuniAmount,wtonuniAmount,deployedUniswapV3.nftPositionManager,uniswapAccount);
 
             let afterliquidity = await wtonTosPool.liquidity();
             // console.log("liquidity : ",Number(liquidity));
@@ -1503,16 +1514,35 @@ describe("Sale", () => {
         })
         
         it("exchangeWTONtoTOS test", async () => {
-            await saleContract.connect(saleOwner).exchangeWTONtoTOS(contractChangeWTON1);
+            let tosValue = await tos.balanceOf(vaultAddress);
+            console.log(Number(tosValue))
+            expect(tosValue).to.be.equal(0);
+            await saleContract.connect(saleOwner).exchangeWTONtoTOS(contractChangeWTON4,tosWtonPoolAddress);
+        })
+
+        it("check tos", async () => {
+            let tosValue = await tos.balanceOf(vaultAddress);
+            console.log(Number(tosValue))
+            expect(tosValue).to.be.above(0);
+        })
+
+        it("check getAmount value", async () => {
+            let hardcapValue = await saleContract.hardcapCalcul();
+            let getAmount = await ton.balanceOf(saleContract.address);
+            console.log("hardcapValue :", Number(hardcapValue));
+            console.log("getAmount :", Number(getAmount));
+            let overflow = Number(getAmount)-Number(hardcapValue);
+            console.log("overflow :", Number(overflow));
         })
 
         it("depositWithdraw test after exchangeWTONtoTOS", async () => {
             let balance1 = await ton.balanceOf(account5.address);
-            expect(Number(balance1)).to.be.equal(0);
+            expect(balance1).to.be.equal(0);
             await saleContract.connect(saleOwner).depositWithdraw();
 
             let balance2 = await ton.balanceOf(account5.address);
-            expect(Number(balance2)).to.be.equal(getTokenOwnerHaveTON);
+            console.log(balance2);
+            expect(balance2).to.be.equal(getTokenOwnerHaveTON);
         })
 
 

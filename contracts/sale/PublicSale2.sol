@@ -27,6 +27,10 @@ interface IIWTON {
     function swapFromTON(uint256 tonAmount) external returns (bool);
 }
 
+interface IIVestingPublicFundAction {
+    function funding(uint256 amount) external;
+}
+
 contract PublicSale2 is
     PublicSaleStorage,
     ProxyAccessCommon,
@@ -806,16 +810,16 @@ contract PublicSale2 is
     function depositWithdraw() external override {
         require(adminWithdraw != true && exchangeTOS == true,"PublicSale : need the exchangeWTONtoTOS");
 
-        uint256 getAmount;
         uint256 liquidityTON = hardcapCalcul();
-        if (totalRound2Users == totalRound2UsersClaim){
-            getAmount = IERC20(getToken).balanceOf(address(this)).sub(liquidityTON);
-        } else {
-            getAmount = totalExPurchasedAmount.add(totalOpenPurchasedAmount()).sub(liquidityTON);
-        }        
+        uint256 getAmount = totalExPurchasedAmount.add(totalOpenPurchasedAmount()).sub(liquidityTON);
+        // if (totalRound2Users == totalRound2UsersClaim){
+        //     getAmount = IERC20(getToken).balanceOf(address(this)).sub(liquidityTON);
+        // } else {
+        //     getAmount = totalExPurchasedAmount.add(totalOpenPurchasedAmount()).sub(liquidityTON).sub(1 ether);
+        // }        
         require(getAmount <= IERC20(getToken).balanceOf(address(this)), "PublicSale: no token to receive");        
-        adminWithdraw = true;
 
+        adminWithdraw = true;
         uint256 burnAmount = totalExpectSaleAmount.add(totalExpectOpenSaleAmount).sub(totalOpenSaleAmount()).sub(totalExSaleAmount);
         IIERC20Burnable(address(saleToken)).burn(burnAmount);
         IERC20(getToken).safeTransfer(getTokenOwner, getAmount);
@@ -824,7 +828,8 @@ contract PublicSale2 is
     }
 
     function exchangeWTONtoTOS(
-        uint256 amountIn
+        uint256 amountIn,
+        address poolAddress
     ) 
         external
         override
@@ -835,13 +840,13 @@ contract PublicSale2 is
         uint256 liquidityTON = hardcapCalcul();
         require(liquidityTON > 0, "PublicSale: don't pass the hardCap");
 
-        IIUniswapV3Pool pool = IIUniswapV3Pool(LibPublicSale2.getPoolAddress());
-        require(address(pool) != address(0), "pool didn't exist");
+        // IIUniswapV3Pool pool = IIUniswapV3Pool(LibPublicSale2.getPoolAddress());
+        // require(address(pool) != address(0), "pool didn't exist");
 
-        (uint160 sqrtPriceX96, int24 tick,,,,,) =  pool.slot0();
+        (uint160 sqrtPriceX96, int24 tick,,,,,) =  IIUniswapV3Pool(poolAddress).slot0();
         require(sqrtPriceX96 > 0, "pool is not initialized");
 
-        int24 timeWeightedAverageTick = OracleLibrary.consult(address(pool), 120);
+        int24 timeWeightedAverageTick = OracleLibrary.consult(poolAddress, 120);
         require(
             LibPublicSale2.acceptMinTick(timeWeightedAverageTick, 60, 8) <= tick
             && tick < LibPublicSale2.acceptMaxTick(timeWeightedAverageTick, 60, 8),
@@ -849,7 +854,7 @@ contract PublicSale2 is
         );
 
         (uint256 amountOutMinimum, , uint160 sqrtPriceLimitX96)
-            = LibPublicSale2.limitPrameters(amountIn, address(pool), wton, address(tos), 18);
+            = LibPublicSale2.limitPrameters(amountIn, poolAddress, wton, address(tos), 18);
         
         uint256 wtonAmount = IERC20(wton).balanceOf(address(this));
         if(wtonAmount == 0) {

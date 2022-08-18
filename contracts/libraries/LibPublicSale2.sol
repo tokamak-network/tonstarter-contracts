@@ -39,8 +39,8 @@ library LibPublicSale2 {
 
     function getPoolAddress() public view returns(address) {
         address factory = 0x1F98431c8aD98523631AE4a59f267346ea31F984;
-        address _wton = 0x709bef48982Bbfd6F2D4Be24660832665F53406C;
-        address _tos = 0x73a54e5C054aA64C1AE7373C2B5474d8AFEa08bd;
+        address _wton = 0x9632BB38aA47E529886dc91188A972752a1bf009;
+        address _tos = 0x68F250BCfa0bD1E76d749A43053a3f1e6D41b14C;
         return IIUniswapV3Factory(factory).getPool(_wton, _tos, 3000);
     }
 
