@@ -21,7 +21,7 @@ async function main() {
 
 
     const privateSale = await ethers.getContractFactory('PrivateSale')
-    const saleContract = await privateSale.deploy(wtonAddress)
+    const saleContract = await privateSale.deploy()
     console.log("saleContract Address: ", saleContract.address)
     await saleContract.deployed()
 
