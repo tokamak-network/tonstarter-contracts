@@ -50,8 +50,12 @@ const PublicSale2_ABI = require('../../artifacts/contracts/sale/PublicSale2.sol/
 const LiquidtyVault = require("../../abis/InitialLiquidityVaultFactory.json");
 const LiquidtyVaultLogic = require("../../abis/InitialLiquidityVault.json");
 const EventLog_ABI = require("../../abis/EventLog.json");
+
 const TON_ABI = require("../../abis/TON.json");
 const WTON_ABI = require("../../abis/WTON.json");
+
+const TOS_ABI = require("../../abis/TOS.json");
+const LockTOSABI_ABI = require("../../abis/LockTOS_ABI.json");
 
 const zeroAddress = "0x0000000000000000000000000000000000000000";
 
@@ -211,7 +215,7 @@ describe("Sale", () => {
     let claimTestTime;
     let claimFirst = 50;
 
-    let tos, ton, lockTOS, lockTOSImpl, lockTOSProxy ;
+    let tos, ton, wton, lockTOS, lockTOSImpl, lockTOSProxy ;
     let epochUnit, maxTime;
     const name = "TONStarter";
     const symbol = "TOS";
@@ -333,6 +337,9 @@ describe("Sale", () => {
         NonfungibleTokenPositionDescriptor: "0x91ae842A5Ffd8d12023116943e72A606179294f3"
     } 
 
+    let lockTOSAddress = "0x5adc7de3a0B4A4797f02C3E99265cd7391437568";
+    let tonAddress = "0x44d4F5d89E9296337b8c48a332B3b2fb2C190CD0";
+
     let price = {
         tos: ethers.BigNumber.from("1000"),
         projectToken:  ethers.BigNumber.from("100"),
@@ -378,25 +385,36 @@ describe("Sale", () => {
         // for sTOS
         epochUnit = 60*60*1;  // 1시간
         maxTime = epochUnit * 156;
+        // let lockTosAdmin = 0x5b6e72248b19F2c5b88A4511A6994AD101d0c287;
+        // await hre.ethers.provider.send("hardhat_impersonateAccount",[lockTosAdmin]);
+
+        // let _lockTosAdmin = await ethers.getSigner(lockTosAdmin);
     });
 
-    describe("Initialize TON, TOS, LockTOS", () => {
+    describe("#1 .setting the TON, WTON, LockTOS, SaleToken", () => {
         //saleToken Deploy
-        it("Initialize Sale Token", async function () {
+        it("#1-1. Initialize Sale Token", async function () {
             erc20token = await ethers.getContractFactory("ERC20Mock");
             saleToken = await erc20token.connect(saleTokenOwner).deploy("testDoM", "AURA");
         });
 
-        //TOS Contract deploy
-        it("Initialize TOS", async function () {
-            const TOS = await ethers.getContractFactory("TOS");
-            tos = await TOS.deploy(name, symbol, version);
-            await tos.deployed();
-            uniswapInfo.tos = tos.address;
-        });
+        it("#1-2. setting the TON", async () => {
+            ton = new ethers.Contract( tonAddress, TON_ABI.abi, ethers.provider );
+        })
 
-        //LockTOS Contract deploy (need the TOS staking)
-        it("Deploy LockTOS", async function () {
+        it("#1-3. setting the WTON", async () => {
+            wton = new ethers.Contract(uniswapInfo.wton, WTON_ABI.abi, ethers.provider );
+        })
+
+        it("#1-4. setting the TOS", async () => {
+            tos = new ethers.Contract(uniswapInfo.tos, TOS_ABI.abi, ethers.provider );
+        })
+
+        // it("#1-5. setting the lockTOS", async () => {
+        //     lockTOS = new ethers.Contract( lockTOSAddress, LockTOSABI_ABI, ethers.provider );
+        // })
+
+        it("#1-5. Deploy LockTOS", async function () {
             lockTOSImpl = await (await ethers.getContractFactory("LockTOS")).deploy();
             await lockTOSImpl.deployed();
 
@@ -412,147 +430,21 @@ describe("Sale", () => {
             lockTOS = new ethers.Contract( lockTOSProxy.address, LockTOS_ABI.abi, ethers.provider );
         });
 
-        //give the TOS
-        it("mint TOS to users", async function () {
-            await (await tos.connect(deployer).mint(tester1.account.address, tosAmount)).wait();
-            expect(await tos.balanceOf(tester1.account.address)).to.be.equal(tosAmount);
-
-            await (await tos.connect(deployer).mint(tester2.account.address, tosAmount)).wait();
-            expect(await tos.balanceOf(tester2.account.address)).to.be.equal(tosAmount);
-
-            await (await tos.connect(deployer).mint(tester3.account.address, tosAmount)).wait();
-            expect(await tos.balanceOf(tester3.account.address)).to.be.equal(tosAmount);
-
-            await (await tos.connect(deployer).mint(tester4.account.address, tosAmount)).wait();
-            expect(await tos.balanceOf(tester4.account.address)).to.be.equal(tosAmount);
-
-            await (await tos.connect(deployer).mint(tester6.account.address, tosAmount)).wait();
-            expect(await tos.balanceOf(tester6.account.address)).to.be.equal(tosAmount);
-
-            await (await tos.connect(deployer).mint(uniswapAccount.address, tosuniAmount)).wait();
-            expect(await tos.balanceOf(uniswapAccount.address)).to.be.equal(tosuniAmount);
-        });
-
-        describe("# 1. Deploy WTON, TON", async function() {
-            it("1. ico20Contracts init  ", async function () {
-                this.timeout(1000000);
-                ICOContractsDeployed = await ico20Contracts.initializeICO20Contracts(
-                    defaultSender
-                );
-            });
-            
-            //ton, wton deploy
-            it("2. tokamakContracts init  ", async function () {
-                this.timeout(1000000);
-                TokamakContractsDeployed =
-                  await ico20Contracts.initializePlasmaEvmContracts(defaultSender);
-                const cons = await ico20Contracts.getPlasamContracts();
-          
-                ton = cons.ton;
-                wton = cons.wton;
-          
-                await ton.mint(defaultSender, ethers.utils.parseUnits("1000", 18), {
-                  from: defaultSender,
-                });
-                await wton.mint(defaultSender, ethers.utils.parseUnits("1000", 27), {
-                  from: defaultSender,
-                });
-
-                await wton.mint(uniswapAccount.address, wtonuniAmount, {
-                    from: defaultSender,
-                });
-
-                expect(await wton.balanceOf(uniswapAccount.address)).to.be.equal(wtonuniAmount);
-    
-                // await ton.mint(tester1.account.address, tester1.tonAmount, {
-                //     from: defaultSender,
-                // });
-                // await ton.mint(tester2.account.address, tester2.tonAmount, {
-                //     from: defaultSender,
-                // });
-                // await ton.mint(tester3.account.address, tester3.tonAmount, {
-                //     from: defaultSender,
-                // });
-          
-                // await wton.mint(tester1.account.address, tester1.wtonAmount, {
-                //     from: defaultSender,
-                // });
-                // await wton.mint(tester2.account.address, tester2.wtonAmount, {
-                //     from: defaultSender,
-                // });
-                // await wton.mint(tester3.account.address, tester3.wtonAmount, {
-                //     from: defaultSender,
-                // });
-            });
-        })
-
-    });
-
-    describe("UniswapV3 pool setting", () => {
-        it("deployedUniswapV3Contracts", async function () {
-            deployedUniswapV3 = await deployedUniswapV3Contracts();
-    
-            uniswapInfo.poolfactory = deployedUniswapV3.coreFactory.address;
-            uniswapInfo.npm = deployedUniswapV3.nftPositionManager.address;
-            uniswapInfo.swapRouter = deployedUniswapV3.swapRouter.address;
-            uniswapInfo.NonfungibleTokenPositionDescriptor = deployedUniswapV3.nftDescriptor.address;
-            // console.log(deployedUniswapV3.coreFactory);
-        });
-
-        it("deploy TEST address", async function () {
-           uniswapInfo.wethUsdcPool = testTemp.address;
-           uniswapInfo.wtonWethPool = testTemp.address;
-           uniswapInfo.wtonTosPool = testTemp.address;
-           uniswapInfo.wton = testTemp.address;
-        });
-
-        it("create WTON-TOS Pool", async () => {
-            let tx = await deployedUniswapV3.coreFactory.connect(uniswapAccount).createPool(wton.address,tos.address,FeeAmount.MEDIUM);
-            await tx.wait();
-            let getpoolAddress = await deployedUniswapV3.coreFactory.connect(uniswapAccount).getPool(wton.address,tos.address,FeeAmount.MEDIUM);
-            console.log(getpoolAddress);
-            tosWtonPoolAddress = getpoolAddress;
-
-            wtonTosPool = await getUniswapV3Pool(getpoolAddress,uniswapAccount);
-            // console.log(wtonTosPool);
-            expect(await wtonTosPool.factory()).to.eq(deployedUniswapV3.coreFactory.address);
-            // expect(await wtonTosPool.token0(), 'pool token0').to.eq(wton.address)
-            // expect(await wtonTosPool.token1(), 'pool token1').to.eq(tos.address)
-            let token0 = await wtonTosPool.token0()
-            console.log("token0 :",token0)
-            let token1 = await wtonTosPool.token1()
-            console.log("token1 :",token1)
-            console.log("wton.address : ", wton.address)
-            console.log("tos.address : ", tos.address)
-            expect(await wtonTosPool.fee(), 'pool fee').to.eq(FeeAmount.MEDIUM)
-            let slot = await wtonTosPool.slot0();
-            expect(slot.sqrtPriceX96).to.be.equal(0);
-        })
-
-        it("set initSqrtPrice", async () => {
-            let sqrtPrice = encodePriceSqrt(1, 1);
-            await wtonTosPool.initialize(sqrtPrice);
-            let slot = await wtonTosPool.slot0();
-            expect(slot.sqrtPriceX96).to.be.gte(0);
-        })
-
-        it("mint the WTON-TOS Pool", async () => {
-            let beforeliquidity = await wtonTosPool.liquidity();
-            expect(beforeliquidity).to.be.equal(0);
-
-            // console.log(deployedUniswapV3.nftPositionManager);
-            await tos.connect(uniswapAccount).approve(deployedUniswapV3.nftPositionManager.address,tosuniAmount)
-            await wton.connect(uniswapAccount).approve(deployedUniswapV3.nftPositionManager.address,wtonuniAmount)
-            await mintPosition2(tos.address,wton.address,tosuniAmount,wtonuniAmount,deployedUniswapV3.nftPositionManager,uniswapAccount);
-
-            let afterliquidity = await wtonTosPool.liquidity();
-            // console.log("liquidity : ",Number(liquidity));
-            expect(afterliquidity).to.be.gt(0);
+        it("#1-6. Deploy the eventLog", async () => {
+            const contract = await (
+                await ethers.getContractFactory(
+                    EventLog_ABI.abi,
+                    EventLog_ABI.bytecode
+                )
+            ).deploy();
+            await contract.deployed();
+            // let tx = await contract.deployed();
+            eventLogAddress = contract.address;
         })
     })
 
-    describe("initial LiquidityVault deploy & setting", () => {
-        it("deploy initialLiquidityFactory", async () => {
+    describe("#2. initial LiquidityVault deploy & setting", () => {
+        it("#2-1. deploy initialLiquidityFactory", async () => {
             const contract = await (
                 await ethers.getContractFactory(
                     LiquidtyVault.abi,
@@ -566,7 +458,7 @@ describe("Sale", () => {
             expect(code).to.not.eq("0x");
         })
 
-        it("deploy initialLiquidityLogic", async () => {
+        it("#2-2. deploy initialLiquidityLogic", async () => {
             const contract = await (
                 await ethers.getContractFactory(
                     LiquidtyVaultLogic.abi,
@@ -580,30 +472,30 @@ describe("Sale", () => {
             expect(code).to.not.eq("0x");
         })
 
-        it("setLogic caller is not admin", async () => {
+        it("#2-3. setLogic caller is not admin", async () => {
             await expect(
                 initialVaultFactory.connect(account1).setLogic(initialVaultLogic.address)
             ).to.be.revertedWith("Accessible: Caller is not an admin");
         })
 
-        it("setLogic caller is admin", async () => {
+        it("#2-4. setLogic caller is admin", async () => {
             await initialVaultFactory.connect(saleTokenOwner).setLogic(initialVaultLogic.address);
 
             expect(await initialVaultFactory.vaultLogic()).to.be.eq(initialVaultLogic.address);
         })
 
-        it("setUpgradeAdmin caller is not admin", async () => {
+        it("#2-5. setUpgradeAdmin caller is not admin", async () => {
             await expect(
                 initialVaultFactory.connect(account1).setUpgradeAdmin(upgradeAdmin.address)
             ).to.be.revertedWith("Accessible: Caller is not an admin");
         });
 
-        it("setUpgradeAdmin caller is admin", async () => {
+        it("#2-6. setUpgradeAdmin caller is admin", async () => {
             await initialVaultFactory.connect(saleTokenOwner).setUpgradeAdmin(upgradeAdmin.address);
             expect(await initialVaultFactory.upgradeAdmin()).to.be.eq(upgradeAdmin.address);
         });
 
-        it("setUniswapInfoNTokens caller is not admin ", async () => {
+        it("#2-7. setUniswapInfoNTokens caller is not admin ", async () => {
             await expect(
                 initialVaultFactory.connect(account1).setUniswapInfoNTokens(
                     [uniswapInfo.poolfactory,
@@ -612,10 +504,9 @@ describe("Sale", () => {
                     ethers.BigNumber.from("3000")
                 )
             ).to.be.revertedWith("Accessible: Caller is not an admin");
-
         });
 
-        it("setUniswapInfoNTokens caller is admin", async () => {
+        it("#2-8. setUniswapInfoNTokens caller is admin", async () => {
             await initialVaultFactory.connect(saleTokenOwner).setUniswapInfoNTokens(
                 [uniswapInfo.poolfactory,
                 uniswapInfo.npm],
@@ -628,7 +519,7 @@ describe("Sale", () => {
             expect(await initialVaultFactory.fee()).to.be.eq(ethers.BigNumber.from("3000"));
         });
 
-        it("create the InitialLiquidityFactory", async () => {
+        it("#2-9. create the InitialLiquidityFactory", async () => {
             let tx = await initialVaultFactory.create(
                 "ABCD",
                 saleToken.address,
@@ -656,7 +547,7 @@ describe("Sale", () => {
             expect((await initialVaultFactory.lastestCreated()).contractAddress).to.be.eq(vaultAddress);
         })
 
-        it("create2 the InitialLiquidityFactory", async () => {
+        it("#2-10. create2 the InitialLiquidityFactory", async () => {
             let tx = await initialVaultFactory.create(
                 "ABC",
                 saleToken.address,
@@ -685,30 +576,15 @@ describe("Sale", () => {
             // console.log(tx2);
             expect((await initialVaultFactory.lastestCreated()).contractAddress).to.be.eq(vaultAddress);
         })
-
     })
 
-    describe("deploy the eventLog", () => {
-        it("deploy the eventLog", async () => {
-            const contract = await (
-                await ethers.getContractFactory(
-                    EventLog_ABI.abi,
-                    EventLog_ABI.bytecode
-                )
-            ).deploy();
-            await contract.deployed();
-            // let tx = await contract.deployed();
-            eventLogAddress = contract.address;
-        })
-    })
-
-    describe("Initialize PublicSaleProxyFactroy and PublicSale", () => {
+    describe("#3. Initialize PublicSaleProxyFactroy and PublicSale", () => {
         //funding Token set(TON)
-        it("Initialize Funding Token", async function () {
+        it("#3-1. Initialize Funding Token", async function () {
             getToken = ton;
         });
 
-        it("deploy PublicSlaeFactory", async () => {
+        it("#3-2. deploy PublicSlaeFactory", async () => {
             const PublicSaleProxyFactory = await ethers.getContractFactory("PublicSaleProxyFactory");
 
             publicFactory = await PublicSaleProxyFactory.connect(saleTokenOwner).deploy();
@@ -718,7 +594,7 @@ describe("Sale", () => {
         })
 
         //deploy publicSale and publicSaleProxy and transfer TON, WTON
-        it("Initialize PublicSale", async function () {
+        it("#3-3. Initialize PublicSale", async function () {
             let PublicSale = await ethers.getContractFactory("PublicSale");
             deploySaleImpl = await PublicSale.connect(saleOwner).deploy();
 
@@ -726,12 +602,12 @@ describe("Sale", () => {
             expect(code).to.not.eq("0x");
         });
 
-        it("Deploy LibPublicSale2 ", async function () {
+        it("#3-4. Deploy LibPublicSale2 ", async function () {
             const LibPublicSale2 = await ethers.getContractFactory("LibPublicSale2");
             libPublicSale2 = await LibPublicSale2.connect(saleOwner).deploy();
           });
 
-        it("Initialize PublicSale2", async function () {
+        it("#3-5. Initialize PublicSale2", async function () {
             let PublicSale2 = await ethers.getContractFactory("PublicSale2",{
                 libraries: {
                     LibPublicSale2: libPublicSale2.address
@@ -743,7 +619,7 @@ describe("Sale", () => {
             expect(code).to.not.eq("0x");
         });
 
-        it("setting the Proxy basicSet from not admin", async () => {
+        it("#3-6. setting the Proxy basicSet from not admin", async () => {
             await expect(publicFactory.connect(account1).basicSet(
                 [
                     getToken.address,
@@ -756,7 +632,7 @@ describe("Sale", () => {
             )).to.be.revertedWith("Accessible: Caller is not an admin");
         });
 
-        it("setting the Proxy basicSet from admin", async () => {
+        it("#3-7. setting the Proxy basicSet from admin", async () => {
             await publicFactory.connect(saleTokenOwner).basicSet(
                 [
                     getToken.address,
@@ -772,8 +648,7 @@ describe("Sale", () => {
             expect(tx).to.be.equal(deploySaleImpl.address);
         });
 
-
-        it("change the basicSet address from admin", async () => {
+        it("#3-8. change the basicSet address from admin", async () => {
             await publicFactory.connect(saleTokenOwner).basicSet(
                 [
                     getToken.address,
@@ -789,7 +664,7 @@ describe("Sale", () => {
             expect(tx).to.be.equal(deploySaleImpl2.address);
         });
         
-        it("set allset from admin", async () => {
+        it("#3-9. set allset from admin", async () => {
             await publicFactory.connect(saleTokenOwner).allSet(
                 [
                     upgradeAdmin.address,
@@ -808,7 +683,7 @@ describe("Sale", () => {
             );
         })
 
-        it("deploy PublicSaleProxy from Factory but not match the liquidtyAddress", async () => {
+        it("#3-10. deploy PublicSaleProxy from Factory but not match the liquidtyAddress", async () => {
             let publicSaleContract = saleContracts[0];
             await expect(publicFactory.connect(saleTokenOwner).create(
                 publicSaleContract.name,
@@ -822,7 +697,7 @@ describe("Sale", () => {
             )).to.be.revertedWith("another liquidityVault");
         })
 
-        it("deploy PublicSaleProxy from Factory", async () => {
+        it("#3-11. deploy PublicSaleProxy from Factory", async () => {
             let publicSaleContract = saleContracts[0];
             let prevTotalCreatedContracts = await publicFactory.totalCreatedContracts();
 
@@ -864,19 +739,16 @@ describe("Sale", () => {
             //account4 = WTON 0, TON 1100
             //account6 = WTON 0, TON 300
             await getToken.connect(saleTokenOwner).transfer(account1.address, account1BigTONAmount)
-            await wton.mint(account1.address, account1BigWTONAmount, {
-                from: defaultSender,
-            });
-            await getToken.connect(saleTokenOwner).mint(account2.address, account2BigTONAmount)
-            await wton.mint(account2.address, account2BigWTONAmount, {
-                from: defaultSender,
-            });
-            await getToken.connect(saleTokenOwner).mint(account3.address, account3BigTONAmount)
-            await wton.mint(account3.address, account3BigWTONAmount, {
-                from: defaultSender,
-            });
-            await getToken.connect(saleTokenOwner).mint(account4.address, account4BigTONAmount)
-            await getToken.connect(saleTokenOwner).mint(account6.address, account6BigTONAmount)
+            await wton.connect(saleTokenOwner).transfer(account1.address, account1BigWTONAmount)
+ 
+            await getToken.connect(saleTokenOwner).transfer(account2.address, account2BigTONAmount)
+            await wton.connect(saleTokenOwner).transfer(account2.address, account2BigWTONAmount)
+
+            await getToken.connect(saleTokenOwner).transfer(account3.address, account3BigTONAmount)
+            await wton.connect(saleTokenOwner).transfer(account3.address, account3BigWTONAmount)
+
+            await getToken.connect(saleTokenOwner).transfer(account4.address, account4BigTONAmount)
+            await getToken.connect(saleTokenOwner).transfer(account6.address, account6BigTONAmount)
         });
 
         it("duration the time", async () => {
@@ -884,59 +756,85 @@ describe("Sale", () => {
             await ethers.provider.send('evm_mine');
         })
 
-        it("should create locks for user", async function () {
+        it("#3-12. transfer tos", async () => {
+            await tos.connect(deployer).transfer(tester1.account.address, tosAmount);
+            await tos.connect(deployer).transfer(tester2.account.address, tosAmount);
+            await tos.connect(deployer).transfer(tester3.account.address, tosAmount);
+            await tos.connect(deployer).transfer(tester4.account.address, tosAmount);
+            await tos.connect(deployer).transfer(tester6.account.address, tosAmount);
+        })
+
+        // it("for test setSnapshot", async () => {
+        //     const block = await ethers.provider.getBlock('latest')
+        //     if (!block) {
+        //         throw new Error('null block returned from provider')
+        //     }
+        //     setSnapshot = block.timestamp;
+        //     console.log(Number(setSnapshot))
+        // })
+
+        // it("#3-13. tos grantRole the LockTOS", async () => {
+        //     let adminPermit = "0xdf8b4c520ffe197c5343c6f5aec59570151ef9a492f2c624fd45ddde6135ec42"
+        //     let tx = await tos.hasRole(
+        //         adminPermit,
+        //         deployer.address
+        //     )
+        //     console.log("tx : ", tx);
+        //     let permitHash = "0xb397c60dd7b1c20a49e703fbb963429124e983fa44a000cb3d8ac4357d984a88"
+        //     console.log(deployer.address);
+        //     await tos.connect(deployer).grantRole(
+        //         adminPermit,
+        //         lockTOS.address
+        //     )
+        // })
+
+        it("#3-13. should create locks for user", async function () {
             expect(await lockTOS.balanceOf(tester1.account.address)).to.be.equal(0);
             expect(await lockTOS.balanceOf(tester2.account.address)).to.be.equal(0);
 
-            let id = await createLockWithPermit({
-                user: tester1.account,
-                amount: 15500,
-                unlockWeeks: 2,
-                tos,
-                lockTOS,
-            });
-            expect(id).to.be.equal(1);
-            tester1.lockTOSIds.push(id);
+            await tos.connect(tester1.account).approve(lockTOS.address, 15500) 
+            await lockTOS.connect(tester1.account).createLock(15500, 2);
 
-            id = await createLockWithPermit({
-                user: tester2.account,
-                amount: 35000,
-                unlockWeeks: 2,
-                tos,
-                lockTOS,
-            });
-            tester2.lockTOSIds.push(id);
-            expect(id).to.be.equal(2);
+            let userLocks = await lockTOS.connect(tester1.account).locksOf(tester1.account.address);
+            let lockId = userLocks[userLocks.length - 1];
+            expect(lockId).to.be.equal(1);
+            tester1.lockTOSIds.push(lockId);
 
-            id = await createLockWithPermit({
-                user: tester3.account,
-                amount: 170000,
-                unlockWeeks: 2,
-                tos,
-                lockTOS,
-            });
-            tester3.lockTOSIds.push(id);
-            expect(id).to.be.equal(3);
 
-            id = await createLockWithPermit({
-                user: tester4.account,
-                amount: 650000,
-                unlockWeeks: 2,
-                tos,
-                lockTOS,
-            });
-            tester4.lockTOSIds.push(id);
-            expect(id).to.be.equal(4);
+            await tos.connect(tester2.account).approve(lockTOS.address, 35000) 
+            await lockTOS.connect(tester2.account).createLock(35000, 2);
 
-            id = await createLockWithPermit({
-                user: tester6.account,
-                amount: 650000,
-                unlockWeeks: 2,
-                tos,
-                lockTOS,
-            });
-            tester6.lockTOSIds.push(id);
-            expect(id).to.be.equal(5);
+            userLocks = await lockTOS.connect(tester2.account).locksOf(tester2.account.address);
+            lockId = userLocks[userLocks.length - 1];
+            expect(lockId).to.be.equal(2);
+            tester2.lockTOSIds.push(lockId);
+
+
+            await tos.connect(tester3.account).approve(lockTOS.address, 170000) 
+            await lockTOS.connect(tester3.account).createLock(170000, 2);
+
+            userLocks = await lockTOS.connect(tester3.account).locksOf(tester3.account.address);
+            lockId = userLocks[userLocks.length - 1];
+            expect(lockId).to.be.equal(3);
+            tester3.lockTOSIds.push(lockId);
+
+
+            await tos.connect(tester4.account).approve(lockTOS.address, 650000) 
+            await lockTOS.connect(tester4.account).createLock(650000, 2);
+
+            userLocks = await lockTOS.connect(tester4.account).locksOf(tester4.account.address);
+            lockId = userLocks[userLocks.length - 1];
+            expect(lockId).to.be.equal(4);
+            tester4.lockTOSIds.push(lockId);
+
+
+            await tos.connect(tester6.account).approve(lockTOS.address, 650000) 
+            await lockTOS.connect(tester6.account).createLock(650000, 2);
+
+            userLocks = await lockTOS.connect(tester6.account).locksOf(tester6.account.address);
+            lockId = userLocks[userLocks.length - 1];
+            expect(lockId).to.be.equal(5);
+            tester6.lockTOSIds.push(lockId);
 
             // ethers.provider.send("evm_increaseTime", [10])   // add 26 seconds
             // ethers.provider.send("evm_mine")      // mine the next block
@@ -969,131 +867,125 @@ describe("Sale", () => {
             expect(tester2.balanceOfAt).to.be.above(0);
             expect(tester3.balanceOfAt).to.be.above(0);
             expect(tester4.balanceOfAt).to.be.above(0);
-
         });
     });
 
-    describe("setting", () => {
-        describe("exclusiveSale setting", () => {
-            //checking the SaleToken balance
-            it("check the balance (contract have the saleToken) ", async () => {
-                balance1 = await saleToken.balanceOf(saleContract.address)
-    
-                expect(Number(balance1)).to.be.equal(Number(totalBigAmount))
-            })
+    describe("#4. setting the PublicSale", () => {
+        it("#4-1. check the balance (contract have the saleToken) ", async () => {
+            balance1 = await saleToken.balanceOf(saleContract.address)
 
-            //setting owner test
-            it('setAllsetting caller not owner', async () => {
-                blocktime = Number(await time.latest())
-                whitelistStartTime = blocktime + 86400;
-                whitelistEndTime = whitelistStartTime + (86400*7);
-                exclusiveStartTime = whitelistEndTime + 1;
-                exclusiveEndTime = exclusiveStartTime + (86400*7);
-                depositStartTime = exclusiveEndTime;
-                depositEndTime = depositStartTime + (86400*7);
-                claimTime1 = depositEndTime + (86400 * 20);
-                claimTime2 = claimTime1 + (60 * 1);
-                claimTime3 = claimTime2 + (60 * 2);
-                claimTime4 = claimTime3 + (60 * 3);
-                claimTime5 = claimTime4 + (60 * 4);
-
-                let tx = saleContract.connect(account1).setAllsetting(
-                    [100, 200, 1000, 4000, 600, 1200, 2200, 6000],
-                    [round1SaleAmount, round2SaleAmount, saleTokenPrice, payTokenPrice, hardcapAmount, changeTOS],
-                    [setSnapshot, whitelistStartTime, whitelistEndTime, exclusiveStartTime, exclusiveEndTime, depositStartTime, depositEndTime, claimCounts],
-                    [claimTime1,claimTime2,claimTime3,claimTime4,claimTime5],
-                    [claimPercent1,claimPercent2,claimPercent3,claimPercent4,claimPercent5]
-                )
-                await expect(tx).to.be.revertedWith("Accessible: Caller is not an admin")
-            })
-
-            it("setAllsetting snapshot error", async () => {
-                let smallsnapshot = setSnapshot-100;
-                let tx = saleContract.connect(saleOwner).setAllsetting(
-                    [100, 200, 1000, 4000, 600, 1200, 2200, 6000],
-                    [round1SaleAmount, round2SaleAmount, saleTokenPrice, payTokenPrice, hardcapAmount, changeTOS],
-                    [smallsnapshot, whitelistStartTime, whitelistEndTime, exclusiveStartTime, exclusiveEndTime, depositStartTime, depositEndTime, claimCounts],
-                    [claimTime1,claimTime2,claimTime3,claimTime4,claimTime5],
-                    [claimPercent1,claimPercent2,claimPercent3,claimPercent4,claimPercent5]
-                )
-                await expect(tx).to.be.revertedWith("snapshot need later")
-            })
-
-            //PublicSale setting owner
-            it('setAllsetting caller owner', async () => {
-                await saleContract.connect(saleOwner).setAllsetting(
-                    [100, 200, 1000, 4000, 600, 1200, 2200, 6000],
-                    [round1SaleAmount, round2SaleAmount, saleTokenPrice, payTokenPrice, hardcapAmount, changeTOS],
-                    [setSnapshot, whitelistStartTime, whitelistEndTime, exclusiveStartTime, exclusiveEndTime, depositStartTime, depositEndTime, claimCounts],
-                    [claimTime1,claimTime2,claimTime3,claimTime4,claimTime5],
-                    [claimPercent1,claimPercent2,claimPercent3,claimPercent4,claimPercent5]
-                )
-
-                let tx = await saleContract.connect(saleOwner).saleTokenPrice()
-                let tx2 = await saleContract.connect(saleOwner).payTokenPrice()
-                // console.log("tx : ", tx)
-                expect(tx).to.be.equal(saleTokenPrice)
-                // console.log("tx : ", tx2)
-                expect(tx2).to.be.equal(payTokenPrice)
-
-                let tx3 = Number(await saleContract.connect(saleOwner).totalExpectSaleAmount())
-                // console.log("tx3 : ", tx3)
-                expect(tx3).to.be.equal(Number(round1SaleAmount))
-                let tx4 = Number(await saleContract.connect(saleOwner).totalExpectOpenSaleAmount())
-                // console.log("tx4 : ", tx4)
-                expect(tx4).to.be.equal(Number(round2SaleAmount))
-                
-                let tx5 = Number(await saleContract.connect(saleOwner).tiers(1))
-                expect(tx5).to.be.equal(100)
-                let tx6 = Number(await saleContract.connect(saleOwner).tiers(2))
-                expect(tx6).to.be.equal(200)
-                let tx7 = Number(await saleContract.connect(saleOwner).tiers(3))
-                expect(tx7).to.be.equal(1000)
-                let tx8 = Number(await saleContract.connect(saleOwner).tiers(4))
-                expect(tx8).to.be.equal(4000)
-                let tx9 = Number(await saleContract.connect(saleOwner).tiersPercents(1))
-                expect(tx9).to.be.equal(600)
-                let tx10 = Number(await saleContract.connect(saleOwner).tiersPercents(2))
-                expect(tx10).to.be.equal(1200)
-                let tx11 = Number(await saleContract.connect(saleOwner).tiersPercents(3))
-                expect(tx11).to.be.equal(2200)
-                let tx12 = Number(await saleContract.connect(saleOwner).tiersPercents(4))
-                expect(tx12).to.be.equal(6000) 
-                
-                let tier1snap = Number(await lockTOS.balanceOfAt(tester1.account.address, setSnapshot))
-                expect(tier1snap).to.be.above(100)
-                let tier2snap = Number(await lockTOS.balanceOfAt(tester2.account.address, setSnapshot))
-                expect(tier2snap).to.be.above(200)
-                let tier3snap = Number(await lockTOS.balanceOfAt(tester3.account.address, setSnapshot))
-                expect(tier3snap).to.be.above(1000)
-                let tier4snap = Number(await lockTOS.balanceOfAt(tester4.account.address, setSnapshot))
-                expect(tier4snap).to.be.above(4000) 
-                let tier5snap = Number(await lockTOS.balanceOfAt(tester6.account.address, setSnapshot))
-                expect(tier5snap).to.be.above(4000) 
-
-                let tx13 = Number(await saleContract.startExclusiveTime())
-                expect(tx13).to.be.equal(exclusiveStartTime)
-                let tx14 = Number(await saleContract.endExclusiveTime())
-                expect(tx14).to.be.equal(exclusiveEndTime)
-                let tx15 = Number(await saleContract.startAddWhiteTime())
-                expect(tx15).to.be.equal(whitelistStartTime)
-                let tx16 = Number(await saleContract.endAddWhiteTime())
-                expect(tx16).to.be.equal(whitelistEndTime)
-
-                let tx17 = Number(await saleContract.claimTimes(0))
-                expect(tx17).to.be.equal(claimTime1)
-                let tx18 = Number(await saleContract.totalClaimCounts())
-                expect(tx18).to.be.equal(claimCounts)
-            })
-
+            expect(Number(balance1)).to.be.equal(Number(totalBigAmount))
         })
-        
+
+         //setting owner test
+        it('#4-2. setAllsetting caller not owner', async () => {
+            blocktime = Number(await time.latest())
+            whitelistStartTime = blocktime + 86400;
+            whitelistEndTime = whitelistStartTime + (86400*7);
+            exclusiveStartTime = whitelistEndTime + 1;
+            exclusiveEndTime = exclusiveStartTime + (86400*7);
+            depositStartTime = exclusiveEndTime;
+            depositEndTime = depositStartTime + (86400*7);
+            claimTime1 = depositEndTime + (86400 * 20);
+            claimTime2 = claimTime1 + (60 * 1);
+            claimTime3 = claimTime2 + (60 * 2);
+            claimTime4 = claimTime3 + (60 * 3);
+            claimTime5 = claimTime4 + (60 * 4);
+
+            let tx = saleContract.connect(account1).setAllsetting(
+                [100, 200, 1000, 4000, 600, 1200, 2200, 6000],
+                [round1SaleAmount, round2SaleAmount, saleTokenPrice, payTokenPrice, hardcapAmount, changeTOS],
+                [setSnapshot, whitelistStartTime, whitelistEndTime, exclusiveStartTime, exclusiveEndTime, depositStartTime, depositEndTime, claimCounts],
+                [claimTime1,claimTime2,claimTime3,claimTime4,claimTime5],
+                [claimPercent1,claimPercent2,claimPercent3,claimPercent4,claimPercent5]
+            )
+            await expect(tx).to.be.revertedWith("Accessible: Caller is not an admin")
+        })
+
+        it("#4-3. setAllsetting snapshot error", async () => {
+            let smallsnapshot = setSnapshot-100;
+            let tx = saleContract.connect(saleOwner).setAllsetting(
+                [100, 200, 1000, 4000, 600, 1200, 2200, 6000],
+                [round1SaleAmount, round2SaleAmount, saleTokenPrice, payTokenPrice, hardcapAmount, changeTOS],
+                [smallsnapshot, whitelistStartTime, whitelistEndTime, exclusiveStartTime, exclusiveEndTime, depositStartTime, depositEndTime, claimCounts],
+                [claimTime1,claimTime2,claimTime3,claimTime4,claimTime5],
+                [claimPercent1,claimPercent2,claimPercent3,claimPercent4,claimPercent5]
+            )
+            await expect(tx).to.be.revertedWith("snapshot need later")
+        })
+
+        //PublicSale setting owner
+        it('#4-4. setAllsetting caller owner', async () => {
+            await saleContract.connect(saleOwner).setAllsetting(
+                [100, 200, 1000, 4000, 600, 1200, 2200, 6000],
+                [round1SaleAmount, round2SaleAmount, saleTokenPrice, payTokenPrice, hardcapAmount, changeTOS],
+                [setSnapshot, whitelistStartTime, whitelistEndTime, exclusiveStartTime, exclusiveEndTime, depositStartTime, depositEndTime, claimCounts],
+                [claimTime1,claimTime2,claimTime3,claimTime4,claimTime5],
+                [claimPercent1,claimPercent2,claimPercent3,claimPercent4,claimPercent5]
+            )
+
+            let tx = await saleContract.connect(saleOwner).saleTokenPrice()
+            let tx2 = await saleContract.connect(saleOwner).payTokenPrice()
+            // console.log("tx : ", tx)
+            expect(tx).to.be.equal(saleTokenPrice)
+            // console.log("tx : ", tx2)
+            expect(tx2).to.be.equal(payTokenPrice)
+
+            let tx3 = Number(await saleContract.connect(saleOwner).totalExpectSaleAmount())
+            // console.log("tx3 : ", tx3)
+            expect(tx3).to.be.equal(Number(round1SaleAmount))
+            let tx4 = Number(await saleContract.connect(saleOwner).totalExpectOpenSaleAmount())
+            // console.log("tx4 : ", tx4)
+            expect(tx4).to.be.equal(Number(round2SaleAmount))
+            
+            let tx5 = Number(await saleContract.connect(saleOwner).tiers(1))
+            expect(tx5).to.be.equal(100)
+            let tx6 = Number(await saleContract.connect(saleOwner).tiers(2))
+            expect(tx6).to.be.equal(200)
+            let tx7 = Number(await saleContract.connect(saleOwner).tiers(3))
+            expect(tx7).to.be.equal(1000)
+            let tx8 = Number(await saleContract.connect(saleOwner).tiers(4))
+            expect(tx8).to.be.equal(4000)
+            let tx9 = Number(await saleContract.connect(saleOwner).tiersPercents(1))
+            expect(tx9).to.be.equal(600)
+            let tx10 = Number(await saleContract.connect(saleOwner).tiersPercents(2))
+            expect(tx10).to.be.equal(1200)
+            let tx11 = Number(await saleContract.connect(saleOwner).tiersPercents(3))
+            expect(tx11).to.be.equal(2200)
+            let tx12 = Number(await saleContract.connect(saleOwner).tiersPercents(4))
+            expect(tx12).to.be.equal(6000) 
+            
+            let tier1snap = Number(await lockTOS.balanceOfAt(tester1.account.address, setSnapshot))
+            expect(tier1snap).to.be.above(100)
+            let tier2snap = Number(await lockTOS.balanceOfAt(tester2.account.address, setSnapshot))
+            expect(tier2snap).to.be.above(200)
+            let tier3snap = Number(await lockTOS.balanceOfAt(tester3.account.address, setSnapshot))
+            expect(tier3snap).to.be.above(1000)
+            let tier4snap = Number(await lockTOS.balanceOfAt(tester4.account.address, setSnapshot))
+            expect(tier4snap).to.be.above(4000) 
+            let tier5snap = Number(await lockTOS.balanceOfAt(tester6.account.address, setSnapshot))
+            expect(tier5snap).to.be.above(4000) 
+
+            let tx13 = Number(await saleContract.startExclusiveTime())
+            expect(tx13).to.be.equal(exclusiveStartTime)
+            let tx14 = Number(await saleContract.endExclusiveTime())
+            expect(tx14).to.be.equal(exclusiveEndTime)
+            let tx15 = Number(await saleContract.startAddWhiteTime())
+            expect(tx15).to.be.equal(whitelistStartTime)
+            let tx16 = Number(await saleContract.endAddWhiteTime())
+            expect(tx16).to.be.equal(whitelistEndTime)
+
+            let tx17 = Number(await saleContract.claimTimes(0))
+            expect(tx17).to.be.equal(claimTime1)
+            let tx18 = Number(await saleContract.totalClaimCounts())
+            expect(tx18).to.be.equal(claimCounts)
+        })
+
     })
-    
-    describe("Sale", () => {
-        describe("exclusiveSale Sale", () => {
-            //calculTierAmount test
-            it("calculTierAmount test before addwhiteList", async () => {
+
+    describe("#5. PublicSale", () => {
+        describe("#5-1. round1 Sale", () => {
+            it("#5-1-1. calculTierAmount test before addwhiteList", async () => {
                 let big60000 = ethers.utils.parseUnits("60000", 18);
                 let big120000 = ethers.utils.parseUnits("120000", 18);
                 let big220000 = ethers.utils.parseUnits("220000", 18);
@@ -1111,13 +1003,11 @@ describe("Sale", () => {
             })
 
             it("duration the time", async () => {
-                604800
                 await ethers.provider.send('evm_setNextBlockTimestamp', [whitelistStartTime]);
                 await ethers.provider.send('evm_mine');
             })
 
-            //addwhiteList test and data check
-            it("addwhiteList", async () => {
+            it("#5-1-2. addWhiteList", async () => {
                 let tx = Number(await saleContract.connect(tester1.account).tiersAccount(1))
                 expect(tx).to.be.equal(0)
                 await saleContract.connect(tester1.account).addWhiteList()
@@ -1169,8 +1059,7 @@ describe("Sale", () => {
                 expect(tx16).to.be.equal(5)
             })
 
-            //calculate how many input ton amount
-            it("how many input amount", async () => {
+            it("#5-1-3. calculation the inputAmount", async () => {
                 let tx = Number(await saleContract.calculPayToken(60000))
                 expect(tx).to.be.equal(60)
                 let tx2 = Number(await saleContract.calculPayToken(120000))
@@ -1183,8 +1072,7 @@ describe("Sale", () => {
                 expect(tx5).to.be.equal(300)
             })
 
-            //calculTierAmount test (before and after different)
-            it("calculTierAmount test after addwhiteList", async () => {
+            it("#5-1-4. calculTierAmount test after addwhiteList", async () => {
                 let big60000 = ethers.utils.parseUnits("60000", 18);
                 let big120000 = ethers.utils.parseUnits("120000", 18);
                 let big220000 = ethers.utils.parseUnits("220000", 18);
@@ -1200,9 +1088,8 @@ describe("Sale", () => {
                 let tx5 = Number(await saleContract.calculTierAmount(account6.address))
                 expect(tx5).to.be.equal(Number(big300000))
             })
-            
-            //time condition test
-            it("exclusiveSale before exclusive startTime", async () => {
+
+            it("#5-1-5. exclusiveSale before exclusive startTime", async () => {
                 await getToken.connect(account1).approve(saleContract.address, 60)
                 let tx = saleContract.connect(account1).exclusiveSale(account1.address,60)
                 await expect(tx).to.be.revertedWith("PublicSale: exclusiveStartTime has not passed")
@@ -1215,94 +1102,36 @@ describe("Sale", () => {
                 await time.increaseTo(exclusiveStartTime+86400);
             })
 
-            //time condition test
-            it("addwhitelist after whitelistTIme", async () => {
+            it("#5-1-6. addwhitelist after whitelistTIme", async () => {
                 let tx = saleContract.connect(account1).addWhiteList()
                 await expect(tx).to.be.revertedWith("PublicSale: end the whitelistTime")
             })
 
-            //round1 sale test
-            it("exclusiveSale after exclusive startTime", async () => {
+            it("#5-1-7. exclusiveSale after exclusive startTime", async () => {
                 let big60 = ethers.utils.parseUnits("60", 18);
-                let account1TON = Number(await getToken.balanceOf(account1.address))
-                let account1WTON = Number(await wton.balanceOf(account1.address))
-                let account2TON = Number(await getToken.balanceOf(account2.address))
-                let account2WTON = Number(await wton.balanceOf(account2.address))
-                let account3TON = Number(await getToken.balanceOf(account3.address))
-                let account3WTON = Number(await wton.balanceOf(account3.address))
-                let account4TON = Number(await getToken.balanceOf(account4.address))
-                let account4WTON = Number(await wton.balanceOf(account4.address))
-                let account6TON = Number(await getToken.balanceOf(account6.address))
-                let account6WTON = Number(await wton.balanceOf(account6.address))
-                
-                // let contractTON = Number(await getToken.balanceOf(account5.address))
-                // console.log("contract TON :", contractTON)
-
-                // console.log("account1 TON :", account1TON)
-                // console.log("account1 WTON :", account1WTON)
-                // console.log("account2 TON :", account2TON)
-                // console.log("account2 WTON :", account2WTON)
-                // console.log("account3 TON :", account3TON)
-                // console.log("account3 WTON :", account3WTON)
-                // console.log("account4 TON :", account4TON)
-                // console.log("account4 WTON :", account4WTON)
-                // console.log("account6 TON :", account6TON)
-                // console.log("account6 WTON :", account6WTON)
+                let big120 = ethers.utils.parseUnits("120", 18);
+                let big220 = ethers.utils.parseUnits("220", 18);
+                let big300 = ethers.utils.parseUnits("300", 18);
 
                 await wton.connect(account1).approveAndCall(saleContract.address, account1BigWTONAmount, 0);
-                // await wton.connect(account1).approve(saleContract.address, account1BigWTONAmount)
-                // await saleContract.connect(account1).exclusiveSale(account1.address,big60)
                 let tx = await saleContract.usersEx(account1.address)
                 expect(Number(tx.payAmount)).to.be.equal(Number(big60))
 
-                let big120 = ethers.utils.parseUnits("120", 18);
                 await getToken.connect(account2).approveAndCall(saleContract.address, big120, 0);
-                // await saleContract.connect(account2).exclusiveSale(account2.address,big120)
                 let tx2 = await saleContract.usersEx(account2.address)
                 expect(Number(tx2.payAmount)).to.be.equal(Number(big120))
-                
-                let big220 = ethers.utils.parseUnits("220", 18);
+
                 await getToken.connect(account3).approveAndCall(saleContract.address, big220, 0);
-                // await getToken.connect(account3).approve(saleContract.address, big220)
-                // await saleContract.connect(account3).exclusiveSale(account3.address,big220)
                 let tx3 = await saleContract.usersEx(account3.address)
                 expect(Number(tx3.payAmount)).to.be.equal(Number(big220))
-                
-                let big300 = ethers.utils.parseUnits("300", 18);
+
                 await getToken.connect(account4).approveAndCall(saleContract.address, big300, 0);
-                // await getToken.connect(account4).approve(saleContract.address, big300)
-                // await saleContract.connect(account4).exclusiveSale(account4.address,big300)
                 let tx4 = await saleContract.usersEx(account4.address)
                 expect(Number(tx4.payAmount)).to.be.equal(Number(big300))
-                
+
                 await getToken.connect(account6).approveAndCall(saleContract.address, account6BigTONAmount, 0);
-                // await getToken.connect(account6).approve(saleContract.address, account6BigTONAmount)
-                // await saleContract.connect(account6).exclusiveSale(account6.address,account6BigTONAmount)
                 let tx5 = await saleContract.usersEx(account6.address)
                 expect(Number(tx5.payAmount)).to.be.equal(Number(account6BigTONAmount))
-                
-                
-                let account1TON2 = Number(await getToken.balanceOf(account1.address))
-                let account1WTON2 = Number(await wton.balanceOf(account1.address))
-                let account2TON2 = Number(await getToken.balanceOf(account2.address))
-                let account2WTON2 = Number(await wton.balanceOf(account2.address))
-                let account3TON2 = Number(await getToken.balanceOf(account3.address))
-                let account3WTON2 = Number(await wton.balanceOf(account3.address))
-                let account4TON2 = Number(await getToken.balanceOf(account4.address))
-                let account4WTON2 = Number(await wton.balanceOf(account4.address))
-                let account6TON2 = Number(await getToken.balanceOf(account6.address))
-                let account6WTON2 = Number(await wton.balanceOf(account6.address))
-                // console.log("------------------------------------------------------")
-                // console.log("account1 TON2 :", account1TON2)
-                // console.log("account1 WTON2 :", account1WTON2)
-                // console.log("account2 TON2 :", account2TON2)
-                // console.log("account2 WTON2 :", account2WTON2)
-                // console.log("account3 TON2 :", account3TON2)
-                // console.log("account3 WTON2 :", account3WTON2)
-                // console.log("account4 TON2 :", account4TON2)
-                // console.log("account4 WTON2 :", account4WTON2)
-                // console.log("account6 TON2 :", account6TON2)
-                // console.log("account6 WTON2 :", account6WTON2)
 
                 let big1000 = ethers.utils.parseUnits("1000", 18);
                 let big1000000 = ethers.utils.parseUnits("1000000", 18);
@@ -1310,14 +1139,11 @@ describe("Sale", () => {
                 expect(tx6).to.be.equal(Number(big1000))
                 let tx7 = Number(await saleContract.totalExSaleAmount())
                 expect(tx7).to.be.equal(Number(big1000000))
-                // let tx8 = Number(await getToken.balanceOf(account5.address))
-                // expect(tx8).to.be.equal(Number(big1000))
             })
         })
 
-        describe("openSale Sale", () => {
-            //time condition test
-            it("deposit before depositTime", async () => {
+        describe("#5-2. round2 Sale", () => {
+            it("#5-2-1. deposit before depositTime", async () => {
                 let tx = saleContract.connect(account1).deposit(account1.address,100)
                 await expect(tx).to.be.revertedWith("PublicSale: don't start depositTime")
             })
@@ -1327,59 +1153,20 @@ describe("Sale", () => {
                 await ethers.provider.send('evm_mine');
             })
 
-            //round2 deposit
-            it("deposit after depositTime", async () => {
+            it("#5-2-2. deposit after depositTime", async () => {
                 account1Before = Number(await getToken.balanceOf(account1.address))
                 account2Before = Number(await getToken.balanceOf(account2.address))
                 account3Before = Number(await getToken.balanceOf(account3.address))
                 account4Before = Number(await getToken.balanceOf(account4.address))
 
-                // let big10 = ethers.utils.parseUnits("10", 18);
-                // await getToken.connect(saleTokenOwner).transfer(account1.address, big10)
-                
                 let big50 = ethers.utils.parseUnits("50", 18);
                 let big100 = ethers.utils.parseUnits("100", 18);
                 let big150 = ethers.utils.parseUnits("150", 18);
                 let big200 = ethers.utils.parseUnits("200", 18);
-                let big300 = ethers.utils.parseUnits("300", 18);
-                let big400 = ethers.utils.parseUnits("400", 18);
-                let big600 = ethers.utils.parseUnits("600", 18);
-                let big800 = ethers.utils.parseUnits("800", 18);
-                // await getToken.connect(account1).approve(saleContract.address, big200)                       //200
-                // await wton.connect(account2).approve(saleContract.address, account2BigWTONAmount)           //400
-                // await getToken.connect(account3).approve(saleContract.address, big300)                      //300
-                await wton.connect(account3).approve(saleContract.address, account3BigWTONAmount)           //300
-                // await getToken.connect(account4).approve(saleContract.address, big800)                      //800
 
-                let account1TON = Number(await getToken.balanceOf(account1.address))
-                let account1WTON = Number(await wton.balanceOf(account1.address))
-                let account2TON = Number(await getToken.balanceOf(account2.address))
-                let account2WTON = Number(await wton.balanceOf(account2.address))
-                let account3TON = Number(await getToken.balanceOf(account3.address))
-                let account3WTON = Number(await wton.balanceOf(account3.address))
-                let account4TON = Number(await getToken.balanceOf(account4.address))
-                let account4WTON = Number(await wton.balanceOf(account4.address))
-                let account6TON = Number(await getToken.balanceOf(account6.address))
-                let account6WTON = Number(await wton.balanceOf(account6.address))
-                
-                // let contractTON = Number(await getToken.balanceOf(account5.address))
-                // console.log("contract TON :", contractTON)
-
-                // console.log("account1 TON :", account1TON)
-                // console.log("account1 WTON :", account1WTON)
-                // console.log("account2 TON :", account2TON)
-                // console.log("account2 WTON :", account2WTON)
-                // console.log("account3 TON :", account3TON)
-                // console.log("account3 WTON :", account3WTON)
-                // console.log("account4 TON :", account4TON)
-                // console.log("account4 WTON :", account4WTON)
-                // console.log("account6 TON :", account6TON)
-                // console.log("account6 WTON :", account6WTON)
-
+                await wton.connect(account3).approve(saleContract.address, account3BigWTONAmount)         
                 await getToken.connect(account1).approveAndCall(saleContract.address, big50, 0);
-                // await saleContract.connect(account1).deposit(big200)
                 await wton.connect(account2).approveAndCall(saleContract.address, account2BigWTONAmount, 0);
-                // await saleContract.connect(account2).deposit(big400)
 
                 var dec = 300000000000000000000;
                 var hex = dec.toString(16);
@@ -1393,31 +1180,7 @@ describe("Sale", () => {
                 }
 
                 await getToken.connect(account3).approveAndCall(saleContract.address, big150, 0);
-                // await saleContract.connect(account3).deposit(big600)
                 await getToken.connect(account4).approveAndCall(saleContract.address, big200, 0);
-                // await saleContract.connect(account4).deposit(big800)
-
-                let account1TON2 = Number(await getToken.balanceOf(account1.address))
-                let account1WTON2 = Number(await wton.balanceOf(account1.address))
-                let account2TON2 = Number(await getToken.balanceOf(account2.address))
-                let account2WTON2 = Number(await wton.balanceOf(account2.address))
-                let account3TON2 = Number(await getToken.balanceOf(account3.address))
-                let account3WTON2 = Number(await wton.balanceOf(account3.address))
-                let account4TON2 = Number(await getToken.balanceOf(account4.address))
-                let account4WTON2 = Number(await wton.balanceOf(account4.address))
-                let account6TON2 = Number(await getToken.balanceOf(account6.address))
-                let account6WTON2 = Number(await wton.balanceOf(account6.address))
-                // console.log("------------------------------------------------------")
-                // console.log("account1 TON2 :", account1TON2)
-                // console.log("account1 WTON2 :", account1WTON2)
-                // console.log("account2 TON2 :", account2TON2)
-                // console.log("account2 WTON2 :", account2WTON2)
-                // console.log("account3 TON2 :", account3TON2)
-                // console.log("account3 WTON2 :", account3WTON2)
-                // console.log("account4 TON2 :", account4TON2)
-                // console.log("account4 WTON2 :", account4WTON2)
-                // console.log("account6 TON2 :", account6TON2)
-                // console.log("account6 WTON2 :", account6WTON2)
 
                 let tx = await saleContract.usersOpen(account1.address)
                 expect(Number(tx.depositAmount)).to.be.equal(Number(big50))
@@ -1431,33 +1194,11 @@ describe("Sale", () => {
         })
     })
 
-    describe("claim test", () => {
-        //time condition test
-        it('claim before claimTime', async () => {
+    describe("#6. claim", () => {
+        it("#6-1. claim before claimTime", async () => {
             let tx = saleContract.connect(account1).claim()
             await expect(tx).to.be.revertedWith("PublicSale: don't start claimTime")
         })
-        
-        // it("duration the time to claimTime1", async () => {
-        //     await ethers.provider.send('evm_setNextBlockTimestamp', [claimTime1]);
-        //     await ethers.provider.send('evm_mine');
-        // })
-
-        // //claimTime1 account1 claim and balance check
-        // it("claim claimTime1, claim call the account1", async () => {
-        //     let expectClaim = await saleContract.calculClaimAmount(account1.address, 0)
-        //     let tx = await saleContract.usersClaim(account1.address)
-        //     expect(Number(tx.claimAmount)).to.be.equal(0)
-        //     await saleContract.connect(account1).claim()
-        //     let tx2 = await saleContract.usersClaim(account1.address)
-        //     // console.log("period1 :", Number(tx2.claimAmount))
-        //     expect(Number(tx2.claimAmount)).to.be.equal(Number(expectClaim._reward))
-        //     let tx3 = await saleToken.balanceOf(account1.address)
-        //     expect(Number(tx3)).to.be.equal(Number(expectClaim._reward))
-
-        //     console.log("account1 amount : ", Number(tx3))
-        //     // account1 = 48,000
-        // })
 
 
         it("duration the time to period end", async () => {
@@ -1466,8 +1207,7 @@ describe("Sale", () => {
             await ethers.provider.send('evm_mine');
         })
 
-        //claimTime5 account3, account4, account6 claim and balance check
-        it("claim period end, claim call the account3, account4, account6", async () => {
+        it("#6-2. claim period end, claim call the account3, account4, account6", async () => {
             let expectClaim = await saleContract.calculClaimAmount(account1.address, 0)
             let expectClaim2 = await saleContract.calculClaimAmount(account2.address, 0)
             let expectClaim3 = await saleContract.calculClaimAmount(account3.address, 0)
@@ -1493,8 +1233,7 @@ describe("Sale", () => {
             expect(Number(tx6)).to.be.equal(Number(expectClaim5._totalClaim))
         })
 
-        //refund test
-        it("no refund check", async () => {
+        it("#6-3. no refund check", async () => {
             let tx = await saleContract.usersClaim(account1.address)
             expect(Number(tx.refundAmount)).to.be.equal(0)
             let tx2 = await saleContract.usersClaim(account2.address)
@@ -1505,30 +1244,30 @@ describe("Sale", () => {
             expect(Number(tx4.refundAmount)).to.be.equal(0)
         })
 
-        it("contract have 1500TON", async () => {
+        it("#6-4. contract have 1500TON", async () => {
             let checkTON = await ton.balanceOf(saleContract.address);
             expect(Number(checkTON)).to.be.eq(Number(contracthaveTON));
         })
 
-        it("depositWithdraw test before exchangeWTONtoTOS", async () => {
+        it("#6-5. depositWithdraw test before exchangeWTONtoTOS", async () => {
             let tx = saleContract.connect(saleOwner).depositWithdraw();
             await expect(tx).to.be.revertedWith("PublicSale : need the exchangeWTONtoTOS")
         })
         
-        it("exchangeWTONtoTOS test", async () => {
+        it("#6-6. exchangeWTONtoTOS test", async () => {
             let tosValue = await tos.balanceOf(vaultAddress);
             console.log(Number(tosValue))
             expect(tosValue).to.be.equal(0);
-            await saleContract.connect(saleOwner).exchangeWTONtoTOS(contractChangeWTON4,tosWtonPoolAddress);
+            await saleContract.connect(saleOwner).exchangeWTONtoTOS(contractChangeWTON4,uniswapInfo.wtonTosPool);
         })
 
-        it("check tos", async () => {
+        it("#6-7. check tos", async () => {
             let tosValue = await tos.balanceOf(vaultAddress);
             console.log(Number(tosValue))
             expect(tosValue).to.be.above(0);
         })
 
-        it("check getAmount value", async () => {
+        it("#6-8. check getAmount value", async () => {
             let hardcapValue = await saleContract.hardcapCalcul();
             let getAmount = await ton.balanceOf(saleContract.address);
             console.log("hardcapValue :", Number(hardcapValue));
@@ -1537,66 +1276,14 @@ describe("Sale", () => {
             console.log("overflow :", Number(overflow));
         })
 
-        it("depositWithdraw test after exchangeWTONtoTOS", async () => {
+        it("#6-9. depositWithdraw test after exchangeWTONtoTOS", async () => {
             let balance1 = await ton.balanceOf(account5.address);
             expect(balance1).to.be.equal(0);
             await saleContract.connect(saleOwner).depositWithdraw();
 
             let balance2 = await ton.balanceOf(account5.address);
-            console.log(balance2);
+            console.log("balance2 :",Number(balance2));
             expect(balance2).to.be.equal(getTokenOwnerHaveTON);
         })
-
-
-
-        // it("deposit withdraw caller is anybody", async () => {
-        //     let beforeTonAmount = Number(await ton.balanceOf(saleContract.address));
-        //     console.log("beforeTonAmount", beforeTonAmount);
-        //     let beforeTosAmount = Number(await tos.balanceOf(vaultAddress));
-        //     expect(beforeTosAmount).to.be.equal(0)
-            
-        //     let beforeTokenAmount = Number(await saleToken.balanceOf(saleContract.address))
-        //     console.log("beforeSaleTokenAmount :", beforeTokenAmount)
-        //     expect(beforeTokenAmount).to.be.gt(0)
-
-        //     let talExSaleAmount = Number(await saleContract.totalExpectSaleAmount());
-        //     let talExOpenAmount = Number(await saleContract.totalExpectOpenSaleAmount());
-        //     let talReSaleAmount = Number(await saleContract.totalOpenSaleAmount());
-        //     let talReOpenAmount = Number(await saleContract.totalExSaleAmount());
-
-        //     let remainAmount = talExSaleAmount + talExOpenAmount - talReSaleAmount - talReOpenAmount;
-        //     console.log("remainAmount :", remainAmount)
-        //     expect(beforeTokenAmount).to.be.equal(remainAmount)
-
-
-        //     let allowanceBefore = Number(await ton.allowance(saleContract.address,wton.address));
-        //     console.log("salecontract to wton allowanceBefore :", allowanceBefore)
-        //     expect(allowanceBefore).to.be.gt(0)
-
-        //     // expect(allowanceBefore).to.be.equal(0)
-        //     // await saleContract.connect(saleOwner).approveToWTON();
-
-        //     // let allowanceAfter = Number(await ton.allowance(saleContract.address,wton.address));
-        //     // expect(allowanceAfter).to.be.gt(0)
-        //     // expect(allowanceAfter).to.be.gt(0)
-
-        //     // await saleContract.connect(saleOwner).approveToUniswap();
-        //     await saleContract.connect(account1).depositWithdraw();
-
-        //     let afterTonAmount = Number(await ton.balanceOf(saleContract.address));
-        //     console.log("afterTonAmount :", afterTonAmount);
-        //     expect(afterTonAmount).to.be.equal(0)
-        //     let afterTosAmountPublic = Number(await tos.balanceOf(saleContract.address));
-        //     console.log("afterTosAmountPublic : ", afterTosAmountPublic);
-        //     expect(afterTosAmountPublic).to.be.equal(0)
-        //     let afterTosAmount = Number(await tos.balanceOf(vaultAddress));
-        //     expect(afterTosAmount).to.be.gt(0)
-        //     console.log("liquidity Vault have afterTosAmount : ", afterTosAmount);
-
-        //     let afterTokenAmount = Number(await saleToken.balanceOf(saleContract.address))
-        //     console.log("afterTokenAmount: ",afterTokenAmount)
-        //     expect(afterTokenAmount).to.be.equal(0)
-        // })
-
     })
 })
