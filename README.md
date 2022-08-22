@@ -115,19 +115,18 @@
 
 * "PublicSaleProxy": "0x3B75d3f628C29d357b484EA7d091faEd63419267"
 
+## Deployed related to [Dragons Of Midgard]'s PublicSale
+
+* "PublicSale": "0xF4B6ab8280f1c53e2059Dc9E5b62482c86128AC9"
+
+* "PublicSaleProxy": "0x3B75d3f628C29d357b484EA7d091faEd63419267"
+
 
 ## Deployed related to [LYDA]'s Private Sale
 
 * "PrivateSaleLogic": "0x06Ee22B0D4b0192766e0f73B0F665424f4F9b6e6"
 
 * "PrivateSaleProxy": "0x8B61D3EaF99fBF56603f873f2db3eEb1907AB481"
-
-
-## Deployed related to [Dragons Of Midgard]'s PublicSale
-
-* "PublicSale": "0xF4B6ab8280f1c53e2059Dc9E5b62482c86128AC9"
-
-* "PublicSaleProxy": "0x3B75d3f628C29d357b484EA7d091faEd63419267"
 
 
 ### USING TOKAMAK CONTRACTS
