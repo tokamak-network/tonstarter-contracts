@@ -83,6 +83,10 @@
 
 * "StakeUniswapV3Proxy": "0xC1349A9a33A0682804c390a3968e26E5a2366153"
 
+## Deployed TokamakStakeUpgrade4 ( exchangeWTONtoTOS )
+
+* "TokamakStakeUpgrade4": "0x523ed202d3591b70cc4ab19d10bde036eae3361f"
+
 
 ## Deployed related to DAO
 
@@ -116,9 +120,19 @@
 * "PublicSaleProxy": "0x3B75d3f628C29d357b484EA7d091faEd63419267"
 
 
-## Deployed TokamakStakeUpgrade4 ( exchangeWTONtoTOS )
+## Deployed related to [Dragons Of Midgard]'s PublicSale
 
-* "TokamakStakeUpgrade4": "0x523ed202d3591b70cc4ab19d10bde036eae3361f"
+* "PublicSale": "0xF4B6ab8280f1c53e2059Dc9E5b62482c86128AC9"
+
+* "PublicSaleProxy": "0x3B75d3f628C29d357b484EA7d091faEd63419267"
+
+
+## Deployed related to [LYDA]'s Private Sale
+
+* "PrivateSaleLogic": "0x06Ee22B0D4b0192766e0f73B0F665424f4F9b6e6"
+
+* "PrivateSaleProxy": "0x8B61D3EaF99fBF56603f873f2db3eEb1907AB481"
+
 
 
 ### USING TOKAMAK CONTRACTS

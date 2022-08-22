@@ -10,13 +10,19 @@ import {
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "../interfaces/IWTON.sol";
 import "../interfaces/IPrivateSale.sol";
-import "../common/AccessibleCommon.sol";
+import "../common/ProxyAccessCommon.sol";
 
 import { OnApprove } from "./OnApprove.sol";
 import "./PrivateSaleStorage.sol";
 
 
-contract PrivateSale is PrivateSaleStorage, AccessibleCommon, ReentrancyGuard, OnApprove, IPrivateSale {
+contract PrivateSale is 
+    PrivateSaleStorage, 
+    ProxyAccessCommon, 
+    ReentrancyGuard, 
+    OnApprove, 
+    IPrivateSale 
+{
     using SafeERC20 for IERC20;
     using SafeMath for uint256;
 
@@ -24,21 +30,12 @@ contract PrivateSale is PrivateSaleStorage, AccessibleCommon, ReentrancyGuard, O
         address user,
         uint256 inputAmount,
         uint256 totalOutPutamount,
-        uint256 inputTime,
-        uint256 monthlyReward,
-        uint256 firstReward
-    );
-
-    event FirstClaiminfo(
-        address user,
-        uint256 claimAmount,
-        uint256 claimTime
+        uint256 inputTime
     );
 
     event Claiminfo(
         address user,
-        uint256 claimAmount,
-        uint256 claimTime
+        uint256 claimAmount
     );
 
     event Withdrawinfo(
@@ -46,15 +43,188 @@ contract PrivateSale is PrivateSaleStorage, AccessibleCommon, ReentrancyGuard, O
         uint256 withdrawAmount
     );
 
-    event addList(
+    event AddList(
         address account,
         uint256 amount
     );
 
-    event delList(
+    event DelList(
         address account,
         uint256 amount
     );
+
+    modifier settingCheck() {
+        require(!pauseSetting || isProxyAdmin(msg.sender), "setting is Pause");
+        _;
+    }
+
+    /* ========== onlyPolicyOwner ========== */
+    /// @dev Set pause state
+    /// @param _pause true:pause or false:resume
+    function setSettingPause(bool _pause) external onlyProxyOwner {
+        pauseSetting = _pause;
+    }
+
+    /* ========== onlyOwner ========== */
+
+    /// @dev address setting
+    /// @param _saleToken saleTokenAddress (contract have token)
+    /// @param _getToken getTokenAddress (TON)
+    /// @param _ownerToken get TON transfer to wallet
+    function addressSetting(
+        address _saleToken,
+        address _getToken,
+        address _ownerToken
+    ) 
+        external 
+        override 
+        onlyOwner 
+        settingCheck
+    {
+        changeTokenAddress(_saleToken,_getToken);
+        changeGetAddress(_ownerToken);
+    }
+
+    function changeWTONAddress(address _wton) 
+        external 
+        override 
+        onlyOwner
+        settingCheck 
+    {
+        wton = _wton;
+    }
+
+    function changeTokenAddress(address _saleToken, address _getToken) 
+        public 
+        override 
+        onlyOwner
+        settingCheck 
+    {
+        saleToken = IERC20(_saleToken);
+        getToken = IERC20(_getToken);
+    }
+
+    function changeGetAddress(address _address) 
+        public 
+        override 
+        onlyOwner 
+        settingCheck
+    {
+        getTokenOwner = _address;
+    }
+
+    /**
+     * @notice AllsettingFunction
+     * @param  _saleTime _saleTime[0] = SalestartTime, _saleTime[1] = SaleEndTime
+     * @param  _tokenPrice _tokenPrice[0] = saleTokenPrice, _tokenPrice[1] = TONTokenPrice
+     * @param  _claimCounts claimTotalCounts
+     * @param  _claimTimes _claimTimeArray
+     * @param  _claimPercents claimPercents
+     */
+    function setAllsetting(
+        uint256[2] calldata _saleTime,
+        uint256[2] calldata _tokenPrice,
+        uint16 _claimCounts,
+        uint256[] calldata _claimTimes,
+        uint32[] calldata _claimPercents
+    ) 
+        external
+        override 
+        onlyOwner
+        settingCheck 
+    {
+        settingSaleTime(
+            _saleTime[0],
+            _saleTime[1]
+        );
+        setTokenPrice(
+            _tokenPrice[0],
+            _tokenPrice[1]
+        );
+        setClaimArray(
+            _claimCounts,
+            _claimTimes,
+            _claimPercents
+        );
+    }
+
+    function settingSaleTime(
+        uint256 _startTime,
+        uint256 _endTime
+    )
+        public 
+        override 
+        onlyOwner 
+        settingCheck
+    {
+        saleStartTime = _startTime;
+        saleEndTime = _endTime;
+    }
+
+    function setTokenPrice(uint256 _saleTokenPrice, uint256 _getTokenPrice)
+        public
+        override
+        onlyOwner
+        settingCheck
+    {
+        saleTokenPrice = _saleTokenPrice;
+        getTokenPrice = _getTokenPrice;
+    }
+
+    function setClaimArray(
+        uint16 _claimCounts,
+        uint256[] calldata _claimTimes,
+        uint32[] calldata _claimPercents
+    ) 
+        public
+        override
+        onlyOwner
+        settingCheck 
+    {
+        if(totalClaimCounts != 0) {
+            delete claimTimes;
+            delete claimPercents;
+        }
+
+        totalClaimCounts = _claimCounts;
+        uint256 i = 0;
+        uint32 y = 0;
+        for (i = 0; i < _claimCounts; i++) {
+            claimTimes.push(_claimTimes[i]);
+            if (i != 0){
+                require(claimTimes[i-1] < claimTimes[i], "PublicSale: claimtime err");
+            }
+            claimPercents.push(_claimPercents[i]);
+            y = y + _claimPercents[i];
+        }
+
+        require(y == 10000, "claimPercents err");
+    }
+
+    function addWhiteList(address _account,uint256 _amount) external override onlyOwner {
+        WhiteList storage userwhite = usersWhite[_account];
+        userwhite.amount = userwhite.amount.add(_amount);
+
+        emit AddList(_account, _amount);
+    }
+
+    function addWhiteListArray(address[] calldata _account, uint256[] calldata _amount) external override onlyOwner {
+        for(uint i = 0; i < _account.length; i++) {
+            WhiteList storage userwhite = usersWhite[_account[i]];
+            userwhite.amount = userwhite.amount.add(_amount[i]);
+
+            emit AddList(_account[i], _amount[i]);
+        }
+    }
+
+    function delWhiteList(address _account, uint256 _amount) external override onlyOwner {
+        WhiteList storage userwhite = usersWhite[_account];
+        userwhite.amount = userwhite.amount.sub(_amount);
+
+        emit DelList(_account, _amount);
+    }
+
+    /* ========== VIEW ========== */
 
     /// @dev calculator the SaleAmount(input TON how many get the anotherToken)
     /// @param _amount input the TON amount
@@ -80,127 +250,42 @@ contract PrivateSale is PrivateSaleStorage, AccessibleCommon, ReentrancyGuard, O
         return tokenGetAmount;
     }
 
-    /// @dev address setting
-    /// @param _saleToken saleTokenAddress (contract have token)
-    /// @param _getToken getTokenAddress (TON)
-    /// @param _ownerToken get TON transfer to wallet
-    function addressSetting(
-        address _saleToken,
-        address _getToken,
-        address _ownerToken
-    ) external override onlyOwner {
-        changeTokenAddress(_saleToken,_getToken);
-        changeGetAddress(_ownerToken);
+    function currentRound() public view returns (uint16 round) {
+        if (block.timestamp > claimTimes[totalClaimCounts-1]) {
+            return totalClaimCounts;
+        }
+        for (uint16 i = 0; i < totalClaimCounts; i++) {
+            if (block.timestamp < claimTimes[i]) {
+                return i;
+            }
+        }
     }
 
-    function changeWTONAddress(address _wton) external override onlyOwner {
-        wton = _wton;
-    }
-
-    function changeTokenAddress(address _saleToken, address _getToken) public override onlyOwner {
-        saleToken = IERC20(_saleToken);
-        getToken = IERC20(_getToken);
-    }
-
-    function changeGetAddress(address _address) public override onlyOwner {
-        getTokenOwner = _address;
-    }
-
-    function settingAll(
-        uint256[4] calldata _time,
-        uint256 _saleTokenPrice,
-        uint256 _getTokenPrice
-    ) external override onlyOwner {
-        settingPrivateTime(_time[0],_time[1],_time[2],_time[3]);
-        setTokenPrice(_saleTokenPrice,_getTokenPrice);
-    }
-
-    function settingPrivateTime(
-        uint256 _startTime,
-        uint256 _endTime,
-        uint256 _firstTime,
-        uint256 _claimTime
-    ) public override onlyOwner {
-        settingSaleTime(_startTime,_endTime);
-        settingFirstClaimTime(_firstTime);
-        settingClaimTime(_claimTime);
-    }
-
-    function settingSaleTime(uint256 _startTime,uint256 _endTime) public override onlyOwner {
-        saleStartTime = _startTime;
-        saleEndTime = _endTime;
-    }
-
-    function settingFirstClaimTime(uint256 _claimTime) public override onlyOwner {
-        firstClaimTime = _claimTime;
-    }
-
-    function settingClaimTime(uint256 _time) public override onlyOwner {
-        claimStartTime = _time;
-        claimEndTime = _time.add(360 days);
-    }
-
-    function setTokenPrice(uint256 _saleTokenPrice, uint256 _getTokenPrice)
+    function calculClaimAmount(address _account, uint16 _round)
         public
-        onlyOwner
+        view
+        returns (uint256 _amount)
     {
-        saleTokenPrice = _saleTokenPrice;
-        getTokenPrice = _getTokenPrice;
-    }
+        if (block.timestamp < claimTimes[0]) return 0;
 
-    function claimAmount(
-        address _account
-    ) external override view returns (uint256) {
         UserInfoAmount memory user = usersAmount[_account];
+        if(user.inputamount == 0) return 0;
 
-        require(user.inputamount > 0, "user isn't buy");
-        require(block.timestamp > claimStartTime, "need to time for claim");
+        if (totalClaimCounts == _round ) {
+            return user.totaloutputamount.sub(user.getAmount);
+        }
+
+        uint256 roundClaimPercent;
+        for (uint16 i = 0; i < _round; i++) {
+            roundClaimPercent = roundClaimPercent.add(claimPercents[i]);
+        }
         
-        UserInfoClaim memory userclaim = usersClaim[msg.sender];
-
-        uint difftime = block.timestamp.sub(claimStartTime);
-        uint monthTime = 30 days;
-
-        if (difftime < monthTime) {
-            uint period = 1;
-            uint256 reward = (user.monthlyReward.mul(period)).sub(userclaim.claimAmount);
-            return reward;
-        } else {
-            uint period = (difftime.div(monthTime)).add(1);
-            if (period >= 12) {
-                uint256 reward = user.totaloutputamount.sub(userclaim.claimAmount).sub(userclaim.firstClaimAmount);
-                return reward; 
-            } else {
-                uint256 reward = (user.monthlyReward.mul(period)).sub(userclaim.claimAmount);
-                return reward;
-            }
-        }
+        uint256 userGetAmount = (user.totaloutputamount.mul(roundClaimPercent).div(10000)).sub(user.getAmount);
+        return userGetAmount;
     }
-    
-    function calculClaimAmount(
-        uint256 _nowtime, 
-        uint256 _preclaimamount,
-        uint256 _monthlyReward,
-        uint256 _usertotaloutput,
-        uint256 _firstReward
-    ) internal view returns (uint256) {
-        uint difftime = _nowtime.sub(claimStartTime);
-        uint monthTime = 30 days;
 
-        if (difftime < monthTime) {
-            uint period = 1;
-            uint256 reward = (_monthlyReward.mul(period)).sub(_preclaimamount);
-            return reward;
-        } else {
-            uint period = (difftime.div(monthTime)).add(1);
-            if (period >= 12) {
-                uint256 reward = _usertotaloutput.sub(_preclaimamount).sub(_firstReward);
-                return reward; 
-            } else {
-                uint256 reward = (_monthlyReward.mul(period)).sub(_preclaimamount);
-                return reward;
-            }
-        }
+    function saleTokenAddress() public view returns (address) {
+        return address(saleToken);
     }
 
     /**
@@ -216,29 +301,36 @@ contract PrivateSale is PrivateSaleStorage, AccessibleCommon, ReentrancyGuard, O
     function _toWAD(uint256 v) public override pure returns (uint256) {
         return v / 10 ** 9;
     }
-    
-    function addWhiteList(address _account,uint256 _amount) external override onlyOwner {
-        WhiteList storage userwhite = usersWhite[_account];
-        userwhite.amount = userwhite.amount.add(_amount);
 
-        emit addList(_account, _amount);
-    }
-
-    function addWhiteListArray(address[] calldata _account, uint256[] calldata _amount) external override onlyOwner {
-        for(uint i = 0; i < _account.length; i++) {
-            WhiteList storage userwhite = usersWhite[_account[i]];
-            userwhite.amount = userwhite.amount.add(_amount[i]);
-
-            emit addList(_account[i], _amount[i]);
+    function decodeApproveData(
+        bytes memory data
+    ) public override pure returns (uint256 approveData) {
+        assembly {
+            approveData := mload(add(data, 0x20))
         }
     }
 
-    function delWhiteList(address _account, uint256 _amount) external override onlyOwner {
-        WhiteList storage userwhite = usersWhite[_account];
-        userwhite.amount = userwhite.amount.sub(_amount);
+    function decodeAddressData(
+        bytes memory data
+    ) public override pure returns (address claimAddress_) {
+        require(data.length == 0x20);
 
-        emit delList(_account, _amount);
+        assembly {
+            claimAddress_ := mload(add(data, 0x20))
+        }
     }
+
+    function encodeAddressData(
+        address _claimAddress
+    ) external override pure returns (bytes memory data) {
+        data = new bytes(0x20);
+
+        assembly {
+            mstore(add(data, 0x20), _claimAddress)
+        }
+    }
+
+    /* ========== Anyone can execute ========== */
 
     function onApprove(
         address sender,
@@ -247,49 +339,58 @@ contract PrivateSale is PrivateSaleStorage, AccessibleCommon, ReentrancyGuard, O
         bytes calldata data
     ) external override returns (bool) {
         require(msg.sender == address(getToken) || msg.sender == address(IWTON(wton)), "PrivateSale: only accept TON and WTON approve callback");
+        
+        address claimAddress = decodeAddressData(data);
+        
         if(msg.sender == address(getToken)) {
-            uint256 wtonAmount = _decodeApproveData(data);
-            if(wtonAmount == 0){
-                buy(sender,amount);
-            } else {
-                uint256 totalAmount = amount + wtonAmount;
-                buy(sender,totalAmount);
-            }
+            buy(sender,claimAddress,amount);
         } else if (msg.sender == address(IWTON(wton))) {
             uint256 wtonAmount = _toWAD(amount);
-            buy(sender,wtonAmount);
+            buy(sender,claimAddress,wtonAmount);
         }
-
+        
         return true;
     }
 
-    function _decodeApproveData(
-        bytes memory data
-    ) public override pure returns (uint256 approveData) {
-        assembly {
-            approveData := mload(add(data, 0x20))
-        }
-    }
-
-    function buy(
-        address _sender,
+    function directBuy(
+        address _claimAddress,
         uint256 _amount
     ) public override {
         require(saleStartTime != 0 && saleEndTime != 0, "need to setting saleTime");
         require(block.timestamp >= saleStartTime && block.timestamp <= saleEndTime, "privaSale period end");
+        WhiteList storage userwhite = usersWhite[msg.sender];
+        require(userwhite.amount >= _amount, "need to add whiteList amount");
+
+        _buy(msg.sender,_claimAddress,_amount);
+        userwhite.amount = userwhite.amount.sub(_amount);
+    }
+
+    function buy(
+        address _sender,
+        address _claimAddress,
+        uint256 _amount
+    ) internal {
+        require(saleStartTime != 0 && saleEndTime != 0, "need to setting saleTime");
+        require(block.timestamp >= saleStartTime && block.timestamp <= saleEndTime, "privaSale period end");
         WhiteList storage userwhite = usersWhite[_sender];
         require(userwhite.amount >= _amount, "need to add whiteList amount");
-        _buy(_sender,_amount);
+
+        _buy(_sender,_claimAddress,_amount);
         userwhite.amount = userwhite.amount.sub(_amount);
     }
 
     function _buy(
         address _sender,
+        address _claimAddress,
         uint256 _amount
     )
         internal
     {
-        UserInfoAmount storage user = usersAmount[_sender];
+        if(_claimAddress == address(0)){
+            _claimAddress = _sender;
+        }
+
+        UserInfoAmount storage user = usersAmount[_claimAddress];
 
         uint256 tokenSaleAmount = calculSaleToken(_amount);
         uint256 Saledtoken = totalSaleAmount.add(tokenSaleAmount);
@@ -302,6 +403,7 @@ contract PrivateSale is PrivateSaleStorage, AccessibleCommon, ReentrancyGuard, O
 
         uint256 tonAllowance = getToken.allowance(_sender, address(this));
         uint256 tonBalance = getToken.balanceOf(_sender);
+
         if(tonAllowance > tonBalance) {
             tonAllowance = tonBalance;  //tonAllowance가 tonBlance보다 더 클때 문제가 된다.
         }
@@ -327,9 +429,8 @@ contract PrivateSale is PrivateSaleStorage, AccessibleCommon, ReentrancyGuard, O
 
         user.inputamount = user.inputamount.add(_amount);
         user.totaloutputamount = user.totaloutputamount.add(tokenSaleAmount);
-        user.firstReward = user.totaloutputamount.mul(5).div(100);
-        user.monthlyReward = (user.totaloutputamount.sub(user.firstReward)).div(12);
-        user.inputTime = block.timestamp;
+        user.getAmount = user.getAmount;
+        user.inputAddress = _sender;
 
         totalGetAmount = totalGetAmount.add(_amount);
         totalSaleAmount = totalSaleAmount.add(tokenSaleAmount);
@@ -338,66 +439,46 @@ contract PrivateSale is PrivateSaleStorage, AccessibleCommon, ReentrancyGuard, O
             msg.sender, 
             user.inputamount, 
             user.totaloutputamount,
-            user.inputTime,
-            user.monthlyReward,
-            user.firstReward
+            block.timestamp
         );
     }
 
     function claim() external override {
-        require(firstClaimTime != 0 && saleEndTime != 0, "need to setting Time");
-        require(block.timestamp > saleEndTime && block.timestamp > firstClaimTime, "need the fisrClaimtime");
-        if(block.timestamp < claimStartTime) {
-            firstClaim();
-        } else if(claimStartTime < block.timestamp){
-            _claim();
-        }
+        require(saleEndTime != 0, "need to setting Time");
+        require(block.timestamp > saleEndTime, "need the endSale");
+        require(block.timestamp > claimTimes[0], "need the claimTime");
+        _claim();
+        
     }
 
-
-    function firstClaim() public {
-        UserInfoAmount storage user = usersAmount[msg.sender];
-        UserInfoClaim storage userclaim = usersClaim[msg.sender];
-
-        require(user.inputamount > 0, "need to buy the token");
-        require(userclaim.firstClaimAmount == 0, "already getFirstreward");
-
-        userclaim.firstClaimAmount = userclaim.firstClaimAmount.add(user.firstReward);
-        userclaim.firstClaimTime = block.timestamp;
-
-        saleToken.safeTransfer(msg.sender, user.firstReward);
-
-        emit FirstClaiminfo(msg.sender, userclaim.firstClaimAmount, userclaim.firstClaimTime);
-    }
-
-    function _claim() public {
-        require(block.timestamp >= claimStartTime, "need the time for claim");
+    function _claim() internal {
+        require(block.timestamp >= claimTimes[0], "need the time for claim");
 
         UserInfoAmount storage user = usersAmount[msg.sender];
-        UserInfoClaim storage userclaim = usersClaim[msg.sender];
 
         require(user.inputamount > 0, "need to buy the token");
-        require(!(user.totaloutputamount == (userclaim.claimAmount.add(userclaim.firstClaimAmount))), "already getAllreward");
+        require(user.totaloutputamount > user.getAmount, "already getAllreward");
 
-        if(userclaim.firstClaimAmount == 0) {
-            firstClaim();
-        }
-
-        uint256 giveTokenAmount = calculClaimAmount(block.timestamp, userclaim.claimAmount, user.monthlyReward, user.totaloutputamount, userclaim.firstClaimAmount);
+        uint256 giveTokenAmount = calculClaimAmount(msg.sender, currentRound());
     
-        require(user.totaloutputamount.sub(userclaim.claimAmount) >= giveTokenAmount, "user is already getAllreward");
+        require(user.totaloutputamount.sub(user.getAmount) >= giveTokenAmount, "user is already getAllreward");
         require(saleToken.balanceOf(address(this)) >= giveTokenAmount, "dont have saleToken in pool");
 
-        userclaim.claimAmount = userclaim.claimAmount.add(giveTokenAmount);
-        userclaim.claimTime = block.timestamp;
+        user.getAmount = user.getAmount.add(giveTokenAmount);
 
         saleToken.safeTransfer(msg.sender, giveTokenAmount);
 
-        emit Claiminfo(msg.sender, userclaim.claimAmount, userclaim.claimTime);
+        emit Claiminfo(msg.sender, giveTokenAmount);
     }
 
 
-    function withdraw(uint256 _amount) external onlyOwner {
+    function withdraw(
+        uint256 _amount
+    ) 
+        external 
+        onlyOwner
+        settingCheck 
+    {
         require(
             saleToken.balanceOf(address(this)) >= _amount,
             "dont have token amount"
