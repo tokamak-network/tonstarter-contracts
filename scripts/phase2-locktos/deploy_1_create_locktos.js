@@ -14,7 +14,11 @@ require("dotenv").config();
 const loadDeployed = require("../load_deployed");
 
 const zeroAddress = "0x0000000000000000000000000000000000000000";
-const tostoken = loadDeployed(process.env.NETWORK, "TOS");
+
+//const tostoken = loadDeployed(process.env.NETWORK, "TOS");
+// rinkeby tos
+const tostoken = "0x73a54e5C054aA64C1AE7373C2B5474d8AFEa08bd"
+
 
 async function deployMain(defaultSender) {
   const [deployer, user1] = await ethers.getSigners();
@@ -44,12 +48,16 @@ async function deployMain(defaultSender) {
   printGasUsedOfUnits('LockTOS  Deploy',tx);
 
   // ale: "0x8c595DA827F4182bC0E3917BccA8e654DF8223E1"
+ // zena admin : 0x5b6e72248b19F2c5b88A4511A6994AD101d0c287
+  let adminAddress = "0x5b6e72248b19F2c5b88A4511A6994AD101d0c287"
 
   const lockTOSProxy = await LockTOSProxy.deploy(
-    lockTOS.address, "0x5b6e72248b19F2c5b88A4511A6994AD101d0c287"
+    lockTOS.address, adminAddress
   );
+
   tx =  await lockTOSProxy.deployed();
   console.log("LockTOSProxy:", lockTOSProxy.address);
+
   deployInfo = {
     name: "LockTOSProxy",
     address: lockTOSProxy.address

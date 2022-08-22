@@ -40,7 +40,7 @@ async function main() {
   console.log("tos:", tos.address);
 
   //================================================
-  let vault = '0xbac8ea42e4301200b8bb6580e87224f2114f2980';
+  let vault = '0x4d58f6bb984b504c3752f0d0fe43ecd261909b1e';
 
   let balance = await tos.balanceOf(vault);
   console.log("tos balance", vault,  utils.formatUnits(balance.toString(), 18) , 'TOS' );

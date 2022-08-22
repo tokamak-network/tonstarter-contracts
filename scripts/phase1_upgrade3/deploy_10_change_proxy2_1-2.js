@@ -58,7 +58,6 @@ async function deployMain(defaultSender) {
     tx2
   );
 
-
   const _func1 = Web3EthAbi.encodeFunctionSignature("withdraw()");
   const _func3 = Web3EthAbi.encodeFunctionSignature("version()");
   console.log("_func1 withdraw()", _func1);
