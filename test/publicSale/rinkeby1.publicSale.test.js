@@ -51,6 +51,10 @@ const LiquidtyVault = require("../../abis/InitialLiquidityVaultFactory.json");
 const LiquidtyVaultLogic = require("../../abis/InitialLiquidityVault.json");
 const EventLog_ABI = require("../../abis/EventLog.json");
 
+const VestingFundFactory = require("../../abis/VestingPublicFundFactory.json");
+const VestingFundLogic = require("../../abis/VestingPublicFund.json");
+const VestingFundLogicProxy = require("../../abis/VestingPublicFundProxy.json");
+
 const TON_ABI = require("../../abis/TON.json");
 const WTON_ABI = require("../../abis/WTON.json");
 
@@ -142,6 +146,7 @@ describe("Sale", () => {
     let tosTokenOwner;          //sTOS
     let saleOwner;              //publicContract
     let vaultAddress;
+    let fundVaultAddress;
     let vaultAmount = ethers.utils.parseUnits("500000", 18);            //500,000 token -> 500 TON
     let hardcapAmount = ethers.utils.parseUnits("100", 18);     
     let changeTOS = 10;
@@ -154,7 +159,7 @@ describe("Sale", () => {
     let account4;
     let account5;
     let account6;
-    let uniswapAccount;
+    let daoAccount;
     
     let ico20Contracts;
     let TokamakContractsDeployed;
@@ -241,6 +246,9 @@ describe("Sale", () => {
     let initialliquidityVault;
     let initialVaultFactory;
     let initialVaultLogic;
+
+    let vestingPublicFundLogic;
+    let vestingPublicFundFactory;
 
     let tosWtonPoolAddress;
 
@@ -350,6 +358,19 @@ describe("Sale", () => {
         tickPrice: 0
     }
 
+    let vaultInfo = {
+        name: "test",
+        contractAddress: null,
+        allocateToken: null,
+        admin : null,
+        totalAllocatedAmount: null,
+        claimCounts: ethers.BigNumber.from("3"),
+        claimTimes: [],
+        claimIntervalSeconds : 60*60*24,
+        claimAmounts: [],
+        totalClaimsAmount: ethers.BigNumber.from("0")
+    }
+
     before(async () => {
         ico20Contracts = new ICO20Contracts();
 
@@ -368,7 +389,7 @@ describe("Sale", () => {
         vaultAddress = await findSigner(addresses[10]);
         uniswapRouter = await findSigner(addresses[11]);
         testTemp = await findSigner(addresses[12]); 
-        uniswapAccount = await findSigner(addresses[13]);
+        daoAccount = await findSigner(addresses[13]);
         upgradeAdmin = await findSigner(addresses[14]);
 
         saleContracts[0].owner = saleOwner;
@@ -391,7 +412,7 @@ describe("Sale", () => {
         // let _lockTosAdmin = await ethers.getSigner(lockTosAdmin);
     });
 
-    describe("#1 .setting the TON, WTON, LockTOS, SaleToken", () => {
+    describe("#1 .setting the TON, WTON, LockTOS, SaleToken, eventLog", () => {
         //saleToken Deploy
         it("#1-1. Initialize Sale Token", async function () {
             erc20token = await ethers.getContractFactory("ERC20Mock");
@@ -605,7 +626,7 @@ describe("Sale", () => {
         it("#3-4. Deploy LibPublicSale2 ", async function () {
             const LibPublicSale2 = await ethers.getContractFactory("LibPublicSale2");
             libPublicSale2 = await LibPublicSale2.connect(saleOwner).deploy();
-          });
+        });
 
         it("#3-5. Initialize PublicSale2", async function () {
             let PublicSale2 = await ethers.getContractFactory("PublicSale2",{
@@ -870,15 +891,112 @@ describe("Sale", () => {
         });
     });
 
-    describe("#4. setting the PublicSale", () => {
-        it("#4-1. check the balance (contract have the saleToken) ", async () => {
+    describe("#4. vestingPublicFund deploy & setting", () => {
+        it("#4-1. deploy VestingPublicFundFactory", async () => {
+            const contract = await (
+                await ethers.getContractFactory(
+                    VestingFundFactory.abi,
+                    VestingFundFactory.bytecode
+                )
+            ).deploy();
+
+            await contract.deployed();
+            vestingPublicFundFactory = await ethers.getContractAt(VestingFundFactory.abi,contract.address);
+            let code = await ethers.provider.getCode(vestingPublicFundFactory.address);
+            expect(code).to.not.eq("0x"); 
+        })
+
+        it("#4-2. deploy VestingPublicFundLogic", async () => {
+            const contract = await (
+                await ethers.getContractFactory(
+                    VestingFundLogic.abi,
+                    VestingFundLogic.bytecode
+                )
+            ).deploy();
+
+            await contract.deployed();
+            vestingPublicFundLogic = await ethers.getContractAt(VestingFundLogic.abi,contract.address);
+            let code = await ethers.provider.getCode(vestingPublicFundLogic.address);
+            expect(code).to.not.eq("0x"); 
+        })
+
+        it("#4-3. set logic", async () => {
+            await vestingPublicFundFactory.connect(deployer).setLogic(vestingPublicFundLogic.address);
+
+            expect(await vestingPublicFundFactory.vaultLogic()).to.be.eq(vestingPublicFundLogic.address);
+        })
+
+        it("#4-4. setUpgradeAdmin ", async () => {
+            await vestingPublicFundFactory.connect(deployer).setUpgradeAdmin(upgradeAdmin.address);
+            expect(await vestingPublicFundFactory.upgradeAdmin()).to.be.eq(upgradeAdmin.address);
+        });
+
+        it("#4-5. setBaseInfo : when not admin, fail ", async () => {
+            await vestingPublicFundFactory.connect(deployer).setBaseInfo([ton.address, daoAccount.address]);
+            expect(await vestingPublicFundFactory.token()).to.be.eq(ton.address);
+            expect(await vestingPublicFundFactory.daoAddress()).to.be.eq(daoAccount.address);
+        });
+
+        it("#4-6. setLogEventAddress   ", async () => {
+            await vestingPublicFundFactory.connect(deployer).setLogEventAddress(eventLogAddress);
+            expect(await vestingPublicFundFactory.logEventAddress()).to.be.eq(eventLogAddress);
+        });
+
+        it("#4-7. create : vestingPublicFundProxy", async () => {
+            let tx = await vestingPublicFundFactory.create(
+                vaultInfo.name,
+                saleContract.address,
+                getTokenOwner.address
+            );
+            vaultInfo.admin = daoAccount;
+
+            const receipt = await tx.wait();
+            let _function ="CreatedVestingPublicFund(address,string)";
+            let interface = vestingPublicFundFactory.interface;
+
+            for(let i=0; i< receipt.events.length; i++){
+                if(receipt.events[i].topics[0] == interface.getEventTopic(_function)){
+                    let data = receipt.events[i].data;
+                    let topics = receipt.events[i].topics;
+                    let log = interface.parseLog(
+                    {  data,  topics } );
+                    fundVaultAddress = log.args.contractAddress;
+                    vaultInfo.contractAddress = fundVaultAddress;
+                }
+            }
+
+            expect(await vestingPublicFundFactory.totalCreatedContracts()).to.be.eq(1);
+            expect((await vestingPublicFundFactory.getContracts(0)).contractAddress).to.be.eq(fundVaultAddress);
+            expect((await vestingPublicFundFactory.lastestCreated()).contractAddress).to.be.eq(fundVaultAddress);
+
+            // let VaultContract = await ethers.getContractAt("VestingPublicFundProxy", fundVaultAddress);
+            let VaultContract = await ethers.getContractAt(VestingFundLogicProxy.abi, fundVaultAddress);
+            // let VaultContract = new ethers.Contract( fundVaultAddress, VestingFundProxy.abi, ethers.provider );
+            vestingPublicFundProxy = VaultContract;
+
+            vestingPublicFund = await ethers.getContractAt(VestingFundLogic.abi, fundVaultAddress);
+
+            expect(await VaultContract.isProxyAdmin(upgradeAdmin.address)).to.be.eq(true);
+            expect(await VaultContract.isProxyAdmin(vaultInfo.admin.address)).to.be.eq(false);
+
+            expect(await VaultContract.isAdmin(vaultInfo.admin.address)).to.be.eq(true);
+            expect(await VaultContract.isAdmin(upgradeAdmin.address)).to.be.eq(true);
+
+            expect(await vestingPublicFundFactory.token()).to.be.eq(await vestingPublicFundProxy.token());
+            expect(getTokenOwner.address).to.be.eq(await vestingPublicFundProxy.receivedAddress());
+            expect(saleContract.address).to.be.eq(await vestingPublicFundProxy.publicSaleVaultAddress());
+        })
+    })
+
+    describe("#5. setting the PublicSale", () => {
+        it("#5-1. check the balance (contract have the saleToken) ", async () => {
             balance1 = await saleToken.balanceOf(saleContract.address)
 
             expect(Number(balance1)).to.be.equal(Number(totalBigAmount))
         })
 
          //setting owner test
-        it('#4-2. setAllsetting caller not owner', async () => {
+        it('#5-2. setAllsetting caller not owner', async () => {
             blocktime = Number(await time.latest())
             whitelistStartTime = blocktime + 86400;
             whitelistEndTime = whitelistStartTime + (86400*7);
@@ -902,7 +1020,7 @@ describe("Sale", () => {
             await expect(tx).to.be.revertedWith("Accessible: Caller is not an admin")
         })
 
-        it("#4-3. setAllsetting snapshot error", async () => {
+        it("#5-3. setAllsetting snapshot error", async () => {
             let smallsnapshot = setSnapshot-100;
             let tx = saleContract.connect(saleOwner).setAllsetting(
                 [100, 200, 1000, 4000, 600, 1200, 2200, 6000],
@@ -915,7 +1033,7 @@ describe("Sale", () => {
         })
 
         //PublicSale setting owner
-        it('#4-4. setAllsetting caller owner', async () => {
+        it('#5-4. setAllsetting caller owner', async () => {
             await saleContract.connect(saleOwner).setAllsetting(
                 [100, 200, 1000, 4000, 600, 1200, 2200, 6000],
                 [round1SaleAmount, round2SaleAmount, saleTokenPrice, payTokenPrice, hardcapAmount, changeTOS],
@@ -981,11 +1099,19 @@ describe("Sale", () => {
             expect(tx18).to.be.equal(claimCounts)
         })
 
+        it("#5-5. changeTONOwner to VestingFund", async () => {
+            await saleContract.connect(saleOwner).changeTONOwner(
+                fundVaultAddress
+            )
+            let tx = await saleContract.getTokenOwner()
+            expect(tx).to.be.equal(fundVaultAddress);
+        })
+
     })
 
-    describe("#5. PublicSale", () => {
-        describe("#5-1. round1 Sale", () => {
-            it("#5-1-1. calculTierAmount test before addwhiteList", async () => {
+    describe("#6. PublicSale", () => {
+        describe("#6-1. round1 Sale", () => {
+            it("#6-1-1. calculTierAmount test before addwhiteList", async () => {
                 let big60000 = ethers.utils.parseUnits("60000", 18);
                 let big120000 = ethers.utils.parseUnits("120000", 18);
                 let big220000 = ethers.utils.parseUnits("220000", 18);
@@ -1007,7 +1133,7 @@ describe("Sale", () => {
                 await ethers.provider.send('evm_mine');
             })
 
-            it("#5-1-2. addWhiteList", async () => {
+            it("#6-1-2. addWhiteList", async () => {
                 let tx = Number(await saleContract.connect(tester1.account).tiersAccount(1))
                 expect(tx).to.be.equal(0)
                 await saleContract.connect(tester1.account).addWhiteList()
@@ -1059,7 +1185,7 @@ describe("Sale", () => {
                 expect(tx16).to.be.equal(5)
             })
 
-            it("#5-1-3. calculation the inputAmount", async () => {
+            it("#6-1-3. calculation the inputAmount", async () => {
                 let tx = Number(await saleContract.calculPayToken(60000))
                 expect(tx).to.be.equal(60)
                 let tx2 = Number(await saleContract.calculPayToken(120000))
@@ -1072,7 +1198,7 @@ describe("Sale", () => {
                 expect(tx5).to.be.equal(300)
             })
 
-            it("#5-1-4. calculTierAmount test after addwhiteList", async () => {
+            it("#6-1-4. calculTierAmount test after addwhiteList", async () => {
                 let big60000 = ethers.utils.parseUnits("60000", 18);
                 let big120000 = ethers.utils.parseUnits("120000", 18);
                 let big220000 = ethers.utils.parseUnits("220000", 18);
@@ -1089,7 +1215,7 @@ describe("Sale", () => {
                 expect(tx5).to.be.equal(Number(big300000))
             })
 
-            it("#5-1-5. exclusiveSale before exclusive startTime", async () => {
+            it("#6-1-5. exclusiveSale before exclusive startTime", async () => {
                 await getToken.connect(account1).approve(saleContract.address, 60)
                 let tx = saleContract.connect(account1).exclusiveSale(account1.address,60)
                 await expect(tx).to.be.revertedWith("PublicSale: exclusiveStartTime has not passed")
@@ -1102,12 +1228,12 @@ describe("Sale", () => {
                 await time.increaseTo(exclusiveStartTime+86400);
             })
 
-            it("#5-1-6. addwhitelist after whitelistTIme", async () => {
+            it("#6-1-6. addwhitelist after whitelistTIme", async () => {
                 let tx = saleContract.connect(account1).addWhiteList()
                 await expect(tx).to.be.revertedWith("PublicSale: end the whitelistTime")
             })
 
-            it("#5-1-7. exclusiveSale after exclusive startTime", async () => {
+            it("#6-1-7. exclusiveSale after exclusive startTime", async () => {
                 let big60 = ethers.utils.parseUnits("60", 18);
                 let big120 = ethers.utils.parseUnits("120", 18);
                 let big220 = ethers.utils.parseUnits("220", 18);
@@ -1142,8 +1268,8 @@ describe("Sale", () => {
             })
         })
 
-        describe("#5-2. round2 Sale", () => {
-            it("#5-2-1. deposit before depositTime", async () => {
+        describe("#6-2. round2 Sale", () => {
+            it("#6-2-1. deposit before depositTime", async () => {
                 let tx = saleContract.connect(account1).deposit(account1.address,100)
                 await expect(tx).to.be.revertedWith("PublicSale: don't start depositTime")
             })
@@ -1153,7 +1279,7 @@ describe("Sale", () => {
                 await ethers.provider.send('evm_mine');
             })
 
-            it("#5-2-2. deposit after depositTime", async () => {
+            it("#6-2-2. deposit after depositTime", async () => {
                 account1Before = Number(await getToken.balanceOf(account1.address))
                 account2Before = Number(await getToken.balanceOf(account2.address))
                 account3Before = Number(await getToken.balanceOf(account3.address))
@@ -1194,8 +1320,8 @@ describe("Sale", () => {
         })
     })
 
-    describe("#6. claim", () => {
-        it("#6-1. claim before claimTime", async () => {
+    describe("#7. claim", () => {
+        it("#7-1. claim before claimTime", async () => {
             let tx = saleContract.connect(account1).claim()
             await expect(tx).to.be.revertedWith("PublicSale: don't start claimTime")
         })
@@ -1207,7 +1333,7 @@ describe("Sale", () => {
             await ethers.provider.send('evm_mine');
         })
 
-        it("#6-2. claim period end, claim call the account3, account4, account6", async () => {
+        it("#7-2. claim period end, claim call the account3, account4, account6", async () => {
             let expectClaim = await saleContract.calculClaimAmount(account1.address, 0)
             let expectClaim2 = await saleContract.calculClaimAmount(account2.address, 0)
             let expectClaim3 = await saleContract.calculClaimAmount(account3.address, 0)
@@ -1233,7 +1359,7 @@ describe("Sale", () => {
             expect(Number(tx6)).to.be.equal(Number(expectClaim5._totalClaim))
         })
 
-        it("#6-3. no refund check", async () => {
+        it("#7-3. no refund check", async () => {
             let tx = await saleContract.usersClaim(account1.address)
             expect(Number(tx.refundAmount)).to.be.equal(0)
             let tx2 = await saleContract.usersClaim(account2.address)
@@ -1244,30 +1370,30 @@ describe("Sale", () => {
             expect(Number(tx4.refundAmount)).to.be.equal(0)
         })
 
-        it("#6-4. contract have 1500TON", async () => {
+        it("#7-4. contract have 1500TON", async () => {
             let checkTON = await ton.balanceOf(saleContract.address);
             expect(Number(checkTON)).to.be.eq(Number(contracthaveTON));
         })
 
-        it("#6-5. depositWithdraw test before exchangeWTONtoTOS", async () => {
+        it("#7-5. depositWithdraw test before exchangeWTONtoTOS", async () => {
             let tx = saleContract.connect(saleOwner).depositWithdraw();
             await expect(tx).to.be.revertedWith("PublicSale : need the exchangeWTONtoTOS")
         })
         
-        it("#6-6. exchangeWTONtoTOS test", async () => {
+        it("#7-6. exchangeWTONtoTOS test", async () => {
             let tosValue = await tos.balanceOf(vaultAddress);
             console.log(Number(tosValue))
             expect(tosValue).to.be.equal(0);
             await saleContract.connect(saleOwner).exchangeWTONtoTOS(contractChangeWTON4,uniswapInfo.wtonTosPool);
         })
 
-        it("#6-7. check tos", async () => {
+        it("#7-7. check tos", async () => {
             let tosValue = await tos.balanceOf(vaultAddress);
             console.log(Number(tosValue))
             expect(tosValue).to.be.above(0);
         })
 
-        it("#6-8. check getAmount value", async () => {
+        it("#7-8. check getAmount value", async () => {
             let hardcapValue = await saleContract.hardcapCalcul();
             let getAmount = await ton.balanceOf(saleContract.address);
             console.log("hardcapValue :", Number(hardcapValue));
@@ -1276,12 +1402,12 @@ describe("Sale", () => {
             console.log("overflow :", Number(overflow));
         })
 
-        it("#6-9. depositWithdraw test after exchangeWTONtoTOS", async () => {
-            let balance1 = await ton.balanceOf(account5.address);
+        it("#7-9. depositWithdraw test after exchangeWTONtoTOS", async () => {
+            let balance1 = await ton.balanceOf(fundVaultAddress);
             expect(balance1).to.be.equal(0);
             await saleContract.connect(saleOwner).depositWithdraw();
 
-            let balance2 = await ton.balanceOf(account5.address);
+            let balance2 = await ton.balanceOf(fundVaultAddress);
             console.log("balance2 :",Number(balance2));
             expect(balance2).to.be.equal(getTokenOwnerHaveTON);
         })

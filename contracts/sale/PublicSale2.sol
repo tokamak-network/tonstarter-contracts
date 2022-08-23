@@ -820,9 +820,13 @@ contract PublicSale2 is
         require(getAmount <= IERC20(getToken).balanceOf(address(this)), "PublicSale: no token to receive");        
 
         adminWithdraw = true;
+
         uint256 burnAmount = totalExpectSaleAmount.add(totalExpectOpenSaleAmount).sub(totalOpenSaleAmount()).sub(totalExSaleAmount);
         IIERC20Burnable(address(saleToken)).burn(burnAmount);
-        IERC20(getToken).safeTransfer(getTokenOwner, getAmount);
+        
+        IERC20(getToken).approve(address(getTokenOwner), getAmount);
+        IIVestingPublicFundAction(getTokenOwner).funding(getAmount);
+        // IERC20(getToken).safeTransfer(getTokenOwner, getAmount);
 
         emit DepositWithdrawal(msg.sender, getAmount, liquidityTON);
     }
