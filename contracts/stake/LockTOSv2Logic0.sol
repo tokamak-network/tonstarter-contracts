@@ -201,6 +201,7 @@ contract LockTOSv2Logic0 is
     function increaseAmountUnlockTimeByStaker(address user, uint256 _lockId, uint256 _value, uint256 _unlockWeeks)
         external override onlyStaker
     {
+        // console.log("increaseAmountUnlockTimeByStaker in ");
         require(_value > 0, "Value locked should be non-zero");
         require(_unlockWeeks > 0, "Unlock period less than a week");
 
