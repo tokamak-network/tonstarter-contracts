@@ -93,6 +93,14 @@ module.exports = {
       gasMultiplier: 1.25,
       gasPrice: 50000000000,
     },
+    goerli: {
+      url: `https://goerli.infura.io/v3/${process.env.InfuraKey}`,
+      accounts: [
+          `${process.env.ACCOUNT0_PK}`,
+          `${process.env.ACCOUNT1_PK}`,
+          `${process.env.ACCOUNT2_PK}`
+          ],
+    },
   },
   etherscan: {
     apiKey: process.env.ETHERSCAN_API_KEY,
