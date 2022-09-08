@@ -14,7 +14,8 @@ require("dotenv").config();
 const loadDeployed = require("../load_deployed");
 
 const zeroAddress = "0x0000000000000000000000000000000000000000";
-const tostoken = loadDeployed(process.env.NETWORK, "TOS");
+// const tostoken = loadDeployed(process.env.NETWORK, "TOS");
+const tostoken = "0x67F3bE272b1913602B191B3A68F7C238A2D81Bb9";
 
 async function deployMain(defaultSender) {
   const [deployer, user1] = await ethers.getSigners();

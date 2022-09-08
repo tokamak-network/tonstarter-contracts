@@ -103,7 +103,11 @@ module.exports = {
     },
   },
   etherscan: {
-    apiKey: process.env.ETHERSCAN_API_KEY,
+    apiKey: {
+      goerli: `${process.env.APIKey}`,
+      rinkeby: `${process.env.APIKey}`,
+      mainnet: `${process.env.APIKey}`
+    }
   },
   solidity: {
     version: "0.7.6",
