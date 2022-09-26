@@ -108,7 +108,10 @@ interface ILockTOSv2Action0 {
     function withdrawByStaker(address user, uint256 _lockId) external;
 
 
-     ///=== onlyOwner
+    ///=== onlyOwner
+
+    /// @dev transfer Tos To Treasury
+    function transferTosToTreasury(address _treasury) external;
 
     /// @dev set MaxTime
     function setMaxTime(uint256 _maxTime) external;

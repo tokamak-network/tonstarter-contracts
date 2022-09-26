@@ -71,7 +71,7 @@ contract LockTOS is LockTOSStorage, AccessibleCommon, ILockTOS {
     /// @inheritdoc ILockTOS
     function activeHolders() external override view returns (address[] memory) {
         bool[] memory activeCheck = new bool[](uniqueUsers.length);
-        uint256 activeSize = 0;        
+        uint256 activeSize = 0;
         for (uint256 i = 0; i < uniqueUsers.length; ++i) {
             uint256[] memory activeLocks = activeLocksOf(uniqueUsers[i]);
             if (activeLocks.length > 0) {
@@ -261,7 +261,7 @@ contract LockTOS is LockTOSStorage, AccessibleCommon, ILockTOS {
         if (!success) {
             return 0;
         }
-        
+
         point = _fillRecordGaps(point, _timestamp);
         int256 currentBias =
             point.slope * (_timestamp.sub(point.timestamp).toInt256());
@@ -480,7 +480,7 @@ contract LockTOS is LockTOSStorage, AccessibleCommon, ILockTOS {
         if (_history.length == 0) {
             return (false, point);
         }
-        
+
         uint256 left = 0;
         uint256 right = _history.length;
         while (left + 1 < right) {

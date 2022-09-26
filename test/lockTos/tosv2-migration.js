@@ -68,6 +68,9 @@ const getlockIds = async (lockTosAddress, blockNumber) => {
     let lockIdCounter = await lockTOS.lockIdCounter();
     console.log('lockIdCounter',lockIdCounter.toString());
     let stosHolders = await lockTOS.allHolders();
+    console.log('stosHolders',stosHolders );
+
+
     console.log('stosHolders.length',stosHolders.length );
 
     let out = {};
@@ -138,7 +141,7 @@ const getlockIds = async (lockTosAddress, blockNumber) => {
 }
 
 function getProfit(amount, period) {
-    let interestRate = 0.000087 ;  // 이자율 0.0087% = 0.000087 (APY =9.994%)
+    let interestRate = 0.00008704505 ;  // 이자율 0.0087% = 0.000087 (APY =9.994%)
     let rebasePeriod = 60 * 60 * 8; // 8시간
     let n = Math.floor(parseFloat(period)/rebasePeriod);
     let pow = Math.pow(1+interestRate, n)
@@ -157,8 +160,11 @@ const increaseLockTOSAmounts = async (lockTosAddress, blockNumber, adminAddress,
     console.log('round',round);
 
     round = parseInt(round) ;
-    // await hre.network.provider.send('hardhat_impersonateAccount',[adminAddress]);
-    // await hre.network.provider.send('hardhat_setBalance',[adminAddress, "0x10000000000000000000000000"]);
+
+    // test local
+    await hre.network.provider.send('hardhat_impersonateAccount',[adminAddress]);
+    await hre.network.provider.send('hardhat_setBalance',[adminAddress, "0x10000000000000000000000000"]);
+
     let admin = await hre.ethers.getSigner(adminAddress) ;
     console.log('admin',admin.address);
 
@@ -223,7 +229,7 @@ const increaseLockTOSAmounts = async (lockTosAddress, blockNumber, adminAddress,
                 amountList.push(ethers.BigNumber.from(amounts[i]));
                 profitList.push(ethers.BigNumber.from(profits[i]));
             }
-            console.log(c, 'idList',idList)
+            // console.log(c, 'idList',idList)
             // console.log(c, 'accountList',accountList)
             // console.log(c, 'amountList',amountList)
             // console.log(c, 'profitList',profitList)
@@ -478,7 +484,7 @@ const migrateStakeAndeLockTOS = async (stakeAddress, blockNumber, adminAddress, 
             let lockTosInfo = await lockTOS.locksInfo(id);
             let stakeId = await stakingV2.lockTOSId(id);
             let stakeInfo = await stakingV2.allStakings(stakeId);
-            LTOS
+
             if(profit != "0"){
                 if(info.amount.gt(amount)) {
                     console.log('ok ', id.toString(), 'original ', amount.toString(), ',profit',profit, 'increase',info.amount.toString() );
