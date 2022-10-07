@@ -76,7 +76,7 @@ module.exports = {
     //   gasMultiplier: 1.25,
     //   gasPrice: 50000000000,
     // },
-    //harvey setting
+    // harvey setting
     rinkeby: {
       url: `https://rinkeby.infura.io/v3/${process.env.InfuraKey}`,
       accounts: [
@@ -89,25 +89,30 @@ module.exports = {
     },
     mainnet: {
       url: `https://mainnet.infura.io/v3/${process.env.InfuraKey}`,
-      accounts: [ `${process.env.ACCOUNT0_PK}` ],
+      accounts: [`${process.env.ACCOUNT0_PK}`],
       gasMultiplier: 1.25,
       gasPrice: 50000000000,
     },
     goerli: {
       url: `https://goerli.infura.io/v3/${process.env.InfuraKey}`,
       accounts: [
-          `${process.env.ACCOUNT0_PK}`,
-          `${process.env.ACCOUNT1_PK}`,
-          `${process.env.ACCOUNT2_PK}`
-          ],
+        `${process.env.ACCOUNT0_PK}`,
+        `${process.env.ACCOUNT1_PK}`,
+        `${process.env.ACCOUNT2_PK}`,
+      ],
     },
   },
+  // etherscan: {
+  //   apiKey: {
+  //     goerli: `${process.env.APIKey}`,
+  //     rinkeby: `${process.env.APIKey}`,
+  //     mainnet: `${process.env.APIKey}`
+  //   }
+  // },
   etherscan: {
     apiKey: {
-      goerli: `${process.env.APIKey}`,
-      rinkeby: `${process.env.APIKey}`,
-      mainnet: `${process.env.APIKey}`
-    }
+      goerli: "YW8HPY4UI4GZAG7CCPNYTSNJ7CPQHGWPCB",
+    },
   },
   solidity: {
     version: "0.7.6",
@@ -127,7 +132,7 @@ module.exports = {
   gasReporter: {
     enabled: !!process.env.REPORT_GAS,
     currency: "KRW",
-    gasPrice: 21
+    gasPrice: 21,
   },
   blockGasLimit: 300000000,
   mocha: {
