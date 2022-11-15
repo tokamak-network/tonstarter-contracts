@@ -115,7 +115,7 @@
 
 * "PublicSaleProxy": "0x3B75d3f628C29d357b484EA7d091faEd63419267"
 
-## Deployed LockTOS Upgrade Contracts on Mainnet
+## Deployed Upgraded LockTOS Contracts on Mainnet
 
 * "LockTOSv2Logic0": "0xdc2df172f16BBa295689Bbaa1f354ED794De0dfF"
 
