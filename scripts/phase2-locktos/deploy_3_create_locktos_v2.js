@@ -24,48 +24,41 @@ async function deployMain(defaultSender) {
   const tos = await ethers.getContractAt("TOS", TOS_Address);
   console.log("tos:", tos.address);
 
-  const LockTOS = await ethers.getContractFactory("LockTOS");
-  const LockTOSProxy = await ethers.getContractFactory("LockTOSProxy");
+  const LockTOSv2Logic0 = await ethers.getContractFactory("LockTOSv2Logic0");
+  const LockTOSv2Proxy = await ethers.getContractFactory("LockTOSv2Proxy");
 
   let deployInfo = { name: "", address: "" };
 
-  const lockTOS = await LockTOS.deploy();
-  let tx = await lockTOS.deployed();
-  console.log("LockTOS:", lockTOS.address);
+  const lockTOSv2Logic0 = await LockTOSv2Logic0.deploy();
+  let tx = await lockTOSv2Logic0.deployed();
+  console.log("LockTOSv2Logic0:", lockTOSv2Logic0.address);
   deployInfo = {
-    name: "LockTOS",
-    address: lockTOS.address,
-  };
-
-  if (deployInfo.address != null && deployInfo.address.length > 0) {
-    save(process.env.NETWORK, deployInfo);
-  }
-
-  printGasUsedOfUnits("LockTOS  Deploy", tx);
-
-  // ale: "0x8c595DA827F4182bC0E3917BccA8e654DF8223E1"
-  // zena admin : 0x5b6e72248b19F2c5b88A4511A6994AD101d0c287
-  const adminAddress = "0x5b6e72248b19F2c5b88A4511A6994AD101d0c287";
-
-  const lockTOSProxy = await LockTOSProxy.deploy(
-    lockTOS.address,
-    "0x5b6e72248b19F2c5b88A4511A6994AD101d0c287"
-  );
-
-  console.log("LockTOSProxy:", lockTOSProxy.address);
-
-  tx = await lockTOSProxy.deployed();
-
-  deployInfo = {
-    name: "LockTOSProxy",
-    address: lockTOSProxy.address,
+    name: "LockTOSv2Logic0",
+    address: lockTOSv2Logic0.address,
   };
 
   // if (deployInfo.address != null && deployInfo.address.length > 0) {
   //   save(process.env.NETWORK, deployInfo);
   // }
 
-  // printGasUsedOfUnits("LockTOSProxy Deploy", tx);
+  // printGasUsedOfUnits("LockTOSv2Logic0  Deploy", tx);
+
+  const lockTOSv2Proxy = await LockTOSv2Proxy.deploy();
+
+  console.log("LockTOSv2Proxy:", lockTOSv2Proxy.address);
+
+  tx = await lockTOSv2Proxy.deployed();
+
+  deployInfo = {
+    name: "LockTOSv2Proxy",
+    address: lockTOSv2Proxy.address,
+  };
+
+  // if (deployInfo.address != null && deployInfo.address.length > 0) {
+  //   save(process.env.NETWORK, deployInfo);
+  // }
+
+  // printGasUsedOfUnits("LockTOSv2Proxy Deploy", tx);
 
   return null;
 }

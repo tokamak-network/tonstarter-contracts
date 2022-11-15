@@ -19,6 +19,10 @@ import "./LockTOSv2Storage.sol";
 
 // import "hardhat/console.log";
 
+interface MyTreasury {
+    function isTreasury() external view returns (bool);
+}
+
 contract LockTOSv2Logic0 is
     LockTOSStorage,
     AccessibleCommon,
@@ -65,6 +69,14 @@ contract LockTOSv2Logic0 is
     /// @inheritdoc ILockTOSv2Action0
     function setMaxTime(uint256 _maxTime) external override onlyOwner {
         maxTime = _maxTime;
+    }
+
+    /// @inheritdoc ILockTOSv2Action0
+    function transferTosToTreasury(address _treasury) external  override onlyOwner {
+        require(_treasury != address(0), "zero address");
+        require(MyTreasury(_treasury).isTreasury(), "not treasury");
+
+        IERC20(tos).transfer(_treasury, IERC20(tos).balanceOf(address(this)));
     }
 
     /// @inheritdoc ILockTOSv2Action0
@@ -201,6 +213,7 @@ contract LockTOSv2Logic0 is
     function increaseAmountUnlockTimeByStaker(address user, uint256 _lockId, uint256 _value, uint256 _unlockWeeks)
         external override onlyStaker
     {
+        // console.log("increaseAmountUnlockTimeByStaker in ");
         require(_value > 0, "Value locked should be non-zero");
         require(_unlockWeeks > 0, "Unlock period less than a week");
 
