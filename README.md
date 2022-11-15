@@ -115,6 +115,12 @@
 
 * "PublicSaleProxy": "0x3B75d3f628C29d357b484EA7d091faEd63419267"
 
+## Deployed LockTOS Upgrade Contracts on Mainnet
+
+* "LockTOSv2Logic0": "0xdc2df172f16BBa295689Bbaa1f354ED794De0dfF"
+
+* "LockTOSv2Proxy": "0x3883F75b2BE639F9236eD230dD7202f31eaf38d5"
+
 
 ## Deployed TokamakStakeUpgrade4 ( exchangeWTONtoTOS )
 
