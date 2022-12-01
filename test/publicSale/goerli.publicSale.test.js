@@ -768,9 +768,10 @@ describe("Sale", () => {
 
             saleContract = new ethers.Contract( publicSaleContract.contractAddress, PublicSale2_ABI.abi, ethers.provider );
             let deployTime1 = await saleContract.deployTime();
-            console.log(Number(deployTime1))
+            // console.log(Number(deployTime1))
             deployTime = Number(await time.latest())
-            console.log(deployTime)
+            // console.log(deployTime)
+            expect(deployTime1).to.be.equal(deployTime);
             expect(await saleContract.isAdmin(saleTokenOwner.address)).to.be.equal(false);
             expect(await saleContract.isAdmin(upgradeAdmin.address)).to.be.equal(true);
             expect(await saleContract.isProxyAdmin(upgradeAdmin.address)).to.be.equal(true);
@@ -891,7 +892,7 @@ describe("Sale", () => {
 
 
             setSnapshot = block.timestamp;
-            console.log(Number(setSnapshot))
+            // console.log(Number(setSnapshot))
 
             tester1.balanceOfAt = Number(await lockTOS.balanceOfAt(tester1.account.address, setSnapshot))
             
@@ -1129,6 +1130,11 @@ describe("Sale", () => {
             )
             let tx = await saleContract.getTokenOwner()
             expect(tx).to.be.equal(fundVaultAddress);
+        })
+
+        it("#5-6. check the changeTick", async () => {
+            let changeTick = await saleContract.connect(saleOwner).changeTick();
+            console.log("changeTick : ", changeTick);
         })
 
     })
@@ -1406,24 +1412,24 @@ describe("Sale", () => {
         
         it("#7-6. exchangeWTONtoTOS test", async () => {
             let tosValue = await tos.balanceOf(vaultAddress);
-            console.log(Number(tosValue))
+            // console.log(Number(tosValue))
             expect(tosValue).to.be.equal(0);
             await saleContract.connect(saleOwner).exchangeWTONtoTOS(contractChangeWTON4,uniswapInfo.wtonTosPool);
         })
 
         it("#7-7. check tos", async () => {
             let tosValue = await tos.balanceOf(vaultAddress);
-            console.log(Number(tosValue))
+            // console.log(Number(tosValue))
             expect(tosValue).to.be.above(0);
         })
 
         it("#7-8. check getAmount value", async () => {
             let hardcapValue = await saleContract.hardcapCalcul();
             let getAmount = await ton.balanceOf(saleContract.address);
-            console.log("hardcapValue :", Number(hardcapValue));
-            console.log("getAmount :", Number(getAmount));
+            // console.log("hardcapValue :", Number(hardcapValue));
+            // console.log("getAmount :", Number(getAmount));
             let overflow = Number(getAmount)-Number(hardcapValue);
-            console.log("overflow :", Number(overflow));
+            // console.log("overflow :", Number(overflow));
         })
 
         it("#7-9. depositWithdraw test after exchangeWTONtoTOS", async () => {
@@ -1432,7 +1438,7 @@ describe("Sale", () => {
             await saleContract.connect(saleOwner).depositWithdraw();
 
             let balance2 = await ton.balanceOf(fundVaultAddress);
-            console.log("balance2 :",Number(balance2));
+            // console.log("balance2 :",Number(balance2));
             expect(balance2).to.be.equal(getTokenOwnerHaveTON);
         })
     })

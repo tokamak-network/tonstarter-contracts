@@ -41,6 +41,7 @@ contract PublicSale2 is
     using SafeMath for uint256;
 
     bool public exchangeTOS;
+    int24 public changeTick;
 
     event AddedWhiteList(address indexed from, uint256 tier);
     event ExclusiveSaled(address indexed from, uint256 amount);
@@ -96,6 +97,15 @@ contract PublicSale2 is
         onlyOwner
     {
         getTokenOwner = _address;
+    }
+    
+    function tickChange(
+        int24 _tick
+    )
+        external
+        onlyOwner
+    {   
+        changeTick = _tick;
     }
 
     function setAllsetting(
@@ -347,6 +357,7 @@ contract PublicSale2 is
         payTokenPrice = _payTokenPrice;
         hardCap = _hardcapAmount;
         changeTOS = _changePercent;
+        changeTick = 8;
     }
 
     function getClaims() public view
@@ -826,7 +837,6 @@ contract PublicSale2 is
         
         IERC20(getToken).approve(address(getTokenOwner), getAmount);
         IIVestingPublicFundAction(getTokenOwner).funding(getAmount);
-        // IERC20(getToken).safeTransfer(getTokenOwner, getAmount);
 
         emit DepositWithdrawal(msg.sender, getAmount, liquidityTON);
     }
@@ -852,8 +862,8 @@ contract PublicSale2 is
 
         int24 timeWeightedAverageTick = OracleLibrary.consult(poolAddress, 120);
         require(
-            LibPublicSale2.acceptMinTick(timeWeightedAverageTick, 60, 8) <= tick
-            && tick < LibPublicSale2.acceptMaxTick(timeWeightedAverageTick, 60, 8),
+            LibPublicSale2.acceptMinTick(timeWeightedAverageTick, 60, changeTick) <= tick
+            && tick < LibPublicSale2.acceptMaxTick(timeWeightedAverageTick, 60, changeTick),
             "It's not allowed changed tick range."
         );
 
