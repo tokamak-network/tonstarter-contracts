@@ -81,11 +81,17 @@ describe("Sale", () => {
     //account3 -> 티어 3 참여 -> 220,000DOC 할당 -> TON 220개
     //account4 -> 티어 4 참여 -> 300,000DOC 할당 -> TON 300개
     //account6 -> 티어 4 참여 -> 300,000DOC 할당 -> TON 300개
-    //Round2 : 1,000,000 -> 1000개 참여면 끝 (총 500TON 참여 -> 500개 구매, 판매되지않은 token burn)
-    //account1 -> 50TON 참여 -> 50,000 DOC
-    //account2 -> 100TON 참여 -> 100,000 DOC
-    //account3 -> 150TON참여 -> 150,000 DOC
-    //account4 -> 200TON 참여 -> 200,000 DOC
+    //Round2 : 1,000,000 -> 1000개 참여면 끝 (총 2000TON 참여 -> 1000개구매 끝, 1000개 환불)
+    //account1 -> 200개 참여 (TON 200개) -> 200/2000 * 1,000,000 = 100,000 DOC -> 100TON 사용 100TON 환불  -> 50TON 참여 -> 50,000 DOC
+    //account2 -> 400개 참여 (WTON 400개) -> 400/2000 * 1,000,000 = 200,000 DOC -> 200TON 사용 200TON 환불 -> 100TON 참여 -> 100,000 DOC
+    //account3 -> 600개 참여 (TON 300개, WTON 300개) -> 600/2000 * 1,000,000 = 300,000 DOC -> 300TON 사용 300TON 환불 -> 150TON참여 -> 150,000 DOC
+    //account4 -> 800개 참여 (TON 800개) -> 800/2000 * 1,000,000 = 400,000 DOC -> 400TON 사용 400TON 환불 -> 200TON 참여 -> 200,000 DOC
+    //total 구매 및 결과
+    //account1 -> 160,000 DOC -> 260TON 참여 -> 160 TON 구매 100 TON 환불
+    //account2 -> 320,000 DOC -> 520TON 참여 -> 320 TON 구매 200 TON 환불
+    //account3 -> 520,000 DOC -> 820TON 참여 -> 520 TON 구매 300 TON 환불
+    //account4 -> 700,000 DOC -> 1100TON 참여 -> 700 TON 구매 400 TON 환불
+    //account6 -> 300,000 DOC -> 300TON 참여 -> 300 TON 구매
 
     //원하는 시간에 맞춰서 정해진 수량 배분 (총 6번 실행할 것 시간은 처음 클레임 시작 후 1분 후 2분 후 3분 후 4분 후 로 테스트)
     //claimPercent1 = 30%
@@ -93,6 +99,7 @@ describe("Sale", () => {
     //claimPercent3 = 20%
     //claimPercent4 = 20%
     //claimPercent5 = 10%
+
 
     //account들 총 TON창여량
     //account1 = 110TON
@@ -1118,7 +1125,7 @@ describe("Sale", () => {
         })
 
         it("#5-5. changeTONOwner to VestingFund", async () => {
-            await saleContract.connect(upgradeAdmin).changeTONOwner(
+            await saleContract.connect(saleOwner).changeTONOwner(
                 fundVaultAddress
             )
             let tx = await saleContract.getTokenOwner()
@@ -1355,7 +1362,7 @@ describe("Sale", () => {
             await ethers.provider.send('evm_mine');
         })
 
-        it("#7-2. claim period end, claim call all accounts", async () => {
+        it("#7-2. claim period end, claim call the account3, account4, account6", async () => {
             let expectClaim = await saleContract.calculClaimAmount(account1.address, 0)
             let expectClaim2 = await saleContract.calculClaimAmount(account2.address, 0)
             let expectClaim3 = await saleContract.calculClaimAmount(account3.address, 0)
@@ -1404,12 +1411,14 @@ describe("Sale", () => {
         
         it("#7-6. exchangeWTONtoTOS test", async () => {
             let tosValue = await tos.balanceOf(vaultAddress);
+            // console.log(Number(tosValue))
             expect(tosValue).to.be.equal(0);
             await saleContract.connect(saleOwner).exchangeWTONtoTOS(contractChangeWTON4,uniswapInfo.wtonTosPool);
         })
 
         it("#7-7. check tos", async () => {
             let tosValue = await tos.balanceOf(vaultAddress);
+            // console.log(Number(tosValue))
             expect(tosValue).to.be.above(0);
         })
 
@@ -1430,11 +1439,6 @@ describe("Sale", () => {
             let balance2 = await ton.balanceOf(fundVaultAddress);
             // console.log("balance2 :",Number(balance2));
             expect(balance2).to.be.equal(getTokenOwnerHaveTON);
-        })
-
-        it("#7-10. check non sale token burn", async () => {
-            let remainToken = await saleToken.balanceOf(saleContract.address);
-            expect(remainToken).to.be.equal(0);
         })
     })
 })

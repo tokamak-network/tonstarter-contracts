@@ -75,49 +75,32 @@ describe("Sale", () => {
     //티어2 : 200 sTOS, 12%(1200)   /120,000 DOC -> TON 120개
     //티어3 : 1,000 sTOS, 22%(2200) /220,000 DOC -> TON 220개
     //티어4 : 4,000 sTOS, 60%(6000) /600,000 DOC -> TON 600개
+
     //Round1 : 1,000,000 -> 1000개 참여면 끝 (총 1000TON 참여)
     //account1 -> 티어 1 참여 -> 60,000DOC 할당 -> TON 60개 (WTON으로 참여)
     //account2 -> 티어 2 참여 -> 120,000DOC 할당 -> TON 120개
     //account3 -> 티어 3 참여 -> 220,000DOC 할당 -> TON 220개
     //account4 -> 티어 4 참여 -> 300,000DOC 할당 -> TON 300개
     //account6 -> 티어 4 참여 -> 300,000DOC 할당 -> TON 300개
-    //Round2 : 1,000,000 -> 1000개 참여면 끝 (총 500TON 참여 -> 500개 구매, 판매되지않은 token burn)
+
+    //Round2 : 1,000,000 -> 1000개 참여면 끝 (총 500TON 참여 -> 500TON 구매)
     //account1 -> 50TON 참여 -> 50,000 DOC
     //account2 -> 100TON 참여 -> 100,000 DOC
     //account3 -> 150TON참여 -> 150,000 DOC
     //account4 -> 200TON 참여 -> 200,000 DOC
+    
+    //total 구매 및 결과
+    //account1 -> 110 TON 환불
+    //account2 -> 220 TON 환불
+    //account3 -> 370 TON 환불
+    //account4 -> 500 TON 환불
+    //account6 -> 300 TON 환불
 
-    //원하는 시간에 맞춰서 정해진 수량 배분 (총 6번 실행할 것 시간은 처음 클레임 시작 후 1분 후 2분 후 3분 후 4분 후 로 테스트)
-    //claimPercent1 = 30%
-    //claimPercent2 = 20%
-    //claimPercent3 = 20%
-    //claimPercent4 = 20%
-    //claimPercent5 = 10%
-
-    //account들 총 TON창여량
-    //account1 = 110TON
-    //account2 = 220TON
-    //account3 = 370TON
-    //account4 = 500TON
-    //account6 = 300TON
-
-    //account이 받는 DOC양
-    //account1 = 33,000 , 22,000 , 22,000, 22,000 , 11,000 -> 110,000 DOC
-    //account2 = 66,000 , 44,000 , 44,000, 44,000 , 22,000 -> 220,000 DOC
-    //account3 = 111,000 , 74,000 , 74,000, 74,000, 37,000 -> 370,000 DOC
-    //account4 = 150,000 , 100,000 , 100,000, 100,000 , 50,000 -> 500,000 DOC
-    //account6 = 90,000 , 60,000 , 60,000, 60,000 , 30,000 -> 300,000 DOC
-
-    //round1 = 450,000
-    //round2 = 300,000
-    //round3 = 300,000
-    //round4 = 300,000
-    //round5 = 150,000
-
-    //total = 1,500,000
+    //hardcap
+    //1600TON
 
     //판매자가 받을 TON양
-    //총 1500TON 중 10% 제외 -> 1350TON
+    //총 1500TON 중 0TON
     let testTotalSalesAmount = ethers.utils.parseUnits("1500000", 18);
 
 
@@ -135,13 +118,13 @@ describe("Sale", () => {
     let payTokenPrice = 12000;
 
     let saleTokenOwner;         //doc
-    let getTokenOwner;         //ton
+    let getTokenOwner;          //ton
     let tosTokenOwner;          //sTOS
     let saleOwner;              //publicContract
     let vaultAddress;
     let fundVaultAddress;
     let vaultAmount = ethers.utils.parseUnits("500000", 18);            //500,000 token -> 500 TON
-    let hardcapAmount = ethers.utils.parseUnits("100", 18);     
+    let hardcapAmount = ethers.utils.parseUnits("1600", 18);     
     let changeTOS = 10;
     let minPer = 5;
     let maxPer = 10;
@@ -191,10 +174,11 @@ describe("Sale", () => {
     let contractChangeWTON3 = ethers.utils.parseUnits("150", 27);
     let contractChangeWTON4 = ethers.utils.parseUnits("1", 27);
 
-    let refundAmount1 = ethers.utils.parseUnits("100", 18);
-    let refundAmount2 = ethers.utils.parseUnits("200", 18);
-    let refundAmount3 = ethers.utils.parseUnits("300", 18);
-    let refundAmount4 = ethers.utils.parseUnits("400", 18);
+    let refundAmount1 = ethers.utils.parseUnits("110", 18);
+    let refundAmount2 = ethers.utils.parseUnits("270", 18);
+    let refundAmount3 = ethers.utils.parseUnits("370", 18);
+    let refundAmount4 = ethers.utils.parseUnits("500", 18);
+    let refundAmount6 = ethers.utils.parseUnits("300", 18);
 
     let setSnapshot;
     let blocktime;
@@ -322,21 +306,6 @@ describe("Sale", () => {
          index : null
         },
     ]
-
-    let uniswapInfo_rinkeby ={
-        poolfactory: "0x1F98431c8aD98523631AE4a59f267346ea31F984",
-        npm: "0xC36442b4a4522E871399CD717aBDD847Ab11FE88",
-        swapRouter: "0xE592427A0AEce92De3Edee1F18E0157C05861564",
-        wethUsdcPool: "0xfbDc20aEFB98a2dD3842023f21D17004eAefbe68",
-        wtonWethPool: "0xE032a3aEc591fF1Ca88122928161eA1053a098AC",
-        wtonTosPool: "0x516e1af7303a94f81e91e4ac29e20f4319d4ecaf",
-        wton: "0x709bef48982Bbfd6F2D4Be24660832665F53406C",
-        tos: "0x73a54e5C054aA64C1AE7373C2B5474d8AFEa08bd",
-        weth: "0xc778417e063141139fce010982780140aa0cd5ab",
-        usdc: "0x4dbcdf9b62e891a7cec5a2568c3f4faf9e8abe2b",
-        _fee: ethers.BigNumber.from("3000"),
-        NonfungibleTokenPositionDescriptor: "0x91ae842A5Ffd8d12023116943e72A606179294f3"
-    }
     
     let uniswapInfo = {
         poolfactory: "0x1F98431c8aD98523631AE4a59f267346ea31F984",
@@ -802,30 +771,6 @@ describe("Sale", () => {
             await tos.connect(deployer).transfer(tester4.account.address, tosAmount);
             await tos.connect(deployer).transfer(tester6.account.address, tosAmount);
         })
-
-        // it("for test setSnapshot", async () => {
-        //     const block = await ethers.provider.getBlock('latest')
-        //     if (!block) {
-        //         throw new Error('null block returned from provider')
-        //     }
-        //     setSnapshot = block.timestamp;
-        //     console.log(Number(setSnapshot))
-        // })
-
-        // it("#3-13. tos grantRole the LockTOS", async () => {
-        //     let adminPermit = "0xdf8b4c520ffe197c5343c6f5aec59570151ef9a492f2c624fd45ddde6135ec42"
-        //     let tx = await tos.hasRole(
-        //         adminPermit,
-        //         deployer.address
-        //     )
-        //     console.log("tx : ", tx);
-        //     let permitHash = "0xb397c60dd7b1c20a49e703fbb963429124e983fa44a000cb3d8ac4357d984a88"
-        //     console.log(deployer.address);
-        //     await tos.connect(deployer).grantRole(
-        //         adminPermit,
-        //         lockTOS.address
-        //     )
-        // })
 
         it("#3-13. should create locks for user", async function () {
             expect(await lockTOS.balanceOf(tester1.account.address)).to.be.equal(0);
@@ -1350,91 +1295,99 @@ describe("Sale", () => {
 
 
         it("duration the time to period end", async () => {
-            let periodEnd = claimTime5 + (86400*7)
+            let periodEnd = claimTime1 + (10)
             await ethers.provider.send('evm_setNextBlockTimestamp', [periodEnd]);
             await ethers.provider.send('evm_mine');
         })
 
-        it("#7-2. claim period end, claim call all accounts", async () => {
-            let expectClaim = await saleContract.calculClaimAmount(account1.address, 0)
-            let expectClaim2 = await saleContract.calculClaimAmount(account2.address, 0)
-            let expectClaim3 = await saleContract.calculClaimAmount(account3.address, 0)
-            let expectClaim4 = await saleContract.calculClaimAmount(account4.address, 0)
-            let expectClaim5 = await saleContract.calculClaimAmount(account6.address, 0)
-
-            await saleContract.connect(account1).claim()
-            await saleContract.connect(account2).claim()
-            await saleContract.connect(account3).claim()
-            await saleContract.connect(account4).claim()
-            await saleContract.connect(account6).claim()
-
-            let tx1 = await saleToken.balanceOf(account1.address)
-            let tx2 = await saleToken.balanceOf(account2.address)
-            let tx3 = await saleToken.balanceOf(account3.address)
-            let tx4 = await saleToken.balanceOf(account4.address)
-            let tx6 = await saleToken.balanceOf(account6.address)
-
-            expect(Number(tx1)).to.be.equal(Number(expectClaim._totalClaim))
-            expect(Number(tx2)).to.be.equal(Number(expectClaim2._totalClaim))
-            expect(Number(tx3)).to.be.equal(Number(expectClaim3._totalClaim))
-            expect(Number(tx4)).to.be.equal(Number(expectClaim4._totalClaim))
-            expect(Number(tx6)).to.be.equal(Number(expectClaim5._totalClaim))
-        })
-
-        it("#7-3. no refund check", async () => {
-            let tx = await saleContract.usersClaim(account1.address)
-            expect(Number(tx.refundAmount)).to.be.equal(0)
-            let tx2 = await saleContract.usersClaim(account2.address)
-            expect(Number(tx2.refundAmount)).to.be.equal(0)
-            let tx3 = await saleContract.usersClaim(account3.address)
-            expect(Number(tx3.refundAmount)).to.be.equal(0)
-            let tx4 = await saleContract.usersClaim(account4.address)
-            expect(Number(tx4.refundAmount)).to.be.equal(0)
-        })
-
-        it("#7-4. contract have 1500TON", async () => {
+        it("#7-2. contract have 1500TON", async () => {
             let checkTON = await ton.balanceOf(saleContract.address);
             expect(Number(checkTON)).to.be.eq(Number(contracthaveTON));
         })
 
-        it("#7-5. depositWithdraw test before exchangeWTONtoTOS", async () => {
+        it("#7-3. claim for refund, account1", async () => {
+            let expectClaim = await saleContract.usersClaim(account1.address)
+            expect(Number(expectClaim.refundAmount)).to.be.equal(0)
+            let before1 = await ton.balanceOf(account1.address)
+
+            await saleContract.connect(account1).claim()
+
+            let after1 = await ton.balanceOf(account1.address)
+            let tx1 = Number(after1)-Number(before1)
+            expectClaim = await saleContract.usersClaim(account1.address)
+            expect(tx1).to.be.equal(Number(expectClaim.refundAmount))
+        })
+
+        it("#7-4. claim for refund, account2", async () => {
+            let expectClaim = await saleContract.usersClaim(account2.address)
+            expect(Number(expectClaim.refundAmount)).to.be.equal(0)
+
+            let before1 = await ton.balanceOf(account2.address)
+
+            await saleContract.connect(account2).claim()
+
+            let after1 = await ton.balanceOf(account2.address)
+            let tx1 = Number(after1)-Number(before1)
+            expectClaim = await saleContract.usersClaim(account2.address)
+            expect(tx1).to.be.equal(Number(expectClaim.refundAmount))
+        })
+
+        it("#7-5. claim for refund, account3", async () => {
+            let expectClaim = await saleContract.usersClaim(account3.address)
+            expect(Number(expectClaim.refundAmount)).to.be.equal(0)
+
+            let before1 = await ton.balanceOf(account3.address)
+
+            await saleContract.connect(account3).claim()
+
+            let after1 = await ton.balanceOf(account3.address)
+            let tx1 = Number(after1)-Number(before1)
+            expectClaim = await saleContract.usersClaim(account3.address)
+            expect(tx1).to.be.equal(Number(expectClaim.refundAmount))
+        })
+
+        it("#7-6. claim for refund, account4", async () => {
+            let expectClaim = await saleContract.usersClaim(account4.address)
+            expect(Number(expectClaim.refundAmount)).to.be.equal(0)
+
+            let before1 = await ton.balanceOf(account4.address)
+
+            await saleContract.connect(account4).claim()
+
+            let after1 = await ton.balanceOf(account4.address)
+            let tx1 = Number(after1)-Number(before1)
+            expectClaim = await saleContract.usersClaim(account4.address)
+            expect(tx1).to.be.equal(Number(expectClaim.refundAmount))
+        })
+
+        it("#7-7. claim for refund, account6", async () => {
+            let expectClaim = await saleContract.usersClaim(account6.address)
+            expect(Number(expectClaim.refundAmount)).to.be.equal(0)
+
+            let before1 = await ton.balanceOf(account6.address)
+
+            await saleContract.connect(account6).claim()
+
+            let after1 = await ton.balanceOf(account6.address)
+            let tx1 = Number(after1)-Number(before1)
+            expectClaim = await saleContract.usersClaim(account6.address)
+            expect(tx1).to.be.equal(Number(expectClaim.refundAmount))
+        })
+
+        it("#7-8. contract have 1500TON", async () => {
+            let checkTON = await ton.balanceOf(saleContract.address);
+            expect(Number(checkTON)).to.be.eq(Number(0));
+        })
+
+        it("#7-9. depositWithdraw test before exchangeWTONtoTOS", async () => {
             let tx = saleContract.connect(saleOwner).depositWithdraw();
             await expect(tx).to.be.revertedWith("PublicSale : need the exchangeWTONtoTOS")
         })
         
-        it("#7-6. exchangeWTONtoTOS test", async () => {
-            let tosValue = await tos.balanceOf(vaultAddress);
-            expect(tosValue).to.be.equal(0);
-            await saleContract.connect(saleOwner).exchangeWTONtoTOS(contractChangeWTON4,uniswapInfo.wtonTosPool);
+        it("#7-10. exchangeWTONtoTOS test", async () => {
+            let tx = saleContract.connect(saleOwner).exchangeWTONtoTOS(contractChangeWTON4,uniswapInfo.wtonTosPool);
+            await expect(tx).to.be.revertedWith("PublicSale: don't pass the hardCap")
         })
-
-        it("#7-7. check tos", async () => {
-            let tosValue = await tos.balanceOf(vaultAddress);
-            expect(tosValue).to.be.above(0);
-        })
-
-        it("#7-8. check getAmount value", async () => {
-            let hardcapValue = await saleContract.hardcapCalcul();
-            let getAmount = await ton.balanceOf(saleContract.address);
-            // console.log("hardcapValue :", Number(hardcapValue));
-            // console.log("getAmount :", Number(getAmount));
-            let overflow = Number(getAmount)-Number(hardcapValue);
-            // console.log("overflow :", Number(overflow));
-        })
-
-        it("#7-9. depositWithdraw test after exchangeWTONtoTOS", async () => {
-            let balance1 = await ton.balanceOf(fundVaultAddress);
-            expect(balance1).to.be.equal(0);
-            await saleContract.connect(saleOwner).depositWithdraw();
-
-            let balance2 = await ton.balanceOf(fundVaultAddress);
-            // console.log("balance2 :",Number(balance2));
-            expect(balance2).to.be.equal(getTokenOwnerHaveTON);
-        })
-
-        it("#7-10. check non sale token burn", async () => {
-            let remainToken = await saleToken.balanceOf(saleContract.address);
-            expect(remainToken).to.be.equal(0);
-        })
+        
     })
 })

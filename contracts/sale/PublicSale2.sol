@@ -94,7 +94,7 @@ contract PublicSale2 is
     )
         external
         override
-        onlyOwner
+        onlyProxyOwner
     {
         getTokenOwner = _address;
     }
@@ -771,6 +771,7 @@ contract PublicSale2 is
             LibPublicSale.UserInfoEx storage userEx = usersEx[msg.sender];
             uint256 refundTON = userEx.payAmount.add(userOpen.depositAmount);
             userClaim.exec = true;
+            userClaim.refundAmount = refundTON;
             IERC20(getToken).safeTransfer(msg.sender, refundTON);
         } else {
             (uint256 reward, uint256 realSaleAmount, uint256 refundAmount) = calculClaimAmount(msg.sender, 0);
@@ -853,9 +854,6 @@ contract PublicSale2 is
 
         uint256 liquidityTON = hardcapCalcul();
         require(liquidityTON > 0, "PublicSale: don't pass the hardCap");
-
-        // IIUniswapV3Pool pool = IIUniswapV3Pool(LibPublicSale2.getPoolAddress());
-        // require(address(pool) != address(0), "pool didn't exist");
 
         (uint160 sqrtPriceX96, int24 tick,,,,,) =  IIUniswapV3Pool(poolAddress).slot0();
         require(sqrtPriceX96 > 0, "pool is not initialized");
