@@ -10,6 +10,7 @@ import "@openzeppelin/contracts/math/SafeMath.sol";
 import "../interfaces/IPublicSale2.sol";
 import "../common/ProxyAccessCommon.sol";
 import "./PublicSaleStorage.sol";
+import "./PublicSale2Storage.sol";
 
 import "../libraries/LibPublicSale2.sol";
 
@@ -34,14 +35,12 @@ interface IIVestingPublicFundAction {
 contract PublicSale2 is
     PublicSaleStorage,
     ProxyAccessCommon,
+    PublicSale2Storage,
     ReentrancyGuard,
     IPublicSale2
 {
     using SafeERC20 for IERC20;
     using SafeMath for uint256;
-
-    bool public exchangeTOS;
-    int24 public changeTick;
 
     event AddedWhiteList(address indexed from, uint256 tier);
     event ExclusiveSaled(address indexed from, uint256 amount);

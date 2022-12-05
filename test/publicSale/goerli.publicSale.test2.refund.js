@@ -1079,20 +1079,6 @@ describe("Sale", () => {
         })
     })
 
-    describe("#test proxy memory", () => {
-        it("check memory", async () => {
-            let memory1 = await saleContract._NOT_ENTERED();
-            let memory2 = await saleContract._ENTERED();
-            console.log("memory1 : ", Number(memory1));
-            console.log("memory2 : ", Number(memory2));
-        })
-
-        it("check implementation_slot", async () => {
-            let imple = await publicProxy.slotReturn();
-            console.log("imple : ", imple);
-        })
-    })
-
     describe("#6. PublicSale", () => {
         describe("#6-1. round1 Sale", () => {
             it("#6-1-1. calculTierAmount test before addwhiteList", async () => {
