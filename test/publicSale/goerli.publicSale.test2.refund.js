@@ -46,6 +46,7 @@ const LockTOS_ABI = require("../..//artifacts/contracts/stake/LockTOS.sol/LockTO
 const PublicSale_ABI = require('../../artifacts/contracts/sale/publicSale.sol/PublicSale.json');
 const PublicSaleTest_ABI = require('../../artifacts/contracts/sale/PublicSaleTest.sol/PublicSaleTest.json');
 const PublicSale2_ABI = require('../../artifacts/contracts/sale/PublicSale2.sol/PublicSale2.json');
+const PublicProxy_ABI = require('../../artifacts/contracts/sale/PublicSaleProxy.sol/PublicSaleProxy.json');
 // const PublicSaleForDoM_ABI = require('../../artifacts/contracts/sale/PublicSaleForDoM.sol/PublicSaleForDoM.json');
 const LiquidtyVault = require("../../abis/InitialLiquidityVaultFactory.json");
 const LiquidtyVaultLogic = require("../../abis/InitialLiquidityVault.json");
@@ -214,6 +215,7 @@ describe("Sale", () => {
     let account3Before, account3After;
     let account4Before, account4After;
     let publicFactory;
+    let publicProxy;
     let deploySaleImpl;
     let deploySaleImpl2;
     let libPublicSale2;
@@ -728,6 +730,7 @@ describe("Sale", () => {
             expect(info.name).to.be.equal(publicSaleContract.name);
             publicSaleContract.contractAddress = info.contractAddress;
 
+            publicProxy = new ethers.Contract( publicSaleContract.contractAddress, PublicProxy_ABI.abi, ethers.provider );
             saleContract = new ethers.Contract( publicSaleContract.contractAddress, PublicSale2_ABI.abi, ethers.provider );
             let deployTime1 = await saleContract.deployTime();
             // console.log(Number(deployTime1))
@@ -1073,6 +1076,20 @@ describe("Sale", () => {
         it("#5-6. check the changeTick", async () => {
             let changeTick = await saleContract.connect(saleOwner).changeTick();
             console.log("changeTick : ", changeTick);
+        })
+    })
+
+    describe("#test proxy memory", () => {
+        it("check memory", async () => {
+            let memory1 = await saleContract._NOT_ENTERED();
+            let memory2 = await saleContract._ENTERED();
+            console.log("memory1 : ", Number(memory1));
+            console.log("memory2 : ", Number(memory2));
+        })
+
+        it("check implementation_slot", async () => {
+            let imple = await publicProxy.slotReturn();
+            console.log("imple : ", imple);
         })
     })
 
