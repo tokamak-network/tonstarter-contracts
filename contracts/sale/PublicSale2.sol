@@ -529,21 +529,23 @@ contract PublicSale2 is
 
         uint256 amount;
         if (totalClaimCounts == round && _round == 0) {
-            amount = realSaleAmount - userClaim.claimAmount;
+            amount = realSaleAmount.sub(userClaim.claimAmount);
             return (amount, realSaleAmount, refundAmount);
         }
 
         if(_round == 0) {
             amount = realSaleAmount.mul(claimPercents[round.sub(1)]).div(100);
-            amount = amount - userClaim.claimAmount;
+            amount = amount.sub(userClaim.claimAmount);
             return (amount, realSaleAmount, refundAmount);
         } else if(_round == 1) {
             amount = realSaleAmount.mul(claimPercents[0]).div(100);
             return (amount, realSaleAmount, refundAmount);
         } else {
-            uint256 amount1 = realSaleAmount.mul(claimPercents[round.sub(1)]).div(100);
-            uint256 amount2 = realSaleAmount.mul(claimPercents[round.sub(2)]).div(100);
-            amount = amount1.sub(amount2);
+            // uint256 amount1 = realSaleAmount.mul(claimPercents[round.sub(1)]).div(100);
+            // uint256 amount2 = realSaleAmount.mul(claimPercents[round.sub(2)]).div(100);
+            // amount = amount1.sub(amount2);
+            uint256 roundPercent = claimPercents[_round.sub(1)].sub(claimPercents[_round.sub(2)]);
+            amount = realSaleAmount.mul(roundPercent).div(100);
             return (amount, realSaleAmount, refundAmount);
         }
     }
