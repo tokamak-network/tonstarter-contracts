@@ -500,7 +500,7 @@ contract PublicSale2 is
     }
 
     function currentRound() public view returns (uint256 round) {
-        if (block.timestamp > claimTimes[totalClaimCounts-1]) {
+        if (block.timestamp >= claimTimes[totalClaimCounts-1]) {
             return totalClaimCounts;
         }
         for (uint256 i = 0; i < totalClaimCounts; i++) {
