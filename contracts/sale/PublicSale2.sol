@@ -538,7 +538,7 @@ contract PublicSale2 is
             amount = amount - userClaim.claimAmount;
             return (amount, realSaleAmount, refundAmount);
         } else if(_round == 1) {
-            amount = realSaleAmount.mul(claimPercents[round.sub(1)]).div(100);
+            amount = realSaleAmount.mul(claimPercents[0]).div(100);
             return (amount, realSaleAmount, refundAmount);
         } else {
             uint256 amount1 = realSaleAmount.mul(claimPercents[round.sub(1)]).div(100);
