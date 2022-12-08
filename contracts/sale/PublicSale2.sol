@@ -95,6 +95,7 @@ contract PublicSale2 is
         override
         onlyProxyOwner
     {
+        require(getTokenOwner == _address, "already same addr");
         getTokenOwner = _address;
     }
     
@@ -104,6 +105,7 @@ contract PublicSale2 is
         external
         onlyOwner
     {   
+        require(changeTick == _tick, "already same tick");
         changeTick = _tick;
     }
 
