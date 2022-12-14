@@ -873,7 +873,7 @@ contract PublicSale2 is
             = LibPublicSale2.limitPrameters(amountIn, poolAddress, wton, address(tos), changeTick);
         
         uint256 wtonAmount = IERC20(wton).balanceOf(address(this));
-        if(wtonAmount == 0) {
+        if(wtonAmount == 0 && exchangeTOS != true) {
             IIWTON(wton).swapFromTON(liquidityTON);
             exchangeTOS = true;
         } else {
