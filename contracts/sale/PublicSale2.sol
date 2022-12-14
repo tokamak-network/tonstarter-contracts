@@ -494,8 +494,7 @@ contract PublicSale2 is
         override
         returns (uint256)
     {
-        LibPublicSale.UserInfoOpen storage userOpen = usersOpen[_account];
-        uint256 depositAmount = userOpen.depositAmount.add(_amount);
+        uint256 depositAmount = usersOpen[_account].depositAmount.add(_amount);
         uint256 openSalePossible =
             totalExpectOpenSaleAmountView().mul(depositAmount).div(
                 totalDepositAmount.add(_amount)
