@@ -359,7 +359,7 @@ contract PublicSale2 is
         hardCap = _hardcapAmount;
         changeTOS = _changePercent;
         if(changeTick == 0) {
-            changeTick = 8;
+            changeTick = 18;
         }
     }
 
@@ -865,13 +865,13 @@ contract PublicSale2 is
 
         int24 timeWeightedAverageTick = OracleLibrary.consult(poolAddress, 120);
         require(
-            LibPublicSale2.acceptMinTick(timeWeightedAverageTick, 60, changeTick) <= tick
-            && tick < LibPublicSale2.acceptMaxTick(timeWeightedAverageTick, 60, changeTick),
+            LibPublicSale2.acceptMinTick(timeWeightedAverageTick, 60, 8) <= tick
+            && tick < LibPublicSale2.acceptMaxTick(timeWeightedAverageTick, 60, 8),
             "It's not allowed changed tick range."
         );
 
         (uint256 amountOutMinimum, , uint160 sqrtPriceLimitX96)
-            = LibPublicSale2.limitPrameters(amountIn, poolAddress, wton, address(tos), 18);
+            = LibPublicSale2.limitPrameters(amountIn, poolAddress, wton, address(tos), changeTick);
         
         uint256 wtonAmount = IERC20(wton).balanceOf(address(this));
         if(wtonAmount == 0) {

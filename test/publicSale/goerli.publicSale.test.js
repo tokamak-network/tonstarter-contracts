@@ -60,6 +60,7 @@ const WTON_ABI = require("../../abis/WTON.json");
 
 const TOS_ABI = require("../../abis/TOS.json");
 const LockTOSABI_ABI = require("../../abis/LockTOS_ABI.json");
+const { joinSignature } = require("@ethersproject/bytes");
 
 const zeroAddress = "0x0000000000000000000000000000000000000000";
 
@@ -115,6 +116,7 @@ describe("Sale", () => {
     //round5 = 150,000
 
     //total = 1,500,000
+    //burn = 500,000
 
     //판매자가 받을 TON양
     //총 1500TON 중 10% 제외 -> 1350TON
@@ -1117,12 +1119,11 @@ describe("Sale", () => {
             expect(tx18).to.be.equal(claimCounts)
         })
 
-        it("#5-5. changeTONOwner to VestingFund", async () => {
-            await saleContract.connect(upgradeAdmin).changeTONOwner(
+        it("#5-5. changeTONOwner to VestingFund can't change same addr", async () => {
+            let tx = saleContract.connect(upgradeAdmin).changeTONOwner(
                 fundVaultAddress
             )
-            let tx = await saleContract.getTokenOwner()
-            expect(tx).to.be.equal(fundVaultAddress);
+            expect(tx).to.be.revertedWith("already same addr")
         })
 
         it("#5-6. check the changeTick", async () => {
@@ -1401,34 +1402,53 @@ describe("Sale", () => {
             let tx = saleContract.connect(saleOwner).depositWithdraw();
             await expect(tx).to.be.revertedWith("PublicSale : need the exchangeWTONtoTOS")
         })
+
+        it("#7-6. check getAmount value", async () => {
+            let hardcapValue = await saleContract.hardcapCalcul();
+            let getAmount = await ton.balanceOf(saleContract.address);
+            console.log("hardcapValue :", Number(hardcapValue));
+            console.log("getAmount :", Number(getAmount));
+            let overflow = Number(getAmount)-Number(hardcapValue);
+            console.log("overflow :", Number(overflow));
+        })
         
-        it("#7-6. exchangeWTONtoTOS test", async () => {
+        it("#7-7. exchangeWTONtoTOS test", async () => {
             let tosValue = await tos.balanceOf(vaultAddress);
             expect(tosValue).to.be.equal(0);
             await saleContract.connect(saleOwner).exchangeWTONtoTOS(contractChangeWTON4,uniswapInfo.wtonTosPool);
         })
 
-        it("#7-7. check tos", async () => {
+        it("#7-8. check tos", async () => {
             let tosValue = await tos.balanceOf(vaultAddress);
             expect(tosValue).to.be.above(0);
         })
+        
+        it("#7-9. check burnAmount", async () => {
+            let round1Expect = await saleContract.totalExpectSaleAmount()
+            console.log("round1Expect :", Number(round1Expect));
 
-        it("#7-8. check getAmount value", async () => {
-            let hardcapValue = await saleContract.hardcapCalcul();
-            let getAmount = await ton.balanceOf(saleContract.address);
-            // console.log("hardcapValue :", Number(hardcapValue));
-            // console.log("getAmount :", Number(getAmount));
-            let overflow = Number(getAmount)-Number(hardcapValue);
-            // console.log("overflow :", Number(overflow));
+            let round2Expect = await saleContract.totalExpectOpenSaleAmount();
+            console.log("round2Expect :", Number(round2Expect));
+
+            let round1Real = await saleContract.totalExSaleAmount();
+            console.log("round1Real :", Number(round1Real));
+
+            let round2Real = await saleContract.totalOpenSaleAmount();
+            console.log("round2Real :", Number(round2Real));
+
+            let burnToken = await saleToken.balanceOf(saleContract.address);
+            console.log("burnToken :", Number(burnToken));
         })
+
 
         it("#7-9. depositWithdraw test after exchangeWTONtoTOS", async () => {
             let balance1 = await ton.balanceOf(fundVaultAddress);
             expect(balance1).to.be.equal(0);
+            console.log("1");
             await saleContract.connect(saleOwner).depositWithdraw();
 
             let balance2 = await ton.balanceOf(fundVaultAddress);
-            // console.log("balance2 :",Number(balance2));
+            console.log("balance2 :",Number(balance2));
             expect(balance2).to.be.equal(getTokenOwnerHaveTON);
         })
 

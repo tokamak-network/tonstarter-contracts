@@ -1096,12 +1096,11 @@ describe("Sale", () => {
             console.log("changeTick : ", changeTick);
         })
 
-        it("#5-7. can changeTONOwner to vestingFund from ProxyOnwer", async () => {
-            await saleContract.connect(upgradeAdmin).changeTONOwner(
+        it("#5-7. changeTONOwner to VestingFund can't change same addr", async () => {
+            let tx = saleContract.connect(upgradeAdmin).changeTONOwner(
                 fundVaultAddress
             )
-            let tx = await saleContract.getTokenOwner()
-            expect(tx).to.be.equal(fundVaultAddress);
+            expect(tx).to.be.revertedWith("already same addr")
         })
 
         it("#5-8. check the claimPercents", async () => {
@@ -1632,6 +1631,33 @@ describe("Sale", () => {
             expect(Number(TONRefund3)).to.be.equal(Number(refundAmount3));
             expect(Number(TONRefund4)).to.be.equal(Number(refundAmount4));
             expect(Number(TONRefund6)).to.be.equal(0);
+        })
+
+        it("#7-9. exchangeWTONtoTOS test", async () => {
+            let tosValue = await tos.balanceOf(vaultAddress);
+            expect(tosValue).to.be.equal(0);
+            await saleContract.connect(saleOwner).exchangeWTONtoTOS(contractChangeWTON4,uniswapInfo.wtonTosPool);
+        })
+
+        it("#7-10. check tos", async () => {
+            let tosValue = await tos.balanceOf(vaultAddress);
+            expect(tosValue).to.be.above(0);
+        })
+
+        it("#7-10. depositWithdraw test after exchangeWTONtoTOS", async () => {
+            let balance1 = await ton.balanceOf(fundVaultAddress);
+            expect(balance1).to.be.equal(0);
+            console.log("1");
+            await saleContract.connect(saleOwner).depositWithdraw();
+
+            let balance2 = await ton.balanceOf(fundVaultAddress);
+            console.log("balance2 :",Number(balance2));
+            expect(balance2).to.be.equal(getTokenOwnerHaveTON);
+        })
+
+        it("#7-11. check non sale token burn", async () => {
+            let remainToken = await saleToken.balanceOf(saleContract.address);
+            expect(remainToken).to.be.equal(0);
         })
     })
 })
