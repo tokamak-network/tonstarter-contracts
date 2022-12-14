@@ -358,7 +358,9 @@ contract PublicSale2 is
         payTokenPrice = _payTokenPrice;
         hardCap = _hardcapAmount;
         changeTOS = _changePercent;
-        changeTick = 8;
+        if(changeTick == 0) {
+            changeTick = 8;
+        }
     }
 
     function getClaims() public view
