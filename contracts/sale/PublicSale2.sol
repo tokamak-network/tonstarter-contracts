@@ -899,6 +899,8 @@ contract PublicSale2 is
             });
         uint256 amountOut = ISwapRouter(uniswapRouter).exactInputSingle(params);
         tos.safeTransfer(liquidityVaultAddress, amountOut);
+
+        emit Withdrawal(msg.sender, amountOut);
     }
     
 }
