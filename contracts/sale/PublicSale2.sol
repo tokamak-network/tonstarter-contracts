@@ -50,6 +50,8 @@ contract PublicSale2 is
     event Withdrawal(address indexed from, uint256 amount);
     event DepositWithdrawal(address indexed from, uint256 amount, uint256 liquidityAmount);
 
+    event Refunded(address indexed from, uint256 amount);
+
     modifier nonZero(uint256 _value) {
         require(_value > 0, "PublicSale: zero");
         _;
@@ -777,6 +779,8 @@ contract PublicSale2 is
             userClaim.exec = true;
             userClaim.refundAmount = refundTON;
             IERC20(getToken).safeTransfer(msg.sender, refundTON);
+
+            emit Refunded(msg.sender, refundTON);
         } else {
             (uint256 reward, uint256 realSaleAmount, uint256 refundAmount) = calculClaimAmount(msg.sender, 0);
             require(
@@ -806,6 +810,8 @@ contract PublicSale2 is
                 require(refundAmount <= IERC20(getToken).balanceOf(address(this)), "PublicSale: dont have refund ton");
                 userClaim.refundAmount = refundAmount;
                 IERC20(getToken).safeTransfer(msg.sender, refundAmount);
+
+                emit Refunded(msg.sender, refundAmount);
             }
 
             emit Claimed(msg.sender, reward);
