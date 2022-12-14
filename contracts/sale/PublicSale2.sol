@@ -522,7 +522,7 @@ contract PublicSale2 is
         if (block.timestamp < startClaimTime) return (0, 0, 0);
         if (_round > totalClaimCounts) return (0, 0, 0);
 
-        LibPublicSale.UserClaim storage userClaim = usersClaim[_account];
+        LibPublicSale.UserClaim memory userClaim = usersClaim[_account];
         (, uint256 realSaleAmount, uint256 refundAmount) = totalSaleUserAmount(_account);  
 
         if (realSaleAmount == 0 ) return (0, 0, 0);
@@ -555,7 +555,7 @@ contract PublicSale2 is
 
     /// @inheritdoc IPublicSale2
     function totalSaleUserAmount(address user) public override view returns (uint256 _realPayAmount, uint256 _realSaleAmount, uint256 _refundAmount) {
-        LibPublicSale.UserInfoEx storage userEx = usersEx[user];
+        LibPublicSale.UserInfoEx memory userEx = usersEx[user];
 
         if (userEx.join) {
             (uint256 realPayAmount, uint256 realSaleAmount, uint256 refundAmount) = openSaleUserAmount(user);
@@ -567,7 +567,7 @@ contract PublicSale2 is
 
     /// @inheritdoc IPublicSale2
     function openSaleUserAmount(address user) public override view returns (uint256 _realPayAmount, uint256 _realSaleAmount, uint256 _refundAmount) {
-        LibPublicSale.UserInfoOpen storage userOpen = usersOpen[user];
+        LibPublicSale.UserInfoOpen memory userOpen = usersOpen[user];
 
         if (!userOpen.join || userOpen.depositAmount == 0) return (0, 0, 0);
 
