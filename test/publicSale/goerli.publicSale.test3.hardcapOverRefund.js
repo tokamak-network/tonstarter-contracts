@@ -107,7 +107,7 @@ describe("Sale", () => {
     //account6 = 90,000 , 60,000 , 60,000, 60,000 , 30,000 -> 300,000 DOC
 
     //총 2,000,000 DOC
-    //총 2,000 TON 중 10% 제외 -> 1800TON
+    //총 2,000 TON 중 10% 제외 -> 1800TON이 vestingVault로 넘어가야함
 
     let testTotalSalesAmount = ethers.utils.parseUnits("1500000", 18);
 
@@ -176,7 +176,7 @@ describe("Sale", () => {
     let account6BigTONAmount = ethers.utils.parseUnits("300", 18);
     
     let contracthaveTON = ethers.utils.parseUnits("1500", 18);
-    let getTokenOwnerHaveTON = ethers.utils.parseUnits("1350", 18);
+    let getTokenOwnerHaveTON = ethers.utils.parseUnits("1800", 18);
     let contractChangeWTON1 = ethers.utils.parseUnits("100", 27);
     let contractChangeWTON2 = ethers.utils.parseUnits("50", 27);
     let contractChangeWTON3 = ethers.utils.parseUnits("150", 27);
@@ -1096,11 +1096,11 @@ describe("Sale", () => {
             console.log("changeTick : ", changeTick);
         })
 
-        it("#5-7. changeTONOwner to VestingFund can't change same addr", async () => {
-            let tx = saleContract.connect(upgradeAdmin).changeTONOwner(
-                fundVaultAddress
-            )
-            expect(tx).to.be.revertedWith("already same addr")
+        it("#5-7. changeTONOwner to VestingFund", async () => {
+            await saleContract.connect(upgradeAdmin).changeTONOwner(fundVaultAddress)
+            let tx = await saleContract.getTokenOwner()
+            expect(tx).to.be.equal(fundVaultAddress);
+            // expect(tx).to.be.revertedWith("already same addr")
         })
 
         it("#5-8. check the claimPercents", async () => {
@@ -1505,22 +1505,6 @@ describe("Sale", () => {
             await ethers.provider.send('evm_mine');
         })
 
-        // it("calculClaimAmount test", async () => {
-        //     console.log("1")
-        //     let expectClaim2 = await saleContract.calculClaimAmount(account2.address, 5)
-        //     console.log("2")
-        //     let expectClaim3 = await saleContract.calculClaimAmount(account3.address, 5)
-        //     console.log("3")
-        //     let expectClaim4 = await saleContract.calculClaimAmount(account4.address, 5)
-        //     console.log("4")
-        //     let expectClaim5 = await saleContract.calculClaimAmount(account5.address, 5)
-        //     console.log("5")
-        //     let expectClaim = await saleContract.calculClaimAmount(account1.address, 5)
-
-        //     let round = await saleContract.currentRound();
-        //     console.log("round : ", Number(round));
-        // })
-
         it("#7-6. claim claimTime5, claim call the account1, account2", async () => {
             let expectClaim = await saleContract.calculClaimAmount(account1.address, 5)
             let expectClaim2 = await saleContract.calculClaimAmount(account2.address, 0)
@@ -1634,17 +1618,36 @@ describe("Sale", () => {
         })
 
         it("#7-9. exchangeWTONtoTOS test", async () => {
-            let tosValue = await tos.balanceOf(vaultAddress);
-            expect(tosValue).to.be.equal(0);
+            let beforeTosValue = await tos.balanceOf(vaultAddress);
+            expect(beforeTosValue).to.be.equal(0);
             await saleContract.connect(saleOwner).exchangeWTONtoTOS(contractChangeWTON4,uniswapInfo.wtonTosPool);
+
+            let afterTosValue = await tos.balanceOf(vaultAddress);
+            expect(afterTosValue).to.be.above(0);
         })
 
-        it("#7-10. check tos", async () => {
-            let tosValue = await tos.balanceOf(vaultAddress);
-            expect(tosValue).to.be.above(0);
+        it("check before depositWithdraw", async () => {
+            let checkbool = await saleContract.adminWithdraw();
+            let checkbool2 = await saleContract.exchangeTOS();
+            console.log("checkbool : ", checkbool)
+            console.log("checkbool2 : ", checkbool2)
+            let saleBalance =  await ton.balanceOf(saleContract.address);
+            let hardcapTON = await saleContract.hardcapCalcul();
+            let total1Purchased = await saleContract.totalExPurchasedAmount();
+            let total2Purchased = await saleContract.totalOpenPurchasedAmount();
+            console.log("saleBalance :", Number(saleBalance));
+            console.log("hardcapTON :", Number(hardcapTON));
+            console.log("total1Purchased :", Number(total1Purchased));
+            console.log("total2Purchased :", Number(total2Purchased));
+
+            let getAmount = Number(total1Purchased) + Number(total2Purchased) - Number(hardcapTON)
+            console.log("getAmount :", getAmount);
+            expect(Number(saleBalance)).to.be.equal(getAmount);
         })
+
 
         it("#7-10. depositWithdraw test after exchangeWTONtoTOS", async () => {
+            // console.log(saleContract);
             let balance1 = await ton.balanceOf(fundVaultAddress);
             expect(balance1).to.be.equal(0);
             console.log("1");

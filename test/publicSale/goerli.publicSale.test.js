@@ -1119,11 +1119,10 @@ describe("Sale", () => {
             expect(tx18).to.be.equal(claimCounts)
         })
 
-        it("#5-5. changeTONOwner to VestingFund can't change same addr", async () => {
-            let tx = saleContract.connect(upgradeAdmin).changeTONOwner(
-                fundVaultAddress
-            )
-            expect(tx).to.be.revertedWith("already same addr")
+        it("#5-5. changeTONOwner to VestingFund", async () => {
+            await saleContract.connect(upgradeAdmin).changeTONOwner(fundVaultAddress)
+            let tx = await saleContract.getTokenOwner()
+            expect(tx).to.be.equal(fundVaultAddress);
         })
 
         it("#5-6. check the changeTick", async () => {

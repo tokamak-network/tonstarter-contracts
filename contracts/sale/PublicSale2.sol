@@ -80,16 +80,6 @@ contract PublicSale2 is
         _;
     }
 
-    modifier greaterThan(uint256 _value1, uint256 _value2) {
-        require(_value1 > _value2, "PublicSale: non greaterThan");
-        _;
-    }
-
-    modifier lessThan(uint256 _value1, uint256 _value2) {
-        require(_value1 < _value2, "PublicSale: non less than");
-        _;
-    }
-
     function changeTONOwner(
         address _address
     )
@@ -97,7 +87,6 @@ contract PublicSale2 is
         override
         onlyProxyOwner
     {
-        require(getTokenOwner == _address, "already same addr");
         getTokenOwner = _address;
     }
     
@@ -107,7 +96,6 @@ contract PublicSale2 is
         external
         onlyOwner
     {   
-        require(changeTick == _tick, "already same tick");
         changeTick = _tick;
     }
 
@@ -365,20 +353,6 @@ contract PublicSale2 is
         }
     }
 
-    function getClaims() public view
-        returns (
-            uint256[] memory
-        )
-    {
-        uint256 len = claimPercents.length;
-        uint256[] memory _claimPercents = new uint256[](len);
-
-        for (uint256 i = 0; i < len; i++) {
-            _claimPercents[i] = claimPercents[i];
-        }
-        return (_claimPercents);
-    }
-
     /// @inheritdoc IPublicSale2
     function totalExpectOpenSaleAmountView()
         public
@@ -467,7 +441,7 @@ contract PublicSale2 is
         override
         returns (uint256)
     {
-        LibPublicSale.UserInfoEx storage userEx = usersEx[_address];
+        LibPublicSale.UserInfoEx memory userEx = usersEx[_address];
         uint256 tier = calculTier(_address);
         if (userEx.join == true && tier > 0) {
             uint256 salePossible =
@@ -546,9 +520,6 @@ contract PublicSale2 is
             amount = realSaleAmount.mul(claimPercents[0]).div(100);
             return (amount, realSaleAmount, refundAmount);
         } else {
-            // uint256 amount1 = realSaleAmount.mul(claimPercents[round.sub(1)]).div(100);
-            // uint256 amount2 = realSaleAmount.mul(claimPercents[round.sub(2)]).div(100);
-            // amount = amount1.sub(amount2);
             uint256 roundPercent = claimPercents[_round.sub(1)].sub(claimPercents[_round.sub(2)]);
             amount = realSaleAmount.mul(roundPercent).div(100);
             return (amount, realSaleAmount, refundAmount);
@@ -834,11 +805,7 @@ contract PublicSale2 is
 
         uint256 liquidityTON = hardcapCalcul();
         uint256 getAmount = totalExPurchasedAmount.add(totalOpenPurchasedAmount()).sub(liquidityTON);
-        // if (totalRound2Users == totalRound2UsersClaim){
-        //     getAmount = IERC20(getToken).balanceOf(address(this)).sub(liquidityTON);
-        // } else {
-        //     getAmount = totalExPurchasedAmount.add(totalOpenPurchasedAmount()).sub(liquidityTON).sub(1 ether);
-        // }        
+        
         require(getAmount <= IERC20(getToken).balanceOf(address(this)), "PublicSale: no token to receive");        
 
         adminWithdraw = true;
@@ -891,14 +858,13 @@ contract PublicSale2 is
                 tokenIn: wton,
                 tokenOut: address(tos),
                 fee: poolFee,
-                recipient: address(this),
+                recipient: liquidityVaultAddress,
                 deadline: block.timestamp,
                 amountIn: amountIn,
                 amountOutMinimum: amountOutMinimum,
                 sqrtPriceLimitX96: sqrtPriceLimitX96
             });
         uint256 amountOut = ISwapRouter(uniswapRouter).exactInputSingle(params);
-        tos.safeTransfer(liquidityVaultAddress, amountOut);
 
         emit Withdrawal(msg.sender, amountOut);
     }
