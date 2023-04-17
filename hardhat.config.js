@@ -53,7 +53,6 @@ module.exports = {
       },
     },
     local: {
-      chainId: 31337,
       url: `http://127.0.0.1:8545/`,
       // accounts: [
       //   `${process.env.ACCOUNT0_PK}`,
@@ -100,6 +99,10 @@ module.exports = {
         `${process.env.ACCOUNT2_PK}`,
       ],
     },
+    "tokamakGoerli" : {
+      url: `https://goerli.optimism.tokamak.network`,
+      accounts: [`${process.env.PRIVATE_KEY}`]
+    },
   },
   // etherscan: {
   //   apiKey: {
@@ -109,9 +112,17 @@ module.exports = {
   //   }
   // },
   etherscan: {
-    apiKey: {
-      goerli: "YW8HPY4UI4GZAG7CCPNYTSNJ7CPQHGWPCB",
-    },
+    apiKey: process.env.ETHERSCAN_API_KEY,
+    customChains: [
+      {
+        network: "tokamakGoerli",
+        chainId: 5050,
+        urls: {
+          apiURL: "https://goerli.explorer.tokamak.network/api",
+          browserURL: "https://goerli.explorer.tokamak.network"
+        }
+      }
+    ]
   },
   solidity: {
     version: "0.7.6",
