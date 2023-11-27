@@ -101,6 +101,11 @@ module.exports = {
         `${process.env.ACCOUNT2_PK}`,
       ],
     },
+    holesky: {
+      url: `https://ethereum-holesky.publicnode.com`,
+      accounts: [`${process.env.PRIVATE_KEY}`],
+      chainId: 17000
+    },
   },
   // etherscan: {
   //   apiKey: {
@@ -109,10 +114,45 @@ module.exports = {
   //     mainnet: `${process.env.APIKey}`
   //   }
   // },
+  // etherscan: {
+  //   apiKey: {
+  //     goerli: "YW8HPY4UI4GZAG7CCPNYTSNJ7CPQHGWPCB",
+  //   },
+  // },
   etherscan: {
     apiKey: {
-      goerli: "YW8HPY4UI4GZAG7CCPNYTSNJ7CPQHGWPCB",
-    },
+      mainnet: `${process.env.APIKey}`,
+      goerli: `${process.env.APIKey}`,
+      titan: "verify",
+      titangoerli: "verify",
+      holesky: `${process.env.APIKey}`,
+    } ,
+    customChains: [
+      {
+        network: "titan",
+        chainId: 55004,
+        urls: {
+          apiURL: "https://explorer.titan.tokamak.network//api",
+          browserURL: "https://explorer.titan.tokamak.network/"
+        }
+      },
+      {
+        network: "titangoerli",
+        chainId: 5050,
+        urls: {
+          apiURL: "https://explorer.titan-goerli.tokamak.network/api",
+          browserURL: "https://explorer.titan-goerli.tokamak.network/"
+        }
+      },
+      {
+        network: "holesky",
+        chainId: 17000,
+        urls: {
+          apiURL: "https://api-holesky.etherscan.io/api",
+          browserURL: "https://holesky.etherscan.io/"
+        }
+      }
+    ]
   },
   solidity: {
     version: "0.7.6",
