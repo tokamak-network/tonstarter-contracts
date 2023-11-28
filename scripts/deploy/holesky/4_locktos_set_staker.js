@@ -14,7 +14,7 @@ const info = {
   lockTosProxy: '0x8Fb966Bfb690a8304a5CdE54d9Ed6F7645b26576',
   lockTosV2Logic: '0xb6564de6BEf2c539D6560B279DcCcD6edbe7a985',
   maxTime : ethers.BigNumber.from('94348800'),
-  staker: '',
+  staker: '0xcdcf05675332ef56B44E437aad4dd71237c89496',
 }
 
 async function deployMain() {
@@ -26,10 +26,10 @@ async function deployMain() {
     deployer
   );
 
-  await (await lockTos.setMaxTime(info.maxTime)).wait()
+  await (await lockTos.setStaker(info.staker)).wait()
 
-  maxTime = await lockTos.maxTime()
-  console.log('maxTime', maxTime)
+  staker = await lockTos.staker()
+  console.log('staker', staker)
 
   return null;
 }
