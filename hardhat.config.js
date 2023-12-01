@@ -106,6 +106,11 @@ module.exports = {
       accounts: [`${process.env.PRIVATE_KEY}`],
       chainId: 17000
     },
+    sepolia: {
+      url: `https://sepolia.infura.io/v3/${process.env.InfuraKey}`,
+      accounts: [`${process.env.PRIVATE_KEY}`],
+      chainId: 11155111,
+    },
   },
   // etherscan: {
   //   apiKey: {
@@ -126,6 +131,7 @@ module.exports = {
       titan: "verify",
       titangoerli: "verify",
       holesky: `${process.env.APIKey}`,
+      sepolia: `${process.env.APIKey}`,
     } ,
     customChains: [
       {
