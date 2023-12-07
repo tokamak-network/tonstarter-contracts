@@ -14,7 +14,7 @@ const info = {
   lockTosProxy: '0x8Fb966Bfb690a8304a5CdE54d9Ed6F7645b26576',
   lockTosV2Logic: '0x5BFb4BF760227ca68bb0d5C36cCaCEBbb466Dfc7',
   maxTime : ethers.BigNumber.from('94348800'),
-  staker: '',
+  staker: '0x80d1c91393C4B516f70Bc95d94b1D85667964531',
 }
 
 async function deployMain() {
